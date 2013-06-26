@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=0.1
+Encoding=UTF-8
+Comment=FQPLOT
+Exec=fqplot %f
+GenericName=FQPlot
+Icon=/usr/local/share/fqplot/fqplot.png
+Name=FQPlot
+StartupNotify=false
+Terminal=0
+Type=Application
+Categories=Applications
