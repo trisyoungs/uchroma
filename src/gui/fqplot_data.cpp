@@ -83,6 +83,9 @@ bool FQPlotWindow::loadData(QString fileName)
 		}
 	}
 
+	// Recreate surface
+	updateSurface();
+
 	parser.closeFiles();
 	return true;
 }
@@ -125,11 +128,14 @@ Slice* FQPlotWindow::loadSlice(QString fileName)
 		printf("File %s is already loaded - will not load it again.\n", qPrintable(relativeFileName));
 		return NULL;
 	}
-	else slice = slices_.add();
-	
-	slice->setFileName(relativeFileName);
-	slice->setZ(slices_.last()->z() + 1.0);
 
+	// Determine automatic Z placement for slice
+	double newZ = (slices_.last() != NULL ? slices_.last()->z() + 1.0 : 0.0);
+	
+	// Create new slice
+	slice = slices_.add();
+	slice->setFileName(relativeFileName);
+	slice->setZ(newZ);
 	slice->loadData(dataFileDirectory_);
 	
 	return slice;
@@ -149,5 +155,16 @@ void FQPlotWindow::updateSurface()
 	// TEST Just add all slices to the array
 	surfaceData_ = slices_;
 	
+	// Loop over slices and apply any transforms (X or Y)
+	for (Slice* slice = surfaceData_.first(); slice != NULL; slice = slice->next)
+	{
+		if (logs.x) slice->data().arrayX().takeLog();
+		if (logs.y) slice->data().arrayY().takeLog();
+		slice->data().arrayX() *= scales.x;
+		slice->data().arrayY() *= scales.y;
+		slice->setZ(slice->z() * scales.z);
+	}
+
 	ui.MainView->createSurface(surfaceData_);
+	ui.MainView->update();
 }

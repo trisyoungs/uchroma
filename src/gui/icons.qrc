@@ -1,0 +1,14 @@
+<RCC>
+  <qresource prefix="/fqplot">
+    <file>icons/minus.svg</file>
+    <file>icons/plus.svg</file>
+    <file>icons/lock.svg</file>
+    <file>icons/unlock.svg</file>
+    <file>icons/down.svg</file>
+    <file>icons/left.svg</file>
+    <file>icons/right.svg</file>
+    <file>icons/up.svg</file>
+    <file>icons/clear.svg</file>
+    <file>icons/refresh.svg</file>
+  </qresource>
+</RCC>

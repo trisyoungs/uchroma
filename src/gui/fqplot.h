@@ -57,6 +57,7 @@ class FQPlotWindow : public QMainWindow
 	private slots:
 	void on_actionFileLoad_triggered(bool checked);
 	void on_actionFileSave_triggered(bool checked);
+	void on_actionFileSaveAs_triggered(bool checked);
 	void on_actionFileQuit_triggered(bool checked);
 
 
@@ -68,15 +69,39 @@ class FQPlotWindow : public QMainWindow
 
 
 	/*
-	 * Tabs
+	 * Tabs -- Source Data
 	 */
 	private slots:
-	// -- Source Data
 	void on_AddFilesButton_clicked(bool checked);
 	void on_RemoveFilesButton_clicked(bool checked);
 	void on_SourceDataTable_itemSelectionChanged();
-	// -- View
-	void on_ColourScaleTable_cellDoubleClicked(QTableWidgetItem* item, int col);   // XXX Correct?
+	
+	public:
+	// Update source data tab
+	void updateSourceDataTab();
+
+
+	/*
+	 * Tabs -- View
+	 */
+	private slots:
+	void on_ColourScaleTable_cellDoubleClicked(QTableWidgetItem* item, int col);
+	void on_XMinSpin_valueChanged(double value);
+	void on_YMinSpin_valueChanged(double value);
+	void on_ZMinSpin_valueChanged(double value);
+	void on_XMaxSpin_valueChanged(double value);
+	void on_YMaxSpin_valueChanged(double value);
+	void on_ZMaxSpin_valueChanged(double value);
+	void on_XLogCheck_clicked(bool checked);
+	void on_YLogCheck_clicked(bool checked);
+	void on_ZLogCheck_clicked(bool checked);
+	void on_XScaleSpin_valueChanged(double value);
+	void on_YScaleSpin_valueChanged(double value);
+	void on_ZScaleSpin_valueChanged(double value);
+
+	public:
+	// Update source data tab
+	void updateViewTab();
 
 
 	/*
@@ -91,12 +116,16 @@ class FQPlotWindow : public QMainWindow
 	QDir dataFileDirectory_;
 	// List of slices
 	List<Slice> slices_;
-	// Minima, maxima, and step sizes for surface generation (if interpolating)
+	// Minima, maxima, and (if interpolating) step sizes for surface generation
 	Vec3<double> axisMin_, axisMax_, axisStep_;
+	// Whether values are to have logs taken before drawing
+	Vec3<bool> axisLog_;
 	// Interpolation flags
 	Vec3<bool> interpolate_;
 	// List of slices for display
 	List<Slice> surfaceData_;
+	// View scales
+	Vec3<double> viewScales_;
 
 	public:
 	// Datafile keywords

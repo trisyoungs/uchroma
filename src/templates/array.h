@@ -200,29 +200,18 @@ template <class A> class Array : public ListItem< Array<A> >
 	// Operator= (set all)
 	void operator=(const double value) { for (int n=0; n<nItems_; ++n) array_[n] = value; }
 	void operator=(const int value) { for (int n=0; n<nItems_; ++n) array_[n] = value; }
-	void operator=(const char* value) { for (int n=0; n<nItems_; ++n) array_[n] = value; }
-	void operator=(const Vec3<double>& value) { for (int n=0; n<nItems_; ++n) array_[n] = value; }
 	// Operator+= (add to all)
 	void operator+=(const double value) { for (int n=0; n<nItems_; ++n) array_[n] += value; }
 	void operator+=(const int value) { for (int n=0; n<nItems_; ++n) array_[n] += value; }
-	void operator+=(const char* value) { for (int n=0; n<nItems_; ++n) array_[n] += value; }
-	void operator+=(const Vec3<double>& value) { for (int n=0; n<nItems_; ++n) array_[n] += value; }
-	void operator+=(const Array<A> array) { for (int n=0; n<nItems_; ++n) array_[n] += array.value(n); }
 	// Operator-= (subtract from all)
 	void operator-=(const double value) { for (int n=0; n<nItems_; ++n) array_[n] -= value; }
 	void operator-=(const int value) { for (int n=0; n<nItems_; ++n) array_[n] -= value; }
-	void operator-=(const char* value) { for (int n=0; n<nItems_; ++n) array_[n] -= value; }
-	void operator-=(const Vec3<double>& value) { for (int n=0; n<nItems_; ++n) array_[n] -= value; }
 	// Operator*= (multiply all)
 	void operator*=(const double value) { for (int n=0; n<nItems_; ++n) array_[n] *= value; }
 	void operator*=(const int value) { for (int n=0; n<nItems_; ++n) array_[n] *= value; }
-	void operator*=(const char* value) { for (int n=0; n<nItems_; ++n) array_[n] *= value; }
-	void operator*=(const Vec3<double>& value) { for (int n=0; n<nItems_; ++n) array_[n] *= value; }
 	// Operator/= (divide all)
 	void operator/=(const double value) { for (int n=0; n<nItems_; ++n) array_[n] /= value; }
 	void operator/=(const int value) { for (int n=0; n<nItems_; ++n) array_[n] /= value; }
-	void operator/=(const char* value) { for (int n=0; n<nItems_; ++n) array_[n] /= value; }
-	void operator/=(const Vec3<double>& value) { for (int n=0; n<nItems_; ++n) array_[n] /= value; }
 	// Operator- (subtraction)
 	Array<A> operator-(const double value) { Array<A> result = *this; result -= value; return result; }
 	Array<A> operator-(const int value) { Array<A> result = *this; result -= value; return result; }
@@ -253,6 +242,11 @@ template <class A> class Array : public ListItem< Array<A> >
 			return A();
 		}
 		return array_[nItems_-1];
+	}
+	// Take log of contained data
+	void takeLog()
+	{
+		 for (int n=0; n<nItems_; ++n) array_[n] = log10(array_[n]);
 	}
 	///@}
 };

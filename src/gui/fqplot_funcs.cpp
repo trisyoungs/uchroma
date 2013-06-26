@@ -1,5 +1,5 @@
 /*
-	*** Main Window - FUnctions 
+	*** Main Window - Functions 
 	*** src/gui/fqplot_funcs.cpp
 	Copyright T. Youngs 2013
 
@@ -24,6 +24,9 @@
 // Constructor
 FQPlotWindow::FQPlotWindow(QMainWindow *parent) : QMainWindow(parent)
 {
+	// Initialise the icon resource
+	Q_INIT_RESOURCE(icons);
+
 	// Call the main creation function
 	ui.setupUi(this);
 
@@ -49,12 +52,52 @@ void FQPlotWindow::closeEvent(QCloseEvent *event)
 
 void FQPlotWindow::on_actionFileLoad_triggered(bool checked)
 {
+	if (modified_)
+	{
+		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+		if (button == QMessageBox::Yes)
+		{
+			// Save file, and check modified_ status to make sure it wasn't cancelled.
+			on_actionFileSave_triggered(false);
+			if (modified_) return;
+		}
+	}
+
+	QString fileName = QFileDialog::getOpenFileName(this, "Choose file to load", dataFileDirectory_.absolutePath(), "FQPlot files (*.fqp);;All files (*.*)");
+	if (fileName.isEmpty()) return;
+
+	clearData();
+	if (loadData(fileName))
+	{
+		inputFile_ = fileName;
+		modified_ = false;
+		
+		// Update GUI
+		updateSourceDataTab();
+		updateViewTab();
+	}
 }
 
 void FQPlotWindow::on_actionFileSave_triggered(bool checked)
 {
-	// Save current data in super-simple keyword format
+	// Has an input filename already been chosen?
+	if (inputFile_.isEmpty())
+	{
+		inputFile_ = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "FQPlot files (*.fqp);;All files (*.*)");
+		if (inputFile_.isEmpty()) return;
+	}
+
+	if (saveData(inputFile_)) modified_ = false;
+}
+
+void FQPlotWindow::on_actionFileSaveAs_triggered(bool checked)
+{
+	// Has an input filename already been chosen?
+	QString newFileName = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "FQPlot files (*.fqp);;All files (*.*)");
+	if (newFileName.isEmpty()) return;
 	
+	inputFile_ = newFileName;
+	if (saveData(inputFile_)) modified_ = false;
 }
 
 void FQPlotWindow::on_actionFileQuit_triggered(bool checked)
@@ -96,19 +139,43 @@ void FQPlotWindow::on_AddFilesButton_clicked(bool checked)
 	}
 	progress.setValue(files.count());
 
-	// Need to update stuff now...
+	// Update file list
+	updateSourceDataTab();
+	
+	// Need to update surface
 	updateSurface();
 }
 
 // Remove files button clicked
 void FQPlotWindow::on_RemoveFilesButton_clicked(bool checked)
 {
+	foreach(QTableWidgetItem* item, ui.SourceFilesTable->selectedItems())
+	{
+		printf("%i\n", item->row());
+	}
 }
 
 // Source data item selection changed
 void FQPlotWindow::on_SourceDataTable_itemSelectionChanged()
 {
-	ui.RemoveFilesButton->setEnabled(ui.SourceDataTable->selectedItems().count() != 0);
+	ui.RemoveFilesButton->setEnabled(ui.SourceFilesTable->selectedItems().count() != 0);
+}
+
+// Update source data
+void FQPlotWindow::updateSourceDataTab()
+{
+	ui.SourceFilesTable->clearContents();
+	ui.SourceFilesTable->setRowCount(slices_.nItems());
+	int count = 0;
+	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
+	{
+		QTableWidgetItem* item = new QTableWidgetItem(slice->fileName());
+		ui.SourceFilesTable->setItem(count, 0, item);
+		item = new QTableWidgetItem(QString::number(slice->z()));
+		ui.SourceFilesTable->setItem(count, 1, item);
+		++count;
+	}
+	ui.SourceFilesTable->resizeColumnsToContents();
 }
 
 /*
@@ -116,5 +183,82 @@ void FQPlotWindow::on_SourceDataTable_itemSelectionChanged()
  */
 
 void FQPlotWindow::on_ColourScaleTable_cellDoubleClicked(QTableWidgetItem* item, int column)
+{
+}
+
+void FQPlotWindow::on_XMinSpin_valueChanged(double value)
+{
+	axisMin_.x = value;
+	updateSurface();
+}
+
+void FQPlotWindow::on_YMinSpin_valueChanged(double value)
+{
+	axisMin_.y = value;
+	updateSurface();
+}
+
+void FQPlotWindow::on_ZMinSpin_valueChanged(double value)
+{
+	axisMin_.z = value;
+	updateSurface();
+}
+
+void FQPlotWindow::on_XMaxSpin_valueChanged(double value)
+{
+	axisMax_.x = value;
+	updateSurface();
+}
+
+void FQPlotWindow::on_YMaxSpin_valueChanged(double value)
+{
+	axisMax_.y = value;
+	updateSurface();
+}
+
+void FQPlotWindow::on_ZMaxSpin_valueChanged(double value)
+{
+	axisMax_.z = value;
+	updateSurface();
+}
+
+void FQPlotWindow::on_XLogCheck_clicked(bool checked)
+{
+	axisLog_.x = checked;
+	updateSurface();
+}
+
+void FQPlotWindow::on_YLogCheck_clicked(bool checked)
+{
+	axisLog_.y = checked;
+	updateSurface();
+}
+
+void FQPlotWindow::on_ZLogCheck_clicked(bool checked)
+{
+	axisLog_.z = checked;
+	updateSurface();
+}
+
+void FQPlotWindow::on_XScaleSpin_valueChanged(double value)
+{
+	viewScales_.x = value;
+	ui.MainView->update();
+}
+
+void FQPlotWindow::on_YScaleSpin_valueChanged(double value)
+{
+	viewScales_.y = value;
+	ui.MainView->update();
+}
+
+void FQPlotWindow::on_ZScaleSpin_valueChanged(double value)
+{
+	viewScales_.z = value;
+	ui.MainView->update();
+}
+
+// Update source data tab
+void FQPlotWindow::updateViewTab()
 {
 }
