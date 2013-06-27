@@ -45,27 +45,6 @@ void Primitive::defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloa
 	++nDefinedVertices_;
 }
 
-// Define next vertex and normal with colour (as array)
-void Primitive::defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat *colour, bool calcCentroid)
-{
-	if (currentVertexChunk_ == NULL)
-	{
-		currentVertexChunk_ = vertexChunks_.add();
-		currentVertexChunk_->initialise(type_, colouredVertexData_);
-	}
-	else if (currentVertexChunk_->full())
-	{
-		if (currentVertexChunk_->next == NULL)
-		{
-			currentVertexChunk_ = vertexChunks_.add();
-			currentVertexChunk_->initialise(type_, colouredVertexData_);
-		}
-		else currentVertexChunk_ = currentVertexChunk_->next;
-	}
-	currentVertexChunk_->defineVertex(x,y,z,nx,ny,nz,colour,calcCentroid);
-	++nDefinedVertices_;
-}
-
 // Define next vertex and normal with colour
 void Primitive::defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat r, GLfloat g, GLfloat b, GLfloat a, bool calcCentroid)
 {
@@ -87,8 +66,8 @@ void Primitive::defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloa
 	++nDefinedVertices_;
 }
 
-// Define next vertex, normal, and colour (as Vec3<double>s and array)
-void Primitive::defineVertex(Vec3<double> &v, Vec3<double> &u, GLfloat *colour, bool calcCentroid)
+// Define next vertex and normal with colour (as array)
+void Primitive::defineVertex(GLfloat x, GLfloat y, GLfloat z, Vec3<double>& normal, Vec4<GLfloat>& colour, bool calcCentroid)
 {
 	if (currentVertexChunk_ == NULL)
 	{
@@ -104,7 +83,28 @@ void Primitive::defineVertex(Vec3<double> &v, Vec3<double> &u, GLfloat *colour, 
 		}
 		else currentVertexChunk_ = currentVertexChunk_->next;
 	}
-	currentVertexChunk_->defineVertex(v.x,v.y,v.z,u.x,u.y,u.z,colour,calcCentroid);
+	currentVertexChunk_->defineVertex(x,y,z,normal.x,normal.y,normal.z,colour.x,colour.y,colour.z,colour.w,calcCentroid);
+	++nDefinedVertices_;
+}
+
+// Define next vertex, normal, and colour (as Vec3<double>s and array)
+void Primitive::defineVertex(Vec3<double>& v, Vec3<double>& u, Vec4<GLfloat>& colour, bool calcCentroid)
+{
+	if (currentVertexChunk_ == NULL)
+	{
+		currentVertexChunk_ = vertexChunks_.add();
+		currentVertexChunk_->initialise(type_, colouredVertexData_);
+	}
+	else if (currentVertexChunk_->full())
+	{
+		if (currentVertexChunk_->next == NULL)
+		{
+			currentVertexChunk_ = vertexChunks_.add();
+			currentVertexChunk_->initialise(type_, colouredVertexData_);
+		}
+		else currentVertexChunk_ = currentVertexChunk_->next;
+	}
+	currentVertexChunk_->defineVertex(v.x,v.y,v.z,u.x,u.y,u.z,colour.x,colour.y,colour.z,colour.w,calcCentroid);
 	++nDefinedVertices_;
 }
 

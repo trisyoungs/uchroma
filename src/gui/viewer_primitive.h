@@ -36,13 +36,11 @@
 class QGLContext;
 
 // Primitive Instance
-class PrimitiveInstance
+class PrimitiveInstance : public ListItem<PrimitiveInstance>
 {
 	public:
 	// Constructor
 	PrimitiveInstance();
-	// List pointers
-	PrimitiveInstance *prev, *next;
 	// Instance Type
 	enum InstanceType { NoInstances, ListInstance, VBOInstance };
 	
@@ -66,14 +64,12 @@ class PrimitiveInstance
 };
 
 // Rendering Primitive
-class Primitive
+class Primitive : public ListItem<Primitive>
 {
 	public:
 	// Constructor / Destructor
 	Primitive();
 	~Primitive();
-	// List pointer
-	Primitive *prev, *next;
 	// VBO function pointers (Windows only)
 	#ifdef _WIN32
 	static PFNGLGENBUFFERSPROC glGenBuffers;
@@ -142,12 +138,12 @@ class Primitive
 	public:
 	// Define next vertex and normal
 	void defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz, bool calcCentroid);
-	// Define next vertex, normal, and colour (as array)
-	void defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat *colour, bool calcCentroid);
 	// Define next vertex, normal, and colour
 	void defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat r, GLfloat g, GLfloat b, GLfloat a, bool calcCentroid);
+	// Define next vertex, normal, and colour
+	void defineVertex(GLfloat x, GLfloat y, GLfloat z, Vec3<double>& normal, Vec4<GLfloat>& colour, bool calcCentroid);
 	// Define next vertex, normal, and colour (as Vec3<double>s and array)
-	void defineVertex(Vec3<double> &v, Vec3<double> &u, GLfloat *colour, bool calcCentroid);
+	void defineVertex(Vec3<double> &v, Vec3<double> &u, Vec4<GLfloat> &colour, bool calcCentroid);
 	// Define triangle fromn supplied array data, unique colour per vertex
 	void defineTriangle(GLfloat *vertices, GLfloat *normals, GLfloat *colour);
 	// Define triangle with single colour per vertex

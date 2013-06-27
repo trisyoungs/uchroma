@@ -129,12 +129,14 @@ class FQPlotWindow : public QMainWindow
 
 	public:
 	// Datafile keywords
-	enum DataFileKeyword { SliceDirectoryKeyword, SliceKeyword, nDataFileKeywords };
+	enum DataFileKeyword { ColourScalePointKeyword, SliceDirectoryKeyword, SliceKeyword, nDataFileKeywords };
 	static DataFileKeyword dataFileKeyword(const char* s);
 
 	public:
 	// Clear current data
 	void clearData();
+	// Create default colourscale
+	void createDefaultColourScale();
 	// Load data from file specified
 	bool loadData(QString fileName);
 	// Save current data to file specified

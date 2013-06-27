@@ -1,0 +1,154 @@
+/*
+	*** ColourScale
+	*** src/gui/colourscale.uih
+	Copyright T. Youngs 2013
+
+	This file is part of FQPlot.
+
+	FQPlot is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	FQPlot is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#ifndef FQPLOT_COLOURSCALE_H
+#define FQPLOT_COLOURSCALE_H
+
+#include "templates/list.h"
+#include "templates/reflist.h"
+#include <QtGui/QWidget>
+
+// Forward declarations
+/* none */
+
+// Colour scale point
+class ColourScalePoint : public ListItem<ColourScalePoint>
+{
+	public:
+	// Constructor
+	ColourScalePoint();
+	// Friend class
+	friend class ColourScaleDelta;
+
+	private:
+	// Value at which this point occurs
+	double value_;
+	// Colour of this point
+	QColor colour_;
+
+	public:
+	// Set value for scalepoint
+	void setValue(double d);
+	// Return value for scalepoint
+	double value() const;
+	// Set colour
+	void setColour(QColor colour);
+	// Return colour
+	QColor colour();
+};
+
+// Colour scale delta
+class ColourScaleDelta : public ListItem<ColourScaleDelta>
+{
+	public:
+	// Constructor
+	ColourScaleDelta();
+
+	private:
+	// Value at which the delta starts
+	double start_;
+	// Range of the data from the startValue
+	double delta_;
+	// Colour of this starting point
+	QColor startColour_;
+	// Delta betweeh the starting point and the final point
+	int deltaColour_[4];
+
+	public:
+	// Check whether the delta 'contains' the supplied value
+	bool containsValue(double d) const;
+	// Create delta from two existing colours
+	void set(ColourScalePoint* point1, ColourScalePoint* point2);
+	// Get colour for value, assuming that v is within the range 0 -> value_
+	QColor colour(double v) const;
+	// Return the starting value of the range
+	double start() const;
+	// Return the range of the delta
+	double delta() const;
+};
+
+// Colour Scale
+class ColourScale : public QWidget
+{
+	Q_OBJECT
+
+	public:
+	// Constructor
+	ColourScale(QWidget* parent);
+
+
+	/*
+	// Rendering
+	*/
+	private:
+	// Whether colours are interpolated between points in the scale
+	bool interpolated_;
+
+	public:
+	// Set whether the colourscale is interpolated
+	void setInterpolated(bool b);
+	// Return whether the colourscale is interpolated
+	bool interpolated() const;
+
+	protected:
+	// Paint event callback
+	void paintEvent(QPaintEvent* event);
+
+
+	/*
+	// Data and data range
+	*/
+	private:
+	// List of points in the colourscale
+	List<ColourScalePoint> points_;
+	// List of colour deltas between points in the colourscale
+	List<ColourScaleDelta> deltas_;
+
+	public:
+	// Return number of points in colourscale
+	int nPoints() const;
+	// Return first point in colourscale
+	ColourScalePoint* firstPoint();
+	// Return last point in colourscale
+	ColourScalePoint* lastPoint();
+	// Return specific point in colourscale
+	ColourScalePoint* point(int id);
+	// Return first delta in colourscale
+	ColourScaleDelta* firstDelta();
+	// Clear all points in colourscale
+	void clear();
+	// Calculate colour deltas for current list of points
+	void calculateDeltas();
+	// Add new point to colourscale
+	ColourScalePoint* addPoint(double value, QColor colour);
+	// Set colour and value data for point
+	void setPoint(int position, double value, QColor colour, bool setval = true, bool setcol = true);
+	// Set only value for point
+	void setPointValue(int position, double value);
+	// Set only colour for point
+	void setPointColour(int position, QColor colour);
+	// Remove old point from colourscale
+	void removePoint(int position);
+	// Get colour associated with value supplied
+	QColor colour(double value);
+};
+
+#endif

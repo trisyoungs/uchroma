@@ -52,7 +52,7 @@
            </size>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="SourceDataTab">
            <attribute name="title">
@@ -179,7 +179,7 @@
                   <number>0</number>
                  </property>
                  <item>
-                  <widget class="QWidget" name="ColourScaleWidget" native="true">
+                  <widget class="ColourScale" name="ColourScaleWidget" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                      <horstretch>0</horstretch>
@@ -634,6 +634,12 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="minimumSize">
+           <size>
+            <width>300</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
@@ -740,6 +746,12 @@
    <class>Viewer</class>
    <extends>QWidget</extends>
    <header>gui/viewer.uih</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ColourScale</class>
+   <extends>QWidget</extends>
+   <header>gui/colourscale.uih</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

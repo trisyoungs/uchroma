@@ -20,13 +20,17 @@
 */
 
 #include "gui/viewer.uih"
+#include "gui/colourscale.uih"
 
 // Create necessary primitives (must be called before any rendering is done)
 void Viewer::createPrimitives()
 {
-	// Create test primitive
+	// Create test primitives
 	spherePrimitive_.plotSphere(0.5, 8, 10);
 	cubePrimitive_.plotCube(0.5, 4, 0.0, 0.0, 0.0);
+
+	// Setup surface primitive
+	surface_.setColourData(true);
 	
 	// Every created primitive must be added to the primitiveList_
 	primitiveList_.add(&spherePrimitive_);
@@ -129,67 +133,178 @@ void Viewer::drawScene()
 	GLfloat colourGreen[4] = { 0.0, 1.0, 0.0, 1.0 };
 	GLfloat colourBlue[4] = { 0.0, 0.0, 1.0, 1.0 };
 	GLfloat colourWhite[4] = { 1.0, 1.0, 1.0, 0.8 };
-	renderPrimitive(&spherePrimitive_, colourWhite, A);
-	A.setTranslation(1.0,0.0,0.0);
-	renderPrimitive(&cubePrimitive_, colourRed, A);
-	A.setTranslation(-1.0,0.0,0.0);
-	renderPrimitive(&cubePrimitive_, colourRed, A);
-	A.setTranslation(0.0,1.0,0.0);
-	renderPrimitive(&cubePrimitive_, colourGreen, A);
-	A.setTranslation(0.0,-1.0,0.0);
-	renderPrimitive(&cubePrimitive_, colourGreen, A);
-	A.setTranslation(0.0,0.0,1.0);
-	renderPrimitive(&cubePrimitive_, colourBlue, A);
-	A.setTranslation(0.0,0.0,-1.0);
-	renderPrimitive(&cubePrimitive_, colourBlue, A);
+
+	if (surface_.nDefinedVertices() == 0)
+	{
+		renderPrimitive(&spherePrimitive_, colourWhite, A);
+		A.setTranslation(1.0,0.0,0.0);
+		renderPrimitive(&cubePrimitive_, colourRed, A);
+		A.setTranslation(-1.0,0.0,0.0);
+		renderPrimitive(&cubePrimitive_, colourRed, A);
+		A.setTranslation(0.0,1.0,0.0);
+		renderPrimitive(&cubePrimitive_, colourGreen, A);
+		A.setTranslation(0.0,-1.0,0.0);
+		renderPrimitive(&cubePrimitive_, colourGreen, A);
+		A.setTranslation(0.0,0.0,1.0);
+		renderPrimitive(&cubePrimitive_, colourBlue, A);
+		A.setTranslation(0.0,0.0,-1.0);
+		renderPrimitive(&cubePrimitive_, colourBlue, A);
+	}
 
 	renderPrimitive(&surface_, colourRed, A);
 }
 
-// Create surface primitive
-void Viewer::createSurface(const List<Slice>& slices)
+// Construct normal / colour data for slice specified
+void Viewer::constructSliceData(Slice* targetSlice, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale* colourScale, Slice* previousSlice, Slice* nextSlice)
 {
-	GLfloat x1, x2, y1, y2, x1last, x2last, y1last, y2last, z1, z2, norm[3] = { 1.0, 0.0, 0.0 };
+	normals.clear();
+	colours.clear();
+	if ((previousSlice == NULL) && (nextSlice == NULL)) return;
+
+	// Get colour data
+	Array<double>& xTarget = targetSlice->data().arrayX();
+	Array<double>& yTarget = targetSlice->data().arrayY();
+	int n, nPoints = xTarget.nItems();
+	QColor colour;
+	for (n=0; n<nPoints; ++n)
+	{
+		colour = colourScale->colour(yTarget[n]);
+		colours.add(Vec4<GLfloat>(colour.redF(), colour.greenF(), colour.blueF(), colour.alphaF()));
+	}
+
+	// Calculate normals
+	Vec3<double> v1, v2;
+	double dz;
+	if (previousSlice && nextSlice)
+	{
+		// Grab other array references
+		Array<double>& yPrev = previousSlice->data().arrayY();
+		Array<double>& yNext = nextSlice->data().arrayY();
+		dz = -((previousSlice->z() - targetSlice->z()) + (nextSlice->z() - targetSlice->z()))*0.5;
+
+		// -- First point
+		v1.set(xTarget[1] - xTarget[0], yTarget[1] - yTarget[0], 0.0);
+		v2.set(0.0, ((yPrev[n] - yTarget[n]) + (yNext[n] - yTarget[n]))*0.5, dz);
+		normals.add(v1 * v2);
+		// -- Points 1 to N-2
+		for (n=1; n<nPoints-1; ++n)
+		{
+			v1.set(((xTarget[n-1] - xTarget[n]) + (xTarget[n+1] - xTarget[n]))*0.5, ((yTarget[n-1] - yTarget[n]) + (yTarget[n+1] - yTarget[n]))*0.5, 0.0);
+			v2.set(0.0, ((yPrev[n] - yTarget[n]) + (yNext[n] - yTarget[n]))*0.5, dz);
+			normals.add(v1 * v2);
+		}
+		// -- Last point
+		v1.set(xTarget[nPoints-2] - xTarget[nPoints-1], yTarget[nPoints-2] - yTarget[nPoints-1], 0.0);
+		v2.set(0.0, ((yPrev[nPoints-1] - yTarget[nPoints-1]) + (yNext[nPoints-1] - yTarget[nPoints-1]))*0.5, dz);
+		normals.add(v1 * v2);
+	}
+	else if (previousSlice)
+	{
+		// Grab other array reference
+		Array<double>& yPrev = previousSlice->data().arrayY();
+		dz = previousSlice->z() - targetSlice->z();
+
+		// -- First point
+		v1.set(xTarget[1] - xTarget[0], yTarget[1] - yTarget[0], 0.0);
+		v2.set(0.0, yPrev[n] - yTarget[n], dz);
+		normals.add(v1 * v2);
+		// -- Points 1 to N-2
+		for (n=1; n<nPoints-1; ++n)
+		{
+			v1.set(((xTarget[n-1] - xTarget[n]) + (xTarget[n+1] - xTarget[n]))*0.5, ((yTarget[n-1] - yTarget[n]) + (yTarget[n+1] - yTarget[n]))*0.5, 0.0);
+			v2.set(0.0, yPrev[n] - yTarget[n], dz);
+			normals.add(v1 * v2);
+		}
+		// -- Last point
+		v1.set(xTarget[nPoints-2] - xTarget[nPoints-1], yTarget[nPoints-2] - yTarget[nPoints-1], 0.0);
+		v2.set(0.0, yPrev[nPoints-1] - yTarget[nPoints-1], dz);
+		normals.add(v1 * v2);
+	}
+	else
+	{
+		// Grab other array reference
+		Array<double>& yNext = nextSlice->data().arrayY();
+		dz = nextSlice->z() - targetSlice->z();
+
+		// -- First point
+		v1.set(xTarget[1] - xTarget[0], yTarget[1] - yTarget[0], 0.0);
+		v2.set(0.0, yNext[n] - yTarget[n], dz);
+		normals.add(v1 * v2);
+		// -- Points 1 to N-2
+		for (n=1; n<nPoints-1; ++n)
+		{
+			v1.set(((xTarget[n-1] - xTarget[n]) + (xTarget[n+1] - xTarget[n]))*0.5, ((yTarget[n-1] - yTarget[n]) + (yTarget[n+1] - yTarget[n]))*0.5, 0.0);
+			v2.set(0.0, yNext[n] - yTarget[n], dz);
+			normals.add(v1 * v2);
+		}
+		// -- Last point
+		v1.set(xTarget[nPoints-2] - xTarget[nPoints-1], yTarget[nPoints-2] - yTarget[nPoints-1], 0.0);
+		v2.set(0.0, yNext[n] - yTarget[n], dz);
+		normals.add(v1 * v2);
+	}
+	
+	// Normalise normals
+	for (n=0; n<normals.nItems(); ++n) normals[n].normalise();
+}
+
+// Create surface primitive
+void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale)
+{
+	GLfloat zA, zB;
 	
 	surface_.popInstance(context());
 	surface_.forgetAll();
 
-	// TEST - Add all data.
-	for (Slice* slice = slices.first(); slice != slices.last(); slice = slice->next)
+	// Sanity check - are there enough slices to proceed?
+	if (slices.nItems() < 2) return;
+
+	// Temporary variables
+	Array< Vec3<double> > normA, normB;
+	Array< Vec4<GLfloat> > colourA, colourB;
+	int n, nPoints = slices.first()->data().nPoints();
+	QColor colour;
+	Vec3<double> nrm(0.0,1.0,0.0);
+
+	// Construct first slice data
+	Slice* sliceA = slices.first();
+	constructSliceData(sliceA, normA, colourA, colourScale, NULL, sliceA->next);
+	
+	// Create triangles
+	for (Slice* sliceB = sliceA->next; sliceB != NULL; sliceB = sliceB->next)
 	{
-		// Grab pointer to next slice
-		Slice* nextSlice = slice->next;
-		z1 = (GLfloat) slice->z();
-		z2 = (GLfloat) nextSlice->z();
+		// Construct data for current slice
+		constructSliceData(sliceB, normB, colourB, colourScale, sliceA, sliceB->next);
+
+		// Grab z values
+		zA = (GLfloat) -sliceA->z();
+		zB = (GLfloat) -sliceB->z();
 
 		// Get nPoints, and initial coordinates
-		int nPoints = (slice->data().nPoints() < nextSlice->data().nPoints() ? slice->data().nPoints() : nextSlice->data().nPoints());
-		x1last = (GLfloat) slice->data().x(0);
-		x2last = (GLfloat) nextSlice->data().x(0);
-		y1last = (GLfloat) slice->data().y(0);
-		y2last = (GLfloat) nextSlice->data().y(0);
-		for (int n=1; n<nPoints; ++n)
+		Array<double>& xA = sliceA->data().arrayX();
+		Array<double>& yA = sliceA->data().arrayY();
+		Array<double>& xB = sliceB->data().arrayX();
+		Array<double>& yB = sliceB->data().arrayY();
+		for (int n=0; n<nPoints-1; ++n)
 		{
-			// Get current coordinates
-			x1 = (GLfloat) slice->data().x(n);
-			x2 = (GLfloat) nextSlice->data().x(n);
-			y1 = (GLfloat) slice->data().y(n);
-			y2 = (GLfloat) nextSlice->data().y(n);
-
 			// Add triangles for this quadrant
-			surface_.defineVertex(x1last, y1last, z1, norm[0], norm[1], norm[2], true);
-			surface_.defineVertex(x1, y1, z1, norm[0], norm[1], norm[2], true);
-			surface_.defineVertex(x2, y2, z2, norm[0], norm[1], norm[2], true);
-			surface_.defineVertex(x1last, y1last, z1, norm[0], norm[1], norm[2], true);
-			surface_.defineVertex(x2last, y2last, z2, norm[0], norm[1], norm[2], true);
-			surface_.defineVertex(x2, y2, z2, norm[0], norm[1], norm[2], true);
-			
-			// Copy current points to last points
-			x1last = x1;
-			x2last = x2;
-			y1last = y1;
-			y2last = y2;
+			surface_.defineVertex(xA[n], yA[n], zA, normA[n], colourA[n], true);
+			surface_.defineVertex(xA[n+1], yA[n+1], zA, normA[n+1], colourA[n+1], true);
+			surface_.defineVertex(xB[n+1], yB[n+1], zB, normB[n+1], colourB[n+1], true);
+			surface_.defineVertex(xA[n], yA[n], zA, normA[n], colourA[n], true);
+			surface_.defineVertex(xB[n], yB[n], zB, normB[n], colourB[n], true);
+			surface_.defineVertex(xB[n+1], yB[n+1], zB, normB[n+1], colourB[n+1], true);
+// 			surface_.defineVertex(xA[n], yA[n], zA, nrm, colourA[n], true);
+// 			surface_.defineVertex(xA[n+1], yA[n+1], zA, nrm, colourA[n+1], true);
+// 			surface_.defineVertex(xB[n+1], yB[n+1], zB, nrm, colourB[n+1], true);
+// 			surface_.defineVertex(xA[n], yA[n], zA, nrm, colourA[n], true);
+// 			surface_.defineVertex(xB[n], yB[n], zB, nrm, colourB[n], true);
+// 			surface_.defineVertex(xB[n+1], yB[n+1], zB, nrm, colourB[n+1], true);
 		}
+
+		// Copy arrays ready for next pass
+		normA = normB;
+		colourA = colourB;
+		sliceA = sliceB;
 	}
 
 	surface_.pushInstance(context());

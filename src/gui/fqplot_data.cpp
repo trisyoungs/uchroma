@@ -23,7 +23,7 @@
 #include "base/lineparser.h"
 
 // DataFile Keywords
-const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "slicedir", "slice" };
+const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "ColourScalePoint", "SliceDir", "Slice" };
 FQPlotWindow::DataFileKeyword FQPlotWindow::dataFileKeyword(const char* s)
 {
 	for (int n=0; n<FQPlotWindow::nDataFileKeywords; ++n) if (strcmp(s, DataFileKeywordStrings[n]) == 0) return (FQPlotWindow::DataFileKeyword) n;
@@ -32,7 +32,7 @@ FQPlotWindow::DataFileKeyword FQPlotWindow::dataFileKeyword(const char* s)
 
 /*
  * Data
-*/
+ */
 
 // Clear current data
 void FQPlotWindow::clearData()
@@ -43,6 +43,26 @@ void FQPlotWindow::clearData()
 	axisStep_.set(0.1, 0.1, 0.1);
 	interpolate_.set(false, false, false);
 	modified_ = false;
+	ui.ColourScaleWidget->clear();
+}
+
+// Create default ColourScale
+void FQPlotWindow::createDefaultColourScale()
+{
+	// Construct default colourscale
+	ui.ColourScaleWidget->clear();
+	ui.ColourScaleWidget->addPoint(0.0, QColor(0, 0, 0));
+	ui.ColourScaleWidget->addPoint(0.05, QColor(255, 255, 0));
+	ui.ColourScaleWidget->addPoint(0.1, QColor(255, 0, 0));
+	ui.ColourScaleWidget->addPoint(0.15, QColor(0, 106, 106));
+	ui.ColourScaleWidget->addPoint(0.2, QColor(170, 170, 127));
+	ui.ColourScaleWidget->addPoint(0.25, QColor(0, 0, 255));
+	ui.ColourScaleWidget->addPoint(0.3, QColor(106, 84, 127));
+	ui.ColourScaleWidget->addPoint(0.35, QColor(255, 255, 255));
+	ui.ColourScaleWidget->addPoint(1.0, QColor(44, 184, 212));
+	ui.ColourScaleWidget->addPoint(1.1, QColor(64, 64, 193));
+	ui.ColourScaleWidget->addPoint(1.2, QColor(255, 255, 255));
+	ui.ColourScaleWidget->addPoint(1.5, QColor(127, 127, 127));
 }
 
 // Load data from file specified
@@ -67,7 +87,11 @@ bool FQPlotWindow::loadData(QString fileName)
 		kwd = dataFileKeyword(parser.argc(0));
 		switch (kwd)
 		{
-			// Dafatile directory
+			// ColourScalePoint definition
+			case (FQPlotWindow::ColourScalePointKeyword):
+				ui.ColourScaleWidget->addPoint(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
+				break;
+			// Datafile directory
 			case (FQPlotWindow::SliceDirectoryKeyword):
 				dataFileDirectory_ = parser.argc(1);
 				if (!dataFileDirectory_.isReadable())
@@ -82,6 +106,9 @@ bool FQPlotWindow::loadData(QString fileName)
 				break;
 		}
 	}
+
+	// Add default colourscale?
+	if (ui.ColourScaleWidget->nPoints() == 0) createDefaultColourScale();
 
 	// Recreate surface
 	updateSurface();
@@ -110,7 +137,14 @@ bool FQPlotWindow::saveData(QString fileName)
 	{
 		parser.writeLineF("%s \"%s\" %f\n", DataFileKeywordStrings[FQPlotWindow::SliceKeyword], qPrintable(slice->fileName()), slice->z());
 	}
-	
+
+	// Write view setup
+	// -- ColourScale
+	for (ColourScalePoint* csp = ui.ColourScaleWidget->firstPoint(); csp != NULL; csp = csp->next)
+	{
+		parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourScalePointKeyword], csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
+	}
+
 	parser.closeFiles();
 	return true;
 }
@@ -152,19 +186,21 @@ void FQPlotWindow::updateSurface()
 	// Clear existing display slices
 	surfaceData_.clear();
 
-	// TEST Just add all slices to the array
+	// Copy all slices to the array
 	surfaceData_ = slices_;
 	
 	// Loop over slices and apply any transforms (X or Y)
 	for (Slice* slice = surfaceData_.first(); slice != NULL; slice = slice->next)
 	{
-		if (logs.x) slice->data().arrayX().takeLog();
-		if (logs.y) slice->data().arrayY().takeLog();
-		slice->data().arrayX() *= scales.x;
-		slice->data().arrayY() *= scales.y;
-		slice->setZ(slice->z() * scales.z);
+		if (axisLog_.x) slice->data().arrayX().takeLog();
+		if (axisLog_.y)
+		{
+			slice->data().arrayY() += 2.0;
+			slice->data().arrayY().takeLog();
+		}
+		if (axisLog_.y) slice->setZ(log10(slice->z()));
 	}
 
-	ui.MainView->createSurface(surfaceData_);
+	ui.MainView->createSurface(surfaceData_, ui.ColourScaleWidget);
 	ui.MainView->update();
 }

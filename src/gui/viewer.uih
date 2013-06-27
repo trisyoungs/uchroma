@@ -1,26 +1,26 @@
 /*
 	*** OpenGL Viewer Widget (subclassing QGLWidget)
 	*** src/gui/viewer.uih
-	Copyright T. Youngs 2012
+	Copyright T. Youngs 2013
 
-	This file is part of FQPLOT.
+	This file is part of FQPlot.
 
-	FQPLOT is free software: you can redistribute it and/or modify
+	FQPlot is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	FQPLOT is distributed in the hope that it will be useful,
+	FQPlot is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with FQPLOT.  If not, see <http://www.gnu.org/licenses/>.
+	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FQPlot_VIEWER_H
-#define FQPlot_VIEWER_H
+#ifndef FQPLOT_VIEWER_H
+#define FQPLOT_VIEWER_H
 
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QObject>
@@ -33,8 +33,7 @@
 #include "templates/reflist.h"
 
 // Forward Declarations
-class VirtualInstrument;
-class Instrument;
+class ColourScale;
 
 // Base rendering widget
 class Viewer : public QGLWidget
@@ -226,8 +225,10 @@ class Viewer : public QGLWidget
 	void drawScene();
 
 	public:
+	// Construct normal / colour data for slice specified
+	void constructSliceData(Slice* targetSlice, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale* colourScale, Slice* previousSlice, Slice* nextSlice);
 	// Create surface primitive
-	void createSurface(const List<Slice>& slices);
+	void createSurface(const List<Slice>& slices, ColourScale* colourScale);
 };
 
 #endif

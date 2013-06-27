@@ -89,7 +89,9 @@ template <class T> class List
 	// Append an item to the list
 	T *add();
 	// Insert an item into the list (after supplied item)
-	T *insert(T *before);
+	T *insertAfter(T *item);
+	// Insert an item into the list (before supplied item)
+	T *insertBefore(T *item);
 	// Add the item into this list
 	void own(T *item);
 	// Disown the item, but do not delete it
@@ -224,19 +226,48 @@ template <class T> T* List<T>::add()
 /*!
  * \brief Insert new item after supplied item
  */
-template <class T> T *List<T>::insert(T* newprev)
+template <class T> T *List<T>::insertAfter(T* item)
 {
+	if (item == NULL)
+	{
+		printf("No item supplied to List<T>::insertAfter().\n");
+		return NULL;
+	}
 	T *newitem = new T;
-	// Get pointer to next item after newprev (our newnext)
-	T *newnext = (newprev == NULL ? listHead_ : newprev->next);
+	// Get pointer to next item after the supplied item (our newnext)
+	T *newnext = item->next;
 	// Re-point newprev and the new item
-	if (newprev != NULL) newprev->next = newitem;
-	else listHead_ = newitem;
-	newitem->prev = newprev;
+	item->next = newitem;
+	newitem->prev = item;
 	// Re-point newnext and the new item
 	if (newnext != NULL) newnext->prev = newitem;
 	else listTail_ = newitem;
 	newitem->next = newnext;
+	nItems_ ++;
+	regenerate_ = 1;
+	return newitem;
+}
+
+/*!
+ * \brief Insert new item before supplied item
+ */
+template <class T> T *List<T>::insertBefore(T* item)
+{
+	if (item == NULL)
+	{
+		printf("No item supplied to List<T>::insertBefore().\n");
+		return NULL;
+	}
+	T *newitem = new T;
+	// Get pointer to next item after the supplied item (our newprev)
+	T *newprev = item->prev;
+	// Re-point newnext and the new item
+	item->prev = newitem;
+	newitem->next = item;
+	// Re-point newprev and the new item
+	if (newprev != NULL) newprev->next = newitem;
+	else listHead_ = newitem;
+	newitem->prev = newprev;
 	nItems_ ++;
 	regenerate_ = 1;
 	return newitem;

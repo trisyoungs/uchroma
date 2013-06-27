@@ -42,12 +42,8 @@ PFNGLDELETEBUFFERSPROC Primitive::glDeleteBuffers = NULL;
 */
 
 // Constructor
-PrimitiveInstance::PrimitiveInstance()
+PrimitiveInstance::PrimitiveInstance() : ListItem<PrimitiveInstance>()
 {
-	// Public variables
-	prev = NULL;
-	next = NULL;
-	
 	// Private variables
 	context_ = NULL;
 	type_ = PrimitiveInstance::ListInstance;
@@ -85,13 +81,11 @@ int PrimitiveInstance::id()
 */
 
 // Constructor
-Primitive::Primitive()
+Primitive::Primitive() : ListItem<Primitive>()
 {
 	currentVertexChunk_ = NULL;
 	colouredVertexData_ = false;
 	type_ = GL_TRIANGLES;
-	prev = NULL;
-	next = NULL;
 	nDefinedVertices_ = 0;
 	useInstances_ = true;
 	name_ = "<UnnamedPrimitive>";

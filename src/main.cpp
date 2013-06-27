@@ -32,9 +32,19 @@ int main(int argc, char *argv[])
 
 	/* Tweak the default QGLFormat */
 	QGLFormat::defaultFormat().setSampleBuffers(true);
-	
-	/* Create and show the main window */
+
+	/* Create the main window */
 	FQPlotWindow mainWindow;
+
+	/* Was an input file supplied? */
+	if (argc == 2)
+	{
+		if (!mainWindow.loadData(argv[1])) return 1;
+// 		mainWindow.updateSourceDataTab();
+// 		mainWindow.updateViewTab();
+	}
+
+	/* Show the main window */
 	mainWindow.show();
 
 	/* Enter Qt's main events loop */
