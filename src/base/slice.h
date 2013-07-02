@@ -49,6 +49,10 @@ class Slice : public ListItem<Slice>
 	private:
 	// Source file (not including path)
 	QString fileName_;
+	// Instrument (determined from filename)
+	QString instrument_;
+	// Run number (determined from filename)
+	QString runNumberString_;
 	// Data
 	Data2D data_;
 	// Z coordinate
@@ -59,6 +63,8 @@ class Slice : public ListItem<Slice>
 	void setFileName(QString fileName);
 	// Return source filename
 	QString fileName();
+	// Return determined base file name with no extension
+	QString baseFileName();
 	// Load data from file
 	bool loadData(QDir sourceDir);
 	// Return data

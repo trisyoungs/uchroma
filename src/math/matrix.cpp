@@ -758,6 +758,14 @@ void Matrix::setTranslation(double x, double y, double z)
 	matrix_[14] = z;
 }
 
+// Set translation in the matrix
+void Matrix::setTranslation(Vec3<double> translation)
+{
+	matrix_[12] = translation.x;
+	matrix_[13] = translation.y;
+	matrix_[14] = translation.z;
+}
+
 /*
 // Scaling
 */

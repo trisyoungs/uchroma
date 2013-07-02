@@ -157,6 +157,8 @@ class Matrix
 	void addTranslation(double dx, double dy, double dz);
 	// Set translation in the matrix
 	void setTranslation(double x, double y, double z);
+	// Set translation in the matrix
+	void setTranslation(Vec3<double> translation);
 
 
 	/*

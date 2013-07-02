@@ -243,10 +243,15 @@ template <class A> class Array : public ListItem< Array<A> >
 		}
 		return array_[nItems_-1];
 	}
-	// Take log of contained data
+	// Take log (base 10) of contained data
 	void takeLog()
 	{
-		 for (int n=0; n<nItems_; ++n) array_[n] = log10(array_[n]);
+		 for (int n=0; n<nItems_; ++n) array_[n] = array_[n] < 1.0e-3 ? 0.0 : log10(array_[n]);
+	}
+	// Take natural log of contained data
+	void takeLn()
+	{
+		 for (int n=0; n<nItems_; ++n) array_[n] = array_[n] < 1.0e-3 ? 0.0 : log(array_[n]);
 	}
 	///@}
 };

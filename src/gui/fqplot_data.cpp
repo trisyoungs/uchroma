@@ -23,11 +23,27 @@
 #include "base/lineparser.h"
 
 // DataFile Keywords
-const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "ColourScalePoint", "SliceDir", "Slice" };
+const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "ColourScalePoint", "PostTransformShiftX", "PostTransformShiftY", "PostTransformShiftZ", "PreTransformShiftX", "PreTransformShiftY", "PreTransformShiftZ", "SliceDir", "Slice", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
 FQPlotWindow::DataFileKeyword FQPlotWindow::dataFileKeyword(const char* s)
 {
 	for (int n=0; n<FQPlotWindow::nDataFileKeywords; ++n) if (strcmp(s, DataFileKeywordStrings[n]) == 0) return (FQPlotWindow::DataFileKeyword) n;
 	return FQPlotWindow::nDataFileKeywords;
+}
+const char* FQPlotWindow::dataFileKeyword(FQPlotWindow::DataFileKeyword dfk)
+{
+	return DataFileKeywordStrings[dfk];
+}
+
+// Data Transform types
+const char* DataTransformKeywords[FQPlotWindow::nDataTransforms] = { "Multiply", "Divide", "LogBase", "NaturalLog" };
+FQPlotWindow::DataTransform FQPlotWindow::dataTransform(const char* s)
+{
+	for (int n=0; n<FQPlotWindow::nDataTransforms; ++n) if (strcmp(s, DataTransformKeywords[n]) == 0) return (FQPlotWindow::DataTransform) n;
+	return FQPlotWindow::nDataTransforms;
+}
+const char* FQPlotWindow::dataTransform(FQPlotWindow::DataTransform dt)
+{
+	return DataTransformKeywords[dt];
 }
 
 /*
@@ -42,6 +58,12 @@ void FQPlotWindow::clearData()
 	axisMax_.set(10.0, 10.0, 10.0);
 	axisStep_.set(0.1, 0.1, 0.1);
 	interpolate_.set(false, false, false);
+	transformValue_.set(1.0,1.0,1.0);
+	transformType_[0] = FQPlotWindow::MultiplyTransform;
+	transformType_[1] = FQPlotWindow::MultiplyTransform;
+	transformType_[2] = FQPlotWindow::MultiplyTransform;
+	preTransformShift_.zero();
+	postTransformShift_.zero();
 	modified_ = false;
 	ui.ColourScaleWidget->clear();
 }
@@ -78,7 +100,10 @@ bool FQPlotWindow::loadData(QString fileName)
 
 	// Read line from file and decide what to do with it
 	FQPlotWindow::DataFileKeyword kwd;
+	FQPlotWindow::DataTransform dt;
 	Slice* slice;
+	int xyz;
+	Matrix mat;
 	while (!parser.eofOrBlank())
 	{
 		parser.getArgsDelim(LineParser::UseQuotes);
@@ -90,6 +115,20 @@ bool FQPlotWindow::loadData(QString fileName)
 			// ColourScalePoint definition
 			case (FQPlotWindow::ColourScalePointKeyword):
 				ui.ColourScaleWidget->addPoint(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
+				break;
+			// Pre-Transform Shifts
+			case (FQPlotWindow::PreTransformShiftXKeyword):
+			case (FQPlotWindow::PreTransformShiftYKeyword):
+			case (FQPlotWindow::PreTransformShiftZKeyword):
+				xyz = kwd - FQPlotWindow::PreTransformShiftXKeyword;
+				preTransformShift_[xyz] = parser.argd(1);
+				break;
+			// Post-Transform Shifts
+			case (FQPlotWindow::PostTransformShiftXKeyword):
+			case (FQPlotWindow::PostTransformShiftYKeyword):
+			case (FQPlotWindow::PostTransformShiftZKeyword):
+				xyz = kwd - FQPlotWindow::PostTransformShiftXKeyword;
+				postTransformShift_[xyz] = parser.argd(1);
 				break;
 			// Datafile directory
 			case (FQPlotWindow::SliceDirectoryKeyword):
@@ -104,8 +143,28 @@ bool FQPlotWindow::loadData(QString fileName)
 				slice = loadSlice(parser.argc(1));
 				if (slice) slice->setZ(parser.argd(2));
 				break;
+			// Data Transform
+			case (FQPlotWindow::TransformXKeyword):
+			case (FQPlotWindow::TransformYKeyword):
+			case (FQPlotWindow::TransformZKeyword):
+				xyz = kwd - FQPlotWindow::TransformXKeyword;
+				dt = dataTransform(parser.argc(1));
+				transformType_[xyz] = dt;
+				transformValue_[xyz] = parser.argd(2);
+				break;
+			// View Matrix
+			case (FQPlotWindow::ViewMatrixXKeyword):
+			case (FQPlotWindow::ViewMatrixYKeyword):
+			case (FQPlotWindow::ViewMatrixZKeyword):
+			case (FQPlotWindow::ViewMatrixWKeyword):
+				xyz = kwd - FQPlotWindow::ViewMatrixXKeyword;
+				mat = ui.MainView->viewMatrix();
+				mat.setColumn(xyz, parser.argd(1), parser.argd(2), parser.argd(3), parser.argd(4));
+				ui.MainView->setViewMatrix(mat);
+				break;
 		}
 	}
+	parser.closeFiles();
 
 	// Add default colourscale?
 	if (ui.ColourScaleWidget->nPoints() == 0) createDefaultColourScale();
@@ -113,7 +172,10 @@ bool FQPlotWindow::loadData(QString fileName)
 	// Recreate surface
 	updateSurface();
 
-	parser.closeFiles();
+	// Set necessary variables
+	inputFile_ = fileName;
+	modified_ = false;
+	
 	return true;
 }
 
@@ -138,12 +200,31 @@ bool FQPlotWindow::saveData(QString fileName)
 		parser.writeLineF("%s \"%s\" %f\n", DataFileKeywordStrings[FQPlotWindow::SliceKeyword], qPrintable(slice->fileName()), slice->z());
 	}
 
+	// Write transform setup
+	// -- Transforms
+	parser.writeLineF("%s %s %f\n", DataFileKeywordStrings[FQPlotWindow::TransformXKeyword], dataTransform(transformType_[0]), transformValue_.x);
+	parser.writeLineF("%s %s %f\n", DataFileKeywordStrings[FQPlotWindow::TransformYKeyword], dataTransform(transformType_[1]), transformValue_.y);
+	parser.writeLineF("%s %s %f\n", DataFileKeywordStrings[FQPlotWindow::TransformZKeyword], dataTransform(transformType_[2]), transformValue_.z);
+	// -- Shifts
+	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::PreTransformShiftXKeyword], preTransformShift_.x);
+	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::PreTransformShiftYKeyword], preTransformShift_.y);
+	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::PreTransformShiftZKeyword], preTransformShift_.z);
+	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::PostTransformShiftXKeyword], postTransformShift_.x);
+	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::PostTransformShiftYKeyword], postTransformShift_.y);
+	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::PostTransformShiftZKeyword], postTransformShift_.z);
+
 	// Write view setup
 	// -- ColourScale
 	for (ColourScalePoint* csp = ui.ColourScaleWidget->firstPoint(); csp != NULL; csp = csp->next)
 	{
 		parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourScalePointKeyword], csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
 	}
+	// -- Transformation Matrix
+	Matrix mat = ui.MainView->viewMatrix();
+	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::ViewMatrixXKeyword], mat[0], mat[1], mat[2], mat[3]);
+	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::ViewMatrixYKeyword], mat[4], mat[5], mat[6], mat[7]);
+	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::ViewMatrixZKeyword], mat[8], mat[9], mat[10], mat[11]);
+	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::ViewMatrixWKeyword], mat[12], mat[13], mat[14], mat[15]);
 
 	parser.closeFiles();
 	return true;
@@ -180,6 +261,13 @@ void FQPlotWindow::resetPlotLimits()
 {
 }
 
+// Flag data as modified, and update titlebar
+void FQPlotWindow::setAsModified()
+{
+	modified_ = true;
+	updateTitleBar();
+}
+
 // Update surface data after data change
 void FQPlotWindow::updateSurface()
 {
@@ -192,15 +280,57 @@ void FQPlotWindow::updateSurface()
 	// Loop over slices and apply any transforms (X or Y)
 	for (Slice* slice = surfaceData_.first(); slice != NULL; slice = slice->next)
 	{
-		if (axisLog_.x) slice->data().arrayX().takeLog();
-		if (axisLog_.y)
+		// X / Y
+		for (int n=0; n<2; ++n)
 		{
-			slice->data().arrayY() += 2.0;
-			slice->data().arrayY().takeLog();
+			Array<double>& arrayRef = n == 0 ? slice->data().arrayX() : slice->data().arrayY();
+
+			// Apply pre-transform shift
+			arrayRef += preTransformShift_[n];
+
+			// Apply transform
+			switch (transformType_[n])
+			{
+				case (FQPlotWindow::MultiplyTransform):
+					arrayRef *= transformValue_[n];
+					break;
+				case (FQPlotWindow::DivideTransform):
+					arrayRef /= transformValue_[n];
+					break;
+				case (FQPlotWindow::LogBase10Transform):
+					arrayRef.takeLog();
+					break;
+				case (FQPlotWindow::NaturalLogTransform):
+					arrayRef.takeLn();
+					break;
+			}
+			// Apply post-transform shift
+			arrayRef += postTransformShift_[n];
 		}
-		if (axisLog_.y) slice->setZ(log10(slice->z()));
+		
+		// Z
+		double z = slice->z();
+		switch (transformType_[2])
+		{
+			case (FQPlotWindow::MultiplyTransform):
+				slice->setZ( (z-preTransformShift_.z)*transformValue_.z + postTransformShift_.z);
+				break;
+			case (FQPlotWindow::DivideTransform):
+				slice->setZ( (z-preTransformShift_.z)/transformValue_.z + postTransformShift_.z);
+				break;
+			case (FQPlotWindow::LogBase10Transform):
+				slice->setZ( log10(z-preTransformShift_.z) + postTransformShift_.z);
+				break;
+			case (FQPlotWindow::NaturalLogTransform):
+				slice->setZ( log(z-preTransformShift_.z) + postTransformShift_.z);
+				break;
+		}
 	}
 
 	ui.MainView->createSurface(surfaceData_, ui.ColourScaleWidget);
+
 	ui.MainView->update();
+
+	ui.NTrianglesLabel->setText("NTriangles: " + QString::number(ui.MainView->surfaceNTriangles()));
+
 }

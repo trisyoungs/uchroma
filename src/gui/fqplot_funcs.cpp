@@ -20,6 +20,7 @@
 */
 
 #include "gui/fqplot.h"
+#include "version.h"
 
 // Constructor
 FQPlotWindow::FQPlotWindow(QMainWindow *parent) : QMainWindow(parent)
@@ -34,6 +35,7 @@ FQPlotWindow::FQPlotWindow(QMainWindow *parent) : QMainWindow(parent)
 // 	dataFileDirectory_ = getenv("CWD");
 	dataFileDirectory_ = "/home/tris/work/RB1220486_Youngs/benzene_D_D2_250mBar";
 	clearData();
+	refreshing_ = false;
 }
 
 // Destructor
@@ -44,6 +46,23 @@ FQPlotWindow::~FQPlotWindow()
 // Window close event
 void FQPlotWindow::closeEvent(QCloseEvent *event)
 {
+}
+
+// Update all tabs
+void FQPlotWindow::updateAllTabs()
+{
+	refreshing_ = true;
+	updateSourceDataTab();
+	updateTransformTab();
+	updateViewTab();
+	refreshing_ = false;
+}
+
+// Update title bar
+void FQPlotWindow::updateTitleBar()
+{
+	if (modified_) setWindowTitle("FQPlot v" + QString(FQPLOTVERSION) + " - " + inputFile_ + " (modified) ");
+	else setWindowTitle("FQPlot v" + QString(FQPLOTVERSION) + " - " + inputFile_);
 }
 
 /*
@@ -69,12 +88,8 @@ void FQPlotWindow::on_actionFileLoad_triggered(bool checked)
 	clearData();
 	if (loadData(fileName))
 	{
-		inputFile_ = fileName;
-		modified_ = false;
-		
 		// Update GUI
-		updateSourceDataTab();
-		updateViewTab();
+		updateAllTabs();
 	}
 }
 
@@ -121,6 +136,20 @@ void FQPlotWindow::on_actionViewReset_triggered(bool checked)
  * Tabs - Source Data
 */
 
+// Select source directory
+void FQPlotWindow::on_SourceDirSelectButton_clicked(bool checked)
+{
+	QString dir = QFileDialog::getExistingDirectory(this, "TimeStamp Extraction", "Choose the directory containing the required files:");
+	if (dir.isEmpty()) return;
+	ui.SourceDirEdit->setText(dir);
+	dataFileDirectory_ = dir;
+	
+	// Reload all data and update surface
+	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) slice->loadData(dataFileDirectory_);
+	setAsModified();
+	updateSurface();
+}
+
 // Add files button clicked
 void FQPlotWindow::on_AddFilesButton_clicked(bool checked)
 {
@@ -141,6 +170,7 @@ void FQPlotWindow::on_AddFilesButton_clicked(bool checked)
 
 	// Update file list
 	updateSourceDataTab();
+	setAsModified();
 	
 	// Need to update surface
 	updateSurface();
@@ -153,6 +183,7 @@ void FQPlotWindow::on_RemoveFilesButton_clicked(bool checked)
 	{
 		printf("%i\n", item->row());
 	}
+	setAsModified();
 }
 
 // Source data item selection changed
@@ -161,9 +192,51 @@ void FQPlotWindow::on_SourceDataTable_itemSelectionChanged()
 	ui.RemoveFilesButton->setEnabled(ui.SourceFilesTable->selectedItems().count() != 0);
 }
 
+// Retrieve relative Z values from timestamps
+void FQPlotWindow::on_GetZFromTimeStampButton_clicked(bool checked)
+{
+	if (slices_.nItems() == 0) return;
+
+// 	QString dir = QInputDialog::getText(this, "Choose File Location", "Select the location of the files that will be interrogated:", QLineEdit::Normal, 
+	bool ok;
+	QString extension = QInputDialog::getItem(this, "TimeStamp Extraction", "Select the type of file to look for:", QStringList() << "log" << "raw" << "nxs", 0, false, &ok);
+	if (!ok) return;
+
+	QString dirString = QFileDialog::getExistingDirectory(this, "TimeStamp Extraction", "Choose the directory containing the required files:");
+	if (dirString.isEmpty()) return;
+	QDir dir(dirString);
+	
+	// Load timestamp data from files - set offset in seconds from an arbitrary point to start with, then adjust afterwards
+	QString s;
+	double earliest = 0.0;
+	QDateTime referenceTime(QDate(1970,1,1));
+	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
+	{
+		// Construct filename to search for
+		s = dir.absoluteFilePath(slice->baseFileName()) + "." + extension;
+		QFileInfo fileInfo(s);
+		if (!fileInfo.exists())
+		{
+			QMessageBox::warning(this, "Failed to Open File", "The file '" + s + "' could not be found.");
+			break;
+		}
+		slice->setZ(referenceTime.secsTo(fileInfo.lastModified()));
+		if ((earliest == 0) || (slice->z() < earliest)) earliest = slice->z();
+	}
+	
+	// Set correct offset
+	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) slice->setZ(slice->z() - earliest);
+	
+	setAsModified();
+	updateSourceDataTab();
+	updateSurface();
+}
+
 // Update source data
 void FQPlotWindow::updateSourceDataTab()
 {
+	ui.SourceDirEdit->setText(dataFileDirectory_.absolutePath());
+
 	ui.SourceFilesTable->clearContents();
 	ui.SourceFilesTable->setRowCount(slices_.nItems());
 	int count = 0;
@@ -179,6 +252,131 @@ void FQPlotWindow::updateSourceDataTab()
 }
 
 /*
+ * Tabs - Transform
+ */
+
+void FQPlotWindow::on_TransformXTypeCombo_currentIndexChanged(int index)
+{
+	if (refreshing_) return;
+	transformType_[0] = (DataTransform) index;
+	ui.TransformXValueSpin->setEnabled(index < 2);
+	setAsModified();
+	updateSurface();
+}
+
+void FQPlotWindow::on_TransformYTypeCombo_currentIndexChanged(int index)
+{
+	if (refreshing_) return;
+	transformType_[1] = (DataTransform) index;
+	ui.TransformYValueSpin->setEnabled(index < 2);
+	setAsModified();
+	updateSurface();
+}
+
+void FQPlotWindow::on_TransformZTypeCombo_currentIndexChanged(int index)
+{
+	if (refreshing_) return;
+	transformType_[2] = (DataTransform) index;
+	ui.TransformZValueSpin->setEnabled(index < 2);
+	setAsModified();
+	updateSurface();
+}
+
+void FQPlotWindow::on_TransformXValueSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	transformValue_.x = value;
+	setAsModified();
+	updateSurface();
+}
+
+void FQPlotWindow::on_TransformYValueSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	transformValue_.y = value;
+	setAsModified();
+	updateSurface();
+}
+
+void FQPlotWindow::on_TransformZValueSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	transformValue_.z = value;
+	setAsModified();
+	updateSurface();
+}
+
+void FQPlotWindow::on_TransformXPreShiftSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	preTransformShift_.x = value;
+	setAsModified();
+	updateSurface();
+}
+
+void FQPlotWindow::on_TransformYPreShiftSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	preTransformShift_.y = value;
+	setAsModified();
+	updateSurface();
+}
+
+void FQPlotWindow::on_TransformZPreShiftSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	preTransformShift_.z = value;
+	setAsModified();
+	updateSurface();
+}
+
+void FQPlotWindow::on_TransformXPostShiftSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	postTransformShift_.x = value;
+	setAsModified();
+	updateSurface();
+}
+
+void FQPlotWindow::on_TransformYPostShiftSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	postTransformShift_.y = value;
+	setAsModified();
+	updateSurface();
+}
+
+void FQPlotWindow::on_TransformZPostShiftSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	postTransformShift_.z = value;
+	setAsModified();
+	updateSurface();
+}
+
+// Update Transform tab
+void FQPlotWindow::updateTransformTab()
+{
+	ui.TransformXTypeCombo->setCurrentIndex(transformType_[0]);
+	ui.TransformYTypeCombo->setCurrentIndex(transformType_[1]);
+	ui.TransformZTypeCombo->setCurrentIndex(transformType_[2]);
+	ui.TransformXValueSpin->setEnabled(transformType_[0] < 2);
+	ui.TransformYValueSpin->setEnabled(transformType_[1] < 2);
+	ui.TransformZValueSpin->setEnabled(transformType_[2] < 2);
+
+	ui.TransformXValueSpin->setValue(transformValue_.x);
+	ui.TransformYValueSpin->setValue(transformValue_.y);
+	ui.TransformZValueSpin->setValue(transformValue_.z);
+
+	ui.TransformXPreShiftSpin->setValue(preTransformShift_.x);
+	ui.TransformYPreShiftSpin->setValue(preTransformShift_.y);
+	ui.TransformZPreShiftSpin->setValue(preTransformShift_.z);
+	ui.TransformXPostShiftSpin->setValue(postTransformShift_.x);
+	ui.TransformYPostShiftSpin->setValue(postTransformShift_.y);
+	ui.TransformZPostShiftSpin->setValue(postTransformShift_.z);
+}
+
+/*
  * Tabs - View
  */
 
@@ -188,74 +386,68 @@ void FQPlotWindow::on_ColourScaleTable_cellDoubleClicked(QTableWidgetItem* item,
 
 void FQPlotWindow::on_XMinSpin_valueChanged(double value)
 {
+	if (refreshing_) return;
 	axisMin_.x = value;
+	setAsModified();
 	updateSurface();
 }
 
 void FQPlotWindow::on_YMinSpin_valueChanged(double value)
 {
+	if (refreshing_) return;
 	axisMin_.y = value;
+	setAsModified();
 	updateSurface();
 }
 
 void FQPlotWindow::on_ZMinSpin_valueChanged(double value)
 {
+	if (refreshing_) return;
 	axisMin_.z = value;
+	setAsModified();
 	updateSurface();
 }
 
 void FQPlotWindow::on_XMaxSpin_valueChanged(double value)
 {
+	if (refreshing_) return;
 	axisMax_.x = value;
+	setAsModified();
 	updateSurface();
 }
 
 void FQPlotWindow::on_YMaxSpin_valueChanged(double value)
 {
+	if (refreshing_) return;
 	axisMax_.y = value;
+	setAsModified();
 	updateSurface();
 }
 
 void FQPlotWindow::on_ZMaxSpin_valueChanged(double value)
 {
+	if (refreshing_) return;
 	axisMax_.z = value;
+	setAsModified();
 	updateSurface();
 }
 
 void FQPlotWindow::on_XLogCheck_clicked(bool checked)
 {
-	axisLog_.x = checked;
+// 	axisLog_.x = checked;
 	updateSurface();
 }
 
 void FQPlotWindow::on_YLogCheck_clicked(bool checked)
 {
-	axisLog_.y = checked;
+// 	axisLog_.y = checked;
 	updateSurface();
 }
 
 void FQPlotWindow::on_ZLogCheck_clicked(bool checked)
 {
-	axisLog_.z = checked;
+// 	axisLog_.z = checked;
 	updateSurface();
-}
-
-void FQPlotWindow::on_XScaleSpin_valueChanged(double value)
-{
-	viewScales_.x = value;
-	ui.MainView->update();
-}
-
-void FQPlotWindow::on_YScaleSpin_valueChanged(double value)
-{
-	viewScales_.y = value;
-	ui.MainView->update();
-}
-
-void FQPlotWindow::on_ZScaleSpin_valueChanged(double value)
-{
-	viewScales_.z = value;
-	ui.MainView->update();
 }
 
 // Update source data tab

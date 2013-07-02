@@ -37,6 +37,10 @@ class FQPlotWindow : public QMainWindow
 	/*
 	// Window Functions
 	*/
+	private:
+	// Whether the window is refreshing / updating its controls
+	bool refreshing_;
+
 	public:
 	// Constructor / Destructor
 	FQPlotWindow(QMainWindow *parent = 0);
@@ -49,6 +53,12 @@ class FQPlotWindow : public QMainWindow
 	protected:
 	// Window close event
 	void closeEvent(QCloseEvent *event);
+	
+	public:
+	// Update all tabs
+	void updateAllTabs();
+	// Update title bar
+	void updateTitleBar();
 
 
 	/*
@@ -72,13 +82,37 @@ class FQPlotWindow : public QMainWindow
 	 * Tabs -- Source Data
 	 */
 	private slots:
+	void on_SourceDirSelectButton_clicked(bool checked);
 	void on_AddFilesButton_clicked(bool checked);
 	void on_RemoveFilesButton_clicked(bool checked);
 	void on_SourceDataTable_itemSelectionChanged();
-	
+	void on_GetZFromTimeStampButton_clicked(bool checked);
+
 	public:
 	// Update source data tab
 	void updateSourceDataTab();
+
+
+	/*
+	 * Tabs -- Transform
+	 */
+	private slots:
+	void on_TransformXTypeCombo_currentIndexChanged(int index);
+	void on_TransformYTypeCombo_currentIndexChanged(int index);
+	void on_TransformZTypeCombo_currentIndexChanged(int index);
+	void on_TransformXValueSpin_valueChanged(double value);
+	void on_TransformYValueSpin_valueChanged(double value);
+	void on_TransformZValueSpin_valueChanged(double value);
+	void on_TransformXPreShiftSpin_valueChanged(double value);
+	void on_TransformYPreShiftSpin_valueChanged(double value);
+	void on_TransformZPreShiftSpin_valueChanged(double value);
+	void on_TransformXPostShiftSpin_valueChanged(double value);
+	void on_TransformYPostShiftSpin_valueChanged(double value);
+	void on_TransformZPostShiftSpin_valueChanged(double value);
+
+	public:
+	// Update Transform tab
+	void updateTransformTab();
 
 
 	/*
@@ -95,18 +129,25 @@ class FQPlotWindow : public QMainWindow
 	void on_XLogCheck_clicked(bool checked);
 	void on_YLogCheck_clicked(bool checked);
 	void on_ZLogCheck_clicked(bool checked);
-	void on_XScaleSpin_valueChanged(double value);
-	void on_YScaleSpin_valueChanged(double value);
-	void on_ZScaleSpin_valueChanged(double value);
 
 	public:
-	// Update source data tab
+	// Update View tab
 	void updateViewTab();
 
 
 	/*
 	 * Data
 	 */
+	public:
+	// Datafile keywords
+	enum DataFileKeyword { ColourScalePointKeyword, PostTransformShiftXKeyword, PostTransformShiftYKeyword, PostTransformShiftZKeyword, PreTransformShiftXKeyword, PreTransformShiftYKeyword, PreTransformShiftZKeyword, SliceDirectoryKeyword, SliceKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
+	static DataFileKeyword dataFileKeyword(const char* s);
+	static const char* dataFileKeyword(DataFileKeyword dfk);
+	// Data Transform types
+	enum DataTransform { MultiplyTransform, DivideTransform, LogBase10Transform, NaturalLogTransform, nDataTransforms };
+	static DataTransform dataTransform(const char* s);
+	static const char* dataTransform(DataTransform dt);
+
 	private:
 	// Whether current data has been modified
 	bool modified_;
@@ -118,19 +159,18 @@ class FQPlotWindow : public QMainWindow
 	List<Slice> slices_;
 	// Minima, maxima, and (if interpolating) step sizes for surface generation
 	Vec3<double> axisMin_, axisMax_, axisStep_;
-	// Whether values are to have logs taken before drawing
-	Vec3<bool> axisLog_;
+	// Transform multipliers for data
+	Vec3<double> transformValue_;
+	// Transform types for data
+	DataTransform transformType_[3];
+	// Pre-transform shift value
+	Vec3<double> preTransformShift_;
+	// Post-transform shift value
+	Vec3<double> postTransformShift_;
 	// Interpolation flags
 	Vec3<bool> interpolate_;
 	// List of slices for display
 	List<Slice> surfaceData_;
-	// View scales
-	Vec3<double> viewScales_;
-
-	public:
-	// Datafile keywords
-	enum DataFileKeyword { ColourScalePointKeyword, SliceDirectoryKeyword, SliceKeyword, nDataFileKeywords };
-	static DataFileKeyword dataFileKeyword(const char* s);
 
 	public:
 	// Clear current data
@@ -145,6 +185,8 @@ class FQPlotWindow : public QMainWindow
 	Slice* loadSlice(QString fileName);
 	// Set limits to encompass entire dataspace
 	void resetPlotLimits();
+	// Flag data as modified, and update titlebar
+	void setAsModified();
 	// Update surface data after data change
 	void updateSurface();
 };

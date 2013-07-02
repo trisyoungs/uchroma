@@ -90,7 +90,9 @@ class Viewer : public QGLWidget
 	// Setup projection matrix
 	void setProjectionMatrix(double perspectiveFov = 20.0);
 	// Update transformation (view) matrix
-	void setViewMatrix(Matrix &mat);
+	void setViewMatrix(Matrix& mat);
+	// Return transformation (view) matrix
+	Matrix viewMatrix();
 	// Render or grab image
 	QPixmap generateImage(int w, int h);
 	// Reset current view
@@ -215,6 +217,8 @@ class Viewer : public QGLWidget
 	Primitive spherePrimitive_, cubePrimitive_;
 	// Surface primitive
 	Primitive surface_;
+	// Centrepoint of surface
+	Vec3<double> surfaceCenter_;
 
 	private:
 	// Create necessary primitives (called once when Viewer is constructed)
@@ -229,6 +233,8 @@ class Viewer : public QGLWidget
 	void constructSliceData(Slice* targetSlice, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale* colourScale, Slice* previousSlice, Slice* nextSlice);
 	// Create surface primitive
 	void createSurface(const List<Slice>& slices, ColourScale* colourScale);
+	// Return number of triangles in surface
+	int surfaceNTriangles();
 };
 
 #endif

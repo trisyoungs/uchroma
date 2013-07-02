@@ -279,6 +279,11 @@ void Viewer::setViewMatrix(Matrix &mat)
 {
 	viewMatrix_ = mat;
 }
+// Return transformation (view) matrix
+Matrix Viewer::viewMatrix()
+{
+	return viewMatrix_;
+}
 
 // Render or grab image
 QPixmap Viewer::generateImage(int w, int h)

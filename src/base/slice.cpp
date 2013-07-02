@@ -56,12 +56,26 @@ void Slice::operator=(const Slice& source)
 void Slice::setFileName(QString fileName)
 {
 	fileName_ = fileName;
+
+	// Determine instrument and run number strings
+	QRegExp re("([A-Z]+)([0-9]+)");
+	if (re.indexIn(fileName_) > -1)
+	{
+		instrument_ = re.cap(1);
+		runNumberString_ = re.cap(2);
+	}
 }
 
 // Return source filename
 QString Slice::fileName()
 {
 	return fileName_;
+}
+
+// Return determined base file name with no extension
+QString Slice::baseFileName()
+{
+	return instrument_+runNumberString_;
 }
 
 // Load data from file

@@ -30,6 +30,10 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationDomain("www.projectaten.net");
 	QCoreApplication::setApplicationName("FQPlot");
 
+	#if QT_VERSION >= 0x040600
+        QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
+        #endif
+	
 	/* Tweak the default QGLFormat */
 	QGLFormat::defaultFormat().setSampleBuffers(true);
 
@@ -40,8 +44,8 @@ int main(int argc, char *argv[])
 	if (argc == 2)
 	{
 		if (!mainWindow.loadData(argv[1])) return 1;
-// 		mainWindow.updateSourceDataTab();
-// 		mainWindow.updateViewTab();
+		mainWindow.updateAllTabs();
+		mainWindow.updateTitleBar();
 	}
 
 	/* Show the main window */

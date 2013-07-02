@@ -48,7 +48,7 @@ void Viewer::setupGL()
 	GLfloat spotlightAmbient[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	GLfloat spotlightDiffuse[4] = { 0.8f, 0.8f, 0.8f, 1.0f };
 	GLfloat spotlightSpecular[4] = { 0.7f, 0.7f, 0.7f, 1.0f };
-	GLfloat spotlightPosition[4] = { 100.0f, 100.0f, 100.0f, 0.0f };
+	GLfloat spotlightPosition[4] = { 10.0f, 10.0f, -100.0f, 0.0f };
 	GLfloat specularColour[4] = { 0.9f, 0.9f, 0.9f, 1.0f };
 
 	// Clear (background) colour
@@ -64,7 +64,7 @@ void Viewer::setupGL()
 	// Smooth shading
 	glShadeModel(GL_SMOOTH);
 
-	// Auto-calculate surface normals
+	// Auto-normalise surface normals
 	glEnable(GL_NORMALIZE);
 
 	// Set alpha-blending function
@@ -151,6 +151,7 @@ void Viewer::drawScene()
 		renderPrimitive(&cubePrimitive_, colourBlue, A);
 	}
 
+	A.setTranslation(-surfaceCenter_.x, -surfaceCenter_.y, surfaceCenter_.z);
 	renderPrimitive(&surface_, colourRed, A);
 }
 
@@ -173,36 +174,47 @@ void Viewer::constructSliceData(Slice* targetSlice, Array< Vec3<double> >& norma
 	}
 
 	// Calculate normals
-	Vec3<double> v1, v2;
+	Vec3<double> v1, v2, v3;
 	double dz;
 	if (previousSlice && nextSlice)
 	{
 		// Grab other array references
+		Array<double>& xPrev = previousSlice->data().arrayX();
+		Array<double>& xNext = nextSlice->data().arrayX();
 		Array<double>& yPrev = previousSlice->data().arrayY();
 		Array<double>& yNext = nextSlice->data().arrayY();
-		dz = -((previousSlice->z() - targetSlice->z()) + (nextSlice->z() - targetSlice->z()))*0.5;
+		dz = ((previousSlice->z() - targetSlice->z()) + (nextSlice->z() - targetSlice->z()))*0.5;
 
 		// -- First point
-		v1.set(xTarget[1] - xTarget[0], yTarget[1] - yTarget[0], 0.0);
+		v1.set(xTarget[1] - xTarget[0], yTarget[1] - yTarget[0], 0);
 		v2.set(0.0, ((yPrev[n] - yTarget[n]) + (yNext[n] - yTarget[n]))*0.5, dz);
-		normals.add(v1 * v2);
+		v3 = v1 * v2;
+		v3.normalise();
+		normals.add(v3);
 		// -- Points 1 to N-2
 		for (n=1; n<nPoints-1; ++n)
 		{
-			v1.set(((xTarget[n-1] - xTarget[n]) + (xTarget[n+1] - xTarget[n]))*0.5, ((yTarget[n-1] - yTarget[n]) + (yTarget[n+1] - yTarget[n]))*0.5, 0.0);
-			v2.set(0.0, ((yPrev[n] - yTarget[n]) + (yNext[n] - yTarget[n]))*0.5, dz);
-			normals.add(v1 * v2);
+// 			v1.set(((xTarget[n-1] - xTarget[n]) + (xTarget[n+1] - xTarget[n]))*0.5, ((yTarget[n-1] - yTarget[n]) + (yTarget[n+1] - yTarget[n]))*0.5, 0);
+// 			v2.set(0.0, ((yPrev[n] - yTarget[n]) + (yNext[n] - yTarget[n]))*0.5, dz);
+			v1.set(xTarget[n+1] - xTarget[n], yNext[n] - yTarget[n], 0.0);
+			v2.set(xNext[n] - xTarget[n], yTarget[n+1] - yTarget[n], dz);
+			v3 = v1 * v2;
+			v3.normalise();
+			normals.add(v3);
+// 			if (normals.nItems() < 100) printf("v1=%f,%f,%f  v2=%f,%f,%f  v3=%f,%f,%f\n", v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		}
 		// -- Last point
 		v1.set(xTarget[nPoints-2] - xTarget[nPoints-1], yTarget[nPoints-2] - yTarget[nPoints-1], 0.0);
 		v2.set(0.0, ((yPrev[nPoints-1] - yTarget[nPoints-1]) + (yNext[nPoints-1] - yTarget[nPoints-1]))*0.5, dz);
-		normals.add(v1 * v2);
+		v3 = v1 * v2;
+		v3.normalise();
+		normals.add(v3);
 	}
 	else if (previousSlice)
 	{
 		// Grab other array reference
 		Array<double>& yPrev = previousSlice->data().arrayY();
-		dz = previousSlice->z() - targetSlice->z();
+		dz = (previousSlice->z() - targetSlice->z());
 
 		// -- First point
 		v1.set(xTarget[1] - xTarget[0], yTarget[1] - yTarget[0], 0.0);
@@ -263,11 +275,14 @@ void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale)
 	Array< Vec4<GLfloat> > colourA, colourB;
 	int n, nPoints = slices.first()->data().nPoints();
 	QColor colour;
-	Vec3<double> nrm(0.0,1.0,0.0);
+	Vec3<double> nrm(0.0,1.0,0.0), dataMin, dataMax;
+	double mmin, mmax;
 
-	// Construct first slice data
+	// Construct first slice data and set initial min/max values
 	Slice* sliceA = slices.first();
 	constructSliceData(sliceA, normA, colourA, colourScale, NULL, sliceA->next);
+	dataMin.set(sliceA->data().xMin(), sliceA->data().yMin(), sliceA->z());
+	dataMax.set(sliceA->data().xMax(), sliceA->data().yMax(), sliceA->z());
 	
 	// Create triangles
 	for (Slice* sliceB = sliceA->next; sliceB != NULL; sliceB = sliceB->next)
@@ -293,13 +308,29 @@ void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale)
 			surface_.defineVertex(xA[n], yA[n], zA, normA[n], colourA[n], true);
 			surface_.defineVertex(xB[n], yB[n], zB, normB[n], colourB[n], true);
 			surface_.defineVertex(xB[n+1], yB[n+1], zB, normB[n+1], colourB[n+1], true);
+// 			nrm = Vec3<double>(xA[n+1]-xA[n],yA[n+1]-yA[n],0.0) * Vec3<double>(xA[n+1]-xB[n+1],yA[n+1]-yB[n+1], zA-zB);
+// 			nrm.normalise();
 // 			surface_.defineVertex(xA[n], yA[n], zA, nrm, colourA[n], true);
 // 			surface_.defineVertex(xA[n+1], yA[n+1], zA, nrm, colourA[n+1], true);
 // 			surface_.defineVertex(xB[n+1], yB[n+1], zB, nrm, colourB[n+1], true);
+// 			nrm = -Vec3<double>(xB[n]-xA[n],yB[n]-yA[n],zB-zA) * Vec3<double>(xB[n]-xB[n+1],yB[n]-yB[n+1], 0.0);
+// 			nrm.normalise();
 // 			surface_.defineVertex(xA[n], yA[n], zA, nrm, colourA[n], true);
 // 			surface_.defineVertex(xB[n], yB[n], zB, nrm, colourB[n], true);
 // 			surface_.defineVertex(xB[n+1], yB[n+1], zB, nrm, colourB[n+1], true);
 		}
+
+		// Adjust min/max range
+		mmin = sliceB->data().xMin();
+		mmax = sliceB->data().xMax();
+		if (mmin < dataMin.x) dataMin.x = mmin;
+		if (mmax > dataMax.x) dataMax.x = mmax;
+		mmin = sliceB->data().yMin();
+		mmax = sliceB->data().yMax();
+		if (mmin < dataMin.y) dataMin.y = mmin;
+		if (mmax > dataMax.y) dataMax.y = mmax;
+		if (sliceB->z() < dataMin.z) dataMin.z = sliceB->z();
+		if (sliceB->z() > dataMax.z) dataMax.z = sliceB->z();
 
 		// Copy arrays ready for next pass
 		normA = normB;
@@ -310,4 +341,14 @@ void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale)
 	surface_.pushInstance(context());
 
 	msg.print("Surface contains %i vertices.\n", surface_.nDefinedVertices());
+	
+	// Determine center coordinates of data (on which to base a view translation for the data)
+	surfaceCenter_ = (dataMax - dataMin) * 0.5;
+	surfaceCenter_.print();
+}
+
+// Return number of triangles in surface
+int Viewer::surfaceNTriangles()
+{
+	return surface_.nDefinedVertices() / 3;
 }
