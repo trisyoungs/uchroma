@@ -217,8 +217,35 @@ void ColourScale::setPoint(int position, double value, QColor colour, bool setva
 		printf("Scale point position to set (%i) is invalid - nItems = %i.\n", position, points_.nItems());
 		return;
 	}
-	if (setval) points_[position]->setValue(value);
 	if (setcol) points_[position]->setColour(colour);
+	if (setval)
+	{
+		points_[position]->setValue(value);
+		// Position in list may have changed - check...
+		bool minBad = true, maxBad = true;
+		ColourScalePoint* csp = points_[position];
+		int dummy = 0;
+		do
+		{
+			printf("BEFORE SHIFT Prev = %f, current= %f, next = %f\n", csp->prev ? csp->prev->value() : -999, csp->value(), csp->next ? csp->next->value() : -999);
+			// Shift item if necessary
+			if (csp->prev && (csp->prev->value() > csp->value()))
+			{
+				points_.shiftUp(csp);
+				minBad = (csp->prev ? (csp->prev->value() > csp->value()) : false);
+			}
+			else minBad = false;
+			if (csp->next && (csp->next->value() < csp->value()))
+			{
+				points_.shiftDown(csp);
+				maxBad = (csp->next ? (csp->next->value() < csp->value()) : false);
+			}
+			else maxBad = false;
+			printf("AFTER SHIFT %i Prev = %f, current= %f, next = %f  B=%i %i\n", dummy, csp->prev ? csp->prev->value() : -999, csp->value(), csp->next ? csp->next->value() : -999, minBad, maxBad);
+			if (++dummy == 10) break;
+			
+		} while (minBad || maxBad);
+	}
 
 	// Recalculate colour deltas
 	calculateDeltas();
@@ -246,6 +273,15 @@ void ColourScale::removePoint(int position)
 		return;
 	}
 	points_.remove( points_[position] );
+
+	// Recalculate colour deltas
+	calculateDeltas();
+}
+
+// Remove specified point from colourscale
+void ColourScale::removePoint(ColourScalePoint* point)
+{
+	points_.remove(point);
 
 	// Recalculate colour deltas
 	calculateDeltas();

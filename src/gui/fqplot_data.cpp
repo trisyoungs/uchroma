@@ -23,7 +23,7 @@
 #include "base/lineparser.h"
 
 // DataFile Keywords
-const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "ColourScalePoint", "PostTransformShiftX", "PostTransformShiftY", "PostTransformShiftZ", "PreTransformShiftX", "PreTransformShiftY", "PreTransformShiftZ", "SliceDir", "Slice", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
+const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "ColourScalePoint", "LimitX", "LimitY", "LimitZ", "PostTransformShiftX", "PostTransformShiftY", "PostTransformShiftZ", "PreTransformShiftX", "PreTransformShiftY", "PreTransformShiftZ", "SliceDir", "Slice", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
 FQPlotWindow::DataFileKeyword FQPlotWindow::dataFileKeyword(const char* s)
 {
 	for (int n=0; n<FQPlotWindow::nDataFileKeywords; ++n) if (strcmp(s, DataFileKeywordStrings[n]) == 0) return (FQPlotWindow::DataFileKeyword) n;
@@ -35,7 +35,7 @@ const char* FQPlotWindow::dataFileKeyword(FQPlotWindow::DataFileKeyword dfk)
 }
 
 // Data Transform types
-const char* DataTransformKeywords[FQPlotWindow::nDataTransforms] = { "Multiply", "Divide", "LogBase", "NaturalLog" };
+const char* DataTransformKeywords[FQPlotWindow::nDataTransforms] = { "Multiply", "Divide", "LogBase10", "NaturalLog" };
 FQPlotWindow::DataTransform FQPlotWindow::dataTransform(const char* s)
 {
 	for (int n=0; n<FQPlotWindow::nDataTransforms; ++n) if (strcmp(s, DataTransformKeywords[n]) == 0) return (FQPlotWindow::DataTransform) n;
@@ -54,9 +54,10 @@ const char* FQPlotWindow::dataTransform(FQPlotWindow::DataTransform dt)
 void FQPlotWindow::clearData()
 {
 	slices_.clear();
-	axisMin_.set(0.0, 0.0, 0.0);
-	axisMax_.set(10.0, 10.0, 10.0);
-	axisStep_.set(0.1, 0.1, 0.1);
+	dataMin_.zero();
+	dataMax_.zero();
+	limitMin_.set(0.0, 0.0, 0.0);
+	limitMax_.set(10.0, 10.0, 10.0);
 	interpolate_.set(false, false, false);
 	transformValue_.set(1.0,1.0,1.0);
 	transformType_[0] = FQPlotWindow::MultiplyTransform;
@@ -116,6 +117,14 @@ bool FQPlotWindow::loadData(QString fileName)
 			case (FQPlotWindow::ColourScalePointKeyword):
 				ui.ColourScaleWidget->addPoint(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
 				break;
+			// Limits
+			case (FQPlotWindow::LimitXKeyword):
+			case (FQPlotWindow::LimitYKeyword):
+			case (FQPlotWindow::LimitZKeyword):
+				xyz = kwd - FQPlotWindow::LimitXKeyword;
+				limitMin_[xyz] = parser.argd(1);
+				limitMax_[xyz] = parser.argd(2);
+				break;
 			// Pre-Transform Shifts
 			case (FQPlotWindow::PreTransformShiftXKeyword):
 			case (FQPlotWindow::PreTransformShiftYKeyword):
@@ -149,6 +158,7 @@ bool FQPlotWindow::loadData(QString fileName)
 			case (FQPlotWindow::TransformZKeyword):
 				xyz = kwd - FQPlotWindow::TransformXKeyword;
 				dt = dataTransform(parser.argc(1));
+				printf("DT = '%s', %i\n", parser.argc(1), dt);
 				transformType_[xyz] = dt;
 				transformValue_[xyz] = parser.argd(2);
 				break;
@@ -212,7 +222,11 @@ bool FQPlotWindow::saveData(QString fileName)
 	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::PostTransformShiftXKeyword], postTransformShift_.x);
 	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::PostTransformShiftYKeyword], postTransformShift_.y);
 	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::PostTransformShiftZKeyword], postTransformShift_.z);
-
+	// -- Limits
+	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[FQPlotWindow::LimitXKeyword], limitMin_.x, limitMax_.x);
+	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[FQPlotWindow::LimitYKeyword], limitMin_.y, limitMax_.y);
+	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[FQPlotWindow::LimitZKeyword], limitMin_.z, limitMax_.z);
+	
 	// Write view setup
 	// -- ColourScale
 	for (ColourScalePoint* csp = ui.ColourScaleWidget->firstPoint(); csp != NULL; csp = csp->next)
@@ -256,9 +270,82 @@ Slice* FQPlotWindow::loadSlice(QString fileName)
 	return slice;
 }
 
-// Set limits to encompass entire dataspace
-void FQPlotWindow::resetPlotLimits()
+// Recalculate data limits
+void FQPlotWindow::calculateDataLimits()
 {
+	dataMin_ = 0.0;
+	dataMax_ = 0.0;
+	if (slices_.nItems() > 0)
+	{
+		// Grab first slice and set initial values
+		Slice* slice = slices_.first();
+		dataMin_.set(slice->data().xMin(), slice->data().yMin(), slice->z());
+		dataMax_.set(slice->data().xMax(), slice->data().yMax(), slice->z());
+		double mmin, mmax;
+		for (slice = slice->next; slice != NULL; slice = slice->next)
+		{
+			mmin = slice->data().xMin();
+			mmax = slice->data().xMax();
+			if (mmin < dataMin_.x) dataMin_.x = mmin;
+			if (mmax > dataMax_.x) dataMax_.x = mmax;
+			mmin = slice->data().yMin();
+			mmax = slice->data().yMax();
+			if (mmin < dataMin_.y) dataMin_.y = mmin;
+			if (mmax > dataMax_.y) dataMax_.y = mmax;
+			if (slice->z() < dataMin_.z) dataMin_.z = slice->z();
+			else if (slice->z() > dataMax_.z) dataMax_.z = slice->z();
+		}
+	}
+	dataMin_.print();
+	dataMax_.print();
+	calculateTransformLimits();
+}
+
+// Recalculate transform limits
+void FQPlotWindow::calculateTransformLimits()
+{
+	transformMin_ = 0.0;
+	transformMax_ = 0.0;
+	if (slices_.nItems() == 0) return;
+	
+	for (int n=0; n<3; ++n)
+	{
+		transformMin_[n] = transformValue(dataMin_[n], preTransformShift_[n], postTransformShift_[n], transformType_[n], transformValue_[n]);
+		transformMax_[n] = transformValue(dataMax_[n], preTransformShift_[n], postTransformShift_[n], transformType_[n], transformValue_[n]);
+		// Values may have swapped...
+		if (transformMin_[n] > transformMax_[n])
+		{
+			double x = transformMin_[n];
+			transformMin_[n] = transformMax_[n];
+			transformMax_[n] = x;
+		}
+		// Might also need to clamp current limits to the new range...
+		if (limitMin_[n] < transformMin_[n]) limitMin_[n] = transformMin_[n];
+		else if (limitMin_[n] > transformMax_[n]) limitMin_[n] = transformMax_[n];
+		if (limitMax_[n] < transformMin_[n]) limitMax_[n] = transformMin_[n];
+		else if (limitMax_[n] > transformMax_[n]) limitMax_[n] = transformMax_[n];
+	}
+}
+
+// Transform single value
+double FQPlotWindow::transformValue(double x, double preShift, double postShift, FQPlotWindow::DataTransform transformType, double transformValue)
+{
+	switch (transformType)
+	{
+		case (FQPlotWindow::MultiplyTransform):
+			return  (x+preShift)*transformValue + postShift;
+			break;
+		case (FQPlotWindow::DivideTransform):
+			return (x+preShift)/transformValue + postShift;
+			break;
+		case (FQPlotWindow::LogBase10Transform):
+			return log10(x+preShift) + postShift;
+			break;
+		case (FQPlotWindow::NaturalLogTransform):
+			return log(x+preShift) + postShift;
+			break;
+	}
+	return 0.0;
 }
 
 // Flag data as modified, and update titlebar
@@ -269,68 +356,69 @@ void FQPlotWindow::setAsModified()
 }
 
 // Update surface data after data change
-void FQPlotWindow::updateSurface()
+void FQPlotWindow::updateSurface(bool dataHasChanged)
 {
-	// Clear existing display slices
-	surfaceData_.clear();
-
-	// Copy all slices to the array
-	surfaceData_ = slices_;
-	
-	// Loop over slices and apply any transforms (X or Y)
-	for (Slice* slice = surfaceData_.first(); slice != NULL; slice = slice->next)
+	if (dataHasChanged)
 	{
-		// X / Y
-		for (int n=0; n<2; ++n)
+		// Clear existing display slices
+		surfaceData_.clear();
+
+		// Loop over slices, apply any transforms (X or Y) and check limits
+		for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
 		{
-			Array<double>& arrayRef = n == 0 ? slice->data().arrayX() : slice->data().arrayY();
+			// Z
+			double z = transformValue(slice->z(), preTransformShift_[2], postTransformShift_[2], transformType_[2], transformValue_[2]);
+			// -- Is the transformed Z value within range?
+			if ((z < limitMin_.z) || (z > limitMax_.z)) continue;
 
-			// Apply pre-transform shift
-			arrayRef += preTransformShift_[n];
+			// Add new item to surfaceData_ array
+			Slice* surfaceSlice = surfaceData_.add();
+			surfaceSlice->setZ(z);
 
-			// Apply transform
-			switch (transformType_[n])
+			// X / Y
+			Array<double> array[2];
+			for (int n=0; n<2; ++n)
 			{
-				case (FQPlotWindow::MultiplyTransform):
-					arrayRef *= transformValue_[n];
-					break;
-				case (FQPlotWindow::DivideTransform):
-					arrayRef /= transformValue_[n];
-					break;
-				case (FQPlotWindow::LogBase10Transform):
-					arrayRef.takeLog();
-					break;
-				case (FQPlotWindow::NaturalLogTransform):
-					arrayRef.takeLn();
-					break;
+				array[n] = n == 0 ? slice->data().arrayX() : slice->data().arrayY();
+
+				// Apply pre-transform shift
+				array[n] += preTransformShift_[n];
+
+				// Apply transform
+				switch (transformType_[n])
+				{
+					case (FQPlotWindow::MultiplyTransform):
+						array[n] *= transformValue_[n];
+						break;
+					case (FQPlotWindow::DivideTransform):
+						array[n] /= transformValue_[n];
+						break;
+					case (FQPlotWindow::LogBase10Transform):
+						array[n].takeLog();
+						break;
+					case (FQPlotWindow::NaturalLogTransform):
+						array[n].takeLn();
+						break;
+				}
+				// Apply post-transform shift
+				array[n] += postTransformShift_[n];
 			}
-			// Apply post-transform shift
-			arrayRef += postTransformShift_[n];
-		}
-		
-		// Z
-		double z = slice->z();
-		switch (transformType_[2])
-		{
-			case (FQPlotWindow::MultiplyTransform):
-				slice->setZ( (z-preTransformShift_.z)*transformValue_.z + postTransformShift_.z);
-				break;
-			case (FQPlotWindow::DivideTransform):
-				slice->setZ( (z-preTransformShift_.z)/transformValue_.z + postTransformShift_.z);
-				break;
-			case (FQPlotWindow::LogBase10Transform):
-				slice->setZ( log10(z-preTransformShift_.z) + postTransformShift_.z);
-				break;
-			case (FQPlotWindow::NaturalLogTransform):
-				slice->setZ( log(z-preTransformShift_.z) + postTransformShift_.z);
-				break;
+
+			// Add data to surfaceSlice, obeying defined x-limits
+			for (int n=0; n<array[0].nItems(); ++n)
+			{
+				if ((array[0].value(n) < limitMin_.x) || (array[0].value(n) > limitMax_.x)) continue;
+				surfaceSlice->data().addPoint(array[0].value(n), array[1].value(n));
+			}
 		}
 	}
 
+	// Update surface GL object
 	ui.MainView->createSurface(surfaceData_, ui.ColourScaleWidget);
+	ui.MainView->createAxes(limitMin_, limitMax_);
+	ui.MainView->setSurfaceCenter((limitMax_-limitMin_)*0.5);
 
 	ui.MainView->update();
 
 	ui.NTrianglesLabel->setText("NTriangles: " + QString::number(ui.MainView->surfaceNTriangles()));
-
 }

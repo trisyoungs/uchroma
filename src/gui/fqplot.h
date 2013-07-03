@@ -109,6 +109,12 @@ class FQPlotWindow : public QMainWindow
 	void on_TransformXPostShiftSpin_valueChanged(double value);
 	void on_TransformYPostShiftSpin_valueChanged(double value);
 	void on_TransformZPostShiftSpin_valueChanged(double value);
+	void on_LimitXMinSpin_valueChanged(double value);
+	void on_LimitYMinSpin_valueChanged(double value);
+	void on_LimitZMinSpin_valueChanged(double value);
+	void on_LimitXMaxSpin_valueChanged(double value);
+	void on_LimitYMaxSpin_valueChanged(double value);
+	void on_LimitZMaxSpin_valueChanged(double value);
 
 	public:
 	// Update Transform tab
@@ -119,16 +125,11 @@ class FQPlotWindow : public QMainWindow
 	 * Tabs -- View
 	 */
 	private slots:
-	void on_ColourScaleTable_cellDoubleClicked(QTableWidgetItem* item, int col);
-	void on_XMinSpin_valueChanged(double value);
-	void on_YMinSpin_valueChanged(double value);
-	void on_ZMinSpin_valueChanged(double value);
-	void on_XMaxSpin_valueChanged(double value);
-	void on_YMaxSpin_valueChanged(double value);
-	void on_ZMaxSpin_valueChanged(double value);
-	void on_XLogCheck_clicked(bool checked);
-	void on_YLogCheck_clicked(bool checked);
-	void on_ZLogCheck_clicked(bool checked);
+	void on_ColourScaleTable_itemSelectionChanged();
+	void on_ColourScaleTable_cellDoubleClicked(int row, int column);
+	void on_ColourScaleTable_cellChanged(int row, int column);
+	void on_AddColourScalePointButton_clicked(bool checked);
+	void on_RemoveColourScalePointButton_clicked(bool checked);
 
 	public:
 	// Update View tab
@@ -140,7 +141,7 @@ class FQPlotWindow : public QMainWindow
 	 */
 	public:
 	// Datafile keywords
-	enum DataFileKeyword { ColourScalePointKeyword, PostTransformShiftXKeyword, PostTransformShiftYKeyword, PostTransformShiftZKeyword, PreTransformShiftXKeyword, PreTransformShiftYKeyword, PreTransformShiftZKeyword, SliceDirectoryKeyword, SliceKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
+	enum DataFileKeyword { ColourScalePointKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword, PostTransformShiftXKeyword, PostTransformShiftYKeyword, PostTransformShiftZKeyword, PreTransformShiftXKeyword, PreTransformShiftYKeyword, PreTransformShiftZKeyword, SliceDirectoryKeyword, SliceKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
 	static DataFileKeyword dataFileKeyword(const char* s);
 	static const char* dataFileKeyword(DataFileKeyword dfk);
 	// Data Transform types
@@ -157,8 +158,12 @@ class FQPlotWindow : public QMainWindow
 	QDir dataFileDirectory_;
 	// List of slices
 	List<Slice> slices_;
-	// Minima, maxima, and (if interpolating) step sizes for surface generation
-	Vec3<double> axisMin_, axisMax_, axisStep_;
+	// Extreme values of raw data
+	Vec3<double> dataMin_, dataMax_;
+	// Extreme values of transformed data 
+	Vec3<double> transformMin_, transformMax_;
+	// Data limits for surface generation
+	Vec3<double> limitMin_, limitMax_;
 	// Transform multipliers for data
 	Vec3<double> transformValue_;
 	// Transform types for data
@@ -183,12 +188,16 @@ class FQPlotWindow : public QMainWindow
 	bool saveData(QString fileName);
 	// Load slice
 	Slice* loadSlice(QString fileName);
-	// Set limits to encompass entire dataspace
-	void resetPlotLimits();
+	// Recalculate data limits
+	void calculateDataLimits();
+	// Recalculate transform limits
+	void calculateTransformLimits();
+	// Transform single value
+	double transformValue(double x, double preShift, double postShift, FQPlotWindow::DataTransform transformType, double transformValue);
 	// Flag data as modified, and update titlebar
 	void setAsModified();
 	// Update surface data after data change
-	void updateSurface();
+	void updateSurface(bool dataHasChanged = true);
 };
 
 #endif

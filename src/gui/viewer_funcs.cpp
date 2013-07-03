@@ -71,7 +71,7 @@ void Viewer::initializeGL()
 	// that, when saving a bitmap using QGLWidget::renderPixmap(), we automatically create new display list
 	// objects, rather than having to worry about context sharing etc. Slow, but safer and more compatible.
 	msg.print("In Viewer::initializeGL, pushing instances for %i primitives...\n", primitiveList_.nItems());
-	for (Refitem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->pushInstance(context()); 
+	for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->pushInstance(context()); 
 
 	msg.exit("Viewer::initializeGL");
 }
@@ -145,7 +145,7 @@ void Viewer::paintEvent(QPaintEvent *event)
 	if (renderingOffscreen_)
 	{
 		msg.print("In Viewer::PaintGL, popping instances for %i primitives...\n", primitiveList_.nItems());
-		for (Refitem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->popInstance(context());
+		for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->popInstance(context());
 	}
 	
 	msg.exit("Viewer::paintGL");

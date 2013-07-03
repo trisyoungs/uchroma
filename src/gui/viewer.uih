@@ -212,11 +212,11 @@ class Viewer : public QGLWidget
 	*/
 	private:
 	// Reference list of all created primitives (to which all user primitives must be added)
-	Reflist<Primitive,int> primitiveList_;
+	RefList<Primitive,int> primitiveList_;
 	// Basic test primtives
 	Primitive spherePrimitive_, cubePrimitive_;
-	// Surface primitive
-	Primitive surface_;
+	// Display primitives
+	Primitive surface_, axisPrimitives_[3], axisTextPrimitives_[3];
 	// Centrepoint of surface
 	Vec3<double> surfaceCenter_;
 
@@ -233,6 +233,10 @@ class Viewer : public QGLWidget
 	void constructSliceData(Slice* targetSlice, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale* colourScale, Slice* previousSlice, Slice* nextSlice);
 	// Create surface primitive
 	void createSurface(const List<Slice>& slices, ColourScale* colourScale);
+	// Create axes primitives
+	void createAxes(Vec3<double> axisMin, Vec3<double> axisMax);
+	// Set surface centre
+	void setSurfaceCenter(Vec3<double> center);
 	// Return number of triangles in surface
 	int surfaceNTriangles();
 };

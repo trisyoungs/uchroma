@@ -4,7 +4,7 @@ project(FQPLOT)
 set(DESCRIPTION "FQPLOT")
 set(AUTHOR "Tristan Youngs")
 set(VERSION_MAJOR "0")
-set(VERSION_MINOR "04")
+set(VERSION_MINOR "05")
 set(VERSION_PATCH "1")
 
 set(CMAKE_BUILD_TYPE "Release")

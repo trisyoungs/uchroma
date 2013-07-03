@@ -147,6 +147,8 @@ class ColourScale : public QWidget
 	void setPointColour(int position, QColor colour);
 	// Remove old point from colourscale
 	void removePoint(int position);
+	// Remove specified point from colourscale
+	void removePoint(ColourScalePoint* point);
 	// Get colour associated with value supplied
 	QColor colour(double value);
 };

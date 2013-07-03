@@ -1,0 +1,24 @@
+SliceDir "/home/tris/src/fqplot/test"
+Slice "triangle1.mint01" 0.000000
+Slice "triangle2.mint01" 1.000000
+Slice "triangle3.mint01" 2.000000
+Slice "triangle4.mint01" 3.000000
+TransformX Multiply 1.000000
+TransformY Multiply 1.000000
+TransformZ Multiply 1.000000
+PreTransformShiftX 0.000000
+PreTransformShiftY 0.000000
+PreTransformShiftZ 0.000000
+PostTransformShiftX 0.000000
+PostTransformShiftY 0.000000
+PostTransformShiftZ 0.000000
+LimitX -5.000000 5.000000
+LimitY 0.000000 3.000000
+LimitZ 0.000000 4.000000
+ColourScalePoint 0.000000 121 121 121 255
+ColourScalePoint 1.000000 255 6 6 255
+ColourScalePoint 2.000000 21 64 255 255
+ViewMatrixX 0.870141 -0.373557 0.321417 0.000000
+ViewMatrixY 0.376149 0.924832 0.056547 0.000000
+ViewMatrixZ -0.318380 0.071697 0.945248 0.000000
+ViewMatrixW 0.000000 0.000000 -23.874150 1.000000

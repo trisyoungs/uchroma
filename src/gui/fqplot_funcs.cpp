@@ -20,6 +20,7 @@
 */
 
 #include "gui/fqplot.h"
+#include "templates/reflist.h"
 #include "version.h"
 
 // Constructor
@@ -51,11 +52,9 @@ void FQPlotWindow::closeEvent(QCloseEvent *event)
 // Update all tabs
 void FQPlotWindow::updateAllTabs()
 {
-	refreshing_ = true;
 	updateSourceDataTab();
 	updateTransformTab();
 	updateViewTab();
-	refreshing_ = false;
 }
 
 // Update title bar
@@ -88,8 +87,12 @@ void FQPlotWindow::on_actionFileLoad_triggered(bool checked)
 	clearData();
 	if (loadData(fileName))
 	{
+		// Update data and transform limits
+		calculateDataLimits();
+
 		// Update GUI
 		updateAllTabs();
+		updateTitleBar();
 	}
 }
 
@@ -103,6 +106,7 @@ void FQPlotWindow::on_actionFileSave_triggered(bool checked)
 	}
 
 	if (saveData(inputFile_)) modified_ = false;
+	updateTitleBar();
 }
 
 void FQPlotWindow::on_actionFileSaveAs_triggered(bool checked)
@@ -113,6 +117,7 @@ void FQPlotWindow::on_actionFileSaveAs_triggered(bool checked)
 	
 	inputFile_ = newFileName;
 	if (saveData(inputFile_)) modified_ = false;
+	updateTitleBar();
 }
 
 void FQPlotWindow::on_actionFileQuit_triggered(bool checked)
@@ -235,6 +240,8 @@ void FQPlotWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 // Update source data
 void FQPlotWindow::updateSourceDataTab()
 {
+	refreshing_ = true;
+	
 	ui.SourceDirEdit->setText(dataFileDirectory_.absolutePath());
 
 	ui.SourceFilesTable->clearContents();
@@ -249,6 +256,8 @@ void FQPlotWindow::updateSourceDataTab()
 		++count;
 	}
 	ui.SourceFilesTable->resizeColumnsToContents();
+	
+	refreshing_ = false;
 }
 
 /*
@@ -354,103 +363,204 @@ void FQPlotWindow::on_TransformZPostShiftSpin_valueChanged(double value)
 	updateSurface();
 }
 
+void FQPlotWindow::on_LimitXMinSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	limitMin_.x = value;
+	setAsModified();
+	updateSurface();
+}
+
+void FQPlotWindow::on_LimitYMinSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	limitMin_.y = value;
+	setAsModified();
+	updateSurface();
+}
+
+void FQPlotWindow::on_LimitZMinSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	limitMin_.z = value;
+	setAsModified();
+	updateSurface();
+}
+
+void FQPlotWindow::on_LimitXMaxSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	limitMax_.x = value;
+	setAsModified();
+	updateSurface();
+}
+
+void FQPlotWindow::on_LimitYMaxSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	limitMax_.y = value;
+	setAsModified();
+	updateSurface();
+}
+
+void FQPlotWindow::on_LimitZMaxSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	limitMax_.z = value;
+	setAsModified();
+	updateSurface();
+}
+
 // Update Transform tab
 void FQPlotWindow::updateTransformTab()
 {
+	refreshing_ = true;
+
+	// Transform type / value
 	ui.TransformXTypeCombo->setCurrentIndex(transformType_[0]);
 	ui.TransformYTypeCombo->setCurrentIndex(transformType_[1]);
 	ui.TransformZTypeCombo->setCurrentIndex(transformType_[2]);
 	ui.TransformXValueSpin->setEnabled(transformType_[0] < 2);
 	ui.TransformYValueSpin->setEnabled(transformType_[1] < 2);
 	ui.TransformZValueSpin->setEnabled(transformType_[2] < 2);
-
 	ui.TransformXValueSpin->setValue(transformValue_.x);
 	ui.TransformYValueSpin->setValue(transformValue_.y);
 	ui.TransformZValueSpin->setValue(transformValue_.z);
 
+	// Shifts
 	ui.TransformXPreShiftSpin->setValue(preTransformShift_.x);
 	ui.TransformYPreShiftSpin->setValue(preTransformShift_.y);
 	ui.TransformZPreShiftSpin->setValue(preTransformShift_.z);
 	ui.TransformXPostShiftSpin->setValue(postTransformShift_.x);
 	ui.TransformYPostShiftSpin->setValue(postTransformShift_.y);
 	ui.TransformZPostShiftSpin->setValue(postTransformShift_.z);
+
+	// Limits
+	ui.LimitXMinSpin->setRange(transformMin_.x, transformMax_.x);
+	ui.LimitYMinSpin->setRange(transformMin_.y, transformMax_.y);
+	ui.LimitZMinSpin->setRange(transformMin_.z, transformMax_.z);
+	ui.LimitXMaxSpin->setRange(transformMin_.x, transformMax_.x);
+	ui.LimitYMaxSpin->setRange(transformMin_.y, transformMax_.y);
+	ui.LimitZMaxSpin->setRange(transformMin_.z, transformMax_.z);
+	ui.LimitXMinSpin->setValue(limitMin_.x);
+	ui.LimitYMinSpin->setValue(limitMin_.y);
+	ui.LimitZMinSpin->setValue(limitMin_.z);
+	ui.LimitXMaxSpin->setValue(limitMax_.x);
+	ui.LimitYMaxSpin->setValue(limitMax_.y);
+	ui.LimitZMaxSpin->setValue(limitMax_.z);
+
+	refreshing_ = false;
 }
 
 /*
  * Tabs - View
  */
 
-void FQPlotWindow::on_ColourScaleTable_cellDoubleClicked(QTableWidgetItem* item, int column)
-{
-}
-
-void FQPlotWindow::on_XMinSpin_valueChanged(double value)
+void FQPlotWindow::on_ColourScaleTable_itemSelectionChanged()
 {
 	if (refreshing_) return;
-	axisMin_.x = value;
+	bool selected = (ui.ColourScaleTable->selectedItems().count() != 0);
+	ui.RemoveColourScalePointButton->setEnabled(selected);
+}
+
+void FQPlotWindow::on_ColourScaleTable_cellDoubleClicked(int row, int column)
+{
+	if (refreshing_ || (column == 0)) return;
+
+	// Get item data (contains ColourScalePoint index)
+	QTableWidgetItem* item = ui.ColourScaleTable->item(row, column);
+	if (!item) return;
+	int cspId = item->data(Qt::UserRole).toInt();
+	
+        // Request a colour dialog
+        QColor newcol = QColorDialog::getColor(item->backgroundColor().rgba(), this, "Select new colour", QColorDialog::ShowAlphaChannel);
+        if (!newcol.isValid()) return;
+	
+	ui.ColourScaleWidget->setPointColour(cspId, newcol);
+
+	// Update table and refresh surface
+	item->setBackgroundColor(newcol);
+	updateSurface(false);
 	setAsModified();
-	updateSurface();
 }
 
-void FQPlotWindow::on_YMinSpin_valueChanged(double value)
+void FQPlotWindow::on_ColourScaleTable_cellChanged(int row, int column)
 {
-	if (refreshing_) return;
-	axisMin_.y = value;
+	if (refreshing_ || (column == 1)) return;
+	
+	// Get item data (contains ColourScalePoint index)
+	QTableWidgetItem* item = ui.ColourScaleTable->item(row, column);
+	if (!item) return;
+	int cspId = item->data(Qt::UserRole).toInt();
+	
+	// Value of this point has changed, so must update the list and refresh the surface and necessary widgets
+	ui.ColourScaleWidget->setPointValue(cspId, item->text().toDouble());
+
+	// Refresh table
+	updateViewTab();
+	updateSurface(false);
 	setAsModified();
-	updateSurface();
 }
 
-void FQPlotWindow::on_ZMinSpin_valueChanged(double value)
+void FQPlotWindow::on_AddColourScalePointButton_clicked(bool checked)
 {
-	if (refreshing_) return;
-	axisMin_.z = value;
+	ui.ColourScaleWidget->addPoint(ui.ColourScaleWidget->lastPoint() ? ui.ColourScaleWidget->lastPoint()->value() + 1.0 : 0.0, Qt::white);
+
+	// Refresh table
+	updateViewTab();
+	updateSurface(false);
 	setAsModified();
-	updateSurface();
 }
 
-void FQPlotWindow::on_XMaxSpin_valueChanged(double value)
+void FQPlotWindow::on_RemoveColourScalePointButton_clicked(bool checked)
 {
-	if (refreshing_) return;
-	axisMax_.x = value;
+	if (ui.ColourScaleTable->selectedItems().count() == 0) return;
+
+	// Get list of items to delete
+	int lastId = -1;
+	RefList<ColourScalePoint,int> toDelete;
+	foreach(QTableWidgetItem* item, ui.ColourScaleTable->selectedItems())
+	{
+		// Get point id from item
+		int cspId = item->data(Qt::UserRole).toInt();
+		if (lastId == cspId) continue;
+		lastId = cspId;
+		toDelete.addUnique(ui.ColourScaleWidget->point(cspId));
+	}
+
+	// Now delete the points
+	for (RefListItem<ColourScalePoint,int>* ri = toDelete.first(); ri != NULL; ri = ri->next) ui.ColourScaleWidget->removePoint(ri->item);
+
+	// Refresh table
+	updateViewTab();
+	updateSurface(false);
 	setAsModified();
-	updateSurface();
-}
-
-void FQPlotWindow::on_YMaxSpin_valueChanged(double value)
-{
-	if (refreshing_) return;
-	axisMax_.y = value;
-	setAsModified();
-	updateSurface();
-}
-
-void FQPlotWindow::on_ZMaxSpin_valueChanged(double value)
-{
-	if (refreshing_) return;
-	axisMax_.z = value;
-	setAsModified();
-	updateSurface();
-}
-
-void FQPlotWindow::on_XLogCheck_clicked(bool checked)
-{
-// 	axisLog_.x = checked;
-	updateSurface();
-}
-
-void FQPlotWindow::on_YLogCheck_clicked(bool checked)
-{
-// 	axisLog_.y = checked;
-	updateSurface();
-}
-
-void FQPlotWindow::on_ZLogCheck_clicked(bool checked)
-{
-// 	axisLog_.z = checked;
-	updateSurface();
 }
 
 // Update source data tab
 void FQPlotWindow::updateViewTab()
 {
+	refreshing_ = true;
+
+	// ColourScale - add points in reverse order so higher values appear at the top of the list
+	ui.ColourScaleTable->clearContents();
+	ui.ColourScaleTable->setRowCount(ui.ColourScaleWidget->nPoints());
+	QTableWidgetItem *item;
+	int count = 0;
+	for (ColourScalePoint *csp = ui.ColourScaleWidget->lastPoint(); csp != NULL; csp = csp->prev)
+	{
+		item = new QTableWidgetItem(QString::number(csp->value()));
+		item->setData(Qt::UserRole, ui.ColourScaleWidget->nPoints() - (count+1));
+		ui.ColourScaleTable->setItem(count, 0, item);
+		item = new QTableWidgetItem();
+		item->setBackgroundColor(csp->colour());
+		item->setData(Qt::UserRole, ui.ColourScaleWidget->nPoints() - (count+1));
+		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable	);
+		ui.ColourScaleTable->setItem(count, 1, item);
+		++count;
+	}
+	// Select first item in list
+	ui.ColourScaleTable->setCurrentItem(0);
+	
+	refreshing_ = false;
 }

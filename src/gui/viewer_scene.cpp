@@ -31,6 +31,7 @@ void Viewer::createPrimitives()
 
 	// Setup surface primitive
 	surface_.setColourData(true);
+	for (int n=0; n<3; ++n) axisPrimitives_[n].setType(GL_LINES);
 	
 	// Every created primitive must be added to the primitiveList_
 	primitiveList_.add(&spherePrimitive_);
@@ -153,6 +154,8 @@ void Viewer::drawScene()
 
 	A.setTranslation(-surfaceCenter_.x, -surfaceCenter_.y, surfaceCenter_.z);
 	renderPrimitive(&surface_, colourRed, A);
+	
+	
 }
 
 // Construct normal / colour data for slice specified
@@ -275,14 +278,11 @@ void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale)
 	Array< Vec4<GLfloat> > colourA, colourB;
 	int n, nPoints = slices.first()->data().nPoints();
 	QColor colour;
-	Vec3<double> nrm(0.0,1.0,0.0), dataMin, dataMax;
-	double mmin, mmax;
+	Vec3<double> nrm(0.0,1.0,0.0);
 
 	// Construct first slice data and set initial min/max values
 	Slice* sliceA = slices.first();
 	constructSliceData(sliceA, normA, colourA, colourScale, NULL, sliceA->next);
-	dataMin.set(sliceA->data().xMin(), sliceA->data().yMin(), sliceA->z());
-	dataMax.set(sliceA->data().xMax(), sliceA->data().yMax(), sliceA->z());
 	
 	// Create triangles
 	for (Slice* sliceB = sliceA->next; sliceB != NULL; sliceB = sliceB->next)
@@ -320,18 +320,6 @@ void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale)
 // 			surface_.defineVertex(xB[n+1], yB[n+1], zB, nrm, colourB[n+1], true);
 		}
 
-		// Adjust min/max range
-		mmin = sliceB->data().xMin();
-		mmax = sliceB->data().xMax();
-		if (mmin < dataMin.x) dataMin.x = mmin;
-		if (mmax > dataMax.x) dataMax.x = mmax;
-		mmin = sliceB->data().yMin();
-		mmax = sliceB->data().yMax();
-		if (mmin < dataMin.y) dataMin.y = mmin;
-		if (mmax > dataMax.y) dataMax.y = mmax;
-		if (sliceB->z() < dataMin.z) dataMin.z = sliceB->z();
-		if (sliceB->z() > dataMax.z) dataMax.z = sliceB->z();
-
 		// Copy arrays ready for next pass
 		normA = normB;
 		colourA = colourB;
@@ -341,10 +329,22 @@ void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale)
 	surface_.pushInstance(context());
 
 	msg.print("Surface contains %i vertices.\n", surface_.nDefinedVertices());
-	
-	// Determine center coordinates of data (on which to base a view translation for the data)
-	surfaceCenter_ = (dataMax - dataMin) * 0.5;
-	surfaceCenter_.print();
+}
+
+// Create axes primitives
+void Viewer::createAxes(Vec3<double> axisMin, Vec3<double> axisMax)
+{
+	for (int axis=0; axis < 3; ++axis)
+	{
+		double range = axisMax[axis] - axisMin[axis];
+		
+	}
+}
+
+// Set surface centre
+void Viewer::setSurfaceCenter(Vec3<double> center)
+{
+	surfaceCenter_ = center;
 }
 
 // Return number of triangles in surface
