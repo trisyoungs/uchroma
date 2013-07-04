@@ -1,0 +1,30 @@
+SliceDir "/home/tris/src/fqplot/test"
+Slice "cos01.txt" 0.000000
+Slice "cos02.txt" 1.000000
+Slice "cos03.txt" 2.000000
+Slice "cos04.txt" 3.000000
+Slice "cos05.txt" 4.000000
+Slice "cos06.txt" 5.000000
+Slice "cos07.txt" 6.000000
+Slice "cos08.txt" 7.000000
+Slice "cos09.txt" 8.000000
+Slice "cos10.txt" 9.000000
+TransformX Multiply 1.000000
+TransformY Multiply 1.000000
+TransformZ Multiply 1.000000
+PreTransformShiftX 0.000000
+PreTransformShiftY 0.000000
+PreTransformShiftZ 0.000000
+PostTransformShiftX 0.000000
+PostTransformShiftY 0.000000
+PostTransformShiftZ 0.000000
+LimitX -10.000000 10.000000
+LimitY 0.000000 0.999943
+LimitZ 0.000000 9.000000
+ColourScalePoint 0.000000 0 17 255 255
+ColourScalePoint 0.500000 255 255 255 0
+ColourScalePoint 1.000000 255 255 255 255
+ViewMatrixX 0.978712 0.082000 0.188145 0.000000
+ViewMatrixY -0.143089 0.929806 0.339096 0.000000
+ViewMatrixZ -0.147132 -0.358798 0.921746 0.000000
+ViewMatrixW 0.000000 0.000000 -43.131824 1.000000

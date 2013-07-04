@@ -122,7 +122,7 @@ class FQPlotWindow : public QMainWindow
 
 
 	/*
-	 * Tabs -- View
+	 * Tabs -- Colour
 	 */
 	private slots:
 	void on_ColourScaleTable_itemSelectionChanged();
@@ -130,6 +130,17 @@ class FQPlotWindow : public QMainWindow
 	void on_ColourScaleTable_cellChanged(int row, int column);
 	void on_AddColourScalePointButton_clicked(bool checked);
 	void on_RemoveColourScalePointButton_clicked(bool checked);
+
+	public:
+	// Update Colour tab
+	void updateColourTab();
+
+
+	/*
+	 * Tabs -- View
+	 */
+	private slots:
+	void on_ViewInvertZCheck_clicked(bool checked);
 
 	public:
 	// Update View tab
@@ -141,7 +152,7 @@ class FQPlotWindow : public QMainWindow
 	 */
 	public:
 	// Datafile keywords
-	enum DataFileKeyword { ColourScalePointKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword, PostTransformShiftXKeyword, PostTransformShiftYKeyword, PostTransformShiftZKeyword, PreTransformShiftXKeyword, PreTransformShiftYKeyword, PreTransformShiftZKeyword, SliceDirectoryKeyword, SliceKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
+	enum DataFileKeyword { ColourScalePointKeyword, InvertZAxisKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword, PostTransformShiftXKeyword, PostTransformShiftYKeyword, PostTransformShiftZKeyword, PreTransformShiftXKeyword, PreTransformShiftYKeyword, PreTransformShiftZKeyword, SliceDirectoryKeyword, SliceKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
 	static DataFileKeyword dataFileKeyword(const char* s);
 	static const char* dataFileKeyword(DataFileKeyword dfk);
 	// Data Transform types
@@ -176,6 +187,8 @@ class FQPlotWindow : public QMainWindow
 	Vec3<bool> interpolate_;
 	// List of slices for display
 	List<Slice> surfaceData_;
+	// Whether to invert Z-axis
+	bool invertZAxis_;
 
 	public:
 	// Clear current data

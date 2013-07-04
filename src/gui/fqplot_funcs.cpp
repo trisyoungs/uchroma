@@ -33,8 +33,7 @@ FQPlotWindow::FQPlotWindow(QMainWindow *parent) : QMainWindow(parent)
 	ui.setupUi(this);
 
 	// Set variable defaults
-// 	dataFileDirectory_ = getenv("CWD");
-	dataFileDirectory_ = "/home/tris/work/RB1220486_Youngs/benzene_D_D2_250mBar";
+	dataFileDirectory_ = getenv("CWD");
 	clearData();
 	refreshing_ = false;
 }
@@ -54,6 +53,7 @@ void FQPlotWindow::updateAllTabs()
 {
 	updateSourceDataTab();
 	updateTransformTab();
+	updateColourTab();
 	updateViewTab();
 }
 
@@ -158,7 +158,7 @@ void FQPlotWindow::on_SourceDirSelectButton_clicked(bool checked)
 // Add files button clicked
 void FQPlotWindow::on_AddFilesButton_clicked(bool checked)
 {
-	QStringList files = QFileDialog::getOpenFileNames(this, "Select datafiles", dataFileDirectory_.path(), "MINT files (*.mint01);;MDCS files (*.mdcs01);;All files (*)");
+	QStringList files = QFileDialog::getOpenFileNames(this, "Select datafiles", dataFileDirectory_.path(), "MINT files (*.mint01);;MDCS files (*.mdcs01);;Text files (*.txt);;All files (*)");
 
 	QProgressDialog progress("Loading Files...", "Abort Loading", 0, files.count(), this);
 	progress.setWindowModality(Qt::WindowModal);
@@ -173,8 +173,10 @@ void FQPlotWindow::on_AddFilesButton_clicked(bool checked)
 	}
 	progress.setValue(files.count());
 
-	// Update file list
+	// Update data limits and file list
+	calculateDataLimits();
 	updateSourceDataTab();
+	updateTransformTab();
 	setAsModified();
 	
 	// Need to update surface
@@ -241,7 +243,6 @@ void FQPlotWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 void FQPlotWindow::updateSourceDataTab()
 {
 	refreshing_ = true;
-	
 	ui.SourceDirEdit->setText(dataFileDirectory_.absolutePath());
 
 	ui.SourceFilesTable->clearContents();
@@ -269,6 +270,7 @@ void FQPlotWindow::on_TransformXTypeCombo_currentIndexChanged(int index)
 	if (refreshing_) return;
 	transformType_[0] = (DataTransform) index;
 	ui.TransformXValueSpin->setEnabled(index < 2);
+	calculateTransformLimits();
 	setAsModified();
 	updateSurface();
 }
@@ -278,6 +280,7 @@ void FQPlotWindow::on_TransformYTypeCombo_currentIndexChanged(int index)
 	if (refreshing_) return;
 	transformType_[1] = (DataTransform) index;
 	ui.TransformYValueSpin->setEnabled(index < 2);
+	calculateTransformLimits();
 	setAsModified();
 	updateSurface();
 }
@@ -287,6 +290,7 @@ void FQPlotWindow::on_TransformZTypeCombo_currentIndexChanged(int index)
 	if (refreshing_) return;
 	transformType_[2] = (DataTransform) index;
 	ui.TransformZValueSpin->setEnabled(index < 2);
+	calculateTransformLimits();
 	setAsModified();
 	updateSurface();
 }
@@ -295,6 +299,7 @@ void FQPlotWindow::on_TransformXValueSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	transformValue_.x = value;
+	calculateTransformLimits();
 	setAsModified();
 	updateSurface();
 }
@@ -303,6 +308,7 @@ void FQPlotWindow::on_TransformYValueSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	transformValue_.y = value;
+	calculateTransformLimits();
 	setAsModified();
 	updateSurface();
 }
@@ -311,6 +317,7 @@ void FQPlotWindow::on_TransformZValueSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	transformValue_.z = value;
+	calculateTransformLimits();
 	setAsModified();
 	updateSurface();
 }
@@ -319,6 +326,7 @@ void FQPlotWindow::on_TransformXPreShiftSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	preTransformShift_.x = value;
+	calculateTransformLimits();
 	setAsModified();
 	updateSurface();
 }
@@ -327,6 +335,7 @@ void FQPlotWindow::on_TransformYPreShiftSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	preTransformShift_.y = value;
+	calculateTransformLimits();
 	setAsModified();
 	updateSurface();
 }
@@ -335,6 +344,7 @@ void FQPlotWindow::on_TransformZPreShiftSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	preTransformShift_.z = value;
+	calculateTransformLimits();
 	setAsModified();
 	updateSurface();
 }
@@ -343,6 +353,7 @@ void FQPlotWindow::on_TransformXPostShiftSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	postTransformShift_.x = value;
+	calculateTransformLimits();
 	setAsModified();
 	updateSurface();
 }
@@ -351,6 +362,7 @@ void FQPlotWindow::on_TransformYPostShiftSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	postTransformShift_.y = value;
+	calculateTransformLimits();
 	setAsModified();
 	updateSurface();
 }
@@ -359,6 +371,7 @@ void FQPlotWindow::on_TransformZPostShiftSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	postTransformShift_.z = value;
+	calculateTransformLimits();
 	setAsModified();
 	updateSurface();
 }
@@ -453,7 +466,7 @@ void FQPlotWindow::updateTransformTab()
 }
 
 /*
- * Tabs - View
+ * Tabs - Colour
  */
 
 void FQPlotWindow::on_ColourScaleTable_itemSelectionChanged()
@@ -497,7 +510,7 @@ void FQPlotWindow::on_ColourScaleTable_cellChanged(int row, int column)
 	ui.ColourScaleWidget->setPointValue(cspId, item->text().toDouble());
 
 	// Refresh table
-	updateViewTab();
+	updateColourTab();
 	updateSurface(false);
 	setAsModified();
 }
@@ -507,7 +520,7 @@ void FQPlotWindow::on_AddColourScalePointButton_clicked(bool checked)
 	ui.ColourScaleWidget->addPoint(ui.ColourScaleWidget->lastPoint() ? ui.ColourScaleWidget->lastPoint()->value() + 1.0 : 0.0, Qt::white);
 
 	// Refresh table
-	updateViewTab();
+	updateColourTab();
 	updateSurface(false);
 	setAsModified();
 }
@@ -532,13 +545,13 @@ void FQPlotWindow::on_RemoveColourScalePointButton_clicked(bool checked)
 	for (RefListItem<ColourScalePoint,int>* ri = toDelete.first(); ri != NULL; ri = ri->next) ui.ColourScaleWidget->removePoint(ri->item);
 
 	// Refresh table
-	updateViewTab();
+	updateColourTab();
 	updateSurface(false);
 	setAsModified();
 }
 
-// Update source data tab
-void FQPlotWindow::updateViewTab()
+// Update Colour tab
+void FQPlotWindow::updateColourTab()
 {
 	refreshing_ = true;
 
@@ -562,5 +575,25 @@ void FQPlotWindow::updateViewTab()
 	// Select first item in list
 	ui.ColourScaleTable->setCurrentItem(0);
 	
+	refreshing_ = false;
+}
+
+/*
+ * Tabs - View
+ */
+
+void FQPlotWindow::on_ViewInvertZCheck_clicked(bool checked)
+{
+	if (refreshing_) return;
+	invertZAxis_ = checked;
+	setAsModified();
+	ui.MainView->setInvertZ(invertZAxis_);
+	ui.MainView->update();
+}
+
+// Update View tab
+void FQPlotWindow::updateViewTab()
+{
+	refreshing_ = true;
 	refreshing_ = false;
 }

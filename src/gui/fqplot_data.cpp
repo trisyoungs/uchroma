@@ -23,7 +23,7 @@
 #include "base/lineparser.h"
 
 // DataFile Keywords
-const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "ColourScalePoint", "LimitX", "LimitY", "LimitZ", "PostTransformShiftX", "PostTransformShiftY", "PostTransformShiftZ", "PreTransformShiftX", "PreTransformShiftY", "PreTransformShiftZ", "SliceDir", "Slice", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
+const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "ColourScalePoint", "InvertZAxis", "LimitX", "LimitY", "LimitZ", "PostTransformShiftX", "PostTransformShiftY", "PostTransformShiftZ", "PreTransformShiftX", "PreTransformShiftY", "PreTransformShiftZ", "SliceDir", "Slice", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
 FQPlotWindow::DataFileKeyword FQPlotWindow::dataFileKeyword(const char* s)
 {
 	for (int n=0; n<FQPlotWindow::nDataFileKeywords; ++n) if (strcmp(s, DataFileKeywordStrings[n]) == 0) return (FQPlotWindow::DataFileKeyword) n;
@@ -67,6 +67,7 @@ void FQPlotWindow::clearData()
 	postTransformShift_.zero();
 	modified_ = false;
 	ui.ColourScaleWidget->clear();
+	invertZAxis_ = false;
 }
 
 // Create default ColourScale
@@ -117,6 +118,10 @@ bool FQPlotWindow::loadData(QString fileName)
 			case (FQPlotWindow::ColourScalePointKeyword):
 				ui.ColourScaleWidget->addPoint(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
 				break;
+			// Invert Z-Axis
+			case (FQPlotWindow::InvertZAxisKeyword):
+				invertZAxis_ = true;
+				break;
 			// Limits
 			case (FQPlotWindow::LimitXKeyword):
 			case (FQPlotWindow::LimitYKeyword):
@@ -158,7 +163,6 @@ bool FQPlotWindow::loadData(QString fileName)
 			case (FQPlotWindow::TransformZKeyword):
 				xyz = kwd - FQPlotWindow::TransformXKeyword;
 				dt = dataTransform(parser.argc(1));
-				printf("DT = '%s', %i\n", parser.argc(1), dt);
 				transformType_[xyz] = dt;
 				transformValue_[xyz] = parser.argd(2);
 				break;
@@ -312,6 +316,7 @@ void FQPlotWindow::calculateTransformLimits()
 	{
 		transformMin_[n] = transformValue(dataMin_[n], preTransformShift_[n], postTransformShift_[n], transformType_[n], transformValue_[n]);
 		transformMax_[n] = transformValue(dataMax_[n], preTransformShift_[n], postTransformShift_[n], transformType_[n], transformValue_[n]);
+
 		// Values may have swapped...
 		if (transformMin_[n] > transformMax_[n])
 		{
@@ -319,11 +324,19 @@ void FQPlotWindow::calculateTransformLimits()
 			transformMin_[n] = transformMax_[n];
 			transformMax_[n] = x;
 		}
+
 		// Might also need to clamp current limits to the new range...
 		if (limitMin_[n] < transformMin_[n]) limitMin_[n] = transformMin_[n];
 		else if (limitMin_[n] > transformMax_[n]) limitMin_[n] = transformMax_[n];
 		if (limitMax_[n] < transformMin_[n]) limitMax_[n] = transformMin_[n];
 		else if (limitMax_[n] > transformMax_[n]) limitMax_[n] = transformMax_[n];
+		
+		// Is limited range acceptable?
+		if ((fabs(limitMax_[n] - limitMin_[n]) < 1.0e-5))
+		{
+			limitMin_[n] = transformMin_[n];
+			limitMax_[n] = transformMax_[n];
+		}
 	}
 }
 
@@ -416,7 +429,7 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 	// Update surface GL object
 	ui.MainView->createSurface(surfaceData_, ui.ColourScaleWidget);
 	ui.MainView->createAxes(limitMin_, limitMax_);
-	ui.MainView->setSurfaceCenter((limitMax_-limitMin_)*0.5);
+	ui.MainView->setSurfaceCenter((limitMax_+limitMin_)*0.5);
 
 	ui.MainView->update();
 

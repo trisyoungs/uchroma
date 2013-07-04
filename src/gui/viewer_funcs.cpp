@@ -44,6 +44,7 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	triangleChopper_.initialise(0.0, 1000, 0.2);
 	createPrimitives();
 	viewMatrix_[14] = -5.0;
+	invertZ_ = false;
 
 	// Prevent QPainter from autofilling widget background
 	setAutoFillBackground(FALSE);

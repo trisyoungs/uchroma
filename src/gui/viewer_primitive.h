@@ -87,7 +87,7 @@ class Primitive : public ListItem<Primitive>
 	// List of vertices in primitive
 	List<VertexChunk> vertexChunks_;
 	// Current vertex chunk
-	VertexChunk *currentVertexChunk_;
+	VertexChunk* currentVertexChunk_;
 	// Whether vertexData_ array also contains colour information
 	bool colouredVertexData_;
 	// Number of vertices that have been defined
@@ -149,7 +149,7 @@ class Primitive : public ListItem<Primitive>
 	// Define triangle with single colour per vertex
 	void defineTriangleSingleColour(GLfloat *vertices, GLfloat *normals, GLfloat *colour);
 	// Plot simple line between specified coordinates
-	void plotLine(GLfloat x1, GLfloat y1, GLfloat z1, GLfloat x2, GLfloat y2, GLfloat z2);
+	void plotLine(Vec3<double> p1, Vec3<double> p2);
 	// Plot vertices of sphere with specified radius and quality
 	void plotSphere(double radius, int nstacks, int nslices);
 	// Plot cylinder vertices from origin {ox,oy,oz}, following vector {vx,vy,vz}, for 'length', with radii and quality specified

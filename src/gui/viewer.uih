@@ -65,7 +65,8 @@ class Viewer : public QGLWidget
 	Matrix viewMatrix_;
 	// Viewport matrix for the scene
 	GLuint viewportMatrix_[4];
-		
+
+
 	protected:
 	// Initialise context widget (when created by Qt)
 	void initializeGL();
@@ -216,9 +217,11 @@ class Viewer : public QGLWidget
 	// Basic test primtives
 	Primitive spherePrimitive_, cubePrimitive_;
 	// Display primitives
-	Primitive surface_, axisPrimitives_[3], axisTextPrimitives_[3];
+	Primitive surface_, axisPrimitives_[3], testPrimitive_;
 	// Centrepoint of surface
 	Vec3<double> surfaceCenter_;
+	// Whether Z axis is inverted
+	bool invertZ_;
 
 	private:
 	// Create necessary primitives (called once when Viewer is constructed)
@@ -239,6 +242,8 @@ class Viewer : public QGLWidget
 	void setSurfaceCenter(Vec3<double> center);
 	// Return number of triangles in surface
 	int surfaceNTriangles();
+	// Set whether Z-axis is inverted
+	void setInvertZ(bool b);
 };
 
 #endif

@@ -44,11 +44,13 @@ int main(int argc, char *argv[])
 	if (argc == 2)
 	{
 		if (!mainWindow.loadData(argv[1])) return 1;
-		mainWindow.calculateDataLimits();
-		mainWindow.updateAllTabs();
-		mainWindow.updateTitleBar();
 	}
 
+	/* Update main window */
+	mainWindow.calculateDataLimits();
+	mainWindow.updateAllTabs();
+	mainWindow.updateTitleBar();
+		
 	/* Show the main window */
 	mainWindow.show();
 

@@ -127,11 +127,11 @@ void Primitive::defineTriangleSingleColour(GLfloat *vertices, GLfloat *normals, 
 }
 
 // Plot simple line between specified coordinates
-void Primitive::plotLine(GLfloat x1, GLfloat y1, GLfloat z1, GLfloat x2, GLfloat y2, GLfloat z2)
+void Primitive::plotLine(Vec3<double> p1, Vec3<double> p2)
 {
 	type_ = GL_LINES;
-	defineVertex(x1,y1,z1,0.0f,0.0f,1.0f,false);
-	defineVertex(x2,y2,z2,0.0f,0.0f,1.0f,false);
+	defineVertex(p1.x,p1.y,p1.z,0.0f,0.0f,1.0f,false);
+	defineVertex(p2.x,p2.y,p2.z,0.0f,0.0f,1.0f,false);
 }
 
 // Create vertices of sphere with specified radius and quality

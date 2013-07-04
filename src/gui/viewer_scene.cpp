@@ -21,6 +21,7 @@
 
 #include "gui/viewer.uih"
 #include "gui/colourscale.uih"
+#include "gui/fqplot.h"
 
 // Create necessary primitives (must be called before any rendering is done)
 void Viewer::createPrimitives()
@@ -31,8 +32,13 @@ void Viewer::createPrimitives()
 
 	// Setup surface primitive
 	surface_.setColourData(true);
-	for (int n=0; n<3; ++n) axisPrimitives_[n].setType(GL_LINES);
-	
+	for (int n=0; n<3; ++n)
+	{
+		axisPrimitives_[n].setType(GL_LINES);
+		axisPrimitives_[n].setNoInstances();
+	}
+	testPrimitive_.setNoInstances();
+
 	// Every created primitive must be added to the primitiveList_
 	primitiveList_.add(&spherePrimitive_);
 	primitiveList_.add(&cubePrimitive_);
@@ -49,7 +55,7 @@ void Viewer::setupGL()
 	GLfloat spotlightAmbient[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	GLfloat spotlightDiffuse[4] = { 0.8f, 0.8f, 0.8f, 1.0f };
 	GLfloat spotlightSpecular[4] = { 0.7f, 0.7f, 0.7f, 1.0f };
-	GLfloat spotlightPosition[4] = { 10.0f, 10.0f, -100.0f, 0.0f };
+	GLfloat spotlightPosition[4] = { 10.0f, 10.0f, 100.0f, 0.0f };
 	GLfloat specularColour[4] = { 0.9f, 0.9f, 0.9f, 1.0f };
 
 	// Clear (background) colour
@@ -129,11 +135,16 @@ void Viewer::drawScene()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	Matrix A;
 	GLfloat colourRed[4] = { 1.0, 0.0, 0.0, 1.0 };
 	GLfloat colourGreen[4] = { 0.0, 1.0, 0.0, 1.0 };
 	GLfloat colourBlue[4] = { 0.0, 0.0, 1.0, 1.0 };
 	GLfloat colourWhite[4] = { 1.0, 1.0, 1.0, 0.8 };
+	GLfloat colourBlack[4] = { 0.0, 0.0, 0.0, 1.0 };
+	
+	// Set up initial matrix
+	Matrix A;
+	A.setIdentity();
+	if (invertZ_) A[10] = -1.0;
 
 	if (surface_.nDefinedVertices() == 0)
 	{
@@ -152,10 +163,39 @@ void Viewer::drawScene()
 		renderPrimitive(&cubePrimitive_, colourBlue, A);
 	}
 
-	A.setTranslation(-surfaceCenter_.x, -surfaceCenter_.y, surfaceCenter_.z);
+	// Shift to center coordinates
+	A.setTranslation(-surfaceCenter_.x, -surfaceCenter_.y, -surfaceCenter_.z);
+
+	// Render axes
+	for (int axis=0; axis<3; ++axis) renderPrimitive(&axisPrimitives_[axis], colourBlack, A);
+
+	// Render surface
 	renderPrimitive(&surface_, colourRed, A);
-	
-	
+
+	QPainterPath path;
+	QFont font;
+	printf("%s\n", qPrintable(font.family()));
+	path.addText(QPointF(0, 0), font, QString(tr("T")));
+	QList<QPolygonF> polyList = path.toSubpathPolygons();
+	testPrimitive_.forgetAll();
+	foreach(QPolygonF polygon, polyList)
+	{
+		printf("Polygon Count = %i\n", polygon.count());
+		int lastPoint = (polygon.isClosed() ? polygon.count()-2 : polygon.count()-1);
+		for (int n=1; n<lastPoint; ++n)
+		{
+			testPrimitive_.defineVertex(polygon.first().rx(), polygon.first().ry(), 0.0, 1.0, 0.0, 0.0, true);
+			testPrimitive_.defineVertex(polygon[n].rx(), polygon[n].ry(), 0.0, 1.0, 0.0, 0.0, true);
+			testPrimitive_.defineVertex(polygon[n+1].rx(), polygon[n+1].ry(), 0.0, 1.0, 0.0, 0.0, true);
+		}
+// 		for (QPolygonF::iterator p = (*i).begin(); p != i->end(); p++)
+// 		{
+	// 		glVertex3f(p->rx()*0.1f, -p->ry()*0.1f, 0);
+	// 		printf("%f %f\n", p->rx(), p->ry());
+// 			testPrimitive_.defineVertex(p->rx(), p->ry(), 0.0, 1.0, 0.0, 0.0, false);
+	}
+	renderPrimitive(&testPrimitive_, colourBlack, A);
+// 	glEnd();
 }
 
 // Construct normal / colour data for slice specified
@@ -186,76 +226,97 @@ void Viewer::constructSliceData(Slice* targetSlice, Array< Vec3<double> >& norma
 		Array<double>& xNext = nextSlice->data().arrayX();
 		Array<double>& yPrev = previousSlice->data().arrayY();
 		Array<double>& yNext = nextSlice->data().arrayY();
-		dz = ((previousSlice->z() - targetSlice->z()) + (nextSlice->z() - targetSlice->z()))*0.5;
+		dz = previousSlice->z() - nextSlice->z();
 
 		// -- First point
 		v1.set(xTarget[1] - xTarget[0], yTarget[1] - yTarget[0], 0);
-		v2.set(0.0, ((yPrev[n] - yTarget[n]) + (yNext[n] - yTarget[n]))*0.5, dz);
+		v2.set(0.0, yNext[n] - yPrev[n], dz);
 		v3 = v1 * v2;
 		v3.normalise();
 		normals.add(v3);
+// 		printf("Norm %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", 0, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		// -- Points 1 to N-2
 		for (n=1; n<nPoints-1; ++n)
 		{
 // 			v1.set(((xTarget[n-1] - xTarget[n]) + (xTarget[n+1] - xTarget[n]))*0.5, ((yTarget[n-1] - yTarget[n]) + (yTarget[n+1] - yTarget[n]))*0.5, 0);
 // 			v2.set(0.0, ((yPrev[n] - yTarget[n]) + (yNext[n] - yTarget[n]))*0.5, dz);
-			v1.set(xTarget[n+1] - xTarget[n], yNext[n] - yTarget[n], 0.0);
-			v2.set(xNext[n] - xTarget[n], yTarget[n+1] - yTarget[n], dz);
+			v1.set(xTarget[n+1] - xTarget[n-1], yTarget[n+1] - yTarget[n-1], 0.0);
+			v2.set(0.0, yNext[n] - yPrev[n], dz);
 			v3 = v1 * v2;
 			v3.normalise();
 			normals.add(v3);
-// 			if (normals.nItems() < 100) printf("v1=%f,%f,%f  v2=%f,%f,%f  v3=%f,%f,%f\n", v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
+// 			printf("Norm %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		}
 		// -- Last point
-		v1.set(xTarget[nPoints-2] - xTarget[nPoints-1], yTarget[nPoints-2] - yTarget[nPoints-1], 0.0);
-		v2.set(0.0, ((yPrev[nPoints-1] - yTarget[nPoints-1]) + (yNext[nPoints-1] - yTarget[nPoints-1]))*0.5, dz);
+		v1.set(xTarget[nPoints-1] - xTarget[nPoints-2], yTarget[nPoints-1] - yTarget[nPoints-2], 0.0);
+		v2.set(0.0, yPrev[nPoints-1] - yNext[nPoints-1], dz);
 		v3 = v1 * v2;
 		v3.normalise();
 		normals.add(v3);
+// 		printf("Norm %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", nPoints-1, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 	}
 	else if (previousSlice)
 	{
 		// Grab other array reference
 		Array<double>& yPrev = previousSlice->data().arrayY();
-		dz = (previousSlice->z() - targetSlice->z());
+		dz = previousSlice->z() - targetSlice->z();
 
 		// -- First point
 		v1.set(xTarget[1] - xTarget[0], yTarget[1] - yTarget[0], 0.0);
-		v2.set(0.0, yPrev[n] - yTarget[n], dz);
-		normals.add(v1 * v2);
+		v2.set(0.0, yTarget[n] - yPrev[n], dz);
+		v3 = v1 * v2;
+		v3.normalise();
+		normals.add(v3);
+// 		printf("Last %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", 0, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		// -- Points 1 to N-2
 		for (n=1; n<nPoints-1; ++n)
 		{
-			v1.set(((xTarget[n-1] - xTarget[n]) + (xTarget[n+1] - xTarget[n]))*0.5, ((yTarget[n-1] - yTarget[n]) + (yTarget[n+1] - yTarget[n]))*0.5, 0.0);
-			v2.set(0.0, yPrev[n] - yTarget[n], dz);
-			normals.add(v1 * v2);
+// 			v1.set(((xTarget[n-1] - xTarget[n]) + (xTarget[n+1] - xTarget[n]))*0.5, ((yTarget[n-1] - yTarget[n]) + (yTarget[n+1] - yTarget[n]))*0.5, 0.0);
+			v1.set(xTarget[n+1] - xTarget[n-1], yTarget[n+1] - yTarget[n-1], 0.0);
+			v2.set(0.0, yTarget[n] - yPrev[n], dz);
+			v3 = v1 * v2;
+			v3.normalise();
+			normals.add(v3);
+// 			printf("Last %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		}
 		// -- Last point
-		v1.set(xTarget[nPoints-2] - xTarget[nPoints-1], yTarget[nPoints-2] - yTarget[nPoints-1], 0.0);
-		v2.set(0.0, yPrev[nPoints-1] - yTarget[nPoints-1], dz);
-		normals.add(v1 * v2);
+		v1.set(xTarget[nPoints-1] - xTarget[nPoints-2], yTarget[nPoints-1] - yTarget[nPoints-2], 0.0);
+		v2.set(0.0, yTarget[nPoints-1] - yPrev[nPoints-1], dz);
+		v3 = v1 * v2;
+		v3.normalise();
+		normals.add(v3);
+// 		printf("Last %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", nPoints-1, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 	}
 	else
 	{
 		// Grab other array reference
 		Array<double>& yNext = nextSlice->data().arrayY();
-		dz = nextSlice->z() - targetSlice->z();
+		dz = targetSlice->z() - nextSlice->z();
 
 		// -- First point
 		v1.set(xTarget[1] - xTarget[0], yTarget[1] - yTarget[0], 0.0);
 		v2.set(0.0, yNext[n] - yTarget[n], dz);
-		normals.add(v1 * v2);
+		v3 = v1 * v2;
+		v3.normalise();
+		normals.add(v3);
+// 		printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", 0, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		// -- Points 1 to N-2
 		for (n=1; n<nPoints-1; ++n)
 		{
-			v1.set(((xTarget[n-1] - xTarget[n]) + (xTarget[n+1] - xTarget[n]))*0.5, ((yTarget[n-1] - yTarget[n]) + (yTarget[n+1] - yTarget[n]))*0.5, 0.0);
+			v1.set(xTarget[n+1] - xTarget[n-1], yTarget[n+1] - yTarget[n-1], 0.0);
 			v2.set(0.0, yNext[n] - yTarget[n], dz);
-			normals.add(v1 * v2);
+			v3 = v1 * v2;
+			v3.normalise();
+			normals.add(v3);
+// 			printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		}
 		// -- Last point
-		v1.set(xTarget[nPoints-2] - xTarget[nPoints-1], yTarget[nPoints-2] - yTarget[nPoints-1], 0.0);
+		v1.set(xTarget[nPoints-1] - xTarget[nPoints-2], yTarget[nPoints-1] - yTarget[nPoints-2], 0.0);
 		v2.set(0.0, yNext[n] - yTarget[n], dz);
-		normals.add(v1 * v2);
+		v3 = v1 * v2;
+		v3.normalise();
+		normals.add(v3);
+// 		printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", nPoints-1, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 	}
 	
 	// Normalise normals
@@ -291,8 +352,8 @@ void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale)
 		constructSliceData(sliceB, normB, colourB, colourScale, sliceA, sliceB->next);
 
 		// Grab z values
-		zA = (GLfloat) -sliceA->z();
-		zB = (GLfloat) -sliceB->z();
+		zA = (GLfloat) sliceA->z();
+		zB = (GLfloat) sliceB->z();
 
 		// Get nPoints, and initial coordinates
 		Array<double>& xA = sliceA->data().arrayX();
@@ -334,10 +395,19 @@ void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale)
 // Create axes primitives
 void Viewer::createAxes(Vec3<double> axisMin, Vec3<double> axisMax)
 {
+	Vec3<double> u, v;
 	for (int axis=0; axis < 3; ++axis)
 	{
+		// Clear old primitive data
+		axisPrimitives_[axis].forgetAll();
 		double range = axisMax[axis] - axisMin[axis];
-		
+
+		// Draw a line from min to max range, passing through 0,0,0
+		u.zero();
+		u.set(axis, axisMin[axis]);
+		v.zero();
+		v.set(axis, axisMax[axis]);
+		axisPrimitives_[axis].plotLine(u, v);
 	}
 }
 
@@ -351,4 +421,10 @@ void Viewer::setSurfaceCenter(Vec3<double> center)
 int Viewer::surfaceNTriangles()
 {
 	return surface_.nDefinedVertices() / 3;
+}
+
+// Set whether Z-axis is inverted
+void Viewer::setInvertZ(bool b)
+{
+	invertZ_ = b;
 }
