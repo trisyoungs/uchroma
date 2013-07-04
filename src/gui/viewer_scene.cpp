@@ -172,30 +172,21 @@ void Viewer::drawScene()
 	// Render surface
 	renderPrimitive(&surface_, colourRed, A);
 
-	QPainterPath path;
-	QFont font;
-	printf("%s\n", qPrintable(font.family()));
-	path.addText(QPointF(0, 0), font, QString(tr("T")));
-	QList<QPolygonF> polyList = path.toSubpathPolygons();
-	testPrimitive_.forgetAll();
-	foreach(QPolygonF polygon, polyList)
-	{
-		printf("Polygon Count = %i\n", polygon.count());
-		int lastPoint = (polygon.isClosed() ? polygon.count()-2 : polygon.count()-1);
-		for (int n=1; n<lastPoint; ++n)
-		{
-			testPrimitive_.defineVertex(polygon.first().rx(), polygon.first().ry(), 0.0, 1.0, 0.0, 0.0, true);
-			testPrimitive_.defineVertex(polygon[n].rx(), polygon[n].ry(), 0.0, 1.0, 0.0, 0.0, true);
-			testPrimitive_.defineVertex(polygon[n+1].rx(), polygon[n+1].ry(), 0.0, 1.0, 0.0, 0.0, true);
-		}
-// 		for (QPolygonF::iterator p = (*i).begin(); p != i->end(); p++)
-// 		{
-	// 		glVertex3f(p->rx()*0.1f, -p->ry()*0.1f, 0);
-	// 		printf("%f %f\n", p->rx(), p->ry());
-// 			testPrimitive_.defineVertex(p->rx(), p->ry(), 0.0, 1.0, 0.0, 0.0, false);
-	}
-	renderPrimitive(&testPrimitive_, colourBlack, A);
-// 	glEnd();
+	// Create a pixmap font from a TrueType file.
+// 	FTPolygonFont font("wright.ttf");
+
+	// If something went wrong, bail out.
+// 	if(font.Error())
+// 	return -1;
+
+	// Set the font size and render a small text.
+	font_->FaceSize(8);
+	font_->Render("Hello World!");
+	glBegin(GL_TRIANGLES);
+	glVertex3f(0.0,0.0,0.0);
+	glVertex3f(1.0,0.0,0.0);
+	glVertex3f(0.0,1.0,0.0);
+	glEnd();
 }
 
 // Construct normal / colour data for slice specified

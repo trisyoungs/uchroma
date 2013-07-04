@@ -77,6 +77,9 @@ if test "$with_install_dir" != "/usr/local"; then
   INSTALLDIR="$with_install_dir"
 fi
 
+PKG_CHECK_MODULES(FREETYPE, freetype2 >= 2.0)
+PKG_CHECK_MODULES(FTGL, ftgl >= 2.0)
+
 
 # QT-FRAMEWORK  (Mac only)
 AC_ARG_WITH([qt],[AC_HELP_STRING([--with-qt=framework|fink|<none>],
@@ -105,8 +108,8 @@ if test "x$with_qt" = "x"; then
   PKG_CHECK_MODULES(QTGUI, QtGui >= 4.1.0)
   PKG_CHECK_MODULES(QTOPENGL, QtOpenGL >= 4.1.0)
 fi
-GUI_LDLIBS="$QTGUI_LIBS $QTOPENGL_LIBS -lreadline -lncurses -lGL"
-GUI_CFLAGS="$QTGUI_CFLAGS -I$RLINCDIR"
+GUI_LDLIBS="$FTGL_LIBS $FREETYPE_LIBS $QTGUI_LIBS $QTOPENGL_LIBS -lreadline -lncurses -lGL -lfreetype"
+GUI_CFLAGS="$FREETYPE_CFLAGS $QTGUI_CFLAGS -I$RLINCDIR"
 
 
 VERSION=FQPLOT_VERSION

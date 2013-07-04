@@ -8,6 +8,6 @@ noinst_HEADERS = version.h
 
 fqplot_SOURCES = main.cpp
 
-fqplot_INCLUDES = -I../ @GUI_CFLAGS@
+INCLUDES = -I../ @GUI_CFLAGS@
 
 fqplot_LDADD = gui/libgui.a math/libmath.a base/libbase.a @MAC_LIBS@ @GUI_LDLIBS@

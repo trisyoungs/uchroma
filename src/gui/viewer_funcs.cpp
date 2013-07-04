@@ -45,6 +45,8 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	createPrimitives();
 	viewMatrix_[14] = -5.0;
 	invertZ_ = false;
+	font_ = new FTPolygonFont("wright.ttf");
+	if (font_->Error()) printf("Oh drea, an error.\n");
 
 	// Prevent QPainter from autofilling widget background
 	setAutoFillBackground(FALSE);

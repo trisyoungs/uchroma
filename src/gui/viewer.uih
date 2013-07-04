@@ -24,6 +24,7 @@
 
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QObject>
+#include <FTGL/ftgl.h>
 #include "gui/viewer_primitive.h"
 #include "gui/viewer_primitiveinfo.h"
 #include "gui/viewer_textprimitive.h"
@@ -45,6 +46,7 @@ class Viewer : public QGLWidget
 	Viewer(QWidget *parent);
 	~Viewer();
 
+	FTPolygonFont* font_;
 
 	/*
 	// Character / Setup
@@ -65,7 +67,6 @@ class Viewer : public QGLWidget
 	Matrix viewMatrix_;
 	// Viewport matrix for the scene
 	GLuint viewportMatrix_[4];
-
 
 	protected:
 	// Initialise context widget (when created by Qt)
