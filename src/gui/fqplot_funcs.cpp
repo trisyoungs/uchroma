@@ -598,6 +598,15 @@ bool FQPlotWindow::viewAxisOrientationChanged(int axis, int dir, bool direction,
 	return true;
 }
 
+bool FQPlotWindow::viewAxisMinorTicksChanged(int axis, int value)
+{
+	if (refreshing_) return false;
+	axisMinorTicks_[axis] = value;
+	setAsModified();
+	updateSurface(false);
+	return true;
+}
+
 void FQPlotWindow::on_ViewInvertZCheck_clicked(bool checked)
 {
 	if (refreshing_) return;
@@ -632,6 +641,11 @@ void FQPlotWindow::on_ViewXAxisTicksStartSpin_valueChanged(double value)
 void FQPlotWindow::on_ViewXAxisTicksDeltaSpin_valueChanged(double value)
 {
 	viewAxisTicksChanged(0, false, value);
+}
+
+void FQPlotWindow::on_ViewXAxisMinorTicksSpin_valueChanged(int value)
+{
+	viewAxisMinorTicksChanged(0, value);
 }
 
 void FQPlotWindow::on_ViewXAxisDirectionXSpin_valueChanged(double value)
@@ -676,6 +690,26 @@ void FQPlotWindow::on_ViewYAxisTicksDeltaSpin_valueChanged(double value)
 	viewAxisTicksChanged(1, false, value);
 }
 
+void FQPlotWindow::on_ViewYAxisMinorTicksSpin_valueChanged(int value)
+{
+	viewAxisMinorTicksChanged(1, value);
+}
+
+void FQPlotWindow::on_ViewYAxisDirectionXSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(1, 0, true, value);
+}
+
+void FQPlotWindow::on_ViewYAxisDirectionYSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(1, 1, true, value);
+}
+
+void FQPlotWindow::on_ViewYAxisDirectionZSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(1, 2, true, value);
+}
+
 void FQPlotWindow::on_ViewZAxisCrossAtXSpin_valueChanged(double value)
 {
 	viewAxisCrossChanged(2, 0, value);
@@ -701,6 +735,26 @@ void FQPlotWindow::on_ViewZAxisTicksStartSpin_valueChanged(double value)
 void FQPlotWindow::on_ViewZAxisTicksDeltaSpin_valueChanged(double value)
 {
 	viewAxisTicksChanged(2, false, value);
+}
+
+void FQPlotWindow::on_ViewZAxisMinorTicksSpin_valueChanged(int value)
+{
+	viewAxisMinorTicksChanged(2, value);
+}
+
+void FQPlotWindow::on_ViewZAxisDirectionXSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(2, 0, true, value);
+}
+
+void FQPlotWindow::on_ViewZAxisDirectionYSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(2, 1, true, value);
+}
+
+void FQPlotWindow::on_ViewZAxisDirectionZSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(2, 2, true, value);
 }
 
 // Update View tab
@@ -731,16 +785,25 @@ void FQPlotWindow::updateViewTab()
 	ui.ViewXAxisTicksWidget->setEnabled(!axisAutoTicks_.x);
 	ui.ViewXAxisTicksStartSpin->setValue(axisFirstTick_.x);
 	ui.ViewXAxisTicksDeltaSpin->setValue(axisTickDelta_.x);
+	ui.ViewXAxisMinorTicksSpin->setValue(axisMinorTicks_.x);
 	// -- Y
 	ui.ViewYAxisAutoTicksCheck->setChecked(axisAutoTicks_.y);
 	ui.ViewYAxisTicksWidget->setEnabled(!axisAutoTicks_.y);
 	ui.ViewYAxisTicksStartSpin->setValue(axisFirstTick_.y);
 	ui.ViewYAxisTicksDeltaSpin->setValue(axisTickDelta_.y);
+	ui.ViewYAxisMinorTicksSpin->setValue(axisMinorTicks_.y);
 	// -- Z
 	ui.ViewZAxisAutoTicksCheck->setChecked(axisAutoTicks_.z);
 	ui.ViewZAxisTicksWidget->setEnabled(!axisAutoTicks_.z);
 	ui.ViewZAxisTicksStartSpin->setValue(axisFirstTick_.z);
 	ui.ViewZAxisTicksDeltaSpin->setValue(axisTickDelta_.z);
+	ui.ViewZAxisMinorTicksSpin->setValue(axisMinorTicks_.z);
+
+	// Orientation
+	// -- X
+	ui.ViewXAxisDirectionXSpin->setValue(axisLabelDirection_[0].x);
+	ui.ViewXAxisDirectionYSpin->setValue(axisLabelDirection_[0].y);
+	ui.ViewXAxisDirectionZSpin->setValue(axisLabelDirection_[0].z);
 	
 	refreshing_ = false;
 }

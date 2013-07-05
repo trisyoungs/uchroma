@@ -352,7 +352,7 @@ void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale)
 }
 
 // Create axis primitives
-void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta)
+void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction)
 {
 	// Clear old primitive data
 	axisPrimitives_[axis].forgetAll();
@@ -367,12 +367,25 @@ void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, dou
 	v = axisPosition;
 	v.set(axis, axisMax);
 	axisPrimitives_[axis].plotLine(u, v);
-	
+
+	// Plot tickmarks
 	int count = 0;
+	double delta = tickDelta / (nMinorTicks+1);
 	u.set(axis, firstTick);
-	while (u[axis] < axisMax)
+	while (u[axis] <= axisMax)
 	{
-		axisTextPrimitives_[axis].add(QString::number(u[axis]), axisLabelScale_, fontBaseHeight_, u, Vec3<double>(0.0,0.0,-1.0), Vec3<double>(0.0,1.0,0.0));
+		if (count%(nMinorTicks+1) == 0) axisPrimitives_[axis].plotLine(u, u+direction*0.1);
+		else axisPrimitives_[axis].plotLine(u, u+direction*0.05);
+		u.add(axis, delta);
+		count = (count+1)%(nMinorTicks+1);
+	}
+	
+	// Plot axis labels
+	count = 0;
+	u.set(axis, firstTick);
+	while (u[axis] <= axisMax)
+	{
+		axisTextPrimitives_[axis].add(QString::number(u[axis]), axisLabelScale_, fontBaseHeight_, u, direction, Vec3<double>(0.0,1.0,0.0));
 		u.add(axis, tickDelta);
 		++count;
 		if (count == 50)

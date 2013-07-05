@@ -243,7 +243,7 @@ class Viewer : public QGLWidget
 	// Create surface primitive
 	void createSurface(const List<Slice>& slices, ColourScale* colourScale);
 	// Create axis primitives
-	void createAxis(int axis, Vec3< double > axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta);
+	void createAxis(int axis, Vec3< double > axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction);
 	// Set surface centre
 	void setSurfaceCenter(Vec3<double> center);
 	// Return number of triangles in surface

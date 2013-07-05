@@ -23,7 +23,7 @@
 #include "base/lineparser.h"
 
 // DataFile Keywords
-const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "ColourScalePoint", "InvertZAxis", "LimitX", "LimitY", "LimitZ", "PostTransformShiftX", "PostTransformShiftY", "PostTransformShiftZ", "PreTransformShiftX", "PreTransformShiftY", "PreTransformShiftZ", "SliceDir", "Slice", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
+const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisLabelDirection", "AxisMinorTicks", "AxisPosition", "AxisTickDelta", "ColourScalePoint", "InvertZAxis", "LimitX", "LimitY", "LimitZ", "PostTransformShift", "PreTransformShift", "SliceDir", "Slice", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
 FQPlotWindow::DataFileKeyword FQPlotWindow::dataFileKeyword(const char* s)
 {
 	for (int n=0; n<FQPlotWindow::nDataFileKeywords; ++n) if (strcmp(s, DataFileKeywordStrings[n]) == 0) return (FQPlotWindow::DataFileKeyword) n;
@@ -131,6 +131,7 @@ void FQPlotWindow::clearData()
 	axisFirstTick_.zero();
 	axisTickDelta_.set(1.0,1.0,1.0);
 	axisAutoTicks_.set(true, true, true);
+	axisMinorTicks_.set(1,1,1);
 	axisLabelDirection_[0].set(1.0, 0.0, 0.0);
 	axisLabelDirection_[1].set(1.0, 0.0, 0.0);
 	axisLabelDirection_[2].set(1.0, 0.0, 0.0);
@@ -181,6 +182,32 @@ bool FQPlotWindow::loadData(QString fileName)
 		kwd = dataFileKeyword(parser.argc(0));
 		switch (kwd)
 		{
+			// Axis auto ticks
+			case (FQPlotWindow::AxisAutoTicksKeyword):
+				axisAutoTicks_.set(parser.argi(1), parser.argi(2), parser.argi(3));
+				break;
+			// Axis first ticks
+			case (FQPlotWindow::AxisFirstTickKeyword):
+				axisFirstTick_.set(parser.argd(1), parser.argd(2), parser.argd(3));
+				break;
+			// Axis label direction
+			case (FQPlotWindow::AxisLabelDirectionKeyword):
+				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Axis index is out of range for %s keyword.\n", dataFileKeyword(kwd));
+				else axisLabelDirection_[parser.argi(1)].set(parser.argd(2), parser.argd(3), parser.argd(4));
+				break;
+			// Axis minor ticks
+			case (FQPlotWindow::AxisMinorTicksKeyword):
+				axisMinorTicks_.set(parser.argi(1), parser.argi(2), parser.argi(3));
+				break;
+			// Axis position
+			case (FQPlotWindow::AxisPositionKeyword):
+				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Axis index is out of range for %s keyword.\n", dataFileKeyword(kwd));
+				else axisPosition_[parser.argi(1)].set(parser.argd(2), parser.argd(3), parser.argd(4));
+				break;
+			// Axis tick deltas
+			case (FQPlotWindow::AxisTickDeltaKeyword):
+				axisTickDelta_.set(parser.argd(1), parser.argd(2), parser.argd(3));
+				break;
 			// ColourScalePoint definition
 			case (FQPlotWindow::ColourScalePointKeyword):
 				ui.ColourScaleWidget->addPoint(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
@@ -198,18 +225,12 @@ bool FQPlotWindow::loadData(QString fileName)
 				limitMax_[xyz] = parser.argd(2);
 				break;
 			// Pre-Transform Shifts
-			case (FQPlotWindow::PreTransformShiftXKeyword):
-			case (FQPlotWindow::PreTransformShiftYKeyword):
-			case (FQPlotWindow::PreTransformShiftZKeyword):
-				xyz = kwd - FQPlotWindow::PreTransformShiftXKeyword;
-				preTransformShift_[xyz] = parser.argd(1);
+			case (FQPlotWindow::PreTransformShiftKeyword):
+				preTransformShift_.set(parser.argd(1), parser.argd(2), parser.argd(3));
 				break;
 			// Post-Transform Shifts
-			case (FQPlotWindow::PostTransformShiftXKeyword):
-			case (FQPlotWindow::PostTransformShiftYKeyword):
-			case (FQPlotWindow::PostTransformShiftZKeyword):
-				xyz = kwd - FQPlotWindow::PostTransformShiftXKeyword;
-				postTransformShift_[xyz] = parser.argd(1);
+			case (FQPlotWindow::PostTransformShiftKeyword):
+				postTransformShift_.set(parser.argd(1), parser.argd(2), parser.argd(3));
 				break;
 			// Datafile directory
 			case (FQPlotWindow::SliceDirectoryKeyword):
@@ -287,23 +308,32 @@ bool FQPlotWindow::saveData(QString fileName)
 	parser.writeLineF("%s %s %f\n", DataFileKeywordStrings[FQPlotWindow::TransformYKeyword], dataTransform(transformType_[1]), transformValue_.y);
 	parser.writeLineF("%s %s %f\n", DataFileKeywordStrings[FQPlotWindow::TransformZKeyword], dataTransform(transformType_[2]), transformValue_.z);
 	// -- Shifts
-	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::PreTransformShiftXKeyword], preTransformShift_.x);
-	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::PreTransformShiftYKeyword], preTransformShift_.y);
-	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::PreTransformShiftZKeyword], preTransformShift_.z);
-	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::PostTransformShiftXKeyword], postTransformShift_.x);
-	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::PostTransformShiftYKeyword], postTransformShift_.y);
-	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::PostTransformShiftZKeyword], postTransformShift_.z);
+	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::PreTransformShiftKeyword], preTransformShift_.x, preTransformShift_.y, preTransformShift_.z);
+	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::PostTransformShiftKeyword], postTransformShift_.x, postTransformShift_.y, postTransformShift_.z);
 	// -- Limits
 	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[FQPlotWindow::LimitXKeyword], limitMin_.x, limitMax_.x);
 	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[FQPlotWindow::LimitYKeyword], limitMin_.y, limitMax_.y);
 	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[FQPlotWindow::LimitZKeyword], limitMin_.z, limitMax_.z);
 	
-	// Write view setup
+	// Write colour setup
 	// -- ColourScale
 	for (ColourScalePoint* csp = ui.ColourScaleWidget->firstPoint(); csp != NULL; csp = csp->next)
 	{
 		parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourScalePointKeyword], csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
 	}
+	
+	// Write view setup
+	// -- Axes
+	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisAutoTicksKeyword], axisAutoTicks_.x, axisAutoTicks_.y, axisAutoTicks_.z);
+	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisFirstTickKeyword], axisFirstTick_.x, axisFirstTick_.y, axisFirstTick_.z);
+	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisTickDeltaKeyword], axisTickDelta_.x, axisTickDelta_.y, axisTickDelta_.z);
+	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisMinorTicksKeyword], axisMinorTicks_.x, axisMinorTicks_.y, axisMinorTicks_.z);
+	for (int axis=0; axis<3; ++axis)
+	{
+		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisPositionKeyword], axis, axisPosition_[axis].x, axisPosition_[axis].y, axisPosition_[axis].z);
+		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisLabelDirectionKeyword], axis, axisLabelDirection_[axis].x, axisLabelDirection_[axis].y, axisLabelDirection_[axis].z);
+	}
+
 	// -- Transformation Matrix
 	Matrix mat = ui.MainView->viewMatrix();
 	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::ViewMatrixXKeyword], mat[0], mat[1], mat[2], mat[3]);
@@ -510,7 +540,7 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 	for (int axis = 0; axis < 3; ++axis)
 	{
 		if (axisAutoTicks_[axis]) calculateTickDeltas(axis);
-		ui.MainView->createAxis(axis, axisPosition_[axis], limitMin_[axis], limitMax_[axis], axisFirstTick_[axis], axisTickDelta_[axis]);
+		ui.MainView->createAxis(axis, axisPosition_[axis], limitMin_[axis], limitMax_[axis], axisFirstTick_[axis], axisTickDelta_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis]);
 	}
 
 	ui.MainView->update();

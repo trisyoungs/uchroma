@@ -149,7 +149,8 @@ class FQPlotWindow : public QMainWindow
 	bool viewAxisCrossChanged(int axis, int dir, double value);
 	bool viewAxisTicksChanged(int axis, bool start, double value);
 	bool viewAxisOrientationChanged(int axis, int dir, bool direction, double value);
-	
+	bool viewAxisMinorTicksChanged(int axis, int value);
+
 	private slots:
 	void on_ViewInvertZCheck_clicked(bool checked);
 	// -- X Axis Tab
@@ -158,6 +159,7 @@ class FQPlotWindow : public QMainWindow
 	void on_ViewXAxisAutoTicksCheck_clicked(bool checked);
 	void on_ViewXAxisTicksStartSpin_valueChanged(double value);
 	void on_ViewXAxisTicksDeltaSpin_valueChanged(double value);
+	void on_ViewXAxisMinorTicksSpin_valueChanged(int value);
 	void on_ViewXAxisDirectionXSpin_valueChanged(double value);
 	void on_ViewXAxisDirectionYSpin_valueChanged(double value);
 	void on_ViewXAxisDirectionZSpin_valueChanged(double value);
@@ -167,12 +169,20 @@ class FQPlotWindow : public QMainWindow
 	void on_ViewYAxisAutoTicksCheck_clicked(bool checked);
 	void on_ViewYAxisTicksStartSpin_valueChanged(double value);
 	void on_ViewYAxisTicksDeltaSpin_valueChanged(double value);
+	void on_ViewYAxisMinorTicksSpin_valueChanged(int value);
+	void on_ViewYAxisDirectionXSpin_valueChanged(double value);
+	void on_ViewYAxisDirectionYSpin_valueChanged(double value);
+	void on_ViewYAxisDirectionZSpin_valueChanged(double value);
 	// -- Z Axis Tab
 	void on_ViewZAxisCrossAtXSpin_valueChanged(double value);
 	void on_ViewZAxisCrossAtYSpin_valueChanged(double value);
 	void on_ViewZAxisAutoTicksCheck_clicked(bool checked);
 	void on_ViewZAxisTicksStartSpin_valueChanged(double value);
 	void on_ViewZAxisTicksDeltaSpin_valueChanged(double value);
+	void on_ViewZAxisMinorTicksSpin_valueChanged(int value);
+	void on_ViewZAxisDirectionXSpin_valueChanged(double value);
+	void on_ViewZAxisDirectionYSpin_valueChanged(double value);
+	void on_ViewZAxisDirectionZSpin_valueChanged(double value);
 
 	public:
 	// Update View tab
@@ -184,7 +194,7 @@ class FQPlotWindow : public QMainWindow
 	 */
 	public:
 	// Datafile keywords
-	enum DataFileKeyword { ColourScalePointKeyword, InvertZAxisKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword, PostTransformShiftXKeyword, PostTransformShiftYKeyword, PostTransformShiftZKeyword, PreTransformShiftXKeyword, PreTransformShiftYKeyword, PreTransformShiftZKeyword, SliceDirectoryKeyword, SliceKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
+	enum DataFileKeyword { AxisAutoTicksKeyword, AxisFirstTickKeyword, AxisLabelDirectionKeyword, AxisMinorTicksKeyword, AxisPositionKeyword, AxisTickDeltaKeyword, ColourScalePointKeyword, InvertZAxisKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword, PostTransformShiftKeyword, PreTransformShiftKeyword, SliceDirectoryKeyword, SliceKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
 	static DataFileKeyword dataFileKeyword(const char* s);
 	static const char* dataFileKeyword(DataFileKeyword dfk);
 	// Data Transform types
@@ -233,6 +243,8 @@ class FQPlotWindow : public QMainWindow
 	Vec3<double> axisTickDelta_;
 	// Whether to calculate ticks automatically
 	Vec3<bool> axisAutoTicks_;
+	// Number of minor ticks in major tick intervals
+	Vec3<int> axisMinorTicks_;
 	// Orientation of axis labels
 	Vec3<double> axisLabelDirection_[3], axisLabelRotation_;
 
