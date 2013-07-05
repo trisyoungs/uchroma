@@ -96,6 +96,12 @@ class FQPlotWindow : public QMainWindow
 	/*
 	 * Tabs -- Transform
 	 */
+	private:
+	// Change functions
+	bool transformTypeChanged(int axis, int index);
+	bool transformValueChanged(int axis, double value);
+	bool transformShiftChanged(int axis, bool pre, double value);
+	bool transformLimitChanged(int axis, bool minLim, double value);
 	private slots:
 	void on_TransformXTypeCombo_currentIndexChanged(int index);
 	void on_TransformYTypeCombo_currentIndexChanged(int index);
@@ -139,8 +145,34 @@ class FQPlotWindow : public QMainWindow
 	/*
 	 * Tabs -- View
 	 */
+	private:
+	bool viewAxisCrossChanged(int axis, int dir, double value);
+	bool viewAxisTicksChanged(int axis, bool start, double value);
+	bool viewAxisOrientationChanged(int axis, int dir, bool direction, double value);
+	
 	private slots:
 	void on_ViewInvertZCheck_clicked(bool checked);
+	// -- X Axis Tab
+	void on_ViewXAxisCrossAtYSpin_valueChanged(double value);
+	void on_ViewXAxisCrossAtZSpin_valueChanged(double value);
+	void on_ViewXAxisAutoTicksCheck_clicked(bool checked);
+	void on_ViewXAxisTicksStartSpin_valueChanged(double value);
+	void on_ViewXAxisTicksDeltaSpin_valueChanged(double value);
+	void on_ViewXAxisDirectionXSpin_valueChanged(double value);
+	void on_ViewXAxisDirectionYSpin_valueChanged(double value);
+	void on_ViewXAxisDirectionZSpin_valueChanged(double value);
+	// -- Y Axis Tab
+	void on_ViewYAxisCrossAtXSpin_valueChanged(double value);
+	void on_ViewYAxisCrossAtZSpin_valueChanged(double value);
+	void on_ViewYAxisAutoTicksCheck_clicked(bool checked);
+	void on_ViewYAxisTicksStartSpin_valueChanged(double value);
+	void on_ViewYAxisTicksDeltaSpin_valueChanged(double value);
+	// -- Z Axis Tab
+	void on_ViewZAxisCrossAtXSpin_valueChanged(double value);
+	void on_ViewZAxisCrossAtYSpin_valueChanged(double value);
+	void on_ViewZAxisAutoTicksCheck_clicked(bool checked);
+	void on_ViewZAxisTicksStartSpin_valueChanged(double value);
+	void on_ViewZAxisTicksDeltaSpin_valueChanged(double value);
 
 	public:
 	// Update View tab
@@ -189,6 +221,24 @@ class FQPlotWindow : public QMainWindow
 	List<Slice> surfaceData_;
 	// Whether to invert Z-axis
 	bool invertZAxis_;
+	// Scale of axis values
+	double axisLabelScale_;
+	// Scale of axis titles
+	double axisTitleScale_;
+	// Axis position (in real surface-space coordinates)
+	Vec3<double> axisPosition_[3];
+	// Position of first tick delta on axes
+	Vec3<double> axisFirstTick_;
+	// Tick delta for axes
+	Vec3<double> axisTickDelta_;
+	// Whether to calculate ticks automatically
+	Vec3<bool> axisAutoTicks_;
+	// Orientation of axis labels
+	Vec3<double> axisLabelDirection_[3], axisLabelRotation_;
+
+	private:
+	// Recalculate tick deltas for specified axis
+	void calculateTickDeltas(int axis);
 
 	public:
 	// Clear current data

@@ -50,6 +50,61 @@ const char* FQPlotWindow::dataTransform(FQPlotWindow::DataTransform dt)
  * Data
  */
 
+// Recalculate tick deltas for specified axis
+void FQPlotWindow::calculateTickDeltas(int axis)
+{
+	const int nBaseValues = 5, maxIterations = 10, maxTicks = 10;
+	int power = 1, baseValues[nBaseValues] = { 1, 2, 3, 4, 5 }, baseValueIndex = 0, nTicks, iteration, minTicks = maxTicks/2;
+
+	baseValueIndex = 0;
+	power = int(log10((limitMax_[axis]-limitMin_[axis]) / maxTicks) - 1);
+	iteration = 0;
+
+	if ((limitMax_[axis] - limitMin_[axis]) > 1.0e-10)
+	{
+		do
+		{
+			// Calculate current tickDelta
+			axisTickDelta_[axis] = baseValues[baseValueIndex]*pow(10.0,power);
+
+			// Get first tickmark value
+			axisFirstTick_[axis] = int(limitMin_[axis] / axisTickDelta_[axis]) * axisTickDelta_[axis];
+			if (axisFirstTick_[axis] < limitMin_[axis]) axisFirstTick_[axis] += axisTickDelta_[axis];
+
+			// How many ticks now fit between the firstTick and max value?
+			// Add 1 to get total ticks for this delta (i.e. including firstTick)
+			nTicks = int((limitMax_[axis]-axisFirstTick_[axis]) / axisTickDelta_[axis]);
+			++nTicks;
+
+			// Check n...
+			if (nTicks > maxTicks)
+			{
+				++baseValueIndex;
+				if (baseValueIndex == nBaseValues) ++power;
+				baseValueIndex = baseValueIndex%nBaseValues;
+			}
+			else if (nTicks < minTicks)
+			{
+				--baseValueIndex;
+				if (baseValueIndex == -1)
+				{
+					--power;
+					baseValueIndex += nBaseValues;
+				}
+			}
+
+			++iteration;
+			if (iteration == maxIterations) break;
+
+		} while ((nTicks > maxTicks) || (nTicks < minTicks));
+	}
+	else
+	{
+		axisFirstTick_[axis] = limitMin_[axis];
+		axisTickDelta_[axis] = 1.0;
+	}
+}
+
 // Clear current data
 void FQPlotWindow::clearData()
 {
@@ -68,6 +123,18 @@ void FQPlotWindow::clearData()
 	modified_ = false;
 	ui.ColourScaleWidget->clear();
 	invertZAxis_ = false;
+	axisLabelScale_ = 0.5;
+	axisTitleScale_ = 0.62;
+	axisPosition_[0].zero();
+	axisPosition_[1].zero();
+	axisPosition_[2].zero();
+	axisFirstTick_.zero();
+	axisTickDelta_.set(1.0,1.0,1.0);
+	axisAutoTicks_.set(true, true, true);
+	axisLabelDirection_[0].set(1.0, 0.0, 0.0);
+	axisLabelDirection_[1].set(1.0, 0.0, 0.0);
+	axisLabelDirection_[2].set(1.0, 0.0, 0.0);
+	axisLabelRotation_.zero();
 }
 
 // Create default ColourScale
@@ -300,8 +367,6 @@ void FQPlotWindow::calculateDataLimits()
 			else if (slice->z() > dataMax_.z) dataMax_.z = slice->z();
 		}
 	}
-	dataMin_.print();
-	dataMax_.print();
 	calculateTransformLimits();
 }
 
@@ -337,6 +402,14 @@ void FQPlotWindow::calculateTransformLimits()
 			limitMin_[n] = transformMin_[n];
 			limitMax_[n] = transformMax_[n];
 		}
+
+		// Are axis positions acceptable
+		for (int m=0; m < 3; ++m)
+		{
+			if (n == m) continue;
+			if (axisPosition_[m].get(n) < limitMin_[n]) axisPosition_[m].set(n, limitMin_[n]);
+			if (axisPosition_[m].get(n) > limitMax_[n]) axisPosition_[m].set(n, limitMax_[n]);
+		}
 	}
 }
 
@@ -371,6 +444,10 @@ void FQPlotWindow::setAsModified()
 // Update surface data after data change
 void FQPlotWindow::updateSurface(bool dataHasChanged)
 {
+	// Make sure view variables are up-to-date
+	ui.MainView->setSurfaceCenter((limitMax_+limitMin_)*0.5);
+	ui.MainView->setAxisLabelScale(axisLabelScale_);
+
 	if (dataHasChanged)
 	{
 		// Clear existing display slices
@@ -428,8 +505,13 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 
 	// Update surface GL object
 	ui.MainView->createSurface(surfaceData_, ui.ColourScaleWidget);
-	ui.MainView->createAxes(limitMin_, limitMax_);
-	ui.MainView->setSurfaceCenter((limitMax_+limitMin_)*0.5);
+
+	// Construct axes
+	for (int axis = 0; axis < 3; ++axis)
+	{
+		if (axisAutoTicks_[axis]) calculateTickDeltas(axis);
+		ui.MainView->createAxis(axis, axisPosition_[axis], limitMin_[axis], limitMax_[axis], axisFirstTick_[axis], axisTickDelta_[axis]);
+	}
 
 	ui.MainView->update();
 

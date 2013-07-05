@@ -31,9 +31,9 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	// Character / Setup
 	contextWidth_ = 0;
 	contextHeight_ = 0;
-	valid_ = FALSE;
-	drawing_ = FALSE;
-	renderingOffscreen_ = FALSE;
+	valid_ = false;
+	drawing_ = false;
+	renderingOffscreen_ = false;
 
 	// Preferences (set static members only on first instance creation)
 	setDefaultPreferences(nViewerInstances == 0);
@@ -45,11 +45,11 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	createPrimitives();
 	viewMatrix_[14] = -5.0;
 	invertZ_ = false;
-	font_ = new FTPolygonFont("wright.ttf");
-	if (font_->Error()) printf("Oh drea, an error.\n");
+	font_ = NULL;
+	setupFont("wright.ttf");
 
 	// Prevent QPainter from autofilling widget background
-	setAutoFillBackground(FALSE);
+	setAutoFillBackground(false);
 	
 	++nViewerInstances;
 }
@@ -81,12 +81,6 @@ void Viewer::initializeGL()
 
 void Viewer::paintGL()
 {
-	if (renderingOffscreen_) paintEvent(NULL);
-}
-
-// General repaint callback
-void Viewer::paintEvent(QPaintEvent *event)
-{
 	msg.enter("Viewer::paintGL");
 	QColor color;
 	QRect currentBox;
@@ -99,7 +93,7 @@ void Viewer::paintEvent(QPaintEvent *event)
 	}
 
 	// Set the drawing flag so we don't have any rendering clashes
-	drawing_ = TRUE;
+	drawing_ = true;
 
 	// Setup basic GL stuff
 	setupGL();
@@ -123,27 +117,22 @@ void Viewer::paintEvent(QPaintEvent *event)
 		drawScene();
 	}
 
+	// Send text primitives to the display first
+// 	font_->FaceSize(1);
+	if (font_)
+	{
+		textPrimitives_.renderAll(viewMatrix_, -surfaceCenter_, font_);
+		axisTextPrimitives_[0].renderAll(viewMatrix_, -surfaceCenter_, font_);
+		axisTextPrimitives_[1].renderAll(viewMatrix_, -surfaceCenter_, font_);
+		axisTextPrimitives_[2].renderAll(viewMatrix_, -surfaceCenter_, font_);
+	}
+	
 	// Send primitives to the display
 	sortAndSendGL();
-
+	
 	// Set the rendering flag to false
-	drawing_ = FALSE;
-	
-	// Start of QPainter code
-	static QFont font;
-	font.setPointSize(Viewer::fontSize());
-	QBrush nobrush(Qt::NoBrush);
-	QPen pen;
-	QPainter painter(this);
-	
-	// Render text elements for all models (with QPainter)
-	painter.setFont(font);
-	painter.setRenderHint(QPainter::Antialiasing);
-	textPrimitives_.renderAll(painter, this);
+	drawing_ = false;
 
-	// Done.
-	painter.end();
-	
 	// If we were rendering offscreen, we may delete the topmost primitive instance here
 	if (renderingOffscreen_)
 	{
@@ -166,6 +155,32 @@ void Viewer::resizeGL(int newwidth, int newheight)
 /*
 // Character / Setup
 */
+
+// Setup font specified
+bool Viewer::setupFont(const char* fontName)
+{
+	// Prevent anything from being drawn while we change the font
+	drawing_ = true;
+	
+	if (font_) delete font_;
+	FTPolygonFont* newFont = new FTPolygonFont("wright.ttf");
+	if (newFont->Error())
+	{
+		printf("Oh dear, an error occurred while trying to load the specified font.\n");
+		font_ = NULL;
+		fontBaseHeight_ = 1.0;
+	}
+	else
+	{
+		font_ = newFont;
+		font_->FaceSize(1);
+		newFont->Depth(10.0);
+		FTBBox boundingBox = font_->BBox("Hello");
+		fontBaseHeight_ = boundingBox.Upper().Yf() - boundingBox.Lower().Yf();
+	}
+
+	drawing_ = false;
+}
 
 // Return the current height of the drawing area
 GLsizei Viewer::contextHeight() const
@@ -292,17 +307,17 @@ Matrix Viewer::viewMatrix()
 QPixmap Viewer::generateImage(int w, int h)
 {
 	renderingOffscreen_ = TRUE;
-	if (useFrameBuffer_ == FALSE)
+	if (useFrameBuffer_ == false)
 	{
 
 		// Generate offscreen bitmap (a temporary context will be created)
-		QPixmap pixmap = renderPixmap(w, h, FALSE);
+		QPixmap pixmap = renderPixmap(w, h, false);
 		
 		// Ensure correct widget context size is stored
 		contextWidth_ = (GLsizei) width();
 		contextHeight_ = (GLsizei) height();
 
-		renderingOffscreen_ = FALSE;
+		renderingOffscreen_ = false;
 		return pixmap;
 	}
 	else
@@ -310,7 +325,7 @@ QPixmap Viewer::generateImage(int w, int h)
 		postRedisplay();
 		QImage image = grabFrameBuffer();
 
-		renderingOffscreen_ = FALSE;
+		renderingOffscreen_ = false;
 		return QPixmap::fromImage(image);
 	}
 }

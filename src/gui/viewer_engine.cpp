@@ -39,12 +39,6 @@ void Viewer::renderPrimitive(Primitive *primitive, GLfloat *colour, Matrix &tran
 	}
 }
 
-// Add text primitive for rendering later
-void Viewer::renderTextPrimitive(Vec3<double> pos, QString text, bool rightalign)
-{
-	textPrimitives_.add(pos, text, rightalign);
-}
-
 // Sort and render filtered polygons by depth
 void Viewer::sortAndSendGL()
 {

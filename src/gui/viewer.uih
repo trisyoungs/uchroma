@@ -46,7 +46,6 @@ class Viewer : public QGLWidget
 	Viewer(QWidget *parent);
 	~Viewer();
 
-	FTPolygonFont* font_;
 
 	/*
 	// Character / Setup
@@ -67,18 +66,22 @@ class Viewer : public QGLWidget
 	Matrix viewMatrix_;
 	// Viewport matrix for the scene
 	GLuint viewportMatrix_[4];
+	// FTGL font for text
+	FTFont* font_;
+	// Basic font height (from baseline to top of normal height letter)
+	double fontBaseHeight_;
 
 	protected:
 	// Initialise context widget (when created by Qt)
 	void initializeGL();
 	// General repaint callback
 	void paintGL();
-	// Paint event callback
-	void paintEvent(QPaintEvent *event);
 	// Resize function
 	void resizeGL(int, int);
 
 	public:
+	// Setup font specified
+	bool setupFont(const char* fontName);
 	// Return the current height of the drawing area
 	GLsizei contextHeight() const;
 	// Return the current width of the drawing area
@@ -153,7 +156,7 @@ class Viewer : public QGLWidget
 	List<PrimitiveInfo> transparentPrimitives_;
 	// List of line primitives
 	Primitive linePrimitives_;
-	// List of text primitives
+	// List of general text primitives
 	TextPrimitiveList textPrimitives_;
 	// Transparency chopper
 	TriangleChopper triangleChopper_;
@@ -161,8 +164,6 @@ class Viewer : public QGLWidget
 	private:
 	// Render primitive in specified colour
 	void renderPrimitive(Primitive *primitive, GLfloat *colour, Matrix &transform, GLenum fillMode = GL_FILL, GLfloat lineWidth = 1.0);
-	// Add text primitive for rendering later
-	void renderTextPrimitive(Vec3<double> pos, QString text, bool rightalign = FALSE);
 	// Send all primitives to the display, sorting transparent triangles if necessary
 	void sortAndSendGL();
 
@@ -218,11 +219,15 @@ class Viewer : public QGLWidget
 	// Basic test primtives
 	Primitive spherePrimitive_, cubePrimitive_;
 	// Display primitives
-	Primitive surface_, axisPrimitives_[3], testPrimitive_;
+	Primitive surface_, axisPrimitives_[3];
+	// Axis text primitives
+	TextPrimitiveList axisTextPrimitives_[3];
 	// Centrepoint of surface
 	Vec3<double> surfaceCenter_;
 	// Whether Z axis is inverted
 	bool invertZ_;
+	// Scale factor for axis labels
+	double axisLabelScale_;
 
 	private:
 	// Create necessary primitives (called once when Viewer is constructed)
@@ -237,14 +242,16 @@ class Viewer : public QGLWidget
 	void constructSliceData(Slice* targetSlice, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale* colourScale, Slice* previousSlice, Slice* nextSlice);
 	// Create surface primitive
 	void createSurface(const List<Slice>& slices, ColourScale* colourScale);
-	// Create axes primitives
-	void createAxes(Vec3<double> axisMin, Vec3<double> axisMax);
+	// Create axis primitives
+	void createAxis(int axis, Vec3< double > axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta);
 	// Set surface centre
 	void setSurfaceCenter(Vec3<double> center);
 	// Return number of triangles in surface
 	int surfaceNTriangles();
 	// Set whether Z-axis is inverted
 	void setInvertZ(bool b);
+	// Set scale factor for axis labels
+	void setAxisLabelScale(double scale);
 };
 
 #endif

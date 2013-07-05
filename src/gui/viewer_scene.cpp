@@ -37,7 +37,6 @@ void Viewer::createPrimitives()
 		axisPrimitives_[n].setType(GL_LINES);
 		axisPrimitives_[n].setNoInstances();
 	}
-	testPrimitive_.setNoInstances();
 
 	// Every created primitive must be added to the primitiveList_
 	primitiveList_.add(&spherePrimitive_);
@@ -91,16 +90,13 @@ void Viewer::setupGL()
 	// Set specular reflection colour
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specularColour);
 	glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 127);
-	glDisable(GL_BLEND);
-	glDisable(GL_LINE_SMOOTH);
-	glDisable(GL_POLYGON_SMOOTH);
-	glDisable(GL_MULTISAMPLE);
 
 	// Configure antialiasing
 	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_BLEND);
-	glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
-	glEnable(GL_LINE_SMOOTH);
+// 	glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+// 	glEnable(GL_LINE_SMOOTH);
+// 	glEnable(GL_POLYGON_SMOOTH);
 
 	// Configure fog effects
 //	glFogi(GL_FOG_MODE, GL_LINEAR);
@@ -161,6 +157,7 @@ void Viewer::drawScene()
 		renderPrimitive(&cubePrimitive_, colourBlue, A);
 		A.setTranslation(0.0,0.0,-1.0);
 		renderPrimitive(&cubePrimitive_, colourBlue, A);
+		return;
 	}
 
 	// Shift to center coordinates
@@ -171,22 +168,6 @@ void Viewer::drawScene()
 
 	// Render surface
 	renderPrimitive(&surface_, colourRed, A);
-
-	// Create a pixmap font from a TrueType file.
-// 	FTPolygonFont font("wright.ttf");
-
-	// If something went wrong, bail out.
-// 	if(font.Error())
-// 	return -1;
-
-	// Set the font size and render a small text.
-	font_->FaceSize(8);
-	font_->Render("Hello World!");
-	glBegin(GL_TRIANGLES);
-	glVertex3f(0.0,0.0,0.0);
-	glVertex3f(1.0,0.0,0.0);
-	glVertex3f(0.0,1.0,0.0);
-	glEnd();
 }
 
 // Construct normal / colour data for slice specified
@@ -229,8 +210,6 @@ void Viewer::constructSliceData(Slice* targetSlice, Array< Vec3<double> >& norma
 		// -- Points 1 to N-2
 		for (n=1; n<nPoints-1; ++n)
 		{
-// 			v1.set(((xTarget[n-1] - xTarget[n]) + (xTarget[n+1] - xTarget[n]))*0.5, ((yTarget[n-1] - yTarget[n]) + (yTarget[n+1] - yTarget[n]))*0.5, 0);
-// 			v2.set(0.0, ((yPrev[n] - yTarget[n]) + (yNext[n] - yTarget[n]))*0.5, dz);
 			v1.set(xTarget[n+1] - xTarget[n-1], yTarget[n+1] - yTarget[n-1], 0.0);
 			v2.set(0.0, yNext[n] - yPrev[n], dz);
 			v3 = v1 * v2;
@@ -262,7 +241,6 @@ void Viewer::constructSliceData(Slice* targetSlice, Array< Vec3<double> >& norma
 		// -- Points 1 to N-2
 		for (n=1; n<nPoints-1; ++n)
 		{
-// 			v1.set(((xTarget[n-1] - xTarget[n]) + (xTarget[n+1] - xTarget[n]))*0.5, ((yTarget[n-1] - yTarget[n]) + (yTarget[n+1] - yTarget[n]))*0.5, 0.0);
 			v1.set(xTarget[n+1] - xTarget[n-1], yTarget[n+1] - yTarget[n-1], 0.0);
 			v2.set(0.0, yTarget[n] - yPrev[n], dz);
 			v3 = v1 * v2;
@@ -360,16 +338,6 @@ void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale)
 			surface_.defineVertex(xA[n], yA[n], zA, normA[n], colourA[n], true);
 			surface_.defineVertex(xB[n], yB[n], zB, normB[n], colourB[n], true);
 			surface_.defineVertex(xB[n+1], yB[n+1], zB, normB[n+1], colourB[n+1], true);
-// 			nrm = Vec3<double>(xA[n+1]-xA[n],yA[n+1]-yA[n],0.0) * Vec3<double>(xA[n+1]-xB[n+1],yA[n+1]-yB[n+1], zA-zB);
-// 			nrm.normalise();
-// 			surface_.defineVertex(xA[n], yA[n], zA, nrm, colourA[n], true);
-// 			surface_.defineVertex(xA[n+1], yA[n+1], zA, nrm, colourA[n+1], true);
-// 			surface_.defineVertex(xB[n+1], yB[n+1], zB, nrm, colourB[n+1], true);
-// 			nrm = -Vec3<double>(xB[n]-xA[n],yB[n]-yA[n],zB-zA) * Vec3<double>(xB[n]-xB[n+1],yB[n]-yB[n+1], 0.0);
-// 			nrm.normalise();
-// 			surface_.defineVertex(xA[n], yA[n], zA, nrm, colourA[n], true);
-// 			surface_.defineVertex(xB[n], yB[n], zB, nrm, colourB[n], true);
-// 			surface_.defineVertex(xB[n+1], yB[n+1], zB, nrm, colourB[n+1], true);
 		}
 
 		// Copy arrays ready for next pass
@@ -380,26 +348,40 @@ void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale)
 
 	surface_.pushInstance(context());
 
-	msg.print("Surface contains %i vertices.\n", surface_.nDefinedVertices());
+// 	msg.print("Surface contains %i vertices.\n", surface_.nDefinedVertices());
 }
 
-// Create axes primitives
-void Viewer::createAxes(Vec3<double> axisMin, Vec3<double> axisMax)
+// Create axis primitives
+void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta)
 {
-	Vec3<double> u, v;
-	for (int axis=0; axis < 3; ++axis)
-	{
-		// Clear old primitive data
-		axisPrimitives_[axis].forgetAll();
-		double range = axisMax[axis] - axisMin[axis];
+	// Clear old primitive data
+	axisPrimitives_[axis].forgetAll();
+	axisTextPrimitives_[axis].forgetAll();
 
-		// Draw a line from min to max range, passing through 0,0,0
-		u.zero();
-		u.set(axis, axisMin[axis]);
-		v.zero();
-		v.set(axis, axisMax[axis]);
-		axisPrimitives_[axis].plotLine(u, v);
+	Vec3<double> u, v;
+	double range = axisMax - axisMin;
+
+	// Draw a line from min to max range, passing through the defined axisPosition
+	u = axisPosition;
+	u.set(axis, axisMin);
+	v = axisPosition;
+	v.set(axis, axisMax);
+	axisPrimitives_[axis].plotLine(u, v);
+	
+	int count = 0;
+	u.set(axis, firstTick);
+	while (u[axis] < axisMax)
+	{
+		axisTextPrimitives_[axis].add(QString::number(u[axis]), axisLabelScale_, fontBaseHeight_, u, Vec3<double>(0.0,0.0,-1.0), Vec3<double>(0.0,1.0,0.0));
+		u.add(axis, tickDelta);
+		++count;
+		if (count == 50)
+		{
+			printf("Maximum ticks exceeded.\n");
+			break;
+		}
 	}
+// 	textPrimitives_.add(QString::number(axisMax[axis]), v, Vec3<double>(1.0,0.0,0.0), Vec3<double>(0.0,1.0,0.0));
 }
 
 // Set surface centre
@@ -418,4 +400,10 @@ int Viewer::surfaceNTriangles()
 void Viewer::setInvertZ(bool b)
 {
 	invertZ_ = b;
+}
+
+// Set scale factor for axis labels
+void Viewer::setAxisLabelScale(double scale)
+{
+	axisLabelScale_ = scale;
 }

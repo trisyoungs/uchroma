@@ -265,163 +265,144 @@ void FQPlotWindow::updateSourceDataTab()
  * Tabs - Transform
  */
 
-void FQPlotWindow::on_TransformXTypeCombo_currentIndexChanged(int index)
+bool FQPlotWindow::transformTypeChanged(int axis, int index)
 {
-	if (refreshing_) return;
-	transformType_[0] = (DataTransform) index;
-	ui.TransformXValueSpin->setEnabled(index < 2);
+	if (refreshing_) return false;
+	transformType_[axis] = (DataTransform) index;
 	calculateTransformLimits();
 	setAsModified();
+	updateTransformTab();
+	updateViewTab();
 	updateSurface();
+	return true;
+}
+
+bool FQPlotWindow::transformValueChanged(int axis, double value)
+{
+	if (refreshing_) return false;
+	transformValue_[axis] = value;
+	calculateTransformLimits();
+	setAsModified();
+	updateTransformTab();
+	updateViewTab();
+	updateSurface();
+	return true;
+}
+
+bool FQPlotWindow::transformShiftChanged(int axis, bool pre, double value)
+{
+	if (refreshing_) return false;
+	if (pre) preTransformShift_[axis] = value;
+	else postTransformShift_[axis] = value;
+	calculateTransformLimits();
+	setAsModified();
+	updateTransformTab();
+	updateViewTab();
+	updateSurface();
+	return true;
+}
+
+bool FQPlotWindow::transformLimitChanged(int axis, bool minLim, double value)
+{
+	if (refreshing_) return false;
+	if (minLim) limitMin_[axis] = value;
+	else limitMax_[axis] = value;
+	calculateTransformLimits();
+	setAsModified();
+	updateTransformTab();
+	updateViewTab();
+	updateSurface();
+	return true;
+}
+
+void FQPlotWindow::on_TransformXTypeCombo_currentIndexChanged(int index)
+{
+	if (transformTypeChanged(0, index)) ui.TransformXValueSpin->setEnabled(index < 2);
 }
 
 void FQPlotWindow::on_TransformYTypeCombo_currentIndexChanged(int index)
 {
-	if (refreshing_) return;
-	transformType_[1] = (DataTransform) index;
-	ui.TransformYValueSpin->setEnabled(index < 2);
-	calculateTransformLimits();
-	setAsModified();
-	updateSurface();
+	if (transformTypeChanged(1, index)) ui.TransformYValueSpin->setEnabled(index < 2);
 }
 
 void FQPlotWindow::on_TransformZTypeCombo_currentIndexChanged(int index)
 {
-	if (refreshing_) return;
-	transformType_[2] = (DataTransform) index;
-	ui.TransformZValueSpin->setEnabled(index < 2);
-	calculateTransformLimits();
-	setAsModified();
-	updateSurface();
+	if (transformTypeChanged(2, index)) ui.TransformZValueSpin->setEnabled(index < 2);
 }
 
 void FQPlotWindow::on_TransformXValueSpin_valueChanged(double value)
 {
-	if (refreshing_) return;
-	transformValue_.x = value;
-	calculateTransformLimits();
-	setAsModified();
-	updateSurface();
+	transformValueChanged(0, value);
 }
 
 void FQPlotWindow::on_TransformYValueSpin_valueChanged(double value)
 {
-	if (refreshing_) return;
-	transformValue_.y = value;
-	calculateTransformLimits();
-	setAsModified();
-	updateSurface();
+	transformValueChanged(0, value);
 }
 
 void FQPlotWindow::on_TransformZValueSpin_valueChanged(double value)
 {
-	if (refreshing_) return;
-	transformValue_.z = value;
-	calculateTransformLimits();
-	setAsModified();
-	updateSurface();
+	transformValueChanged(0, value);
 }
 
 void FQPlotWindow::on_TransformXPreShiftSpin_valueChanged(double value)
 {
-	if (refreshing_) return;
-	preTransformShift_.x = value;
-	calculateTransformLimits();
-	setAsModified();
-	updateSurface();
+	transformShiftChanged(0, true, value);
 }
 
 void FQPlotWindow::on_TransformYPreShiftSpin_valueChanged(double value)
 {
-	if (refreshing_) return;
-	preTransformShift_.y = value;
-	calculateTransformLimits();
-	setAsModified();
-	updateSurface();
+	transformShiftChanged(1, true, value);
 }
 
 void FQPlotWindow::on_TransformZPreShiftSpin_valueChanged(double value)
 {
-	if (refreshing_) return;
-	preTransformShift_.z = value;
-	calculateTransformLimits();
-	setAsModified();
-	updateSurface();
+	transformShiftChanged(2, true, value);
 }
 
 void FQPlotWindow::on_TransformXPostShiftSpin_valueChanged(double value)
 {
-	if (refreshing_) return;
-	postTransformShift_.x = value;
-	calculateTransformLimits();
-	setAsModified();
-	updateSurface();
+	transformShiftChanged(0, false, value);
 }
 
 void FQPlotWindow::on_TransformYPostShiftSpin_valueChanged(double value)
 {
-	if (refreshing_) return;
-	postTransformShift_.y = value;
-	calculateTransformLimits();
-	setAsModified();
-	updateSurface();
+	transformShiftChanged(1, false, value);
 }
 
 void FQPlotWindow::on_TransformZPostShiftSpin_valueChanged(double value)
 {
-	if (refreshing_) return;
-	postTransformShift_.z = value;
-	calculateTransformLimits();
-	setAsModified();
-	updateSurface();
+	transformShiftChanged(2, false, value);
 }
 
 void FQPlotWindow::on_LimitXMinSpin_valueChanged(double value)
 {
-	if (refreshing_) return;
-	limitMin_.x = value;
-	setAsModified();
-	updateSurface();
+	transformLimitChanged(0, true, value);
 }
 
 void FQPlotWindow::on_LimitYMinSpin_valueChanged(double value)
 {
-	if (refreshing_) return;
-	limitMin_.y = value;
-	setAsModified();
-	updateSurface();
+	transformLimitChanged(1, true, value);
 }
 
 void FQPlotWindow::on_LimitZMinSpin_valueChanged(double value)
 {
-	if (refreshing_) return;
-	limitMin_.z = value;
-	setAsModified();
-	updateSurface();
+	transformLimitChanged(2, true, value);
 }
 
 void FQPlotWindow::on_LimitXMaxSpin_valueChanged(double value)
 {
-	if (refreshing_) return;
-	limitMax_.x = value;
-	setAsModified();
-	updateSurface();
+	transformLimitChanged(0, false, value);
 }
 
 void FQPlotWindow::on_LimitYMaxSpin_valueChanged(double value)
 {
-	if (refreshing_) return;
-	limitMax_.y = value;
-	setAsModified();
-	updateSurface();
+	transformLimitChanged(1, false, value);
 }
 
 void FQPlotWindow::on_LimitZMaxSpin_valueChanged(double value)
 {
-	if (refreshing_) return;
-	limitMax_.z = value;
-	setAsModified();
-	updateSurface();
+	transformLimitChanged(2, false, value);
 }
 
 // Update Transform tab
@@ -461,6 +442,12 @@ void FQPlotWindow::updateTransformTab()
 	ui.LimitXMaxSpin->setValue(limitMax_.x);
 	ui.LimitYMaxSpin->setValue(limitMax_.y);
 	ui.LimitZMaxSpin->setValue(limitMax_.z);
+	ui.LimitXMinLabel->setText(QString::number(transformMin_.x));
+	ui.LimitXMaxLabel->setText(QString::number(transformMax_.x));
+	ui.LimitYMinLabel->setText(QString::number(transformMin_.y));
+	ui.LimitYMaxLabel->setText(QString::number(transformMax_.y));
+	ui.LimitZMinLabel->setText(QString::number(transformMin_.z));
+	ui.LimitZMaxLabel->setText(QString::number(transformMax_.z));
 
 	refreshing_ = false;
 }
@@ -582,6 +569,35 @@ void FQPlotWindow::updateColourTab()
  * Tabs - View
  */
 
+bool FQPlotWindow::viewAxisCrossChanged(int axis, int dir, double value)
+{
+	if (refreshing_) return false;
+	axisPosition_[axis].set(dir,value);
+	setAsModified();
+	updateSurface(false);
+	return true;
+}
+
+bool FQPlotWindow::viewAxisTicksChanged(int axis, bool start, double value)
+{
+	if (refreshing_) return false;
+	if (start) axisFirstTick_[axis] = value;
+	else axisTickDelta_[axis] = value;
+	setAsModified();
+	updateSurface(false);
+	return true;
+}
+
+bool FQPlotWindow::viewAxisOrientationChanged(int axis, int dir, bool direction, double value)
+{
+	if (refreshing_) return false;
+	if (direction) axisLabelDirection_[axis].set(dir, value);
+	else axisLabelRotation_[axis] = value;
+	setAsModified();
+	updateSurface(false);
+	return true;
+}
+
 void FQPlotWindow::on_ViewInvertZCheck_clicked(bool checked)
 {
 	if (refreshing_) return;
@@ -591,9 +607,140 @@ void FQPlotWindow::on_ViewInvertZCheck_clicked(bool checked)
 	ui.MainView->update();
 }
 
+void FQPlotWindow::on_ViewXAxisCrossAtYSpin_valueChanged(double value)
+{
+	viewAxisCrossChanged(0, 1, value);
+}
+
+void FQPlotWindow::on_ViewXAxisCrossAtZSpin_valueChanged(double value)
+{
+	viewAxisCrossChanged(0, 2, value);
+}
+
+void FQPlotWindow::on_ViewXAxisAutoTicksCheck_clicked(bool checked)
+{
+	axisAutoTicks_.x = checked;
+	updateViewTab();
+	updateSurface(false);
+}
+
+void FQPlotWindow::on_ViewXAxisTicksStartSpin_valueChanged(double value)
+{
+	viewAxisTicksChanged(0, true, value);
+}
+
+void FQPlotWindow::on_ViewXAxisTicksDeltaSpin_valueChanged(double value)
+{
+	viewAxisTicksChanged(0, false, value);
+}
+
+void FQPlotWindow::on_ViewXAxisDirectionXSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(0, 0, true, value);
+}
+
+void FQPlotWindow::on_ViewXAxisDirectionYSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(0, 1, true, value);
+}
+
+void FQPlotWindow::on_ViewXAxisDirectionZSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(0, 2, true, value);
+}
+
+void FQPlotWindow::on_ViewYAxisCrossAtXSpin_valueChanged(double value)
+{
+	viewAxisCrossChanged(1, 0, value);
+}
+
+void FQPlotWindow::on_ViewYAxisCrossAtZSpin_valueChanged(double value)
+{
+	viewAxisCrossChanged(1, 2, value);
+}
+
+void FQPlotWindow::on_ViewYAxisAutoTicksCheck_clicked(bool checked)
+{
+	axisAutoTicks_.y = checked;
+	updateViewTab();
+	updateSurface(false);
+}
+
+void FQPlotWindow::on_ViewYAxisTicksStartSpin_valueChanged(double value)
+{
+	viewAxisTicksChanged(1, true, value);
+}
+
+void FQPlotWindow::on_ViewYAxisTicksDeltaSpin_valueChanged(double value)
+{
+	viewAxisTicksChanged(1, false, value);
+}
+
+void FQPlotWindow::on_ViewZAxisCrossAtXSpin_valueChanged(double value)
+{
+	viewAxisCrossChanged(2, 0, value);
+}
+
+void FQPlotWindow::on_ViewZAxisCrossAtYSpin_valueChanged(double value)
+{
+	viewAxisCrossChanged(2, 1, value);
+}
+
+void FQPlotWindow::on_ViewZAxisAutoTicksCheck_clicked(bool checked)
+{
+	axisAutoTicks_.z = checked;
+	updateViewTab();
+	updateSurface(false);
+}
+
+void FQPlotWindow::on_ViewZAxisTicksStartSpin_valueChanged(double value)
+{
+	viewAxisTicksChanged(2, true, value);
+}
+
+void FQPlotWindow::on_ViewZAxisTicksDeltaSpin_valueChanged(double value)
+{
+	viewAxisTicksChanged(2, false, value);
+}
+
 // Update View tab
 void FQPlotWindow::updateViewTab()
 {
 	refreshing_ = true;
+
+	// Axis positions
+	// -- X
+	ui.ViewXAxisCrossAtYSpin->setRange(limitMin_.y, limitMax_.y);
+	ui.ViewXAxisCrossAtZSpin->setRange(limitMin_.z, limitMax_.z);
+	ui.ViewXAxisCrossAtYSpin->setValue(axisPosition_[0].y);
+	ui.ViewXAxisCrossAtZSpin->setValue(axisPosition_[0].z);
+	// -- Y
+	ui.ViewYAxisCrossAtXSpin->setRange(limitMin_.x, limitMax_.x);
+	ui.ViewYAxisCrossAtZSpin->setRange(limitMin_.z, limitMax_.z);
+	ui.ViewYAxisCrossAtXSpin->setValue(axisPosition_[0].x);
+	ui.ViewYAxisCrossAtZSpin->setValue(axisPosition_[0].z);
+	// -- Z
+	ui.ViewZAxisCrossAtXSpin->setRange(limitMin_.x, limitMax_.x);
+	ui.ViewZAxisCrossAtYSpin->setRange(limitMin_.y, limitMax_.y);
+	ui.ViewZAxisCrossAtXSpin->setValue(axisPosition_[0].x);
+	ui.ViewZAxisCrossAtYSpin->setValue(axisPosition_[0].y);
+	
+	// AxisTicks
+	// -- X
+	ui.ViewXAxisAutoTicksCheck->setChecked(axisAutoTicks_.x);
+	ui.ViewXAxisTicksWidget->setEnabled(!axisAutoTicks_.x);
+	ui.ViewXAxisTicksStartSpin->setValue(axisFirstTick_.x);
+	ui.ViewXAxisTicksDeltaSpin->setValue(axisTickDelta_.x);
+	// -- Y
+	ui.ViewYAxisAutoTicksCheck->setChecked(axisAutoTicks_.y);
+	ui.ViewYAxisTicksWidget->setEnabled(!axisAutoTicks_.y);
+	ui.ViewYAxisTicksStartSpin->setValue(axisFirstTick_.y);
+	ui.ViewYAxisTicksDeltaSpin->setValue(axisTickDelta_.y);
+	// -- Z
+	ui.ViewZAxisAutoTicksCheck->setChecked(axisAutoTicks_.z);
+	ui.ViewZAxisTicksWidget->setEnabled(!axisAutoTicks_.z);
+	ui.ViewZAxisTicksStartSpin->setValue(axisFirstTick_.z);
+	ui.ViewZAxisTicksDeltaSpin->setValue(axisTickDelta_.z);
+	
 	refreshing_ = false;
 }
