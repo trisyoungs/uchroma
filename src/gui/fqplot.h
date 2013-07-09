@@ -146,14 +146,20 @@ class FQPlotWindow : public QMainWindow
 	 * Tabs -- View
 	 */
 	private:
+	bool viewAxisInvertChanged(int axis, bool checked);
+	bool viewAxisVisibleChanged(int axis, bool checked);
 	bool viewAxisCrossChanged(int axis, int dir, double value);
 	bool viewAxisTicksChanged(int axis, bool start, double value);
 	bool viewAxisOrientationChanged(int axis, int dir, bool direction, double value);
 	bool viewAxisMinorTicksChanged(int axis, int value);
+	bool viewAxisRotationChanged(int axis, int rotation);
 
 	private slots:
-	void on_ViewInvertZCheck_clicked(bool checked);
+	void on_ViewLabelScaleSpin_valueChanged(double value);
+	void on_ViewTitleScaleSpin_valueChanged(double value);
 	// -- X Axis Tab
+	void on_ViewXAxisInvertCheck_clicked(bool checked);
+	void on_ViewXAxisVisibleCheck_clicked(bool checked);
 	void on_ViewXAxisCrossAtYSpin_valueChanged(double value);
 	void on_ViewXAxisCrossAtZSpin_valueChanged(double value);
 	void on_ViewXAxisAutoTicksCheck_clicked(bool checked);
@@ -163,7 +169,13 @@ class FQPlotWindow : public QMainWindow
 	void on_ViewXAxisDirectionXSpin_valueChanged(double value);
 	void on_ViewXAxisDirectionYSpin_valueChanged(double value);
 	void on_ViewXAxisDirectionZSpin_valueChanged(double value);
+	void on_ViewXAxisUpXSpin_valueChanged(double value);
+	void on_ViewXAxisUpYSpin_valueChanged(double value);
+	void on_ViewXAxisUpZSpin_valueChanged(double value);
+	void on_ViewXAxisRotationSpin_valueChanged(int value);
 	// -- Y Axis Tab
+	void on_ViewYAxisInvertCheck_clicked(bool checked);
+	void on_ViewYAxisVisibleCheck_clicked(bool checked);
 	void on_ViewYAxisCrossAtXSpin_valueChanged(double value);
 	void on_ViewYAxisCrossAtZSpin_valueChanged(double value);
 	void on_ViewYAxisAutoTicksCheck_clicked(bool checked);
@@ -173,7 +185,13 @@ class FQPlotWindow : public QMainWindow
 	void on_ViewYAxisDirectionXSpin_valueChanged(double value);
 	void on_ViewYAxisDirectionYSpin_valueChanged(double value);
 	void on_ViewYAxisDirectionZSpin_valueChanged(double value);
+	void on_ViewYAxisUpXSpin_valueChanged(double value);
+	void on_ViewYAxisUpYSpin_valueChanged(double value);
+	void on_ViewYAxisUpZSpin_valueChanged(double value);
+	void on_ViewYAxisRotationSpin_valueChanged(int value);
 	// -- Z Axis Tab
+	void on_ViewZAxisInvertCheck_clicked(bool checked);
+	void on_ViewZAxisVisibleCheck_clicked(bool checked);
 	void on_ViewZAxisCrossAtXSpin_valueChanged(double value);
 	void on_ViewZAxisCrossAtYSpin_valueChanged(double value);
 	void on_ViewZAxisAutoTicksCheck_clicked(bool checked);
@@ -183,6 +201,10 @@ class FQPlotWindow : public QMainWindow
 	void on_ViewZAxisDirectionXSpin_valueChanged(double value);
 	void on_ViewZAxisDirectionYSpin_valueChanged(double value);
 	void on_ViewZAxisDirectionZSpin_valueChanged(double value);
+	void on_ViewZAxisUpXSpin_valueChanged(double value);
+	void on_ViewZAxisUpYSpin_valueChanged(double value);
+	void on_ViewZAxisUpZSpin_valueChanged(double value);
+	void on_ViewZAxisRotationSpin_valueChanged(int value);
 
 	public:
 	// Update View tab
@@ -194,7 +216,7 @@ class FQPlotWindow : public QMainWindow
 	 */
 	public:
 	// Datafile keywords
-	enum DataFileKeyword { AxisAutoTicksKeyword, AxisFirstTickKeyword, AxisLabelDirectionKeyword, AxisMinorTicksKeyword, AxisPositionKeyword, AxisTickDeltaKeyword, ColourScalePointKeyword, InvertZAxisKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword, PostTransformShiftKeyword, PreTransformShiftKeyword, SliceDirectoryKeyword, SliceKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
+	enum DataFileKeyword { AxisAutoTicksKeyword, AxisFirstTickKeyword, AxisInvertKeyword, AxisLabelDirectionKeyword, AxisMinorTicksKeyword, AxisPositionKeyword, AxisRotationKeyword, AxisTickDeltaKeyword, AxisVisibleKeyword, ColourScalePointKeyword, LabelScaleKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword, PostTransformShiftKeyword, PreTransformShiftKeyword, SliceDirectoryKeyword, SliceKeyword, TitleScaleKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
 	static DataFileKeyword dataFileKeyword(const char* s);
 	static const char* dataFileKeyword(DataFileKeyword dfk);
 	// Data Transform types
@@ -229,12 +251,10 @@ class FQPlotWindow : public QMainWindow
 	Vec3<bool> interpolate_;
 	// List of slices for display
 	List<Slice> surfaceData_;
-	// Whether to invert Z-axis
-	bool invertZAxis_;
-	// Scale of axis values
-	double axisLabelScale_;
-	// Scale of axis titles
-	double axisTitleScale_;
+	// Whether to invert axes
+	Vec3<bool> axisInvert_;
+	// Axis visibility
+	Vec3<bool> axisVisible_;
 	// Axis position (in real surface-space coordinates)
 	Vec3<double> axisPosition_[3];
 	// Position of first tick delta on axes
@@ -246,7 +266,13 @@ class FQPlotWindow : public QMainWindow
 	// Number of minor ticks in major tick intervals
 	Vec3<int> axisMinorTicks_;
 	// Orientation of axis labels
-	Vec3<double> axisLabelDirection_[3], axisLabelRotation_;
+	Vec3<double> axisLabelDirection_[3], axisLabelUp_[3];
+	// Rotation of axis labels (about calculated Z)
+	Vec3<int> axisRotation_;
+	// Font scaling for axis value labels
+	double labelScale_;
+	// Font scaling for titles
+	double titleScale_;
 
 	private:
 	// Recalculate tick deltas for specified axis

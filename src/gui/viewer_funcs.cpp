@@ -24,6 +24,21 @@
 
 // Static instance counter
 int nViewerInstances = 0;
+static float textures[][48] =
+{
+    {
+        1.0, 1.0, 1.0, 0.7, 0.7, 0.7, 1.0, 1.0, 1.0, 0.7, 0.7, 0.7,
+        0.7, 0.7, 0.7, 0.4, 0.4, 0.4, 0.7, 0.7, 0.7, 0.4, 0.4, 0.4,
+        1.0, 1.0, 1.0, 0.7, 0.7, 0.7, 1.0, 1.0, 1.0, 0.7, 0.7, 0.7,
+        0.7, 0.7, 0.7, 0.4, 0.4, 0.4, 0.7, 0.7, 0.7, 0.4, 0.4, 0.4,
+    },
+    {
+        0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
+        0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
+        0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
+        0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
+    }
+};
 
 // Constructor
 Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
@@ -39,12 +54,11 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	setDefaultPreferences(nViewerInstances == 0);
 	
 	// Engine Setup
-	linePrimitives_.setColourData(TRUE);
+// 	linePrimitives_.setColourData(false);
 	linePrimitives_.setType(GL_LINES);
 	triangleChopper_.initialise(0.0, 1000, 0.2);
 	createPrimitives();
 	viewMatrix_[14] = -5.0;
-	invertZ_ = false;
 	font_ = NULL;
 	setupFont("wright.ttf");
 
@@ -74,7 +88,7 @@ void Viewer::initializeGL()
 	// that, when saving a bitmap using QGLWidget::renderPixmap(), we automatically create new display list
 	// objects, rather than having to worry about context sharing etc. Slow, but safer and more compatible.
 	msg.print("In Viewer::initializeGL, pushing instances for %i primitives...\n", primitiveList_.nItems());
-	for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->pushInstance(context()); 
+	for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->pushInstance(context());
 
 	msg.exit("Viewer::initializeGL");
 }
@@ -106,7 +120,8 @@ void Viewer::paintGL()
 	// Clear view
 	msg.print(Messenger::Verbose, " --> Clearing context, background, and setting pen colour\n");
 	glViewport(0,0,contextWidth_,contextHeight_);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);
 
 	// Check to see if data has changed since the last time drawScene() was called
 	if (1)
@@ -117,14 +132,32 @@ void Viewer::paintGL()
 		drawScene();
 	}
 
+	// Set colour mode
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_TEXTURE_2D);
+// 	glDisable(GL_DEPTH_TEST);
+
+	// Prepare for model rendering
+// 	glViewport(vp[0], vp[1], vp[2], vp[3]);
+	glMatrixMode(GL_PROJECTION);
+	setProjectionMatrix();
+	glLoadMatrixd(projectionMatrix_.matrix());
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	
 	// Send text primitives to the display first
-// 	font_->FaceSize(1);
+	font_->FaceSize(1);
 	if (font_)
 	{
+		glEnable(GL_LINE_SMOOTH);
+		glEnable(GL_POLYGON_SMOOTH);
 		textPrimitives_.renderAll(viewMatrix_, -surfaceCenter_, font_);
 		axisTextPrimitives_[0].renderAll(viewMatrix_, -surfaceCenter_, font_);
 		axisTextPrimitives_[1].renderAll(viewMatrix_, -surfaceCenter_, font_);
 		axisTextPrimitives_[2].renderAll(viewMatrix_, -surfaceCenter_, font_);
+		glDisable(GL_LINE_SMOOTH);
+		glDisable(GL_POLYGON_SMOOTH);
 	}
 	
 	// Send primitives to the display
@@ -164,6 +197,7 @@ bool Viewer::setupFont(const char* fontName)
 	
 	if (font_) delete font_;
 	FTPolygonFont* newFont = new FTPolygonFont("wright.ttf");
+// 	FTPixmapFont* newFont = new FTPixmapFont("wright.ttf");
 	if (newFont->Error())
 	{
 		printf("Oh dear, an error occurred while trying to load the specified font.\n");
@@ -172,11 +206,24 @@ bool Viewer::setupFont(const char* fontName)
 	}
 	else
 	{
+		glGenTextures(2, textureID_);
+
+		for(int i = 0; i < 2; i++)
+		{
+			glBindTexture(GL_TEXTURE_2D, textureID_[i]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_FLOAT, textures[i]);
+		}
 		font_ = newFont;
 		font_->FaceSize(1);
-		newFont->Depth(10.0);
 		FTBBox boundingBox = font_->BBox("Hello");
 		fontBaseHeight_ = boundingBox.Upper().Yf() - boundingBox.Lower().Yf();
+// 		newFont->Depth(3.0);
+// 		        fonts[x]->Depth(3.);
+// 		newFont->Outset(-.5, 1.5);
 	}
 
 	drawing_ = false;
@@ -197,46 +244,39 @@ GLsizei Viewer::contextWidth() const
 // Probe features
 void Viewer::probeFeatures()
 {
-	if (msg.isOutputActive(Messenger::Verbose))
-	{
-		QGLFormat fmt = context()->format();
-		// Probe this format!
-		printf(" QGLFormat: Alpha buffer is %s.\n", fmt.alpha() ? "enabled" : "disabled");
-		printf(" QGLFormat: Accumulation buffer is %s.\n", fmt.accum() ? "enabled" : "disabled");
-		printf(" QGLFormat: Depth buffer is %s.\n", fmt.depth() ? "enabled" : "disabled");
-		printf(" QGLFormat: Double-buffering is %s.\n", fmt.doubleBuffer() ? "enabled" : "disabled");
-		printf(" QGLFormat: Direct rendering is %s.\n", fmt.directRendering() ? "enabled" : "disabled");
-		printf(" QGLFormat: RGBA colour mode is %s.\n", fmt.rgba() ? "enabled" : "disabled");
-		printf(" QGLFormat: Multisample buffer is %s.\n", fmt.sampleBuffers() ? "enabled" : "disabled");
-		printf(" QGLFormat: Stencil buffer is %s.\n", fmt.stencil() ? "enabled" : "disabled");
-		printf(" QGLWidget: Autoswap buffers is %s.\n", autoBufferSwap() ? "enabled" : "disabled");
-	}
+	QGLFormat fmt = context()->format();
+	// Probe this format!
+	printf(" QGLFormat: Alpha buffer is %s.\n", fmt.alpha() ? "enabled" : "disabled");
+	printf(" QGLFormat: Accumulation buffer is %s.\n", fmt.accum() ? "enabled" : "disabled");
+	printf(" QGLFormat: Depth buffer is %s.\n", fmt.depth() ? "enabled" : "disabled");
+	printf(" QGLFormat: Double-buffering is %s.\n", fmt.doubleBuffer() ? "enabled" : "disabled");
+	printf(" QGLFormat: Direct rendering is %s.\n", fmt.directRendering() ? "enabled" : "disabled");
+	printf(" QGLFormat: RGBA colour mode is %s.\n", fmt.rgba() ? "enabled" : "disabled");
+	printf(" QGLFormat: Multisample buffer is %s.\n", fmt.sampleBuffers() ? "enabled" : "disabled");
+	printf(" QGLFormat: Stencil buffer is %s.\n", fmt.stencil() ? "enabled" : "disabled");
+	printf(" QGLWidget: Autoswap buffers is %s.\n", autoBufferSwap() ? "enabled" : "disabled");
 }
 
 // Check for GL error
 void Viewer::checkGlError()
 {
-	// Do GL error check
-	if (msg.isOutputActive(Messenger::Verbose))
+	GLenum glerr = GL_NO_ERROR;
+	do
 	{
-		GLenum glerr = GL_NO_ERROR;
-		do
+		switch (glGetError())
 		{
-			switch (glGetError())
-			{
-				case (GL_INVALID_ENUM): msg.print(Messenger::Verbose, "GLenum argument out of range\n"); break;
-				case (GL_INVALID_VALUE): msg.print(Messenger::Verbose, "N(umeric argument out of range\n"); break;
-				case (GL_INVALID_OPERATION): msg.print(Messenger::Verbose, "Operation illegal in current state\n"); break;
-				case (GL_STACK_OVERFLOW): msg.print(Messenger::Verbose, "Command would cause a stack overflow\n"); break;
-				case (GL_STACK_UNDERFLOW): msg.print(Messenger::Verbose, "Command would cause a stack underflow\n"); break;
-				case (GL_OUT_OF_MEMORY): msg.print(Messenger::Verbose, "Not enough memory left to execute command\n"); break;
-				case (GL_NO_ERROR): msg.print(Messenger::Verbose, "No GL error\n"); break;
-				default:
-					msg.print(Messenger::Verbose, "Unknown GL error?\n");
-					break;
-			}
-		} while (glerr != GL_NO_ERROR);
-	}
+			case (GL_INVALID_ENUM): msg.print(Messenger::Verbose, "GLenum argument out of range\n"); break;
+			case (GL_INVALID_VALUE): msg.print(Messenger::Verbose, "N(umeric argument out of range\n"); break;
+			case (GL_INVALID_OPERATION): msg.print(Messenger::Verbose, "Operation illegal in current state\n"); break;
+			case (GL_STACK_OVERFLOW): msg.print(Messenger::Verbose, "Command would cause a stack overflow\n"); break;
+			case (GL_STACK_UNDERFLOW): msg.print(Messenger::Verbose, "Command would cause a stack underflow\n"); break;
+			case (GL_OUT_OF_MEMORY): msg.print(Messenger::Verbose, "Not enough memory left to execute command\n"); break;
+			case (GL_NO_ERROR): msg.print(Messenger::Verbose, "No GL error\n"); break;
+			default:
+				msg.print(Messenger::Verbose, "Unknown GL error?\n");
+				break;
+		}
+	} while (glerr != GL_NO_ERROR);
 }
 
 // Refresh widget / scene

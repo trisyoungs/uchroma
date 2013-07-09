@@ -62,7 +62,7 @@ void Viewer::setupGL()
 	//glClearDepth(1.0);
 
 	// Perspective hint
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_FASTEST);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
 
 	// Enable depth buffer
 	glEnable(GL_DEPTH_TEST);
@@ -73,9 +73,6 @@ void Viewer::setupGL()
 	// Auto-normalise surface normals
 	glEnable(GL_NORMALIZE);
 
-	// Set alpha-blending function
-	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_SRC_ALPHA_SATURATE, GL_ONE);
 
 	// Set up the light model
 	glMatrixMode(GL_MODELVIEW);
@@ -92,9 +89,12 @@ void Viewer::setupGL()
 	glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 127);
 
 	// Configure antialiasing
-	glEnable(GL_MULTISAMPLE);
+	glDisable(GL_MULTISAMPLE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
-// 	glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+// 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 // 	glEnable(GL_LINE_SMOOTH);
 // 	glEnable(GL_POLYGON_SMOOTH);
 
@@ -119,18 +119,6 @@ void Viewer::setupGL()
 // Draw the scene to display (i.e. store primitives ready for sending to GL)
 void Viewer::drawScene()
 {
-	// Set colour mode
-	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-	glEnable(GL_COLOR_MATERIAL);
-
-	// Prepare for model rendering
-// 	glViewport(vp[0], vp[1], vp[2], vp[3]);
-	glMatrixMode(GL_PROJECTION);
-	setProjectionMatrix();
-	glLoadMatrixd(projectionMatrix_.matrix());
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
 	GLfloat colourRed[4] = { 1.0, 0.0, 0.0, 1.0 };
 	GLfloat colourGreen[4] = { 0.0, 1.0, 0.0, 1.0 };
 	GLfloat colourBlue[4] = { 0.0, 0.0, 1.0, 1.0 };
@@ -140,7 +128,6 @@ void Viewer::drawScene()
 	// Set up initial matrix
 	Matrix A;
 	A.setIdentity();
-	if (invertZ_) A[10] = -1.0;
 
 	if (surface_.nDefinedVertices() == 0)
 	{
@@ -164,7 +151,7 @@ void Viewer::drawScene()
 	A.setTranslation(-surfaceCenter_.x, -surfaceCenter_.y, -surfaceCenter_.z);
 
 	// Render axes
-	for (int axis=0; axis<3; ++axis) renderPrimitive(&axisPrimitives_[axis], colourBlack, A);
+	for (int axis=0; axis<3; ++axis) renderPrimitive(&axisPrimitives_[axis], colourBlack, A, GL_LINE, 2.0);
 
 	// Render surface
 	renderPrimitive(&surface_, colourRed, A);
@@ -352,7 +339,7 @@ void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale)
 }
 
 // Create axis primitives
-void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction)
+void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted, bool logarithmic)
 {
 	// Clear old primitive data
 	axisPrimitives_[axis].forgetAll();
@@ -360,6 +347,8 @@ void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, dou
 
 	Vec3<double> u, v;
 	double range = axisMax - axisMin;
+	QString s;
+	FTBBox boundingBox;
 
 	// Draw a line from min to max range, passing through the defined axisPosition
 	u = axisPosition;
@@ -370,10 +359,14 @@ void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, dou
 
 	// Plot tickmarks
 	int count = 0;
-	double delta = tickDelta / (nMinorTicks+1);
-	u.set(axis, firstTick);
-	while (u[axis] <= axisMax)
+	double delta = (inverted ? -tickDelta : tickDelta) / (nMinorTicks+1);
+	u.set(axis, inverted ? (axisMax - firstTick) + axisMin : firstTick);
+	while (count < 50)
 	{
+		// Check break condition
+		if ((!inverted) && (u[axis] > axisMax)) break;
+		if (inverted && (u[axis] < axisMin)) break;
+		
 		if (count%(nMinorTicks+1) == 0) axisPrimitives_[axis].plotLine(u, u+direction*0.1);
 		else axisPrimitives_[axis].plotLine(u, u+direction*0.05);
 		u.add(axis, delta);
@@ -382,19 +375,22 @@ void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, dou
 	
 	// Plot axis labels
 	count = 0;
-	u.set(axis, firstTick);
-	while (u[axis] <= axisMax)
+	u.set(axis, inverted ? (axisMax - firstTick) + axisMin : firstTick);
+	u += direction*0.1;
+	while (count < 50)
 	{
-		axisTextPrimitives_[axis].add(QString::number(u[axis]), axisLabelScale_, fontBaseHeight_, u, direction, Vec3<double>(0.0,1.0,0.0));
-		u.add(axis, tickDelta);
+		// Check break condition
+		if ((!inverted) && (u[axis] > axisMax)) break;
+		if (inverted && (u[axis] < axisMin)) break;
+		
+		// Determine resulting text primitive width (so we can do label rotations
+		s = QString::number(firstTick+count*tickDelta);
+		boundingBox = font_->BBox(qPrintable(s));
+
+		axisTextPrimitives_[axis].add(s, labelScale_, fontBaseHeight_, fabs(boundingBox.Upper().Xf() - boundingBox.Lower().Xf()), u, direction, up, zrotation);
+		u.add(axis, (inverted ? -tickDelta : tickDelta));
 		++count;
-		if (count == 50)
-		{
-			printf("Maximum ticks exceeded.\n");
-			break;
-		}
 	}
-// 	textPrimitives_.add(QString::number(axisMax[axis]), v, Vec3<double>(1.0,0.0,0.0), Vec3<double>(0.0,1.0,0.0));
 }
 
 // Set surface centre
@@ -409,14 +405,14 @@ int Viewer::surfaceNTriangles()
 	return surface_.nDefinedVertices() / 3;
 }
 
-// Set whether Z-axis is inverted
-void Viewer::setInvertZ(bool b)
+// Set scale factor for axis labels
+void Viewer::setLabelScale(double scale)
 {
-	invertZ_ = b;
+	labelScale_ = scale;
 }
 
-// Set scale factor for axis labels
-void Viewer::setAxisLabelScale(double scale)
+// Set scale factor for titles
+void Viewer::setTitleScale(double scale)
 {
-	axisLabelScale_ = scale;
+	titleScale_ = scale;
 }

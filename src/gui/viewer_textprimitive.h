@@ -44,7 +44,7 @@ class TextPrimitive
 	
 	public:
 	// Set data
-	void set(QString text, double scale, double fontBaseHeight, Vec3<double> origin, Vec3<double> direction, Vec3<double> up);
+	void set(QString text, double scale, double fontBaseHeight, double relativeWidth, Vec3<double> origin, Vec3<double> direction, Vec3<double> up, int zrotation);
 	// Return local transform 
 	Matrix& localTransform();
 	// Return text to render
@@ -72,7 +72,7 @@ class TextPrimitiveChunk
 	// Return whether array is full
 	bool full();
 	// Add primitive to list
-	void add(QString text, double scale, double fontBaseHeight, Vec3<double> origin, Vec3<double> direction, Vec3<double> up);
+	void add(QString text, double scale, double fontBaseHeight, double relativeWidth, Vec3<double> origin, Vec3<double> direction, Vec3<double> up, int zrotation);
 	// Render all primitives in chunk
 	void renderAll(Matrix viewMatrix, Vec3<double> center, FTFont* font);
 };
@@ -94,7 +94,7 @@ class TextPrimitiveList
 	// Forget all text primitives, but keeping lists intact
 	void forgetAll();
 	// Add primitive to list
-	void add(QString text, double scale, double fontBaseHeight, Vec3<double> origin, Vec3<double> direction, Vec3<double> up);
+	void add(QString text, double scale, double fontBaseHeight, double relativeWidth, Vec3<double> origin, Vec3<double> direction, Vec3<double> up, int zrotation);
 	// Render all primitives in list
 	void renderAll(Matrix viewMatrix, Vec3<double> center, FTFont* font);
 };

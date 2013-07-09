@@ -57,6 +57,7 @@ void Viewer::sortAndSendGL()
 		glPolygonMode(GL_FRONT_AND_BACK, pi->fillMode());
 		if (pi->fillMode() == GL_LINE)
 		{
+// 			glEnable(GL_LINE_SMOOTH);
 			glLineWidth(pi->lineWidth());
 			glDisable(GL_LIGHTING);
 		}
@@ -73,19 +74,22 @@ void Viewer::sortAndSendGL()
 		{
 			glLineWidth(1.0);
 			glEnable(GL_LIGHTING);
+// 			glDisable(GL_LINE_SMOOTH);
 		}
 		else if (pi->fillMode() == GL_POINT) glEnable(GL_LIGHTING);
 	}
 
 	// Draw line primitives
 	glDisable(GL_LIGHTING);
+// 	glEnable(GL_LINE_SMOOTH);
 	glLoadMatrixd(viewMatrix_.matrix());
-	glLineWidth(1.0);
+	glLineWidth(2.0);
 	linePrimitives_.sendToGL();
-// 	glLineWidth(prefs.stickLineSelectedWidth());
-// 	stickSelectedLines_.sendToGL();
 	glEnable(GL_LIGHTING);
 	glLineWidth(1.0);
+// 	glDisable(GL_LINE_SMOOTH);
+	
+	checkGlError();
 	
 	// Transform and render each transparent primitive in each list, unless correctTransparency_ is off.
 	if (correctTransparency_)

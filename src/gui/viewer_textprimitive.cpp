@@ -27,10 +27,10 @@
 */
 
 // Set data
-void TextPrimitive::set(QString text, double scale, double fontBaseHeight, Vec3<double> origin, Vec3<double> direction, Vec3<double> up)
+void TextPrimitive::set(QString text, double scale, double fontBaseHeight, double relativeWidth, Vec3<double> origin, Vec3<double> direction, Vec3<double> up, int zrotation)
 {
 	text_ = text;
-
+XXX Do Rotation.
 	// Construct basic transformation matrix
 	direction.normalise();
 	up.normalise();
@@ -41,7 +41,7 @@ void TextPrimitive::set(QString text, double scale, double fontBaseHeight, Vec3<
 	localTransform_.setColumn(2, (direction * up)*scale, 0.0);
 	
 	// Apply a shift along the up vector (Y) to center the middle of the text characters in line with the origin
-	localTransform_.addTranslation(-up*fontBaseHeight*scale*scale);
+	localTransform_.addTranslation(-up*fontBaseHeight*scale*0.5);
 }
 
 // Return local transform matrix
@@ -84,9 +84,9 @@ bool TextPrimitiveChunk::full()
 }
 
 // Add primitive to chunk
-void TextPrimitiveChunk::add(QString text, double scale, double fontBaseHeight, Vec3< double > origin, Vec3< double > direction, Vec3< double > up)
+void TextPrimitiveChunk::add(QString text, double scale, double fontBaseHeight, double relativeWidth, Vec3<double> origin, Vec3<double> direction, Vec3<double> up, int zrotation)
 {
-	textPrimitives_[nTextPrimitives_].set(text, fontBaseHeight, scale, origin, direction, up);
+	textPrimitives_[nTextPrimitives_].set(text, scale, fontBaseHeight, relativeWidth, origin, direction, up, zrotation);
 	++nTextPrimitives_;
 }
 
@@ -123,12 +123,12 @@ void TextPrimitiveList::forgetAll()
 }
 
 // Set data from literal coordinates and text
-void TextPrimitiveList::add(QString text, double scale, double fontBaseHeight, Vec3<double> origin, Vec3<double> direction, Vec3<double> up)
+void TextPrimitiveList::add(QString text, double scale, double fontBaseHeight, double relativeWidth, Vec3<double> origin, Vec3<double> direction, Vec3<double> up, int zrotation)
 {
 	if (currentChunk_ == NULL) currentChunk_ = textPrimitives_.add();
 	else if (currentChunk_->full()) currentChunk_ = textPrimitives_.add();
 	// Add primitive and set data
-	currentChunk_->add(text, scale, fontBaseHeight, origin, direction, up);
+	currentChunk_->add(text, scale, fontBaseHeight, relativeWidth, origin, direction, up, zrotation);
 }
 
 // Render all primitives in list

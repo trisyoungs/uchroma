@@ -337,12 +337,12 @@ void FQPlotWindow::on_TransformXValueSpin_valueChanged(double value)
 
 void FQPlotWindow::on_TransformYValueSpin_valueChanged(double value)
 {
-	transformValueChanged(0, value);
+	transformValueChanged(1, value);
 }
 
 void FQPlotWindow::on_TransformZValueSpin_valueChanged(double value)
 {
-	transformValueChanged(0, value);
+	transformValueChanged(2, value);
 }
 
 void FQPlotWindow::on_TransformXPreShiftSpin_valueChanged(double value)
@@ -569,6 +569,24 @@ void FQPlotWindow::updateColourTab()
  * Tabs - View
  */
 
+bool FQPlotWindow::viewAxisInvertChanged(int axis, bool checked)
+{
+	if (refreshing_) return false;
+	axisInvert_[axis] = checked;
+	setAsModified();
+	updateSurface();
+	return true;
+}
+
+bool FQPlotWindow::viewAxisVisibleChanged(int axis, bool checked)
+{
+	if (refreshing_) return false;
+	axisVisible_[axis] = checked;
+	setAsModified();
+	updateSurface(false);
+	return true;
+}
+
 bool FQPlotWindow::viewAxisCrossChanged(int axis, int dir, double value)
 {
 	if (refreshing_) return false;
@@ -592,7 +610,7 @@ bool FQPlotWindow::viewAxisOrientationChanged(int axis, int dir, bool direction,
 {
 	if (refreshing_) return false;
 	if (direction) axisLabelDirection_[axis].set(dir, value);
-	else axisLabelRotation_[axis] = value;
+	else axisLabelUp_[axis].set(dir, value);
 	setAsModified();
 	updateSurface(false);
 	return true;
@@ -607,13 +625,43 @@ bool FQPlotWindow::viewAxisMinorTicksChanged(int axis, int value)
 	return true;
 }
 
-void FQPlotWindow::on_ViewInvertZCheck_clicked(bool checked)
+bool FQPlotWindow::viewAxisRotationChanged(int axis, int rotation)
+{
+	if (refreshing_) return false;
+	axisRotation_[axis] = rotation;
+	setAsModified();
+	updateSurface(false);
+	return true;
+}
+
+void FQPlotWindow::on_ViewLabelScaleSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
-	invertZAxis_ = checked;
+	labelScale_ = value;
+	ui.MainView->setLabelScale(labelScale_);
 	setAsModified();
-	ui.MainView->setInvertZ(invertZAxis_);
-	ui.MainView->update();
+	updateSurface(false);
+}
+
+void FQPlotWindow::on_ViewTitleScaleSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	titleScale_ = value;
+	ui.MainView->setTitleScale(titleScale_);
+	setAsModified();
+	updateSurface(false);
+}
+
+// X Axis
+
+void FQPlotWindow::on_ViewXAxisInvertCheck_clicked(bool checked)
+{
+	viewAxisInvertChanged(2, checked);
+}
+
+void FQPlotWindow::on_ViewXAxisVisibleCheck_clicked(bool checked)
+{
+	viewAxisVisibleChanged(0, checked);
 }
 
 void FQPlotWindow::on_ViewXAxisCrossAtYSpin_valueChanged(double value)
@@ -663,6 +711,38 @@ void FQPlotWindow::on_ViewXAxisDirectionZSpin_valueChanged(double value)
 	viewAxisOrientationChanged(0, 2, true, value);
 }
 
+void FQPlotWindow::on_ViewXAxisUpXSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(0, 0, false, value);
+}
+
+void FQPlotWindow::on_ViewXAxisUpYSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(0, 1, false, value);
+}
+
+void FQPlotWindow::on_ViewXAxisUpZSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(0, 2, false, value);
+}
+
+void FQPlotWindow::on_ViewXAxisRotationSpin_valueChanged(int value)
+{
+	viewAxisRotationChanged(0, value);
+}
+
+// Y Axis
+
+void FQPlotWindow::on_ViewYAxisInvertCheck_clicked(bool checked)
+{
+	viewAxisInvertChanged(1, checked);
+}
+
+void FQPlotWindow::on_ViewYAxisVisibleCheck_clicked(bool checked)
+{
+	viewAxisVisibleChanged(1, checked);
+}
+
 void FQPlotWindow::on_ViewYAxisCrossAtXSpin_valueChanged(double value)
 {
 	viewAxisCrossChanged(1, 0, value);
@@ -708,6 +788,38 @@ void FQPlotWindow::on_ViewYAxisDirectionYSpin_valueChanged(double value)
 void FQPlotWindow::on_ViewYAxisDirectionZSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(1, 2, true, value);
+}
+
+void FQPlotWindow::on_ViewYAxisUpXSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(1, 0, false, value);
+}
+
+void FQPlotWindow::on_ViewYAxisUpYSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(1, 1, false, value);
+}
+
+void FQPlotWindow::on_ViewYAxisUpZSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(1, 2, false, value);
+}
+
+void FQPlotWindow::on_ViewYAxisRotationSpin_valueChanged(int value)
+{
+	viewAxisRotationChanged(1, value);
+}
+
+// Z Axis
+
+void FQPlotWindow::on_ViewZAxisInvertCheck_clicked(bool checked)
+{
+	viewAxisInvertChanged(2, checked);
+}
+
+void FQPlotWindow::on_ViewZAxisVisibleCheck_clicked(bool checked)
+{
+	viewAxisVisibleChanged(2, checked);
 }
 
 void FQPlotWindow::on_ViewZAxisCrossAtXSpin_valueChanged(double value)
@@ -757,6 +869,26 @@ void FQPlotWindow::on_ViewZAxisDirectionZSpin_valueChanged(double value)
 	viewAxisOrientationChanged(2, 2, true, value);
 }
 
+void FQPlotWindow::on_ViewZAxisUpXSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(2, 0, false, value);
+}
+
+void FQPlotWindow::on_ViewZAxisUpYSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(2, 1, false, value);
+}
+
+void FQPlotWindow::on_ViewZAxisUpZSpin_valueChanged(double value)
+{
+	viewAxisOrientationChanged(2, 2, false, value);
+}
+
+void FQPlotWindow::on_ViewZAxisRotationSpin_valueChanged(int value)
+{
+	viewAxisRotationChanged(2, value);
+}
+
 // Update View tab
 void FQPlotWindow::updateViewTab()
 {
@@ -804,6 +936,23 @@ void FQPlotWindow::updateViewTab()
 	ui.ViewXAxisDirectionXSpin->setValue(axisLabelDirection_[0].x);
 	ui.ViewXAxisDirectionYSpin->setValue(axisLabelDirection_[0].y);
 	ui.ViewXAxisDirectionZSpin->setValue(axisLabelDirection_[0].z);
-	
+	ui.ViewXAxisUpXSpin->setValue(axisLabelUp_[0].x);
+	ui.ViewXAxisUpYSpin->setValue(axisLabelUp_[0].y);
+	ui.ViewXAxisUpZSpin->setValue(axisLabelUp_[0].z);
+	// -- Y
+	ui.ViewYAxisDirectionXSpin->setValue(axisLabelDirection_[1].x);
+	ui.ViewYAxisDirectionYSpin->setValue(axisLabelDirection_[1].y);
+	ui.ViewYAxisDirectionZSpin->setValue(axisLabelDirection_[1].z);
+	ui.ViewYAxisUpXSpin->setValue(axisLabelUp_[1].x);
+	ui.ViewYAxisUpYSpin->setValue(axisLabelUp_[1].y);
+	ui.ViewYAxisUpZSpin->setValue(axisLabelUp_[1].z);
+	// -- Z
+	ui.ViewZAxisDirectionXSpin->setValue(axisLabelDirection_[2].x);
+	ui.ViewZAxisDirectionYSpin->setValue(axisLabelDirection_[2].y);
+	ui.ViewZAxisDirectionZSpin->setValue(axisLabelDirection_[2].z);
+	ui.ViewZAxisUpXSpin->setValue(axisLabelUp_[2].x);
+	ui.ViewZAxisUpYSpin->setValue(axisLabelUp_[2].y);
+	ui.ViewZAxisUpZSpin->setValue(axisLabelUp_[2].z);
+
 	refreshing_ = false;
 }

@@ -23,7 +23,7 @@
 #include "base/lineparser.h"
 
 // DataFile Keywords
-const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisLabelDirection", "AxisMinorTicks", "AxisPosition", "AxisTickDelta", "ColourScalePoint", "InvertZAxis", "LimitX", "LimitY", "LimitZ", "PostTransformShift", "PreTransformShift", "SliceDir", "Slice", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
+const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisInvert", "AxisLabelDirection", "AxisMinorTicks", "AxisPosition", "AxisRotation", "AxisTickDelta", "AxisVisible", "ColourScalePoint", "LabelScale", "LimitX", "LimitY", "LimitZ", "PostTransformShift", "PreTransformShift", "SliceDir", "Slice", "TitleScale", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
 FQPlotWindow::DataFileKeyword FQPlotWindow::dataFileKeyword(const char* s)
 {
 	for (int n=0; n<FQPlotWindow::nDataFileKeywords; ++n) if (strcmp(s, DataFileKeywordStrings[n]) == 0) return (FQPlotWindow::DataFileKeyword) n;
@@ -122,9 +122,10 @@ void FQPlotWindow::clearData()
 	postTransformShift_.zero();
 	modified_ = false;
 	ui.ColourScaleWidget->clear();
-	invertZAxis_ = false;
-	axisLabelScale_ = 0.5;
-	axisTitleScale_ = 0.62;
+	axisInvert_.set(false, false, false);
+	axisVisible_.set(true, true, true);
+	labelScale_ = 0.25;
+	titleScale_ = 0.3;
 	axisPosition_[0].zero();
 	axisPosition_[1].zero();
 	axisPosition_[2].zero();
@@ -135,7 +136,10 @@ void FQPlotWindow::clearData()
 	axisLabelDirection_[0].set(1.0, 0.0, 0.0);
 	axisLabelDirection_[1].set(1.0, 0.0, 0.0);
 	axisLabelDirection_[2].set(1.0, 0.0, 0.0);
-	axisLabelRotation_.zero();
+	axisLabelUp_[0].set(0.0, 1.0, 0.0);
+	axisLabelUp_[1].set(0.0, 1.0, 0.0);
+	axisLabelUp_[2].set(0.0, 1.0, 0.0);
+	axisRotation_.zero();
 }
 
 // Create default ColourScale
@@ -190,6 +194,10 @@ bool FQPlotWindow::loadData(QString fileName)
 			case (FQPlotWindow::AxisFirstTickKeyword):
 				axisFirstTick_.set(parser.argd(1), parser.argd(2), parser.argd(3));
 				break;
+			// Axis invert flags
+			case (FQPlotWindow::AxisInvertKeyword):
+				axisInvert_.set(parser.argi(1), parser.argi(2), parser.argi(3));
+				break;
 			// Axis label direction
 			case (FQPlotWindow::AxisLabelDirectionKeyword):
 				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Axis index is out of range for %s keyword.\n", dataFileKeyword(kwd));
@@ -208,13 +216,17 @@ bool FQPlotWindow::loadData(QString fileName)
 			case (FQPlotWindow::AxisTickDeltaKeyword):
 				axisTickDelta_.set(parser.argd(1), parser.argd(2), parser.argd(3));
 				break;
+			// Axis visibility
+			case (FQPlotWindow::AxisVisibleKeyword):
+				axisVisible_.set(parser.argi(1), parser.argi(2), parser.argi(3));
+				break;
 			// ColourScalePoint definition
 			case (FQPlotWindow::ColourScalePointKeyword):
 				ui.ColourScaleWidget->addPoint(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
 				break;
-			// Invert Z-Axis
-			case (FQPlotWindow::InvertZAxisKeyword):
-				invertZAxis_ = true;
+			// Label scale
+			case (FQPlotWindow::LabelScaleKeyword):
+				labelScale_ = parser.argd(1);
 				break;
 			// Limits
 			case (FQPlotWindow::LimitXKeyword):
@@ -232,7 +244,7 @@ bool FQPlotWindow::loadData(QString fileName)
 			case (FQPlotWindow::PostTransformShiftKeyword):
 				postTransformShift_.set(parser.argd(1), parser.argd(2), parser.argd(3));
 				break;
-			// Datafile directory
+			// Slice directory
 			case (FQPlotWindow::SliceDirectoryKeyword):
 				dataFileDirectory_ = parser.argc(1);
 				if (!dataFileDirectory_.isReadable())
@@ -240,10 +252,14 @@ bool FQPlotWindow::loadData(QString fileName)
 					QMessageBox::StandardButton button = QMessageBox::warning(this, "Error", "The slice directory specified (" + dataFileDirectory_.absolutePath() + ") does not exist or is unreadable.\nDo you want to reset the datafile location?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 				}
 				break;
-			// Datafile slice specification
+			// Slice specification
 			case (FQPlotWindow::SliceKeyword):
 				slice = loadSlice(parser.argc(1));
 				if (slice) slice->setZ(parser.argd(2));
+				break;
+			// Title scale
+			case (FQPlotWindow::TitleScaleKeyword):
+				titleScale_ = parser.argd(1);
 				break;
 			// Data Transform
 			case (FQPlotWindow::TransformXKeyword):
@@ -323,6 +339,9 @@ bool FQPlotWindow::saveData(QString fileName)
 	}
 	
 	// Write view setup
+	// -- Font Scaling
+	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::LabelScaleKeyword], labelScale_);
+	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::TitleScaleKeyword], titleScale_);
 	// -- Axes
 	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisAutoTicksKeyword], axisAutoTicks_.x, axisAutoTicks_.y, axisAutoTicks_.z);
 	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisFirstTickKeyword], axisFirstTick_.x, axisFirstTick_.y, axisFirstTick_.z);
@@ -333,6 +352,8 @@ bool FQPlotWindow::saveData(QString fileName)
 		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisPositionKeyword], axis, axisPosition_[axis].x, axisPosition_[axis].y, axisPosition_[axis].z);
 		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisLabelDirectionKeyword], axis, axisLabelDirection_[axis].x, axisLabelDirection_[axis].y, axisLabelDirection_[axis].z);
 	}
+	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisInvertKeyword], axisInvert_.x, axisInvert_.y, axisInvert_.z);
+	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisVisibleKeyword], axisVisible_.x, axisVisible_.y, axisVisible_.z);
 
 	// -- Transformation Matrix
 	Matrix mat = ui.MainView->viewMatrix();
@@ -474,22 +495,30 @@ void FQPlotWindow::setAsModified()
 // Update surface data after data change
 void FQPlotWindow::updateSurface(bool dataHasChanged)
 {
+	// Determine surface center
+	Vec3<double> center;
+	for (int n=0; n<3; ++n) center[n] = (limitMax_[n]+limitMin_[n]) * 0.5;
+	ui.MainView->setSurfaceCenter(center);
+
 	// Make sure view variables are up-to-date
-	ui.MainView->setSurfaceCenter((limitMax_+limitMin_)*0.5);
-	ui.MainView->setAxisLabelScale(axisLabelScale_);
+	ui.MainView->setLabelScale(labelScale_);
+	ui.MainView->setTitleScale(labelScale_);
 
 	if (dataHasChanged)
 	{
 		// Clear existing display slices
 		surfaceData_.clear();
+		double x, y;
 
 		// Loop over slices, apply any transforms (X or Y) and check limits
-		for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
+		Slice* slice = axisInvert_.z ? slices_.last() : slices_.first();
+		while (slice)
 		{
 			// Z
 			double z = transformValue(slice->z(), preTransformShift_[2], postTransformShift_[2], transformType_[2], transformValue_[2]);
 			// -- Is the transformed Z value within range?
 			if ((z < limitMin_.z) || (z > limitMax_.z)) continue;
+			if (axisInvert_.z) z = (limitMax_.z - z) + limitMin_.z;
 
 			// Add new item to surfaceData_ array
 			Slice* surfaceSlice = surfaceData_.add();
@@ -527,9 +556,14 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 			// Add data to surfaceSlice, obeying defined x-limits
 			for (int n=0; n<array[0].nItems(); ++n)
 			{
-				if ((array[0].value(n) < limitMin_.x) || (array[0].value(n) > limitMax_.x)) continue;
-				surfaceSlice->data().addPoint(array[0].value(n), array[1].value(n));
+				x = array[0].value(n);
+				if ((x < limitMin_.x) || (x > limitMax_.x)) continue;
+				if (axisInvert_.x) x = (limitMax_.x - x) + limitMin_.x;
+				surfaceSlice->data().addPoint(x, array[1].value(n));
 			}
+
+			// Move to next Z slice
+			slice = axisInvert_.z ? slice->prev : slice->next;
 		}
 	}
 
@@ -540,7 +574,7 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 	for (int axis = 0; axis < 3; ++axis)
 	{
 		if (axisAutoTicks_[axis]) calculateTickDeltas(axis);
-		ui.MainView->createAxis(axis, axisPosition_[axis], limitMin_[axis], limitMax_[axis], axisFirstTick_[axis], axisTickDelta_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis]);
+		ui.MainView->createAxis(axis, axisPosition_[axis], limitMin_[axis], limitMax_[axis], axisFirstTick_[axis], axisTickDelta_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis], axisLabelUp_[axis], axisRotation_[axis], axisInvert_[axis], axisVisible_[axis]);
 	}
 
 	ui.MainView->update();

@@ -70,6 +70,8 @@ class Viewer : public QGLWidget
 	FTFont* font_;
 	// Basic font height (from baseline to top of normal height letter)
 	double fontBaseHeight_;
+	GLuint textureID_[2];
+
 
 	protected:
 	// Initialise context widget (when created by Qt)
@@ -224,10 +226,10 @@ class Viewer : public QGLWidget
 	TextPrimitiveList axisTextPrimitives_[3];
 	// Centrepoint of surface
 	Vec3<double> surfaceCenter_;
-	// Whether Z axis is inverted
-	bool invertZ_;
 	// Scale factor for axis labels
-	double axisLabelScale_;
+	double labelScale_;
+	// Scale factor for titles
+	double titleScale_;
 
 	private:
 	// Create necessary primitives (called once when Viewer is constructed)
@@ -243,15 +245,15 @@ class Viewer : public QGLWidget
 	// Create surface primitive
 	void createSurface(const List<Slice>& slices, ColourScale* colourScale);
 	// Create axis primitives
-	void createAxis(int axis, Vec3< double > axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction);
+	void createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted, bool logarithmic);
 	// Set surface centre
 	void setSurfaceCenter(Vec3<double> center);
 	// Return number of triangles in surface
 	int surfaceNTriangles();
-	// Set whether Z-axis is inverted
-	void setInvertZ(bool b);
 	// Set scale factor for axis labels
-	void setAxisLabelScale(double scale);
+	void setLabelScale(double scale);
+	// Set scale factor for titles
+	void setTitleScale(double scale);
 };
 
 #endif
