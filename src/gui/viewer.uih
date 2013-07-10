@@ -244,8 +244,12 @@ class Viewer : public QGLWidget
 	void constructSliceData(Slice* targetSlice, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale* colourScale, Slice* previousSlice, Slice* nextSlice);
 	// Create surface primitive
 	void createSurface(const List<Slice>& slices, ColourScale* colourScale);
+	// Clear specified axix primitive
+	void clearAxisPrimitive(int axis);
 	// Create axis primitives
-	void createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted, bool logarithmic);
+	void createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted);
+	// Create logarithmic axis primitives
+	void createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted);
 	// Set surface centre
 	void setSurfaceCenter(Vec3<double> center);
 	// Return number of triangles in surface

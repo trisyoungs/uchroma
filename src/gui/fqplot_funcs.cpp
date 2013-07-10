@@ -578,6 +578,15 @@ bool FQPlotWindow::viewAxisInvertChanged(int axis, bool checked)
 	return true;
 }
 
+bool FQPlotWindow::viewAxisLogarithmicChanged(int axis, bool checked)
+{
+	if (refreshing_) return false;
+	axisLogarithmic_[axis] = checked;
+	setAsModified();
+	updateSurface(true);
+	return true;
+}
+
 bool FQPlotWindow::viewAxisVisibleChanged(int axis, bool checked)
 {
 	if (refreshing_) return false;
@@ -628,7 +637,7 @@ bool FQPlotWindow::viewAxisMinorTicksChanged(int axis, int value)
 bool FQPlotWindow::viewAxisRotationChanged(int axis, int rotation)
 {
 	if (refreshing_) return false;
-	axisRotation_[axis] = rotation;
+	axisLabelRotation_[axis] = rotation;
 	setAsModified();
 	updateSurface(false);
 	return true;
@@ -656,7 +665,12 @@ void FQPlotWindow::on_ViewTitleScaleSpin_valueChanged(double value)
 
 void FQPlotWindow::on_ViewXAxisInvertCheck_clicked(bool checked)
 {
-	viewAxisInvertChanged(2, checked);
+	viewAxisInvertChanged(0, checked);
+}
+
+void FQPlotWindow::on_ViewXAxisLogarithmicCheck_clicked(bool checked)
+{
+	viewAxisLogarithmicChanged(0, checked);
 }
 
 void FQPlotWindow::on_ViewXAxisVisibleCheck_clicked(bool checked)
@@ -738,6 +752,11 @@ void FQPlotWindow::on_ViewYAxisInvertCheck_clicked(bool checked)
 	viewAxisInvertChanged(1, checked);
 }
 
+void FQPlotWindow::on_ViewYAxisLogarithmicCheck_clicked(bool checked)
+{
+	viewAxisLogarithmicChanged(1, checked);
+}
+
 void FQPlotWindow::on_ViewYAxisVisibleCheck_clicked(bool checked)
 {
 	viewAxisVisibleChanged(1, checked);
@@ -817,6 +836,11 @@ void FQPlotWindow::on_ViewZAxisInvertCheck_clicked(bool checked)
 	viewAxisInvertChanged(2, checked);
 }
 
+void FQPlotWindow::on_ViewZAxisLogarithmicCheck_clicked(bool checked)
+{
+	viewAxisLogarithmicChanged(2, checked);
+}
+
 void FQPlotWindow::on_ViewZAxisVisibleCheck_clicked(bool checked)
 {
 	viewAxisVisibleChanged(2, checked);
@@ -893,6 +917,18 @@ void FQPlotWindow::on_ViewZAxisRotationSpin_valueChanged(int value)
 void FQPlotWindow::updateViewTab()
 {
 	refreshing_ = true;
+	
+	// Label scales
+	ui.ViewLabelScaleSpin->setValue(labelScale_);
+	ui.ViewTitleScaleSpin->setValue(titleScale_);
+
+	// Invert / Visible
+	ui.ViewXAxisInvertCheck->setChecked(axisInvert_.x);
+	ui.ViewYAxisInvertCheck->setChecked(axisInvert_.y);
+	ui.ViewZAxisInvertCheck->setChecked(axisInvert_.z);
+	ui.ViewXAxisVisibleCheck->setChecked(axisVisible_.x);
+	ui.ViewYAxisVisibleCheck->setChecked(axisVisible_.y);
+	ui.ViewZAxisVisibleCheck->setChecked(axisVisible_.z);
 
 	// Axis positions
 	// -- X
@@ -910,7 +946,7 @@ void FQPlotWindow::updateViewTab()
 	ui.ViewZAxisCrossAtYSpin->setRange(limitMin_.y, limitMax_.y);
 	ui.ViewZAxisCrossAtXSpin->setValue(axisPosition_[0].x);
 	ui.ViewZAxisCrossAtYSpin->setValue(axisPosition_[0].y);
-	
+
 	// AxisTicks
 	// -- X
 	ui.ViewXAxisAutoTicksCheck->setChecked(axisAutoTicks_.x);
@@ -939,6 +975,7 @@ void FQPlotWindow::updateViewTab()
 	ui.ViewXAxisUpXSpin->setValue(axisLabelUp_[0].x);
 	ui.ViewXAxisUpYSpin->setValue(axisLabelUp_[0].y);
 	ui.ViewXAxisUpZSpin->setValue(axisLabelUp_[0].z);
+	ui.ViewXAxisRotationSpin->setValue(axisLabelRotation_.x);
 	// -- Y
 	ui.ViewYAxisDirectionXSpin->setValue(axisLabelDirection_[1].x);
 	ui.ViewYAxisDirectionYSpin->setValue(axisLabelDirection_[1].y);
@@ -946,6 +983,7 @@ void FQPlotWindow::updateViewTab()
 	ui.ViewYAxisUpXSpin->setValue(axisLabelUp_[1].x);
 	ui.ViewYAxisUpYSpin->setValue(axisLabelUp_[1].y);
 	ui.ViewYAxisUpZSpin->setValue(axisLabelUp_[1].z);
+	ui.ViewYAxisRotationSpin->setValue(axisLabelRotation_.y);
 	// -- Z
 	ui.ViewZAxisDirectionXSpin->setValue(axisLabelDirection_[2].x);
 	ui.ViewZAxisDirectionYSpin->setValue(axisLabelDirection_[2].y);
@@ -953,6 +991,7 @@ void FQPlotWindow::updateViewTab()
 	ui.ViewZAxisUpXSpin->setValue(axisLabelUp_[2].x);
 	ui.ViewZAxisUpYSpin->setValue(axisLabelUp_[2].y);
 	ui.ViewZAxisUpZSpin->setValue(axisLabelUp_[2].z);
+	ui.ViewZAxisRotationSpin->setValue(axisLabelRotation_.z);
 
 	refreshing_ = false;
 }

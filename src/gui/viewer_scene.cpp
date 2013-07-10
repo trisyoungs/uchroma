@@ -73,7 +73,6 @@ void Viewer::setupGL()
 	// Auto-normalise surface normals
 	glEnable(GL_NORMALIZE);
 
-
 	// Set up the light model
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -92,11 +91,7 @@ void Viewer::setupGL()
 	glDisable(GL_MULTISAMPLE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
-// 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-// 	glEnable(GL_LINE_SMOOTH);
-// 	glEnable(GL_POLYGON_SMOOTH);
 
 	// Configure fog effects
 //	glFogi(GL_FOG_MODE, GL_LINEAR);
@@ -150,11 +145,11 @@ void Viewer::drawScene()
 	// Shift to center coordinates
 	A.setTranslation(-surfaceCenter_.x, -surfaceCenter_.y, -surfaceCenter_.z);
 
-	// Render axes
-	for (int axis=0; axis<3; ++axis) renderPrimitive(&axisPrimitives_[axis], colourBlack, A, GL_LINE, 2.0);
-
 	// Render surface
 	renderPrimitive(&surface_, colourRed, A);
+
+	// Render axes
+	for (int axis=0; axis<3; ++axis) renderPrimitive(&axisPrimitives_[axis], colourBlack, A, GL_LINE, 2.0);
 }
 
 // Construct normal / colour data for slice specified
@@ -338,12 +333,18 @@ void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale)
 // 	msg.print("Surface contains %i vertices.\n", surface_.nDefinedVertices());
 }
 
-// Create axis primitives
-void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted, bool logarithmic)
+// Clear specified axix primitive
+void Viewer::clearAxisPrimitive(int axis)
 {
-	// Clear old primitive data
 	axisPrimitives_[axis].forgetAll();
 	axisTextPrimitives_[axis].forgetAll();
+}
+
+// Create axis primitives
+void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted)
+{
+	// Clear old primitive data
+	clearAxisPrimitive(axis);
 
 	Vec3<double> u, v;
 	double range = axisMax - axisMin;
@@ -387,9 +388,78 @@ void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, dou
 		s = QString::number(firstTick+count*tickDelta);
 		boundingBox = font_->BBox(qPrintable(s));
 
-		axisTextPrimitives_[axis].add(s, labelScale_, fontBaseHeight_, fabs(boundingBox.Upper().Xf() - boundingBox.Lower().Xf()), u, direction, up, zrotation);
+		axisTextPrimitives_[axis].add(s, labelScale_, fontBaseHeight_, fabs(boundingBox.Upper().X() - boundingBox.Lower().X()), u, direction, up, zrotation);
 		u.add(axis, (inverted ? -tickDelta : tickDelta));
 		++count;
+	}
+}
+
+// Create logarithmic axis primitives
+void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted)
+{
+	// Clear old primitive data
+	clearAxisPrimitive(axis);
+
+	// For the log axis, the associated surface data coordinate will already be in log form
+	if ((axisMin < 0.0) || (axisMax < 0.0))
+	{
+		msg.print("Axis range is inappropriate for a log scale (%f < x < %f). Axis will not be drawn.\n", axisMin, axisMax);
+		return;
+	}
+
+	double logAxisMin = log10(axisMin);
+	double logAxisMax = log10(axisMax);
+
+	Vec3<double> u, v;
+	QString s;
+	FTBBox boundingBox;
+
+	// Draw a line from min to max range, passing through the defined axisPosition
+	u = axisPosition;
+	u.set(axis, logAxisMin);
+	v = axisPosition;
+	v.set(axis, logAxisMax);
+	axisPrimitives_[axis].plotLine(u, v);
+
+	// Plot tickmarks
+	if (nMinorTicks > 8) nMinorTicks = 8;
+	// Start at floored (ceiling'd) integer of logAxisMin (logAxisMax), and go from there.
+	int count = 0;
+	double power = inverted ? ceil(logAxisMax) : floor(logAxisMin);
+	double value = pow10(power);
+	while (true)
+	{
+		// Check break condition
+		if (inverted && (value < axisMin)) break;
+		if ((!inverted) && value > axisMax) break;
+
+		// If the current value is in range, plot a tick
+		u[axis] = log10(value);
+		if ((value >= axisMin) && (value <= axisMax))
+		{
+			// Tick mark
+			axisPrimitives_[axis].plotLine(u, u+direction*(count == 0 ? 0.1 : 0.05));
+
+			// Tick label
+			if (count == 0)
+			{
+				// Determine resulting text primitive width (so we can do label rotations
+				s = QString::number(value);
+				boundingBox = font_->BBox(qPrintable(s));
+
+				axisTextPrimitives_[axis].add(s, labelScale_, fontBaseHeight_, fabs(boundingBox.Upper().X() - boundingBox.Lower().X()), u + direction*0.1, direction, up, zrotation);
+			}
+		}
+
+		// Increase tick counter, value, and power if necessary
+		++count;
+		if (count > nMinorTicks)
+		{
+			count = 0;
+			power = power + 1.0;
+			value = pow10(power);
+		}
+		else value += pow10(power);
 	}
 }
 

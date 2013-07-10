@@ -150,14 +150,10 @@ void Viewer::paintGL()
 	font_->FaceSize(1);
 	if (font_)
 	{
-		glEnable(GL_LINE_SMOOTH);
-		glEnable(GL_POLYGON_SMOOTH);
 		textPrimitives_.renderAll(viewMatrix_, -surfaceCenter_, font_);
 		axisTextPrimitives_[0].renderAll(viewMatrix_, -surfaceCenter_, font_);
 		axisTextPrimitives_[1].renderAll(viewMatrix_, -surfaceCenter_, font_);
 		axisTextPrimitives_[2].renderAll(viewMatrix_, -surfaceCenter_, font_);
-		glDisable(GL_LINE_SMOOTH);
-		glDisable(GL_POLYGON_SMOOTH);
 	}
 	
 	// Send primitives to the display

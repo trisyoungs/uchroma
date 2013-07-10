@@ -1,0 +1,35 @@
+SliceDir "/home/tris/src/fqplot/test"
+Slice "logarithm1.txt" 0.000000
+Slice "logarithm2.txt" 1.000000
+TransformX Multiply 1.000000
+TransformY Multiply 0.030000
+TransformZ Multiply 1.000000
+PreTransformShift 0.000000 0.000000 0.000000
+PostTransformShift 0.000000 0.000000 0.000000
+LimitX 0.010000 50.000000
+LimitY -0.270000 0.300000
+LimitZ 0.000000 1.000000
+ColourScalePoint 0.000000 255 255 255 255
+ColourScalePoint 1.000000 255 255 255 255
+LabelScale 0.100000
+TitleScale 0.300000
+AxisAutoTicks 1 1 1
+AxisFirstTick 5.000000 -0.200000 0.000000
+AxisTickDelta 5.000000 0.100000 0.200000
+AxisMinorTicks 8 1 1
+AxisPosition 0 0.000000 -0.090000 1.000000
+AxisLabelDirection 0 0.000000 1.000000 0.000000
+AxisLabelUp 0 -1.000000 0.000000 0.000000
+AxisPosition 1 0.100000 0.000000 0.000000
+AxisLabelDirection 1 1.000000 0.000000 0.000000
+AxisLabelUp 1 0.000000 1.000000 0.000000
+AxisPosition 2 0.100000 0.000000 0.000000
+AxisLabelDirection 2 1.000000 0.000000 0.000000
+AxisLabelUp 2 0.000000 1.000000 0.000000
+AxisLabelRotation 150 0 0
+AxisInvert 0 0 0
+AxisVisible 1 1 1
+ViewMatrixX 0.999908 -0.010541 -0.008620 0.000000
+ViewMatrixY 0.011832 0.985938 0.166693 0.000000
+ViewMatrixZ 0.006742 -0.166779 0.985971 0.000000
+ViewMatrixW -0.200000 0.133333 -5.547492 1.000000

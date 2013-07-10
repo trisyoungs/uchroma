@@ -21,6 +21,7 @@
 
 #include "gui/viewer_textprimitive.h"
 #include "gui/viewer.uih"
+#include "math/constants.h"
 
 /*
 // Text Primitive
@@ -30,24 +31,37 @@
 void TextPrimitive::set(QString text, double scale, double fontBaseHeight, double relativeWidth, Vec3<double> origin, Vec3<double> direction, Vec3<double> up, int zrotation)
 {
 	text_ = text;
-XXX Do Rotation.
+
 	// Construct basic transformation matrix
 	direction.normalise();
 	up.normalise();
 	localTransform_.setIdentity();
-	localTransform_.setTranslation(origin);
+	localTransform_.setTranslation(origin + direction*(fabs(cos(zrotation/DEGRAD)*relativeWidth) + fabs(sin(zrotation/DEGRAD)*fontBaseHeight))*scale*0.5);
 	localTransform_.setColumn(0, direction*scale, 0.0);
 	localTransform_.setColumn(1, up*scale, 0.0);
 	localTransform_.setColumn(2, (direction * up)*scale, 0.0);
-	
-	// Apply a shift along the up vector (Y) to center the middle of the text characters in line with the origin
-	localTransform_.addTranslation(-up*fontBaseHeight*scale*0.5);
+	Matrix rotation;
+	rotation.createRotationAxis(localTransform_[8], localTransform_[9], localTransform_[10], zrotation*1.0, true);
+	localTransform_ *= rotation;
+
+	// Calculate the text centerPoint_ so the rotation applied above operates on the centre of the text string
+	// Don't apply the 'scale' multiplier again, since it already exists in the transformation matrix
+	// Work in local coordinates, rather than the transform axes calculated above
+	centerPoint_.X(-relativeWidth*0.5);
+	centerPoint_.Y(-fontBaseHeight*0.5);
+	centerPoint_.Z(0.0);
 }
 
 // Return local transform matrix
 Matrix& TextPrimitive::localTransform()
 {
 	return localTransform_;
+}
+
+// Return text centerpoint
+FTPoint TextPrimitive::centerPoint()
+{
+	return centerPoint_;
 }
 
 // Return text to render
@@ -101,7 +115,8 @@ void TextPrimitiveChunk::renderAll(Matrix viewMatrix, Vec3<double> globalCenter,
 		A.addTranslation(globalCenter);
 
 		glLoadMatrixd((viewMatrix * A).matrix());
-		font->Render(qPrintable(textPrimitives_[n].text()));
+// 		FTPoint point(-up*fontBaseHeight*scale*0.5);
+		font->Render(qPrintable(textPrimitives_[n].text()), -1, textPrimitives_[n].centerPoint());
 	}
 }
 

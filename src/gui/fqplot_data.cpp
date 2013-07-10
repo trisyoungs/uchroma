@@ -23,7 +23,7 @@
 #include "base/lineparser.h"
 
 // DataFile Keywords
-const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisInvert", "AxisLabelDirection", "AxisMinorTicks", "AxisPosition", "AxisRotation", "AxisTickDelta", "AxisVisible", "ColourScalePoint", "LabelScale", "LimitX", "LimitY", "LimitZ", "PostTransformShift", "PreTransformShift", "SliceDir", "Slice", "TitleScale", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
+const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisInvert", "AxisLabelDirection", "AxisLabelRotation", "AxisLabelUp", "AxisLogarithmic", "AxisMinorTicks", "AxisPosition", "AxisTickDelta", "AxisVisible", "ColourScalePoint", "LabelScale", "LimitX", "LimitY", "LimitZ", "PostTransformShift", "PreTransformShift", "SliceDir", "Slice", "TitleScale", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
 FQPlotWindow::DataFileKeyword FQPlotWindow::dataFileKeyword(const char* s)
 {
 	for (int n=0; n<FQPlotWindow::nDataFileKeywords; ++n) if (strcmp(s, DataFileKeywordStrings[n]) == 0) return (FQPlotWindow::DataFileKeyword) n;
@@ -139,7 +139,8 @@ void FQPlotWindow::clearData()
 	axisLabelUp_[0].set(0.0, 1.0, 0.0);
 	axisLabelUp_[1].set(0.0, 1.0, 0.0);
 	axisLabelUp_[2].set(0.0, 1.0, 0.0);
-	axisRotation_.zero();
+	axisLabelRotation_.zero();
+	axisLogarithmic_.set(true, false, false);
 }
 
 // Create default ColourScale
@@ -202,6 +203,19 @@ bool FQPlotWindow::loadData(QString fileName)
 			case (FQPlotWindow::AxisLabelDirectionKeyword):
 				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Axis index is out of range for %s keyword.\n", dataFileKeyword(kwd));
 				else axisLabelDirection_[parser.argi(1)].set(parser.argd(2), parser.argd(3), parser.argd(4));
+				break;
+			// Axis label rotation
+			case (FQPlotWindow::AxisLabelRotationKeyword):
+				axisLabelRotation_.set(parser.argi(1), parser.argi(2), parser.argi(3));
+				break;
+			// Axis label direction
+			case (FQPlotWindow::AxisLabelUpKeyword):
+				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Axis index is out of range for %s keyword.\n", dataFileKeyword(kwd));
+				else axisLabelUp_[parser.argi(1)].set(parser.argd(2), parser.argd(3), parser.argd(4));
+				break;
+			// Axis logarithmic flag
+			case (FQPlotWindow::AxisLogarithmicKeyword):
+				axisLogarithmic_.set(parser.argi(1), parser.argi(2), parser.argi(3));
 				break;
 			// Axis minor ticks
 			case (FQPlotWindow::AxisMinorTicksKeyword):
@@ -351,8 +365,11 @@ bool FQPlotWindow::saveData(QString fileName)
 	{
 		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisPositionKeyword], axis, axisPosition_[axis].x, axisPosition_[axis].y, axisPosition_[axis].z);
 		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisLabelDirectionKeyword], axis, axisLabelDirection_[axis].x, axisLabelDirection_[axis].y, axisLabelDirection_[axis].z);
+		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisLabelUpKeyword], axis, axisLabelUp_[axis].x, axisLabelUp_[axis].y, axisLabelUp_[axis].z);
 	}
+	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisLabelRotationKeyword], axisLabelRotation_.x, axisLabelRotation_.y, axisLabelRotation_.z);
 	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisInvertKeyword], axisInvert_.x, axisInvert_.y, axisInvert_.z);
+	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisLogarithmicKeyword], axisLogarithmic_.x, axisLogarithmic_.y, axisLogarithmic_.z);
 	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisVisibleKeyword], axisVisible_.x, axisVisible_.y, axisVisible_.z);
 
 	// -- Transformation Matrix
@@ -497,7 +514,7 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 {
 	// Determine surface center
 	Vec3<double> center;
-	for (int n=0; n<3; ++n) center[n] = (limitMax_[n]+limitMin_[n]) * 0.5;
+	for (int n=0; n<3; ++n) center[n] = axisLogarithmic_[n] ? (log10(limitMax_[n])+log10(limitMin_[n])) * 0.5 : (limitMax_[n]+limitMin_[n]) * 0.5;
 	ui.MainView->setSurfaceCenter(center);
 
 	// Make sure view variables are up-to-date
@@ -519,6 +536,7 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 			// -- Is the transformed Z value within range?
 			if ((z < limitMin_.z) || (z > limitMax_.z)) continue;
 			if (axisInvert_.z) z = (limitMax_.z - z) + limitMin_.z;
+			if (axisLogarithmic_.z) z = log10(z);
 
 			// Add new item to surfaceData_ array
 			Slice* surfaceSlice = surfaceData_.add();
@@ -559,7 +577,10 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 				x = array[0].value(n);
 				if ((x < limitMin_.x) || (x > limitMax_.x)) continue;
 				if (axisInvert_.x) x = (limitMax_.x - x) + limitMin_.x;
-				surfaceSlice->data().addPoint(x, array[1].value(n));
+				if (axisLogarithmic_.x) x = log10(x);
+				y = array[1].value(n);
+				if (axisLogarithmic_.y) y = log10(y);
+				surfaceSlice->data().addPoint(x, y);
 			}
 
 			// Move to next Z slice
@@ -573,8 +594,24 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 	// Construct axes
 	for (int axis = 0; axis < 3; ++axis)
 	{
-		if (axisAutoTicks_[axis]) calculateTickDeltas(axis);
-		ui.MainView->createAxis(axis, axisPosition_[axis], limitMin_[axis], limitMax_[axis], axisFirstTick_[axis], axisTickDelta_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis], axisLabelUp_[axis], axisRotation_[axis], axisInvert_[axis], axisVisible_[axis]);
+		if (!axisVisible_[axis])
+		{
+			ui.MainView->clearAxisPrimitive(axis);
+			continue;
+		}
+
+		// Set position, taking into account logarithmic axes
+		Vec3<double> pos;
+		for (int n=0; n<3; ++n) pos.set(n, n == axis ? 0.0 : (axisLogarithmic_[n] ? log10(axisPosition_[axis][n]) : axisPosition_[axis][n]));
+
+		if (axisLogarithmic_[axis]) ui.MainView->createLogAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis], axisLabelUp_[axis], axisLabelRotation_[axis], axisInvert_[axis]);
+		else
+		{
+			// Calculate autoticks if necessary
+			if (axisAutoTicks_[axis]) calculateTickDeltas(axis);
+
+			ui.MainView->createAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisFirstTick_[axis], axisTickDelta_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis], axisLabelUp_[axis], axisLabelRotation_[axis], axisInvert_[axis]);
+		}
 	}
 
 	ui.MainView->update();

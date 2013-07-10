@@ -57,7 +57,8 @@ void Viewer::sortAndSendGL()
 		glPolygonMode(GL_FRONT_AND_BACK, pi->fillMode());
 		if (pi->fillMode() == GL_LINE)
 		{
-// 			glEnable(GL_LINE_SMOOTH);
+			glEnable(GL_LINE_SMOOTH);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glLineWidth(pi->lineWidth());
 			glDisable(GL_LIGHTING);
 		}
@@ -66,6 +67,7 @@ void Viewer::sortAndSendGL()
 			glPointSize(1.0);
 			glDisable(GL_LIGHTING);
 		}
+		else glEnable(GL_MULTISAMPLE);
 		A = viewMatrix_ * pi->localTransform();
 		glLoadMatrixd(A.matrix());
 		prim->sendToGL();
@@ -74,9 +76,11 @@ void Viewer::sortAndSendGL()
 		{
 			glLineWidth(1.0);
 			glEnable(GL_LIGHTING);
-// 			glDisable(GL_LINE_SMOOTH);
+			glDisable(GL_LINE_SMOOTH);
+// 			glClearColor(1.0, 1.0, 1.0, 1.0);
 		}
 		else if (pi->fillMode() == GL_POINT) glEnable(GL_LIGHTING);
+		else glDisable(GL_MULTISAMPLE);
 	}
 
 	// Draw line primitives

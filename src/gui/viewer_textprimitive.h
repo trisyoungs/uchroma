@@ -26,12 +26,12 @@
 #include "math/matrix.h"
 #include "templates/vector3.h"
 #include "templates/list.h"
+#include <FTGL/ftgl.h>
 
 #define TEXTCHUNKSIZE 100
 
 // Forward Declarations
 class Viewer;
-class FTFont;
 
 // Text Primitive
 class TextPrimitive
@@ -39,6 +39,8 @@ class TextPrimitive
 	private:
 	// Local transform matrix for the text
 	Matrix localTransform_;
+	// Desired centrepoint of text
+	FTPoint centerPoint_;
 	// Text to render
 	QString text_;
 	
@@ -47,6 +49,8 @@ class TextPrimitive
 	void set(QString text, double scale, double fontBaseHeight, double relativeWidth, Vec3<double> origin, Vec3<double> direction, Vec3<double> up, int zrotation);
 	// Return local transform 
 	Matrix& localTransform();
+	// Return text centerpoint
+	FTPoint centerPoint();
 	// Return text to render
 	QString& text();
 };
