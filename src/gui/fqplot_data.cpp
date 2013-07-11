@@ -23,7 +23,7 @@
 #include "base/lineparser.h"
 
 // DataFile Keywords
-const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisInvert", "AxisLabelDirection", "AxisLabelRotation", "AxisLabelUp", "AxisLogarithmic", "AxisMinorTicks", "AxisPosition", "AxisTickDelta", "AxisVisible", "ColourScalePoint", "LabelScale", "LimitX", "LimitY", "LimitZ", "PostTransformShift", "PreTransformShift", "SliceDir", "Slice", "TitleScale", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
+const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisInvert", "AxisLabelDirection", "AxisLabelRotation", "AxisLabelUp", "AxisLogarithmic", "AxisMinorTicks", "AxisPosition", "AxisTickDelta", "AxisVisible", "ColourScalePoint", "Interpolate", "InterpolateConstrain", "InterpolateStep", "LabelScale", "LimitX", "LimitY", "LimitZ", "Perspective", "PostTransformShift", "PreTransformShift", "SliceDir", "Slice", "TitleScale", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
 FQPlotWindow::DataFileKeyword FQPlotWindow::dataFileKeyword(const char* s)
 {
 	for (int n=0; n<FQPlotWindow::nDataFileKeywords; ++n) if (strcmp(s, DataFileKeywordStrings[n]) == 0) return (FQPlotWindow::DataFileKeyword) n;
@@ -114,7 +114,9 @@ void FQPlotWindow::clearData()
 	limitMin_.set(0.0, 0.0, 0.0);
 	limitMax_.set(10.0, 10.0, 10.0);
 	interpolate_.set(false, false, false);
-	transformValue_.set(1.0,1.0,1.0);
+	interpolateConstrained_.set(false, false, false);
+	interpolationStep_.set(1.0, 1.0, 1.0);
+	transformValue_.set(1.0, 1.0, 1.0);
 	transformType_[0] = FQPlotWindow::MultiplyTransform;
 	transformType_[1] = FQPlotWindow::MultiplyTransform;
 	transformType_[2] = FQPlotWindow::MultiplyTransform;
@@ -140,7 +142,8 @@ void FQPlotWindow::clearData()
 	axisLabelUp_[1].set(0.0, 1.0, 0.0);
 	axisLabelUp_[2].set(0.0, 1.0, 0.0);
 	axisLabelRotation_.zero();
-	axisLogarithmic_.set(true, false, false);
+	axisLogarithmic_.set(false, false, false);
+	ui.actionViewPerspective->setChecked(false);
 }
 
 // Create default ColourScale
@@ -238,6 +241,18 @@ bool FQPlotWindow::loadData(QString fileName)
 			case (FQPlotWindow::ColourScalePointKeyword):
 				ui.ColourScaleWidget->addPoint(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
 				break;
+			// Interpolate flags
+			case (FQPlotWindow::InterpolateKeyword):
+				interpolate_.set(parser.argi(1), false, parser.argi(2));
+				break;
+			// Interpolate constrain flags
+			case (FQPlotWindow::InterpolateConstrainKeyword):
+				interpolateConstrained_.set(parser.argi(1), false, parser.argi(2));
+				break;
+			// Interpolation step flags
+			case (FQPlotWindow::InterpolateStepKeyword):
+				interpolationStep_.set(parser.argd(1), 0.0, parser.argd(2));
+				break;
 			// Label scale
 			case (FQPlotWindow::LabelScaleKeyword):
 				labelScale_ = parser.argd(1);
@@ -249,6 +264,10 @@ bool FQPlotWindow::loadData(QString fileName)
 				xyz = kwd - FQPlotWindow::LimitXKeyword;
 				limitMin_[xyz] = parser.argd(1);
 				limitMax_[xyz] = parser.argd(2);
+				break;
+			// Orthographic view
+			case (FQPlotWindow::PerspectiveKeyword):
+				ui.actionViewPerspective->setChecked(true);
 				break;
 			// Pre-Transform Shifts
 			case (FQPlotWindow::PreTransformShiftKeyword):
@@ -344,7 +363,11 @@ bool FQPlotWindow::saveData(QString fileName)
 	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[FQPlotWindow::LimitXKeyword], limitMin_.x, limitMax_.x);
 	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[FQPlotWindow::LimitYKeyword], limitMin_.y, limitMax_.y);
 	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[FQPlotWindow::LimitZKeyword], limitMin_.z, limitMax_.z);
-	
+	// -- Interpolation
+	parser.writeLineF("%s %i %i\n", DataFileKeywordStrings[FQPlotWindow::InterpolateKeyword], interpolate_.x, interpolate_.z);
+	parser.writeLineF("%s %i %i\n", DataFileKeywordStrings[FQPlotWindow::InterpolateConstrainKeyword], interpolateConstrained_.x, interpolateConstrained_.z);
+	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[FQPlotWindow::InterpolateStepKeyword], interpolationStep_.x, interpolationStep_.z);
+
 	// Write colour setup
 	// -- ColourScale
 	for (ColourScalePoint* csp = ui.ColourScaleWidget->firstPoint(); csp != NULL; csp = csp->next)
@@ -378,6 +401,7 @@ bool FQPlotWindow::saveData(QString fileName)
 	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::ViewMatrixYKeyword], mat[4], mat[5], mat[6], mat[7]);
 	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::ViewMatrixZKeyword], mat[8], mat[9], mat[10], mat[11]);
 	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::ViewMatrixWKeyword], mat[12], mat[13], mat[14], mat[15]);
+	if (ui.actionViewPerspective->isChecked()) parser.writeLineF("%s\n", DataFileKeywordStrings[FQPlotWindow::PerspectiveKeyword]);
 
 	parser.closeFiles();
 	return true;
@@ -519,7 +543,7 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 
 	// Make sure view variables are up-to-date
 	ui.MainView->setLabelScale(labelScale_);
-	ui.MainView->setTitleScale(labelScale_);
+	ui.MainView->setTitleScale(titleScale_);
 
 	if (dataHasChanged)
 	{
@@ -534,7 +558,11 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 			// Z
 			double z = transformValue(slice->z(), preTransformShift_[2], postTransformShift_[2], transformType_[2], transformValue_[2]);
 			// -- Is the transformed Z value within range?
-			if ((z < limitMin_.z) || (z > limitMax_.z)) continue;
+			if ((z < limitMin_.z) || (z > limitMax_.z))
+			{
+				slice = axisInvert_.z ? slice->prev : slice->next;
+				continue;
+			}
 			if (axisInvert_.z) z = (limitMax_.z - z) + limitMin_.z;
 			if (axisLogarithmic_.z) z = log10(z);
 
@@ -542,12 +570,28 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 			Slice* surfaceSlice = surfaceData_.add();
 			surfaceSlice->setZ(z);
 
-			// X / Y
+			// Copy / interpolate arrays
 			Array<double> array[2];
+			if (interpolate_.x)
+			{
+				slice->data().interpolate(interpolateConstrained_.x);
+				double x = limitMin_.x;
+				while (x <= limitMax_.x)
+				{
+					array[0].add(x);
+					array[1].add(slice->data().interpolated(x));
+					x += interpolationStep_.x;
+				}
+			}
+			else
+			{
+				array[0] = slice->data().arrayX();
+				array[1] = slice->data().arrayY();
+			}
+
+			// X / Y
 			for (int n=0; n<2; ++n)
 			{
-				array[n] = n == 0 ? slice->data().arrayX() : slice->data().arrayY();
-
 				// Apply pre-transform shift
 				array[n] += preTransformShift_[n];
 
@@ -587,7 +631,7 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 			slice = axisInvert_.z ? slice->prev : slice->next;
 		}
 	}
-
+	
 	// Update surface GL object
 	ui.MainView->createSurface(surfaceData_, ui.ColourScaleWidget);
 

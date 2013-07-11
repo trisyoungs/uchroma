@@ -158,11 +158,15 @@ void Viewer::constructSliceData(Slice* targetSlice, Array< Vec3<double> >& norma
 	normals.clear();
 	colours.clear();
 	if ((previousSlice == NULL) && (nextSlice == NULL)) return;
-
-	// Get colour data
+	
+	// Grab references to target arrays
 	Array<double>& xTarget = targetSlice->data().arrayX();
 	Array<double>& yTarget = targetSlice->data().arrayY();
-	int n, nPoints = xTarget.nItems();
+	int nPoints = xTarget.nItems();
+	if (nPoints < 2) return;
+
+	// Get colour data
+	int n;
 	QColor colour;
 	for (n=0; n<nPoints; ++n)
 	{
@@ -184,27 +188,30 @@ void Viewer::constructSliceData(Slice* targetSlice, Array< Vec3<double> >& norma
 
 		// -- First point
 		v1.set(xTarget[1] - xTarget[0], yTarget[1] - yTarget[0], 0);
-		v2.set(0.0, yNext[n] - yPrev[n], dz);
-		v3 = v1 * v2;
-		v3.normalise();
-		normals.add(v3);
+		v2.set(0.0, yNext[0] - yPrev[0], dz);
+		normals.add(v1 * v2);
+// 		v3 = v1 * v2;
+// 		v3.normalise();
+// 		normals.add(v3);
 // 		printf("Norm %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", 0, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		// -- Points 1 to N-2
 		for (n=1; n<nPoints-1; ++n)
 		{
 			v1.set(xTarget[n+1] - xTarget[n-1], yTarget[n+1] - yTarget[n-1], 0.0);
 			v2.set(0.0, yNext[n] - yPrev[n], dz);
-			v3 = v1 * v2;
-			v3.normalise();
-			normals.add(v3);
+			normals.add(v1 * v2);
+// 			v3 = v1 * v2;
+// 			v3.normalise();
+// 			normals.add(v3);
 // 			printf("Norm %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		}
 		// -- Last point
 		v1.set(xTarget[nPoints-1] - xTarget[nPoints-2], yTarget[nPoints-1] - yTarget[nPoints-2], 0.0);
 		v2.set(0.0, yPrev[nPoints-1] - yNext[nPoints-1], dz);
-		v3 = v1 * v2;
-		v3.normalise();
-		normals.add(v3);
+		normals.add(v1 * v2);
+// 		v3 = v1 * v2;
+// 		v3.normalise();
+// 		normals.add(v3);
 // 		printf("Norm %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", nPoints-1, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 	}
 	else if (previousSlice)
@@ -215,27 +222,30 @@ void Viewer::constructSliceData(Slice* targetSlice, Array< Vec3<double> >& norma
 
 		// -- First point
 		v1.set(xTarget[1] - xTarget[0], yTarget[1] - yTarget[0], 0.0);
-		v2.set(0.0, yTarget[n] - yPrev[n], dz);
-		v3 = v1 * v2;
-		v3.normalise();
-		normals.add(v3);
+		v2.set(0.0, yTarget[0] - yPrev[0], dz);
+		normals.add(v1 * v2);
+// 		v3 = v1 * v2;
+// 		v3.normalise();
+// 		normals.add(v3);
 // 		printf("Last %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", 0, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		// -- Points 1 to N-2
 		for (n=1; n<nPoints-1; ++n)
 		{
 			v1.set(xTarget[n+1] - xTarget[n-1], yTarget[n+1] - yTarget[n-1], 0.0);
 			v2.set(0.0, yTarget[n] - yPrev[n], dz);
-			v3 = v1 * v2;
-			v3.normalise();
-			normals.add(v3);
+			normals.add(v1 * v2);
+// 			v3 = v1 * v2;
+// 			v3.normalise();
+// 			normals.add(v3);
 // 			printf("Last %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		}
 		// -- Last point
 		v1.set(xTarget[nPoints-1] - xTarget[nPoints-2], yTarget[nPoints-1] - yTarget[nPoints-2], 0.0);
 		v2.set(0.0, yTarget[nPoints-1] - yPrev[nPoints-1], dz);
-		v3 = v1 * v2;
-		v3.normalise();
-		normals.add(v3);
+		normals.add(v1 * v2);
+// 		v3 = v1 * v2;
+// 		v3.normalise();
+// 		normals.add(v3);
 // 		printf("Last %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", nPoints-1, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 	}
 	else
@@ -246,28 +256,31 @@ void Viewer::constructSliceData(Slice* targetSlice, Array< Vec3<double> >& norma
 
 		// -- First point
 		v1.set(xTarget[1] - xTarget[0], yTarget[1] - yTarget[0], 0.0);
-		v2.set(0.0, yNext[n] - yTarget[n], dz);
-		v3 = v1 * v2;
-		v3.normalise();
-		normals.add(v3);
-// 		printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", 0, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
+		v2.set(0.0, yNext[0] - yTarget[0], dz);
+		normals.add(v1 * v2);
+// 		v3 = v1 * v2;
+// 		v3.normalise();
+// 		normals.add(v3);
+// 		printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f)\n", 0, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		// -- Points 1 to N-2
 		for (n=1; n<nPoints-1; ++n)
 		{
 			v1.set(xTarget[n+1] - xTarget[n-1], yTarget[n+1] - yTarget[n-1], 0.0);
 			v2.set(0.0, yNext[n] - yTarget[n], dz);
-			v3 = v1 * v2;
-			v3.normalise();
-			normals.add(v3);
-// 			printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
+			normals.add(v1 * v2);
+// 			v3 = v1 * v2;
+// 			v3.normalise();
+// 			normals.add(v3);
+// 			printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f)\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		}
 		// -- Last point
 		v1.set(xTarget[nPoints-1] - xTarget[nPoints-2], yTarget[nPoints-1] - yTarget[nPoints-2], 0.0);
-		v2.set(0.0, yNext[n] - yTarget[n], dz);
-		v3 = v1 * v2;
-		v3.normalise();
-		normals.add(v3);
-// 		printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", nPoints-1, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
+		v2.set(0.0, yNext[nPoints-1] - yTarget[nPoints-1], dz);
+		normals.add(v1 * v2);
+// 		v3 = v1 * v2;
+// 		v3.normalise();
+// 		normals.add(v3);
+// 		printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f)\n", nPoints-1, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 	}
 	
 	// Normalise normals

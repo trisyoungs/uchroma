@@ -868,7 +868,6 @@ void Data2D::interpolate(bool constrained)
 	 * No derivative matching is (can) be performed at the extreme points i=0 and i=N-1, so specify exact derivatives at these points:
 	 * 	Natural splines:
 	 * 		S'(0) = 0	S'(N-1) = 0
-	 * 	Clamped splines
 	 *
 	 * We need expressions for the derivatives of S:
 	 * 	Let h(i) = x - x(i)
@@ -962,15 +961,18 @@ void Data2D::interpolate(bool constrained)
 	
 	int i, nPoints = x_.nItems();
 	
+	// Do a quick test on splineH_ and constrainedSpline_ to see if we need to recalculate the interpolation
+// 	if ((splineH_.nItems() != 0) && (constrainedSpline_ == constrained)) return;
+
 	// Calculate interval array 'h'
 	splineH_.createEmpty(nPoints);
 	for (i=0; i<nPoints-1; ++i) splineH_[i] = x_[i+1] - x_[i];
 
 	// Initialise parameter arrays and working array
-	splineA_.createEmpty(nPoints-1);
-	splineB_.createEmpty(nPoints-1);
-	splineC_.createEmpty(nPoints-1);
-	splineD_.createEmpty(nPoints-1);
+	splineA_.createEmpty(nPoints);
+	splineB_.createEmpty(nPoints);
+	splineC_.createEmpty(nPoints);
+	splineD_.createEmpty(nPoints);
 
 	constrainedSpline_ = constrained;
 	

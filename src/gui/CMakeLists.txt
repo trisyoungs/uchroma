@@ -14,6 +14,9 @@ SET(qtproject_SRCS
 fqplot_funcs.cpp
 fqplot_data.cpp
 colourscale_funcs.cpp
+plotwidget_data.cpp
+plotwidget_funcs.cpp
+plotwidget_paintevent.cpp
 viewer_engine.cpp
 viewer_funcs.cpp
 viewer_input.cpp
@@ -35,6 +38,7 @@ viewer_vertexchunk.h
 SET(pro_MOC_HDRS
   fqplot.h
   colourscale.uih
+  plotwidget.uih
   viewer.uih
 )
 QT4_WRAP_CPP(pro_MOC_SRCS ${pro_MOC_HDRS} OPTIONS -f)

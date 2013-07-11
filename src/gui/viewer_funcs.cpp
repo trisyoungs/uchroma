@@ -49,6 +49,7 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	valid_ = false;
 	drawing_ = false;
 	renderingOffscreen_ = false;
+	hasPerspective_ = false;
 
 	// Preferences (set static members only on first instance creation)
 	setDefaultPreferences(nViewerInstances == 0);

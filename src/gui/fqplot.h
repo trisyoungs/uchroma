@@ -75,6 +75,7 @@ class FQPlotWindow : public QMainWindow
 	// View Menu
 	*/
 	private slots:
+	void on_actionViewPerspective_triggered(bool checked);
 	void on_actionViewReset_triggered(bool checked);
 
 
@@ -85,8 +86,10 @@ class FQPlotWindow : public QMainWindow
 	void on_SourceDirSelectButton_clicked(bool checked);
 	void on_AddFilesButton_clicked(bool checked);
 	void on_RemoveFilesButton_clicked(bool checked);
-	void on_SourceDataTable_itemSelectionChanged();
+	void on_SourceFilesTable_itemSelectionChanged();
+	void on_SourceFilesTable_cellChanged(int row, int column);
 	void on_GetZFromTimeStampButton_clicked(bool checked);
+	void on_ReloadAllDataButton_clicked(bool checked);
 
 	public:
 	// Update source data tab
@@ -102,6 +105,9 @@ class FQPlotWindow : public QMainWindow
 	bool transformValueChanged(int axis, double value);
 	bool transformShiftChanged(int axis, bool pre, double value);
 	bool transformLimitChanged(int axis, bool minLim, double value);
+	bool transformInterpolateChanged(int axis, bool checked);
+	bool transformInterpolateStepChanged(int axis, double step);
+	bool transformInterpolateConstrainChanged(int axis, bool checked);
 	private slots:
 	void on_TransformXTypeCombo_currentIndexChanged(int index);
 	void on_TransformYTypeCombo_currentIndexChanged(int index);
@@ -121,6 +127,13 @@ class FQPlotWindow : public QMainWindow
 	void on_LimitXMaxSpin_valueChanged(double value);
 	void on_LimitYMaxSpin_valueChanged(double value);
 	void on_LimitZMaxSpin_valueChanged(double value);
+	void on_TransformXInterpolateCheck_clicked(bool checked);
+	void on_TransformXInterpolateStepSpin_valueChanged(double value);
+	void on_TransformXInterpolateConstrainCheck_clicked(bool checked);
+	void on_TransformZInterpolateCheck_clicked(bool checked);
+	void on_TransformZInterpolateStepSpin_valueChanged(double value);
+	void on_TransformZInterpolateConstrainCheck_clicked(bool checked);
+
 
 	public:
 	// Update Transform tab
@@ -220,7 +233,7 @@ class FQPlotWindow : public QMainWindow
 	 */
 	public:
 	// Datafile keywords
-	enum DataFileKeyword { AxisAutoTicksKeyword, AxisFirstTickKeyword, AxisInvertKeyword, AxisLabelDirectionKeyword, AxisLabelRotationKeyword, AxisLabelUpKeyword, AxisLogarithmicKeyword, AxisMinorTicksKeyword, AxisPositionKeyword, AxisTickDeltaKeyword, AxisVisibleKeyword, ColourScalePointKeyword, LabelScaleKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword, PostTransformShiftKeyword, PreTransformShiftKeyword, SliceDirectoryKeyword, SliceKeyword, TitleScaleKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
+	enum DataFileKeyword { AxisAutoTicksKeyword, AxisFirstTickKeyword, AxisInvertKeyword, AxisLabelDirectionKeyword, AxisLabelRotationKeyword, AxisLabelUpKeyword, AxisLogarithmicKeyword, AxisMinorTicksKeyword, AxisPositionKeyword, AxisTickDeltaKeyword, AxisVisibleKeyword, ColourScalePointKeyword, InterpolateKeyword, InterpolateConstrainKeyword, InterpolateStepKeyword, LabelScaleKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword, PerspectiveKeyword, PostTransformShiftKeyword, PreTransformShiftKeyword, SliceDirectoryKeyword, SliceKeyword, TitleScaleKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
 	static DataFileKeyword dataFileKeyword(const char* s);
 	static const char* dataFileKeyword(DataFileKeyword dfk);
 	// Data Transform types
@@ -252,7 +265,9 @@ class FQPlotWindow : public QMainWindow
 	// Post-transform shift value
 	Vec3<double> postTransformShift_;
 	// Interpolation flags
-	Vec3<bool> interpolate_;
+	Vec3<bool> interpolate_, interpolateConstrained_;
+	// Interpolation step sizes
+	Vec3<double> interpolationStep_;
 	// List of slices for display
 	List<Slice> surfaceData_;
 	// Whether to invert axes

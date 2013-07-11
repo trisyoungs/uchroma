@@ -60,8 +60,8 @@ void FQPlotWindow::updateAllTabs()
 // Update title bar
 void FQPlotWindow::updateTitleBar()
 {
-	if (modified_) setWindowTitle("FQPlot v" + QString(FQPLOTVERSION) + " - " + inputFile_ + " (modified) ");
-	else setWindowTitle("FQPlot v" + QString(FQPLOTVERSION) + " - " + inputFile_);
+	if (modified_) setWindowTitle("FQPlot v" + QString(FQPLOTREVISION) + " - " + inputFile_ + " (modified) ");
+	else setWindowTitle("FQPlot v" + QString(FQPLOTREVISION) + " - " + inputFile_);
 }
 
 /*
@@ -129,12 +129,18 @@ void FQPlotWindow::on_actionFileQuit_triggered(bool checked)
 // View Menu
 */
 
+void FQPlotWindow::on_actionViewPerspective_triggered(bool checked)
+{
+	ui.MainView->setHasPerspective(checked);
+	ui.MainView->update();
+}
+
 void FQPlotWindow::on_actionViewReset_triggered(bool checked)
 {
 	Matrix A;
 	A[14] = -5.0;
 	ui.MainView->setViewMatrix(A);
-	ui.MainView->postRedisplay();
+	ui.MainView->update();
 }
 
 /*
@@ -194,9 +200,27 @@ void FQPlotWindow::on_RemoveFilesButton_clicked(bool checked)
 }
 
 // Source data item selection changed
-void FQPlotWindow::on_SourceDataTable_itemSelectionChanged()
+void FQPlotWindow::on_SourceFilesTable_itemSelectionChanged()
 {
 	ui.RemoveFilesButton->setEnabled(ui.SourceFilesTable->selectedItems().count() != 0);
+}
+
+void FQPlotWindow::on_SourceFilesTable_cellChanged(int row, int column)
+{
+	if (refreshing_) return;
+
+	// Z changed
+	if (column == 1)
+	{
+		Slice* slice = slices_[row];
+		if (slice == NULL) return;
+		
+		printf("Cell changed %i %i\n", row, column);
+
+		XXX Move slice to its correct position in the list
+		
+		updateSourceDataTab();
+	}
 }
 
 // Retrieve relative Z values from timestamps
@@ -228,14 +252,23 @@ void FQPlotWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 			break;
 		}
 		slice->setZ(referenceTime.secsTo(fileInfo.lastModified()));
+		
 		if ((earliest == 0) || (slice->z() < earliest)) earliest = slice->z();
 	}
 	
 	// Set correct offset
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) slice->setZ(slice->z() - earliest);
-	
+
 	setAsModified();
 	updateSourceDataTab();
+	updateSurface();
+}
+
+void FQPlotWindow::on_ReloadAllDataButton_clicked(bool checked)
+{
+	// Reload all data and update surface
+	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) slice->loadData(dataFileDirectory_);
+	setAsModified();
 	updateSurface();
 }
 
@@ -251,6 +284,7 @@ void FQPlotWindow::updateSourceDataTab()
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
 	{
 		QTableWidgetItem* item = new QTableWidgetItem(slice->fileName());
+		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 		ui.SourceFilesTable->setItem(count, 0, item);
 		item = new QTableWidgetItem(QString::number(slice->z()));
 		ui.SourceFilesTable->setItem(count, 1, item);
@@ -311,6 +345,33 @@ bool FQPlotWindow::transformLimitChanged(int axis, bool minLim, double value)
 	setAsModified();
 	updateTransformTab();
 	updateViewTab();
+	updateSurface();
+	return true;
+}
+
+bool FQPlotWindow::transformInterpolateChanged(int axis, bool checked)
+{
+	if (refreshing_) return false;
+	interpolate_[axis] = checked;
+	setAsModified();
+	updateSurface();
+	return true;
+}
+
+bool FQPlotWindow::transformInterpolateStepChanged(int axis, double step)
+{
+	if (refreshing_) return false;
+	interpolationStep_[axis] = step;
+	setAsModified();
+	updateSurface();
+	return true;
+}
+
+bool FQPlotWindow::transformInterpolateConstrainChanged(int axis, bool checked)
+{
+	if (refreshing_) return false;
+	interpolateConstrained_[axis] = checked;
+	setAsModified();
 	updateSurface();
 	return true;
 }
@@ -405,6 +466,38 @@ void FQPlotWindow::on_LimitZMaxSpin_valueChanged(double value)
 	transformLimitChanged(2, false, value);
 }
 
+void FQPlotWindow::on_TransformXInterpolateCheck_clicked(bool checked)
+{
+	transformInterpolateChanged(0, checked);
+	ui.TransformXInterpolateOptions->setEnabled(checked);
+}
+
+void FQPlotWindow::on_TransformXInterpolateStepSpin_valueChanged(double value)
+{
+	transformInterpolateStepChanged(0, value);
+}
+
+void FQPlotWindow::on_TransformXInterpolateConstrainCheck_clicked(bool checked)
+{
+	transformInterpolateConstrainChanged(0, checked);
+}
+
+void FQPlotWindow::on_TransformZInterpolateCheck_clicked(bool checked)
+{
+	transformInterpolateChanged(2, checked);
+	ui.TransformZInterpolateOptions->setEnabled(checked);
+}
+
+void FQPlotWindow::on_TransformZInterpolateStepSpin_valueChanged(double value)
+{
+	transformInterpolateStepChanged(2, value);
+}
+
+void FQPlotWindow::on_TransformZInterpolateConstrainCheck_clicked(bool checked)
+{
+	transformInterpolateConstrainChanged(2, checked);
+}
+
 // Update Transform tab
 void FQPlotWindow::updateTransformTab()
 {
@@ -448,6 +541,14 @@ void FQPlotWindow::updateTransformTab()
 	ui.LimitYMaxLabel->setText(QString::number(transformMax_.y));
 	ui.LimitZMinLabel->setText(QString::number(transformMin_.z));
 	ui.LimitZMaxLabel->setText(QString::number(transformMax_.z));
+
+	// Interpolation
+	ui.TransformXInterpolateCheck->setChecked(interpolate_.x);
+	ui.TransformXInterpolateConstrainCheck->setChecked(interpolateConstrained_.x);
+	ui.TransformXInterpolateStepSpin->setValue(interpolationStep_.x);
+	ui.TransformZInterpolateCheck->setChecked(interpolate_.z);
+	ui.TransformZInterpolateConstrainCheck->setChecked(interpolateConstrained_.z);
+	ui.TransformZInterpolateStepSpin->setValue(interpolationStep_.z);
 
 	refreshing_ = false;
 }
