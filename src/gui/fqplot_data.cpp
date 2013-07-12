@@ -143,6 +143,7 @@ void FQPlotWindow::clearData()
 	axisLabelUp_[2].set(0.0, 1.0, 0.0);
 	axisLabelRotation_.zero();
 	axisLogarithmic_.set(false, false, false);
+	axisStretch_.set(1.0, 1.0, 1.0);
 	ui.actionViewPerspective->setChecked(false);
 }
 
@@ -538,8 +539,10 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 {
 	// Determine surface center
 	Vec3<double> center;
-	for (int n=0; n<3; ++n) center[n] = axisLogarithmic_[n] ? (log10(limitMax_[n])+log10(limitMin_[n])) * 0.5 : (limitMax_[n]+limitMin_[n]) * 0.5;
+	for (int n=0; n<3; ++n) center[n] = (axisLogarithmic_[n] ? (log10(limitMax_[n])+log10(limitMin_[n])) : (limitMax_[n]+limitMin_[n])) * 0.5 * axisStretch_[n];
 	ui.MainView->setSurfaceCenter(center);
+	if (axisLogarithmic_.y) ui.MainView->setYClip(log10(limitMin_.y), log10(limitMax_.y));
+	else ui.MainView->setYClip(limitMin_.y, limitMax_.y);
 
 	// Make sure view variables are up-to-date
 	ui.MainView->setLabelScale(labelScale_);
@@ -622,8 +625,10 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 				if ((x < limitMin_.x) || (x > limitMax_.x)) continue;
 				if (axisInvert_.x) x = (limitMax_.x - x) + limitMin_.x;
 				if (axisLogarithmic_.x) x = log10(x);
+				x *= axisStretch_.x;
 				y = array[1].value(n);
 				if (axisLogarithmic_.y) y = log10(y);
+				y *= axisStretch_.y;
 				surfaceSlice->data().addPoint(x, y);
 			}
 
@@ -648,13 +653,13 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 		Vec3<double> pos;
 		for (int n=0; n<3; ++n) pos.set(n, n == axis ? 0.0 : (axisLogarithmic_[n] ? log10(axisPosition_[axis][n]) : axisPosition_[axis][n]));
 
-		if (axisLogarithmic_[axis]) ui.MainView->createLogAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis], axisLabelUp_[axis], axisLabelRotation_[axis], axisInvert_[axis]);
+		if (axisLogarithmic_[axis]) ui.MainView->createLogAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis], axisLabelUp_[axis], axisLabelRotation_[axis], axisInvert_[axis], axisStretch_[axis]);
 		else
 		{
 			// Calculate autoticks if necessary
 			if (axisAutoTicks_[axis]) calculateTickDeltas(axis);
 
-			ui.MainView->createAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisFirstTick_[axis], axisTickDelta_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis], axisLabelUp_[axis], axisLabelRotation_[axis], axisInvert_[axis]);
+			ui.MainView->createAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisFirstTick_[axis], axisTickDelta_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis], axisLabelUp_[axis], axisLabelRotation_[axis], axisInvert_[axis], axisStretch_[axis]);
 		}
 	}
 

@@ -1,5 +1,8 @@
 <RCC>
   <qresource prefix="/fqplot">
+    <file>icons/tozero.svg</file>
+    <file>icons/toleftlimit.svg</file>
+    <file>icons/torightlimit.svg</file>
     <file>icons/minus.svg</file>
     <file>icons/plus.svg</file>
     <file>icons/lock.svg</file>

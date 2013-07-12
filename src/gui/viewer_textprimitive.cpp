@@ -115,7 +115,6 @@ void TextPrimitiveChunk::renderAll(Matrix viewMatrix, Vec3<double> globalCenter,
 		A.addTranslation(globalCenter);
 
 		glLoadMatrixd((viewMatrix * A).matrix());
-// 		FTPoint point(-up*fontBaseHeight*scale*0.5);
 		font->Render(qPrintable(textPrimitives_[n].text()), -1, textPrimitives_[n].centerPoint());
 	}
 }

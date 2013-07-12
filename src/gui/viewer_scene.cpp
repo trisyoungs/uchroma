@@ -26,10 +26,6 @@
 // Create necessary primitives (must be called before any rendering is done)
 void Viewer::createPrimitives()
 {
-	// Create test primitives
-	spherePrimitive_.plotSphere(0.5, 8, 10);
-	cubePrimitive_.plotCube(0.5, 4, 0.0, 0.0, 0.0);
-
 	// Setup surface primitive
 	surface_.setColourData(true);
 	for (int n=0; n<3; ++n)
@@ -38,9 +34,7 @@ void Viewer::createPrimitives()
 		axisPrimitives_[n].setNoInstances();
 	}
 
-	// Every created primitive must be added to the primitiveList_
-	primitiveList_.add(&spherePrimitive_);
-	primitiveList_.add(&cubePrimitive_);
+	// Every primitive using instances must be added to the primitiveList_
 	primitiveList_.add(&surface_);
 }
 
@@ -59,7 +53,6 @@ void Viewer::setupGL()
 
 	// Clear (background) colour
 	glClearColor(backgroundColour[0], backgroundColour[1], backgroundColour[2], backgroundColour[3]);
-	//glClearDepth(1.0);
 
 	// Perspective hint
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
@@ -109,47 +102,6 @@ void Viewer::setupGL()
 // 	glEnable(GL_CULL_FACE);
 
 	msg.exit("Viewer::setupGL");
-}
-
-// Draw the scene to display (i.e. store primitives ready for sending to GL)
-void Viewer::drawScene()
-{
-	GLfloat colourRed[4] = { 1.0, 0.0, 0.0, 1.0 };
-	GLfloat colourGreen[4] = { 0.0, 1.0, 0.0, 1.0 };
-	GLfloat colourBlue[4] = { 0.0, 0.0, 1.0, 1.0 };
-	GLfloat colourWhite[4] = { 1.0, 1.0, 1.0, 0.8 };
-	GLfloat colourBlack[4] = { 0.0, 0.0, 0.0, 1.0 };
-	
-	// Set up initial matrix
-	Matrix A;
-	A.setIdentity();
-
-	if (surface_.nDefinedVertices() == 0)
-	{
-		renderPrimitive(&spherePrimitive_, colourWhite, A);
-		A.setTranslation(1.0,0.0,0.0);
-		renderPrimitive(&cubePrimitive_, colourRed, A);
-		A.setTranslation(-1.0,0.0,0.0);
-		renderPrimitive(&cubePrimitive_, colourRed, A);
-		A.setTranslation(0.0,1.0,0.0);
-		renderPrimitive(&cubePrimitive_, colourGreen, A);
-		A.setTranslation(0.0,-1.0,0.0);
-		renderPrimitive(&cubePrimitive_, colourGreen, A);
-		A.setTranslation(0.0,0.0,1.0);
-		renderPrimitive(&cubePrimitive_, colourBlue, A);
-		A.setTranslation(0.0,0.0,-1.0);
-		renderPrimitive(&cubePrimitive_, colourBlue, A);
-		return;
-	}
-
-	// Shift to center coordinates
-	A.setTranslation(-surfaceCenter_.x, -surfaceCenter_.y, -surfaceCenter_.z);
-
-	// Render surface
-	renderPrimitive(&surface_, colourRed, A);
-
-	// Render axes
-	for (int axis=0; axis<3; ++axis) renderPrimitive(&axisPrimitives_[axis], colourBlack, A, GL_LINE, 2.0);
 }
 
 // Construct normal / colour data for slice specified
@@ -354,7 +306,7 @@ void Viewer::clearAxisPrimitive(int axis)
 }
 
 // Create axis primitives
-void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted)
+void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted, double stretch)
 {
 	// Clear old primitive data
 	clearAxisPrimitive(axis);
@@ -366,49 +318,60 @@ void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, dou
 
 	// Draw a line from min to max range, passing through the defined axisPosition
 	u = axisPosition;
-	u.set(axis, axisMin);
+	u.set(axis, axisMin * stretch);
 	v = axisPosition;
-	v.set(axis, axisMax);
+	v.set(axis, axisMax * stretch);
 	axisPrimitives_[axis].plotLine(u, v);
 
 	// Plot tickmarks
 	int count = 0;
 	double delta = (inverted ? -tickDelta : tickDelta) / (nMinorTicks+1);
-	u.set(axis, inverted ? (axisMax - firstTick) + axisMin : firstTick);
+	double value = inverted ? (axisMax - firstTick) + axisMin : firstTick;
+	u.set(axis, value * stretch);
 	while (count < 50)
 	{
 		// Check break condition
 		if ((!inverted) && (u[axis] > axisMax)) break;
 		if (inverted && (u[axis] < axisMin)) break;
 		
-		if (count%(nMinorTicks+1) == 0) axisPrimitives_[axis].plotLine(u, u+direction*0.1);
+		if (count%(nMinorTicks+1) == 0)
+		{
+			axisPrimitives_[axis].plotLine(u, u+direction*0.1);
+			
+			// Determine resulting text primitive width (so we can do label rotations)
+			s = QString::number(firstTick+count*tickDelta);
+			boundingBox = font_->BBox(qPrintable(s));
+
+			axisTextPrimitives_[axis].add(s, labelScale_, fontBaseHeight_, fabs(boundingBox.Upper().X() - boundingBox.Lower().X()), u + direction*0.1, direction, up, zrotation);
+		}
 		else axisPrimitives_[axis].plotLine(u, u+direction*0.05);
-		u.add(axis, delta);
+		u.add(axis, delta*stretch);
+		value += delta;
 		count = (count+1)%(nMinorTicks+1);
 	}
 	
-	// Plot axis labels
-	count = 0;
-	u.set(axis, inverted ? (axisMax - firstTick) + axisMin : firstTick);
-	u += direction*0.1;
-	while (count < 50)
-	{
-		// Check break condition
-		if ((!inverted) && (u[axis] > axisMax)) break;
-		if (inverted && (u[axis] < axisMin)) break;
-		
-		// Determine resulting text primitive width (so we can do label rotations
-		s = QString::number(firstTick+count*tickDelta);
-		boundingBox = font_->BBox(qPrintable(s));
-
-		axisTextPrimitives_[axis].add(s, labelScale_, fontBaseHeight_, fabs(boundingBox.Upper().X() - boundingBox.Lower().X()), u, direction, up, zrotation);
-		u.add(axis, (inverted ? -tickDelta : tickDelta));
-		++count;
-	}
+// 	// Plot axis labels
+// 	count = 0;
+// 	u.set(axis, inverted ? (axisMax - firstTick) + axisMin : firstTick);
+// 	u += direction*0.1;
+// 	while (count < 50)
+// 	{
+// 		// Check break condition
+// 		if ((!inverted) && (u[axis] > axisMax)) break;
+// 		if (inverted && (u[axis] < axisMin)) break;
+// 		
+// 		// Determine resulting text primitive width (so we can do label rotations
+// 		s = QString::number(firstTick+count*tickDelta);
+// 		boundingBox = font_->BBox(qPrintable(s));
+// 
+// 		axisTextPrimitives_[axis].add(s, labelScale_, fontBaseHeight_, fabs(boundingBox.Upper().X() - boundingBox.Lower().X()), u + direction*0.1, direction, up, zrotation);
+// 		u.add(axis, (inverted ? -tickDelta : tickDelta));
+// 		++count;
+// 	}
 }
 
 // Create logarithmic axis primitives
-void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted)
+void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted, double stretch)
 {
 	// Clear old primitive data
 	clearAxisPrimitive(axis);
@@ -429,9 +392,9 @@ void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, 
 
 	// Draw a line from min to max range, passing through the defined axisPosition
 	u = axisPosition;
-	u.set(axis, logAxisMin);
+	u.set(axis, logAxisMin * stretch);
 	v = axisPosition;
-	v.set(axis, logAxisMax);
+	v.set(axis, logAxisMax * stretch);
 	axisPrimitives_[axis].plotLine(u, v);
 
 	// Plot tickmarks
@@ -447,7 +410,7 @@ void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, 
 		if ((!inverted) && value > axisMax) break;
 
 		// If the current value is in range, plot a tick
-		u[axis] = log10(value);
+		u[axis] = log10(value) * stretch;
 		if ((value >= axisMin) && (value <= axisMax))
 		{
 			// Tick mark
@@ -480,6 +443,13 @@ void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, 
 void Viewer::setSurfaceCenter(Vec3<double> center)
 {
 	surfaceCenter_ = center;
+}
+
+// Set Y clip plane limits
+void Viewer::setYClip(double yMin, double yMax)
+{
+	clipPlaneYMin_ = yMin - clipPlaneDelta_;
+	clipPlaneYMax_ = yMax + clipPlaneDelta_;
 }
 
 // Return number of triangles in surface

@@ -28,12 +28,12 @@ bool Viewer::useNiceText_;
 // Set default values for all preferences
 void Viewer::setDefaultPreferences(bool setStaticMembers)
 {
-	correctTransparency_ = TRUE;
+	correctTransparency_ = true;
 	fontSize_ = 10;
 	if (setStaticMembers)
 	{
-		Viewer::useFrameBuffer_ = TRUE;
-		Viewer::useNiceText_ = TRUE;
+		Viewer::useFrameBuffer_ = true;
+		Viewer::useNiceText_ = true;
 	}
 }
 

@@ -88,16 +88,17 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 			// Reset translation and scaling on original matrix, and multiply
 			viewMatrix_.removeTranslationAndScaling();
 			viewMatrix_ = A * viewMatrix_;
+			postRedisplay();
 		}
 	}
 	else if (buttonState_&Qt::MidButton)
 	{
-		viewMatrix_.adjustColumn(3, delta.x/5.0, -delta.y/15.0, 0.0, 0.0);
+		viewMatrix_.adjustColumn(3, delta.x/15.0, -delta.y/15.0, 0.0, 0.0);
+		postRedisplay();
 	}
 	
 	rMouseLast_.set(event->x(), event->y(), 0.0);
 	setFocus();
-	postRedisplay();
 }
 
 // Qt Signal (mouse wheel event)

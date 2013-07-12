@@ -684,7 +684,76 @@
                </property>
                <item>
                 <layout class="QGridLayout" name="gridLayout_2">
-                 <item row="0" column="2">
+                 <item row="2" column="0">
+                  <widget class="QToolButton" name="LimitYMinSetMinimumButton">
+                   <property name="maximumSize">
+                    <size>
+                     <width>24</width>
+                     <height>24</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>...</string>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="icons.qrc">
+                     <normaloff>:/fqplot/icons/toleftlimit.svg</normaloff>:/fqplot/icons/toleftlimit.svg</iconset>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="3">
+                  <widget class="QLabel" name="ZAxisLabel">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>&lt; Z &lt;</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QToolButton" name="LimitXMinSetMinimumButton">
+                   <property name="maximumSize">
+                    <size>
+                     <width>24</width>
+                     <height>24</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>...</string>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="icons.qrc">
+                     <normaloff>:/fqplot/icons/toleftlimit.svg</normaloff>:/fqplot/icons/toleftlimit.svg</iconset>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="4">
+                  <widget class="QDoubleSpinBox" name="LimitYMaxSpin">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="decimals">
+                    <number>4</number>
+                   </property>
+                   <property name="minimum">
+                    <double>-1000000.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>1000000.000000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>1.000000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="4">
                   <widget class="QDoubleSpinBox" name="LimitXMaxSpin">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -750,55 +819,7 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="XAxisLabel">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>X</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="0">
-                  <widget class="QLabel" name="ZAxisLabel">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>Z</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="2">
-                  <widget class="QDoubleSpinBox" name="LimitYMaxSpin">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="decimals">
-                    <number>4</number>
-                   </property>
-                   <property name="minimum">
-                    <double>-1000000.000000000000000</double>
-                   </property>
-                   <property name="maximum">
-                    <double>1000000.000000000000000</double>
-                   </property>
-                   <property name="value">
-                    <double>1.000000000000000</double>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="2">
+                 <item row="4" column="4">
                   <widget class="QDoubleSpinBox" name="LimitZMaxSpin">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -842,19 +863,6 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="0">
-                  <widget class="QLabel" name="YAxisLabel">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>Y</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="3" column="1">
                   <widget class="QLabel" name="LimitYMinLabel">
                    <property name="font">
@@ -879,7 +887,7 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="1" column="2">
+                 <item row="1" column="4">
                   <widget class="QLabel" name="LimitXMaxLabel">
                    <property name="font">
                     <font>
@@ -903,7 +911,7 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="2">
+                 <item row="3" column="4">
                   <widget class="QLabel" name="LimitYMaxLabel">
                    <property name="font">
                     <font>
@@ -915,7 +923,7 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="5" column="2">
+                 <item row="5" column="4">
                   <widget class="QLabel" name="LimitZMaxLabel">
                    <property name="font">
                     <font>
@@ -924,6 +932,100 @@
                    </property>
                    <property name="text">
                     <string>0.0</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="3">
+                  <widget class="QLabel" name="XAxisLabel">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>&lt; X &lt; </string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="3">
+                  <widget class="QLabel" name="YAxisLabel">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>&lt; Y &lt;</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="0">
+                  <widget class="QToolButton" name="LimitZMinSetMinimumButton">
+                   <property name="maximumSize">
+                    <size>
+                     <width>24</width>
+                     <height>24</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>...</string>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="icons.qrc">
+                     <normaloff>:/fqplot/icons/toleftlimit.svg</normaloff>:/fqplot/icons/toleftlimit.svg</iconset>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="5">
+                  <widget class="QToolButton" name="LimitXMaxSetMaximumButton">
+                   <property name="maximumSize">
+                    <size>
+                     <width>24</width>
+                     <height>24</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>...</string>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="icons.qrc">
+                     <normaloff>:/fqplot/icons/torightlimit.svg</normaloff>:/fqplot/icons/torightlimit.svg</iconset>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="5">
+                  <widget class="QToolButton" name="LimitYMaxSetMaximumButton">
+                   <property name="maximumSize">
+                    <size>
+                     <width>24</width>
+                     <height>24</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>...</string>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="icons.qrc">
+                     <normaloff>:/fqplot/icons/torightlimit.svg</normaloff>:/fqplot/icons/torightlimit.svg</iconset>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="5">
+                  <widget class="QToolButton" name="LimitZMaxSetMaximumButton">
+                   <property name="maximumSize">
+                    <size>
+                     <width>24</width>
+                     <height>24</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>...</string>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="icons.qrc">
+                     <normaloff>:/fqplot/icons/torightlimit.svg</normaloff>:/fqplot/icons/torightlimit.svg</iconset>
                    </property>
                   </widget>
                  </item>
@@ -1334,6 +1436,42 @@
                  </layout>
                 </item>
                 <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_28">
+                  <item>
+                   <widget class="QLabel" name="label_38">
+                    <property name="text">
+                     <string>Stretch Factor</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QDoubleSpinBox" name="ViewXAxisStretchSpin">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="toolTip">
+                     <string/>
+                    </property>
+                    <property name="decimals">
+                     <number>3</number>
+                    </property>
+                    <property name="minimum">
+                     <double>0.001000000000000</double>
+                    </property>
+                    <property name="maximum">
+                     <double>1000000.000000000000000</double>
+                    </property>
+                    <property name="value">
+                     <double>1.000000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
                  <widget class="QGroupBox" name="XAxisCrossGroup">
                   <property name="title">
                    <string>Cross At</string>
@@ -1347,6 +1485,9 @@
                    </property>
                    <item>
                     <layout class="QGridLayout" name="gridLayout_3">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item row="0" column="0">
                       <widget class="QLabel" name="label_4">
                        <property name="sizePolicy">
@@ -1411,6 +1552,108 @@
                        </property>
                       </widget>
                      </item>
+                     <item row="0" column="5">
+                      <widget class="QToolButton" name="ViewXAxisCrossAtYSetMaximumButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/torightlimit.svg</normaloff>:/fqplot/icons/torightlimit.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="3">
+                      <widget class="QToolButton" name="ViewXAxisCrossAtYSetZeroButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/tozero.svg</normaloff>:/fqplot/icons/tozero.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="2">
+                      <widget class="QToolButton" name="ViewXAxisCrossAtYSetMinimumButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/toleftlimit.svg</normaloff>:/fqplot/icons/toleftlimit.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="2">
+                      <widget class="QToolButton" name="ViewXAxisCrossAtZSetMinimumButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/toleftlimit.svg</normaloff>:/fqplot/icons/toleftlimit.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="3">
+                      <widget class="QToolButton" name="ViewXAxisCrossAtZSetZeroButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/tozero.svg</normaloff>:/fqplot/icons/tozero.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="5">
+                      <widget class="QToolButton" name="ViewXAxisCrossAtZSetMaximumButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/torightlimit.svg</normaloff>:/fqplot/icons/torightlimit.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
                     </layout>
                    </item>
                   </layout>
@@ -1446,6 +1689,9 @@
                       </property>
                       <item>
                        <layout class="QGridLayout" name="gridLayout_5">
+                        <property name="spacing">
+                         <number>4</number>
+                        </property>
                         <item row="0" column="0">
                          <widget class="QLabel" name="label_6">
                           <property name="sizePolicy">
@@ -1556,6 +1802,9 @@
                    </property>
                    <item>
                     <layout class="QGridLayout" name="gridLayout_10">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item row="4" column="0">
                       <widget class="QLabel" name="label_18">
                        <property name="text">
@@ -1805,6 +2054,42 @@
                  </layout>
                 </item>
                 <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_31">
+                  <item>
+                   <widget class="QLabel" name="label_41">
+                    <property name="text">
+                     <string>Stretch Factor</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QDoubleSpinBox" name="ViewYAxisStretchSpin">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="toolTip">
+                     <string/>
+                    </property>
+                    <property name="decimals">
+                     <number>3</number>
+                    </property>
+                    <property name="minimum">
+                     <double>0.001000000000000</double>
+                    </property>
+                    <property name="maximum">
+                     <double>1000000.000000000000000</double>
+                    </property>
+                    <property name="value">
+                     <double>1.000000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
                  <widget class="QGroupBox" name="YAxisCrossGroup">
                   <property name="title">
                    <string>Cross At</string>
@@ -1818,6 +2103,9 @@
                    </property>
                    <item>
                     <layout class="QGridLayout" name="gridLayout_6">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item row="0" column="0">
                       <widget class="QLabel" name="label_8">
                        <property name="sizePolicy">
@@ -1882,6 +2170,108 @@
                        </property>
                       </widget>
                      </item>
+                     <item row="0" column="5">
+                      <widget class="QToolButton" name="ViewYAxisCrossAtXSetMaximumButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/torightlimit.svg</normaloff>:/fqplot/icons/torightlimit.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="3">
+                      <widget class="QToolButton" name="ViewYAxisCrossAtXSetZeroButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/tozero.svg</normaloff>:/fqplot/icons/tozero.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="2">
+                      <widget class="QToolButton" name="ViewYAxisCrossAtXSetMinimumButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/toleftlimit.svg</normaloff>:/fqplot/icons/toleftlimit.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="2">
+                      <widget class="QToolButton" name="ViewYAxisCrossAtZSetMinimumButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/toleftlimit.svg</normaloff>:/fqplot/icons/toleftlimit.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="3">
+                      <widget class="QToolButton" name="ViewYAxisCrossAtZSetZeroButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/tozero.svg</normaloff>:/fqplot/icons/tozero.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="5">
+                      <widget class="QToolButton" name="ViewYAxisCrossAtZSetMaximumButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/torightlimit.svg</normaloff>:/fqplot/icons/torightlimit.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
                     </layout>
                    </item>
                   </layout>
@@ -1917,6 +2307,9 @@
                       </property>
                       <item>
                        <layout class="QGridLayout" name="gridLayout_7">
+                        <property name="spacing">
+                         <number>4</number>
+                        </property>
                         <item row="0" column="0">
                          <widget class="QLabel" name="label_10">
                           <property name="sizePolicy">
@@ -2027,6 +2420,9 @@
                    </property>
                    <item>
                     <layout class="QGridLayout" name="gridLayout_11">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item row="4" column="0">
                       <widget class="QLabel" name="label_25">
                        <property name="text">
@@ -2276,6 +2672,42 @@
                  </layout>
                 </item>
                 <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_30">
+                  <item>
+                   <widget class="QLabel" name="label_40">
+                    <property name="text">
+                     <string>Stretch Factor</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QDoubleSpinBox" name="ViewZAxisStretchSpin">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="toolTip">
+                     <string/>
+                    </property>
+                    <property name="decimals">
+                     <number>3</number>
+                    </property>
+                    <property name="minimum">
+                     <double>0.001000000000000</double>
+                    </property>
+                    <property name="maximum">
+                     <double>1000000.000000000000000</double>
+                    </property>
+                    <property name="value">
+                     <double>1.000000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
                  <widget class="QGroupBox" name="ZAxisCrossGroup">
                   <property name="title">
                    <string>Cross At</string>
@@ -2289,6 +2721,9 @@
                    </property>
                    <item>
                     <layout class="QGridLayout" name="gridLayout_8">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item row="0" column="0">
                       <widget class="QLabel" name="label_12">
                        <property name="sizePolicy">
@@ -2353,6 +2788,108 @@
                        </property>
                       </widget>
                      </item>
+                     <item row="0" column="2">
+                      <widget class="QToolButton" name="ViewZAxisCrossAtXSetMinimumButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/toleftlimit.svg</normaloff>:/fqplot/icons/toleftlimit.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="4">
+                      <widget class="QToolButton" name="ViewZAxisCrossAtXSetMaximumButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/torightlimit.svg</normaloff>:/fqplot/icons/torightlimit.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="3">
+                      <widget class="QToolButton" name="ViewZAxisCrossAtXSetZeroButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/tozero.svg</normaloff>:/fqplot/icons/tozero.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="2">
+                      <widget class="QToolButton" name="ViewZAxisCrossAtYSetMinimumButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/toleftlimit.svg</normaloff>:/fqplot/icons/toleftlimit.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="3">
+                      <widget class="QToolButton" name="ViewZAxisCrossAtYSetZeroButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/tozero.svg</normaloff>:/fqplot/icons/tozero.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="4">
+                      <widget class="QToolButton" name="ViewZAxisCrossAtYSetMaximumButton">
+                       <property name="maximumSize">
+                        <size>
+                         <width>24</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/fqplot/icons/torightlimit.svg</normaloff>:/fqplot/icons/torightlimit.svg</iconset>
+                       </property>
+                      </widget>
+                     </item>
                     </layout>
                    </item>
                   </layout>
@@ -2388,6 +2925,9 @@
                       </property>
                       <item>
                        <layout class="QGridLayout" name="gridLayout_9">
+                        <property name="spacing">
+                         <number>4</number>
+                        </property>
                         <item row="0" column="0">
                          <widget class="QLabel" name="label_14">
                           <property name="sizePolicy">
@@ -2498,6 +3038,9 @@
                    </property>
                    <item>
                     <layout class="QGridLayout" name="gridLayout_12">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item row="4" column="0">
                       <widget class="QLabel" name="label_28">
                        <property name="text">

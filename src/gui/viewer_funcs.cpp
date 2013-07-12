@@ -55,13 +55,22 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	setDefaultPreferences(nViewerInstances == 0);
 	
 	// Engine Setup
-// 	linePrimitives_.setColourData(false);
-	linePrimitives_.setType(GL_LINES);
 	triangleChopper_.initialise(0.0, 1000, 0.2);
 	createPrimitives();
 	viewMatrix_[14] = -5.0;
 	font_ = NULL;
 	setupFont("wright.ttf");
+	clipPlaneDelta_ = 0.0001;
+	clipPlaneBottom_[0] = 0.0;
+	clipPlaneBottom_[1] = 1.0;
+	clipPlaneBottom_[2] = 0.0;
+	clipPlaneBottom_[3] = 0.0;
+	clipPlaneTop_[0] = 0.0;
+	clipPlaneTop_[1] = -1.0;
+	clipPlaneTop_[2] = 0.0;
+	clipPlaneTop_[3] = 0.0;
+	clipPlaneYMin_ = 0.0;
+	clipPlaneYMax_ = 0.0;
 
 	// Prevent QPainter from autofilling widget background
 	setAutoFillBackground(false);
@@ -97,8 +106,6 @@ void Viewer::initializeGL()
 void Viewer::paintGL()
 {
 	msg.enter("Viewer::paintGL");
-	QColor color;
-	QRect currentBox;
 
 	// Do nothing if the canvas is not valid, or we are still drawing from last time.
 	if ((!valid_) || drawing_)
@@ -113,39 +120,33 @@ void Viewer::paintGL()
 	// Setup basic GL stuff
 	setupGL();
 
-	// Note: An internet source suggests that the QPainter documentation is incomplete, and that
-	// all OpenGL calls should be made after the QPainter is constructed, and before the QPainter
-	// is destroyed. However, this results in mangled graphics on the Linux (and other?) versions,
-	// so here it is done in the 'wrong' order.
-	
 	// Clear view
 	msg.print(Messenger::Verbose, " --> Clearing context, background, and setting pen colour\n");
 	glViewport(0,0,contextWidth_,contextHeight_);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	// Check to see if data has changed since the last time drawScene() was called
-	if (1)
-	{
-		solidPrimitives_.clear();
-		transparentPrimitives_.clear();
-		linePrimitives_.clear();
-		drawScene();
-	}
+// 	solidPrimitives_.clear();
+// 	transparentPrimitives_.clear();
+	
+	GLfloat colourBlack[4] = { 0.0, 0.0, 0.0, 1.0 };
 
 	// Set colour mode
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_TEXTURE_2D);
-// 	glDisable(GL_DEPTH_TEST);
 
 	// Prepare for model rendering
-// 	glViewport(vp[0], vp[1], vp[2], vp[3]);
 	glMatrixMode(GL_PROJECTION);
 	setProjectionMatrix();
 	glLoadMatrixd(projectionMatrix_.matrix());
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+
+	// Set up our transformation matrix
+	Matrix A;
+	A.setIdentity();
+	A.setTranslation(-surfaceCenter_.x, -surfaceCenter_.y, -surfaceCenter_.z);
+	A = viewMatrix_ * A;
 	
 	// Send text primitives to the display first
 	font_->FaceSize(1);
@@ -156,9 +157,62 @@ void Viewer::paintGL()
 		axisTextPrimitives_[1].renderAll(viewMatrix_, -surfaceCenter_, font_);
 		axisTextPrimitives_[2].renderAll(viewMatrix_, -surfaceCenter_, font_);
 	}
+
+	// Render main surface
+	// -- Setup clip planes to enforce Y-axis limits
+	glLoadMatrixd(A.matrix());
+	glEnable(GL_MULTISAMPLE);
+	glPushMatrix();
+	glTranslated(0.0, clipPlaneYMin_, 0.0);
+	glClipPlane (GL_CLIP_PLANE0, clipPlaneBottom_);
+	glEnable(GL_CLIP_PLANE0);
+	glPopMatrix();
+	glPushMatrix();
+	glTranslated(0.0, clipPlaneYMax_, 0.0);
+	glClipPlane (GL_CLIP_PLANE1, clipPlaneTop_);
+	glEnable(GL_CLIP_PLANE1);
+	glPopMatrix();
+	surface_.sendToGL();
+	glDisable(GL_MULTISAMPLE);
+	glDisable(GL_CLIP_PLANE0);
+	glDisable(GL_CLIP_PLANE1);
+
+	// Render axes
+	glEnable(GL_LINE_SMOOTH);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glLineWidth(2.0);
+	glDisable(GL_LIGHTING);
+	glColor4fv(colourBlack);
+	for (int axis=0; axis<3; ++axis) axisPrimitives_[axis].sendToGL();
+
 	
-	// Send primitives to the display
-	sortAndSendGL();
+	
+	// Send all other listed primitives to the display
+// 	sortAndSendGL();
+// 		// Transform and render each transparent primitive in each list, unless correctTransparency_ is off.
+// 	if (correctTransparency_)
+// 	{
+// 		triangleChopper_.emptyTriangles();
+// 		for (PrimitiveInfo *pi = transparentPrimitives_.first(); pi != NULL; pi = pi->next)
+// 		{
+// 			triangleChopper_.storeTriangles(pi, viewMatrix_);
+// 		}
+// 		glLoadIdentity();
+// 		glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
+// 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+// 		triangleChopper_.sendToGL();
+// 		glPopClientAttrib();
+// 	}
+// 	else for (PrimitiveInfo *pi = transparentPrimitives_.first(); pi != NULL; pi = pi->next)
+// 	{
+// 		// Grab primitive pointer
+// 		prim = pi->primitive();
+// 		if (prim == NULL) continue;
+// 		if (!prim->colouredVertexData()) glColor4fv(pi->colour());
+// 		A = viewMatrix_ * pi->localTransform();
+// 		glLoadMatrixd(A.matrix());
+// 		prim->sendToGL();
+// 	}
 	
 	// Set the rendering flag to false
 	drawing_ = false;

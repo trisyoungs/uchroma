@@ -70,6 +70,10 @@ class Viewer : public QGLWidget
 	FTFont* font_;
 	// Basic font height (from baseline to top of normal height letter)
 	double fontBaseHeight_;
+	// Y axis clip plane definitions
+	GLdouble clipPlaneBottom_[4], clipPlaneTop_[4], clipPlaneYMin_, clipPlaneYMax_;
+	// Delta to add to Y clip plane limits
+	double clipPlaneDelta_;
 	GLuint textureID_[2];
 
 
@@ -157,17 +161,11 @@ class Viewer : public QGLWidget
 	// List of filtered transparent primitives
 	List<PrimitiveInfo> transparentPrimitives_;
 	// List of line primitives
-	Primitive linePrimitives_;
+	List<PrimitiveInfo> linePrimitives_;
 	// List of general text primitives
 	TextPrimitiveList textPrimitives_;
 	// Transparency chopper
 	TriangleChopper triangleChopper_;
-
-	private:
-	// Render primitive in specified colour
-	void renderPrimitive(Primitive *primitive, GLfloat *colour, Matrix &transform, GLenum fillMode = GL_FILL, GLfloat lineWidth = 1.0);
-	// Send all primitives to the display, sorting transparent triangles if necessary
-	void sortAndSendGL();
 
 
 	/*
@@ -218,8 +216,6 @@ class Viewer : public QGLWidget
 	private:
 	// Reference list of all created primitives (to which all user primitives must be added)
 	RefList<Primitive,int> primitiveList_;
-	// Basic test primtives
-	Primitive spherePrimitive_, cubePrimitive_;
 	// Display primitives
 	Primitive surface_, axisPrimitives_[3];
 	// Axis text primitives
@@ -236,8 +232,6 @@ class Viewer : public QGLWidget
 	void createPrimitives();
 	// Setup basic GL properties
 	void setupGL();
-	// Draw the scene to display (i.e. store primitives ready for sending to GL)
-	void drawScene();
 
 	public:
 	// Construct normal / colour data for slice specified
@@ -247,11 +241,13 @@ class Viewer : public QGLWidget
 	// Clear specified axix primitive
 	void clearAxisPrimitive(int axis);
 	// Create axis primitives
-	void createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted);
+	void createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted, double stretch);
 	// Create logarithmic axis primitives
-	void createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted);
+	void createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted, double stretch);
 	// Set surface centre
 	void setSurfaceCenter(Vec3<double> center);
+	// Set Y clip plane limits
+	void setYClip(double yMin, double yMax);
 	// Return number of triangles in surface
 	int surfaceNTriangles();
 	// Set scale factor for axis labels

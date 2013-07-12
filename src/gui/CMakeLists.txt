@@ -13,11 +13,15 @@ ${CMAKE_BINARY_DIR}/src/
 SET(qtproject_SRCS
 fqplot_funcs.cpp
 fqplot_data.cpp
+fqplot_analyse.cpp
+fqplot_colour.cpp
+fqplot_sourcedata.cpp
+fqplot_transform.cpp
+fqplot_view.cpp
 colourscale_funcs.cpp
 plotwidget_data.cpp
 plotwidget_funcs.cpp
 plotwidget_paintevent.cpp
-viewer_engine.cpp
 viewer_funcs.cpp
 viewer_input.cpp
 viewer_prefs.cpp

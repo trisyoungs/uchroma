@@ -1,6 +1,6 @@
 /*
-	*** FQPlot version information
-	*** src/version.h
+	*** Main Window - Analyse Functions 
+	*** src/gui/fqplot_analyse.cpp
 	Copyright T. Youngs 2013
 
 	This file is part of FQPlot.
@@ -19,11 +19,6 @@
 	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FQPLOT_VERSION_H
-#define FQPLOT_VERSION_H
+#include "gui/fqplot.h"
+#include "templates/reflist.h"
 
-#define FQPLOTREVISION "14"
-#define FQPLOTDATE "Fri 12 Jul 2013 - 13:05"
-#define FQPLOTURL "http://www.projectaten.net/fqplot"
-
-#endif

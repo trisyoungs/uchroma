@@ -227,7 +227,7 @@ void ColourScale::setPoint(int position, double value, QColor colour, bool setva
 		int dummy = 0;
 		do
 		{
-			printf("BEFORE SHIFT Prev = %f, current= %f, next = %f\n", csp->prev ? csp->prev->value() : -999, csp->value(), csp->next ? csp->next->value() : -999);
+// 			printf("BEFORE SHIFT Prev = %f, current= %f, next = %f\n", csp->prev ? csp->prev->value() : -999, csp->value(), csp->next ? csp->next->value() : -999);
 			// Shift item if necessary
 			if (csp->prev && (csp->prev->value() > csp->value()))
 			{
@@ -241,7 +241,7 @@ void ColourScale::setPoint(int position, double value, QColor colour, bool setva
 				maxBad = (csp->next ? (csp->next->value() < csp->value()) : false);
 			}
 			else maxBad = false;
-			printf("AFTER SHIFT %i Prev = %f, current= %f, next = %f  B=%i %i\n", dummy, csp->prev ? csp->prev->value() : -999, csp->value(), csp->next ? csp->next->value() : -999, minBad, maxBad);
+// 			printf("AFTER SHIFT %i Prev = %f, current= %f, next = %f  B=%i %i\n", dummy, csp->prev ? csp->prev->value() : -999, csp->value(), csp->next ? csp->next->value() : -999, minBad, maxBad);
 			if (++dummy == 10) break;
 			
 		} while (minBad || maxBad);

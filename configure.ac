@@ -3,7 +3,7 @@
 AC_PREREQ(2.60)
 
 # Set program name, version, bug-address and source directory
-m4_define([FQPLOT_VERSION],[r13])
+m4_define([FQPLOT_VERSION],[r14])
 AC_INIT(fqplot,FQPLOT_VERSION,tris@projectaten.net)
 AC_CONFIG_SRCDIR([src/])
 
@@ -19,7 +19,7 @@ if test "$target_vendor" = "apple"; then
 fi
 AC_SUBST(MAC_LIBS)
 
-AM_INIT_AUTOMAKE(notepsr,FQPLOT_VERSION)
+AM_INIT_AUTOMAKE(fqplot,FQPLOT_VERSION)
 
 # Checks for programs.
 AC_PROG_CXX

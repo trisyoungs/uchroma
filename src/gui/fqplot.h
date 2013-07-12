@@ -105,6 +105,7 @@ class FQPlotWindow : public QMainWindow
 	bool transformValueChanged(int axis, double value);
 	bool transformShiftChanged(int axis, bool pre, double value);
 	bool transformLimitChanged(int axis, bool minLim, double value);
+	bool transformLimitSetExtreme(int axis, bool minLim);
 	bool transformInterpolateChanged(int axis, bool checked);
 	bool transformInterpolateStepChanged(int axis, double step);
 	bool transformInterpolateConstrainChanged(int axis, bool checked);
@@ -124,9 +125,15 @@ class FQPlotWindow : public QMainWindow
 	void on_LimitXMinSpin_valueChanged(double value);
 	void on_LimitYMinSpin_valueChanged(double value);
 	void on_LimitZMinSpin_valueChanged(double value);
+	void on_LimitXMinSetMinimumButton_clicked(bool checked);
+	void on_LimitYMinSetMinimumButton_clicked(bool checked);
+	void on_LimitZMinSetMinimumButton_clicked(bool checked);
 	void on_LimitXMaxSpin_valueChanged(double value);
 	void on_LimitYMaxSpin_valueChanged(double value);
 	void on_LimitZMaxSpin_valueChanged(double value);
+	void on_LimitXMaxSetMaximumButton_clicked(bool checked);
+	void on_LimitYMaxSetMaximumButton_clicked(bool checked);
+	void on_LimitZMaxSetMaximumButton_clicked(bool checked);
 	void on_TransformXInterpolateCheck_clicked(bool checked);
 	void on_TransformXInterpolateStepSpin_valueChanged(double value);
 	void on_TransformXInterpolateConstrainCheck_clicked(bool checked);
@@ -162,7 +169,9 @@ class FQPlotWindow : public QMainWindow
 	bool viewAxisInvertChanged(int axis, bool checked);
 	bool viewAxisLogarithmicChanged(int axis, bool checked);
 	bool viewAxisVisibleChanged(int axis, bool checked);
+	bool viewAxisStretchChanged(int axis, double value);
 	bool viewAxisCrossChanged(int axis, int dir, double value);
+	bool viewAxisCrossSet(int axis, int dir, int type);
 	bool viewAxisTicksChanged(int axis, bool start, double value);
 	bool viewAxisOrientationChanged(int axis, int dir, bool direction, double value);
 	bool viewAxisMinorTicksChanged(int axis, int value);
@@ -175,8 +184,15 @@ class FQPlotWindow : public QMainWindow
 	void on_ViewXAxisInvertCheck_clicked(bool checked);
 	void on_ViewXAxisLogarithmicCheck_clicked(bool checked);
 	void on_ViewXAxisVisibleCheck_clicked(bool checked);
+	void on_ViewXAxisStretchSpin_valueChanged(double value);
 	void on_ViewXAxisCrossAtYSpin_valueChanged(double value);
 	void on_ViewXAxisCrossAtZSpin_valueChanged(double value);
+	void on_ViewXAxisCrossAtYSetMinimumButton_clicked(bool checked);
+	void on_ViewXAxisCrossAtYSetZeroButton_clicked(bool checked);
+	void on_ViewXAxisCrossAtYSetMaximumButton_clicked(bool checked);
+	void on_ViewXAxisCrossAtZSetMinimumButton_clicked(bool checked);
+	void on_ViewXAxisCrossAtZSetZeroButton_clicked(bool checked);
+	void on_ViewXAxisCrossAtZSetMaximumButton_clicked(bool checked);
 	void on_ViewXAxisAutoTicksCheck_clicked(bool checked);
 	void on_ViewXAxisTicksStartSpin_valueChanged(double value);
 	void on_ViewXAxisTicksDeltaSpin_valueChanged(double value);
@@ -192,8 +208,15 @@ class FQPlotWindow : public QMainWindow
 	void on_ViewYAxisInvertCheck_clicked(bool checked);
 	void on_ViewYAxisLogarithmicCheck_clicked(bool checked);
 	void on_ViewYAxisVisibleCheck_clicked(bool checked);
+	void on_ViewYAxisStretchSpin_valueChanged(double value);
 	void on_ViewYAxisCrossAtXSpin_valueChanged(double value);
 	void on_ViewYAxisCrossAtZSpin_valueChanged(double value);
+	void on_ViewYAxisCrossAtXSetMinimumButton_clicked(bool checked);
+	void on_ViewYAxisCrossAtXSetZeroButton_clicked(bool checked);
+	void on_ViewYAxisCrossAtXSetMaximumButton_clicked(bool checked);
+	void on_ViewYAxisCrossAtZSetMinimumButton_clicked(bool checked);
+	void on_ViewYAxisCrossAtZSetZeroButton_clicked(bool checked);
+	void on_ViewYAxisCrossAtZSetMaximumButton_clicked(bool checked);
 	void on_ViewYAxisAutoTicksCheck_clicked(bool checked);
 	void on_ViewYAxisTicksStartSpin_valueChanged(double value);
 	void on_ViewYAxisTicksDeltaSpin_valueChanged(double value);
@@ -209,8 +232,15 @@ class FQPlotWindow : public QMainWindow
 	void on_ViewZAxisInvertCheck_clicked(bool checked);
 	void on_ViewZAxisLogarithmicCheck_clicked(bool checked);
 	void on_ViewZAxisVisibleCheck_clicked(bool checked);
+	void on_ViewZAxisStretchSpin_valueChanged(double value);
 	void on_ViewZAxisCrossAtXSpin_valueChanged(double value);
 	void on_ViewZAxisCrossAtYSpin_valueChanged(double value);
+	void on_ViewZAxisCrossAtXSetMinimumButton_clicked(bool checked);
+	void on_ViewZAxisCrossAtXSetZeroButton_clicked(bool checked);
+	void on_ViewZAxisCrossAtXSetMaximumButton_clicked(bool checked);
+	void on_ViewZAxisCrossAtYSetMinimumButton_clicked(bool checked);
+	void on_ViewZAxisCrossAtYSetZeroButton_clicked(bool checked);
+	void on_ViewZAxisCrossAtYSetMaximumButton_clicked(bool checked);
 	void on_ViewZAxisAutoTicksCheck_clicked(bool checked);
 	void on_ViewZAxisTicksStartSpin_valueChanged(double value);
 	void on_ViewZAxisTicksDeltaSpin_valueChanged(double value);
@@ -290,6 +320,8 @@ class FQPlotWindow : public QMainWindow
 	Vec3<int> axisLabelRotation_;
 	// Whether axes should be plotted as logarithms
 	Vec3<bool> axisLogarithmic_;
+	// Stretch factors to apply to axes
+	Vec3<double> axisStretch_;
 	// Font scaling for axis value labels
 	double labelScale_;
 	// Font scaling for titles
