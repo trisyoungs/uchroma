@@ -28,7 +28,6 @@ viewer_prefs.cpp
 viewer_primitive.cpp
 viewer_primitiveinfo.cpp
 viewer_primitivevertex.cpp
-viewer_scene.cpp
 viewer_textprimitive.cpp
 viewer_trianglechopper.cpp
 viewer_vertexchunk.cpp
@@ -36,6 +35,7 @@ viewer_primitive.h
 viewer_primitiveinfo.h
 viewer_textprimitive.h
 viewer_trianglechopper.h
+viewer_user.cpp
 viewer_vertexchunk.h
 )
 

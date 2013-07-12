@@ -70,10 +70,6 @@ class Viewer : public QGLWidget
 	FTFont* font_;
 	// Basic font height (from baseline to top of normal height letter)
 	double fontBaseHeight_;
-	// Y axis clip plane definitions
-	GLdouble clipPlaneBottom_[4], clipPlaneTop_[4], clipPlaneYMin_, clipPlaneYMax_;
-	// Delta to add to Y clip plane limits
-	double clipPlaneDelta_;
 	GLuint textureID_[2];
 
 
@@ -217,7 +213,7 @@ class Viewer : public QGLWidget
 	// Reference list of all created primitives (to which all user primitives must be added)
 	RefList<Primitive,int> primitiveList_;
 	// Display primitives
-	Primitive surface_, axisPrimitives_[3];
+	Primitive surface_, axisPrimitives_[3], slicePrimitive_;
 	// Axis text primitives
 	TextPrimitiveList axisTextPrimitives_[3];
 	// Centrepoint of surface
@@ -226,8 +222,22 @@ class Viewer : public QGLWidget
 	double labelScale_;
 	// Scale factor for titles
 	double titleScale_;
+	// Y axis clip plane definitions
+	GLdouble clipPlaneBottom_[4], clipPlaneTop_[4], clipPlaneYMin_, clipPlaneYMax_;
+	// Delta to add to Y clip plane limits
+	double clipPlaneDelta_;
+	// Axis extreme values
+	Vec3<double> axisMin_, axisMax_;
+	// Axis extreme coordinates
+	Vec3<double> axisCoordMin_[3], axisCoordMax_[3];
+	// Current axis target for temporary slice selection
+	Vec3<bool> sliceSelector_;
+	// Current axis value for temporary slice selection
+	Vec3<double> sliceAxisValue_;
 
 	private:
+	// Calculate active axis values at current mouse position
+	void calculateMouseAxisValues();
 	// Create necessary primitives (called once when Viewer is constructed)
 	void createPrimitives();
 	// Setup basic GL properties
@@ -248,6 +258,8 @@ class Viewer : public QGLWidget
 	void setSurfaceCenter(Vec3<double> center);
 	// Set Y clip plane limits
 	void setYClip(double yMin, double yMax);
+	// Set axis extreme value limits and coordinates
+	void setAxisCoordinates(int axis, double axisMin, Vec3<double> minCoord, double axisMax, Vec3<double> maxCoord);
 	// Return number of triangles in surface
 	int surfaceNTriangles();
 	// Set scale factor for axis labels

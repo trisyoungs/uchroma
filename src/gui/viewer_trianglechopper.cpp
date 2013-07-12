@@ -77,16 +77,14 @@ void TriangleChopper::initialise(double startz, int nbins, double slicewidth)
 }
 
 // Store primitive's triangles
-void TriangleChopper::storeTriangles(PrimitiveInfo* pinfo, Matrix& worldtransform)
+void TriangleChopper::storeTriangles(Primitive* prim, Matrix& worldtransform)
 {
 	GLfloat *vertexData, *centroids;
 	VertexChunk *chunk;
-	Matrix transform = worldtransform * pinfo->localTransform();
-	GLfloat newr[9], newn[9], norm[3], colour[12], *colourptr;
+	Matrix transform = worldtransform; // * prim->localTransform();
+	GLfloat newr[9], newn[9], norm[3], colour[12];
 	int voff, bin, m;
 
-	Primitive *prim = pinfo->primitive();
-	if (prim == NULL) prim = pinfo->primitive();
 	if (prim->nDefinedVertices() == 0) return;
 
 	// For speed, different loops depending on type of vertexData...
@@ -131,7 +129,7 @@ void TriangleChopper::storeTriangles(PrimitiveInfo* pinfo, Matrix& worldtransfor
 	}
 	else
 	{
-		colourptr = pinfo->colour();
+		GLfloat colourptr[4] = { 1.0, 1.0, 1.0, 0.5 };
 		for (chunk = prim->vertexChunks(); chunk != NULL; chunk = chunk->next)
 		{
 			vertexData = chunk->vertexData();

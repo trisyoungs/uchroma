@@ -70,6 +70,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 	Qt::KeyboardModifiers km = event->modifiers();
 	delta.set(event->x(), event->y(), 0.0);
 	delta = delta - rMouseLast_;
+	bool refresh = false;
 
 	if (buttonState_&Qt::RightButton)
 	{
@@ -88,17 +89,25 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 			// Reset translation and scaling on original matrix, and multiply
 			viewMatrix_.removeTranslationAndScaling();
 			viewMatrix_ = A * viewMatrix_;
-			postRedisplay();
+			refresh = true;
 		}
 	}
 	else if (buttonState_&Qt::MidButton)
 	{
 		viewMatrix_.adjustColumn(3, delta.x/15.0, -delta.y/15.0, 0.0, 0.0);
-		postRedisplay();
+		refresh = true;
 	}
 	
+	// Recalculate slice values?
+	if (sliceSelector_.x || sliceSelector_.y || sliceSelector_.z)
+	{
+		calculateMouseAxisValues();
+		refresh = true;
+	}
 	rMouseLast_.set(event->x(), event->y(), 0.0);
 	setFocus();
+	
+	if (refresh) postRedisplay();
 }
 
 // Qt Signal (mouse wheel event)
@@ -114,6 +123,7 @@ void Viewer::wheelEvent(QWheelEvent *event)
 	// Never let camera z go below -1.0...
 	if (viewMatrix_[14] > -1.0) viewMatrix_[14] = -1.0;
 	postRedisplay();
+
 	msg.exit("Viewer::wheelEvent");
 }
 
@@ -137,48 +147,70 @@ Vec3<double> Viewer::rMouseLast()
 void Viewer::keyPressEvent(QKeyEvent *event)
 {
 	// Check datamodel...
-	bool refresh = FALSE, ignore = TRUE;
+	bool refresh = false, ignore = true;
 	Qt::KeyboardModifiers km = event->modifiers();
+	Matrix A;
 	int n;
 	
 	switch (event->key())
 	{
 		case (Qt::Key_Left):
-			if (km&Qt::ControlModifier)
-			{
-				printf("Why doesn't this ever get printed?\n");
-			}
-//			else source->rotateView( keyModifier_[Viewer::ShiftKey] ? -1.0 : -10.0, 0.0);
-			refresh = TRUE;
-			ignore = FALSE;
+			A.createRotationXY(0.0, km.testFlag(Qt::ShiftModifier) ? -1.0 : -10.0);
+			A.copyTranslationAndScaling(viewMatrix_);
+			viewMatrix_.removeTranslationAndScaling();
+			viewMatrix_ = A * viewMatrix_;
+			refresh = true;
+			ignore = false;
 			break;
 		case (Qt::Key_Right):
-//			source->rotateView( keyModifier_[Viewer::ShiftKey] ? 1.0 : 10.0, 0.0);
-			refresh = TRUE;
-			ignore = FALSE;
+			A.createRotationXY(0.0, km.testFlag(Qt::ShiftModifier) ? 1.0 : 10.0);
+			A.copyTranslationAndScaling(viewMatrix_);
+			viewMatrix_.removeTranslationAndScaling();
+			viewMatrix_ = A * viewMatrix_;
+			refresh = true;
+			ignore = false;
 			break;
 		case (Qt::Key_Up):
-//			source->rotateView(0.0, keyModifier_[Viewer::ShiftKey] ? -1.0 : -10.0);
-			refresh = TRUE;
-			ignore = FALSE;
+			A.createRotationXY(km.testFlag(Qt::ShiftModifier) ? -1.0 : -10.0, 0.0);
+			A.copyTranslationAndScaling(viewMatrix_);
+			viewMatrix_.removeTranslationAndScaling();
+			viewMatrix_ = A * viewMatrix_;
+			refresh = true;
+			ignore = false;
 			break;
 		case (Qt::Key_Down):
-//			source->rotateView(0.0, keyModifier_[Viewer::ShiftKey] ? 1.0 : 10.0);
-			refresh = TRUE;
-			ignore = FALSE;
+			A.createRotationXY(km.testFlag(Qt::ShiftModifier) ? 1.0 : 10.0, 0.0);
+			A.copyTranslationAndScaling(viewMatrix_);
+			viewMatrix_.removeTranslationAndScaling();
+			viewMatrix_ = A * viewMatrix_;
+			refresh = true;
+			ignore = false;
 			break;
-		case (Qt::Key_Escape):
-//			gui.mainWindow()->cancelCurrentMode();
-			refresh = TRUE;
-			ignore = FALSE;
+		case (Qt::Key_X):
+			sliceSelector_.x = !sliceSelector_.x;
+			calculateMouseAxisValues();
+			refresh = true;
+			ignore = false;
+			break;
+		case (Qt::Key_Y):
+			sliceSelector_.y = !sliceSelector_.y;
+			calculateMouseAxisValues();
+			refresh = true;
+			ignore = false;
+			break;
+		case (Qt::Key_Z):
+			sliceSelector_.z = !sliceSelector_.z;
+			calculateMouseAxisValues();
+			refresh = true;
+			ignore = false;
 			break;
 		// Cycle render styles
 		case (Qt::Key_F8):
-			ignore = FALSE;
+			ignore = false;
 			break;
 		// Cycle colouring styles
 		case (Qt::Key_F9):
-			ignore = FALSE;
+			ignore = false;
 			break;
 		default:
 			break;
@@ -193,5 +225,26 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 // Qt Slot (key release event)
 void Viewer::keyReleaseEvent(QKeyEvent *event)
 {
-	event->ignore();
+	// Check datamodel...
+	bool refresh = false, ignore = true;
+	Qt::KeyboardModifiers km = event->modifiers();
+	
+	switch (event->key())
+	{
+		// Cycle render styles
+		case (Qt::Key_F8):
+			ignore = false;
+			break;
+		// Cycle colouring styles
+		case (Qt::Key_F9):
+			ignore = false;
+			break;
+		default:
+			break;
+	}
+	
+	// Update display if necessary
+	if (refresh) postRedisplay();
+	if (ignore) event->ignore();
+	else event->accept();
 }

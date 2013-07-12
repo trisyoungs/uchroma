@@ -50,6 +50,8 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	drawing_ = false;
 	renderingOffscreen_ = false;
 	hasPerspective_ = false;
+	sliceSelector_.set(false, false, false);
+	sliceAxisValue_ = 0.0;
 
 	// Preferences (set static members only on first instance creation)
 	setDefaultPreferences(nViewerInstances == 0);
@@ -126,9 +128,6 @@ void Viewer::paintGL()
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-// 	solidPrimitives_.clear();
-// 	transparentPrimitives_.clear();
-	
 	GLfloat colourBlack[4] = { 0.0, 0.0, 0.0, 1.0 };
 
 	// Set colour mode
@@ -158,6 +157,34 @@ void Viewer::paintGL()
 		axisTextPrimitives_[2].renderAll(viewMatrix_, -surfaceCenter_, font_);
 	}
 
+	// Render locator slices
+	glLoadMatrixd(A.matrix());
+	slicePrimitive_.clear();
+	glColor4f(0.0, 0.0, 0.0, 0.5);
+	Vec3<double> u, v, s, t, normal, extension = (axisMax_-axisMin_)*0.25;
+	for (int axis=0; axis<3; ++axis)
+	{
+		if (!sliceSelector_[axis]) continue;
+
+		v = axisMin_ - extension;
+		u = axisMax_ + extension;
+		v[axis] = sliceAxisValue_[axis];
+		u[axis] = sliceAxisValue_[axis];
+		s = u;
+		s[(axis+1)%3] = v[(axis+1)%3];
+		t = u;
+		t[(axis+2)%3] = v[(axis+2)%3];
+		normal.zero();
+		normal[axis] = 1.0;
+		slicePrimitive_.defineVertex(u.x, u.y, u.z, normal.x, normal.y, normal.z, true);
+		slicePrimitive_.defineVertex(v.x, v.y, v.z, normal.x, normal.y, normal.z, true);
+		slicePrimitive_.defineVertex(s.x, s.y, s.z, normal.x, normal.y, normal.z, true);
+		slicePrimitive_.defineVertex(u.x, u.y, u.z, normal.x, normal.y, normal.z, true);
+		slicePrimitive_.defineVertex(v.x, v.y, v.z, normal.x, normal.y, normal.z, true);
+		slicePrimitive_.defineVertex(t.x, t.y, t.z, normal.x, normal.y, normal.z, true);
+		slicePrimitive_.sendToGL();
+	}
+
 	// Render main surface
 	// -- Setup clip planes to enforce Y-axis limits
 	glLoadMatrixd(A.matrix());
@@ -172,12 +199,23 @@ void Viewer::paintGL()
 	glClipPlane (GL_CLIP_PLANE1, clipPlaneTop_);
 	glEnable(GL_CLIP_PLANE1);
 	glPopMatrix();
+	
+// 	triangleChopper_.emptyTriangles();
+// 	triangleChopper_.storeTriangles(&surface_, A);
+// 	glLoadIdentity();
+// 	glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
+// 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+// 	triangleChopper_.sendToGL();
+// 	glPopClientAttrib();
+
 	surface_.sendToGL();
+	
 	glDisable(GL_MULTISAMPLE);
 	glDisable(GL_CLIP_PLANE0);
 	glDisable(GL_CLIP_PLANE1);
 
 	// Render axes
+	glLoadMatrixd(A.matrix());
 	glEnable(GL_LINE_SMOOTH);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glLineWidth(2.0);
@@ -185,8 +223,6 @@ void Viewer::paintGL()
 	glColor4fv(colourBlack);
 	for (int axis=0; axis<3; ++axis) axisPrimitives_[axis].sendToGL();
 
-	
-	
 	// Send all other listed primitives to the display
 // 	sortAndSendGL();
 // 		// Transform and render each transparent primitive in each list, unless correctTransparency_ is off.
@@ -343,6 +379,13 @@ void Viewer::setProjectionMatrix(double perspectiveFov)
 	// Create projection matrix for model
 	GLdouble top, bottom, right, left, aspect = (GLdouble) contextWidth_ / (GLdouble) contextHeight_;
 	GLdouble nearClip = 0.5, farClip = 2000.0;
+
+	// Set viewport matrix here
+	viewportMatrix_[0] = 0;
+	viewportMatrix_[1] = 0;
+	viewportMatrix_[2] = contextWidth_;
+	viewportMatrix_[3] = contextHeight_;
+
 	if (hasPerspective_)
 	{
 		// Use reversed top and bottom values so we get y-axis (0,1,0) pointing up
@@ -449,9 +492,9 @@ Vec4<double> Viewer::modelToScreen(Vec3<double> &modelr, double screenradius)
 	Vec4<double> pos;
 	// Projection formula is : worldr = P x M x modelr
 	pos.set(modelr, 1.0);
-	// Get the world coordinates of the atom - Multiply by modelview matrix 'view'
+	// Get the world coordinates of the point - Multiply by modelview matrix 'view'
 	vmat = viewMatrix_;
-//	vmat.applyTranslation(-cell_.centre().x, -cell_.centre().y, -cell_.centre().z);
+	vmat.applyTranslation(-surfaceCenter_.x, -surfaceCenter_.y, -surfaceCenter_.z);
 	worldr = vmat * pos;
 
 	screenr = projectionMatrix_ * worldr;
