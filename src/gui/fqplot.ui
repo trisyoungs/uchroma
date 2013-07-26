@@ -3471,7 +3471,7 @@
   <customwidget>
    <class>PlotWidget</class>
    <extends>QWidget</extends>
-   <header>plotwidget.uih</header>
+   <header>gui/plotwidget.uih</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
