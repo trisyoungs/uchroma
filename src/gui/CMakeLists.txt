@@ -52,10 +52,10 @@ SET(pro_UIS
 )
 QT4_WRAP_UI(pro_UIS_H ${pro_UIS})
 
-#set(pro_RES_QRC
-#  icons.qrc 
-#)
-#QT4_ADD_RESOURCES(pro_RES ${pro_RES_QRC})
+set(pro_RES_QRC
+  icons.qrc 
+)
+QT4_ADD_RESOURCES(pro_RES ${pro_RES_QRC})
 
 add_library(gui
 ${pro_RES}

@@ -429,7 +429,7 @@ void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, 
 	// Start at floored (ceiling'd) integer of logAxisMin (logAxisMax), and go from there.
 	int count = 0;
 	double power = inverted ? ceil(logAxisMax) : floor(logAxisMin);
-	double value = pow10(power);
+	double value = pow(10,power);
 	while (true)
 	{
 		// Check break condition
@@ -460,9 +460,9 @@ void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, 
 		{
 			count = 0;
 			power = power + 1.0;
-			value = pow10(power);
+			value = pow(10,power);
 		}
-		else value += pow10(power);
+		else value += pow(10,power);
 	}
 }
 
