@@ -23,7 +23,7 @@
 #include "base/lineparser.h"
 
 // DataFile Keywords
-const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisInvert", "AxisLabelDirection", "AxisLabelRotation", "AxisLabelUp", "AxisLogarithmic", "AxisMinorTicks", "AxisPosition", "AxisTickDelta", "AxisVisible", "ColourScalePoint", "Interpolate", "InterpolateConstrain", "InterpolateStep", "LabelScale", "LimitX", "LimitY", "LimitZ", "Perspective", "PostTransformShift", "PreTransformShift", "SliceDir", "Slice", "TitleScale", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
+const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisInvert", "AxisLabelDirection", "AxisLabelRotation", "AxisLabelUp", "AxisLogarithmic", "AxisMinorTicks", "AxisPosition", "AxisStretch", "AxisTickDelta", "AxisVisible", "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearA", "ColourLinearB", "ColourSingle", "ColourSource", "Interpolate", "InterpolateConstrain", "InterpolateStep", "LabelScale", "LimitX", "LimitY", "LimitZ", "Perspective", "PostTransformShift", "PreTransformShift", "SliceDir", "Slice", "TitleScale", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
 FQPlotWindow::DataFileKeyword FQPlotWindow::dataFileKeyword(const char* s)
 {
 	for (int n=0; n<FQPlotWindow::nDataFileKeywords; ++n) if (strcmp(s, DataFileKeywordStrings[n]) == 0) return (FQPlotWindow::DataFileKeyword) n;
@@ -124,7 +124,6 @@ void FQPlotWindow::clearData()
 	preTransformShift_.zero();
 	postTransformShift_.zero();
 	modified_ = false;
-	ui.ColourScaleWidget->clear();
 	axisInvert_.set(false, false, false);
 	axisVisible_.set(true, true, true);
 	labelScale_ = 0.25;
@@ -145,26 +144,16 @@ void FQPlotWindow::clearData()
 	axisLabelRotation_.zero();
 	axisLogarithmic_.set(false, false, false);
 	axisStretch_.set(1.0, 1.0, 1.0);
+	colourSource_ = SingleColourSource;
+	colourScale_[SingleColourSource].clear();
+	colourScale_[SingleColourSource].addPoint(0.0, QColor(255,255,255));
+	colourScale_[LinearGradientSource].clear();
+	colourScale_[LinearGradientSource].addPoint(0.0, QColor(255,255,255));
+	colourScale_[LinearGradientSource].addPoint(1.0, QColor(0,0,255));
+	colourScale_[CustomGradientSource].clear();
+	fixedAlpha_ = 128;
+	alphaControl_ = FQPlotWindow::OwnAlpha;
 	ui.actionViewPerspective->setChecked(false);
-}
-
-// Create default ColourScale
-void FQPlotWindow::createDefaultColourScale()
-{
-	// Construct default colourscale
-	ui.ColourScaleWidget->clear();
-	ui.ColourScaleWidget->addPoint(0.0, QColor(0, 0, 0));
-	ui.ColourScaleWidget->addPoint(0.05, QColor(255, 255, 0));
-	ui.ColourScaleWidget->addPoint(0.1, QColor(255, 0, 0));
-	ui.ColourScaleWidget->addPoint(0.15, QColor(0, 106, 106));
-	ui.ColourScaleWidget->addPoint(0.2, QColor(170, 170, 127));
-	ui.ColourScaleWidget->addPoint(0.25, QColor(0, 0, 255));
-	ui.ColourScaleWidget->addPoint(0.3, QColor(106, 84, 127));
-	ui.ColourScaleWidget->addPoint(0.35, QColor(255, 255, 255));
-	ui.ColourScaleWidget->addPoint(1.0, QColor(44, 184, 212));
-	ui.ColourScaleWidget->addPoint(1.1, QColor(64, 64, 193));
-	ui.ColourScaleWidget->addPoint(1.2, QColor(255, 255, 255));
-	ui.ColourScaleWidget->addPoint(1.5, QColor(127, 127, 127));
 }
 
 // Load data from file specified
@@ -231,6 +220,10 @@ bool FQPlotWindow::loadData(QString fileName)
 				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Axis index is out of range for %s keyword.\n", dataFileKeyword(kwd));
 				else axisPosition_[parser.argi(1)].set(parser.argd(2), parser.argd(3), parser.argd(4));
 				break;
+			// Axis stretch factors
+			case (FQPlotWindow::AxisStretchKeyword):
+				axisStretch_.set(parser.argd(1), parser.argd(2), parser.argd(3));
+				break;
 			// Axis tick deltas
 			case (FQPlotWindow::AxisTickDeltaKeyword):
 				axisTickDelta_.set(parser.argd(1), parser.argd(2), parser.argd(3));
@@ -239,9 +232,33 @@ bool FQPlotWindow::loadData(QString fileName)
 			case (FQPlotWindow::AxisVisibleKeyword):
 				axisVisible_.set(parser.argi(1), parser.argi(2), parser.argi(3));
 				break;
-			// ColourScalePoint definition
-			case (FQPlotWindow::ColourScalePointKeyword):
-				ui.ColourScaleWidget->addPoint(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
+			// Colour alpha control
+			case (FQPlotWindow::ColourAlphaControlKeyword):
+				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Value is out of range for %s keyword.\n", dataFileKeyword(kwd));
+				else alphaControl_ = (FQPlotWindow::AlphaControl) parser.argi(1);
+				break;
+			// Colour alpha fixed value
+			case (FQPlotWindow::ColourAlphaFixedKeyword):
+				if ((parser.argi(1) < 0) || (parser.argi(1) > 255)) printf("Value is out of range for %s keyword.\n", dataFileKeyword(kwd));
+				else fixedAlpha_ = parser.argi(1);
+				break;
+			// Colour Custom Gradient point definition
+			case (FQPlotWindow::ColourCustomGradientKeyword):
+				colourScale_[CustomGradientSource].addPoint(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
+				break;
+			// Colour Linear Gradient point definition
+			case (FQPlotWindow::ColourLinearAKeyword):
+			case (FQPlotWindow::ColourLinearBKeyword):
+				colourScale_[LinearGradientSource].setPoint(kwd-ColourLinearAKeyword, parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
+				break;
+			// Colour single colour definition
+			case (FQPlotWindow::ColourSingleKeyword):
+				colourScale_[SingleColourSource].setPoint(0, parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
+				break;
+			// Colour source
+			case (FQPlotWindow::ColourSourceKeyword):
+				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Value is out of range for %s keyword.\n", dataFileKeyword(kwd));
+				else colourSource_ = (FQPlotWindow::ColourSource) parser.argi(1);
 				break;
 			// Interpolate flags
 			case (FQPlotWindow::InterpolateKeyword):
@@ -319,9 +336,6 @@ bool FQPlotWindow::loadData(QString fileName)
 	}
 	parser.closeFiles();
 
-	// Add default colourscale?
-	if (ui.ColourScaleWidget->nPoints() == 0) createDefaultColourScale();
-
 	// Recreate surface
 	updateSurface();
 
@@ -371,11 +385,24 @@ bool FQPlotWindow::saveData(QString fileName)
 	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[FQPlotWindow::InterpolateStepKeyword], interpolationStep_.x, interpolationStep_.z);
 
 	// Write colour setup
-	// -- ColourScale
-	for (ColourScalePoint* csp = ui.ColourScaleWidget->firstPoint(); csp != NULL; csp = csp->next)
+	parser.writeLineF("%s %i", DataFileKeywordStrings[FQPlotWindow::ColourSourceKeyword], colourSource_);
+	ColourScalePoint* csp;
+	// -- Single Colour
+	csp = colourScale_[SingleColourSource].point(0);
+	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourSingleKeyword], csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
+	// -- Linear Gradient
+	csp = colourScale_[LinearGradientSource].point(0);
+	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourLinearAKeyword], csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
+	csp = colourScale_[LinearGradientSource].point(1);
+	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourLinearBKeyword], csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
+	// -- Custom Gradient
+	for (csp = colourScale_[CustomGradientSource].firstPoint(); csp != NULL; csp = csp->next)
 	{
-		parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourScalePointKeyword], csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
+		parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourCustomGradientKeyword], csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
 	}
+	// -- Alpha control
+	parser.writeLineF("%s %i", DataFileKeywordStrings[FQPlotWindow::ColourAlphaControlKeyword, ColourAlphaFixedKeyword], colourSource_);
+
 	
 	// Write view setup
 	// -- Font Scaling
@@ -396,7 +423,7 @@ bool FQPlotWindow::saveData(QString fileName)
 	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisInvertKeyword], axisInvert_.x, axisInvert_.y, axisInvert_.z);
 	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisLogarithmicKeyword], axisLogarithmic_.x, axisLogarithmic_.y, axisLogarithmic_.z);
 	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisVisibleKeyword], axisVisible_.x, axisVisible_.y, axisVisible_.z);
-
+	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisStretchKeyword], axisStretch_.x, axisStretch_.y, axisStretch_.z);
 	// -- Transformation Matrix
 	Matrix mat = ui.MainView->viewMatrix();
 	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::ViewMatrixXKeyword], mat[0], mat[1], mat[2], mat[3]);
@@ -654,9 +681,13 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 			slice = axisInvert_.z ? slice->prev : slice->next;
 		}
 	}
-	
+
+	// Create temporary colourScale_
+	ColourScale scale = colourScale_[colourSource_];
+	if (alphaControl_ == FQPlotWindow::FixedAlpha) scale.setAllAlpha(fixedAlpha_);
+
 	// Update surface GL object
-	ui.MainView->createSurface(surfaceData_, ui.ColourScaleWidget, axisStretch_.y);
+	ui.MainView->createSurface(surfaceData_, scale, axisStretch_.y);
 
 	// Construct axes
 	for (int axis = 0; axis < 3; ++axis)

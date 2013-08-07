@@ -1,6 +1,6 @@
 /*
 	*** ColourScale
-	*** src/gui/colourscale.cpp
+	*** src/base/colourscale.cpp
 	Copyright T. Youngs 2013
 
 	This file is part of FQPlot.
@@ -19,8 +19,7 @@
 	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/colourscale.uih"
-#include <QtGui/QPainter>
+#include "base/colourscale.h"
 
 /*
  * ColourScalePoint
@@ -123,10 +122,24 @@ double ColourScaleDelta::delta() const
  */
 
 // Constructor
-ColourScale::ColourScale(QWidget* parent) : QWidget(parent)
+ColourScale::ColourScale()
 {
 	// Private variables
 	interpolated_ = true;
+}
+
+// Copy Constructor
+ColourScale::ColourScale(const ColourScale& source)
+{
+	(*this) = source;
+}
+
+// Assignment operator
+void ColourScale::operator=(const ColourScale& source)
+{
+	clear();
+	for (ColourScalePoint* csp = source.points_.first(); csp != NULL; csp = csp->next) addPoint( csp->value(), csp->colour() );
+	interpolated_ = source.interpolated_;
 }
 
 // Set whether the colourscale is interpolated
@@ -139,33 +152,6 @@ void ColourScale::setInterpolated(bool b)
 bool ColourScale::interpolated() const
 {
 	return interpolated_;
-}
-
-// Paint event callback
-void ColourScale::paintEvent(QPaintEvent *event)
-{
-	if (points_.nItems() == 0) return;
-
-	QPainter painter(this);
-
-	// Setup gradient - in ObjectBoundingMode, 0.0 = top of rectangle, and 1.0 is bottom
-	QLinearGradient gradient(0.0, 1.0, 0.0, 0.0);
-	gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-	double zero = points_.first()->value();
-	double span = points_.last()->value() - zero;
-
-	// -- Loop backwards through points
-	for (ColourScalePoint* csp = points_.first(); csp != NULL; csp = csp->next)
-	{
-		gradient.setColorAt((csp->value() - zero) / span, csp->colour());
-	}
-	
-	// Draw single rectangle and we're done
-	QBrush brush(gradient);
-	QRectF rect(0.0, 0.0, width()-1.0, height()-1.0);
-	painter.setBrush(brush);
-	painter.drawRect(rect);
-	painter.end();
 }
 
 // Recalculate colour deltas between points
@@ -342,4 +328,17 @@ ColourScaleDelta *ColourScale::firstDelta()
 void ColourScale::clear()
 {
 	points_.clear();
+}
+
+// Set all alpha values to that specified
+void ColourScale::setAllAlpha(int alpha)
+{
+	QColor color;
+	for (ColourScalePoint *csp = points_.first(); csp != NULL; csp = csp->next)
+	{
+		color = csp->colour();
+		color.setAlpha(alpha);
+		csp->setColour(color);
+	}
+	calculateDeltas();
 }

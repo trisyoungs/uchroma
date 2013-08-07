@@ -245,9 +245,9 @@ class Viewer : public QGLWidget
 
 	public:
 	// Construct normal / colour data for slice specified
-	void constructSliceData(Slice* targetSlice, double yAxisScale, Array< Vec3< double > >& normals, Array< Vec4< GLfloat > >& colours, ColourScale* colourScale, Slice* previousSlice, Slice* nextSlice);
+	void constructSliceData(Slice* targetSlice, double yAxisScale, Array< Vec3< double > >& normals, Array< Vec4< GLfloat > >& colours, ColourScale& colourScale, Slice* previousSlice, Slice* nextSlice);
 	// Create surface primitive
-	void createSurface(const List< Slice >& slices, ColourScale* colourScale, double yAxisScale);
+	void createSurface(const List<Slice>& slices, ColourScale& colourScale, double yAxisScale);
 	// Clear specified axix primitive
 	void clearAxisPrimitive(int axis);
 	// Create axis primitives

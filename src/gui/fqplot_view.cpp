@@ -515,18 +515,12 @@ void FQPlotWindow::updateViewTab()
 
 	// Axis positions
 	// -- X
-	ui.ViewXAxisCrossAtYSpin->setRange(limitMin_.y, limitMax_.y);
-	ui.ViewXAxisCrossAtZSpin->setRange(limitMin_.z, limitMax_.z);
 	ui.ViewXAxisCrossAtYSpin->setValue(axisPosition_[0].y);
 	ui.ViewXAxisCrossAtZSpin->setValue(axisPosition_[0].z);
 	// -- Y
-	ui.ViewYAxisCrossAtXSpin->setRange(limitMin_.x, limitMax_.x);
-	ui.ViewYAxisCrossAtZSpin->setRange(limitMin_.z, limitMax_.z);
 	ui.ViewYAxisCrossAtXSpin->setValue(axisPosition_[1].x);
 	ui.ViewYAxisCrossAtZSpin->setValue(axisPosition_[1].z);
 	// -- Z
-	ui.ViewZAxisCrossAtXSpin->setRange(limitMin_.x, limitMax_.x);
-	ui.ViewZAxisCrossAtYSpin->setRange(limitMin_.y, limitMax_.y);
 	ui.ViewZAxisCrossAtXSpin->setValue(axisPosition_[2].x);
 	ui.ViewZAxisCrossAtYSpin->setValue(axisPosition_[2].y);
 

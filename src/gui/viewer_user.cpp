@@ -20,7 +20,7 @@
 */
 
 #include "gui/viewer.uih"
-#include "gui/colourscale.uih"
+// #include "gui/colourscale.uih"
 #include "gui/fqplot.h"
 
 // Calculate axis slice selection for given axis at current mouse position
@@ -139,7 +139,7 @@ void Viewer::setupGL()
 }
 
 // Construct normal / colour data for slice specified
-void Viewer::constructSliceData(Slice* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale* colourScale, Slice* previousSlice, Slice* nextSlice)
+void Viewer::constructSliceData(Slice* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale& colourScale, Slice* previousSlice, Slice* nextSlice)
 {
 	normals.clear();
 	colours.clear();
@@ -156,7 +156,7 @@ void Viewer::constructSliceData(Slice* targetSlice, double yAxisScale, Array< Ve
 	QColor colour;
 	for (n=0; n<nPoints; ++n)
 	{
-		colour = colourScale->colour(yTarget[n] / yAxisScale);
+		colour = colourScale.colour(yTarget[n] / yAxisScale);
 		colours.add(Vec4<GLfloat>(colour.redF(), colour.greenF(), colour.blueF(), colour.alphaF()));
 	}
 
@@ -274,7 +274,7 @@ void Viewer::constructSliceData(Slice* targetSlice, double yAxisScale, Array< Ve
 }
 
 // Create surface primitive
-void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale, double yAxisScale)
+void Viewer::createSurface(const List< Slice >& slices, ColourScale& colourScale, double yAxisScale)
 {
 	GLfloat zA, zB;
 	

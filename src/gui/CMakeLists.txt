@@ -18,7 +18,8 @@ fqplot_colour.cpp
 fqplot_sourcedata.cpp
 fqplot_transform.cpp
 fqplot_view.cpp
-colourscale_funcs.cpp
+colourbutton_funcs.cpp
+gradientbar_funcs.cpp
 plotwidget_data.cpp
 plotwidget_funcs.cpp
 plotwidget_paintevent.cpp
@@ -41,7 +42,8 @@ viewer_vertexchunk.h
 
 SET(pro_MOC_HDRS
   fqplot.h
-  colourscale.uih
+  colourbutton.uih
+  gradientbar.uih
   plotwidget.uih
   viewer.uih
 )

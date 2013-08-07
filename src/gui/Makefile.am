@@ -23,7 +23,8 @@ clean:
 
 libgui_a_SOURCES = icons.qrc fqplot.ui fqplot_funcs.cpp fqplot_data.cpp fqplot_analyse.cpp fqplot_colour.cpp fqplot_sourcedata.cpp fqplot_transform.cpp fqplot_view.cpp
 
-libgui_a_SOURCES += colourscale.uih colourscale_funcs.cpp
+libgui_a_SOURCES += colourbutton.uih colourbutton_funcs.cpp
+libgui_a_SOURCES += gradientbar.uih gradientbar_funcs.cpp
 libgui_a_SOURCES += plotwidget.uih plotwidget_data.cpp plotwidget_funcs.cpp plotwidget_paintevent.cpp 
 libgui_a_SOURCES += viewer.uih viewer_funcs.cpp viewer_input.cpp viewer_prefs.cpp viewer_primitive.cpp viewer_primitiveinfo.cpp viewer_primitivevertex.cpp viewer_textprimitive.cpp viewer_trianglechopper.cpp viewer_user.cpp viewer_vertexchunk.cpp
 

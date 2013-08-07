@@ -1,6 +1,6 @@
 /*
-	*** FQPlot version information
-	*** src/version.h
+	*** Gradient Bar
+	*** src/gui/gradientbar.uih
 	Copyright T. Youngs 2013
 
 	This file is part of FQPlot.
@@ -19,11 +19,39 @@
 	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FQPLOT_VERSION_H
-#define FQPLOT_VERSION_H
+#ifndef FQPLOT_GRADIENTBAR_H
+#define FQPLOT_GRADIENTBAR_H
 
-#define FQPLOTREVISION "20"
-#define FQPLOTDATE "Wed 07 Aug 2013 - 18:25"
-#define FQPLOTURL "http://www.projectaten.net/fqplot"
+#include "base/colourscale.h"
+#include <QtGui/QWidget>
+
+// Forward declarations
+/* none */
+
+// Gradient Bar
+class GradientBar : public QWidget
+{
+	Q_OBJECT
+
+	public:
+	// Constructor
+	GradientBar(QWidget* parent);
+
+
+	/*
+	// ColourScale
+	*/
+	private:
+	// Local ColourScale to display
+	ColourScale colourScale_;
+
+	public:
+	// Set colourscale to display
+	void setColourScale(ColourScale& colourScale);
+
+	protected:
+	// Paint event callback
+	void paintEvent(QPaintEvent* event);
+};
 
 #endif

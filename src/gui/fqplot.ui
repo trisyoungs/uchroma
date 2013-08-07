@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>857</width>
-    <height>880</height>
+    <width>1221</width>
+    <height>1001</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -62,7 +62,7 @@
            </size>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="SourceDataTab">
            <attribute name="title">
@@ -269,6 +269,9 @@
                  </property>
                  <item>
                   <layout class="QGridLayout" name="gridLayout">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
                    <item row="0" column="0">
                     <widget class="QLabel" name="XScaleSpinLabel">
                      <property name="sizePolicy">
@@ -451,19 +454,6 @@
                 </layout>
                </widget>
               </item>
-              <item>
-               <spacer name="horizontalSpacer_3">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
              </layout>
             </item>
             <item>
@@ -482,6 +472,9 @@
                  </property>
                  <item>
                   <layout class="QGridLayout" name="gridLayout_4">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
                    <item row="1" column="0">
                     <widget class="QLabel" name="XScaleShiftLabel">
                      <property name="sizePolicy">
@@ -688,6 +681,9 @@
                </property>
                <item>
                 <layout class="QGridLayout" name="gridLayout_2">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
                  <item row="2" column="0">
                   <widget class="QToolButton" name="LimitYMinSetMinimumButton">
                    <property name="maximumSize">
@@ -695,6 +691,9 @@
                      <width>24</width>
                      <height>24</height>
                     </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>Set to minimum source data value</string>
                    </property>
                    <property name="text">
                     <string>...</string>
@@ -725,6 +724,9 @@
                      <width>24</width>
                      <height>24</height>
                     </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>Set to minimum source data value</string>
                    </property>
                    <property name="text">
                     <string>...</string>
@@ -973,6 +975,9 @@
                      <height>24</height>
                     </size>
                    </property>
+                   <property name="toolTip">
+                    <string>Set to minimum source data value</string>
+                   </property>
                    <property name="text">
                     <string>...</string>
                    </property>
@@ -989,6 +994,9 @@
                      <width>24</width>
                      <height>24</height>
                     </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>Set to maximum source data value</string>
                    </property>
                    <property name="text">
                     <string>...</string>
@@ -1007,6 +1015,9 @@
                      <height>24</height>
                     </size>
                    </property>
+                   <property name="toolTip">
+                    <string>Set to maximum source data value</string>
+                   </property>
                    <property name="text">
                     <string>...</string>
                    </property>
@@ -1023,6 +1034,9 @@
                      <width>24</width>
                      <height>24</height>
                     </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>Set to maximum source data value</string>
                    </property>
                    <property name="text">
                     <string>...</string>
@@ -1052,6 +1066,9 @@
                </property>
                <item>
                 <layout class="QGridLayout" name="gridLayout_13">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
                  <item row="0" column="0">
                   <widget class="QCheckBox" name="TransformXInterpolateCheck">
                    <property name="text">
@@ -1198,7 +1215,7 @@
            <attribute name="title">
             <string>Colour</string>
            </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
+           <layout class="QHBoxLayout" name="horizontalLayout_34">
             <property name="spacing">
              <number>4</number>
             </property>
@@ -1206,51 +1223,314 @@
              <number>4</number>
             </property>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <widget class="QFrame" name="ColourScaleFrame">
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Sunken</enum>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_2">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="margin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="GradientBar" name="ColourGradient" native="true">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>50</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>25</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_5">
+              <property name="spacing">
+               <number>4</number>
+              </property>
               <item>
-               <widget class="QFrame" name="ColourScaleFrame">
-                <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+               <widget class="QRadioButton" name="ColourSingleColourRadio">
+                <property name="text">
+                 <string>Single Colour</string>
                 </property>
-                <property name="frameShadow">
-                 <enum>QFrame::Sunken</enum>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
-                <layout class="QVBoxLayout" name="verticalLayout_2">
-                 <property name="spacing">
-                  <number>0</number>
-                 </property>
-                 <property name="margin">
-                  <number>0</number>
-                 </property>
-                 <item>
-                  <widget class="ColourScale" name="ColourScaleWidget" native="true">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>25</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>25</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_7">
+                <item>
+                 <spacer name="horizontalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="ColourButton" name="ColourSingleColourButton">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click to select new colour</string>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_6">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="ColourLinearGradientRadio">
+                <property name="text">
+                 <string>Linear Gradient</string>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_8">
+                <property name="spacing">
+                 <number>4</number>
+                </property>
+                <item>
+                 <spacer name="horizontalSpacer_7">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="ColourLinearGradientASetMinimumButton">
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Set to Y value minimum limit</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="icons.qrc">
+                    <normaloff>:/fqplot/icons/toleftlimit.svg</normaloff>:/fqplot/icons/toleftlimit.svg</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QDoubleSpinBox" name="ColourLinearGradientASpin">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="minimum">
+                   <double>-10000000.000000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>10000000.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="ColourLinearGradientASetMaximumButton">
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="acceptDrops">
+                   <bool>false</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Set to Y value maximum limit</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="icons.qrc">
+                    <normaloff>:/fqplot/icons/torightlimit.svg</normaloff>:/fqplot/icons/torightlimit.svg</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="ColourButton" name="ColourLinearGradientAButton">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click to select new colour</string>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_32">
+                <property name="spacing">
+                 <number>4</number>
+                </property>
+                <item>
+                 <spacer name="horizontalSpacer_8">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="ColourLinearGradientBSetMinimumButton">
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Set to Y value minimum limit</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="icons.qrc">
+                    <normaloff>:/fqplot/icons/toleftlimit.svg</normaloff>:/fqplot/icons/toleftlimit.svg</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QDoubleSpinBox" name="ColourLinearGradientBSpin">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="minimum">
+                   <double>-10000000.000000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>10000000.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="ColourLinearGradientBSetMaximumButton">
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="acceptDrops">
+                   <bool>false</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Set to Y value maximum limit</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="icons.qrc">
+                    <normaloff>:/fqplot/icons/torightlimit.svg</normaloff>:/fqplot/icons/torightlimit.svg</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="ColourButton" name="ColourLinearGradientBButton">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click to select new colour</string>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="ColourCustomGradientRadio">
+                <property name="text">
+                 <string>Custom Gradient</string>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
                </widget>
               </item>
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_3">
                 <item>
-                 <widget class="QTableWidget" name="ColourScaleTable">
+                 <widget class="QTableWidget" name="ColourCustomGradientTable">
                   <property name="selectionBehavior">
                    <enum>QAbstractItemView::SelectRows</enum>
                   </property>
@@ -1291,7 +1571,7 @@
                    </spacer>
                   </item>
                   <item>
-                   <widget class="QToolButton" name="AddColourScalePointButton">
+                   <widget class="QToolButton" name="ColourCustomGradientAddButton">
                     <property name="text">
                      <string/>
                     </property>
@@ -1302,7 +1582,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QToolButton" name="RemoveColourScalePointButton">
+                   <widget class="QToolButton" name="ColourCustomGradientRemoveButton">
                     <property name="text">
                      <string/>
                     </property>
@@ -1316,10 +1596,78 @@
                 </item>
                </layout>
               </item>
+              <item>
+               <widget class="QGroupBox" name="AlphaGroup">
+                <property name="title">
+                 <string>Alpha Values</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_26">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
+                 <property name="margin">
+                  <number>4</number>
+                 </property>
+                 <item>
+                  <widget class="QRadioButton" name="ColourAlphaOwnAlphaRadio">
+                   <property name="text">
+                    <string>From Defined Colours</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="ColourAlphaFixedAlphaRadio">
+                   <property name="text">
+                    <string>Use Fixed Value</string>
+                   </property>
+                   <property name="checked">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_33">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
+                   <item>
+                    <spacer name="horizontalSpacer_9">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QSpinBox" name="ColourAlphaFixedAlphaSpin">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="maximum">
+                      <number>255</number>
+                     </property>
+                     <property name="singleStep">
+                      <number>5</number>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
              </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_8"/>
             </item>
            </layout>
           </widget>
@@ -1386,6 +1734,9 @@
             </item>
             <item>
              <widget class="QTabWidget" name="AxesTabs">
+              <property name="toolTip">
+               <string>Set to maximum source data value</string>
+              </property>
               <property name="currentIndex">
                <number>0</number>
               </property>
@@ -1564,6 +1915,9 @@
                          <height>24</height>
                         </size>
                        </property>
+                       <property name="toolTip">
+                        <string>Set to maximum source data value</string>
+                       </property>
                        <property name="text">
                         <string>...</string>
                        </property>
@@ -1580,6 +1934,9 @@
                          <width>24</width>
                          <height>24</height>
                         </size>
+                       </property>
+                       <property name="toolTip">
+                        <string>Set to zero</string>
                        </property>
                        <property name="text">
                         <string>...</string>
@@ -1598,6 +1955,9 @@
                          <height>24</height>
                         </size>
                        </property>
+                       <property name="toolTip">
+                        <string>Set to minimum source data value</string>
+                       </property>
                        <property name="text">
                         <string>...</string>
                        </property>
@@ -1614,6 +1974,9 @@
                          <width>24</width>
                          <height>24</height>
                         </size>
+                       </property>
+                       <property name="toolTip">
+                        <string>Set to minimum source data value</string>
                        </property>
                        <property name="text">
                         <string>...</string>
@@ -1632,6 +1995,9 @@
                          <height>24</height>
                         </size>
                        </property>
+                       <property name="toolTip">
+                        <string>Set to zero</string>
+                       </property>
                        <property name="text">
                         <string>...</string>
                        </property>
@@ -1648,6 +2014,9 @@
                          <width>24</width>
                          <height>24</height>
                         </size>
+                       </property>
+                       <property name="toolTip">
+                        <string>Set to maximum source data value</string>
                        </property>
                        <property name="text">
                         <string>...</string>
@@ -2199,6 +2568,9 @@
                          <height>24</height>
                         </size>
                        </property>
+                       <property name="toolTip">
+                        <string>Set to zero</string>
+                       </property>
                        <property name="text">
                         <string>...</string>
                        </property>
@@ -2215,6 +2587,9 @@
                          <width>24</width>
                          <height>24</height>
                         </size>
+                       </property>
+                       <property name="toolTip">
+                        <string>Set to minimum source data value</string>
                        </property>
                        <property name="text">
                         <string>...</string>
@@ -2233,6 +2608,9 @@
                          <height>24</height>
                         </size>
                        </property>
+                       <property name="toolTip">
+                        <string>Set to minimum source data value</string>
+                       </property>
                        <property name="text">
                         <string>...</string>
                        </property>
@@ -2249,6 +2627,9 @@
                          <width>24</width>
                          <height>24</height>
                         </size>
+                       </property>
+                       <property name="toolTip">
+                        <string>Set to zero</string>
                        </property>
                        <property name="text">
                         <string>...</string>
@@ -2800,6 +3181,9 @@
                          <height>24</height>
                         </size>
                        </property>
+                       <property name="toolTip">
+                        <string>Set to minimum source data value</string>
+                       </property>
                        <property name="text">
                         <string>...</string>
                        </property>
@@ -2816,6 +3200,9 @@
                          <width>24</width>
                          <height>24</height>
                         </size>
+                       </property>
+                       <property name="toolTip">
+                        <string>Set to maximum source data value</string>
                        </property>
                        <property name="text">
                         <string>...</string>
@@ -2834,6 +3221,9 @@
                          <height>24</height>
                         </size>
                        </property>
+                       <property name="toolTip">
+                        <string>Set to zero</string>
+                       </property>
                        <property name="text">
                         <string>...</string>
                        </property>
@@ -2850,6 +3240,9 @@
                          <width>24</width>
                          <height>24</height>
                         </size>
+                       </property>
+                       <property name="toolTip">
+                        <string>Set to minimum source data value</string>
                        </property>
                        <property name="text">
                         <string>...</string>
@@ -2868,6 +3261,9 @@
                          <height>24</height>
                         </size>
                        </property>
+                       <property name="toolTip">
+                        <string>Set to zero</string>
+                       </property>
                        <property name="text">
                         <string>...</string>
                        </property>
@@ -2884,6 +3280,9 @@
                          <width>24</width>
                          <height>24</height>
                         </size>
+                       </property>
+                       <property name="toolTip">
+                        <string>Set to maximum source data value</string>
                        </property>
                        <property name="text">
                         <string>...</string>
@@ -3391,7 +3790,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>857</width>
+     <width>1221</width>
      <height>27</height>
     </rect>
    </property>
@@ -3467,16 +3866,21 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ColourScale</class>
-   <extends>QWidget</extends>
-   <header>gui/colourscale.uih</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>PlotWidget</class>
    <extends>QWidget</extends>
    <header>gui/plotwidget.uih</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>GradientBar</class>
+   <extends>QWidget</extends>
+   <header>gui/gradientbar.uih</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ColourButton</class>
+   <extends>QPushButton</extends>
+   <header>gui/colourbutton.uih</header>
   </customwidget>
  </customwidgets>
  <resources>

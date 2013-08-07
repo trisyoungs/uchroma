@@ -1,6 +1,6 @@
 /*
 	*** ColourScale
-	*** src/gui/colourscale.uih
+	*** src/base/colourscale.h
 	Copyright T. Youngs 2013
 
 	This file is part of FQPlot.
@@ -24,7 +24,7 @@
 
 #include "templates/list.h"
 #include "templates/reflist.h"
-#include <QtGui/QWidget>
+#include <QtGui/QColor>
 
 // Forward declarations
 /* none */
@@ -86,17 +86,19 @@ class ColourScaleDelta : public ListItem<ColourScaleDelta>
 };
 
 // Colour Scale
-class ColourScale : public QWidget
+class ColourScale
 {
-	Q_OBJECT
-
 	public:
 	// Constructor
-	ColourScale(QWidget* parent);
+	ColourScale();
+	// Copy constructor
+	ColourScale(const ColourScale&);
+	// Assignment operator
+	void operator=(const ColourScale& source);
 
 
 	/*
-	// Rendering
+	// Style
 	*/
 	private:
 	// Whether colours are interpolated between points in the scale
@@ -108,13 +110,9 @@ class ColourScale : public QWidget
 	// Return whether the colourscale is interpolated
 	bool interpolated() const;
 
-	protected:
-	// Paint event callback
-	void paintEvent(QPaintEvent* event);
-
 
 	/*
-	// Data and data range
+	// Colour Points
 	*/
 	private:
 	// List of points in the colourscale
@@ -151,6 +149,8 @@ class ColourScale : public QWidget
 	void removePoint(ColourScalePoint* point);
 	// Get colour associated with value supplied
 	QColor colour(double value);
+	// Set all alpha values to that specified
+	void setAllAlpha(int alpha);
 };
 
 #endif

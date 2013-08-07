@@ -1,10 +1,12 @@
 add_library(base
+colourscale.cpp
 data2d.cpp
 dnchar.cpp
 lineparser.cpp
 messenger.cpp
 slice.cpp
 sysfunc.cpp
+colourscale.h
 data2d.h
 dnchar.h
 lineparser.h

@@ -151,14 +151,33 @@ class FQPlotWindow : public QMainWindow
 	 * Tabs -- Colour
 	 */
 	private slots:
-	void on_ColourScaleTable_itemSelectionChanged();
-	void on_ColourScaleTable_cellDoubleClicked(int row, int column);
-	void on_ColourScaleTable_cellChanged(int row, int column);
-	void on_AddColourScalePointButton_clicked(bool checked);
-	void on_RemoveColourScalePointButton_clicked(bool checked);
+	// -- Single Colour
+	void on_ColourSingleColourRadio_clicked(bool checked);
+	void on_ColourSingleColourButton_clicked(bool checked);
+	// -- Linear Gradient
+	void on_ColourLinearGradientRadio_clicked(bool checked);
+	void on_ColourLinearGradientAButton_clicked(bool checked);
+	void on_ColourLinearGradientASpin_valueChanged(double value);
+	void on_ColourLinearGradientASetMinimumButton_clicked(bool checked);
+	void on_ColourLinearGradientASetMaximumButton_clicked(bool checked);
+	void on_ColourLinearGradientBButton_clicked(bool checked);
+	void on_ColourLinearGradientBSpin_valueChanged(double value);
+	void on_ColourLinearGradientBSetMinimumButton_clicked(bool checked);
+	void on_ColourLinearGradientBSetMaximumButton_clicked(bool checked);
+	// -- Custom Gradient
+	void on_ColourCustomGradientRadio_clicked(bool checked);
+	void on_ColourCustomGradientTable_itemSelectionChanged();
+	void on_ColourCustomGradientTable_cellDoubleClicked(int row, int column);
+	void on_ColourCustomGradientTable_cellChanged(int row, int column);
+	void on_ColourCustomGradientAddButton_clicked(bool checked);
+	void on_ColourCustomGradientRemoveButton_clicked(bool checked);
+	// -- Alpha Control
+	void on_ColourAlphaOwnAlphaRadio_clicked(bool checked);
+	void on_ColourAlphaFixedAlphaRadio_clicked(bool checked);
+	void on_ColourAlphaFixedAlphaSpin_valueChanged(int value);
 
 	public:
-	// Update Colour tab
+	// Update
 	void updateColourTab();
 
 
@@ -263,7 +282,7 @@ class FQPlotWindow : public QMainWindow
 	 */
 	public:
 	// Datafile keywords
-	enum DataFileKeyword { AxisAutoTicksKeyword, AxisFirstTickKeyword, AxisInvertKeyword, AxisLabelDirectionKeyword, AxisLabelRotationKeyword, AxisLabelUpKeyword, AxisLogarithmicKeyword, AxisMinorTicksKeyword, AxisPositionKeyword, AxisTickDeltaKeyword, AxisVisibleKeyword, ColourScalePointKeyword, InterpolateKeyword, InterpolateConstrainKeyword, InterpolateStepKeyword, LabelScaleKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword, PerspectiveKeyword, PostTransformShiftKeyword, PreTransformShiftKeyword, SliceDirectoryKeyword, SliceKeyword, TitleScaleKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
+	enum DataFileKeyword { AxisAutoTicksKeyword, AxisFirstTickKeyword, AxisInvertKeyword, AxisLabelDirectionKeyword, AxisLabelRotationKeyword, AxisLabelUpKeyword, AxisLogarithmicKeyword, AxisMinorTicksKeyword, AxisPositionKeyword, AxisStretchKeyword, AxisTickDeltaKeyword, AxisVisibleKeyword, ColourAlphaControlKeyword, ColourAlphaFixedKeyword, ColourCustomGradientKeyword, ColourLinearAKeyword, ColourLinearBKeyword, ColourSingleKeyword, ColourSourceKeyword, InterpolateKeyword, InterpolateConstrainKeyword, InterpolateStepKeyword, LabelScaleKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword, PerspectiveKeyword, PostTransformShiftKeyword, PreTransformShiftKeyword, SliceDirectoryKeyword, SliceKeyword, TitleScaleKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
 	static DataFileKeyword dataFileKeyword(const char* s);
 	static const char* dataFileKeyword(DataFileKeyword dfk);
 	// Data Transform types
@@ -334,8 +353,6 @@ class FQPlotWindow : public QMainWindow
 	public:
 	// Clear current data
 	void clearData();
-	// Create default colourscale
-	void createDefaultColourScale();
 	// Load data from file specified
 	bool loadData(QString fileName);
 	// Save current data to file specified
@@ -352,6 +369,26 @@ class FQPlotWindow : public QMainWindow
 	void setAsModified();
 	// Update surface data after data change
 	void updateSurface(bool dataHasChanged = true);
+
+
+	/*
+	 * Colours
+	 */
+	public:
+	// Available colourscale sources
+	enum ColourSource { SingleColourSource, LinearGradientSource, CustomGradientSource, nColourSources };
+	// Alpha control options
+	enum AlphaControl { OwnAlpha, FixedAlpha };
+
+	private:
+	// ColourScale sources
+	ColourScale colourScale_[nColourSources];
+	// Current colourscale source to use
+	ColourSource colourSource_;
+	// Current alpha control
+	AlphaControl alphaControl_;
+	// Fixed alpha value (for FixedAlpha option)
+	int fixedAlpha_;
 };
 
 #endif
