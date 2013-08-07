@@ -82,7 +82,7 @@ void Viewer::setupGL()
 	GLfloat spotlightAmbient[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	GLfloat spotlightDiffuse[4] = { 0.8f, 0.8f, 0.8f, 1.0f };
 	GLfloat spotlightSpecular[4] = { 0.7f, 0.7f, 0.7f, 1.0f };
-	GLfloat spotlightPosition[4] = { 10.0f, 10.0f, 100.0f, 0.0f };
+	GLfloat spotlightPosition[4] = { 100.0f, 100.0f, 0.0f, 0.0f };
 	GLfloat specularColour[4] = { 0.9f, 0.9f, 0.9f, 1.0f };
 
 	// Clear (background) colour
@@ -139,7 +139,7 @@ void Viewer::setupGL()
 }
 
 // Construct normal / colour data for slice specified
-void Viewer::constructSliceData(Slice* targetSlice, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale* colourScale, Slice* previousSlice, Slice* nextSlice)
+void Viewer::constructSliceData(Slice* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale* colourScale, Slice* previousSlice, Slice* nextSlice)
 {
 	normals.clear();
 	colours.clear();
@@ -156,7 +156,7 @@ void Viewer::constructSliceData(Slice* targetSlice, Array< Vec3<double> >& norma
 	QColor colour;
 	for (n=0; n<nPoints; ++n)
 	{
-		colour = colourScale->colour(yTarget[n]);
+		colour = colourScale->colour(yTarget[n] / yAxisScale);
 		colours.add(Vec4<GLfloat>(colour.redF(), colour.greenF(), colour.blueF(), colour.alphaF()));
 	}
 
@@ -274,7 +274,7 @@ void Viewer::constructSliceData(Slice* targetSlice, Array< Vec3<double> >& norma
 }
 
 // Create surface primitive
-void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale)
+void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale, double yAxisScale)
 {
 	GLfloat zA, zB;
 	
@@ -293,13 +293,13 @@ void Viewer::createSurface(const List<Slice>& slices, ColourScale* colourScale)
 
 	// Construct first slice data and set initial min/max values
 	Slice* sliceA = slices.first();
-	constructSliceData(sliceA, normA, colourA, colourScale, NULL, sliceA->next);
+	constructSliceData(sliceA, yAxisScale, normA, colourA, colourScale, NULL, sliceA->next);
 	
 	// Create triangles
 	for (Slice* sliceB = sliceA->next; sliceB != NULL; sliceB = sliceB->next)
 	{
 		// Construct data for current slice
-		constructSliceData(sliceB, normB, colourB, colourScale, sliceA, sliceB->next);
+		constructSliceData(sliceB, yAxisScale, normB, colourB, colourScale, sliceA, sliceB->next);
 
 		// Grab z values
 		zA = (GLfloat) sliceA->z();
@@ -365,27 +365,30 @@ void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, dou
 
 	// Plot tickmarks
 	int count = 0;
-	double delta = (inverted ? -tickDelta : tickDelta) / (nMinorTicks+1);
-	double value = inverted ? (axisMax - firstTick) + axisMin : firstTick;
-	u.set(axis, value * stretch);
+	double delta = tickDelta / (nMinorTicks+1);
+	double value = firstTick * stretch;
+	u.set(axis, (inverted ? (axisMax - firstTick) + axisMin : firstTick) * stretch);
 	while (count < 50)
 	{
 		// Check break condition
-		if ((!inverted) && (u[axis] > axisMax)) break;
-		if (inverted && (u[axis] < axisMin)) break;
+		if (value > axisMax) break;
 		
-		if (count%(nMinorTicks+1) == 0)
+		// Draw tick here, only if value >= limitMin_
+		if (value >= axisMin)
 		{
-			axisPrimitives_[axis].plotLine(u, u+direction*0.1);
-			
-			// Determine resulting text primitive width (so we can do label rotations)
-			s = QString::number(value);
-			boundingBox = font_->BBox(qPrintable(s));
+			if (count%(nMinorTicks+1) == 0)
+			{
+				axisPrimitives_[axis].plotLine(u, u+direction*0.1);
+				
+				// Determine resulting text primitive width (so we can do label rotations)
+				s = QString::number(value);
+				boundingBox = font_->BBox(qPrintable(s));
 
-			axisTextPrimitives_[axis].add(s, labelScale_, fontBaseHeight_, fabs(boundingBox.Upper().X() - boundingBox.Lower().X()), u + direction*0.1, direction, up, zrotation);
+				axisTextPrimitives_[axis].add(s, labelScale_, fontBaseHeight_, fabs(boundingBox.Upper().X() - boundingBox.Lower().X()), u + direction*0.1, direction, up, zrotation);
+			}
+			else axisPrimitives_[axis].plotLine(u, u+direction*0.05);
 		}
-		else axisPrimitives_[axis].plotLine(u, u+direction*0.05);
-		u.add(axis, delta*stretch);
+		u.add(axis, inverted ? -delta*stretch : delta*stretch);
 		value += delta;
 		count = (count+1)%(nMinorTicks+1);
 	}
@@ -404,8 +407,10 @@ void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, 
 		return;
 	}
 
-	double logAxisMin = log10(axisMin);
-	double logAxisMax = log10(axisMax);
+	double axisMinValue = log10(axisMin);
+	double axisMaxValue = log10(axisMax);
+	double viewAxisMin = inverted ? log10(axisMax/axisMin) : log10(axisMin);
+	double viewAxisMax = inverted ? 0.0 : log10(axisMax);
 
 	Vec3<double> u, v;
 	QString s;
@@ -413,9 +418,9 @@ void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, 
 
 	// Draw a line from min to max range, passing through the defined axisPosition
 	u = axisPosition;
-	u.set(axis, logAxisMin * stretch);
+	u.set(axis, viewAxisMin * stretch);
 	v = axisPosition;
-	v.set(axis, logAxisMax * stretch);
+	v.set(axis, viewAxisMax * stretch);
 	axisPrimitives_[axis].plotLine(u, v);
 
 	// Store min/max values and coordinates
@@ -428,17 +433,16 @@ void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, 
 	if (nMinorTicks > 8) nMinorTicks = 8;
 	// Start at floored (ceiling'd) integer of logAxisMin (logAxisMax), and go from there.
 	int count = 0;
-	double power = inverted ? ceil(logAxisMax) : floor(logAxisMin);
+	double power = floor(axisMinValue);
 	double value = pow(10,power);
 	while (true)
 	{
 		// Check break condition
-		if (inverted && (value < axisMin)) break;
-		if ((!inverted) && value > axisMax) break;
+		if (value > axisMax) break;
 
 		// If the current value is in range, plot a tick
-		u[axis] = log10(value) * stretch;
-		if ((value >= axisMin) && (value <= axisMax))
+		u[axis] = (inverted ? log10(axisMax/value) : log10(value)) * stretch;
+		if (value >= axisMin)
 		{
 			// Tick mark
 			axisPrimitives_[axis].plotLine(u, u+direction*(count == 0 ? 0.1 : 0.05));

@@ -71,7 +71,7 @@ bool FQPlotWindow::viewAxisCrossSet(int axis, int dir, int type)
 {
 	if (refreshing_) return false;
 	if (type == -1) axisPosition_[axis].set(dir, limitMin_[dir]);
-	else if ((type == 0) && (limitMin_[axis] <= 0.0) && (limitMax_[axis] >= 0.0)) axisPosition_[axis].set(dir, 0.0);
+	else if ((type == 0) && (limitMin_[dir] <= 0.0) && (limitMax_[dir] >= 0.0)) axisPosition_[axis].set(dir, 0.0);
 	else if (type == 1) axisPosition_[axis].set(dir, limitMax_[dir]);
 	else return false;
 	setAsModified();
@@ -502,13 +502,16 @@ void FQPlotWindow::updateViewTab()
 	ui.ViewLabelScaleSpin->setValue(labelScale_);
 	ui.ViewTitleScaleSpin->setValue(titleScale_);
 
-	// Invert / Visible
+	// Invert / Visible / Logarithmic
 	ui.ViewXAxisInvertCheck->setChecked(axisInvert_.x);
 	ui.ViewYAxisInvertCheck->setChecked(axisInvert_.y);
 	ui.ViewZAxisInvertCheck->setChecked(axisInvert_.z);
 	ui.ViewXAxisVisibleCheck->setChecked(axisVisible_.x);
 	ui.ViewYAxisVisibleCheck->setChecked(axisVisible_.y);
 	ui.ViewZAxisVisibleCheck->setChecked(axisVisible_.z);
+	ui.ViewXAxisLogarithmicCheck->setChecked(axisLogarithmic_.x);
+	ui.ViewYAxisLogarithmicCheck->setChecked(axisLogarithmic_.y);
+	ui.ViewZAxisLogarithmicCheck->setChecked(axisLogarithmic_.z);
 
 	// Axis positions
 	// -- X
@@ -519,13 +522,13 @@ void FQPlotWindow::updateViewTab()
 	// -- Y
 	ui.ViewYAxisCrossAtXSpin->setRange(limitMin_.x, limitMax_.x);
 	ui.ViewYAxisCrossAtZSpin->setRange(limitMin_.z, limitMax_.z);
-	ui.ViewYAxisCrossAtXSpin->setValue(axisPosition_[0].x);
-	ui.ViewYAxisCrossAtZSpin->setValue(axisPosition_[0].z);
+	ui.ViewYAxisCrossAtXSpin->setValue(axisPosition_[1].x);
+	ui.ViewYAxisCrossAtZSpin->setValue(axisPosition_[1].z);
 	// -- Z
 	ui.ViewZAxisCrossAtXSpin->setRange(limitMin_.x, limitMax_.x);
 	ui.ViewZAxisCrossAtYSpin->setRange(limitMin_.y, limitMax_.y);
-	ui.ViewZAxisCrossAtXSpin->setValue(axisPosition_[0].x);
-	ui.ViewZAxisCrossAtYSpin->setValue(axisPosition_[0].y);
+	ui.ViewZAxisCrossAtXSpin->setValue(axisPosition_[2].x);
+	ui.ViewZAxisCrossAtYSpin->setValue(axisPosition_[2].y);
 
 	// AxisTicks
 	// -- X

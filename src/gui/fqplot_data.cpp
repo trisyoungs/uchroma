@@ -55,6 +55,7 @@ void FQPlotWindow::calculateTickDeltas(int axis)
 {
 	const int nBaseValues = 5, maxIterations = 10, maxTicks = 10;
 	int power = 1, baseValues[nBaseValues] = { 1, 2, 3, 4, 5 }, baseValueIndex = 0, nTicks, iteration, minTicks = maxTicks/2;
+	double clampedStartValue;
 
 	baseValueIndex = 0;
 	power = int(log10((limitMax_[axis]-limitMin_[axis]) / maxTicks) - 1);
@@ -69,11 +70,11 @@ void FQPlotWindow::calculateTickDeltas(int axis)
 
 			// Get first tickmark value
 			axisFirstTick_[axis] = int(limitMin_[axis] / axisTickDelta_[axis]) * axisTickDelta_[axis];
-			if (axisFirstTick_[axis] < limitMin_[axis]) axisFirstTick_[axis] += axisTickDelta_[axis];
+			clampedStartValue = (axisFirstTick_[axis] < limitMin_[axis] ? axisFirstTick_[axis] + axisTickDelta_[axis] : axisFirstTick_[axis]);
 
 			// How many ticks now fit between the firstTick and max value?
 			// Add 1 to get total ticks for this delta (i.e. including firstTick)
-			nTicks = int((limitMax_[axis]-axisFirstTick_[axis]) / axisTickDelta_[axis]);
+			nTicks = int((limitMax_[axis]-limitMin_[axis]) / axisTickDelta_[axis]);
 			++nTicks;
 
 			// Check n...
@@ -537,12 +538,16 @@ void FQPlotWindow::setAsModified()
 // Update surface data after data change
 void FQPlotWindow::updateSurface(bool dataHasChanged)
 {
-	// Determine surface center
+	// Determine surface center and Y clip limits
 	Vec3<double> center;
-	for (int n=0; n<3; ++n) center[n] = (axisLogarithmic_[n] ? (log10(limitMax_[n])+log10(limitMin_[n])) : (limitMax_[n]+limitMin_[n])) * 0.5 * axisStretch_[n];
+	for (int n=0; n<3; ++n)
+	{
+		if (axisLogarithmic_[n]) center[n] = (axisInvert_[n] ? log10(limitMax_[n]/limitMin_[n]) : log10(limitMax_[n]*limitMin_[n])) * 0.5 * axisStretch_[n];
+		else center[n] = (limitMax_[n]+limitMin_[n]) * 0.5 * axisStretch_[n];
+	}
 	ui.MainView->setSurfaceCenter(center);
-	if (axisLogarithmic_.y) ui.MainView->setYClip(log10(limitMin_.y), log10(limitMax_.y));
-	else ui.MainView->setYClip(limitMin_.y, limitMax_.y);
+	if (axisLogarithmic_.y) ui.MainView->setYClip(log10(limitMin_.y) * axisStretch_.y, log10(limitMax_.y) * axisStretch_.y);
+	else ui.MainView->setYClip(limitMin_.y * axisStretch_.y, limitMax_.y * axisStretch_.y);
 
 	// Make sure view variables are up-to-date
 	ui.MainView->setLabelScale(labelScale_);
@@ -571,7 +576,7 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 
 			// Add new item to surfaceData_ array
 			Slice* surfaceSlice = surfaceData_.add();
-			surfaceSlice->setZ(z);
+			surfaceSlice->setZ(z * axisStretch_.z);
 
 			// Copy / interpolate arrays
 			Array<double> array[2];
@@ -619,15 +624,28 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 			}
 
 			// Add data to surfaceSlice, obeying defined x-limits
-			for (int n=0; n<array[0].nItems(); ++n)
+			if (axisInvert_.x) for (int n=array[0].nItems()-1; n >= 0; --n)
 			{
 				x = array[0].value(n);
 				if ((x < limitMin_.x) || (x > limitMax_.x)) continue;
-				if (axisInvert_.x) x = (limitMax_.x - x) + limitMin_.x;
+				if (axisLogarithmic_.x) x = log10(limitMax_.x / x);
+				else x = (limitMax_.x - x) + limitMin_.x;
+				x *= axisStretch_.x;
+				y = array[1].value(n);
+				if (axisLogarithmic_.y) y = (axisInvert_.y ? log10(limitMax_.y / y) : log10(y));
+				else if (axisInvert_.y) y = (limitMax_.y - y) + limitMin_.y;
+				y *= axisStretch_.y;
+				surfaceSlice->data().addPoint(x, y);
+			}
+			else for (int n=0; n<array[0].nItems(); ++n)
+			{
+				x = array[0].value(n);
+				if ((x < limitMin_.x) || (x > limitMax_.x)) continue;
 				if (axisLogarithmic_.x) x = log10(x);
 				x *= axisStretch_.x;
 				y = array[1].value(n);
-				if (axisLogarithmic_.y) y = log10(y);
+				if (axisLogarithmic_.y) y = (axisInvert_.y ? log10(limitMax_.y / y) : log10(y));
+				else if (axisInvert_.y) y = (limitMax_.y - y) + limitMin_.y;
 				y *= axisStretch_.y;
 				surfaceSlice->data().addPoint(x, y);
 			}
@@ -638,7 +656,7 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 	}
 	
 	// Update surface GL object
-	ui.MainView->createSurface(surfaceData_, ui.ColourScaleWidget);
+	ui.MainView->createSurface(surfaceData_, ui.ColourScaleWidget, axisStretch_.y);
 
 	// Construct axes
 	for (int axis = 0; axis < 3; ++axis)
@@ -649,9 +667,14 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 			continue;
 		}
 
-		// Set position, taking into account logarithmic axes
+		// Set position, taking into account logarithmic axes and scale factors
 		Vec3<double> pos;
-		for (int n=0; n<3; ++n) pos.set(n, n == axis ? 0.0 : (axisLogarithmic_[n] ? log10(axisPosition_[axis][n]) : axisPosition_[axis][n]));
+		for (int n=0; n<3; ++n)
+		{
+			if (n == axis) pos.set(n, 0.0);
+			else if (axisLogarithmic_[n]) pos.set(n, (axisInvert_[n] ? log10(limitMax_[n] / axisPosition_[axis][n]) : log10(axisPosition_[axis][n])) * axisStretch_[n]);
+			else pos.set(n, (axisInvert_[n] ? limitMax_[n] - axisPosition_[axis][n] : axisPosition_[axis][n]) * axisStretch_[n]);
+		}
 
 		if (axisLogarithmic_[axis]) ui.MainView->createLogAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis], axisLabelUp_[axis], axisLabelRotation_[axis], axisInvert_[axis], axisStretch_[axis]);
 		else
