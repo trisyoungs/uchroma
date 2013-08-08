@@ -178,7 +178,6 @@ void Viewer::paintGL()
 	glEnable(GL_LINE_SMOOTH);
 	glLoadMatrixd(A.matrix());
 	glLineWidth(lineWidth_);
-	printf("Line width = %f\n", lineWidth_);
 	glDisable(GL_LIGHTING);
 	for (int axis=0; axis<3; ++axis) if (axisVisible_[axis]) axisPrimitives_[axis].sendToGL();
 	glEnable(GL_LIGHTING);

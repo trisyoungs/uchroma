@@ -335,6 +335,11 @@ bool FQPlotWindow::loadData(QString fileName)
 				if (!dataFileDirectory_.isReadable())
 				{
 					QMessageBox::StandardButton button = QMessageBox::warning(this, "Error", "The slice directory specified (" + dataFileDirectory_.absolutePath() + ") does not exist or is unreadable.\nDo you want to reset the datafile location?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+					if (button == QMessageBox::Yes)
+					{
+						QString dir = QFileDialog::getExistingDirectory(this, "Data Directory", "Choose the directory containing the required files:");
+						if (!dir.isEmpty()) dataFileDirectory_ = dir;
+					}
 				}
 				break;
 			// Slice specification
@@ -368,6 +373,10 @@ bool FQPlotWindow::loadData(QString fileName)
 		}
 	}
 	parser.closeFiles();
+
+	// Warn if slices were loaded which have no data in them
+	int nEmpty = nEmptySlices();
+	if (nEmpty != 0) QMessageBox::warning(this, "Empty Data", QString("There are ") + QString::number(nEmpty) + " defined slices which contain no data or could not be found.\nCheck the slice data directory, and/or the datafiles themselves..");
 
 	// Recreate surface
 	updateSurface();
@@ -507,6 +516,14 @@ Slice* FQPlotWindow::loadSlice(QString fileName)
 	return slice;
 }
 
+// Return number of slices with no data present
+int FQPlotWindow::nEmptySlices()
+{
+	int count = 0;
+	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) if (slice->data().nPoints() < 2) ++count;
+	return count;
+}
+
 // Recalculate data limits
 void FQPlotWindow::calculateDataLimits()
 {
@@ -577,6 +594,13 @@ void FQPlotWindow::calculateTransformLimits()
 			if (axisPosition_[m].get(n) > limitMax_[n]) axisPosition_[m].set(n, limitMax_[n]);
 		}
 	}
+}
+
+// Set display limits to show all available data
+void FQPlotWindow::showAllData()
+{
+	limitMin_ = transformMin_;
+	limitMax_ = transformMax_;
 }
 
 // Transform single value

@@ -305,7 +305,7 @@ void Viewer::createSurface(const List< Slice >& slices, ColourScale& colourScale
 		// Grab z values
 		zA = (GLfloat) sliceA->z();
 		zB = (GLfloat) sliceB->z();
-
+	
 		// Get nPoints, and initial coordinates
 		Array<double>& xA = sliceA->data().arrayX();
 		Array<double>& yA = sliceA->data().arrayY();
@@ -330,7 +330,7 @@ void Viewer::createSurface(const List< Slice >& slices, ColourScale& colourScale
 
 	surfacePrimitive_.pushInstance(context());
 
-// 	msg.print("Surface contains %i vertices.\n", surfacePrimitive_.nDefinedVertices());
+	msg.print("Surface contains %i vertices.\n", surfacePrimitive_.nDefinedVertices());
 }
 
 // Clear specified axix primitive

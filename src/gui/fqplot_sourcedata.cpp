@@ -25,13 +25,28 @@
 // Select source directory
 void FQPlotWindow::on_SourceDirSelectButton_clicked(bool checked)
 {
-	QString dir = QFileDialog::getExistingDirectory(this, "TimeStamp Extraction", "Choose the directory containing the required files:");
+	QString dir = QFileDialog::getExistingDirectory(this, "Data Directory", "Choose the directory containing the required files:");
 	if (dir.isEmpty()) return;
 	ui.SourceDirEdit->setText(dir);
 	dataFileDirectory_ = dir;
 	
 	// Reload all data and update surface
-	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) slice->loadData(dataFileDirectory_);
+	QProgressDialog progress("Loading data...", "Abort", 0, slices_.nItems(), this);
+	progress.setWindowModality(Qt::WindowModal);
+	int count = 0;
+	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
+	{
+		slice->loadData(dataFileDirectory_);
+		progress.setValue(count);
+		if (progress.wasCanceled()) break;
+		++count;
+	}
+	progress.setValue(slices_.nItems());
+	
+	calculateDataLimits();
+	calculateTransformLimits();
+	showAllData();
+		
 	setAsModified();
 	updateSurface();
 }
@@ -41,9 +56,8 @@ void FQPlotWindow::on_AddFilesButton_clicked(bool checked)
 {
 	QStringList files = QFileDialog::getOpenFileNames(this, "Select datafiles", dataFileDirectory_.path(), "MINT files (*.mint01);;MDCS files (*.mdcs01);;Text files (*.txt);;All files (*)");
 
-	QProgressDialog progress("Loading Files...", "Abort Loading", 0, files.count(), this);
+	QProgressDialog progress("Loading data...", "Abort Loading", 0, files.count(), this);
 	progress.setWindowModality(Qt::WindowModal);
-
 	int count = 0;
 	foreach (QString fileName, files)
 	{

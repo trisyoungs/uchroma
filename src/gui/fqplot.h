@@ -350,10 +350,14 @@ class FQPlotWindow : public QMainWindow
 	bool saveData(QString fileName);
 	// Load slice
 	Slice* loadSlice(QString fileName);
+	// Return number of slices with no data present
+	int nEmptySlices();
 	// Recalculate data limits
 	void calculateDataLimits();
 	// Recalculate transform limits
 	void calculateTransformLimits();
+	// Set display limits to show all available data
+	void showAllData();
 	// Transform single value
 	double transformValue(double x, double preShift, double postShift, FQPlotWindow::DataTransform transformType, double transformValue);
 	// Flag data as modified, and update titlebar

@@ -87,7 +87,7 @@ bool Slice::loadData(QDir sourceDir)
 	// Check file exists
 	if (!QFile::exists(sourceDir.absoluteFilePath(fileName_)))
 	{
-		QMessageBox::warning(NULL, "File Not Found", QString("The file ") + fileName_ + " could not be found.");
+// 		QMessageBox::warning(NULL, "File Not Found", QString("The file ") + fileName_ + " could not be found.");
 		return false;
 	}
 
