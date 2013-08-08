@@ -70,7 +70,6 @@ class Viewer : public QGLWidget
 	FTFont* font_;
 	// Basic font height (from baseline to top of normal height letter)
 	double fontBaseHeight_;
-	GLuint textureID_[2];
 
 
 	protected:
@@ -148,8 +147,7 @@ class Viewer : public QGLWidget
 
 
 	/*
-	// Rendering Engine
-	// (in viewer_engine.cpp)
+	// Object Lists
 	*/
 	private:
 	// List of filtered solid primitives
@@ -170,40 +168,29 @@ class Viewer : public QGLWidget
 	*/ 
 	private:
 	// Flag specifying whether framebuffer should be used for offscreen rendering
-	static bool useFrameBuffer_;
-	// Flag specifying whether to use Qt text rendering over native OpenGL
-	static bool useNiceText_;
+	bool useFrameBuffer_;
 	// Flag specifying whether to correct transparency artefacts
 	bool correctTransparency_;
-	// Font size to use
-	int fontSize_;
 	// Flag specifying whether the view has perspective
 	bool hasPerspective_;
-
+	// Line width to use for line primitives
+	double lineWidth_;
+	
 	public:
-	// Set default values for all static preferences
-	void setDefaultPreferences(bool setStaticMembers);
 	// Set whether framebuffer should be used for offscreen rendering
-	static void setUseFrameBuffer(bool b);
+	void setUseFrameBuffer(bool b);
 	// Return whether framebuffer should be used for offscreen rendering
-	static bool useFrameBuffer();
-	// Set whether to use Qt text rendering over native OpenGL
-	static void setUseNiceText(bool b);
-	// Return whether to use Qt text rendering over native OpenGL
-	static bool useNiceText();
+	bool useFrameBuffer();
 	// Set whether to correct transparency artefacts
 	void setCorrectTransparency(bool b);
 	// Return whether to correct transparency artefacts
 	bool correctTransparency();
-	// Set font size to use
-	void setFontSize(int size);
-	// Return font size to use
-	int fontSize();
 	// Return whether the view has perspective
 	bool hasPerspective();
 	// Set whether this view has perspective
 	void setHasPerspective(bool b);
-
+	// Set line width to use for line primitives
+	void setLineWidth(double lineWidth);
 
 	/*
 	// User Functions / Data
@@ -213,7 +200,7 @@ class Viewer : public QGLWidget
 	// Reference list of all created primitives (to which all user primitives must be added)
 	RefList<Primitive,int> primitiveList_;
 	// Display primitives
-	Primitive surface_, axisPrimitives_[3], slicePrimitive_;
+	Primitive surfacePrimitive_, axisPrimitives_[3], slicePrimitive_, boundingBoxPrimitive_;
 	// Axis text primitives
 	TextPrimitiveList axisTextPrimitives_[3];
 	// Centrepoint of surface
@@ -230,6 +217,10 @@ class Viewer : public QGLWidget
 	Vec3<double> axisMin_, axisMax_;
 	// Axis extreme coordinates
 	Vec3<double> axisCoordMin_[3], axisCoordMax_[3];
+	// Whether axes are logarithmic
+	Vec3<bool> axisLogarithmic_;
+	// Whether axes are visible
+	Vec3<bool> axisVisible_;
 	// Current axis target for temporary slice selection
 	Vec3<bool> sliceSelector_;
 	// Current axis value for temporary slice selection
@@ -248,24 +239,38 @@ class Viewer : public QGLWidget
 	void constructSliceData(Slice* targetSlice, double yAxisScale, Array< Vec3< double > >& normals, Array< Vec4< GLfloat > >& colours, ColourScale& colourScale, Slice* previousSlice, Slice* nextSlice);
 	// Create surface primitive
 	void createSurface(const List<Slice>& slices, ColourScale& colourScale, double yAxisScale);
-	// Clear specified axix primitive
+	// Clear specified axis primitive
 	void clearAxisPrimitive(int axis);
 	// Create axis primitives
 	void createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted, double stretch);
 	// Create logarithmic axis primitives
 	void createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted, double stretch);
+	// Set whether axis is visible
+	void setAxisVisible(int axis, bool visible);
+	// Create bounding box
+	void createBoundingBox(int type, double planeY);
 	// Set surface centre
 	void setSurfaceCenter(Vec3<double> center);
 	// Set Y clip plane limits
 	void setYClip(double yMin, double yMax);
-	// Set axis extreme value limits and coordinates
-	void setAxisCoordinates(int axis, double axisMin, Vec3<double> minCoord, double axisMax, Vec3<double> maxCoord);
 	// Return number of triangles in surface
 	int surfaceNTriangles();
 	// Set scale factor for axis labels
 	void setLabelScale(double scale);
 	// Set scale factor for titles
 	void setTitleScale(double scale);
+
+
+	/*
+	 * Image Formats
+	 */
+	public:
+	// Available image export formats
+        enum ImageFormat { BMPFormat, PGFormat, PNGFormat, PPMFOrmat, XBMFormat, X11Format, nImageFormats };
+        static ImageFormat imageFormat(const char* name);
+        static ImageFormat imageFormatFromFilter(const char* s);
+        static const char *imageFormatFilter(ImageFormat bf);
+        static const char *imageFormatExtension(ImageFormat bf);
 };
 
 #endif

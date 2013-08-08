@@ -24,7 +24,7 @@
 #include "version.h"
 
 // Constructor
-FQPlotWindow::FQPlotWindow(QMainWindow *parent) : QMainWindow(parent)
+FQPlotWindow::FQPlotWindow(QMainWindow *parent) : QMainWindow(parent), saveImageDialog_(this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -101,7 +101,7 @@ void FQPlotWindow::on_actionFileSave_triggered(bool checked)
 	// Has an input filename already been chosen?
 	if (inputFile_.isEmpty())
 	{
-		inputFile_ = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "FQPlot files (*.fqp);;All files (*.*)");
+		
 		if (inputFile_.isEmpty()) return;
 	}
 
@@ -120,8 +120,32 @@ void FQPlotWindow::on_actionFileSaveAs_triggered(bool checked)
 	updateTitleBar();
 }
 
+void FQPlotWindow::on_actionFileSaveImage_triggered(bool checked)
+{
+	if (saveImageDialog_.getImageDetails(imageExportFile_, imageExportWidth_, imageExportHeight_, imageExportFormat_, imageExportMaintainAspect_, double(ui.MainView->width()) / double(ui.MainView->height())))
+	{
+		imageExportFile_ = saveImageDialog_.imageFileName();
+		imageExportFormat_ = saveImageDialog_.imageFormat();
+		imageExportHeight_ = saveImageDialog_.imageHeight();
+		imageExportWidth_ = saveImageDialog_.imageWidth();
+		imageExportMaintainAspect_ = saveImageDialog_.imageAspectRatioMaintained();
+		QPixmap pixmap = ui.MainView->generateImage(imageExportWidth_, imageExportHeight_);
+		pixmap.save(imageExportFile_, Viewer::imageFormatExtension(imageExportFormat_), -1);
+	}
+}
+
 void FQPlotWindow::on_actionFileQuit_triggered(bool checked)
 {
+	if (modified_)
+	{
+		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+		if (button == QMessageBox::Yes)
+		{
+			// Save file, and check modified_ status to make sure it wasn't cancelled.
+			on_actionFileSave_triggered(false);
+			if (modified_) return;
+		}
+	}
 	QApplication::exit(0);
 }
 

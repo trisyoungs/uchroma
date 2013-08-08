@@ -69,16 +69,16 @@ class ColourScaleDelta : public ListItem<ColourScaleDelta>
 	double delta_;
 	// Colour of this starting point
 	QColor startColour_;
-	// Delta betweeh the starting point and the final point
+	// Delta between the starting point and the final point
 	int deltaColour_[4];
 
 	public:
 	// Check whether the delta 'contains' the supplied value
 	bool containsValue(double d) const;
 	// Create delta from two existing colours
-	void set(ColourScalePoint* point1, ColourScalePoint* point2);
+	void set(ColourScalePoint* point1, ColourScalePoint* point2, bool useHSV);
 	// Get colour for value, assuming that v is within the range 0 -> value_
-	QColor colour(double v) const;
+	QColor colour(double v, bool useHSV) const;
 	// Return the starting value of the range
 	double start() const;
 	// Return the range of the delta
@@ -103,12 +103,18 @@ class ColourScale
 	private:
 	// Whether colours are interpolated between points in the scale
 	bool interpolated_;
+	// Whether interpolation should be performed with HSV instead of RGB
+	bool useHSV_;
 
 	public:
 	// Set whether the colourscale is interpolated
 	void setInterpolated(bool b);
 	// Return whether the colourscale is interpolated
 	bool interpolated() const;
+	// Set whether or not to use HSV interpolation
+	bool setUseHSV(bool b);
+	// Return whether or not to use HSV interpolation
+	bool useHSV() const;
 
 
 	/*
@@ -124,13 +130,13 @@ class ColourScale
 	// Return number of points in colourscale
 	int nPoints() const;
 	// Return first point in colourscale
-	ColourScalePoint* firstPoint();
+	ColourScalePoint* firstPoint() const;
 	// Return last point in colourscale
-	ColourScalePoint* lastPoint();
+	ColourScalePoint* lastPoint() const;
 	// Return specific point in colourscale
 	ColourScalePoint* point(int id);
 	// Return first delta in colourscale
-	ColourScaleDelta* firstDelta();
+	ColourScaleDelta* firstDelta() const;
 	// Clear all points in colourscale
 	void clear();
 	// Calculate colour deltas for current list of points
@@ -148,7 +154,7 @@ class ColourScale
 	// Remove specified point from colourscale
 	void removePoint(ColourScalePoint* point);
 	// Get colour associated with value supplied
-	QColor colour(double value);
+	QColor colour(double value) const;
 	// Set all alpha values to that specified
 	void setAllAlpha(int alpha);
 };

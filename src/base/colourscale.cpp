@@ -78,29 +78,45 @@ bool ColourScaleDelta::containsValue(double d) const
 }
 
 // Create delta from two existing colours
-void ColourScaleDelta::set(ColourScalePoint* point1, ColourScalePoint* point2)
+void ColourScaleDelta::set(ColourScalePoint* point1, ColourScalePoint* point2, bool useHSV)
 {
 	// Copy first colour point
 	start_ = point1->value_;
 	startColour_ = point1->colour();
-	deltaColour_[0] = point2->colour_.red() - startColour_.red();
-	deltaColour_[1] = point2->colour_.green() - startColour_.green();
-	deltaColour_[2] = point2->colour_.blue() - startColour_.blue();
+	if (useHSV)
+	{
+		deltaColour_[0] = point2->colour_.hue() - startColour_.hue();
+		deltaColour_[1] = point2->colour_.saturation() - startColour_.saturation();
+		deltaColour_[2] = point2->colour_.value() - startColour_.value();
+	}
+	else
+	{
+		deltaColour_[0] = point2->colour_.red() - startColour_.red();
+		deltaColour_[1] = point2->colour_.green() - startColour_.green();
+		deltaColour_[2] = point2->colour_.blue() - startColour_.blue();
+	}
 	deltaColour_[3] = point2->colour_.alpha() - startColour_.alpha();
 	delta_ = point2->value_ - start_;
 }
 
 // Get colour for value v
-QColor ColourScaleDelta::colour(double v) const
+QColor ColourScaleDelta::colour(double value, bool useHSV) const
 {
 	// Clamp 'v' to range 0.0 - 1.0 to span range of delta
-	double clampv = (v - start_) / delta_;
+	double clampv = (value - start_) / delta_;
 	if (clampv < 0.0) clampv = 0.0;
 	else if (clampv > 1.0) clampv = 1.0;
 	QColor col;
-	col.setRed(startColour_.red() + deltaColour_[0] * clampv);
-	col.setGreen(startColour_.green() + deltaColour_[1] * clampv);
-	col.setBlue(startColour_.blue() + deltaColour_[2]* clampv);
+	if (useHSV)
+	{
+		col.setHsv(startColour_.hue() + deltaColour_[0] * clampv, startColour_.saturation() + deltaColour_[1] * clampv, startColour_.value() + deltaColour_[2] * clampv);
+	}
+	else
+	{
+		col.setRed(startColour_.red() + deltaColour_[0] * clampv);
+		col.setGreen(startColour_.green() + deltaColour_[1] * clampv);
+		col.setBlue(startColour_.blue() + deltaColour_[2]* clampv);
+	}
 	col.setAlpha(startColour_.alpha() + deltaColour_[3] * clampv);
 	return col;
 }
@@ -126,6 +142,7 @@ ColourScale::ColourScale()
 {
 	// Private variables
 	interpolated_ = true;
+	useHSV_ = false;
 }
 
 // Copy Constructor
@@ -138,6 +155,7 @@ ColourScale::ColourScale(const ColourScale& source)
 void ColourScale::operator=(const ColourScale& source)
 {
 	clear();
+	useHSV_ = source.useHSV_;
 	for (ColourScalePoint* csp = source.points_.first(); csp != NULL; csp = csp->next) addPoint( csp->value(), csp->colour() );
 	interpolated_ = source.interpolated_;
 }
@@ -154,6 +172,19 @@ bool ColourScale::interpolated() const
 	return interpolated_;
 }
 
+// Set whether or not to use HSV interpolation
+bool ColourScale::setUseHSV(bool b)
+{
+	useHSV_ = b;
+	calculateDeltas();
+}
+
+// Return whether or not to use HSV interpolation
+bool ColourScale::useHSV() const
+{
+	return useHSV_;
+}
+
 // Recalculate colour deltas between points
 void ColourScale::calculateDeltas()
 {
@@ -163,7 +194,7 @@ void ColourScale::calculateDeltas()
 	for (ColourScalePoint *csp = points_.first(); csp != points_.last(); csp = csp->next)
 	{
 		delta = deltas_.add();
-		delta->set(csp, csp->next);
+		delta->set(csp, csp->next, useHSV_);
 	}
 }
 
@@ -274,7 +305,7 @@ void ColourScale::removePoint(ColourScalePoint* point)
 }
 
 // Return colour associated with value provided
-QColor ColourScale::colour(double value)
+QColor ColourScale::colour(double value) const
 {
 	// Step through points associated to scale and find the two that we are inbetween.
 	// Check for no points being defined
@@ -287,7 +318,7 @@ QColor ColourScale::colour(double value)
 	// Find the correct delta to use
 	for (ColourScaleDelta *delta = deltas_.first(); delta != NULL; delta = delta->next)
 	{
-		if (delta->containsValue(value)) return delta->colour(interpolated_ ? value : delta->start());
+		if (delta->containsValue(value)) return delta->colour(interpolated_ ? value : delta->start(), useHSV_);
 	}
 
 	// If we get to here then the supplied value is outside the range of all values, so take colour from the endpoint
@@ -301,13 +332,13 @@ int ColourScale::nPoints() const
 }
 
 // Return first point in colourscale
-ColourScalePoint *ColourScale::firstPoint()
+ColourScalePoint *ColourScale::firstPoint() const
 {
 	return points_.first();
 }
 
 // Return last point in colourscale
-ColourScalePoint *ColourScale::lastPoint()
+ColourScalePoint *ColourScale::lastPoint() const
 {
 	return points_.last();
 }
@@ -319,7 +350,7 @@ ColourScalePoint *ColourScale::point(int id)
 }
 
 // Return first delta in colourscale
-ColourScaleDelta *ColourScale::firstDelta()
+ColourScaleDelta *ColourScale::firstDelta() const
 {
 	return deltas_.first();
 }
@@ -328,6 +359,7 @@ ColourScaleDelta *ColourScale::firstDelta()
 void ColourScale::clear()
 {
 	points_.clear();
+	deltas_.clear();
 }
 
 // Set all alpha values to that specified

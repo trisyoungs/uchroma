@@ -29,12 +29,45 @@
 // Constructor
 GradientBar::GradientBar(QWidget* parent) : QWidget(parent)
 {
+	// Private variables
+
 }
 
 // Set local colourscale
-void GradientBar::setColourScale(ColourScale& colourScale)
+void GradientBar::setColourScale(const ColourScale& colourScale)
 {
-	colourScale_ = colourScale;
+	// If the source colourscale uses deltaHSV_, we must construct an interpolated gradient manually since QGradient doesn't support HSV interpolation
+	if (colourScale.useHSV())
+	{
+		colourScale_.clear();
+		colourScale_.setUseHSV(false);
+		if (colourScale.nPoints() > 1)
+		{
+			const int nPoints = 101;
+			double value = colourScale.firstPoint()->value();
+			double delta = (colourScale.lastPoint()->value() - value) / nPoints;
+			for (int n=0; n<nPoints; ++n)
+			{
+				colourScale_.addPoint(value, colourScale.colour(value));
+				value += delta;
+			}
+		}
+	}
+	else colourScale_ = colourScale;
+	
+	// Setup QGradient - in ObjectBoundingMode, 0.0 = top of rectangle, and 1.0 is bottom
+	gradient_ = QLinearGradient(0.0, 1.0, 0.0, 0.0);
+	gradient_.setCoordinateMode(QGradient::ObjectBoundingMode);
+
+	double zero = colourScale_.firstPoint()->value();
+	double span = colourScale_.lastPoint()->value() - zero;
+
+	// -- Loop backwards through points
+	for (ColourScalePoint* csp = colourScale_.firstPoint(); csp != NULL; csp = csp->next)
+	{
+		gradient_.setColorAt((csp->value() - zero) / span, csp->colour());
+	}
+	
 	repaint();
 }
 
@@ -44,23 +77,13 @@ void GradientBar::paintEvent(QPaintEvent *event)
 	if (colourScale_.nPoints() == 0) return;
 
 	QPainter painter(this);
-
-	// Setup gradient - in ObjectBoundingMode, 0.0 = top of rectangle, and 1.0 is bottom
-	QLinearGradient gradient(0.0, 1.0, 0.0, 0.0);
-	gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-	double zero = colourScale_.firstPoint()->value();
-	double span = colourScale_.lastPoint()->value() - zero;
-
-	// -- Loop backwards through points
-	for (ColourScalePoint* csp = colourScale_.firstPoint(); csp != NULL; csp = csp->next)
-	{
-		gradient.setColorAt((csp->value() - zero) / span, csp->colour());
-	}
 	
 	// Draw single rectangle and we're done
-	QBrush brush(gradient);
+	QBrush brush(gradient_);
+	QPen pen(Qt::NoPen);
 	QRectF rect(0.0, 0.0, width()-1.0, height()-1.0);
 	painter.setBrush(brush);
+	painter.setPen(pen);
 	painter.drawRect(rect);
 	painter.end();
 }

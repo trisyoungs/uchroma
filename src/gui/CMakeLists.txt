@@ -18,6 +18,7 @@ fqplot_colour.cpp
 fqplot_sourcedata.cpp
 fqplot_transform.cpp
 fqplot_view.cpp
+saveimagedialog_funcs.cpp
 colourbutton_funcs.cpp
 gradientbar_funcs.cpp
 plotwidget_data.cpp
@@ -42,6 +43,7 @@ viewer_vertexchunk.h
 
 SET(pro_MOC_HDRS
   fqplot.h
+  saveimagedialog.h
   colourbutton.uih
   gradientbar.uih
   plotwidget.uih
@@ -50,6 +52,7 @@ SET(pro_MOC_HDRS
 QT4_WRAP_CPP(pro_MOC_SRCS ${pro_MOC_HDRS} OPTIONS -f)
 
 SET(pro_UIS
+  saveimagedialog.ui
   fqplot.ui
 )
 QT4_WRAP_UI(pro_UIS_H ${pro_UIS})

@@ -493,7 +493,56 @@ void FQPlotWindow::on_ViewZAxisRotationSpin_valueChanged(int value)
 	viewAxisRotationChanged(2, value);
 }
 
-// Update View tab
+/*
+ * Extras Tab
+ */
+
+void FQPlotWindow::on_ViewBoundingBoxNoneRadio_clicked(bool checked)
+{
+	if (refreshing_) return;
+	boundingBox_ = FQPlotWindow::NoBox;
+	updateSurface(false);
+}
+
+void FQPlotWindow::on_ViewBoundingBoxPlaneRadio_clicked(bool checked)
+{
+	if (refreshing_) return;
+	boundingBox_ = FQPlotWindow::PlaneBox;
+	updateSurface(false);
+}
+
+void FQPlotWindow::on_ViewBoundingBoxCubeRadio_clicked(bool checked)
+{
+	if (refreshing_) return;
+	boundingBox_ = FQPlotWindow::CubeBox;
+	updateSurface(false);
+}
+
+void FQPlotWindow::on_ViewBoundingBoxPlaneYSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	boundingBoxPlaneY_ = value;
+	updateSurface(false);
+}
+
+void FQPlotWindow::on_ViewBoundingBoxPlaneYSetMinimumButton_clicked(bool checked)
+{
+	ui.ViewBoundingBoxPlaneYSpin->setValue(limitMin_.y);
+}
+
+void FQPlotWindow::on_ViewBoundingBoxPlaneYSetZeroButton_clicked(bool checked)
+{
+	ui.ViewBoundingBoxPlaneYSpin->setValue(0.0);
+}
+
+void FQPlotWindow::on_ViewBoundingBoxPlaneYSetMaximumButton_clicked(bool checked)
+{
+	ui.ViewBoundingBoxPlaneYSpin->setValue(limitMax_.y);
+}
+
+/*
+ * Update
+ */
 void FQPlotWindow::updateViewTab()
 {
 	refreshing_ = true;

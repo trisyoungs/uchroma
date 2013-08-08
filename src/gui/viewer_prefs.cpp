@@ -21,22 +21,6 @@
 
 #include "gui/viewer.uih"
 
-// Static member variables
-bool Viewer::useFrameBuffer_;
-bool Viewer::useNiceText_;
-
-// Set default values for all preferences
-void Viewer::setDefaultPreferences(bool setStaticMembers)
-{
-	correctTransparency_ = true;
-	fontSize_ = 10;
-	if (setStaticMembers)
-	{
-		Viewer::useFrameBuffer_ = true;
-		Viewer::useNiceText_ = true;
-	}
-}
-
 // Set whether framebuffer should be used for offscreen rendering
 void Viewer::setUseFrameBuffer(bool b)
 {
@@ -47,18 +31,6 @@ void Viewer::setUseFrameBuffer(bool b)
 bool Viewer::useFrameBuffer()
 {
 	return useFrameBuffer_;
-}
-
-// Set whether to use Qt text rendering over native OpenGL
-void Viewer::setUseNiceText(bool b)
-{
-	useNiceText_ = b;
-}
-
-// Return whether to use Qt text rendering over native OpenGL
-bool Viewer::useNiceText()
-{
-	return useNiceText_;
 }
 
 // Set whether to correct transparency artefacts
@@ -73,18 +45,6 @@ bool Viewer::correctTransparency()
 	return correctTransparency_;
 }
 
-// Set font size to use
-void Viewer::setFontSize(int size)
-{
-	fontSize_ = size;
-}
-
-// Return font size to use
-int Viewer::fontSize()
-{
-	return fontSize_;
-}
-
 // Return whether the view has perspective
 bool Viewer::hasPerspective()
 {
@@ -96,4 +56,10 @@ void Viewer::setHasPerspective(bool b)
 {
 	hasPerspective_ = b;
 	setProjectionMatrix();
+}
+
+// Set line width to use
+void Viewer::setLineWidth(double lineWidth)
+{
+	lineWidth_ = lineWidth;
 }

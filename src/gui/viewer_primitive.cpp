@@ -333,7 +333,10 @@ void Primitive::sendToGL()
 		else if (pi->type() == PrimitiveInstance::VBOInstance)
 		{
 			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_NORMAL_ARRAY);
+			glEnableClientState(GL_COLOR_ARRAY);
 			glDisableClientState(GL_INDEX_ARRAY);
+
 			// Bind VBO
 			glBindBuffer(GL_ARRAY_BUFFER, pi->id());
 

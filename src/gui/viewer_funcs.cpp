@@ -22,27 +22,41 @@
 #include "gui/viewer.uih"
 #include "base/messenger.h"
 
-// Static instance counter
-int nViewerInstances = 0;
-static float textures[][48] =
+/*
+ * Image Formats
+ */
+
+// Available image export formats
+const char *imageFormatFilters[Viewer::nImageFormats] = { "Windows Image (*.bmp)", "Joint Photographic Experts Group (*.jpg)", "Portable Network Graphics (*.png)", "Portable Pixmap (*.ppm)", "X11 Bitmap (*.xbm)", "X11 Pixmap (*.xpm)" };
+const char *imageFormatExtensions[Viewer::nImageFormats] = { "bmp", "jpg", "png", "ppm", "xbm", "xpm" };
+Viewer::ImageFormat Viewer::imageFormat(const char *s)
 {
-    {
-        1.0, 1.0, 1.0, 0.7, 0.7, 0.7, 1.0, 1.0, 1.0, 0.7, 0.7, 0.7,
-        0.7, 0.7, 0.7, 0.4, 0.4, 0.4, 0.7, 0.7, 0.7, 0.4, 0.4, 0.4,
-        1.0, 1.0, 1.0, 0.7, 0.7, 0.7, 1.0, 1.0, 1.0, 0.7, 0.7, 0.7,
-        0.7, 0.7, 0.7, 0.4, 0.4, 0.4, 0.7, 0.7, 0.7, 0.4, 0.4, 0.4,
-    },
-    {
-        0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
-        0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
-        0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
-        0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
-    }
-};
+	for (int n=0; n<Viewer::nImageFormats; ++n) if (strcmp(s, imageFormatExtensions[n]) == 0) return (Viewer::ImageFormat) n;
+	return Viewer::nImageFormats;
+}
+Viewer::ImageFormat Viewer::imageFormatFromFilter(const char *s)
+{
+	for (int n=0; n<Viewer::nImageFormats; ++n) if (strcmp(s, imageFormatFilters[n]) == 0) return (Viewer::ImageFormat) n;
+	return Viewer::nImageFormats;
+}
+const char *Viewer::imageFormatFilter(Viewer::ImageFormat bf)
+{
+        return imageFormatFilters[bf];
+}
+const char *Viewer::imageFormatExtension(Viewer::ImageFormat bf)
+{
+        return imageFormatExtensions[bf];
+}
 
 // Constructor
 Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 {
+	// Setup context format
+	QGLFormat format;
+	format.setSampleBuffers(true);
+	format.setDirectRendering(true);
+	setFormat(format);
+
 	// Character / Setup
 	contextWidth_ = 0;
 	contextHeight_ = 0;
@@ -53,9 +67,6 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	sliceSelector_.set(false, false, false);
 	sliceAxisValue_ = 0.0;
 
-	// Preferences (set static members only on first instance creation)
-	setDefaultPreferences(nViewerInstances == 0);
-	
 	// Engine Setup
 	triangleChopper_.initialise(0.0, 1000, 0.2);
 	createPrimitives();
@@ -73,11 +84,12 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	clipPlaneTop_[3] = 0.0;
 	clipPlaneYMin_ = 0.0;
 	clipPlaneYMax_ = 0.0;
+	correctTransparency_ = true;
+	useFrameBuffer_ = false;
+	lineWidth_ = 2.0;
 
 	// Prevent QPainter from autofilling widget background
 	setAutoFillBackground(false);
-	
-	++nViewerInstances;
 }
 
 // Destructor
@@ -147,15 +159,33 @@ void Viewer::paintGL()
 	A.setTranslation(-surfaceCenter_.x, -surfaceCenter_.y, -surfaceCenter_.z);
 	A = viewMatrix_ * A;
 	
-	// Send text primitives to the display first
-	font_->FaceSize(1);
+	// Send axis primitives to the display first
+	glLoadMatrixd(A.matrix());
+	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_BLEND);
+	glColor4fv(colourBlack);
+	// -- Render axis text
 	if (font_)
 	{
+		font_->FaceSize(1);
 		textPrimitives_.renderAll(viewMatrix_, -surfaceCenter_, font_);
 		axisTextPrimitives_[0].renderAll(viewMatrix_, -surfaceCenter_, font_);
 		axisTextPrimitives_[1].renderAll(viewMatrix_, -surfaceCenter_, font_);
 		axisTextPrimitives_[2].renderAll(viewMatrix_, -surfaceCenter_, font_);
 	}
+
+	// -- Render axis lines
+	glEnable(GL_LINE_SMOOTH);
+	glLoadMatrixd(A.matrix());
+	glLineWidth(lineWidth_);
+	printf("Line width = %f\n", lineWidth_);
+	glDisable(GL_LIGHTING);
+	for (int axis=0; axis<3; ++axis) if (axisVisible_[axis]) axisPrimitives_[axis].sendToGL();
+	glEnable(GL_LIGHTING);
+	glDisable(GL_LINE_SMOOTH);
+
+	// Render bounding box
+	boundingBoxPrimitive_.sendToGL();
 
 	// Render locator slices
 	glLoadMatrixd(A.matrix());
@@ -188,7 +218,6 @@ void Viewer::paintGL()
 	// Render main surface
 	// -- Setup clip planes to enforce Y-axis limits
 	glLoadMatrixd(A.matrix());
-	glEnable(GL_MULTISAMPLE);
 	glPushMatrix();
 	glTranslated(0.0, clipPlaneYMin_, 0.0);
 	glClipPlane (GL_CLIP_PLANE0, clipPlaneBottom_);
@@ -208,20 +237,11 @@ void Viewer::paintGL()
 // 	triangleChopper_.sendToGL();
 // 	glPopClientAttrib();
 
-	surface_.sendToGL();
+	surfacePrimitive_.sendToGL();
 	
 	glDisable(GL_MULTISAMPLE);
 	glDisable(GL_CLIP_PLANE0);
 	glDisable(GL_CLIP_PLANE1);
-
-	// Render axes
-	glLoadMatrixd(A.matrix());
-	glEnable(GL_LINE_SMOOTH);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glLineWidth(2.0);
-	glDisable(GL_LIGHTING);
-	glColor4fv(colourBlack);
-	for (int axis=0; axis<3; ++axis) axisPrimitives_[axis].sendToGL();
 
 	// Send all other listed primitives to the display
 // 	sortAndSendGL();
@@ -284,33 +304,21 @@ bool Viewer::setupFont(const char* fontName)
 	
 	if (font_) delete font_;
 	FTPolygonFont* newFont = new FTPolygonFont("wright.ttf");
-// 	FTPixmapFont* newFont = new FTPixmapFont("wright.ttf");
 	if (newFont->Error())
 	{
-		printf("Oh dear, an error occurred while trying to load the specified font.\n");
+		msg.print("Oh dear, an error occurred while trying to load the specified font.\n");
 		font_ = NULL;
 		fontBaseHeight_ = 1.0;
 	}
 	else
 	{
-		glGenTextures(2, textureID_);
-
-		for(int i = 0; i < 2; i++)
-		{
-			glBindTexture(GL_TEXTURE_2D, textureID_[i]);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_FLOAT, textures[i]);
-		}
 		font_ = newFont;
+// 		font_->Depth(3.0);
+// 		font_->Outset(-.5, 1.5);
 		font_->FaceSize(1);
 		FTBBox boundingBox = font_->BBox("Hello");
 		fontBaseHeight_ = boundingBox.Upper().Yf() - boundingBox.Lower().Yf();
-// 		newFont->Depth(3.0);
-// 		        fonts[x]->Depth(3.);
-// 		newFont->Outset(-.5, 1.5);
+
 	}
 
 	drawing_ = false;
@@ -440,9 +448,20 @@ Matrix Viewer::viewMatrix()
 // Render or grab image
 QPixmap Viewer::generateImage(int w, int h)
 {
-	renderingOffscreen_ = TRUE;
-	if (useFrameBuffer_ == false)
+	renderingOffscreen_ = true;
+	if (useFrameBuffer_)
 	{
+		postRedisplay();
+		QImage image = grabFrameBuffer();
+
+		renderingOffscreen_ = false;
+		return QPixmap::fromImage(image);
+	}
+	else
+	{
+		// Scale current line width to reflect size of exported image
+		double oldLineWidth = lineWidth_;
+		lineWidth_ *= double(w) / width();
 
 		// Generate offscreen bitmap (a temporary context will be created)
 		QPixmap pixmap = renderPixmap(w, h, false);
@@ -451,16 +470,11 @@ QPixmap Viewer::generateImage(int w, int h)
 		contextWidth_ = (GLsizei) width();
 		contextHeight_ = (GLsizei) height();
 
+		// Reset everything back to normal
+		lineWidth_ = oldLineWidth;
 		renderingOffscreen_ = false;
-		return pixmap;
-	}
-	else
-	{
-		postRedisplay();
-		QImage image = grabFrameBuffer();
 
-		renderingOffscreen_ = false;
-		return QPixmap::fromImage(image);
+		return pixmap;
 	}
 }
 

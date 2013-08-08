@@ -20,7 +20,6 @@
 */
 
 #include "gui/viewer.uih"
-// #include "gui/colourscale.uih"
 #include "gui/fqplot.h"
 
 // Calculate axis slice selection for given axis at current mouse position
@@ -60,8 +59,10 @@ void Viewer::calculateMouseAxisValues()
 void Viewer::createPrimitives()
 {
 	// Setup surface primitive
-	surface_.setColourData(true);
+	surfacePrimitive_.setColourData(true);
 	slicePrimitive_.setNoInstances();
+	boundingBoxPrimitive_.setNoInstances();
+	boundingBoxPrimitive_.setType(GL_LINES);
 	for (int n=0; n<3; ++n)
 	{
 		axisPrimitives_[n].setType(GL_LINES);
@@ -69,7 +70,7 @@ void Viewer::createPrimitives()
 	}
 
 	// Every primitive using instances must be added to the primitiveList_
-	primitiveList_.add(&surface_);
+	primitiveList_.add(&surfacePrimitive_);
 }
 
 // Setup basic GL properties (called each time before renderScene())
@@ -98,7 +99,7 @@ void Viewer::setupGL()
 	glShadeModel(GL_SMOOTH);
 
 	// Auto-normalise surface normals
-	glEnable(GL_NORMALIZE);
+	glEnable(GL_NORMALIZE);	
 
 	// Set up the light model
 	glMatrixMode(GL_MODELVIEW);
@@ -278,8 +279,8 @@ void Viewer::createSurface(const List< Slice >& slices, ColourScale& colourScale
 {
 	GLfloat zA, zB;
 	
-	surface_.popInstance(context());
-	surface_.forgetAll();
+	surfacePrimitive_.popInstance(context());
+	surfacePrimitive_.forgetAll();
 
 	// Sanity check - are there enough slices to proceed?
 	if (slices.nItems() < 2) return;
@@ -313,12 +314,12 @@ void Viewer::createSurface(const List< Slice >& slices, ColourScale& colourScale
 		for (int n=0; n<nPoints-1; ++n)
 		{
 			// Add triangles for this quadrant
-			surface_.defineVertex(xA[n], yA[n], zA, normA[n], colourA[n], true);
-			surface_.defineVertex(xA[n+1], yA[n+1], zA, normA[n+1], colourA[n+1], true);
-			surface_.defineVertex(xB[n+1], yB[n+1], zB, normB[n+1], colourB[n+1], true);
-			surface_.defineVertex(xA[n], yA[n], zA, normA[n], colourA[n], true);
-			surface_.defineVertex(xB[n], yB[n], zB, normB[n], colourB[n], true);
-			surface_.defineVertex(xB[n+1], yB[n+1], zB, normB[n+1], colourB[n+1], true);
+			surfacePrimitive_.defineVertex(xA[n], yA[n], zA, normA[n], colourA[n], true);
+			surfacePrimitive_.defineVertex(xA[n+1], yA[n+1], zA, normA[n+1], colourA[n+1], true);
+			surfacePrimitive_.defineVertex(xB[n+1], yB[n+1], zB, normB[n+1], colourB[n+1], true);
+			surfacePrimitive_.defineVertex(xA[n], yA[n], zA, normA[n], colourA[n], true);
+			surfacePrimitive_.defineVertex(xB[n], yB[n], zB, normB[n], colourB[n], true);
+			surfacePrimitive_.defineVertex(xB[n+1], yB[n+1], zB, normB[n+1], colourB[n+1], true);
 		}
 
 		// Copy arrays ready for next pass
@@ -327,9 +328,9 @@ void Viewer::createSurface(const List< Slice >& slices, ColourScale& colourScale
 		sliceA = sliceB;
 	}
 
-	surface_.pushInstance(context());
+	surfacePrimitive_.pushInstance(context());
 
-// 	msg.print("Surface contains %i vertices.\n", surface_.nDefinedVertices());
+// 	msg.print("Surface contains %i vertices.\n", surfacePrimitive_.nDefinedVertices());
 }
 
 // Clear specified axix primitive
@@ -345,28 +346,26 @@ void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, dou
 	// Clear old primitive data
 	clearAxisPrimitive(axis);
 
-	Vec3<double> u, v;
-	double range = axisMax - axisMin;
 	QString s;
 	FTBBox boundingBox;
 
-	// Draw a line from min to max range, passing through the defined axisPosition
-	u = axisPosition;
-	u.set(axis, axisMin * stretch);
-	v = axisPosition;
-	v.set(axis, axisMax * stretch);
-	axisPrimitives_[axis].plotLine(u, v);
-
 	// Store min/max values and coordinates
+	axisLogarithmic_[axis] = false;
 	axisMin_[axis] = axisMin;
 	axisMax_[axis] = axisMax;
-	axisCoordMin_[axis] = u;
-	axisCoordMax_[axis] = v;
+	axisCoordMin_[axis] = axisPosition;
+	axisCoordMin_[axis].set(axis, (inverted ? axisMax : axisMin) * stretch);
+	axisCoordMax_[axis] = axisPosition;
+	axisCoordMax_[axis].set(axis, (inverted ? axisMin : axisMax) * stretch);
+	
+	// Draw a line from min to max limits, passing through the defined axisPosition
+	axisPrimitives_[axis].plotLine(axisCoordMin_[axis], axisCoordMax_[axis]);
 
 	// Plot tickmarks
 	int count = 0;
 	double delta = tickDelta / (nMinorTicks+1);
 	double value = firstTick * stretch;
+	Vec3<double> u = axisCoordMin_[axis];
 	u.set(axis, (inverted ? (axisMax - firstTick) + axisMin : firstTick) * stretch);
 	while (count < 50)
 	{
@@ -382,7 +381,7 @@ void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, dou
 				
 				// Determine resulting text primitive width (so we can do label rotations)
 				s = QString::number(value);
-				boundingBox = font_->BBox(qPrintable(s));
+				if (font_) boundingBox = font_->BBox(qPrintable(s));
 
 				axisTextPrimitives_[axis].add(s, labelScale_, fontBaseHeight_, fabs(boundingBox.Upper().X() - boundingBox.Lower().X()), u + direction*0.1, direction, up, zrotation);
 			}
@@ -407,34 +406,28 @@ void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, 
 		return;
 	}
 
-	double axisMinValue = log10(axisMin);
-	double axisMaxValue = log10(axisMax);
-	double viewAxisMin = inverted ? log10(axisMax/axisMin) : log10(axisMin);
-	double viewAxisMax = inverted ? 0.0 : log10(axisMax);
-
-	Vec3<double> u, v;
+	// Store min/max values and coordinates
+	axisLogarithmic_[axis] = true;
+	axisMin_[axis] = log10(axisMin);
+	axisMax_[axis] = log10(axisMax);
+	axisCoordMin_[axis] = axisPosition;
+	axisCoordMin_[axis].set(axis, (inverted ? log10(axisMax/axisMin) : log10(axisMin)) * stretch);
+	axisCoordMax_[axis] = axisPosition;
+	axisCoordMax_[axis].set(axis, (inverted ? 0.0 : log10(axisMax)) * stretch);
+	
 	QString s;
 	FTBBox boundingBox;
 
 	// Draw a line from min to max range, passing through the defined axisPosition
-	u = axisPosition;
-	u.set(axis, viewAxisMin * stretch);
-	v = axisPosition;
-	v.set(axis, viewAxisMax * stretch);
-	axisPrimitives_[axis].plotLine(u, v);
-
-	// Store min/max values and coordinates
-	axisMin_[axis] = axisMin;
-	axisMax_[axis] = axisMax;
-	axisCoordMin_[axis] = u;
-	axisCoordMax_[axis] = v;
+	axisPrimitives_[axis].plotLine(axisCoordMin_[axis], axisCoordMax_[axis]);
 
 	// Plot tickmarks
 	if (nMinorTicks > 8) nMinorTicks = 8;
 	// Start at floored (ceiling'd) integer of logAxisMin (logAxisMax), and go from there.
 	int count = 0;
-	double power = floor(axisMinValue);
+	double power = floor(axisMin_[axis]);
 	double value = pow(10,power);
+	Vec3<double> u = axisCoordMin_[axis];
 	while (true)
 	{
 		// Check break condition
@@ -452,7 +445,7 @@ void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, 
 			{
 				// Determine resulting text primitive width (so we can do label rotations
 				s = QString::number(value);
-				boundingBox = font_->BBox(qPrintable(s));
+				if (font_) boundingBox = font_->BBox(qPrintable(s));
 
 				axisTextPrimitives_[axis].add(s, labelScale_, fontBaseHeight_, fabs(boundingBox.Upper().X() - boundingBox.Lower().X()), u + direction*0.1, direction, up, zrotation);
 			}
@@ -467,6 +460,28 @@ void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, 
 			value = pow(10,power);
 		}
 		else value += pow(10,power);
+	}
+}
+
+// Set whether axis is visible
+void Viewer::setAxisVisible(int axis, bool visible)
+{
+	axisVisible_[axis] = visible;
+}
+
+// Create bounding box
+void Viewer::createBoundingBox(int type, double planeY)
+{
+	boundingBoxPrimitive_.forgetAll();
+	
+	if (type == 0) return;
+	else if (type == 1)
+	{
+		// Plane in XZ, spanning data range
+		boundingBoxPrimitive_.plotLine(Vec3<double>(axisCoordMin_[0].x, planeY, axisCoordMin_[2].z), Vec3<double>(axisCoordMin_[0].x, planeY, axisCoordMax_[2].z));
+		boundingBoxPrimitive_.plotLine(Vec3<double>(axisCoordMin_[0].x, planeY, axisCoordMax_[2].z), Vec3<double>(axisCoordMax_[0].x, planeY, axisCoordMax_[2].z));
+		boundingBoxPrimitive_.plotLine(Vec3<double>(axisCoordMax_[0].x, planeY, axisCoordMax_[2].z), Vec3<double>(axisCoordMax_[0].x, planeY, axisCoordMin_[2].z));
+		boundingBoxPrimitive_.plotLine(Vec3<double>(axisCoordMax_[0].x, planeY, axisCoordMin_[2].z), Vec3<double>(axisCoordMin_[0].x, planeY, axisCoordMin_[2].z));
 	}
 }
 
@@ -486,7 +501,7 @@ void Viewer::setYClip(double yMin, double yMax)
 // Return number of triangles in surface
 int Viewer::surfaceNTriangles()
 {
-	return surface_.nDefinedVertices() / 3;
+	return surfacePrimitive_.nDefinedVertices() / 3;
 }
 
 // Set scale factor for axis labels

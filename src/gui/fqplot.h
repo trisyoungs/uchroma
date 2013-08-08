@@ -23,6 +23,7 @@
 #define FQPLOT_MAINWINDOW_H
 
 #include "gui/ui_fqplot.h"
+#include "gui/saveimagedialog.h"
 #include "base/slice.h"
 
 // Forward Declarations
@@ -40,6 +41,8 @@ class FQPlotWindow : public QMainWindow
 	private:
 	// Whether the window is refreshing / updating its controls
 	bool refreshing_;
+	// Save Image Dialog
+	SaveImageDialog saveImageDialog_;
 
 	public:
 	// Constructor / Destructor
@@ -53,7 +56,7 @@ class FQPlotWindow : public QMainWindow
 	protected:
 	// Window close event
 	void closeEvent(QCloseEvent *event);
-	
+
 	public:
 	// Update all tabs
 	void updateAllTabs();
@@ -68,6 +71,7 @@ class FQPlotWindow : public QMainWindow
 	void on_actionFileLoad_triggered(bool checked);
 	void on_actionFileSave_triggered(bool checked);
 	void on_actionFileSaveAs_triggered(bool checked);
+	void on_actionFileSaveImage_triggered(bool checked);
 	void on_actionFileQuit_triggered(bool checked);
 
 
@@ -150,20 +154,34 @@ class FQPlotWindow : public QMainWindow
 	/*
 	 * Tabs -- Colour
 	 */
+	private:
+	// Update Gradient Bar
+	void updateGradientBar();
+
 	private slots:
 	// -- Single Colour
 	void on_ColourSingleColourRadio_clicked(bool checked);
 	void on_ColourSingleColourButton_clicked(bool checked);
-	// -- Linear Gradient
-	void on_ColourLinearGradientRadio_clicked(bool checked);
-	void on_ColourLinearGradientAButton_clicked(bool checked);
-	void on_ColourLinearGradientASpin_valueChanged(double value);
-	void on_ColourLinearGradientASetMinimumButton_clicked(bool checked);
-	void on_ColourLinearGradientASetMaximumButton_clicked(bool checked);
-	void on_ColourLinearGradientBButton_clicked(bool checked);
-	void on_ColourLinearGradientBSpin_valueChanged(double value);
-	void on_ColourLinearGradientBSetMinimumButton_clicked(bool checked);
-	void on_ColourLinearGradientBSetMaximumButton_clicked(bool checked);
+	// -- RGB Gradient
+	void on_ColourRGBGradientRadio_clicked(bool checked);
+	void on_ColourRGBGradientAButton_clicked(bool checked);
+	void on_ColourRGBGradientASpin_valueChanged(double value);
+	void on_ColourRGBGradientASetMinimumButton_clicked(bool checked);
+	void on_ColourRGBGradientASetMaximumButton_clicked(bool checked);
+	void on_ColourRGBGradientBButton_clicked(bool checked);
+	void on_ColourRGBGradientBSpin_valueChanged(double value);
+	void on_ColourRGBGradientBSetMinimumButton_clicked(bool checked);
+	void on_ColourRGBGradientBSetMaximumButton_clicked(bool checked);
+	// -- HSV Gradient
+	void on_ColourHSVGradientRadio_clicked(bool checked);
+	void on_ColourHSVGradientAButton_clicked(bool checked);
+	void on_ColourHSVGradientASpin_valueChanged(double value);
+	void on_ColourHSVGradientASetMinimumButton_clicked(bool checked);
+	void on_ColourHSVGradientASetMaximumButton_clicked(bool checked);
+	void on_ColourHSVGradientBButton_clicked(bool checked);
+	void on_ColourHSVGradientBSpin_valueChanged(double value);
+	void on_ColourHSVGradientBSetMinimumButton_clicked(bool checked);
+	void on_ColourHSVGradientBSetMaximumButton_clicked(bool checked);
 	// -- Custom Gradient
 	void on_ColourCustomGradientRadio_clicked(bool checked);
 	void on_ColourCustomGradientTable_itemSelectionChanged();
@@ -271,6 +289,14 @@ class FQPlotWindow : public QMainWindow
 	void on_ViewZAxisUpYSpin_valueChanged(double value);
 	void on_ViewZAxisUpZSpin_valueChanged(double value);
 	void on_ViewZAxisRotationSpin_valueChanged(int value);
+	// -- Extras Tab
+	void on_ViewBoundingBoxNoneRadio_clicked(bool checked);
+	void on_ViewBoundingBoxPlaneRadio_clicked(bool checked);
+	void on_ViewBoundingBoxCubeRadio_clicked(bool checked);
+	void on_ViewBoundingBoxPlaneYSpin_valueChanged(double value);
+	void on_ViewBoundingBoxPlaneYSetMinimumButton_clicked(bool checked);
+	void on_ViewBoundingBoxPlaneYSetZeroButton_clicked(bool checked);
+	void on_ViewBoundingBoxPlaneYSetMaximumButton_clicked(bool checked);
 
 	public:
 	// Update View tab
@@ -282,13 +308,14 @@ class FQPlotWindow : public QMainWindow
 	 */
 	public:
 	// Datafile keywords
-	enum DataFileKeyword { AxisAutoTicksKeyword, AxisFirstTickKeyword, AxisInvertKeyword, AxisLabelDirectionKeyword, AxisLabelRotationKeyword, AxisLabelUpKeyword, AxisLogarithmicKeyword, AxisMinorTicksKeyword, AxisPositionKeyword, AxisStretchKeyword, AxisTickDeltaKeyword, AxisVisibleKeyword, ColourAlphaControlKeyword, ColourAlphaFixedKeyword, ColourCustomGradientKeyword, ColourLinearAKeyword, ColourLinearBKeyword, ColourSingleKeyword, ColourSourceKeyword, InterpolateKeyword, InterpolateConstrainKeyword, InterpolateStepKeyword, LabelScaleKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword, PerspectiveKeyword, PostTransformShiftKeyword, PreTransformShiftKeyword, SliceDirectoryKeyword, SliceKeyword, TitleScaleKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
+	enum DataFileKeyword { AxisAutoTicksKeyword, AxisFirstTickKeyword, AxisInvertKeyword, AxisLabelDirectionKeyword, AxisLabelRotationKeyword, AxisLabelUpKeyword, AxisLogarithmicKeyword, AxisMinorTicksKeyword, AxisPositionKeyword, AxisStretchKeyword, AxisTickDeltaKeyword, AxisVisibleKeyword, BoundingBoxKeyword, BoundingBoxPlaneYKeyword, ColourAlphaControlKeyword, ColourAlphaFixedKeyword, ColourCustomGradientKeyword, ColourRGBGradientAKeyword, ColourRGBGradientBKeyword, ColourHSVGradientAKeyword, ColourHSVGradientBKeyword, ColourSingleKeyword, ColourSourceKeyword, ImageExportKeyword, InterpolateKeyword, InterpolateConstrainKeyword, InterpolateStepKeyword, LabelScaleKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword, PerspectiveKeyword, PostTransformShiftKeyword, PreTransformShiftKeyword, SliceDirectoryKeyword, SliceKeyword, TitleScaleKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
 	static DataFileKeyword dataFileKeyword(const char* s);
 	static const char* dataFileKeyword(DataFileKeyword dfk);
 	// Data Transform types
 	enum DataTransform { MultiplyTransform, DivideTransform, LogBase10Transform, NaturalLogTransform, nDataTransforms };
 	static DataTransform dataTransform(const char* s);
 	static const char* dataTransform(DataTransform dt);
+	// 
 
 	private:
 	// Whether current data has been modified
@@ -297,54 +324,18 @@ class FQPlotWindow : public QMainWindow
 	QString inputFile_;
 	// Root directory for datafiles
 	QDir dataFileDirectory_;
+	// Current image export filename
+	QString imageExportFile_;
+	// Format for exported image
+	Viewer::ImageFormat imageExportFormat_;
+	// Size of exported image
+	int imageExportWidth_, imageExportHeight_;
+	// Whether to maintain current aspect ratio on image export
+	bool imageExportMaintainAspect_;
 	// List of slices
 	List<Slice> slices_;
-	// Extreme values of raw data
-	Vec3<double> dataMin_, dataMax_;
-	// Extreme values of transformed data 
-	Vec3<double> transformMin_, transformMax_;
-	// Data limits for surface generation
-	Vec3<double> limitMin_, limitMax_;
-	// Transform multipliers for data
-	Vec3<double> transformValue_;
-	// Transform types for data
-	DataTransform transformType_[3];
-	// Pre-transform shift value
-	Vec3<double> preTransformShift_;
-	// Post-transform shift value
-	Vec3<double> postTransformShift_;
-	// Interpolation flags
-	Vec3<bool> interpolate_, interpolateConstrained_;
-	// Interpolation step sizes
-	Vec3<double> interpolationStep_;
 	// List of slices for display
 	List<Slice> surfaceData_;
-	// Whether to invert axes
-	Vec3<bool> axisInvert_;
-	// Axis visibility
-	Vec3<bool> axisVisible_;
-	// Axis position (in real surface-space coordinates)
-	Vec3<double> axisPosition_[3];
-	// Position of first tick delta on axes
-	Vec3<double> axisFirstTick_;
-	// Tick delta for axes
-	Vec3<double> axisTickDelta_;
-	// Whether to calculate ticks automatically
-	Vec3<bool> axisAutoTicks_;
-	// Number of minor ticks in major tick intervals
-	Vec3<int> axisMinorTicks_;
-	// Orientation of axis labels
-	Vec3<double> axisLabelDirection_[3], axisLabelUp_[3];
-	// Rotation of axis labels (about calculated Z)
-	Vec3<int> axisLabelRotation_;
-	// Whether axes should be plotted as logarithms
-	Vec3<bool> axisLogarithmic_;
-	// Stretch factors to apply to axes
-	Vec3<double> axisStretch_;
-	// Font scaling for axis value labels
-	double labelScale_;
-	// Font scaling for titles
-	double titleScale_;
 
 	private:
 	// Recalculate tick deltas for specified axis
@@ -372,13 +363,69 @@ class FQPlotWindow : public QMainWindow
 
 
 	/*
+	 * Transform
+	 */
+	private:
+	// Extreme values of raw data
+	Vec3<double> dataMin_, dataMax_;
+	// Extreme values of transformed data 
+	Vec3<double> transformMin_, transformMax_;
+	// Data limits for surface generation
+	Vec3<double> limitMin_, limitMax_;
+	// Transform multipliers for data
+	Vec3<double> transformValue_;
+	// Transform types for data
+	DataTransform transformType_[3];
+	// Pre-transform shift value
+	Vec3<double> preTransformShift_;
+	// Post-transform shift value
+	Vec3<double> postTransformShift_;
+	// Interpolation flags
+	Vec3<bool> interpolate_, interpolateConstrained_;
+	// Interpolation step sizes
+	Vec3<double> interpolationStep_;
+
+
+	/*
+	 * Axes
+	 */
+	private:
+	// Whether to invert axes
+	Vec3<bool> axisInvert_;
+	// Axis visibility
+	Vec3<bool> axisVisible_;
+	// Axis position (in real surface-space coordinates)
+	Vec3<double> axisPosition_[3];
+	// Position of first tick delta on axes
+	Vec3<double> axisFirstTick_;
+	// Tick delta for axes
+	Vec3<double> axisTickDelta_;
+	// Whether to calculate ticks automatically
+	Vec3<bool> axisAutoTicks_;
+	// Number of minor ticks in major tick intervals
+	Vec3<int> axisMinorTicks_;
+	// Orientation of axis labels
+	Vec3<double> axisLabelDirection_[3], axisLabelUp_[3];
+	// Rotation of axis labels (about calculated Z)
+	Vec3<int> axisLabelRotation_;
+	// Whether axes should be plotted as logarithms
+	Vec3<bool> axisLogarithmic_;
+	// Stretch factors to apply to axes
+	Vec3<double> axisStretch_;
+	// Font scaling for axis value labels
+	double labelScale_;
+	// Font scaling for titles
+	double titleScale_;
+
+
+	/*
 	 * Colours
 	 */
 	public:
 	// Available colourscale sources
-	enum ColourSource { SingleColourSource, LinearGradientSource, CustomGradientSource, nColourSources };
+	enum ColourSource { SingleColourSource, RGBGradientSource, HSVGradientSource, CustomGradientSource, nColourSources };
 	// Alpha control options
-	enum AlphaControl { OwnAlpha, FixedAlpha };
+	enum AlphaControl { OwnAlpha, FixedAlpha, nAlphaControls };
 
 	private:
 	// ColourScale sources
@@ -389,6 +436,20 @@ class FQPlotWindow : public QMainWindow
 	AlphaControl alphaControl_;
 	// Fixed alpha value (for FixedAlpha option)
 	int fixedAlpha_;
+
+
+	/*
+	 * Extras
+	 */
+	public:
+	// Available Bounding Boxes
+	enum BoundingBox { NoBox, PlaneBox, CubeBox, nBoundingBoxes };
+
+	private:
+	// Current bounding box type
+	BoundingBox boundingBox_;
+	// Y-intercept of XZ plane
+	double boundingBoxPlaneY_;
 };
 
 #endif

@@ -22,12 +22,23 @@
 #include "gui/fqplot.h"
 #include "templates/reflist.h"
 
+// Update Gradient Bar
+void FQPlotWindow::updateGradientBar()
+{
+	if (colourSource_ == FQPlotWindow::SingleColourSource) ui.ColourGradient->setColourScale(colourScale_[FQPlotWindow::SingleColourSource]);
+	else if (colourSource_ == FQPlotWindow::RGBGradientSource) ui.ColourGradient->setColourScale(colourScale_[FQPlotWindow::RGBGradientSource]);
+	else if (colourSource_ == FQPlotWindow::HSVGradientSource) ui.ColourGradient->setColourScale(colourScale_[FQPlotWindow::HSVGradientSource]);
+	else if (colourSource_ == FQPlotWindow::CustomGradientSource) ui.ColourGradient->setColourScale(colourScale_[FQPlotWindow::CustomGradientSource]);
+}
+
 /*
  * Single Colour
  */
 void FQPlotWindow::on_ColourSingleColourRadio_clicked(bool checked)
 {
+	if (refreshing_) return;
 	colourSource_ = FQPlotWindow::SingleColourSource;
+	updateGradientBar();
 	updateSurface(false);
 }
 
@@ -37,71 +48,145 @@ void FQPlotWindow::on_ColourSingleColourButton_clicked(bool checked)
 	if (ui.ColourSingleColourButton->selectColour())
 	{
 		colourScale_[FQPlotWindow::SingleColourSource].setPoint(0, 0.0, ui.ColourSingleColourButton->colour());
+		updateGradientBar();
 		updateSurface(false);
 	}
 }
 
 /*
- * Linear Gradient
+ * RGB Gradient
  */
 
-void FQPlotWindow::on_ColourLinearGradientRadio_clicked(bool checked)
+void FQPlotWindow::on_ColourRGBGradientRadio_clicked(bool checked)
 {
 	if (refreshing_) return;
-	colourSource_ = FQPlotWindow::LinearGradientSource;
+	colourSource_ = FQPlotWindow::RGBGradientSource;
+	updateGradientBar();
 	updateSurface(false);
 }
 
-void FQPlotWindow::on_ColourLinearGradientAButton_clicked(bool checked)
+void FQPlotWindow::on_ColourRGBGradientAButton_clicked(bool checked)
 {
-	if (ui.ColourLinearGradientAButton->selectColour())
+	if (ui.ColourRGBGradientAButton->selectColour())
 	{
-		colourScale_[FQPlotWindow::LinearGradientSource].setPoint(0, ui.ColourLinearGradientASpin->value(), ui.ColourLinearGradientAButton->colour());
+		colourScale_[FQPlotWindow::RGBGradientSource].setPoint(0, ui.ColourRGBGradientASpin->value(), ui.ColourRGBGradientAButton->colour());
+		updateGradientBar();
 		updateSurface(false);
 	}
 }
 
-void FQPlotWindow::on_ColourLinearGradientASpin_valueChanged(double value)
+void FQPlotWindow::on_ColourRGBGradientASpin_valueChanged(double value)
 {
 	if (refreshing_) return;
-	colourScale_[FQPlotWindow::LinearGradientSource].setPointValue(0, ui.ColourLinearGradientASpin->value());
+	colourScale_[FQPlotWindow::RGBGradientSource].setPointValue(0, ui.ColourRGBGradientASpin->value());
+	updateGradientBar();
 	updateSurface(false);
 }
 
-void FQPlotWindow::on_ColourLinearGradientASetMinimumButton_clicked(bool checked)
+void FQPlotWindow::on_ColourRGBGradientASetMinimumButton_clicked(bool checked)
 {
-	ui.ColourLinearGradientASpin->setValue(limitMin_.y);
+	ui.ColourRGBGradientASpin->setValue(limitMin_.y);
 }
 
-void FQPlotWindow::on_ColourLinearGradientASetMaximumButton_clicked(bool checked)
+void FQPlotWindow::on_ColourRGBGradientASetMaximumButton_clicked(bool checked)
 {
-	ui.ColourLinearGradientASpin->setValue(limitMax_.y);
+	ui.ColourRGBGradientASpin->setValue(limitMax_.y);
 }
 
-void FQPlotWindow::on_ColourLinearGradientBButton_clicked(bool checked)
+void FQPlotWindow::on_ColourRGBGradientBButton_clicked(bool checked)
 {
-	if (ui.ColourLinearGradientBButton->selectColour())
+	if (ui.ColourRGBGradientBButton->selectColour())
 	{
-		colourScale_[FQPlotWindow::LinearGradientSource].setPointColour(1, ui.ColourLinearGradientBButton->colour());
+		colourScale_[FQPlotWindow::RGBGradientSource].setPointColour(1, ui.ColourRGBGradientBButton->colour());
+		updateGradientBar();
 		updateSurface(false);
 	}
 }
 
-void FQPlotWindow::on_ColourLinearGradientBSpin_valueChanged(double value)
+void FQPlotWindow::on_ColourRGBGradientBSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
-	colourScale_[FQPlotWindow::LinearGradientSource].setPointValue(1, ui.ColourLinearGradientBSpin->value());
+	colourScale_[FQPlotWindow::RGBGradientSource].setPointValue(1, ui.ColourRGBGradientBSpin->value());
+	updateGradientBar();
 	updateSurface(false);
 }
 
-void FQPlotWindow::on_ColourLinearGradientBSetMinimumButton_clicked(bool checked)
+void FQPlotWindow::on_ColourRGBGradientBSetMinimumButton_clicked(bool checked)
 {
-	ui.ColourLinearGradientBSpin->setValue(limitMin_.y);
+	ui.ColourRGBGradientBSpin->setValue(limitMin_.y);
 }
 
-void FQPlotWindow::on_ColourLinearGradientBSetMaximumButton_clicked(bool checked)
+void FQPlotWindow::on_ColourRGBGradientBSetMaximumButton_clicked(bool checked)
 {
-	ui.ColourLinearGradientBSpin->setValue(limitMax_.y);
+	ui.ColourRGBGradientBSpin->setValue(limitMax_.y);
+}
+
+/*
+ * HSV Gradient
+ */
+
+void FQPlotWindow::on_ColourHSVGradientRadio_clicked(bool checked)
+{
+	if (refreshing_) return;
+	colourSource_ = FQPlotWindow::HSVGradientSource;
+	updateGradientBar();
+	updateSurface(false);
+}
+
+void FQPlotWindow::on_ColourHSVGradientAButton_clicked(bool checked)
+{
+	if (ui.ColourHSVGradientAButton->selectColour())
+	{
+		colourScale_[FQPlotWindow::HSVGradientSource].setPoint(0, ui.ColourHSVGradientASpin->value(), ui.ColourHSVGradientAButton->colour());
+		updateGradientBar();
+		updateSurface(false);
+	}
+}
+
+void FQPlotWindow::on_ColourHSVGradientASpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	colourScale_[FQPlotWindow::HSVGradientSource].setPointValue(0, ui.ColourHSVGradientASpin->value());
+	updateGradientBar();
+	updateSurface(false);
+}
+
+void FQPlotWindow::on_ColourHSVGradientASetMinimumButton_clicked(bool checked)
+{
+	ui.ColourHSVGradientASpin->setValue(limitMin_.y);
+}
+
+void FQPlotWindow::on_ColourHSVGradientASetMaximumButton_clicked(bool checked)
+{
+	ui.ColourHSVGradientASpin->setValue(limitMax_.y);
+}
+
+void FQPlotWindow::on_ColourHSVGradientBButton_clicked(bool checked)
+{
+	if (ui.ColourHSVGradientBButton->selectColour())
+	{
+		colourScale_[FQPlotWindow::HSVGradientSource].setPointColour(1, ui.ColourHSVGradientBButton->colour());
+		updateGradientBar();
+		updateSurface(false);
+	}
+}
+
+void FQPlotWindow::on_ColourHSVGradientBSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	colourScale_[FQPlotWindow::HSVGradientSource].setPointValue(1, ui.ColourHSVGradientBSpin->value());
+	updateGradientBar();
+	updateSurface(false);
+}
+
+void FQPlotWindow::on_ColourHSVGradientBSetMinimumButton_clicked(bool checked)
+{
+	ui.ColourHSVGradientBSpin->setValue(limitMin_.y);
+}
+
+void FQPlotWindow::on_ColourHSVGradientBSetMaximumButton_clicked(bool checked)
+{
+	ui.ColourHSVGradientBSpin->setValue(limitMax_.y);
 }
 
 /*
@@ -112,6 +197,7 @@ void FQPlotWindow::on_ColourCustomGradientRadio_clicked(bool checked)
 {
 	if (refreshing_) return;
 	colourSource_ = FQPlotWindow::CustomGradientSource;
+	updateGradientBar();
 	updateSurface(false);
 }
 
@@ -139,6 +225,7 @@ void FQPlotWindow::on_ColourCustomGradientTable_cellDoubleClicked(int row, int c
 
 	// Update table and refresh surface
 	item->setBackgroundColor(newcol);
+	updateGradientBar();
 	updateSurface(false);
 	setAsModified();
 }
@@ -233,13 +320,21 @@ void FQPlotWindow::updateColourTab()
 	csp = colourScale_[FQPlotWindow::SingleColourSource].point(0);
 	ui.ColourSingleColourButton->setColour(csp ? csp->colour() : QColor());
 
-	// Linear Gradient
-	csp = colourScale_[FQPlotWindow::LinearGradientSource].point(0);
-	ui.ColourLinearGradientAButton->setColour(csp ? csp->colour() : QColor());
-	ui.ColourLinearGradientASpin->setValue(csp->value());
-	csp = colourScale_[FQPlotWindow::LinearGradientSource].point(1);
-	ui.ColourLinearGradientBButton->setColour(csp ? csp->colour() : QColor());
-	ui.ColourLinearGradientBSpin->setValue(csp->value());
+	// RGB Gradient
+	csp = colourScale_[FQPlotWindow::RGBGradientSource].point(0);
+	ui.ColourRGBGradientAButton->setColour(csp ? csp->colour() : QColor());
+	ui.ColourRGBGradientASpin->setValue(csp->value());
+	csp = colourScale_[FQPlotWindow::RGBGradientSource].point(1);
+	ui.ColourRGBGradientBButton->setColour(csp ? csp->colour() : QColor());
+	ui.ColourRGBGradientBSpin->setValue(csp->value());
+
+	// HSV Gradient
+	csp = colourScale_[FQPlotWindow::HSVGradientSource].point(0);
+	ui.ColourHSVGradientAButton->setColour(csp ? csp->colour() : QColor());
+	ui.ColourHSVGradientASpin->setValue(csp->value());
+	csp = colourScale_[FQPlotWindow::HSVGradientSource].point(1);
+	ui.ColourHSVGradientBButton->setColour(csp ? csp->colour() : QColor());
+	ui.ColourHSVGradientBSpin->setValue(csp->value());
 
 	// Custom Gradient - add points in reverse order so higher values appear at the top of the list
 	ui.ColourCustomGradientTable->clearContents();
@@ -263,9 +358,13 @@ void FQPlotWindow::updateColourTab()
 	
 	// Set current colour source
 	if (colourSource_ == FQPlotWindow::SingleColourSource) ui.ColourSingleColourRadio->setChecked(true);
-	else if (colourSource_ == FQPlotWindow::LinearGradientSource) ui.ColourLinearGradientRadio->setChecked(true);
+	else if (colourSource_ == FQPlotWindow::RGBGradientSource) ui.ColourRGBGradientRadio->setChecked(true);
+	else if (colourSource_ == FQPlotWindow::HSVGradientSource) ui.ColourHSVGradientRadio->setChecked(true);
 	else if (colourSource_ == FQPlotWindow::CustomGradientSource) ui.ColourCustomGradientRadio->setChecked(true);
-	
+
+	// Update gradient bar
+	updateGradientBar();
+
 	// Set current alpha control
 	if (alphaControl_ == FQPlotWindow::OwnAlpha) ui.ColourAlphaOwnAlphaRadio->setChecked(true);
 	else if (alphaControl_ == FQPlotWindow::FixedAlpha) ui.ColourAlphaFixedAlphaRadio->setChecked(true);
