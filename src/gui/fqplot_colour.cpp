@@ -25,10 +25,8 @@
 // Update Gradient Bar
 void FQPlotWindow::updateGradientBar()
 {
-	if (colourSource_ == FQPlotWindow::SingleColourSource) ui.ColourGradient->setColourScale(colourScale_[FQPlotWindow::SingleColourSource]);
-	else if (colourSource_ == FQPlotWindow::RGBGradientSource) ui.ColourGradient->setColourScale(colourScale_[FQPlotWindow::RGBGradientSource]);
-	else if (colourSource_ == FQPlotWindow::HSVGradientSource) ui.ColourGradient->setColourScale(colourScale_[FQPlotWindow::HSVGradientSource]);
-	else if (colourSource_ == FQPlotWindow::CustomGradientSource) ui.ColourGradient->setColourScale(colourScale_[FQPlotWindow::CustomGradientSource]);
+	updateColourScale();
+	ui.ColourGradient->setColourScale(colourScale_);
 }
 
 /*
@@ -47,7 +45,7 @@ void FQPlotWindow::on_ColourSingleColourButton_clicked(bool checked)
 	if (refreshing_) return;
 	if (ui.ColourSingleColourButton->selectColour())
 	{
-		colourScale_[FQPlotWindow::SingleColourSource].setPoint(0, 0.0, ui.ColourSingleColourButton->colour());
+		colourSinglePoint_.setColour(ui.ColourSingleColourButton->colour());
 		updateGradientBar();
 		updateSurface(false);
 	}
@@ -69,7 +67,7 @@ void FQPlotWindow::on_ColourRGBGradientAButton_clicked(bool checked)
 {
 	if (ui.ColourRGBGradientAButton->selectColour())
 	{
-		colourScale_[FQPlotWindow::RGBGradientSource].setPoint(0, ui.ColourRGBGradientASpin->value(), ui.ColourRGBGradientAButton->colour());
+		colourRGBGradientAPoint_.setColour(ui.ColourRGBGradientAButton->colour());
 		updateGradientBar();
 		updateSurface(false);
 	}
@@ -78,7 +76,7 @@ void FQPlotWindow::on_ColourRGBGradientAButton_clicked(bool checked)
 void FQPlotWindow::on_ColourRGBGradientASpin_valueChanged(double value)
 {
 	if (refreshing_) return;
-	colourScale_[FQPlotWindow::RGBGradientSource].setPointValue(0, ui.ColourRGBGradientASpin->value());
+	colourRGBGradientAPoint_.setValue(ui.ColourRGBGradientASpin->value());
 	updateGradientBar();
 	updateSurface(false);
 }
@@ -97,7 +95,7 @@ void FQPlotWindow::on_ColourRGBGradientBButton_clicked(bool checked)
 {
 	if (ui.ColourRGBGradientBButton->selectColour())
 	{
-		colourScale_[FQPlotWindow::RGBGradientSource].setPointColour(1, ui.ColourRGBGradientBButton->colour());
+		colourRGBGradientBPoint_.setColour(ui.ColourRGBGradientBButton->colour());
 		updateGradientBar();
 		updateSurface(false);
 	}
@@ -106,7 +104,7 @@ void FQPlotWindow::on_ColourRGBGradientBButton_clicked(bool checked)
 void FQPlotWindow::on_ColourRGBGradientBSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
-	colourScale_[FQPlotWindow::RGBGradientSource].setPointValue(1, ui.ColourRGBGradientBSpin->value());
+	colourRGBGradientBPoint_.setValue(ui.ColourRGBGradientBSpin->value());
 	updateGradientBar();
 	updateSurface(false);
 }
@@ -137,7 +135,7 @@ void FQPlotWindow::on_ColourHSVGradientAButton_clicked(bool checked)
 {
 	if (ui.ColourHSVGradientAButton->selectColour())
 	{
-		colourScale_[FQPlotWindow::HSVGradientSource].setPoint(0, ui.ColourHSVGradientASpin->value(), ui.ColourHSVGradientAButton->colour());
+		colourHSVGradientAPoint_.setColour(ui.ColourHSVGradientAButton->colour());
 		updateGradientBar();
 		updateSurface(false);
 	}
@@ -146,7 +144,7 @@ void FQPlotWindow::on_ColourHSVGradientAButton_clicked(bool checked)
 void FQPlotWindow::on_ColourHSVGradientASpin_valueChanged(double value)
 {
 	if (refreshing_) return;
-	colourScale_[FQPlotWindow::HSVGradientSource].setPointValue(0, ui.ColourHSVGradientASpin->value());
+	colourHSVGradientAPoint_.setValue(ui.ColourHSVGradientASpin->value());
 	updateGradientBar();
 	updateSurface(false);
 }
@@ -165,7 +163,7 @@ void FQPlotWindow::on_ColourHSVGradientBButton_clicked(bool checked)
 {
 	if (ui.ColourHSVGradientBButton->selectColour())
 	{
-		colourScale_[FQPlotWindow::HSVGradientSource].setPointColour(1, ui.ColourHSVGradientBButton->colour());
+		colourHSVGradientBPoint_.setColour(ui.ColourHSVGradientBButton->colour());
 		updateGradientBar();
 		updateSurface(false);
 	}
@@ -174,7 +172,7 @@ void FQPlotWindow::on_ColourHSVGradientBButton_clicked(bool checked)
 void FQPlotWindow::on_ColourHSVGradientBSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
-	colourScale_[FQPlotWindow::HSVGradientSource].setPointValue(1, ui.ColourHSVGradientBSpin->value());
+	colourHSVGradientBPoint_.setValue(ui.ColourHSVGradientBSpin->value());
 	updateGradientBar();
 	updateSurface(false);
 }
@@ -221,7 +219,7 @@ void FQPlotWindow::on_ColourCustomGradientTable_cellDoubleClicked(int row, int c
         QColor newcol = QColorDialog::getColor(item->backgroundColor().rgba(), this, "Select new colour", QColorDialog::ShowAlphaChannel);
         if (!newcol.isValid()) return;
 	
-	colourScale_[CustomGradientSource].setPointColour(cspId, newcol);
+	customColourScale_.setPointColour(cspId, newcol);
 
 	// Update table and refresh surface
 	item->setBackgroundColor(newcol);
@@ -240,7 +238,7 @@ void FQPlotWindow::on_ColourCustomGradientTable_cellChanged(int row, int column)
 	int cspId = item->data(Qt::UserRole).toInt();
 	
 	// Value of this point has changed, so must update the list and refresh the surface and necessary widgets
-	colourScale_[CustomGradientSource].setPointValue(cspId, item->text().toDouble());
+	customColourScale_.setPointValue(cspId, item->text().toDouble());
 
 	// Refresh table
 	updateColourTab();
@@ -250,7 +248,7 @@ void FQPlotWindow::on_ColourCustomGradientTable_cellChanged(int row, int column)
 
 void FQPlotWindow::on_ColourCustomGradientAddButton_clicked(bool checked)
 {
-	colourScale_[CustomGradientSource].addPoint(colourScale_[CustomGradientSource].lastPoint() ? colourScale_[CustomGradientSource].lastPoint()->value() + 1.0 : 0.0, Qt::white);
+	customColourScale_.addPoint(customColourScale_.lastPoint() ? customColourScale_.lastPoint()->value() + 1.0 : 0.0, Qt::white);
 
 	// Refresh table
 	updateColourTab();
@@ -271,11 +269,11 @@ void FQPlotWindow::on_ColourCustomGradientRemoveButton_clicked(bool checked)
 		int cspId = item->data(Qt::UserRole).toInt();
 		if (lastId == cspId) continue;
 		lastId = cspId;
-		toDelete.addUnique(colourScale_[CustomGradientSource].point(cspId));
+		toDelete.addUnique(customColourScale_.point(cspId));
 	}
 
 	// Now delete the points
-	for (RefListItem<ColourScalePoint,int>* ri = toDelete.first(); ri != NULL; ri = ri->next) colourScale_[CustomGradientSource].removePoint(ri->item);
+	for (RefListItem<ColourScalePoint,int>* ri = toDelete.first(); ri != NULL; ri = ri->next) customColourScale_.removePoint(ri->item);
 
 	// Refresh table
 	updateColourTab();
@@ -315,40 +313,34 @@ void FQPlotWindow::updateColourTab()
 {
 	refreshing_ = true;
 
-	ColourScalePoint* csp;
 	// Single Colour
-	csp = colourScale_[FQPlotWindow::SingleColourSource].point(0);
-	ui.ColourSingleColourButton->setColour(csp ? csp->colour() : QColor());
+	ui.ColourSingleColourButton->setColour(colourSinglePoint_.colour());
 
 	// RGB Gradient
-	csp = colourScale_[FQPlotWindow::RGBGradientSource].point(0);
-	ui.ColourRGBGradientAButton->setColour(csp ? csp->colour() : QColor());
-	ui.ColourRGBGradientASpin->setValue(csp->value());
-	csp = colourScale_[FQPlotWindow::RGBGradientSource].point(1);
-	ui.ColourRGBGradientBButton->setColour(csp ? csp->colour() : QColor());
-	ui.ColourRGBGradientBSpin->setValue(csp->value());
+	ui.ColourRGBGradientAButton->setColour(colourRGBGradientAPoint_.colour());
+	ui.ColourRGBGradientASpin->setValue(colourRGBGradientAPoint_.value());
+	ui.ColourRGBGradientBButton->setColour(colourRGBGradientBPoint_.colour());
+	ui.ColourRGBGradientBSpin->setValue(colourRGBGradientBPoint_.value());
 
 	// HSV Gradient
-	csp = colourScale_[FQPlotWindow::HSVGradientSource].point(0);
-	ui.ColourHSVGradientAButton->setColour(csp ? csp->colour() : QColor());
-	ui.ColourHSVGradientASpin->setValue(csp->value());
-	csp = colourScale_[FQPlotWindow::HSVGradientSource].point(1);
-	ui.ColourHSVGradientBButton->setColour(csp ? csp->colour() : QColor());
-	ui.ColourHSVGradientBSpin->setValue(csp->value());
+	ui.ColourHSVGradientAButton->setColour(colourHSVGradientAPoint_.colour());
+	ui.ColourHSVGradientASpin->setValue(colourHSVGradientAPoint_.value());
+	ui.ColourHSVGradientBButton->setColour(colourHSVGradientBPoint_.colour());
+	ui.ColourHSVGradientBSpin->setValue(colourHSVGradientBPoint_.value());
 
 	// Custom Gradient - add points in reverse order so higher values appear at the top of the list
 	ui.ColourCustomGradientTable->clearContents();
-	ui.ColourCustomGradientTable->setRowCount(colourScale_[FQPlotWindow::CustomGradientSource].nPoints());
+	ui.ColourCustomGradientTable->setRowCount(customColourScale_.nPoints());
 	QTableWidgetItem *item;
 	int count = 0;
-	for (ColourScalePoint *csp = colourScale_[FQPlotWindow::CustomGradientSource].lastPoint(); csp != NULL; csp = csp->prev)
+	for (ColourScalePoint *csp = customColourScale_.lastPoint(); csp != NULL; csp = csp->prev)
 	{
 		item = new QTableWidgetItem(QString::number(csp->value()));
-		item->setData(Qt::UserRole, colourScale_[FQPlotWindow::CustomGradientSource].nPoints() - (count+1));
+		item->setData(Qt::UserRole, customColourScale_.nPoints() - (count+1));
 		ui.ColourCustomGradientTable->setItem(count, 0, item);
 		item = new QTableWidgetItem();
 		item->setBackgroundColor(csp->colour());
-		item->setData(Qt::UserRole, colourScale_[FQPlotWindow::CustomGradientSource].nPoints() - (count+1));
+		item->setData(Qt::UserRole, customColourScale_.nPoints() - (count+1));
 		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable	);
 		ui.ColourCustomGradientTable->setItem(count, 1, item);
 		++count;

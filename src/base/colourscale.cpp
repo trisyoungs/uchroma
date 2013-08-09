@@ -33,13 +33,20 @@ ColourScalePoint::ColourScalePoint() : ListItem<ColourScalePoint>()
 	setColour(QColor(0,0,0,255));
 }
 
-// Return value of scale point
+// Return value of point
 double ColourScalePoint::value() const
 {
 	return value_;
 }
 
-// Set value of scale point
+// Set value and colour for point
+void ColourScalePoint::set(double value, QColor colour)
+{
+	value_ = value;
+	colour_ = colour;
+}
+
+// Set value of point
 void ColourScalePoint::setValue(double d)
 {
 	value_ = d;
@@ -52,7 +59,7 @@ void ColourScalePoint::setColour(QColor colour)
 }
 
 // Return colour
-QColor ColourScalePoint::colour()
+QColor ColourScalePoint::colour() const
 {
 	return colour_;
 }
@@ -374,3 +381,4 @@ void ColourScale::setAllAlpha(int alpha)
 	}
 	calculateDeltas();
 }
+

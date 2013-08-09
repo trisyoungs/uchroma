@@ -47,7 +47,9 @@ int main(int argc, char *argv[])
 	}
 
 	/* Update main window */
+	// TODO Put these functions in an 'updateAfterLoad()' function
 	mainWindow.calculateDataLimits();
+	mainWindow.updateColourScale();
 	mainWindow.updateAllTabs();
 	mainWindow.updateTitleBar();
 		

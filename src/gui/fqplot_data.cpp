@@ -145,16 +145,12 @@ void FQPlotWindow::clearData()
 	axisLogarithmic_.set(false, false, false);
 	axisStretch_.set(1.0, 1.0, 1.0);
 	colourSource_ = SingleColourSource;
-	colourScale_[SingleColourSource].clear();
-	colourScale_[SingleColourSource].addPoint(0.0, QColor(255,255,255));
-	colourScale_[RGBGradientSource].clear();
-	colourScale_[RGBGradientSource].addPoint(0.0, QColor(255,255,255));
-	colourScale_[RGBGradientSource].addPoint(1.0, QColor(0,0,255));
-	colourScale_[HSVGradientSource].clear();
-	colourScale_[HSVGradientSource].setUseHSV(true);
-	colourScale_[HSVGradientSource].addPoint(0.0, QColor(255,255,255));
-	colourScale_[HSVGradientSource].addPoint(1.0, QColor(100,40,255));
-	colourScale_[CustomGradientSource].clear();
+	colourSinglePoint_.set(0.0, QColor(255,255,255));
+	colourRGBGradientAPoint_.set(0.0, QColor(255,255,255));
+	colourRGBGradientBPoint_.set(1.0, QColor(0,0,255));
+	colourHSVGradientBPoint_.set(0.0, QColor(255,255,255));
+	colourHSVGradientBPoint_.set(1.0, QColor(100,40,255));
+	customColourScale_.clear();
 	fixedAlpha_ = 128;
 	alphaControl_ = FQPlotWindow::OwnAlpha;
 	boundingBox_ = FQPlotWindow::NoBox;
@@ -264,21 +260,23 @@ bool FQPlotWindow::loadData(QString fileName)
 				break;
 			// Colour Custom Gradient point definition
 			case (FQPlotWindow::ColourCustomGradientKeyword):
-				colourScale_[CustomGradientSource].addPoint(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
+				customColourScale_.addPoint(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
 				break;
 			// Colour Linear Gradient point definition
 			case (FQPlotWindow::ColourRGBGradientAKeyword):
 			case (FQPlotWindow::ColourRGBGradientBKeyword):
-				colourScale_[RGBGradientSource].setPoint(kwd-ColourRGBGradientAKeyword, parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
+				if (kwd == ColourRGBGradientAKeyword) colourRGBGradientAPoint_.set(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
+				else colourRGBGradientBPoint_.set(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
 				break;
 			// Colour Linear HSV Gradient point definition
 			case (FQPlotWindow::ColourHSVGradientAKeyword):
 			case (FQPlotWindow::ColourHSVGradientBKeyword):
-				colourScale_[HSVGradientSource].setPoint(kwd-ColourHSVGradientAKeyword, parser.argd(1), QColor::fromHsv(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
+				if (kwd == ColourHSVGradientAKeyword) colourHSVGradientAPoint_.set(parser.argd(1), QColor::fromHsv(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
+				else colourHSVGradientBPoint_.set(parser.argd(1), QColor::fromHsv(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
 				break;
 			// Colour single colour definition
 			case (FQPlotWindow::ColourSingleKeyword):
-				colourScale_[SingleColourSource].setPoint(0, parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
+				colourSinglePoint_.setColour(QColor(parser.argi(1), parser.argi(2), parser.argi(3), parser.argi(4)));
 				break;
 			// Colour source
 			case (FQPlotWindow::ColourSourceKeyword):
@@ -461,20 +459,16 @@ bool FQPlotWindow::saveData(QString fileName)
 	parser.writeLineF("%s %i\n", DataFileKeywordStrings[FQPlotWindow::ColourSourceKeyword], colourSource_);
 	ColourScalePoint* csp;
 	// -- Single Colour
-	csp = colourScale_[SingleColourSource].point(0);
-	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourSingleKeyword], csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
+	parser.writeLineF("%s %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourSingleKeyword], colourSinglePoint_.colour().red(), colourSinglePoint_.colour().green(), colourSinglePoint_.colour().blue(), colourSinglePoint_.colour().alpha());
+	// -- RGB Gradient
+	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourRGBGradientAKeyword], colourRGBGradientAPoint_.value(), colourRGBGradientAPoint_.colour().red(), colourRGBGradientAPoint_.colour().green(), colourRGBGradientAPoint_.colour().blue(), colourRGBGradientAPoint_.colour().alpha());
+	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourRGBGradientBKeyword], colourRGBGradientBPoint_.value(), colourHSVGradientBPoint_.colour().red(), colourHSVGradientBPoint_.colour().green(), colourHSVGradientBPoint_.colour().blue(), colourHSVGradientBPoint_.colour().alpha());
 	// -- HSV Gradient
-	csp = colourScale_[HSVGradientSource].point(0);
-	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourHSVGradientAKeyword], csp->value(), csp->colour().hue(), csp->colour().saturation(), csp->colour().value(), csp->colour().alpha());
-	csp = colourScale_[HSVGradientSource].point(1);
-	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourHSVGradientBKeyword], csp->value(), csp->colour().hue(), csp->colour().saturation(), csp->colour().value(), csp->colour().alpha());
-	// -- HSV Gradient
-	csp = colourScale_[RGBGradientSource].point(0);
-	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourRGBGradientAKeyword], csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
-	csp = colourScale_[RGBGradientSource].point(1);
-	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourRGBGradientBKeyword], csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
+	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourHSVGradientAKeyword], colourHSVGradientAPoint_.value(), colourHSVGradientAPoint_.colour().hue(), colourHSVGradientAPoint_.colour().saturation(), colourHSVGradientAPoint_.colour().value(), colourHSVGradientAPoint_.colour().alpha());
+	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourHSVGradientBKeyword], colourHSVGradientBPoint_.value(), colourHSVGradientBPoint_.colour().hue(), colourHSVGradientBPoint_.colour().saturation(), colourHSVGradientBPoint_.colour().value(), colourHSVGradientBPoint_.colour().alpha());
+
 	// -- Custom Gradient
-	for (csp = colourScale_[CustomGradientSource].firstPoint(); csp != NULL; csp = csp->next)
+	for (csp = customColourScale_.firstPoint(); csp != NULL; csp = csp->next)
 	{
 		parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourCustomGradientKeyword], csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
 	}
@@ -740,7 +734,11 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 				if (axisLogarithmic_.x) x = log10(x);
 				x *= axisStretch_.x;
 				y = array[1].value(n);
-				if (axisLogarithmic_.y) y = (axisInvert_.y ? log10(limitMax_.y / y) : log10(y));
+				if (axisLogarithmic_.y)
+				{
+					if (y < 0.0) y = 1.0e-10;
+					else y = (axisInvert_.y ? log10(limitMax_.y / y) : log10(y));
+				}
 				else if (axisInvert_.y) y = (limitMax_.y - y) + limitMin_.y;
 				y *= axisStretch_.y;
 				surfaceSlice->data().addPoint(x, y);
@@ -752,8 +750,10 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 	}
 
 	// Create temporary colourScale_
-	ColourScale scale = colourScale_[colourSource_];
+	ColourScale scale = colourScale_;
 	if (alphaControl_ == FQPlotWindow::FixedAlpha) scale.setAllAlpha(fixedAlpha_);
+	int i = 0;
+	for (ColourScalePoint* csp = scale.firstPoint(); csp != NULL; csp = csp->next) printf("CScale point %i : %f = (HSV) %i %i %i\n", i++, csp->value(), csp->colour().hue(), csp->colour().saturation(), csp->colour().value());
 
 	// Update surface GL object
 	ui.MainView->createSurface(surfaceData_, scale, axisStretch_.y);

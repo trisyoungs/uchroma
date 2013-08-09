@@ -45,14 +45,16 @@ class ColourScalePoint : public ListItem<ColourScalePoint>
 	QColor colour_;
 
 	public:
-	// Set value for scalepoint
-	void setValue(double d);
-	// Return value for scalepoint
+	// Set value and colour for point
+	void set(double value, QColor colour);
+	// Set value for point
+	void setValue(double value);
+	// Return value for point
 	double value() const;
 	// Set colour
 	void setColour(QColor colour);
 	// Return colour
-	QColor colour();
+	QColor colour() const;
 };
 
 // Colour scale delta

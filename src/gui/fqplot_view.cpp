@@ -619,5 +619,11 @@ void FQPlotWindow::updateViewTab()
 	ui.ViewZAxisUpZSpin->setValue(axisLabelUp_[2].z);
 	ui.ViewZAxisRotationSpin->setValue(axisLabelRotation_.z);
 
+	// Extras
+	if (boundingBox_ == FQPlotWindow::NoBox) ui.ViewBoundingBoxNoneRadio->setChecked(true);
+	else if (boundingBox_ == FQPlotWindow::PlaneBox) ui.ViewBoundingBoxPlaneRadio->setChecked(true);
+	else if (boundingBox_ == FQPlotWindow::CubeBox) ui.ViewBoundingBoxCubeRadio->setChecked(true);
+	ui.ViewBoundingBoxPlaneYSpin->setValue(boundingBoxPlaneY_);
+
 	refreshing_ = false;
 }

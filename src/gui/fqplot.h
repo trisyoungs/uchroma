@@ -432,14 +432,24 @@ class FQPlotWindow : public QMainWindow
 	enum AlphaControl { OwnAlpha, FixedAlpha, nAlphaControls };
 
 	private:
-	// ColourScale sources
-	ColourScale colourScale_[nColourSources];
+	// Points for SingleColour, RGBGradient and HSVGradient sources
+	ColourScalePoint colourSinglePoint_;
+	ColourScalePoint colourRGBGradientAPoint_, colourRGBGradientBPoint_;
+	ColourScalePoint colourHSVGradientAPoint_, colourHSVGradientBPoint_;
+	// ColourScale used by surface
+	ColourScale colourScale_;
+	// Custom ColourScale source
+	ColourScale customColourScale_;
 	// Current colourscale source to use
 	ColourSource colourSource_;
 	// Current alpha control
 	AlphaControl alphaControl_;
 	// Fixed alpha value (for FixedAlpha option)
 	int fixedAlpha_;
+
+	public:
+	// Update colour scale
+	void updateColourScale();
 
 
 	/*

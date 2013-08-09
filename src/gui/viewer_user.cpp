@@ -157,7 +157,8 @@ void Viewer::constructSliceData(Slice* targetSlice, double yAxisScale, Array< Ve
 	QColor colour;
 	for (n=0; n<nPoints; ++n)
 	{
-		colour = colourScale.colour(yTarget[n] / yAxisScale);
+		colour = colourScale.colour((axisLogarithmic_.y ? pow(10.0, yTarget[n]): yTarget[n]) / yAxisScale);
+// 		colour = colourScale.colour(yTarget[n] / yAxisScale);	
 		colours.add(Vec4<GLfloat>(colour.redF(), colour.greenF(), colour.blueF(), colour.alphaF()));
 	}
 
@@ -320,6 +321,18 @@ void Viewer::createSurface(const List< Slice >& slices, ColourScale& colourScale
 			surfacePrimitive_.defineVertex(xA[n], yA[n], zA, normA[n], colourA[n], true);
 			surfacePrimitive_.defineVertex(xB[n], yB[n], zB, normB[n], colourB[n], true);
 			surfacePrimitive_.defineVertex(xB[n+1], yB[n+1], zB, normB[n+1], colourB[n+1], true);
+			
+			if (n == 550)
+			{
+				Vec4<GLfloat> colour(0.0, 0.0, 0.0, 0.5);
+				Vec3<double> normal(1.0, 0.0, 0.0);
+				surfacePrimitive_.defineVertex(xA[n], -0.523, zA, normal, colour, true);
+				surfacePrimitive_.defineVertex(xA[n], 0, zA, normal, colour, true);
+				surfacePrimitive_.defineVertex(xA[n], 0, zB, normal, colour, true);
+				surfacePrimitive_.defineVertex(xA[n], 0, zB, normal, colour, true);
+				surfacePrimitive_.defineVertex(xA[n], -0.523, zB, normal, colour, true);
+				surfacePrimitive_.defineVertex(xA[n], -0.523, zA, normal, colour, true);
+			}
 		}
 
 		// Copy arrays ready for next pass
@@ -405,6 +418,9 @@ void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, 
 		msg.print("Axis range is inappropriate for a log scale (%f < x < %f). Axis will not be drawn.\n", axisMin, axisMax);
 		return;
 	}
+
+	// Enforce sensible minimum for log axes
+	if (axisMin <= 0.0) axisMin = 1.0e-10;
 
 	// Store min/max values and coordinates
 	axisLogarithmic_[axis] = true;

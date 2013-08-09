@@ -90,6 +90,9 @@ void FQPlotWindow::on_actionFileLoad_triggered(bool checked)
 		// Update data and transform limits
 		calculateDataLimits();
 
+		// Update colour scale
+		updateColourScale();
+
 		// Update GUI
 		updateAllTabs();
 		updateTitleBar();
@@ -165,4 +168,27 @@ void FQPlotWindow::on_actionViewReset_triggered(bool checked)
 	A[14] = -5.0;
 	ui.MainView->setViewMatrix(A);
 	ui.MainView->update();
+}
+
+/*
+ * Colours
+ */
+
+// Update colour scale
+void FQPlotWindow::updateColourScale()
+{
+	colourScale_.clear();
+	if (colourSource_ == FQPlotWindow::SingleColourSource) colourScale_.addPoint(0.0, colourSinglePoint_.colour());
+	else if (colourSource_ == FQPlotWindow::RGBGradientSource)
+	{
+		colourScale_.addPoint(colourRGBGradientAPoint_.value(), colourRGBGradientAPoint_.colour());
+		colourScale_.addPoint(colourRGBGradientBPoint_.value(), colourRGBGradientBPoint_.colour());
+	}
+	else if (colourSource_ == FQPlotWindow::HSVGradientSource)
+	{
+		colourScale_.addPoint(colourHSVGradientAPoint_.value(), colourHSVGradientAPoint_.colour());
+		colourScale_.addPoint(colourHSVGradientBPoint_.value(), colourHSVGradientBPoint_.colour());
+		colourScale_.setUseHSV(true);
+	}
+	else if (colourSource_ == FQPlotWindow::CustomGradientSource) colourScale_ = customColourScale_;
 }

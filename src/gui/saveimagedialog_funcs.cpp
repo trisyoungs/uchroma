@@ -41,14 +41,13 @@ bool SaveImageDialog::getImageDetails(QString currentFilename, int width, int he
 {
 	ui.FileNameEdit->setText(currentFilename);
 	currentDirectory_.setPath(currentFilename);
-	ui.MaintainAspectRatioCheck->setChecked(maintainAspect);
-	ui.ImageHeightSpin->setValue(height);
-	ui.ImageWidthSpin->setValue(width);
-	ui.ImageFormatCombo->setCurrentIndex(format);
 	aspectRatio_ = currentAspect;
-	
+	ui.MaintainAspectRatioCheck->setChecked(maintainAspect);
+	ui.ImageWidthSpin->setValue(width);
+	ui.ImageHeightSpin->setValue(maintainAspect ? width/aspectRatio_ : height);
+	ui.ImageFormatCombo->setCurrentIndex(format);
+
 	int result = exec();
-	printf("Result = %i\n", result);
 	return (result == 1);
 }
 
