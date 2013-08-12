@@ -64,6 +64,23 @@ void FQPlotWindow::updateTitleBar()
 	else setWindowTitle("FQPlot v" + QString(FQPLOTREVISION) + " - " + inputFile_);
 }
 
+// Update GUI after loading data
+void FQPlotWindow::updateAfterLoad()
+{
+	// Update data and transform limits
+	calculateDataLimits();
+
+	// Update colour scale
+	updateColourScale();
+	
+	// Update GUI
+	updateAllTabs();
+	updateTitleBar();
+
+	// Update surface
+	updateSurface();
+}
+
 /*
 // File Menu
 */
@@ -85,18 +102,8 @@ void FQPlotWindow::on_actionFileLoad_triggered(bool checked)
 	if (fileName.isEmpty()) return;
 
 	clearData();
-	if (loadData(fileName))
-	{
-		// Update data and transform limits
-		calculateDataLimits();
-
-		// Update colour scale
-		updateColourScale();
-
-		// Update GUI
-		updateAllTabs();
-		updateTitleBar();
-	}
+	loadData(fileName);
+	updateAfterLoad();
 }
 
 void FQPlotWindow::on_actionFileSave_triggered(bool checked)
@@ -186,9 +193,9 @@ void FQPlotWindow::updateColourScale()
 	}
 	else if (colourSource_ == FQPlotWindow::HSVGradientSource)
 	{
+		colourScale_.setUseHSV(true);
 		colourScale_.addPoint(colourHSVGradientAPoint_.value(), colourHSVGradientAPoint_.colour());
 		colourScale_.addPoint(colourHSVGradientBPoint_.value(), colourHSVGradientBPoint_.colour());
-		colourScale_.setUseHSV(true);
 	}
 	else if (colourSource_ == FQPlotWindow::CustomGradientSource) colourScale_ = customColourScale_;
 }

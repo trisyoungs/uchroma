@@ -52,10 +52,10 @@ const char *Viewer::imageFormatExtension(Viewer::ImageFormat bf)
 Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 {
 	// Setup context format
-// 	QGLFormat format;
-// 	format.setSampleBuffers(true);
-// 	format.setDirectRendering(true);
-// 	setFormat(format);
+	QGLFormat format;
+	format.setSampleBuffers(true);
+	format.setDirectRendering(true);
+	setFormat(format);
 
 	// Character / Setup
 	contextWidth_ = 0;

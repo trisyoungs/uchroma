@@ -376,9 +376,6 @@ bool FQPlotWindow::loadData(QString fileName)
 	int nEmpty = nEmptySlices();
 	if (nEmpty != 0) QMessageBox::warning(this, "Empty Data", QString("There are ") + QString::number(nEmpty) + " defined slices which contain no data or could not be found.\nCheck the slice data directory, and/or the datafiles themselves..");
 
-	// Recreate surface
-	updateSurface();
-
 	// Set necessary variables
 	inputFile_ = fileName;
 	modified_ = false;
@@ -643,6 +640,31 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 	ui.MainView->setLabelScale(labelScale_);
 	ui.MainView->setTitleScale(titleScale_);
 
+	// Construct axes
+	for (int axis = 0; axis < 3; ++axis)
+	{
+		// Set position, taking into account logarithmic axes and scale factors
+		Vec3<double> pos;
+		for (int n=0; n<3; ++n)
+		{
+			if (n == axis) pos.set(n, 0.0);
+			else if (axisLogarithmic_[n]) pos.set(n, (axisInvert_[n] ? log10(limitMax_[n] / axisPosition_[axis][n]) : log10(axisPosition_[axis][n])) * axisStretch_[n]);
+			else pos.set(n, (axisInvert_[n] ? limitMax_[n] - axisPosition_[axis][n] : axisPosition_[axis][n]) * axisStretch_[n]);
+		}
+
+		if (axisLogarithmic_[axis]) ui.MainView->createLogAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis], axisLabelUp_[axis], axisLabelRotation_[axis], axisInvert_[axis], axisStretch_[axis]);
+		else
+		{
+			// Calculate autoticks if necessary
+			if (axisAutoTicks_[axis]) calculateTickDeltas(axis);
+
+			ui.MainView->createAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisFirstTick_[axis], axisTickDelta_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis], axisLabelUp_[axis], axisLabelRotation_[axis], axisInvert_[axis], axisStretch_[axis]);
+		}
+		
+		ui.MainView->setAxisVisible(axis, axisVisible_[axis]);
+	}
+
+	// Reconstruct surface
 	if (dataHasChanged)
 	{
 		// Clear existing display slices
@@ -752,35 +774,10 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 	// Create temporary colourScale_
 	ColourScale scale = colourScale_;
 	if (alphaControl_ == FQPlotWindow::FixedAlpha) scale.setAllAlpha(fixedAlpha_);
-	int i = 0;
-	for (ColourScalePoint* csp = scale.firstPoint(); csp != NULL; csp = csp->next) printf("CScale point %i : %f = (HSV) %i %i %i\n", i++, csp->value(), csp->colour().hue(), csp->colour().saturation(), csp->colour().value());
+	for (ColourScalePoint* csp = scale.firstPoint(); csp != NULL; csp = csp->next) printf("CSP %p : value = %f, colour = %i %i %i\n", csp, csp->value(), csp->colour().hue(), csp->colour().saturation(), csp->colour().value());
 
 	// Update surface GL object
 	ui.MainView->createSurface(surfaceData_, scale, axisStretch_.y);
-
-	// Construct axes
-	for (int axis = 0; axis < 3; ++axis)
-	{
-		// Set position, taking into account logarithmic axes and scale factors
-		Vec3<double> pos;
-		for (int n=0; n<3; ++n)
-		{
-			if (n == axis) pos.set(n, 0.0);
-			else if (axisLogarithmic_[n]) pos.set(n, (axisInvert_[n] ? log10(limitMax_[n] / axisPosition_[axis][n]) : log10(axisPosition_[axis][n])) * axisStretch_[n]);
-			else pos.set(n, (axisInvert_[n] ? limitMax_[n] - axisPosition_[axis][n] : axisPosition_[axis][n]) * axisStretch_[n]);
-		}
-
-		if (axisLogarithmic_[axis]) ui.MainView->createLogAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis], axisLabelUp_[axis], axisLabelRotation_[axis], axisInvert_[axis], axisStretch_[axis]);
-		else
-		{
-			// Calculate autoticks if necessary
-			if (axisAutoTicks_[axis]) calculateTickDeltas(axis);
-
-			ui.MainView->createAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisFirstTick_[axis], axisTickDelta_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis], axisLabelUp_[axis], axisLabelRotation_[axis], axisInvert_[axis], axisStretch_[axis]);
-		}
-		
-		ui.MainView->setAxisVisible(axis, axisVisible_[axis]);
-	}
 
 	// Setup Bounding Box
 	ui.MainView->createBoundingBox(boundingBox_, axisLogarithmic_.y ? log10(boundingBoxPlaneY_) : boundingBoxPlaneY_);

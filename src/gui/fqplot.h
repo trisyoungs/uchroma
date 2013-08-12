@@ -62,6 +62,8 @@ class FQPlotWindow : public QMainWindow
 	void updateAllTabs();
 	// Update title bar
 	void updateTitleBar();
+	// Update GUI after loading data
+	void updateAfterLoad();
 
 
 	/*

@@ -22,8 +22,8 @@
 #ifndef FQPLOT_VERSION_H
 #define FQPLOT_VERSION_H
 
-#define FQPLOTREVISION "23"
-#define FQPLOTDATE "Fri 09 Aug 2013 - 16:46"
+#define FQPLOTREVISION "24"
+#define FQPLOTDATE "Mon 12 Aug 2013 - 10:50"
 #define FQPLOTURL "http://www.projectaten.net/fqplot"
 
 #endif

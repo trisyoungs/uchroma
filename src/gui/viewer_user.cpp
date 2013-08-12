@@ -158,7 +158,6 @@ void Viewer::constructSliceData(Slice* targetSlice, double yAxisScale, Array< Ve
 	for (n=0; n<nPoints; ++n)
 	{
 		colour = colourScale.colour((axisLogarithmic_.y ? pow(10.0, yTarget[n]): yTarget[n]) / yAxisScale);
-// 		colour = colourScale.colour(yTarget[n] / yAxisScale);	
 		colours.add(Vec4<GLfloat>(colour.redF(), colour.greenF(), colour.blueF(), colour.alphaF()));
 	}
 
