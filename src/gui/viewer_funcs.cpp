@@ -72,7 +72,7 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	createPrimitives();
 	viewMatrix_[14] = -5.0;
 	font_ = NULL;
-	setupFont("wright.ttf");
+	setupFont(qPrintable(QDir::current().absoluteFilePath("wright.ttf")));
 	clipPlaneDelta_ = 0.0001;
 	clipPlaneBottom_[0] = 0.0;
 	clipPlaneBottom_[1] = 1.0;
