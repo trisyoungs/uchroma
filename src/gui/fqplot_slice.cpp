@@ -32,9 +32,8 @@ void FQPlotWindow::sliceAxisValueChanged(int axis, double value)
 	if (axis != -1)
 	{
 		// Update label
-		ui.SliceSelectorLabel->setText( QString("Slice @ ") + QChar(80 + axis) + " = " + QString::number(value));
+		ui.SliceSelectorLabel->setText( QString("Slice @ ") + QChar(88 + axis) + " = " + QString::number(value));
 	}
-	
 	updateSliceData();
 }
 
@@ -47,12 +46,18 @@ int FQPlotWindow::closestBin(int axis, double value)
 	{
 		// Check X array of first slice
 		Array<double>& x = slices_.first()->data().arrayX();
-		double delta, lastDelta = (x[1] - x[0])*1.0e9;
-		for (int n=0; n<x.nItems(); ++n)
+		int midIndex, loIndex = 0, hiIndex = x.nItems() - 1;
+		if (value < x.value(0)) return 0;
+		if (value > x.value(hiIndex)) return hiIndex;
+		// Binary... chop!
+		while ((hiIndex - loIndex) > 1)
 		{
-			delta = value - x[n];
-			XXX
+			midIndex = (hiIndex + loIndex) / 2;
+			if (x.value(midIndex) <= value) loIndex = midIndex;
+			else hiIndex = midIndex;
 		}
+		if (fabs(x.value(loIndex) - value) < fabs(x.value(hiIndex) - value)) return loIndex;
+		else return hiIndex;
 	}
 	else if (sliceAxis_ == 1)
 	{
@@ -60,8 +65,20 @@ int FQPlotWindow::closestBin(int axis, double value)
 	}
 	else if (sliceAxis_ == 2)
 	{
-		// Slice through Z - i.e. original slice data
-		//
+		// Check z-values
+		int closest = 0, n = 0;
+		double delta, closestDelta = fabs(slices_.first()->z() - value);
+		for (Slice* slice = slices_.first()->next; slice != NULL; slice = slice->next)
+		{
+			delta = fabs(slice->z() - value);
+			++n;
+			if (delta < closestDelta)
+			{
+				closest = n;
+				closestDelta = delta;
+			}
+		}
+		return closest;
 	}
 	else return -1;
 }
@@ -69,10 +86,14 @@ int FQPlotWindow::closestBin(int axis, double value)
 // Update slice data
 void FQPlotWindow::updateSliceData()
 {
+	int bin = closestBin(sliceAxis_, sliceAxisValue_);
 	// Grab slice data
 	if (sliceAxis_ == 0)
 	{
 		// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated)
+		sliceData_.clear();
+		for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) sliceData_.addPoint(slice->z(), slice->data().x(bin));
+		ui.SliceGraph->setStaticData(sliceData_, "X = " + QString::number(sliceData_.x(bin)));
 	}
 	else if (sliceAxis_ == 1)
 	{
@@ -81,6 +102,8 @@ void FQPlotWindow::updateSliceData()
 	else if (sliceAxis_ == 2)
 	{
 		// Slice through Z - i.e. original slice data
-		//
+		sliceData_.clear();
+		sliceData_ = slices_[bin]->data();
+		ui.SliceGraph->setStaticData(sliceData_, "Z = " + QString::number(slices_[bin]->z()));
 	}
 }

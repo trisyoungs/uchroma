@@ -110,7 +110,6 @@ void PlotWidget::plotSetup(QPainter& painter)
 	if (tempRect.width() > yValueRect_.width()) { yValueRect_.setLeft(tempRect.left()); yValueRect_.setRight(tempRect.right()); }
 
 	// Work out areas
-// 	if (absoluteTime_) xAxisArea_.setRect(spacing_, areaHeight_ - 3*spacing_ - 3*textHeight_, areaWidth_-2*spacing_, 3*textHeight_ + 3*spacing_);
 	xAxisArea_.setRect(spacing_, areaHeight_ - 2*spacing_ - 2*textHeight_, areaWidth_-2*spacing_, 2*textHeight_ + 2*spacing_);
 	yAxisArea_.setRect(spacing_, spacing_, yValueRect_.width() + 2*spacing_ + textHeight_, areaHeight_-2*spacing_);
 	graphArea_.setRect(yAxisArea_.right(), 2*spacing_+textHeight_, areaWidth_-2*spacing_-yAxisArea_.width(), areaHeight_-2*spacing_-textHeight_-xAxisArea_.height());
@@ -118,16 +117,17 @@ void PlotWidget::plotSetup(QPainter& painter)
 	yScale_ = graphArea_.height()/(yMax_-yMin_);
 
 	// If graph area has changed since last redraw then the scales will also have changed, so must regenerate QPainterPaths and recalculate tick deltas
-	if ((graphArea_ != lastGraphArea_) || (fabs(xScale_-lastXScale_) > 1e-5) || (fabs(yScale_-lastYScale_) > 13-5))
-	{
-		calculateTickDeltas(10);
-		for (PlotData* pd = dataSets_.first(); pd != NULL; pd = pd->next)
-		{
-			if (!pd->visible()) continue;
-			pd->generatePainterPaths(xScale_, yScale_);
-		}
-	}
-	lastGraphArea_ = graphArea_;
+	if ((graphArea_ != lastGraphArea_) || (fabs(xScale_-lastXScale_) > 1e-5) || (fabs(yScale_-lastYScale_) > 1e-5)) calculateTickDeltas(10);
+	
+	// Loop over all datasets and recreate painterpaths (if necessary)
+        for (PlotData* pd = dataSets_.first(); pd != NULL; pd = pd->next)
+        {
+                if (!pd->visible()) continue;
+                pd->generatePainterPaths(xScale_, yScale_);
+        }
+        staticDataSet_.generatePainterPaths(xScale_, yScale_);
+
+        lastGraphArea_ = graphArea_;
 	lastXScale_ = xScale_;
 	lastYScale_ = yScale_;
 
@@ -235,6 +235,20 @@ void PlotWidget::drawData(QPainter& painter)
 		painter.setBrush(Qt::NoBrush);
 		painter.drawPath(pd->linePath());
 	}
+
+	// Static data
+	// Take copy of the current transformation matrix, and modify it as necessary
+	modifiedTransform = localTransform_;
+// 		dataTransform.translate(0.0, verticalSpacing_*pd->verticalOffset()); TODO
+	// -- Set correct x-origin for data
+	modifiedTransform.translate(-xMin_*xScale_, -yMin_*yScale_);
+
+	// Update Painter transform, pen, and draw the dataset path
+	painter.setTransform(modifiedTransform);
+	staticDataSet_.stylePen(dataPen);
+	painter.setPen(dataPen);
+	painter.setBrush(Qt::NoBrush);
+	painter.drawPath(staticDataSet_.linePath());
 }
 
 // Draw axis tick marks / labels

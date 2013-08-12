@@ -74,7 +74,6 @@ PlotWidget::PlotWidget(QWidget* parent) : QWidget(parent)
 	limitYMin_ = false;
 	limitYMax_ = false;
 	autoScale_ = true;
-	nDataSetGroupsVisible_ = 0;
 	nDataSetBlocksVisible_ = 0;
 	
 	// Style
@@ -537,27 +536,13 @@ void PlotWidget::setYMaxLimit(bool enabled)
 // Source Data
 */
 
-// Create new dataset group
-PlotDataGroup* PlotWidget::addPlotDataGroup(QString name, bool visible)
-{
-	PlotDataGroup* group = new PlotDataGroup(name);
-	group->setVisible(visible);
-	if (visible)
-	{
-		group->setColour( PlotWidget::lineColour(nDataSetGroupsVisible_%PlotWidget::nLineColours) );
-		++nDataSetGroupsVisible_;
-	}
-	dataSetGroups_.own(group);
-	return group;
-}
-
 /*!
  * \brief Add data to Plot (local Data2D)
  */
-PlotData* PlotWidget::addDataSet(PlotDataGroup* parent, Data2D& data, QString runNumber, QString blockName, int yOffset)
+PlotData* PlotWidget::addDataSet(Data2D& data, QString name, QString blockName, int yOffset)
 {
 	PlotData* pd = dataSets_.add();
-	pd->setData(parent, data, runNumber);
+	pd->setData(data, name);
 	pd->setVerticalOffset(yOffset);
 	
 	// Determine limits for this data, and adjust parent's relative limits if necessary
@@ -573,10 +558,17 @@ PlotData* PlotWidget::addDataSet(PlotDataGroup* parent, Data2D& data, QString ru
 	}
 	pd->setBlock(pdb);
 
-	// Flag recreation of contextMenu_, and repaint widget
+	// Repaint widget
 	repaint();
 
 	return pd;
+}
+
+// Set static data
+void PlotWidget::setStaticData(Data2D& data, QString name)
+{
+	staticDataSet_.setData(data, name);
+	staticDataSet_.generatePainterPaths(xScale_, yScale_);
 }
 
 /*!
@@ -610,32 +602,8 @@ const List<PlotDataBlock>& PlotWidget::dataSetBlocks()
 // Hide all datasets
 void PlotWidget::hideAllDataSets()
 {
-	for (PlotDataGroup* group = dataSetGroups_.first(); group != NULL; group = group->next) group->setVisible(false);
-	nDataSetGroupsVisible_ = 0;
 	for (PlotDataBlock* pdb = dataSetBlocks_.first(); pdb != NULL; pdb = pdb->next) pdb->setVisible(false);
 	nDataSetBlocksVisible_ = 0;
-}
-
-// Set availability for data from specified run number
-void PlotWidget::setGroupVisible(QString runNumber, bool visible)
-{
-	// Loop over time periods, and set the one for this runnumber
-	// Recalculate number of visible groups while we're at it...
-	nDataSetGroupsVisible_ = 0;
-	for (PlotDataGroup* group = dataSetGroups_.first(); group != NULL; group = group->next)
-	{
-		if (group->name() == runNumber) group->setVisible(visible);
-		
-		// Set group colour
-		if (group->visible())
-		{
-			group->setColour( PlotWidget::lineColour(nDataSetGroupsVisible_%PlotWidget::nLineColours) );
-			++nDataSetGroupsVisible_;
-		}
-	}
-
-	fitData(true);
-	update();
 }
 
 // Show all datasets containing specified block data
@@ -647,14 +615,6 @@ void PlotWidget::setBlockVisible(QString blockName, bool visible)
 		if (pdb->blockName() == blockName)
 		{
 			pdb->setVisible(visible);
-
-			// Update PlotDataGroup visibility counters
-			for (PlotData* pd = dataSets_.first(); pd != NULL; pd = pd->next)
-			{
-				if (pd->block() != pdb) continue;
-				if (pd->parent() == NULL) continue;
-				pd->parent()->changeVisibleCount(visible);
-			}
 		}
 		
 		// Set block linestyle

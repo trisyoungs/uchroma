@@ -36,45 +36,6 @@ class QPushButton;
 class QLabel;
 class PlotData;
 
-// PlotData Group
-class PlotDataGroup : public ListItem<PlotDataGroup>
-{
-	public:
-	// Constructor
-	PlotDataGroup(QString name);
-
-	/*
-	 * Basic Data
-	 */
-	private:
-	// Name of this group
-	QString name_;
-	// Whether this group is visible
-	bool visible_;
-	// Associated PlotData
-	RefList<PlotData,int> dataSets_;
-	// Number of dataSets_ which are currently visible
-	int nDataSetsVisible_;
-	// General colour for this group
-	QColor colour_;
-
-	public:
-	// Return name of this group
-	QString name();
-	// Set availability
-	void setVisible(bool avail);
-	// Return visibility of this group
-	bool visible();
-	// Modify dataset visibility count
-	void changeVisibleCount(bool newDataSetVisibility);
-	// Return number of dataSets_ which are currently visible
-	int nDataSetsVisible();
-	// Set general colour for this group
-	void setColour(QColor colour);
-	// Return general colour for this group
-	QColor colour();
-};
-
 // PlotDataBlock
 class PlotDataBlock : public ListItem<PlotDataBlock>
 {
@@ -148,14 +109,14 @@ class PlotData : public ListItem<PlotData>
 	double yMin_, yMax_;
 	// Data name
 	QString name_;
-	// Parent PlotDataGroup
-	PlotDataGroup* parent_;
 	// Associated PlotDataBlock
 	PlotDataBlock* block_;
+	// Scales used in last path generation
+	double lastXScale_, lastYScale_;
 
 	public:
 	// Set data
-	void setData(PlotDataGroup* parent, Data2D& source, QString runNumber);
+	void setData(Data2D& source, QString runNumber);
 	// Return reference to contained data
 	Data2D& data();
 	// Determine data limits
@@ -184,8 +145,6 @@ class PlotData : public ListItem<PlotData>
 	double yMax();
 	// Return name
 	QString name();
-	// Return parent
-	PlotDataGroup* parent();
 
 
 	/*
@@ -435,22 +394,20 @@ class PlotWidget : public QWidget
 	 * Source Data
 	 */
 	private:
-	// List of dataset groups (i.e. based on RunNumber)
-	List<PlotDataGroup> dataSetGroups_;
 	// Blockname list
 	List<PlotDataBlock> dataSetBlocks_;
-	// Number of visible dataSetGroups_
-	int nDataSetGroupsVisible_;
 	// Number of visible dataSetBlocks_
 	int nDataSetBlocksVisible_;
 	// List of individual datasets
 	List<PlotData> dataSets_;
+	// Static data (always displayed)
+	PlotData staticDataSet_;
 
 	public:
-	// Create new dataset group
-	PlotDataGroup* addPlotDataGroup(QString name, bool visible);
 	// Add data to Plot (local Data2D)
-	PlotData* addDataSet(PlotDataGroup* parent, Data2D& data, QString runNumber, QString blockName = QString(), int yOffset = 0);
+	PlotData* addDataSet(Data2D& data, QString name, QString blockName, int yOffset = 0);
+	// Set static data
+	void setStaticData(Data2D& data, QString name);
 	// Remove all data from plot
 	void removeAllDataSets();
 	// Return dataset list
@@ -461,8 +418,6 @@ class PlotWidget : public QWidget
 	const List<PlotDataBlock>& dataSetBlocks();
 	// Hide all datasets
 	void hideAllDataSets();
-	// Set availability for data from specified group
-	void setGroupVisible(QString runNumber, bool visible);
 	// Show all datasets containing the specified block data
 	void setBlockVisible(QString blockName, bool visible);
 

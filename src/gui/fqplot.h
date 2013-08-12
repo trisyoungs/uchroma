@@ -318,7 +318,7 @@ class FQPlotWindow : public QMainWindow
 	// Current slice axis value
 	double sliceAxisValue_;
 	// Current slice data
-	Data2D currentSliceData_;
+	Data2D sliceData_;
 	
 	private:
 	// Return axis bin value of closest point to supplied value

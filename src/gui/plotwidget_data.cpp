@@ -23,61 +23,6 @@
 #include <math.h>
 
 /*
-// Plot Data Group
-*/
-
-// Constructor
-PlotDataGroup::PlotDataGroup(QString name) : ListItem<PlotDataGroup>()
-{
-	name_ = name;
-	visible_ = false;
-	nDataSetsVisible_ = 0;
-}
-
-// Return name of this period
-QString PlotDataGroup::name()
-{
-	return name_;
-}
-
-// Set availability
-void PlotDataGroup::setVisible(bool avail)
-{
-	visible_ = avail;
-}
-
-// Return availability
-bool PlotDataGroup::visible()
-{
-	return visible_;
-}
-
-// Modify dataset visibility count
-void PlotDataGroup::changeVisibleCount(bool newDataSetVisibility)
-{
-	if (newDataSetVisibility) ++nDataSetsVisible_;
-	else --nDataSetsVisible_;
-}
-
-// Return number of dataSets_ which are currently visible
-int PlotDataGroup::nDataSetsVisible()
-{
-	return nDataSetsVisible_;
-}
-
-// Set general colour for this group
-void PlotDataGroup::setColour(QColor colour)
-{
-	colour_ = colour;
-}
-
-// Return general colour for this group
-QColor PlotDataGroup::colour()
-{
-	return colour_;
-}
-
-/*
  * PlotDataBlock
  */
 
@@ -93,7 +38,7 @@ PlotDataBlock::PlotDataBlock(QString blockName) : ListItem<PlotDataBlock>()
 {
 	blockName_ = blockName;
 	lineStyle_ = PlotDataBlock::SolidStyle;
-	visible_ = false;
+	visible_ = true;
 }
 
 // Destructor
@@ -143,7 +88,6 @@ PlotData::PlotData() : ListItem<PlotData>()
 {
 	lineColour_ = Qt::black;
 	lineStyle_ = Qt::SolidLine;
-	parent_ = NULL;
 }
 
 /*!
@@ -155,11 +99,10 @@ PlotData::~PlotData()
 }
 
 // Set source data
-void PlotData::setData(PlotDataGroup* parent, Data2D& source, QString runNumber)
+void PlotData::setData(Data2D& source, QString name)
 {
-	parent_ = parent;
 	data_ = source;
-	name_ = runNumber;
+	name_ = name;
 }
 
 // Return reference to contained data
@@ -201,6 +144,9 @@ void PlotData::determineLimits()
 // Regenerate painter path
 void PlotData::generatePainterPaths(double xScale, double yScale)
 {
+	// Check the scale values at which the path was last created at - if it hasn't changed, don't bother recreating the path again...
+	if ( (fabs(xScale-lastXScale_) < 1.0e-10) && (fabs(yScale-lastYScale_) < 1.0e-10)) return;
+
 	// Generate QPainterPath, determining minimum / maximum values along the way
 	linePath_ = QPainterPath();
 	QRect symbolRect(0, 0, 7, 7);
@@ -265,12 +211,7 @@ QPainterPath& PlotData::linePath()
  */
 bool PlotData::visible()
 {
-	if (parent_)
-	{
-		if (block_) return (parent_->visible() && block_->visible());
-		else return parent_->visible();
-	}
-	else if (block_) return block_->visible();
+	if (block_) return block_->visible();
 	else return true;
 }
 
@@ -330,12 +271,6 @@ QString PlotData::name()
 	return name_;
 }
 
-// Return parent
-PlotDataGroup* PlotData::parent()
-{
-	return parent_;
-}
-
 /*
 // Style
 */
@@ -376,8 +311,7 @@ Qt::PenStyle PlotData::lineStyle()
 void PlotData::stylePen(QPen& pen)
 {
 	// Get colour from PlotDataGroup parent (if available)
-	if (parent_) pen.setColor(parent_->colour());
-	else pen.setColor(lineColour_);
+	pen.setColor(lineColour_);
 	
 	// Get line style from PlotDataBlock (if available)
 	if (block_) pen.setDashPattern(block_->dashes());
