@@ -569,6 +569,9 @@ void PlotWidget::setStaticData(Data2D& data, QString name)
 {
 	staticDataSet_.setData(data, name);
 	staticDataSet_.generatePainterPaths(xScale_, yScale_);
+	
+	// Repaint widget
+	repaint();
 }
 
 /*!
@@ -591,6 +594,7 @@ const List<PlotData>& PlotWidget::dataSets()
 void PlotWidget::determineDataSetLimits()
 {
 	for (PlotData* pd = dataSets_.first(); pd != NULL; pd = pd->next) pd->determineLimits();
+	staticDataSet_.determineLimits();
 }
 
 // Return list of data set groups
@@ -706,6 +710,15 @@ void PlotWidget::fitData(bool obeySoftLimits)
 		++nVisible;
 	}
 	
+	// Static data
+	// -- X axis first
+	if (staticDataSet_.xMin() < xMin_) xMin_ = staticDataSet_.xMin();
+	if (staticDataSet_.xMax() > xMax_) xMax_ = staticDataSet_.xMax();
+	
+	// Now Y
+	if ((staticDataSet_.yMin()) < yMin_) yMin_ = staticDataSet_.yMin();
+	if ((staticDataSet_.yMax()) > yMax_) yMax_ = staticDataSet_.yMax();
+
 	if (nVisible > 0)
 	{
 		// Increase y limits by 5% of difference (or actual value if difference is 'zero')

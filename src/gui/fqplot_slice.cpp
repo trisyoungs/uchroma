@@ -92,7 +92,7 @@ void FQPlotWindow::updateSliceData()
 	{
 		// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated)
 		sliceData_.clear();
-		for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) sliceData_.addPoint(slice->z(), slice->data().x(bin));
+		for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) sliceData_.addPoint(slice->z(), slice->data().y(bin));
 		ui.SliceGraph->setStaticData(sliceData_, "X = " + QString::number(sliceData_.x(bin)));
 	}
 	else if (sliceAxis_ == 1)
