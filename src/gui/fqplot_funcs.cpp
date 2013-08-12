@@ -40,6 +40,8 @@ FQPlotWindow::FQPlotWindow(QMainWindow *parent) : QMainWindow(parent), saveImage
 	viewerFont_ = QDir::current().absoluteFilePath("wright.ttf");
 #endif
 	clearData();
+	sliceAxis_ = -1;
+	sliceAxisValue_ = 0.0;
 	refreshing_ = false;
 
 	// Load settings...
@@ -47,6 +49,9 @@ FQPlotWindow::FQPlotWindow(QMainWindow *parent) : QMainWindow(parent), saveImage
 
 	// Load font for viewer
 	ui.MainView->setupFont(viewerFont_);
+
+	// Connect signals / slots between Viewer and main UI
+	connect(ui.MainView, SIGNAL(sliceAxisValueChanged(int,double)), this, SLOT(sliceAxisValueChanged(int,double)));
 }
 
 // Destructor

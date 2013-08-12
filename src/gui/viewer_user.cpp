@@ -25,15 +25,14 @@
 // Calculate axis slice selection for given axis at current mouse position
 void Viewer::calculateMouseAxisValues()
 {
-	for (int axis = 0; axis < 3; ++axis)
+	if (sliceSelector_ != -1)
 	{
-		if (!sliceSelector_[axis]) continue;
 // 		printf("Test: min=%f, max=%f\n", axisMin_[0], axisMax_[0]);
 // 		rMouseLast_.print();
 // 		axisCoordMin_[0].print();
 		// Project axis coordinates to get a screen-based yardstick
-		Vec4<double> axmin = modelToScreen(axisCoordMin_[axis]);
-		Vec4<double> axmax = modelToScreen(axisCoordMax_[axis]);
+		Vec4<double> axmin = modelToScreen(axisCoordMin_[sliceSelector_]);
+		Vec4<double> axmax = modelToScreen(axisCoordMax_[sliceSelector_]);
 // 		axmin.print();
 // 		axmax.print();
 
@@ -46,13 +45,19 @@ void Viewer::calculateMouseAxisValues()
 		amNorm.normalise();
 		double angle = acos(abNorm.dp(amNorm)) ;
 // 		printf("Angle = %f, %f\n", angle, angle * DEGRAD);
-		sliceAxisValue_[axis] = abNorm.dp(amNorm)*ratio * (axisMax_[axis] - axisMin_[axis]) + axisMin_[axis];
+		if (axisInverted_[sliceSelector_]) sliceAxisValue_ = abNorm.dp(amNorm)*ratio * (axisMin_[sliceSelector_] - axisMax_[sliceSelector_]) + axisMax_[sliceSelector_];
+		else sliceAxisValue_ = abNorm.dp(amNorm)*ratio * (axisMax_[sliceSelector_] - axisMin_[sliceSelector_]) + axisMin_[sliceSelector_];
 		
 		// Clamp value to data range
-		if (sliceAxisValue_[axis] < axisMin_[axis]) sliceAxisValue_[axis] = axisMin_[axis];
-		else if (sliceAxisValue_[axis] > axisMax_[axis]) sliceAxisValue_[axis] = axisMax_[axis];
-// 		printf("ACMAG = %f, X = %f\n", ratio, sliceAxisValue_[axis]);
+		if (sliceAxisValue_ < axisMin_[sliceSelector_]) sliceAxisValue_ = axisMin_[sliceSelector_];
+		else if (sliceAxisValue_ > axisMax_[sliceSelector_]) sliceAxisValue_ = axisMax_[sliceSelector_];
+// 		printf("ACMAG = %f, X = %f\n", ratio, sliceAxisValue_[sliceSelector_]);
+
+		// Account for log and inverted scales
+		if (axisLogarithmic_[sliceSelector_]) emit(sliceAxisValueChanged(sliceSelector_, pow(10.0, sliceAxisValue_)));
+		else emit(sliceAxisValueChanged(sliceSelector_, sliceAxisValue_));
 	}
+	else emit(sliceAxisValueChanged(-1, 0.0));
 }
 
 // Create necessary primitives (must be called before any rendering is done)
@@ -363,6 +368,7 @@ void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, dou
 
 	// Store min/max values and coordinates
 	axisLogarithmic_[axis] = false;
+	axisInverted_[axis] = inverted;
 	axisMin_[axis] = axisMin;
 	axisMax_[axis] = axisMax;
 	axisCoordMin_[axis] = axisPosition;
@@ -423,6 +429,7 @@ void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, 
 
 	// Store min/max values and coordinates
 	axisLogarithmic_[axis] = true;
+	axisInverted_[axis] = inverted;
 	axisMin_[axis] = log10(axisMin);
 	axisMax_[axis] = log10(axisMax);
 	axisCoordMin_[axis] = axisPosition;

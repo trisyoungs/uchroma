@@ -221,12 +221,14 @@ class Viewer : public QGLWidget
 	Vec3<double> axisCoordMin_[3], axisCoordMax_[3];
 	// Whether axes are logarithmic
 	Vec3<bool> axisLogarithmic_;
+	// Wheter axes are inverted
+	Vec3<bool> axisInverted_;
 	// Whether axes are visible
 	Vec3<bool> axisVisible_;
 	// Current axis target for temporary slice selection
-	Vec3<bool> sliceSelector_;
+	int sliceSelector_;
 	// Current axis value for temporary slice selection
-	Vec3<double> sliceAxisValue_;
+	double sliceAxisValue_;
 
 	private:
 	// Calculate active axis values at current mouse position
@@ -261,6 +263,9 @@ class Viewer : public QGLWidget
 	void setLabelScale(double scale);
 	// Set scale factor for titles
 	void setTitleScale(double scale);
+	
+	signals:
+	void sliceAxisValueChanged(int, double);
 
 
 	/*

@@ -310,6 +310,28 @@ class FQPlotWindow : public QMainWindow
 
 
 	/*
+	 * Interactive Data Slicing / Fitting
+	 */
+	private:
+	// Current slice axis
+	int sliceAxis_;
+	// Current slice axis value
+	double sliceAxisValue_;
+	// Current slice data
+	Data2D currentSliceData_;
+	
+	private:
+	// Return axis bin value of closest point to supplied value
+	int closestBin(int axis, double value);
+
+	public:
+	// Update slice data
+	void updateSliceData();
+
+	public slots:
+	void sliceAxisValueChanged(int axis, double value);
+
+	/*
 	 * Data
 	 */
 	public:

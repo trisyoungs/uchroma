@@ -99,7 +99,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 	}
 	
 	// Recalculate slice values?
-	if (sliceSelector_.x || sliceSelector_.y || sliceSelector_.z)
+	if (sliceSelector_ != -1)
 	{
 		calculateMouseAxisValues();
 		refresh = true;
@@ -187,19 +187,9 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 			ignore = false;
 			break;
 		case (Qt::Key_X):
-			sliceSelector_.x = !sliceSelector_.x;
-			calculateMouseAxisValues();
-			refresh = true;
-			ignore = false;
-			break;
 		case (Qt::Key_Y):
-			sliceSelector_.y = !sliceSelector_.y;
-			calculateMouseAxisValues();
-			refresh = true;
-			ignore = false;
-			break;
 		case (Qt::Key_Z):
-			sliceSelector_.z = !sliceSelector_.z;
+			sliceSelector_ = sliceSelector_ == (event->key() - Qt::Key_X) ? -1 : (event->key() - Qt::Key_X);
 			calculateMouseAxisValues();
 			refresh = true;
 			ignore = false;
