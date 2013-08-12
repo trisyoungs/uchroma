@@ -72,7 +72,6 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	createPrimitives();
 	viewMatrix_[14] = -5.0;
 	font_ = NULL;
-	setupFont(qPrintable(QDir::current().absoluteFilePath("wright.ttf")));
 	clipPlaneDelta_ = 0.0001;
 	clipPlaneBottom_[0] = 0.0;
 	clipPlaneBottom_[1] = 1.0;
@@ -296,17 +295,31 @@ void Viewer::resizeGL(int newwidth, int newheight)
 */
 
 // Setup font specified
-bool Viewer::setupFont(const char* fontName)
+bool Viewer::setupFont(QString fontName)
 {
+	// If the current font is valid, and matches the name of the new font supplied, do nothing
+	if (font_ && (fontFile_ == fontName)) return true;
+
 	// Prevent anything from being drawn while we change the font
 	drawing_ = true;
 	
 	if (font_) delete font_;
-	FTPolygonFont* newFont = new FTPolygonFont("wright.ttf");
+	font_ = NULL;
+	fontFile_ = fontName;
+
+	// Check if the file exists
+	if (!QFile::exists(fontFile_))
+	{
+		QMessageBox::warning(this, "Font Error", "The specified font file '" + fontFile_ + "' does not exist.");
+		drawing_ = false;
+		return false;
+	}
+
+	FTPolygonFont* newFont = new FTPolygonFont(qPrintable(fontName));
 	if (newFont->Error())
 	{
-		msg.print("Oh dear, an error occurred while trying to load the specified font.\n");
-		font_ = NULL;
+		QMessageBox::warning(this, "Font Error", "Error creating primitives from '" + fontFile_ + "'.");
+		delete newFont;
 		fontBaseHeight_ = 1.0;
 	}
 	else
@@ -321,6 +334,7 @@ bool Viewer::setupFont(const char* fontName)
 	}
 
 	drawing_ = false;
+	return (font_ != NULL);
 }
 
 // Return the current height of the drawing area

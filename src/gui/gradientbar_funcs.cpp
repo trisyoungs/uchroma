@@ -41,7 +41,7 @@ void GradientBar::setColourScale(const ColourScale& colourScale)
 	{
 		colourScale_.clear();
 		colourScale_.setUseHSV(false);
-		if (colourScale.nPoints() > 1)
+		if (colourScale.nPoints() > 0)
 		{
 			const int nPoints = 101;
 			double value = colourScale.firstPoint()->value();
@@ -59,13 +59,22 @@ void GradientBar::setColourScale(const ColourScale& colourScale)
 	gradient_ = QLinearGradient(0.0, 1.0, 0.0, 0.0);
 	gradient_.setCoordinateMode(QGradient::ObjectBoundingMode);
 
-	double zero = colourScale_.firstPoint()->value();
-	double span = colourScale_.lastPoint()->value() - zero;
-
 	// -- Loop backwards through points
-	for (ColourScalePoint* csp = colourScale_.firstPoint(); csp != NULL; csp = csp->next)
+	if (colourScale_.nPoints() == 0)
 	{
-		gradient_.setColorAt((csp->value() - zero) / span, csp->colour());
+		gradient_.setColorAt(0.0, QColor(0,0,0));
+		gradient_.setColorAt(1.0, QColor(0,0,0));
+	}
+	else if (colourScale_.nPoints() == 1)
+	{
+		gradient_.setColorAt(0.0, colourScale_.firstPoint()->colour());
+		gradient_.setColorAt(1.0, colourScale_.firstPoint()->colour());
+	}
+	else
+	{
+		double zero = colourScale_.firstPoint()->value();
+		double span = colourScale_.lastPoint()->value() - zero;
+		for (ColourScalePoint* csp = colourScale_.firstPoint(); csp != NULL; csp = csp->next) gradient_.setColorAt((csp->value() - zero) / span, csp->colour());
 	}
 	
 	repaint();

@@ -66,6 +66,8 @@ class Viewer : public QGLWidget
 	Matrix viewMatrix_;
 	// Viewport matrix for the scene
 	GLuint viewportMatrix_[4];
+	// Font file last passed to setupFont()
+	QString fontFile_;
 	// FTGL font for text
 	FTFont* font_;
 	// Basic font height (from baseline to top of normal height letter)
@@ -82,7 +84,7 @@ class Viewer : public QGLWidget
 
 	public:
 	// Setup font specified
-	bool setupFont(const char* fontName);
+	bool setupFont(QString fontName);
 	// Return the current height of the drawing area
 	GLsizei contextHeight() const;
 	// Return the current width of the drawing area

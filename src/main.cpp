@@ -47,7 +47,6 @@ int main(int argc, char *argv[])
 	}
 
 	/* Update main window */
-	// TODO Put these functions in an 'updateAfterLoad()' function
 	mainWindow.updateAfterLoad();
 
 	/* Show the main window */

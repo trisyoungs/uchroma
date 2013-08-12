@@ -34,8 +34,19 @@ FQPlotWindow::FQPlotWindow(QMainWindow *parent) : QMainWindow(parent), saveImage
 
 	// Set variable defaults
 	dataFileDirectory_ = getenv("CWD");
+#ifdef WIN32
+	viewerFont_ = QDir::current().absoluteFilePath("bin/wright.ttf");
+#else
+	viewerFont_ = QDir::current().absoluteFilePath("wright.ttf");
+#endif
 	clearData();
 	refreshing_ = false;
+
+	// Load settings...
+	loadSettings();
+
+	// Load font for viewer
+	ui.MainView->setupFont(viewerFont_);
 }
 
 // Destructor
@@ -46,6 +57,15 @@ FQPlotWindow::~FQPlotWindow()
 // Window close event
 void FQPlotWindow::closeEvent(QCloseEvent *event)
 {
+}
+
+// Load settings...
+void FQPlotWindow::loadSettings()
+{
+	QSettings settings;
+
+	// Viewer font
+	if (settings.contains("ViewerFont")) viewerFont_ = settings.value("ViewerFont").toString();
 }
 
 // Update all tabs
@@ -79,6 +99,9 @@ void FQPlotWindow::updateAfterLoad()
 
 	// Update surface
 	updateSurface();
+
+	// Setup font
+	ui.MainView->setupFont(viewerFont_);
 }
 
 /*

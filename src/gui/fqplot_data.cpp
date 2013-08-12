@@ -774,7 +774,6 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 	// Create temporary colourScale_
 	ColourScale scale = colourScale_;
 	if (alphaControl_ == FQPlotWindow::FixedAlpha) scale.setAllAlpha(fixedAlpha_);
-	for (ColourScalePoint* csp = scale.firstPoint(); csp != NULL; csp = csp->next) printf("CSP %p : value = %f, colour = %i %i %i\n", csp, csp->value(), csp->colour().hue(), csp->colour().saturation(), csp->colour().value());
 
 	// Update surface GL object
 	ui.MainView->createSurface(surfaceData_, scale, axisStretch_.y);

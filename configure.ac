@@ -3,7 +3,7 @@
 AC_PREREQ(2.60)
 
 # Set program name, version, bug-address and source directory
-m4_define([FQPLOT_VERSION],[r25])
+m4_define([FQPLOT_VERSION],[r26])
 AC_INIT(fqplot,FQPLOT_VERSION,tris@projectaten.net)
 AC_CONFIG_SRCDIR([src/])
 

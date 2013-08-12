@@ -58,6 +58,10 @@ class FQPlotWindow : public QMainWindow
 	void closeEvent(QCloseEvent *event);
 
 	public:
+	// Load program settings
+	void loadSettings();
+	// Save program settings
+	void saveSettings();
 	// Update all tabs
 	void updateAllTabs();
 	// Update title bar
@@ -338,6 +342,8 @@ class FQPlotWindow : public QMainWindow
 	List<Slice> slices_;
 	// List of slices for display
 	List<Slice> surfaceData_;
+	// Font file to use for viewer
+	QString viewerFont_;
 
 	private:
 	// Recalculate tick deltas for specified axis
