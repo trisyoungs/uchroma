@@ -25,14 +25,14 @@
 // Calculate axis slice selection for given axis at current mouse position
 void Viewer::calculateMouseAxisValues()
 {
-	if (sliceSelector_ != -1)
+	if (sliceAxis_ != -1)
 	{
 // 		printf("Test: min=%f, max=%f\n", axisMin_[0], axisMax_[0]);
 // 		rMouseLast_.print();
 // 		axisCoordMin_[0].print();
 		// Project axis coordinates to get a screen-based yardstick
-		Vec4<double> axmin = modelToScreen(axisCoordMin_[sliceSelector_]);
-		Vec4<double> axmax = modelToScreen(axisCoordMax_[sliceSelector_]);
+		Vec4<double> axmin = modelToScreen(axisCoordMin_[sliceAxis_]);
+		Vec4<double> axmax = modelToScreen(axisCoordMax_[sliceAxis_]);
 // 		axmin.print();
 // 		axmax.print();
 
@@ -45,17 +45,18 @@ void Viewer::calculateMouseAxisValues()
 		amNorm.normalise();
 		double angle = acos(abNorm.dp(amNorm)) ;
 // 		printf("Angle = %f, %f\n", angle, angle * DEGRAD);
-		if (axisInverted_[sliceSelector_]) sliceAxisValue_ = abNorm.dp(amNorm)*ratio * (axisMin_[sliceSelector_] - axisMax_[sliceSelector_]) + axisMax_[sliceSelector_];
-		else sliceAxisValue_ = abNorm.dp(amNorm)*ratio * (axisMax_[sliceSelector_] - axisMin_[sliceSelector_]) + axisMin_[sliceSelector_];
+		
+		// Calculate slice axis value - no need to account for inverted axes here, since this is accounted for by axmin and axmax
+		sliceAxisValue_ = abNorm.dp(amNorm)*ratio * (axisMax_[sliceAxis_] - axisMin_[sliceAxis_]) + axisMin_[sliceAxis_];
 		
 		// Clamp value to data range
-		if (sliceAxisValue_ < axisMin_[sliceSelector_]) sliceAxisValue_ = axisMin_[sliceSelector_];
-		else if (sliceAxisValue_ > axisMax_[sliceSelector_]) sliceAxisValue_ = axisMax_[sliceSelector_];
-// 		printf("ACMAG = %f, X = %f\n", ratio, sliceAxisValue_[sliceSelector_]);
+		if (sliceAxisValue_ < axisMin_[sliceAxis_]) sliceAxisValue_ = axisMin_[sliceAxis_];
+		else if (sliceAxisValue_ > axisMax_[sliceAxis_]) sliceAxisValue_ = axisMax_[sliceAxis_];
+// 		printf("ACMAG = %f, X = %f\n", ratio, sliceAxisValue_[sliceAxis_]);
 
 		// Account for log and inverted scales
-		if (axisLogarithmic_[sliceSelector_]) emit(sliceAxisValueChanged(sliceSelector_, pow(10.0, sliceAxisValue_)));
-		else emit(sliceAxisValueChanged(sliceSelector_, sliceAxisValue_));
+		if (axisLogarithmic_[sliceAxis_]) emit(sliceAxisValueChanged(sliceAxis_, pow(10.0, sliceAxisValue_)));
+		else emit(sliceAxisValueChanged(sliceAxis_, sliceAxisValue_));
 	}
 	else emit(sliceAxisValueChanged(-1, 0.0));
 }
@@ -63,7 +64,7 @@ void Viewer::calculateMouseAxisValues()
 // Create necessary primitives (must be called before any rendering is done)
 void Viewer::createPrimitives()
 {
-	// Setup surface primitive
+	// Setup primitives
 	surfacePrimitive_.setColourData(true);
 	slicePrimitive_.setNoInstances();
 	boundingBoxPrimitive_.setNoInstances();
@@ -76,6 +77,51 @@ void Viewer::createPrimitives()
 
 	// Every primitive using instances must be added to the primitiveList_
 	primitiveList_.add(&surfacePrimitive_);
+}
+
+// Regenerate slice primitive
+void Viewer::regenerateSlicePrimitive()
+{
+	slicePrimitive_.forgetAll();
+	if (sliceAxis_ == -1) return;
+	
+	const int nPoints = 100;
+	double delta, value;
+	Vec4<GLfloat> colour(0.0, 0.0, 0.0, 0.5);
+	Vec3<double> normal(0.0, 0.0, 0.0);
+	
+	if (sliceAxis_ == 0)
+	{
+		value = axisCoordMin_[2].z;
+		delta = (axisCoordMax_[2].z - axisCoordMin_[2].z) / nPoints;
+		normal[sliceAxis_] = 1.0;
+		for (int n=0; n<nPoints; ++n)
+		{
+			slicePrimitive_.defineVertex(0.0, axisCoordMin_[1].y, value, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(0.0, axisCoordMax_[1].y, value, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(0.0, axisCoordMax_[1].y, value+delta, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(0.0, axisCoordMax_[1].y, value+delta, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(0.0, axisCoordMin_[1].y, value+delta, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(0.0, axisCoordMin_[1].y, value, normal.x, normal.y, normal.z, true);
+			value += delta;
+		}
+	}
+	if (sliceAxis_ == 2)
+	{
+		value = axisCoordMin_[0].x;
+		delta = (axisCoordMax_[0].x - axisCoordMin_[0].x) / nPoints;
+		normal[sliceAxis_] = 1.0;
+		for (int n=0; n<nPoints; ++n)
+		{
+			slicePrimitive_.defineVertex(axisCoordMin_[0].x, value, 0.0, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(axisCoordMax_[0].x, value, 0.0, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(axisCoordMax_[0].x, value+delta, 0.0, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(axisCoordMax_[0].x, value+delta, 0.0, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(axisCoordMin_[0].x, value+delta, 0.0, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(axisCoordMin_[0].x, value, 0.0, normal.x, normal.y, normal.z, true);
+			value += delta;
+		}
+	}
 }
 
 // Setup basic GL properties (called each time before renderScene())
@@ -280,7 +326,7 @@ void Viewer::constructSliceData(Slice* targetSlice, double yAxisScale, Array< Ve
 }
 
 // Create surface primitive
-void Viewer::createSurface(const List< Slice >& slices, ColourScale& colourScale, double yAxisScale)
+void Viewer::createSurface(const List<Slice>& slices, ColourScale& colourScale, double yAxisScale)
 {
 	GLfloat zA, zB;
 	
@@ -325,18 +371,6 @@ void Viewer::createSurface(const List< Slice >& slices, ColourScale& colourScale
 			surfacePrimitive_.defineVertex(xA[n], yA[n], zA, normA[n], colourA[n], true);
 			surfacePrimitive_.defineVertex(xB[n], yB[n], zB, normB[n], colourB[n], true);
 			surfacePrimitive_.defineVertex(xB[n+1], yB[n+1], zB, normB[n+1], colourB[n+1], true);
-			
-			if (n == 550)
-			{
-				Vec4<GLfloat> colour(0.0, 0.0, 0.0, 0.5);
-				Vec3<double> normal(1.0, 0.0, 0.0);
-				surfacePrimitive_.defineVertex(xA[n], -0.523, zA, normal, colour, true);
-				surfacePrimitive_.defineVertex(xA[n], 0, zA, normal, colour, true);
-				surfacePrimitive_.defineVertex(xA[n], 0, zB, normal, colour, true);
-				surfacePrimitive_.defineVertex(xA[n], 0, zB, normal, colour, true);
-				surfacePrimitive_.defineVertex(xA[n], -0.523, zB, normal, colour, true);
-				surfacePrimitive_.defineVertex(xA[n], -0.523, zA, normal, colour, true);
-			}
 		}
 
 		// Copy arrays ready for next pass
@@ -369,6 +403,7 @@ void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, dou
 	// Store min/max values and coordinates
 	axisLogarithmic_[axis] = false;
 	axisInverted_[axis] = inverted;
+	axisStretch_[axis] = stretch;
 	axisMin_[axis] = axisMin;
 	axisMax_[axis] = axisMax;
 	axisCoordMin_[axis] = axisPosition;
@@ -430,6 +465,7 @@ void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, 
 	// Store min/max values and coordinates
 	axisLogarithmic_[axis] = true;
 	axisInverted_[axis] = inverted;
+	axisStretch_[axis] = stretch;
 	axisMin_[axis] = log10(axisMin);
 	axisMax_[axis] = log10(axisMax);
 	axisCoordMin_[axis] = axisPosition;
@@ -536,4 +572,13 @@ void Viewer::setLabelScale(double scale)
 void Viewer::setTitleScale(double scale)
 {
 	titleScale_ = scale;
+}
+
+// Set current slice axis
+void Viewer::setSliceAxis(int axis)
+{
+	sliceAxis_ = axis;
+	regenerateSlicePrimitive();
+	calculateMouseAxisValues();
+	repaint();
 }

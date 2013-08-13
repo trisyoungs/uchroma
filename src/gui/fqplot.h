@@ -310,8 +310,19 @@ class FQPlotWindow : public QMainWindow
 
 
 	/*
-	 * Interactive Data Slicing / Fitting
+	 * Tabs -- Analyse
 	 */
+	private slots:
+	void on_AnalyseSliceNoneRadio_clicked(bool checked);
+	void on_AnalyseSliceXRadio_clicked(bool checked);
+	void on_AnalyseSliceYRadio_clicked(bool checked);
+	void on_AnalyseSliceZRadio_clicked(bool checked);
+	void on_AnalyseSliceMonitorCheck_clicked(bool checked);
+
+	public slots:
+	void sliceAxisValueChanged(int axis, double value);
+	void addSlice(int axis, double value);
+
 	private:
 	// Current slice axis
 	int sliceAxis_;
@@ -326,10 +337,8 @@ class FQPlotWindow : public QMainWindow
 
 	public:
 	// Update slice data
-	void updateSliceData();
+	void updateSliceData(bool setStatic);
 
-	public slots:
-	void sliceAxisValueChanged(int axis, double value);
 
 	/*
 	 * Data
@@ -388,8 +397,6 @@ class FQPlotWindow : public QMainWindow
 	void calculateTransformLimits();
 	// Set display limits to show all available data
 	void showAllData();
-	// Transform single value
-	double transformValue(double x, double preShift, double postShift, FQPlotWindow::DataTransform transformType, double transformValue);
 	// Flag data as modified, and update titlebar
 	void setAsModified();
 	// Update surface data after data change
@@ -418,6 +425,10 @@ class FQPlotWindow : public QMainWindow
 	Vec3<bool> interpolate_, interpolateConstrained_;
 	// Interpolation step sizes
 	Vec3<double> interpolationStep_;
+
+	public:
+	// Transform single value on the axis specified
+	double transformValue(double x, int axis);
 
 
 	/*

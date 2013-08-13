@@ -558,6 +558,9 @@ PlotData* PlotWidget::addDataSet(Data2D& data, QString name, QString blockName, 
 	}
 	pd->setBlock(pdb);
 
+	// Autoscale view if requested
+	if (autoScale_) fitData(true);
+
 	// Repaint widget
 	repaint();
 
@@ -568,7 +571,10 @@ PlotData* PlotWidget::addDataSet(Data2D& data, QString name, QString blockName, 
 void PlotWidget::setStaticData(Data2D& data, QString name)
 {
 	staticDataSet_.setData(data, name);
-	staticDataSet_.generatePainterPaths(xScale_, yScale_);
+	staticDataSet_.determineLimits();
+
+	// Autoscale view if requested
+	if (autoScale_) fitData(true);
 	
 	// Repaint widget
 	repaint();
@@ -681,8 +687,16 @@ void PlotWidget::zoomToGraph(double x1, double y1, double x2, double y2)
  */
 void PlotWidget::fitData(bool obeySoftLimits)
 {
+	// Static data first
+	// -- X axis first
+	xMin_ = staticDataSet_.xMin();
+	xMax_ = staticDataSet_.xMax();
+
+	// -- Now Y
+	yMin_ = staticDataSet_.yMin();
+	yMax_ = staticDataSet_.yMax();
+	
 	// Set initial values
-	int nVisible = 0;
 	for (PlotData* pd = dataSets_.first(); pd != NULL; pd = pd->next)
 	{
 		// If dataset isn't currently shown, move on
@@ -690,49 +704,26 @@ void PlotWidget::fitData(bool obeySoftLimits)
 		
 		// If this is the first visible dataset encountered, set initial limits - otherwise, compare
 		double off = verticalSpacing_ * pd->verticalOffset();
-		if (nVisible == 0)
-		{
-			xMin_ = pd->xMin();
-			xMax_ = pd->xMax();
-			yMin_ = pd->yMin() + verticalSpacing_*pd->verticalOffset();
-			yMax_ = pd->yMax() + verticalSpacing_*pd->verticalOffset();
-		}
-		else
-		{
-			// X axis first
-			if (pd->xMin() < xMin_) xMin_ = pd->xMin();
-			if (pd->xMax() > xMax_) xMax_ = pd->xMax();
-			
-			// Now Y
-			if ((pd->yMin() + off) < yMin_) yMin_ = pd->yMin() + off;
-			if ((pd->yMax() + off) > yMax_) yMax_ = pd->yMax() + off;
-		}
-		++nVisible;
-	}
-	
-	// Static data
-	// -- X axis first
-	if (staticDataSet_.xMin() < xMin_) xMin_ = staticDataSet_.xMin();
-	if (staticDataSet_.xMax() > xMax_) xMax_ = staticDataSet_.xMax();
-	
-	// Now Y
-	if ((staticDataSet_.yMin()) < yMin_) yMin_ = staticDataSet_.yMin();
-	if ((staticDataSet_.yMax()) > yMax_) yMax_ = staticDataSet_.yMax();
+		// X axis first
+		if (pd->xMin() < xMin_) xMin_ = pd->xMin();
+		if (pd->xMax() > xMax_) xMax_ = pd->xMax();
 
-	if (nVisible > 0)
+		// Now Y
+		if ((pd->yMin() + off) < yMin_) yMin_ = pd->yMin() + off;
+		if ((pd->yMax() + off) > yMax_) yMax_ = pd->yMax() + off;
+	}
+
+	// Increase y limits by 5% of difference (or actual value if difference is 'zero')
+	double diff = ((yMax_ - yMin_) < yMax_*1.0e-3 ? yMax_*0.05 : (yMax_ - yMin_) * 0.05);
+	if (diff < 1.0e-8)
 	{
-		// Increase y limits by 5% of difference (or actual value if difference is 'zero')
-		double diff = ((yMax_ - yMin_) < yMax_*1.0e-3 ? yMax_*0.05 : (yMax_ - yMin_) * 0.05);
-		if (diff < 1.0e-8)
-		{
-			yMin_ -= 1.0;
-			yMax_ += 1.0;
-		}
-		else
-		{
-			if (fabs(yMin_) > 1.0e-8) yMin_ -= diff;
-			if (fabs(yMax_) > 1.0e-8) yMax_ += diff;
-		}
+		yMin_ -= 1.0;
+		yMax_ += 1.0;
+	}
+	else
+	{
+		if (fabs(yMin_) > 1.0e-8) yMin_ -= diff;
+		if (fabs(yMax_) > 1.0e-8) yMax_ += diff;
 	}
 
 	// Obey soft limits?
@@ -744,7 +735,7 @@ void PlotWidget::fitData(bool obeySoftLimits)
 		if (limitYMax_ && (yMax_ > yMaxLimit_)) yMax_ = yMaxLimit_;
 	}
 
-	msg.print("New axis limits are %f/%f and %f/%f (scales = %f/%f), %i/%i\n", xMin_, xMax_, yMin_, yMax_, xScale_, yScale_, graphArea_.width(), graphArea_.height());
+// 	msg.print("New axis limits are %f/%f and %f/%f (scales = %f/%f), %i/%i\n", xMin_, xMax_, yMin_, yMax_, xScale_, yScale_, graphArea_.width(), graphArea_.height());
 
 	repaint();
 }

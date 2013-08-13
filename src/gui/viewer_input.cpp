@@ -37,7 +37,18 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 
 	// Store event information
 	rMouseDown_.set(event->x(), event->y(), 0.0);
-	
+
+	if (buttonState_&Qt::LeftButton)
+	{
+		if (sliceAxis_ != -1)
+		{
+			calculateMouseAxisValues();
+			if (axisLogarithmic_[sliceAxis_]) emit(sliceAxisClicked(sliceAxis_, pow(10.0, sliceAxisValue_)));
+			else emit(sliceAxisClicked(sliceAxis_, sliceAxisValue_));
+		}
+		
+	}
+
 	// Do something with the button press event (e.g. context menu function)?
 	if (buttonState_&Qt::RightButton)
 	{
@@ -55,6 +66,8 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
 	buttonState_ = event->buttons();
 	Qt::KeyboardModifiers km = event->modifiers();
 	
+
+
 	postRedisplay();
 	
 	msg.exit("Viewer::mouseReleaseEvent");
@@ -99,7 +112,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 	}
 	
 	// Recalculate slice values?
-	if (sliceSelector_ != -1)
+	if (sliceAxis_ != -1)
 	{
 		calculateMouseAxisValues();
 		refresh = true;
@@ -189,7 +202,8 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 		case (Qt::Key_X):
 		case (Qt::Key_Y):
 		case (Qt::Key_Z):
-			sliceSelector_ = sliceSelector_ == (event->key() - Qt::Key_X) ? -1 : (event->key() - Qt::Key_X);
+			sliceAxis_ = sliceAxis_ == (event->key() - Qt::Key_X) ? -1 : (event->key() - Qt::Key_X);
+			regenerateSlicePrimitive();
 			calculateMouseAxisValues();
 			refresh = true;
 			ignore = false;

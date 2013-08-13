@@ -64,7 +64,7 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	drawing_ = false;
 	renderingOffscreen_ = false;
 	hasPerspective_ = false;
-	sliceSelector_ = -1;
+	sliceAxis_ = -1;
 	sliceAxisValue_ = 0.0;
 
 	// Engine Setup
@@ -187,27 +187,12 @@ void Viewer::paintGL()
 
 	// Render locator slices
 	glLoadMatrixd(A.matrix());
-	slicePrimitive_.clear();
-	glColor4f(0.0, 0.0, 0.0, 0.5);
-	Vec3<double> u, v, s, t, normal, extension = (axisMax_-axisMin_)*0.1;
-	if (sliceSelector_ != -1)
+	if (sliceAxis_ != -1)
 	{
-		v = axisMin_ - extension;
-		u = axisMax_ + extension;
-		v[sliceSelector_] = sliceAxisValue_;
-		u[sliceSelector_] = sliceAxisValue_;
-		s = u;
-		s[(sliceSelector_+1)%3] = v[(sliceSelector_+1)%3];
-		t = u;
-		t[(sliceSelector_+2)%3] = v[(sliceSelector_+2)%3];
-		normal.zero();
-		normal[sliceSelector_] = 1.0;
-		slicePrimitive_.defineVertex(u.x, u.y, u.z, normal.x, normal.y, normal.z, true);
-		slicePrimitive_.defineVertex(v.x, v.y, v.z, normal.x, normal.y, normal.z, true);
-		slicePrimitive_.defineVertex(s.x, s.y, s.z, normal.x, normal.y, normal.z, true);
-		slicePrimitive_.defineVertex(u.x, u.y, u.z, normal.x, normal.y, normal.z, true);
-		slicePrimitive_.defineVertex(v.x, v.y, v.z, normal.x, normal.y, normal.z, true);
-		slicePrimitive_.defineVertex(t.x, t.y, t.z, normal.x, normal.y, normal.z, true);
+		Vec3<double> v(0.0, 0.0, 0.0);
+		v[sliceAxis_] = sliceAxisValue_ * axisStretch_[sliceAxis_];
+		glTranslated(v.x, v.y, v.z);
+		glColor4d(0.0, 0.0, 0.0, 0.5);
 		slicePrimitive_.sendToGL();
 	}
 

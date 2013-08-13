@@ -553,8 +553,8 @@ void FQPlotWindow::calculateTransformLimits()
 	
 	for (int n=0; n<3; ++n)
 	{
-		transformMin_[n] = transformValue(dataMin_[n], preTransformShift_[n], postTransformShift_[n], transformType_[n], transformValue_[n]);
-		transformMax_[n] = transformValue(dataMax_[n], preTransformShift_[n], postTransformShift_[n], transformType_[n], transformValue_[n]);
+		transformMin_[n] = transformValue(dataMin_[n], n);
+		transformMax_[n] = transformValue(dataMax_[n], n);
 
 		// Values may have swapped...
 		if (transformMin_[n] > transformMax_[n])
@@ -595,21 +595,21 @@ void FQPlotWindow::showAllData()
 }
 
 // Transform single value
-double FQPlotWindow::transformValue(double x, double preShift, double postShift, FQPlotWindow::DataTransform transformType, double transformValue)
+double FQPlotWindow::transformValue(double x, int axis)
 {
-	switch (transformType)
+	switch (transformType_[axis])
 	{
 		case (FQPlotWindow::MultiplyTransform):
-			return  (x+preShift)*transformValue + postShift;
+			return  (x+preTransformShift_[axis])*transformValue_[axis] + postTransformShift_[axis];
 			break;
 		case (FQPlotWindow::DivideTransform):
-			return (x+preShift)/transformValue + postShift;
+			return (x+preTransformShift_[axis])/transformValue_[axis] + postTransformShift_[axis];
 			break;
 		case (FQPlotWindow::LogBase10Transform):
-			return log10(x+preShift) + postShift;
+			return log10(x+preTransformShift_[axis]) + postTransformShift_[axis];
 			break;
 		case (FQPlotWindow::NaturalLogTransform):
-			return log(x+preShift) + postShift;
+			return log(x+preTransformShift_[axis]) + postTransformShift_[axis];
 			break;
 	}
 	return 0.0;
@@ -676,7 +676,7 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 		while (slice)
 		{
 			// Z
-			double z = transformValue(slice->z(), preTransformShift_[2], postTransformShift_[2], transformType_[2], transformValue_[2]);
+			double z = transformValue(slice->z(), 2);
 			// -- Is the transformed Z value within range?
 			if ((z < limitMin_.z) || (z > limitMax_.z))
 			{

@@ -562,6 +562,11 @@ void FQPlotWindow::updateViewTab()
 	ui.ViewYAxisLogarithmicCheck->setChecked(axisLogarithmic_.y);
 	ui.ViewZAxisLogarithmicCheck->setChecked(axisLogarithmic_.z);
 
+	// Axis Stretch factors
+	ui.ViewXAxisStretchSpin->setValue(axisStretch_.x);
+	ui.ViewYAxisStretchSpin->setValue(axisStretch_.y);
+	ui.ViewZAxisStretchSpin->setValue(axisStretch_.z);
+
 	// Axis positions
 	// -- X
 	ui.ViewXAxisCrossAtYSpin->setValue(axisPosition_[0].y);

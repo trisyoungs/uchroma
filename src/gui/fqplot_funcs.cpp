@@ -52,6 +52,10 @@ FQPlotWindow::FQPlotWindow(QMainWindow *parent) : QMainWindow(parent), saveImage
 
 	// Connect signals / slots between Viewer and main UI
 	connect(ui.MainView, SIGNAL(sliceAxisValueChanged(int,double)), this, SLOT(sliceAxisValueChanged(int,double)));
+	connect(ui.MainView, SIGNAL(sliceAxisClicked(int,double)), this, SLOT(addSlice(int,double)));
+
+	// Hide the SliceGraph to begin with
+	ui.ViewGraphSplitter->setSizes(QList<int>() << -1 << 0);
 }
 
 // Destructor

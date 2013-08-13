@@ -221,12 +221,14 @@ class Viewer : public QGLWidget
 	Vec3<double> axisCoordMin_[3], axisCoordMax_[3];
 	// Whether axes are logarithmic
 	Vec3<bool> axisLogarithmic_;
-	// Wheter axes are inverted
+	// Whether axes are inverted
 	Vec3<bool> axisInverted_;
+	// Stretch factors for axes
+	Vec3<double> axisStretch_;
 	// Whether axes are visible
 	Vec3<bool> axisVisible_;
 	// Current axis target for temporary slice selection
-	int sliceSelector_;
+	int sliceAxis_;
 	// Current axis value for temporary slice selection
 	double sliceAxisValue_;
 
@@ -235,6 +237,8 @@ class Viewer : public QGLWidget
 	void calculateMouseAxisValues();
 	// Create necessary primitives (called once when Viewer is constructed)
 	void createPrimitives();
+	// Regenerate slice primitive
+	void regenerateSlicePrimitive();
 	// Setup basic GL properties
 	void setupGL();
 
@@ -263,9 +267,12 @@ class Viewer : public QGLWidget
 	void setLabelScale(double scale);
 	// Set scale factor for titles
 	void setTitleScale(double scale);
+	// Set current slice axis
+	void setSliceAxis(int axis);
 	
 	signals:
 	void sliceAxisValueChanged(int, double);
+	void sliceAxisClicked(int, double);
 
 
 	/*

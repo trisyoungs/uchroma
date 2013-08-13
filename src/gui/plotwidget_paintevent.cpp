@@ -271,7 +271,7 @@ void PlotWidget::drawAxes(QPainter& painter)
 		{
 			// Draw larger tick mark since there is a value here
 			line.setLine(deviceXpos, deviceYpos, deviceXpos, deviceYpos+spacing_);
-			painter.drawText(rect1, Qt::AlignRight, QString::number(xpos, 'g', 4));
+			painter.drawText(rect1, Qt::AlignCenter, QString::number(xpos, 'g', 4));
 			
 			lastPos = rect1.right();
 		}
