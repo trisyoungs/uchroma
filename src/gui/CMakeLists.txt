@@ -17,7 +17,7 @@ fqplot_analyse.cpp
 fqplot_colour.cpp
 fqplot_analyse.cpp
 fqplot_sourcedata.cpp
-fplot_transform.cpp
+fqplot_transform.cpp
 fqplot_view.cpp
 dataimport_funcs.cpp
 dataimport_seqxy.cpp

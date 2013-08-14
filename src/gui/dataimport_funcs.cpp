@@ -20,7 +20,6 @@
 */
 
 #include "gui/dataimport.h"
-#include <../ac/src/main.h>
 #include <QtGui/QFileDialog>
 
 // Constructor

@@ -138,7 +138,7 @@ void FQPlotWindow::clearData()
 	axisLabelDirection_[0].set(0.0, 1.0, 0.0);
 	axisLabelDirection_[1].set(1.0, 0.0, 0.0);
 	axisLabelDirection_[2].set(1.0, 0.0, 0.0);
-	axisLabelUp_[0].set(1.0, 0.0, 0.0);
+	axisLabelUp_[0].set(-1.0, 0.0, 0.0);
 	axisLabelUp_[1].set(0.0, 1.0, 0.0);
 	axisLabelUp_[2].set(0.0, 1.0, 0.0);
 	axisLabelRotation_.zero();

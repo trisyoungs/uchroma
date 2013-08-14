@@ -159,8 +159,9 @@ void FQPlotWindow::on_actionFileSave_triggered(bool checked)
 	// Has an input filename already been chosen?
 	if (inputFile_.isEmpty())
 	{
-		
-		if (inputFile_.isEmpty()) return;
+		QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "FQPlot files (*.fqp);;All files (*.*)");
+		if (fileName.isEmpty()) return;
+		inputFile_ = fileName;
 	}
 
 	if (saveData(inputFile_)) modified_ = false;
@@ -170,10 +171,10 @@ void FQPlotWindow::on_actionFileSave_triggered(bool checked)
 void FQPlotWindow::on_actionFileSaveAs_triggered(bool checked)
 {
 	// Has an input filename already been chosen?
-	QString newFileName = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "FQPlot files (*.fqp);;All files (*.*)");
-	if (newFileName.isEmpty()) return;
+	QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "FQPlot files (*.fqp);;All files (*.*)");
+	if (fileName.isEmpty()) return;
 	
-	inputFile_ = newFileName;
+	inputFile_ = fileName;
 	if (saveData(inputFile_)) modified_ = false;
 	updateTitleBar();
 }
