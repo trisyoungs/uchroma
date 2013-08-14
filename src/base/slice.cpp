@@ -1,6 +1,6 @@
 /*
 	*** Slice
-	*** src/main/slice.cpp
+	*** src/base/slice.cpp
 	Copyright T. Youngs 2013
 
 	This file is part of FQPlot.
@@ -20,12 +20,15 @@
 */
 
 #include "base/slice.h"
+#include "base/nxs.h"
 #include <QtGui/QMessageBox>
 
 // Constructor
 Slice::Slice() : ListItem<Slice>()
 {
-	fileName_ = "";
+	sourceFileName_ = "";
+	fileAssociated_ = false;
+	title_ = "";
 	z_ = 0.0;
 }
 
@@ -43,9 +46,11 @@ Slice::Slice(const Slice& source)
 // Assignment operator
 void Slice::operator=(const Slice& source)
 {
-	fileName_ = source.fileName_;
+	sourceFileName_ = source.sourceFileName_;
+	title_ = source.title_;
 	data_ = source.data_;
 	z_ = source.z_;
+	fileAssociated_ = source.fileAssociated_;
 }
 
 /*
@@ -53,46 +58,48 @@ void Slice::operator=(const Slice& source)
 */
 
 // Set source filename
-void Slice::setFileName(QString fileName)
+void Slice::setSourceFileName(QString fileName)
 {
-	fileName_ = fileName;
-
-	// Determine instrument and run number strings
-	QRegExp re("([A-Z]+)([0-9]+)");
-	if (re.indexIn(fileName_) > -1)
-	{
-		instrument_ = re.cap(1);
-		runNumberString_ = re.cap(2);
-	}
+	sourceFileName_ = fileName;
+	fileAssociated_ = true;
 }
 
 // Return source filename
-QString Slice::fileName()
+QString Slice::sourceFileName()
 {
-	return fileName_;
+	return sourceFileName_;
 }
 
-// Return determined base file name with no extension
-QString Slice::baseFileName()
+// Set source title
+void Slice::setTitle(QString title)
 {
-	return instrument_+runNumberString_;
+	title_ = title;
+}
+
+// Return source title
+QString Slice::title()
+{
+	return title_;
 }
 
 // Load data from file
 bool Slice::loadData(QDir sourceDir)
 {
+	// Check that a fileName is specified - otherwise there is nothing to do
+	if (!fileAssociated_) return false;
+
 	// Clear any existing data
 	data_.clear();
 
 	// Check file exists
-	if (!QFile::exists(sourceDir.absoluteFilePath(fileName_)))
+	if (!QFile::exists(sourceDir.absoluteFilePath(sourceFileName_)))
 	{
-// 		QMessageBox::warning(NULL, "File Not Found", QString("The file ") + fileName_ + " could not be found.");
+// 		QMessageBox::warning(NULL, "File Not Found", QString("The file ") + sourceFileName_ + " could not be found.");
 		return false;
 	}
 
-	// Open the file, and read in the data
-	return data_.load(qPrintable(sourceDir.absoluteFilePath(fileName_)));
+	// Read in the data
+	return data_.load(qPrintable(sourceDir.absoluteFilePath(sourceFileName_)));
 }
 
 // Return data

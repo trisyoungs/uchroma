@@ -71,10 +71,8 @@ void PlotWidget::renderPlot(QPainter& painter)
 {
 	// Setup plot variables etc.
 	plotSetup(painter);
-	
 	drawGridLines(painter);
 	drawData(painter);
-	
 	// Reset transform to cover whole area again
 	painter.setTransform(globalTransform_);
 	painter.setClipping(false);
@@ -217,6 +215,8 @@ void PlotWidget::drawData(QPainter& painter)
 	QPen dataPen;
 	dataPen.setWidthF(1.5);
 	int count = 0;
+
+
 	for (PlotData* pd = dataSets_.first(); pd != NULL; pd = pd->next)
 	{
 		// Is dataset visible?
@@ -246,6 +246,7 @@ void PlotWidget::drawData(QPainter& painter)
 	// Update Painter transform, pen, and draw the dataset path
 	painter.setTransform(modifiedTransform);
 	staticDataSet_.stylePen(dataPen);
+
 	painter.setPen(dataPen);
 	painter.setBrush(Qt::NoBrush);
 	painter.drawPath(staticDataSet_.linePath());

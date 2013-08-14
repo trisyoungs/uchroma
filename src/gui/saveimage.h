@@ -1,6 +1,6 @@
 /*
 	*** Save Image Dialog
-	*** src/gui/saveimagedialog.h
+	*** src/gui/saveimage.h
 	Copyright T. Youngs 2013
 
 	This file is part of FQPlot.
@@ -22,7 +22,7 @@
 #ifndef FQPLOT_SAVEIMAGEDIALOG_H
 #define FQPLOT_SAVEIMAGEDIALOG_H
 
-#include "gui/ui_saveimagedialog.h"
+#include "gui/ui_saveimage.h"
 #include "gui/viewer.uih"
 #include <QtGui/QDialog>
 

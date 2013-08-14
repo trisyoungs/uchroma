@@ -1,6 +1,6 @@
 /*
 	*** Save Image Dialog
-	*** src/gui/saveimagedialog.cpp
+	*** src/gui/saveimage_funcs.cpp
 	Copyright T. Youngs 2013
 
 	This file is part of FQPlot.
@@ -19,7 +19,7 @@
 	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/saveimagedialog.h"
+#include "gui/saveimage.h"
 #include <QtGui/QFileDialog>
 
 // Constructor

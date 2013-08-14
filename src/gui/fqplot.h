@@ -23,7 +23,8 @@
 #define FQPLOT_MAINWINDOW_H
 
 #include "gui/ui_fqplot.h"
-#include "gui/saveimagedialog.h"
+#include "gui/saveimage.h"
+#include "gui/dataimport.h"
 #include "base/slice.h"
 
 // Forward Declarations
@@ -43,6 +44,8 @@ class FQPlotWindow : public QMainWindow
 	bool refreshing_;
 	// Save Image Dialog
 	SaveImageDialog saveImageDialog_;
+	// Data Import Dialog
+	DataImportDialog dataImportDialog_;
 
 	public:
 	// Constructor / Destructor
@@ -74,9 +77,11 @@ class FQPlotWindow : public QMainWindow
 	// File Menu
 	*/
 	private slots:
+	void on_actionFileNew_triggered(bool checked);
 	void on_actionFileLoad_triggered(bool checked);
 	void on_actionFileSave_triggered(bool checked);
 	void on_actionFileSaveAs_triggered(bool checked);
+	void on_actionFileImportData_triggered(bool checked);
 	void on_actionFileSaveImage_triggered(bool checked);
 	void on_actionFileQuit_triggered(bool checked);
 
@@ -99,7 +104,7 @@ class FQPlotWindow : public QMainWindow
 	void on_SourceFilesTable_itemSelectionChanged();
 	void on_SourceFilesTable_cellChanged(int row, int column);
 	void on_GetZFromTimeStampButton_clicked(bool checked);
-	void on_ReloadAllDataButton_clicked(bool checked);
+	void on_ReloadFilesButton_clicked(bool checked);
 
 	public:
 	// Update source data tab
@@ -318,10 +323,11 @@ class FQPlotWindow : public QMainWindow
 	void on_AnalyseSliceYRadio_clicked(bool checked);
 	void on_AnalyseSliceZRadio_clicked(bool checked);
 	void on_AnalyseSliceMonitorCheck_clicked(bool checked);
+	void on_AnalyseShowLegendCheck_clicked(bool checked);
 
 	public slots:
-	void sliceAxisValueChanged(int axis, double value);
-	void addSlice(int axis, double value);
+	void surfaceSliceAxisValueChanged(int axis, double value);
+	void addSurfaceSlice(int axis, double value);
 
 	private:
 	// Current slice axis
@@ -337,7 +343,7 @@ class FQPlotWindow : public QMainWindow
 
 	public:
 	// Update slice data
-	void updateSliceData(bool setStatic);
+	void updateSurfaceSliceData(bool setStatic);
 
 
 	/*
@@ -345,7 +351,7 @@ class FQPlotWindow : public QMainWindow
 	 */
 	public:
 	// Datafile keywords
-	enum DataFileKeyword { AxisAutoTicksKeyword, AxisFirstTickKeyword, AxisInvertKeyword, AxisLabelDirectionKeyword, AxisLabelRotationKeyword, AxisLabelUpKeyword, AxisLogarithmicKeyword, AxisMinorTicksKeyword, AxisPositionKeyword, AxisStretchKeyword, AxisTickDeltaKeyword, AxisVisibleKeyword, BoundingBoxKeyword, BoundingBoxPlaneYKeyword, ColourAlphaControlKeyword, ColourAlphaFixedKeyword, ColourCustomGradientKeyword, ColourRGBGradientAKeyword, ColourRGBGradientBKeyword, ColourHSVGradientAKeyword, ColourHSVGradientBKeyword, ColourSingleKeyword, ColourSourceKeyword, ImageExportKeyword, InterpolateKeyword, InterpolateConstrainKeyword, InterpolateStepKeyword, LabelScaleKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword, PerspectiveKeyword, PostTransformShiftKeyword, PreTransformShiftKeyword, SliceDirectoryKeyword, SliceKeyword, TitleScaleKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
+	enum DataFileKeyword { AxisAutoTicksKeyword, AxisFirstTickKeyword, AxisInvertKeyword, AxisLabelDirectionKeyword, AxisLabelRotationKeyword, AxisLabelUpKeyword, AxisLogarithmicKeyword, AxisMinorTicksKeyword, AxisPositionKeyword, AxisStretchKeyword, AxisTickDeltaKeyword, AxisVisibleKeyword, BoundingBoxKeyword, BoundingBoxPlaneYKeyword, ColourAlphaControlKeyword, ColourAlphaFixedKeyword, ColourCustomGradientKeyword, ColourRGBGradientAKeyword, ColourRGBGradientBKeyword, ColourHSVGradientAKeyword, ColourHSVGradientBKeyword, ColourSingleKeyword, ColourSourceKeyword, DataKeyword, ImageExportKeyword, InterpolateKeyword, InterpolateConstrainKeyword, InterpolateStepKeyword, LabelScaleKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword, PerspectiveKeyword, PostTransformShiftKeyword, PreTransformShiftKeyword, SliceDirectoryKeyword, SliceKeyword, TitleScaleKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
 	static DataFileKeyword dataFileKeyword(const char* s);
 	static const char* dataFileKeyword(DataFileKeyword dfk);
 	// Data Transform types
@@ -387,8 +393,10 @@ class FQPlotWindow : public QMainWindow
 	bool loadData(QString fileName);
 	// Save current data to file specified
 	bool saveData(QString fileName);
-	// Load slice
-	Slice* loadSlice(QString fileName);
+	// Add slice
+	Slice* addSlice(double z, QString fileName, QString title);
+	// Find slice with corresponding title
+	Slice* findSlice(QString title);
 	// Return number of slices with no data present
 	int nEmptySlices();
 	// Recalculate data limits
@@ -429,6 +437,8 @@ class FQPlotWindow : public QMainWindow
 	public:
 	// Transform single value on the axis specified
 	double transformValue(double x, int axis);
+	// Set limits to show all data
+	void showAll(bool changeX = true, bool changeY = true, bool changeZ = true);
 
 
 	/*

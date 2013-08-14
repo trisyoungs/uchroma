@@ -3,7 +3,7 @@ project(FQPlot)
 set(DESCRIPTION "FQPlot")
 set(AUTHOR "Tristan Youngs")
 set(VERSION_MAJOR "0")
-set(VERSION_MINOR "30")
+set(VERSION_MINOR "31")
 
 set(CMAKE_BUILD_TYPE "Release")
 
@@ -26,8 +26,10 @@ else(WIN32)
 	set (target_name fqplot)
 endif(WIN32)
 
-# Setup FTGL (Windows Only)
+# Setup SZIP and FTGL (Windows Only)
 if(WIN32)
+  set(SZIP_DIR "C:/src/szip-2.1")
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "C:/src/szip-2.1/")
   set(FTGL_INCLUDES "C:/src/ftgl-2.1.3~rc5/src")
   set(FT2_INCLUDES "C:/Program Files (x86)/GnuWin32/include" "C:/Program Files (x86)/GnuWin32/include/freetype2")
   set(FTGL_LIBRARIES "C:/src/ftgl-2.1.3~rc5/src/libftgl.a")
@@ -40,6 +42,19 @@ find_package(Qt4 REQUIRED)
 IF(WIN32 OR APPLE)
  find_package(OPENGL REQUIRED)
 endif(WIN32 OR APPLE)
+
+# Setup HDF5-related stuff
+if(MINGW)
+	  SET(HDF5_LIBS "-LC:/src/hdf5-1.8.10-patch1/bin -lhdf5 -L${SZIP_DIR}/bin -lszip" CACHE STRING "Link-time commands to use HDF5 (Windows only)")
+else(MINGW)
+	  SET(HDF5_LIBS "C:/Program Files (x86)/HDF_Group/HDF5/1.8.10/lib/hdf5dll.lib" CACHE STRING "Link-time commands to use HDF5 (Windows only)")
+endif(MINGW)
+
+find_package(HDF5 REQUIRED)
+find_package(ZLIB REQUIRED)
+if(NOT UNIX)
+	find_package(SZIP REQUIRED)
+endif(NOT UNIX)
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
@@ -62,6 +77,7 @@ include_directories(
 	${FTGL_INCLUDES}
 	${FT2_INCLUDES}
 	${GLEXT_INCLUDES}
+	${HDF5_INCLUDE_DIRS}
 )
 
 # Process CMakeLists.txt in src subdirectory
@@ -86,9 +102,9 @@ add_executable(${target_name}  MACOSX_BUNDLE
 # Link line
 link_directories (${LIBRARY_OUTPUT_PATH})
 IF(WIN32 OR APPLE)
-	target_link_libraries(${target_name} gui base math ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${FTGL_LIBRARIES} ${OPENGL_LIBRARIES} ${FT2_LIBRARIES})
+	target_link_libraries(${target_name} gui base math ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${FTGL_LIBRARIES} ${OPENGL_LIBRARIES} ${FT2_LIBRARIES} ${HDF5_LIBS})
 ELSE(WIN32 OR APPLE)
-	target_link_libraries(${target_name} gui base math ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTNETWORK_LIBRARY})
+	target_link_libraries(${target_name} gui base math ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${HDF5_LIBRARIES})
 ENDIF(WIN32 OR APPLE)
 
 # -----------------------------------

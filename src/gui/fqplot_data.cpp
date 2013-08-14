@@ -23,7 +23,7 @@
 #include "base/lineparser.h"
 
 // DataFile Keywords
-const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisInvert", "AxisLabelDirection", "AxisLabelRotation", "AxisLabelUp", "AxisLogarithmic", "AxisMinorTicks", "AxisPosition", "AxisStretch", "AxisTickDelta", "AxisVisible", "BoundingBox", "BoundingBoxPlaneY", "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearA", "ColourLinearB", "ColourLinearHSVA", "ColourLinearHSVB", "ColourSingle", "ColourSource", "ImageExport", "Interpolate", "InterpolateConstrain", "InterpolateStep", "LabelScale", "LimitX", "LimitY", "LimitZ", "Perspective", "PostTransformShift", "PreTransformShift", "SliceDir", "Slice", "TitleScale", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
+const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisInvert", "AxisLabelDirection", "AxisLabelRotation", "AxisLabelUp", "AxisLogarithmic", "AxisMinorTicks", "AxisPosition", "AxisStretch", "AxisTickDelta", "AxisVisible", "BoundingBox", "BoundingBoxPlaneY", "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearA", "ColourLinearB", "ColourLinearHSVA", "ColourLinearHSVB", "ColourSingle", "ColourSource", "Data", "ImageExport", "Interpolate", "InterpolateConstrain", "InterpolateStep", "LabelScale", "LimitX", "LimitY", "LimitZ", "Perspective", "PostTransformShift", "PreTransformShift", "SliceDir", "Slice", "TitleScale", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
 FQPlotWindow::DataFileKeyword FQPlotWindow::dataFileKeyword(const char* s)
 {
 	for (int n=0; n<FQPlotWindow::nDataFileKeywords; ++n) if (strcmp(s, DataFileKeywordStrings[n]) == 0) return (FQPlotWindow::DataFileKeyword) n;
@@ -135,10 +135,10 @@ void FQPlotWindow::clearData()
 	axisTickDelta_.set(1.0,1.0,1.0);
 	axisAutoTicks_.set(true, true, true);
 	axisMinorTicks_.set(1,1,1);
-	axisLabelDirection_[0].set(1.0, 0.0, 0.0);
+	axisLabelDirection_[0].set(0.0, 1.0, 0.0);
 	axisLabelDirection_[1].set(1.0, 0.0, 0.0);
 	axisLabelDirection_[2].set(1.0, 0.0, 0.0);
-	axisLabelUp_[0].set(0.0, 1.0, 0.0);
+	axisLabelUp_[0].set(1.0, 0.0, 0.0);
 	axisLabelUp_[1].set(0.0, 1.0, 0.0);
 	axisLabelUp_[2].set(0.0, 1.0, 0.0);
 	axisLabelRotation_.zero();
@@ -148,7 +148,7 @@ void FQPlotWindow::clearData()
 	colourSinglePoint_.set(0.0, QColor(255,255,255));
 	colourRGBGradientAPoint_.set(0.0, QColor(255,255,255));
 	colourRGBGradientBPoint_.set(1.0, QColor(0,0,255));
-	colourHSVGradientBPoint_.set(0.0, QColor(255,255,255));
+	colourHSVGradientAPoint_.set(0.0, QColor(255,0,0));
 	colourHSVGradientBPoint_.set(1.0, QColor(100,40,255));
 	customColourScale_.clear();
 	fixedAlpha_ = 128;
@@ -178,7 +178,7 @@ bool FQPlotWindow::loadData(QString fileName)
 	FQPlotWindow::DataFileKeyword kwd;
 	FQPlotWindow::DataTransform dt;
 	Slice* slice;
-	int xyz;
+	int xyz, nPoints;
 	Matrix mat;
 	while (!parser.eofOrBlank())
 	{
@@ -283,6 +283,24 @@ bool FQPlotWindow::loadData(QString fileName)
 				if ((parser.argi(1) < 0) || (parser.argi(1) >= FQPlotWindow::nColourSources)) printf("Value is out of range for %s keyword.\n", dataFileKeyword(kwd));
 				else colourSource_ = (FQPlotWindow::ColourSource) parser.argi(1);
 				break;
+			// Data
+			case (FQPlotWindow::DataKeyword):
+				// Get title of associated slice and number of points to expect
+				slice = findSlice(parser.argc(1));
+				if (slice == NULL)
+				{
+					msg.print("Data associated to slice '%s' found, but no slice with this title exists.\n", parser.argc(1));
+					parser.skipLines(parser.argi(2));
+					continue;
+				}
+				// Load data into slice...
+				nPoints = parser.argi(2);
+				for (int n=0; n<nPoints; ++n)
+				{
+					parser.getArgsDelim(LineParser::Defaults);
+					slice->data().addPoint(parser.argd(0), parser.argd(1));
+				}
+				break;
 			// Image Export info
 			case (FQPlotWindow::ImageExportKeyword):
 				imageExportFile_ = parser.argc(1);
@@ -342,8 +360,7 @@ bool FQPlotWindow::loadData(QString fileName)
 				break;
 			// Slice specification
 			case (FQPlotWindow::SliceKeyword):
-				slice = loadSlice(parser.argc(1));
-				if (slice) slice->setZ(parser.argd(2));
+				slice = addSlice(parser.argd(1), parser.argc(2), parser.argc(3));
 				break;
 			// Title scale
 			case (FQPlotWindow::TitleScaleKeyword):
@@ -372,9 +389,23 @@ bool FQPlotWindow::loadData(QString fileName)
 	}
 	parser.closeFiles();
 
-	// Warn if slices were loaded which have no data in them
+	// Check for empty slices
+	
 	int nEmpty = nEmptySlices();
-	if (nEmpty != 0) QMessageBox::warning(this, "Empty Data", QString("There are ") + QString::number(nEmpty) + " defined slices which contain no data or could not be found.\nCheck the slice data directory, and/or the datafiles themselves..");
+	if (nEmpty != 0)
+	{
+		QMessageBox::StandardButton button = QMessageBox::warning(this, "Empty Data", QString("There are ") + QString::number(nEmpty) + " defined slices which contain no data.\nWould you like to reload these now from their source files?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+		if (button == QMessageBox::Yes)
+		{
+			nEmpty = 0;
+			for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) if (!slice->loadData(dataFileDirectory_)) ++nEmpty;
+			
+			if (nEmpty > 0)
+			{
+				QMessageBox::StandardButton button = QMessageBox::warning(this, "Empty Data", QString("There are still ") + QString::number(nEmpty) + " defined slices which contain no data or whose original files could not be found.\nCheck the slice data directory, and/or the datafiles themselves.");
+			}
+		}
+	}
 
 	// Set necessary variables
 	inputFile_ = fileName;
@@ -397,11 +428,11 @@ bool FQPlotWindow::saveData(QString fileName)
 	// Write datafile directory
 	parser.writeLineF("%s \"%s\"\n", DataFileKeywordStrings[FQPlotWindow::SliceDirectoryKeyword], qPrintable(dataFileDirectory_.absolutePath()));
 
-	// Write list of datafiles (slices)
-	// Line format:  slice "filename" z	
+	// Write list of slices
+	// Line format:  slice z "filename" "dataname"
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
 	{
-		parser.writeLineF("%s \"%s\" %f\n", DataFileKeywordStrings[FQPlotWindow::SliceKeyword], qPrintable(slice->fileName()), slice->z());
+		parser.writeLineF("%s  %f  \"%s\"  \"%s\"\n", DataFileKeywordStrings[FQPlotWindow::SliceKeyword], slice->z(), qPrintable(slice->sourceFileName()), qPrintable(slice->title()));
 	}
 
 	// Write image info
@@ -477,34 +508,49 @@ bool FQPlotWindow::saveData(QString fileName)
 	parser.writeLineF("%s %i\n", DataFileKeywordStrings[FQPlotWindow::BoundingBoxKeyword], boundingBox_);
 	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::BoundingBoxPlaneYKeyword], boundingBoxPlaneY_);
 
+	// Data Section
+	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
+	{
+		Data2D& data = slice->data();
+		parser.writeLineF("%s  \"%s\"  %i\n", DataFileKeywordStrings[FQPlotWindow::DataKeyword], qPrintable(slice->title()), data.nPoints());
+		for (int n=0; n<data.nPoints(); ++n) parser.writeLineF("%10.4e  %10.4e\n", data.x(n), data.y(n));
+	}
+
 	parser.closeFiles();
 	return true;
 }
 
-// Load slice
-Slice* FQPlotWindow::loadSlice(QString fileName)
+// Add slice
+Slice* FQPlotWindow::addSlice(double z, QString fileName, QString title)
 {
-	QString relativeFileName = dataFileDirectory_.relativeFilePath(fileName);
-
-	// Is this file already loaded
-	Slice* slice = NULL;
-	for (slice = slices_.first(); slice != NULL; slice = slice->next) if (relativeFileName == slice->fileName()) break;
-	if (slice)
-	{
-		printf("File %s is already loaded - will not load it again.\n", qPrintable(relativeFileName));
-		return NULL;
-	}
-
-	// Determine automatic Z placement for slice
-	double newZ = (slices_.last() != NULL ? slices_.last()->z() + 1.0 : 0.0);
-	
 	// Create new slice
-	slice = slices_.add();
-	slice->setFileName(relativeFileName);
-	slice->setZ(newZ);
-	slice->loadData(dataFileDirectory_);
-	
+	Slice* slice = slices_.add();
+
+	if (fileName.length() > 0)
+	{
+		QString relativeFileName = dataFileDirectory_.relativeFilePath(fileName);
+
+		// Is this file already loaded
+		Slice* otherSlice = NULL;
+		for (otherSlice = slices_.first(); otherSlice != NULL; otherSlice = otherSlice->next) if (relativeFileName == otherSlice->sourceFileName()) break;
+		if (otherSlice)
+		{
+			printf("File %s is already loaded - will not load it again.\n", qPrintable(relativeFileName));
+			return NULL;
+		}
+		slice->setSourceFileName(relativeFileName);
+	}
+	slice->setTitle(title);
+	slice->setZ(z);
+
 	return slice;
+}
+
+// Find slice with corresponding title
+Slice* FQPlotWindow::findSlice(QString title)
+{
+	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) if (slice->title() == title) return slice;
+	return NULL;
 }
 
 // Return number of slices with no data present
@@ -613,6 +659,17 @@ double FQPlotWindow::transformValue(double x, int axis)
 			break;
 	}
 	return 0.0;
+}
+
+// Set limits to show all data
+void FQPlotWindow::showAll(bool changeX, bool changeY, bool changeZ)
+{
+	bool flags[3] = { changeX, changeY, changeZ };
+	for (int axis = 0; axis < 3; ++axis) if (flags[axis])
+	{
+		limitMin_[axis] = transformMin_[axis];
+		limitMax_[axis] = transformMax_[axis];
+	}
 }
 
 // Flag data as modified, and update titlebar

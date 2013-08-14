@@ -26,7 +26,7 @@
 #include <stdarg.h>
 
 // Parse options
-const char *ParseOptionKeywords[LineParser::nParseOptions] = { "stripcomments", "usequotes", "skipblanks", "stripbrackets", "noescapes", "usecurlies", "normalcommas" };
+const char *ParseOptionKeywords[LineParser::nParseOptions] = { "_defaults", "stripcomments", "usequotes", "skipblanks", "stripbrackets", "noescapes", "usecurlies", "normalcommas", "_dummy_" };
 LineParser::ParseOption LineParser::parseOption(const char *s)
 {
 	return (LineParser::ParseOption) (1 << enumSearch("line parser option", LineParser::nParseOptions, ParseOptionKeywords, s));

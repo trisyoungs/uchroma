@@ -4,6 +4,7 @@ data2d.cpp
 dnchar.cpp
 lineparser.cpp
 messenger.cpp
+nxs.cpp
 slice.cpp
 sysfunc.cpp
 colourscale.h
@@ -11,6 +12,7 @@ data2d.h
 dnchar.h
 lineparser.h
 messenger.h
+nxs.h
 slice.h
 sysfunc.h
 )

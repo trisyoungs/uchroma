@@ -50,12 +50,17 @@ void FQPlotWindow::on_AnalyseSliceMonitorCheck_clicked(bool checked)
 {
 }
 
+void FQPlotWindow::on_AnalyseShowLegendCheck_clicked(bool checked)
+{
+	ui.SurfaceSliceGraph->setShowLegend(checked);
+}
+
 /*
  * Public Slots
  */
 
 // Slice axis value changed
-void FQPlotWindow::sliceAxisValueChanged(int axis, double value)
+void FQPlotWindow::surfaceSliceAxisValueChanged(int axis, double value)
 {
 	sliceAxis_ = axis;
 	sliceAxisValue_ = value;
@@ -73,13 +78,13 @@ void FQPlotWindow::sliceAxisValueChanged(int axis, double value)
 	}
 
 	// If we are monitoring, construct a slice and add it as the static data of the graph
-	if (ui.AnalyseSliceMonitorCheck->isChecked()) updateSliceData(true);
+	if (ui.AnalyseSliceMonitorCheck->isChecked()) updateSurfaceSliceData(true);
 }
 
 // Add slice to graph
-void FQPlotWindow::addSlice(int axis, double value)
+void FQPlotWindow::addSurfaceSlice(int axis, double value)
 {
-	updateSliceData(false);
+	updateSurfaceSliceData(false);
 }
 
 /*
@@ -137,7 +142,7 @@ int FQPlotWindow::closestBin(int axis, double value)
  */
 
 // Update/add slice data
-void FQPlotWindow::updateSliceData(bool setStatic)
+void FQPlotWindow::updateSurfaceSliceData(bool setStatic)
 {
 	if (setStatic && (!ui.AnalyseSliceMonitorCheck->isChecked())) return;
 
@@ -165,7 +170,7 @@ void FQPlotWindow::updateSliceData(bool setStatic)
 	}
 
 	// Set static data, or add other dataset?
-	if (setStatic) ui.SliceGraph->setStaticData(sliceData_, title);
-	else ui.SliceGraph->addDataSet(sliceData_, title, "Data");
+	if (setStatic) ui.SurfaceSliceGraph->setStaticData(sliceData_, title);
+	else ui.SurfaceSliceGraph->addDataSet(sliceData_, title, "Data");
 }
 

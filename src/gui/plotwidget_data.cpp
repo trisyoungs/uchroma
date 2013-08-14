@@ -88,6 +88,7 @@ PlotData::PlotData() : ListItem<PlotData>()
 {
 	lineColour_ = Qt::black;
 	lineStyle_ = Qt::SolidLine;
+	block_ = NULL;
 }
 
 /*!
@@ -312,7 +313,7 @@ void PlotData::stylePen(QPen& pen)
 {
 	// Get colour from PlotDataGroup parent (if available)
 	pen.setColor(lineColour_);
-	
+
 	// Get line style from PlotDataBlock (if available)
 	if (block_) pen.setDashPattern(block_->dashes());
 }

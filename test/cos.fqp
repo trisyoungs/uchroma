@@ -1,14 +1,14 @@
 SliceDir "/home/tris/src/fqplot/test"
-Slice "cos01.txt" 0.000000
-Slice "cos02.txt" 1.000000
-Slice "cos03.txt" 2.000000
-Slice "cos04.txt" 3.000000
-Slice "cos05.txt" 4.000000
-Slice "cos06.txt" 5.000000
-Slice "cos07.txt" 6.000000
-Slice "cos08.txt" 7.000000
-Slice "cos09.txt" 8.000000
-Slice "cos10.txt" 9.000000
+Slice 0 "cos01.txt" ""
+Slice 1 "cos02.txt" ""
+Slice 2 "cos03.txt" ""
+Slice 3 "cos04.txt" ""
+Slice 4 "cos05.txt" ""
+Slice 5 "cos06.txt" ""
+Slice 6 "cos07.txt" ""
+Slice 7 "cos08.txt" ""
+Slice 8 "cos09.txt" ""
+Slice 9 "cos10.txt" ""
 TransformX Multiply 1.000000
 TransformY Multiply 1.000000
 TransformZ Multiply 1.000000

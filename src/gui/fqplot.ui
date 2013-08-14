@@ -19,6 +19,9 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <property name="spacing">
+     <number>4</number>
+    </property>
     <property name="margin">
      <number>0</number>
     </property>
@@ -30,7 +33,7 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_7">
+      <layout class="QHBoxLayout" name="horizontalLayout_39">
        <property name="spacing">
         <number>4</number>
        </property>
@@ -38,7 +41,7 @@
         <number>4</number>
        </property>
        <item>
-        <widget class="QSplitter" name="MainSplitter">
+        <widget class="QSplitter" name="splitter">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -119,7 +122,7 @@
               </property>
               <column>
                <property name="text">
-                <string>Filename</string>
+                <string>Title</string>
                </property>
               </column>
               <column>
@@ -154,24 +157,27 @@
                </widget>
               </item>
               <item>
-               <widget class="QToolButton" name="ReloadAllDataButton">
-                <property name="minimumSize">
-                 <size>
-                  <width>24</width>
-                  <height>24</height>
-                 </size>
+               <widget class="QPushButton" name="ReloadFilesButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>24</width>
-                  <height>27</height>
+                  <width>128</width>
+                  <height>24</height>
                  </size>
                 </property>
+                <property name="cursor">
+                 <cursorShape>ArrowCursor</cursorShape>
+                </property>
                 <property name="toolTip">
-                 <string>Reload all data for current slices</string>
+                 <string>Add surface slices from NXS datafiles</string>
                 </property>
                 <property name="text">
-                 <string/>
+                 <string>Reload</string>
                 </property>
                 <property name="icon">
                  <iconset resource="icons.qrc">
@@ -193,38 +199,9 @@
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="AddNXSFilesButton">
+               <widget class="QPushButton" name="AddFilesButton">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>128</width>
-                  <height>24</height>
-                 </size>
-                </property>
-                <property name="cursor">
-                 <cursorShape>ArrowCursor</cursorShape>
-                </property>
-                <property name="toolTip">
-                 <string>Add surface slices from NXS datafiles</string>
-                </property>
-                <property name="text">
-                 <string>NXS</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="icons.qrc">
-                  <normaloff>:/fqplot/icons/plus.svg</normaloff>:/fqplot/icons/plus.svg</iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="AddXYFilesButton">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
@@ -242,7 +219,7 @@
                  <string>Add surface slices from XY datafiles</string>
                 </property>
                 <property name="text">
-                 <string>XY</string>
+                 <string>Add</string>
                 </property>
                 <property name="icon">
                  <iconset resource="icons.qrc">
@@ -253,14 +230,14 @@
               <item>
                <widget class="QPushButton" name="RemoveFilesButton">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>24</width>
+                  <width>128</width>
                   <height>24</height>
                  </size>
                 </property>
@@ -268,7 +245,7 @@
                  <string>Remove selected slices from surface</string>
                 </property>
                 <property name="text">
-                 <string/>
+                 <string>Remove</string>
                 </property>
                 <property name="icon">
                  <iconset resource="icons.qrc">
@@ -2055,13 +2032,16 @@
                      <string/>
                     </property>
                     <property name="decimals">
-                     <number>3</number>
+                     <number>6</number>
                     </property>
                     <property name="minimum">
-                     <double>0.001000000000000</double>
+                     <double>0.000001000000000</double>
                     </property>
                     <property name="maximum">
                      <double>1000000.000000000000000</double>
+                    </property>
+                    <property name="singleStep">
+                     <double>0.010000000000000</double>
                     </property>
                     <property name="value">
                      <double>1.000000000000000</double>
@@ -2691,13 +2671,16 @@
                      <string/>
                     </property>
                     <property name="decimals">
-                     <number>3</number>
+                     <number>6</number>
                     </property>
                     <property name="minimum">
-                     <double>0.001000000000000</double>
+                     <double>0.000001000000000</double>
                     </property>
                     <property name="maximum">
                      <double>1000000.000000000000000</double>
+                    </property>
+                    <property name="singleStep">
+                     <double>0.010000000000000</double>
                     </property>
                     <property name="value">
                      <double>1.000000000000000</double>
@@ -3321,13 +3304,16 @@
                      <string/>
                     </property>
                     <property name="decimals">
-                     <number>3</number>
+                     <number>6</number>
                     </property>
                     <property name="minimum">
-                     <double>0.001000000000000</double>
+                     <double>0.000001000000000</double>
                     </property>
                     <property name="maximum">
                      <double>1000000.000000000000000</double>
+                    </property>
+                    <property name="singleStep">
+                     <double>0.010000000000000</double>
                     </property>
                     <property name="value">
                      <double>1.000000000000000</double>
@@ -3897,6 +3883,12 @@
                    <string>Bounding Box</string>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_27">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
+                   <property name="margin">
+                    <number>4</number>
+                   </property>
                    <item>
                     <widget class="QRadioButton" name="ViewBoundingBoxNoneRadio">
                      <property name="text">
@@ -4072,7 +4064,7 @@
            <attribute name="title">
             <string>Analyse</string>
            </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_31">
+           <layout class="QVBoxLayout" name="verticalLayout_7">
             <property name="spacing">
              <number>4</number>
             </property>
@@ -4126,10 +4118,54 @@
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="AnalyseSliceMonitorCheck">
-              <property name="text">
-               <string>Monitor</string>
+             <layout class="QHBoxLayout" name="horizontalLayout_40">
+              <item>
+               <widget class="QCheckBox" name="AnalyseSliceMonitorCheck">
+                <property name="text">
+                 <string>Monitor</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="AnalyseShowLegendCheck">
+                <property name="text">
+                 <string>Legend</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QFrame" name="SurfaceSliceGraphFrame">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>300</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Sunken</enum>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_38">
+               <property name="spacing">
+                <number>2</number>
+               </property>
+               <property name="margin">
+                <number>2</number>
+               </property>
+               <item>
+                <widget class="PlotWidget" name="SurfaceSliceGraph" native="true"/>
+               </item>
+              </layout>
              </widget>
             </item>
             <item>
@@ -4148,125 +4184,89 @@
            </layout>
           </widget>
          </widget>
-         <widget class="QSplitter" name="ViewGraphSplitter">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <widget class="QWidget" name="layoutWidget">
-           <layout class="QVBoxLayout" name="verticalLayout_4">
-            <property name="spacing">
-             <number>2</number>
-            </property>
-            <item>
-             <widget class="QFrame" name="MainViewFrame">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+         <widget class="QWidget" name="">
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item>
+            <widget class="QFrame" name="MainViewFrame">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>300</width>
+               <height>300</height>
+              </size>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Sunken</enum>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <property name="spacing">
+               <number>0</number>
               </property>
-              <property name="minimumSize">
-               <size>
-                <width>300</width>
-                <height>300</height>
-               </size>
+              <property name="margin">
+               <number>0</number>
               </property>
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Sunken</enum>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout">
-               <property name="spacing">
-                <number>0</number>
-               </property>
-               <property name="margin">
-                <number>0</number>
-               </property>
-               <item>
-                <widget class="Viewer" name="MainView" native="true">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                   <horstretch>0</horstretch>
-                   <verstretch>3</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="cursor">
-                  <cursorShape>CrossCursor</cursorShape>
-                 </property>
-                 <property name="mouseTracking">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_11">
               <item>
-               <widget class="QLabel" name="NTrianglesLabel">
-                <property name="text">
-                 <string>NTriangles: 0</string>
+               <widget class="Viewer" name="MainView" native="true">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>3</verstretch>
+                 </sizepolicy>
                 </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_4">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+                <property name="cursor">
+                 <cursorShape>CrossCursor</cursorShape>
                 </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QLabel" name="SliceSelectorLabel">
-                <property name="text">
-                 <string/>
+                <property name="mouseTracking">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
              </layout>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QFrame" name="SliceGraphFrame">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>150</height>
-            </size>
-           </property>
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Sunken</enum>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_24">
-            <property name="spacing">
-             <number>2</number>
-            </property>
-            <property name="margin">
-             <number>2</number>
-            </property>
-            <item>
-             <widget class="PlotWidget" name="SliceGraph" native="true"/>
-            </item>
-           </layout>
-          </widget>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_11">
+             <item>
+              <widget class="QLabel" name="NTrianglesLabel">
+               <property name="text">
+                <string>NTriangles: 0</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="SliceSelectorLabel">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
          </widget>
         </widget>
        </item>
@@ -4288,9 +4288,12 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionFileNew"/>
     <addaction name="actionFileLoad"/>
     <addaction name="actionFileSave"/>
     <addaction name="actionFileSaveAs"/>
+    <addaction name="separator"/>
+    <addaction name="actionFileImportData"/>
     <addaction name="separator"/>
     <addaction name="actionFileSaveImage"/>
     <addaction name="separator"/>
@@ -4353,6 +4356,16 @@
   <action name="actionFileSaveImage">
    <property name="text">
     <string>Save Image</string>
+   </property>
+  </action>
+  <action name="actionFileImportData">
+   <property name="text">
+    <string>Import Data</string>
+   </property>
+  </action>
+  <action name="actionFileNew">
+   <property name="text">
+    <string>&amp;New</string>
    </property>
   </action>
  </widget>

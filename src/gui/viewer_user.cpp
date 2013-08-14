@@ -417,7 +417,7 @@ void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, dou
 	// Plot tickmarks
 	int count = 0;
 	double delta = tickDelta / (nMinorTicks+1);
-	double value = firstTick * stretch;
+	double value = firstTick;
 	Vec3<double> u = axisCoordMin_[axis];
 	u.set(axis, (inverted ? (axisMax - firstTick) + axisMin : firstTick) * stretch);
 	while (count < 50)
@@ -442,7 +442,7 @@ void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, dou
 		}
 		u.add(axis, inverted ? -delta*stretch : delta*stretch);
 		value += delta;
-		count = (count+1)%(nMinorTicks+1);
+		++count;
 	}
 }
 

@@ -1,6 +1,6 @@
 /*
 	*** Slice
-	*** src/main/slice.h
+	*** src/base/slice.h
 	Copyright T. Youngs 2013
 
 	This file is part of FQPlot.
@@ -47,12 +47,12 @@ class Slice : public ListItem<Slice>
 	// Data
 	*/
 	private:
-	// Source file (not including path)
-	QString fileName_;
-	// Instrument (determined from filename)
-	QString instrument_;
-	// Run number (determined from filename)
-	QString runNumberString_;
+	// Source file, if one is specified (not including path)
+	QString sourceFileName_;
+	// Whether a file has been associated to this slice
+	bool fileAssociated_;
+	// Slice title
+	QString title_;
 	// Data
 	Data2D data_;
 	// Z coordinate
@@ -60,11 +60,13 @@ class Slice : public ListItem<Slice>
 
 	public:
 	// Set source filename
-	void setFileName(QString fileName);
+	void setSourceFileName(QString fileName);
 	// Return source filename
-	QString fileName();
-	// Return determined base file name with no extension
-	QString baseFileName();
+	QString sourceFileName();
+	// Set source title
+	void setTitle(QString title);
+	// Return source title
+	QString title();
 	// Load data from file
 	bool loadData(QDir sourceDir);
 	// Return data

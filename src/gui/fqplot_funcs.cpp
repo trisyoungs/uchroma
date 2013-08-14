@@ -24,7 +24,7 @@
 #include "version.h"
 
 // Constructor
-FQPlotWindow::FQPlotWindow(QMainWindow *parent) : QMainWindow(parent), saveImageDialog_(this)
+FQPlotWindow::FQPlotWindow(QMainWindow *parent) : QMainWindow(parent), saveImageDialog_(this), dataImportDialog_(this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -51,11 +51,8 @@ FQPlotWindow::FQPlotWindow(QMainWindow *parent) : QMainWindow(parent), saveImage
 	ui.MainView->setupFont(viewerFont_);
 
 	// Connect signals / slots between Viewer and main UI
-	connect(ui.MainView, SIGNAL(sliceAxisValueChanged(int,double)), this, SLOT(sliceAxisValueChanged(int,double)));
-	connect(ui.MainView, SIGNAL(sliceAxisClicked(int,double)), this, SLOT(addSlice(int,double)));
-
-	// Hide the SliceGraph to begin with
-	ui.ViewGraphSplitter->setSizes(QList<int>() << -1 << 0);
+	connect(ui.MainView, SIGNAL(sliceAxisValueChanged(int,double)), this, SLOT(surfaceSliceAxisValueChanged(int,double)));
+	connect(ui.MainView, SIGNAL(sliceAxisClicked(int,double)), this, SLOT(addSurfaceSlice(int,double)));
 }
 
 // Destructor
@@ -117,6 +114,25 @@ void FQPlotWindow::updateAfterLoad()
 // File Menu
 */
 
+void FQPlotWindow::on_actionFileNew_triggered(bool checked)
+{
+	if (modified_)
+	{
+		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+		if (button == QMessageBox::Yes)
+		{
+			// Save file, and check modified_ status to make sure it wasn't cancelled.
+			on_actionFileSave_triggered(false);
+			if (modified_) return;
+		}
+	}
+
+	clearData();
+	updateSurface();
+	ui.SurfaceSliceGraph->removeAllDataSets();
+	updateAfterLoad();
+}
+
 void FQPlotWindow::on_actionFileLoad_triggered(bool checked)
 {
 	if (modified_)
@@ -160,6 +176,31 @@ void FQPlotWindow::on_actionFileSaveAs_triggered(bool checked)
 	inputFile_ = newFileName;
 	if (saveData(inputFile_)) modified_ = false;
 	updateTitleBar();
+}
+
+void FQPlotWindow::on_actionFileImportData_triggered(bool checked)
+{
+	// Raise the Data Import dialog
+	bool fitData = slices_.nItems() == 0;
+	bool result = dataImportDialog_.import();
+	if (!result) return;
+
+	// Loop over list of imported slices and copy them to our local list
+	for (Slice* slice = dataImportDialog_.importedSlices(); slice != NULL; slice = slice->next)
+	{
+		Slice* newSlice = slices_.add();
+		(*newSlice) = (*slice);
+	}
+
+	// Update data limits and file list
+	calculateDataLimits();
+	if (fitData) showAll();
+	updateSourceDataTab();
+	updateTransformTab();
+	setAsModified();
+	
+	// Need to update surface
+	updateSurface();
 }
 
 void FQPlotWindow::on_actionFileSaveImage_triggered(bool checked)

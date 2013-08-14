@@ -586,6 +586,7 @@ void PlotWidget::setStaticData(Data2D& data, QString name)
 void PlotWidget::removeAllDataSets()
 {
 	dataSets_.clear();
+	staticDataSet_.data().clear();
 
 	repaint();
 }

@@ -59,12 +59,22 @@ void FQPlotWindow::on_AddFilesButton_clicked(bool checked)
 	QProgressDialog progress("Loading data...", "Abort Loading", 0, files.count(), this);
 	progress.setWindowModality(Qt::WindowModal);
 	int count = 0;
+	// Determine automatic Z placement for slice
+	double z = 0.0, delta = 1.0;
+	if (slices_.nItems() == 1) z = slices_.last()->z() + 1.0;
+	else if (slices_.nItems() > 1)
+	{
+		delta = slices_.last()->z() - slices_.last()->prev->z();
+		z = slices_.last()->prev->z() + delta;
+	}
+
 	foreach (QString fileName, files)
 	{
 		progress.setValue(count);
 		if (progress.wasCanceled()) break;
 
-		if (loadSlice(fileName)) ++count;
+		if (addSlice(z, fileName, fileName)) ++count;
+		z += delta;
 	}
 	progress.setValue(files.count());
 
@@ -153,7 +163,7 @@ void FQPlotWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 	QString dirString = QFileDialog::getExistingDirectory(this, "TimeStamp Extraction", "Choose the directory containing the required files:");
 	if (dirString.isEmpty()) return;
 	QDir dir(dirString);
-	
+
 	// Load timestamp data from files - set offset in seconds from an arbitrary point to start with, then adjust afterwards
 	QString s;
 	double earliest = 0.0;
@@ -161,7 +171,8 @@ void FQPlotWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
 	{
 		// Construct filename to search for
-		s = dir.absoluteFilePath(slice->baseFileName()) + "." + extension;
+		QFileInfo baseInfo(slice->sourceFileName());
+		s = dir.absoluteFilePath(baseInfo.baseName()) + "." + extension;
 		QFileInfo fileInfo(s);
 		if (!fileInfo.exists())
 		{
@@ -181,7 +192,7 @@ void FQPlotWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 	updateSurface();
 }
 
-void FQPlotWindow::on_ReloadAllDataButton_clicked(bool checked)
+void FQPlotWindow::on_ReloadFilesButton_clicked(bool checked)
 {
 	// Reload all data and update surface
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) slice->loadData(dataFileDirectory_);
@@ -200,7 +211,7 @@ void FQPlotWindow::updateSourceDataTab()
 	int count = 0;
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
 	{
-		QTableWidgetItem* item = new QTableWidgetItem(slice->fileName());
+		QTableWidgetItem* item = new QTableWidgetItem(slice->sourceFileName());
 		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 		ui.SourceFilesTable->setItem(count, 0, item);
 		item = new QTableWidgetItem(QString::number(slice->z()));

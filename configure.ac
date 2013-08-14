@@ -3,7 +3,7 @@
 AC_PREREQ(2.60)
 
 # Set program name, version, bug-address and source directory
-m4_define([FQPLOT_VERSION],[r30])
+m4_define([FQPLOT_VERSION],[r31])
 AC_INIT(fqplot,FQPLOT_VERSION,tris@projectaten.net)
 AC_CONFIG_SRCDIR([src/])
 
@@ -108,7 +108,7 @@ if test "x$with_qt" = "x"; then
   PKG_CHECK_MODULES(QTGUI, QtGui >= 4.1.0)
   PKG_CHECK_MODULES(QTOPENGL, QtOpenGL >= 4.1.0)
 fi
-GUI_LDLIBS="$FTGL_LIBS $FREETYPE_LIBS $QTGUI_LIBS $QTOPENGL_LIBS -lreadline -lncurses -lGL -lfreetype"
+GUI_LDLIBS="$FTGL_LIBS $FREETYPE_LIBS $QTGUI_LIBS $QTOPENGL_LIBS -lreadline -lncurses -lGL -lfreetype -lhdf5"
 GUI_CFLAGS="$FREETYPE_CFLAGS $QTGUI_CFLAGS -I$RLINCDIR"
 
 
