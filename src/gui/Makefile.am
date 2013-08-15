@@ -33,5 +33,3 @@ noinst_HEADERS = fqplot.h dataimport.h saveimage.h viewer_primitive.h viewer_pri
 
 INCLUDES = -I$(top_srcdir)/src -I$(top_srcdir)/src/gui @GUI_CFLAGS@
 
-
-

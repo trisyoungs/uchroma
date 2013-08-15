@@ -95,6 +95,13 @@ class FQPlotWindow : public QMainWindow
 
 
 	/*
+	// Settings Menu
+	*/
+	private slots:
+	void on_actionSettingsChooseFont_triggered(bool checked);
+
+
+	/*
 	 * Tabs -- Source Data
 	 */
 	private slots:
@@ -322,8 +329,12 @@ class FQPlotWindow : public QMainWindow
 	void on_AnalyseSliceXRadio_clicked(bool checked);
 	void on_AnalyseSliceYRadio_clicked(bool checked);
 	void on_AnalyseSliceZRadio_clicked(bool checked);
-	void on_AnalyseSliceMonitorCheck_clicked(bool checked);
-	void on_AnalyseShowLegendCheck_clicked(bool checked);
+	void on_AnalyseSurfaceSliceMonitorCheck_clicked(bool checked);
+	void on_AnalyseSurfaceSliceShowLegendCheck_clicked(bool checked);
+	void on_AnalyseSurfaceSliceAutoScaleCheck_clicked(bool checked);
+	void on_AnalyseSurfaceSliceClearButton_clicked(bool checked);
+	void on_AnalyseSurfaceSliceSaveButton_clicked(bool checked);
+	void on_AnalyseSurfaceSliceList_currentRowChanged(int index);
 
 	public slots:
 	void surfaceSliceAxisValueChanged(int axis, double value);

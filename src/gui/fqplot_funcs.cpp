@@ -65,13 +65,22 @@ void FQPlotWindow::closeEvent(QCloseEvent *event)
 {
 }
 
-// Load settings...
+// Load settings
 void FQPlotWindow::loadSettings()
 {
 	QSettings settings;
 
 	// Viewer font
 	if (settings.contains("ViewerFont")) viewerFont_ = settings.value("ViewerFont").toString();
+}
+
+// Save settings
+void FQPlotWindow::saveSettings()
+{
+	QSettings settings;
+
+	// Viewer font
+	settings.setValue("ViewerFont", viewerFont_);
 }
 
 // Update all tabs
@@ -129,7 +138,7 @@ void FQPlotWindow::on_actionFileNew_triggered(bool checked)
 
 	clearData();
 	updateSurface();
-	ui.SurfaceSliceGraph->removeAllDataSets();
+	ui.AnalyseSurfaceSliceGraph->removeAllDataSets();
 	updateAfterLoad();
 }
 
@@ -234,8 +243,8 @@ void FQPlotWindow::on_actionFileQuit_triggered(bool checked)
 }
 
 /*
-// View Menu
-*/
+ * View Menu
+ */
 
 void FQPlotWindow::on_actionViewPerspective_triggered(bool checked)
 {
@@ -249,6 +258,22 @@ void FQPlotWindow::on_actionViewReset_triggered(bool checked)
 	A[14] = -5.0;
 	ui.MainView->setViewMatrix(A);
 	ui.MainView->update();
+}
+
+/*
+ * Settings Menu
+ */
+
+void FQPlotWindow::on_actionSettingsChooseFont_triggered(bool checked)
+{
+	static QDir currentFontDirectory = viewerFont_;
+	QString newFont = QFileDialog::getOpenFileName(this, "Choose truetype font", currentFontDirectory.path(), "TrueType font files (*.ttf);;All files (*.*)");
+	if (!newFont.isEmpty())
+	{
+		viewerFont_ = newFont;
+		ui.MainView->setupFont(viewerFont_);
+		saveSettings();
+	}
 }
 
 /*

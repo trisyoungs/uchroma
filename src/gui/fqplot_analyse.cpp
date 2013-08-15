@@ -38,21 +38,41 @@ void FQPlotWindow::on_AnalyseSliceXRadio_clicked(bool checked)
 
 void FQPlotWindow::on_AnalyseSliceYRadio_clicked(bool checked)
 {
-	ui.MainView->setSliceAxis(0);
+	ui.MainView->setSliceAxis(1);
 }
 
 void FQPlotWindow::on_AnalyseSliceZRadio_clicked(bool checked)
 {
-	ui.MainView->setSliceAxis(0);
+	ui.MainView->setSliceAxis(2);
 }
 
-void FQPlotWindow::on_AnalyseSliceMonitorCheck_clicked(bool checked)
+void FQPlotWindow::on_AnalyseSurfaceSliceMonitorCheck_clicked(bool checked)
 {
 }
 
-void FQPlotWindow::on_AnalyseShowLegendCheck_clicked(bool checked)
+void FQPlotWindow::on_AnalyseSurfaceSliceShowLegendCheck_clicked(bool checked)
 {
-	ui.SurfaceSliceGraph->setShowLegend(checked);
+	ui.AnalyseSurfaceSliceGraph->setShowLegend(checked);
+}
+
+void FQPlotWindow::on_AnalyseSurfaceSliceAutoScaleCheck_clicked(bool checked)
+{
+	ui.AnalyseSurfaceSliceGraph->setAutoScale(checked);
+}
+
+void FQPlotWindow::on_AnalyseSurfaceSliceClearButton_clicked(bool checked)
+{
+	ui.AnalyseSurfaceSliceList->clear();
+	ui.AnalyseSurfaceSliceGraph->removeAllDataSets();
+}
+
+void FQPlotWindow::on_AnalyseSurfaceSliceSaveButton_clicked(bool checked)
+{
+}
+
+void FQPlotWindow::on_AnalyseSurfaceSliceList_currentRowChanged(int index)
+{
+	
 }
 
 /*
@@ -78,7 +98,7 @@ void FQPlotWindow::surfaceSliceAxisValueChanged(int axis, double value)
 	}
 
 	// If we are monitoring, construct a slice and add it as the static data of the graph
-	if (ui.AnalyseSliceMonitorCheck->isChecked()) updateSurfaceSliceData(true);
+	if (ui.AnalyseSurfaceSliceMonitorCheck->isChecked()) updateSurfaceSliceData(true);
 }
 
 // Add slice to graph
@@ -144,7 +164,7 @@ int FQPlotWindow::closestBin(int axis, double value)
 // Update/add slice data
 void FQPlotWindow::updateSurfaceSliceData(bool setStatic)
 {
-	if (setStatic && (!ui.AnalyseSliceMonitorCheck->isChecked())) return;
+	if (setStatic && (!ui.AnalyseSurfaceSliceMonitorCheck->isChecked())) return;
 
 	int bin = closestBin(sliceAxis_, sliceAxisValue_);
 	QString title;
@@ -155,11 +175,11 @@ void FQPlotWindow::updateSurfaceSliceData(bool setStatic)
 		// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated)
 		sliceData_.clear();
 		for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) sliceData_.addPoint(transformValue(slice->z(), 2), transformValue(slice->data().y(bin), 1));
-		title = "X = " + QString::number(transformValue(sliceData_.x(bin), 0));
+		title = "X = " + QString::number(transformValue(slices_.first()->data().x(bin), 0));
 	}
 	else if (sliceAxis_ == 1)
 	{
-		// ???
+		return;
 	}
 	else if (sliceAxis_ == 2)
 	{
@@ -170,7 +190,10 @@ void FQPlotWindow::updateSurfaceSliceData(bool setStatic)
 	}
 
 	// Set static data, or add other dataset?
-	if (setStatic) ui.SurfaceSliceGraph->setStaticData(sliceData_, title);
-	else ui.SurfaceSliceGraph->addDataSet(sliceData_, title, "Data");
+	if (setStatic) ui.AnalyseSurfaceSliceGraph->setStaticData(sliceData_, title);
+	else
+	{
+		ui.AnalyseSurfaceSliceGraph->addDataSet(sliceData_, title, "Data");
+		ui.AnalyseSurfaceSliceList->addItem(title);
+	}
 }
-

@@ -215,8 +215,6 @@ void PlotWidget::drawData(QPainter& painter)
 	QPen dataPen;
 	dataPen.setWidthF(1.5);
 	int count = 0;
-
-
 	for (PlotData* pd = dataSets_.first(); pd != NULL; pd = pd->next)
 	{
 		// Is dataset visible?
@@ -231,9 +229,11 @@ void PlotWidget::drawData(QPainter& painter)
 		// Update Painter transform, pen, and draw the dataset path
 		painter.setTransform(modifiedTransform);
 		pd->stylePen(dataPen);
+		dataPen.setColor(lineColour(count));
 		painter.setPen(dataPen);
 		painter.setBrush(Qt::NoBrush);
 		painter.drawPath(pd->linePath());
+		++count;
 	}
 
 	// Static data
@@ -350,54 +350,55 @@ void PlotWidget::drawLegend(QPainter& painter)
 {
 	painter.setTransform(globalTransform_);
 
-	// Draw legend (if visible, and more than one dataset block is visible)
-	if (nDataSetBlocksVisible_ > 0)
+	// Loop over datasets and determine maximum extent needed for titles
+	QRectF textRect, tempRect;
+	int nDataSets = 0;
+	for (PlotData* pd = dataSets_.first(); pd != NULL; pd = pd->next)
 	{
-		// Loop over datasets and determine maximum extent needed for titles
-		QRectF textRect, tempRect;
-		int nDataSets = 0;
-		for (PlotDataBlock* pdb = dataSetBlocks_.first(); pdb != NULL; pdb = pdb->next)
-		{
-			// Is dataset to be drawn?
-			if (!pdb->visible()) continue;
+		// Is dataset to be drawn?
+		if (!pd->visible()) continue;
 
-			tempRect = painter.boundingRect(QRectF(), Qt::AlignLeft, pdb->blockName());
-			if (tempRect.width() > textRect.width()) textRect = tempRect;
-			++nDataSets;
-		}
+		tempRect = painter.boundingRect(QRectF(), Qt::AlignLeft, pd->name());
+		if (tempRect.width() > textRect.width()) textRect = tempRect;
+		++nDataSets;
+	}
+	
+	if (nDataSets == 0) return;
 
-		// Create rectangle for legend area
-		int legendSpacing = 2, legendLineLength = 20;
-		QRectF legendRect = textRect;
-		legendRect.setWidth( textRect.width() + 3 * legendSpacing + legendLineLength );
-		legendRect.moveRight(width()-spacing_);
-		legendRect.moveTop(graphArea_.top());
-		legendRect.setHeight( textRect.height() * nDataSets + (nDataSets+1) * legendSpacing );
-		textRect.moveRight(width() - legendSpacing - spacing_);
-		textRect.moveTop(legendRect.top() + legendSpacing);
+	// Create rectangle for legend area
+	int legendSpacing = 2, legendLineLength = 20;
+	QRectF legendRect = textRect;
+	legendRect.setWidth( textRect.width() + 3 * legendSpacing + legendLineLength );
+	legendRect.moveRight(width()-spacing_);
+	legendRect.moveTop(graphArea_.top());
+	legendRect.setHeight( textRect.height() * nDataSets + (nDataSets+1) * legendSpacing );
+	textRect.moveRight(width() - legendSpacing - spacing_);
+	textRect.moveTop(legendRect.top() + legendSpacing);
 
-		// Draw semi-transparent box to underpin legend
-		QBrush legendBrush(backgroundColour_, Qt::SolidPattern);
-		painter.setBrush(legendBrush);
-		painter.drawRect(legendRect);
-		QLine legendLine(legendRect.left() + legendSpacing, legendRect.top()+legendSpacing+textRect.height()/2, legendRect.left() + legendSpacing + legendLineLength, legendRect.top()+legendSpacing+textRect.height()/2);
+	// Draw semi-transparent box to underpin legend
+	QBrush legendBrush(backgroundColour_, Qt::SolidPattern);
+	painter.setBrush(legendBrush);
+	painter.drawRect(legendRect);
+	QLine legendLine(legendRect.left() + legendSpacing, legendRect.top()+legendSpacing+textRect.height()/2, legendRect.left() + legendSpacing + legendLineLength, legendRect.top()+legendSpacing+textRect.height()/2);
 
-		// Draw on dataSet names and representative lines...
-		QPen pen;
-		pen.setWidth(2);
-		pen.setColor(Qt::black);
-		for (PlotDataBlock* pdb = dataSetBlocks_.first(); pdb != NULL; pdb = pdb->next)
-		{
-			// Is dataset visible?
-			if (!pdb->visible()) continue;
+	// Draw on dataSet names and representative lines...
+	QPen pen;
+	int count = 0;
+	pen.setWidth(2);
+	for (PlotData* pd = dataSets_.first(); pd != NULL; pd = pd->next)
+	{
+		// Is dataset visible?
+		if (!pd->visible()) continue;
 
-			painter.drawText(textRect, Qt::AlignLeft, pdb->blockName());
-			textRect.moveTop( textRect.top() + textRect.height() + legendSpacing);
-			
-			pen.setDashPattern(pdb->dashes());
-			painter.setPen(pen);
-			painter.drawLine(legendLine);
-			legendLine.translate(0, textRect.height()+legendSpacing);
-		}
+		painter.setPen(Qt::black);
+		painter.drawText(textRect, Qt::AlignLeft, pd->name());
+		textRect.moveTop( textRect.top() + textRect.height() + legendSpacing);
+		
+		if (pd->block() != NULL) pen.setDashPattern(pd->block()->dashes());
+		pen.setColor(lineColour(count));
+		painter.setPen(pen);
+		painter.drawLine(legendLine);
+		legendLine.translate(0, textRect.height()+legendSpacing);
+		++count;
 	}
 }

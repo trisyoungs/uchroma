@@ -4120,23 +4120,33 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_40">
               <item>
-               <widget class="QCheckBox" name="AnalyseSliceMonitorCheck">
+               <widget class="QCheckBox" name="AnalyseSurfaceSliceMonitorCheck">
                 <property name="text">
                  <string>Monitor</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QCheckBox" name="AnalyseShowLegendCheck">
+               <widget class="QCheckBox" name="AnalyseSurfaceSliceShowLegendCheck">
                 <property name="text">
                  <string>Legend</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="AnalyseSurfaceSliceAutoScaleCheck">
+                <property name="text">
+                 <string>AutoScale</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
              </layout>
             </item>
             <item>
-             <widget class="QFrame" name="SurfaceSliceGraphFrame">
+             <widget class="QFrame" name="AnalyseSurfaceSliceGraphFrame">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
@@ -4163,10 +4173,51 @@
                 <number>2</number>
                </property>
                <item>
-                <widget class="PlotWidget" name="SurfaceSliceGraph" native="true"/>
+                <widget class="PlotWidget" name="AnalyseSurfaceSliceGraph" native="true"/>
                </item>
               </layout>
              </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_41">
+              <item>
+               <widget class="QListWidget" name="AnalyseSurfaceSliceList"/>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_24">
+                <item>
+                 <widget class="QPushButton" name="AnalyseSurfaceSliceClearButton">
+                  <property name="text">
+                   <string>Clear</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="AnalyseSurfaceSliceSaveButton">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>Save</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
             </item>
             <item>
              <spacer name="verticalSpacer_4">
@@ -4184,7 +4235,7 @@
            </layout>
           </widget>
          </widget>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <property name="spacing">
             <number>2</number>
@@ -4307,8 +4358,15 @@
     <addaction name="separator"/>
     <addaction name="actionViewReset"/>
    </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="actionSettingsChooseFont"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
+   <addaction name="menuSettings"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionFileQuit">
@@ -4366,6 +4424,11 @@
   <action name="actionFileNew">
    <property name="text">
     <string>&amp;New</string>
+   </property>
+  </action>
+  <action name="actionSettingsChooseFont">
+   <property name="text">
+    <string>Choost Font...</string>
    </property>
   </action>
  </widget>

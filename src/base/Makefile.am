@@ -4,4 +4,4 @@ libbase_a_SOURCES = colourscale.cpp data2d.cpp dnchar.cpp lineparser.cpp messeng
 
 noinst_HEADERS = colourscale.h data2d.h dnchar.h lineparser.h messenger.h nxs.h slice.h sysfunc.h
 
-INCLUDES = -I$(top_srcdir)/src -I../
+INCLUDES = -I$(top_srcdir)/src -I../ @GUI_CFLAGS@
