@@ -1,9 +1,9 @@
-project(FQPlot)
+project(uChroma)
 
-set(DESCRIPTION "FQPlot")
+set(DESCRIPTION "uChroma")
 set(AUTHOR "Tristan Youngs")
 set(VERSION_MAJOR "0")
-set(VERSION_MINOR "34")
+set(VERSION_MINOR "35")
 
 set(CMAKE_BUILD_TYPE "Release")
 
@@ -21,9 +21,9 @@ endif(COMMAND cmake_policy)
 
 # Set target name
 if(WIN32)
-	set (target_name FQPlot)
+	set (target_name uChroma)
 else(WIN32)
-	set (target_name fqplot)
+	set (target_name uchroma)
 endif(WIN32)
 
 # Setup SZIP and FTGL (Windows Only)
@@ -85,10 +85,10 @@ add_subdirectory(${SRCS})
 
 # Set bundle information for Mac
 If(APPLE)
-	set(MACOSX_BUNDLE_ICON_FILE  "fqplot.icns")
-	set(MACOSX_BUNDLE_GUI_IDENTIFIER  "FQPlot")
+	set(MACOSX_BUNDLE_ICON_FILE  "uchroma.icns")
+	set(MACOSX_BUNDLE_GUI_IDENTIFIER  "uChroma")
 	set(MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}")
-	set(MACOSX_BUNDLE_BUNDLE_NAME  "FQPlot" )
+	set(MACOSX_BUNDLE_BUNDLE_NAME  "uChroma" )
 	set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}")
 	set(MACOSX_BUNDLE_BUNDLE_VERSION  "${VERSION_MAJOR}.${VERSION_MINOR}")
 	set(MACOSX_BUNDLE_COPYRIGHT "${AUTHOR}")
@@ -123,11 +123,11 @@ if(NOT ${PREFIX})
 endif(NOT ${PREFIX})
 
 if(UNIX AND NOT APPLE)
-  configure_file(${CMAKE_SOURCE_DIR}/desktop.cmake ${CMAKE_BINARY_DIR}/FQPlot.desktop)
-  install(FILES ${CMAKE_BINARY_DIR}/FQPlot.desktop 
+  configure_file(${CMAKE_SOURCE_DIR}/desktop.cmake ${CMAKE_BINARY_DIR}/uChroma.desktop)
+  install(FILES ${CMAKE_BINARY_DIR}/uChroma.desktop 
        DESTINATION "/usr/share/applications/")
-  install(FILES ${CMAKE_SOURCE_DIR}/extra/FQPlot.png
-        DESTINATION share/fqplot)
+  install(FILES ${CMAKE_SOURCE_DIR}/extra/uChroma.png
+        DESTINATION share/uchroma)
 endif(UNIX AND NOT APPLE)
 
 if (APPLE)
@@ -168,7 +168,7 @@ if(WIN32)
     Find_File(qsvg qsvgicon4.dll PATHS ${QT_PLUGINS_DIR}/iconengines NO_DEFAULT_PATH)
   endif(NOT qsvg)
   Find_File(qsvgie qsvg4.dll PATHS ${QT_PLUGINS_DIR}/imageformats NO_DEFAULT_PATH)
-  install(FILES ${qtgui} ${qtcore} ${qtnetwork} ${qtsvg} ${qtxml} ${qtgl} ${mingwgcc} ${mingwg++} ${ft2} ${zlib}  ${CMAKE_CURRENT_SOURCE_DIR}/extra/FQPlot.ico
+  install(FILES ${qtgui} ${qtcore} ${qtnetwork} ${qtsvg} ${qtxml} ${qtgl} ${mingwgcc} ${mingwg++} ${ft2} ${zlib}  ${CMAKE_CURRENT_SOURCE_DIR}/extra/uChroma.ico
    DESTINATION bin
   )
   install(FILES ${qsvg} 
@@ -182,18 +182,18 @@ ENDIF(WIN32)
 
 if(APPLE)
 ## install the icon for the bundle
-  install(FILES "${CMAKE_SOURCE_DIR}/extra/fqplot.icns" 
+  install(FILES "${CMAKE_SOURCE_DIR}/extra/uchroma.icns" 
         DESTINATION "${target_name}.app/Contents/Resources/")
 #  install(DIRECTORY  "${CMAKE_HOME_DIRECTORY}/data/"
 #     DESTINATION ${target_name}.app/Contents/SharedSupport/
 #     REGEX ".svn" EXCLUDE)
-  install(FILES "${CMAKE_SOURCE_DIR}/extra/fqplot.icns"
+  install(FILES "${CMAKE_SOURCE_DIR}/extra/uchroma.icns"
         DESTINATION . RENAME ".VolumeIcon.icns")
   install(FILES "${CMAKE_SOURCE_DIR}/extra/background.png"
         DESTINATION .background/) 
   install(FILES "${CMAKE_SOURCE_DIR}/COPYING" 
          DESTINATION . RENAME .COPYING)
-  install(FILES "${CMAKE_SOURCE_DIR}/extra/FQPlot.DS_Store"
+  install(FILES "${CMAKE_SOURCE_DIR}/extra/uChroma.DS_Store"
          DESTINATION . RENAME .DS_Store)
 #  INSTALL(CODE "set(input_file
 #        \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${target_name}.app/Contents/MacOS/${target_name}\")")
@@ -230,25 +230,25 @@ ENDIF(APPLE)
 SET(CPACK_PACKAGE_VERSION ${VERSION_MAJOR}.${VERSION_MINOR})
 SET(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
 SET(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
-SET(CPACK_PACKAGE_INSTALL_DIRECTORY "FQPlot")
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY "uChroma")
 IF(WIN32)
   SET(CPACK_GENERATOR "NSIS;ZIP")
   set(CMAKE_INSTALL_PREFIX "")
   # There is a bug in NSI that does not handle full unix paths properly. Make
   # sure there is at least one set of four (4) backlasshes.
-  set(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/extra/FQPlot.ico")
-  set(CPACK_NSIS_MUI_UNIICON "${CMAKE_CURRENT_SOURCE_DIR}/extra/FQPlot.ico")
-  SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/extra\\\\FQPlot.bmp")
-  SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\fqplot.ico")  
-  SET(CPACK_NSIS_DISPLAY_NAME "FQPlot")
-  SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.projectaten.net\\\\fqplot")
-  SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.projectaten.net\\\\fqplot")
+  set(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/extra/uChroma.ico")
+  set(CPACK_NSIS_MUI_UNIICON "${CMAKE_CURRENT_SOURCE_DIR}/extra/uChroma.ico")
+  SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/extra\\\\uChroma.bmp")
+  SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\uchroma.ico")  
+  SET(CPACK_NSIS_DISPLAY_NAME "uChroma")
+  SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.projectaten.net\\\\uchroma")
+  SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.projectaten.net\\\\uchroma")
   SET(CPACK_NSIS_CONTACT "tris@projectaten.net")
   SET(CPACK_NSIS_MODIFY_PATH ON) 
-  SET(CPACK_PACKAGE_EXECUTABLES "fqplot" "fqplot")
-  set(CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut \\\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\fqplot.lnk\\\" \\\"$INSTDIR\\\\bin\\\\fqplot.exe\\\" \\\"\\\" \\\"$INSTDIR\\\\bin\\\\fqplot.ico\\\"
+  SET(CPACK_PACKAGE_EXECUTABLES "uchroma" "uchroma")
+  set(CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut \\\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\uchroma.lnk\\\" \\\"$INSTDIR\\\\bin\\\\uchroma.exe\\\" \\\"\\\" \\\"$INSTDIR\\\\bin\\\\uchroma.ico\\\"
       StrCmp $INSTALL_DESKTOP \\\"1\\\" 0 +2
-      CreateShortCut \\\"$DESKTOP\\\\fqplot.lnk\\\" \\\"$INSTDIR\\\\bin\\\\fqplot.exe\\\" \\\"\\\" \\\"$INSTDIR\\\\bin\\\\fqplot.ico\\\"
+      CreateShortCut \\\"$DESKTOP\\\\uchroma.lnk\\\" \\\"$INSTDIR\\\\bin\\\\uchroma.exe\\\" \\\"\\\" \\\"$INSTDIR\\\\bin\\\\uchroma.ico\\\"
 "
   )
 Endif(WIN32)

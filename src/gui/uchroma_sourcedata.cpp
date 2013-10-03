@@ -1,29 +1,29 @@
 /*
 	*** Main Window - Source Data Functions 
-	*** src/gui/fqplot_sourcedata.cpp
+	*** src/gui/uchroma_sourcedata.cpp
 	Copyright T. Youngs 2013
 
-	This file is part of FQPlot.
+	This file is part of uChroma.
 
-	FQPlot is free software: you can redistribute it and/or modify
+	uChroma is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	FQPlot is distributed in the hope that it will be useful,
+	uChroma is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
+	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/fqplot.h"
+#include "gui/uchroma.h"
 #include "templates/reflist.h"
 
 // Select source directory
-void FQPlotWindow::on_SourceDirSelectButton_clicked(bool checked)
+void UChromaWindow::on_SourceDirSelectButton_clicked(bool checked)
 {
 	QString dir = QFileDialog::getExistingDirectory(this, "Data Directory", "Choose the directory containing the required files:");
 	if (dir.isEmpty()) return;
@@ -52,7 +52,7 @@ void FQPlotWindow::on_SourceDirSelectButton_clicked(bool checked)
 }
 
 // Add files button clicked
-void FQPlotWindow::on_AddFilesButton_clicked(bool checked)
+void UChromaWindow::on_AddFilesButton_clicked(bool checked)
 {
 	QStringList files = QFileDialog::getOpenFileNames(this, "Select datafiles", dataFileDirectory_.path(), "MINT files (*.mint01);;MDCS files (*.mdcs01);;Text files (*.txt);;All files (*)");
 
@@ -89,7 +89,7 @@ void FQPlotWindow::on_AddFilesButton_clicked(bool checked)
 }
 
 // Remove files button clicked
-void FQPlotWindow::on_RemoveFilesButton_clicked(bool checked)
+void UChromaWindow::on_RemoveFilesButton_clicked(bool checked)
 {
 	foreach(QTableWidgetItem* item, ui.SourceFilesTable->selectedItems())
 	{
@@ -99,12 +99,12 @@ void FQPlotWindow::on_RemoveFilesButton_clicked(bool checked)
 }
 
 // Source data item selection changed
-void FQPlotWindow::on_SourceFilesTable_itemSelectionChanged()
+void UChromaWindow::on_SourceFilesTable_itemSelectionChanged()
 {
 	ui.RemoveFilesButton->setEnabled(ui.SourceFilesTable->selectedItems().count() != 0);
 }
 
-void FQPlotWindow::on_SourceFilesTable_cellChanged(int row, int column)
+void UChromaWindow::on_SourceFilesTable_cellChanged(int row, int column)
 {
 	if (refreshing_) return;
 
@@ -151,7 +151,7 @@ void FQPlotWindow::on_SourceFilesTable_cellChanged(int row, int column)
 }
 
 // Retrieve relative Z values from timestamps
-void FQPlotWindow::on_GetZFromTimeStampButton_clicked(bool checked)
+void UChromaWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 {
 	if (slices_.nItems() == 0) return;
 
@@ -192,7 +192,7 @@ void FQPlotWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 	updateSurface();
 }
 
-void FQPlotWindow::on_ReloadFilesButton_clicked(bool checked)
+void UChromaWindow::on_ReloadFilesButton_clicked(bool checked)
 {
 	// Reload all data and update surface
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) slice->loadData(dataFileDirectory_);
@@ -201,7 +201,7 @@ void FQPlotWindow::on_ReloadFilesButton_clicked(bool checked)
 }
 
 // Update source data
-void FQPlotWindow::updateSourceDataTab()
+void UChromaWindow::updateSourceDataTab()
 {
 	refreshing_ = true;
 	ui.SourceDirEdit->setText(dataFileDirectory_.absolutePath());

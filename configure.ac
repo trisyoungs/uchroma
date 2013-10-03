@@ -3,8 +3,8 @@
 AC_PREREQ(2.60)
 
 # Set program name, version, bug-address and source directory
-m4_define([FQPLOT_VERSION],[r34])
-AC_INIT(fqplot,FQPLOT_VERSION,tris@projectaten.net)
+m4_define([UCHROMA_VERSION],[r34])
+AC_INIT(uchroma,UCHROMA_VERSION,tris@projectaten.net)
 AC_CONFIG_SRCDIR([src/])
 
 # Check system type and set defines
@@ -19,7 +19,7 @@ if test "$target_vendor" = "apple"; then
 fi
 AC_SUBST(MAC_LIBS)
 
-AM_INIT_AUTOMAKE(fqplot,FQPLOT_VERSION)
+AM_INIT_AUTOMAKE(uchroma,UCHROMA_VERSION)
 
 # Checks for programs.
 AC_PROG_CXX
@@ -112,7 +112,7 @@ GUI_LDLIBS="$FTGL_LIBS $FREETYPE_LIBS $QTGUI_LIBS $QTOPENGL_LIBS -lreadline -lnc
 GUI_CFLAGS="$FREETYPE_CFLAGS $QTGUI_CFLAGS -I$RLINCDIR"
 
 
-VERSION=FQPLOT_VERSION
+VERSION=UCHROMA_VERSION
 # Perform Makefile substitutions
 AC_SUBST(GUI_LDLIBS)
 AC_SUBST(GUI_CFLAGS)

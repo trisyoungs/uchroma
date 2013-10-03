@@ -1,30 +1,30 @@
 /*
 	*** Main Window - Functions 
-	*** src/gui/fqplot_funcs.cpp
+	*** src/gui/uchroma_funcs.cpp
 	Copyright T. Youngs 2013
 
-	This file is part of FQPlot.
+	This file is part of uChroma.
 
-	FQPlot is free software: you can redistribute it and/or modify
+	uChroma is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	FQPlot is distributed in the hope that it will be useful,
+	uChroma is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
+	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/fqplot.h"
+#include "gui/uchroma.h"
 #include "templates/reflist.h"
 #include "version.h"
 
 // Constructor
-FQPlotWindow::FQPlotWindow(QMainWindow *parent) : QMainWindow(parent), saveImageDialog_(this), dataImportDialog_(this)
+UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveImageDialog_(this), dataImportDialog_(this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -56,17 +56,17 @@ FQPlotWindow::FQPlotWindow(QMainWindow *parent) : QMainWindow(parent), saveImage
 }
 
 // Destructor
-FQPlotWindow::~FQPlotWindow()
+UChromaWindow::~UChromaWindow()
 {
 }
 
 // Window close event
-void FQPlotWindow::closeEvent(QCloseEvent *event)
+void UChromaWindow::closeEvent(QCloseEvent *event)
 {
 }
 
 // Load settings
-void FQPlotWindow::loadSettings()
+void UChromaWindow::loadSettings()
 {
 	QSettings settings;
 
@@ -75,7 +75,7 @@ void FQPlotWindow::loadSettings()
 }
 
 // Save settings
-void FQPlotWindow::saveSettings()
+void UChromaWindow::saveSettings()
 {
 	QSettings settings;
 
@@ -84,7 +84,7 @@ void FQPlotWindow::saveSettings()
 }
 
 // Update all tabs
-void FQPlotWindow::updateAllTabs()
+void UChromaWindow::updateAllTabs()
 {
 	updateSourceDataTab();
 	updateTransformTab();
@@ -93,14 +93,14 @@ void FQPlotWindow::updateAllTabs()
 }
 
 // Update title bar
-void FQPlotWindow::updateTitleBar()
+void UChromaWindow::updateTitleBar()
 {
-	if (modified_) setWindowTitle("FQPlot v" + QString(FQPLOTREVISION) + " - " + inputFile_ + " (modified) ");
-	else setWindowTitle("FQPlot v" + QString(FQPLOTREVISION) + " - " + inputFile_);
+	if (modified_) setWindowTitle("uChroma v" + QString(UCHROMAREVISION) + " - " + inputFile_ + " (modified) ");
+	else setWindowTitle("uChroma v" + QString(UCHROMAREVISION) + " - " + inputFile_);
 }
 
 // Update GUI after loading data
-void FQPlotWindow::updateAfterLoad()
+void UChromaWindow::updateAfterLoad()
 {
 	// Update data and transform limits
 	calculateDataLimits();
@@ -123,7 +123,7 @@ void FQPlotWindow::updateAfterLoad()
 // File Menu
 */
 
-void FQPlotWindow::on_actionFileNew_triggered(bool checked)
+void UChromaWindow::on_actionFileNew_triggered(bool checked)
 {
 	if (modified_)
 	{
@@ -142,7 +142,7 @@ void FQPlotWindow::on_actionFileNew_triggered(bool checked)
 	updateAfterLoad();
 }
 
-void FQPlotWindow::on_actionFileLoad_triggered(bool checked)
+void UChromaWindow::on_actionFileLoad_triggered(bool checked)
 {
 	if (modified_)
 	{
@@ -155,7 +155,7 @@ void FQPlotWindow::on_actionFileLoad_triggered(bool checked)
 		}
 	}
 
-	QString fileName = QFileDialog::getOpenFileName(this, "Choose file to load", dataFileDirectory_.absolutePath(), "FQPlot files (*.fqp);;All files (*.*)");
+	QString fileName = QFileDialog::getOpenFileName(this, "Choose file to load", dataFileDirectory_.absolutePath(), "uChroma files (*.fqp);;All files (*.*)");
 	if (fileName.isEmpty()) return;
 
 	clearData();
@@ -163,12 +163,12 @@ void FQPlotWindow::on_actionFileLoad_triggered(bool checked)
 	updateAfterLoad();
 }
 
-void FQPlotWindow::on_actionFileSave_triggered(bool checked)
+void UChromaWindow::on_actionFileSave_triggered(bool checked)
 {
 	// Has an input filename already been chosen?
 	if (inputFile_.isEmpty())
 	{
-		QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "FQPlot files (*.fqp);;All files (*.*)");
+		QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "uChroma files (*.fqp);;All files (*.*)");
 		if (fileName.isEmpty()) return;
 		inputFile_ = fileName;
 	}
@@ -177,10 +177,10 @@ void FQPlotWindow::on_actionFileSave_triggered(bool checked)
 	updateTitleBar();
 }
 
-void FQPlotWindow::on_actionFileSaveAs_triggered(bool checked)
+void UChromaWindow::on_actionFileSaveAs_triggered(bool checked)
 {
 	// Has an input filename already been chosen?
-	QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "FQPlot files (*.fqp);;All files (*.*)");
+	QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "uChroma files (*.fqp);;All files (*.*)");
 	if (fileName.isEmpty()) return;
 	
 	inputFile_ = fileName;
@@ -188,7 +188,7 @@ void FQPlotWindow::on_actionFileSaveAs_triggered(bool checked)
 	updateTitleBar();
 }
 
-void FQPlotWindow::on_actionFileImportData_triggered(bool checked)
+void UChromaWindow::on_actionFileImportData_triggered(bool checked)
 {
 	// Raise the Data Import dialog
 	bool fitData = slices_.nItems() == 0;
@@ -213,7 +213,7 @@ void FQPlotWindow::on_actionFileImportData_triggered(bool checked)
 	updateSurface();
 }
 
-void FQPlotWindow::on_actionFileSaveImage_triggered(bool checked)
+void UChromaWindow::on_actionFileSaveImage_triggered(bool checked)
 {
 	if (saveImageDialog_.getImageDetails(imageExportFile_, imageExportWidth_, imageExportHeight_, imageExportFormat_, imageExportMaintainAspect_, double(ui.MainView->width()) / double(ui.MainView->height())))
 	{
@@ -227,7 +227,7 @@ void FQPlotWindow::on_actionFileSaveImage_triggered(bool checked)
 	}
 }
 
-void FQPlotWindow::on_actionFileQuit_triggered(bool checked)
+void UChromaWindow::on_actionFileQuit_triggered(bool checked)
 {
 	if (modified_)
 	{
@@ -246,13 +246,13 @@ void FQPlotWindow::on_actionFileQuit_triggered(bool checked)
  * View Menu
  */
 
-void FQPlotWindow::on_actionViewPerspective_triggered(bool checked)
+void UChromaWindow::on_actionViewPerspective_triggered(bool checked)
 {
 	ui.MainView->setHasPerspective(checked);
 	ui.MainView->update();
 }
 
-void FQPlotWindow::on_actionViewReset_triggered(bool checked)
+void UChromaWindow::on_actionViewReset_triggered(bool checked)
 {
 	Matrix A;
 	A[14] = -5.0;
@@ -264,7 +264,7 @@ void FQPlotWindow::on_actionViewReset_triggered(bool checked)
  * Settings Menu
  */
 
-void FQPlotWindow::on_actionSettingsChooseFont_triggered(bool checked)
+void UChromaWindow::on_actionSettingsChooseFont_triggered(bool checked)
 {
 	static QDir currentFontDirectory = viewerFont_;
 	QString newFont = QFileDialog::getOpenFileName(this, "Choose truetype font", currentFontDirectory.path(), "TrueType font files (*.ttf);;All files (*.*)");
@@ -281,20 +281,20 @@ void FQPlotWindow::on_actionSettingsChooseFont_triggered(bool checked)
  */
 
 // Update colour scale
-void FQPlotWindow::updateColourScale()
+void UChromaWindow::updateColourScale()
 {
 	colourScale_.clear();
-	if (colourSource_ == FQPlotWindow::SingleColourSource) colourScale_.addPoint(0.0, colourSinglePoint_.colour());
-	else if (colourSource_ == FQPlotWindow::RGBGradientSource)
+	if (colourSource_ == UChromaWindow::SingleColourSource) colourScale_.addPoint(0.0, colourSinglePoint_.colour());
+	else if (colourSource_ == UChromaWindow::RGBGradientSource)
 	{
 		colourScale_.addPoint(colourRGBGradientAPoint_.value(), colourRGBGradientAPoint_.colour());
 		colourScale_.addPoint(colourRGBGradientBPoint_.value(), colourRGBGradientBPoint_.colour());
 	}
-	else if (colourSource_ == FQPlotWindow::HSVGradientSource)
+	else if (colourSource_ == UChromaWindow::HSVGradientSource)
 	{
 		colourScale_.setUseHSV(true);
 		colourScale_.addPoint(colourHSVGradientAPoint_.value(), colourHSVGradientAPoint_.colour());
 		colourScale_.addPoint(colourHSVGradientBPoint_.value(), colourHSVGradientBPoint_.colour());
 	}
-	else if (colourSource_ == FQPlotWindow::CustomGradientSource) colourScale_ = customColourScale_;
+	else if (colourSource_ == UChromaWindow::CustomGradientSource) colourScale_ = customColourScale_;
 }

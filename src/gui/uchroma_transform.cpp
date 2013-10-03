@@ -1,28 +1,28 @@
 /*
 	*** Main Window - Transform Functions 
-	*** src/gui/fqplot_transform.cpp
+	*** src/gui/uchroma_transform.cpp
 	Copyright T. Youngs 2013
 
-	This file is part of FQPlot.
+	This file is part of uChroma.
 
-	FQPlot is free software: you can redistribute it and/or modify
+	uChroma is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	FQPlot is distributed in the hope that it will be useful,
+	uChroma is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
+	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/fqplot.h"
+#include "gui/uchroma.h"
 #include "templates/reflist.h"
 
-bool FQPlotWindow::transformTypeChanged(int axis, int index)
+bool UChromaWindow::transformTypeChanged(int axis, int index)
 {
 	if (refreshing_) return false;
 	transformType_[axis] = (DataTransform) index;
@@ -34,7 +34,7 @@ bool FQPlotWindow::transformTypeChanged(int axis, int index)
 	return true;
 }
 
-bool FQPlotWindow::transformValueChanged(int axis, double value)
+bool UChromaWindow::transformValueChanged(int axis, double value)
 {
 	if (refreshing_) return false;
 	transformValue_[axis] = value;
@@ -46,7 +46,7 @@ bool FQPlotWindow::transformValueChanged(int axis, double value)
 	return true;
 }
 
-bool FQPlotWindow::transformShiftChanged(int axis, bool pre, double value)
+bool UChromaWindow::transformShiftChanged(int axis, bool pre, double value)
 {
 	if (refreshing_) return false;
 	if (pre) preTransformShift_[axis] = value;
@@ -59,7 +59,7 @@ bool FQPlotWindow::transformShiftChanged(int axis, bool pre, double value)
 	return true;
 }
 
-bool FQPlotWindow::transformLimitChanged(int axis, bool minLim, double value)
+bool UChromaWindow::transformLimitChanged(int axis, bool minLim, double value)
 {
 	if (refreshing_) return false;
 	if (minLim) limitMin_[axis] = value;
@@ -72,7 +72,7 @@ bool FQPlotWindow::transformLimitChanged(int axis, bool minLim, double value)
 	return true;
 }
 
-bool FQPlotWindow::transformLimitSetExtreme(int axis, bool minLim)
+bool UChromaWindow::transformLimitSetExtreme(int axis, bool minLim)
 {
 	if (refreshing_) return false;
 	if (minLim) limitMin_[axis] = transformMin_[axis];
@@ -85,7 +85,7 @@ bool FQPlotWindow::transformLimitSetExtreme(int axis, bool minLim)
 	return true;
 }
 
-bool FQPlotWindow::transformInterpolateChanged(int axis, bool checked)
+bool UChromaWindow::transformInterpolateChanged(int axis, bool checked)
 {
 	if (refreshing_) return false;
 	interpolate_[axis] = checked;
@@ -94,7 +94,7 @@ bool FQPlotWindow::transformInterpolateChanged(int axis, bool checked)
 	return true;
 }
 
-bool FQPlotWindow::transformInterpolateStepChanged(int axis, double step)
+bool UChromaWindow::transformInterpolateStepChanged(int axis, double step)
 {
 	if (refreshing_) return false;
 	interpolationStep_[axis] = step;
@@ -103,7 +103,7 @@ bool FQPlotWindow::transformInterpolateStepChanged(int axis, double step)
 	return true;
 }
 
-bool FQPlotWindow::transformInterpolateConstrainChanged(int axis, bool checked)
+bool UChromaWindow::transformInterpolateConstrainChanged(int axis, bool checked)
 {
 	if (refreshing_) return false;
 	interpolateConstrained_[axis] = checked;
@@ -112,160 +112,160 @@ bool FQPlotWindow::transformInterpolateConstrainChanged(int axis, bool checked)
 	return true;
 }
 
-void FQPlotWindow::on_TransformXTypeCombo_currentIndexChanged(int index)
+void UChromaWindow::on_TransformXTypeCombo_currentIndexChanged(int index)
 {
 	if (transformTypeChanged(0, index)) ui.TransformXValueSpin->setEnabled(index < 2);
 }
 
-void FQPlotWindow::on_TransformYTypeCombo_currentIndexChanged(int index)
+void UChromaWindow::on_TransformYTypeCombo_currentIndexChanged(int index)
 {
 	if (transformTypeChanged(1, index)) ui.TransformYValueSpin->setEnabled(index < 2);
 }
 
-void FQPlotWindow::on_TransformZTypeCombo_currentIndexChanged(int index)
+void UChromaWindow::on_TransformZTypeCombo_currentIndexChanged(int index)
 {
 	if (transformTypeChanged(2, index)) ui.TransformZValueSpin->setEnabled(index < 2);
 }
 
-void FQPlotWindow::on_TransformXValueSpin_valueChanged(double value)
+void UChromaWindow::on_TransformXValueSpin_valueChanged(double value)
 {
 	transformValueChanged(0, value);
 }
 
-void FQPlotWindow::on_TransformYValueSpin_valueChanged(double value)
+void UChromaWindow::on_TransformYValueSpin_valueChanged(double value)
 {
 	transformValueChanged(1, value);
 }
 
-void FQPlotWindow::on_TransformZValueSpin_valueChanged(double value)
+void UChromaWindow::on_TransformZValueSpin_valueChanged(double value)
 {
 	transformValueChanged(2, value);
 }
 
-void FQPlotWindow::on_TransformXPreShiftSpin_valueChanged(double value)
+void UChromaWindow::on_TransformXPreShiftSpin_valueChanged(double value)
 {
 	transformShiftChanged(0, true, value);
 }
 
-void FQPlotWindow::on_TransformYPreShiftSpin_valueChanged(double value)
+void UChromaWindow::on_TransformYPreShiftSpin_valueChanged(double value)
 {
 	transformShiftChanged(1, true, value);
 }
 
-void FQPlotWindow::on_TransformZPreShiftSpin_valueChanged(double value)
+void UChromaWindow::on_TransformZPreShiftSpin_valueChanged(double value)
 {
 	transformShiftChanged(2, true, value);
 }
 
-void FQPlotWindow::on_TransformXPostShiftSpin_valueChanged(double value)
+void UChromaWindow::on_TransformXPostShiftSpin_valueChanged(double value)
 {
 	transformShiftChanged(0, false, value);
 }
 
-void FQPlotWindow::on_TransformYPostShiftSpin_valueChanged(double value)
+void UChromaWindow::on_TransformYPostShiftSpin_valueChanged(double value)
 {
 	transformShiftChanged(1, false, value);
 }
 
-void FQPlotWindow::on_TransformZPostShiftSpin_valueChanged(double value)
+void UChromaWindow::on_TransformZPostShiftSpin_valueChanged(double value)
 {
 	transformShiftChanged(2, false, value);
 }
 
-void FQPlotWindow::on_LimitXMinSpin_valueChanged(double value)
+void UChromaWindow::on_LimitXMinSpin_valueChanged(double value)
 {
 	transformLimitChanged(0, true, value);
 }
 
-void FQPlotWindow::on_LimitYMinSpin_valueChanged(double value)
+void UChromaWindow::on_LimitYMinSpin_valueChanged(double value)
 {
 	transformLimitChanged(1, true, value);
 }
 
-void FQPlotWindow::on_LimitZMinSpin_valueChanged(double value)
+void UChromaWindow::on_LimitZMinSpin_valueChanged(double value)
 {
 	transformLimitChanged(2, true, value);
 }
 
-void FQPlotWindow::on_LimitXMinSetMinimumButton_clicked(bool checked)
+void UChromaWindow::on_LimitXMinSetMinimumButton_clicked(bool checked)
 {
 	transformLimitSetExtreme(0, true);
 }
 
-void FQPlotWindow::on_LimitYMinSetMinimumButton_clicked(bool checked)
+void UChromaWindow::on_LimitYMinSetMinimumButton_clicked(bool checked)
 {
 	transformLimitSetExtreme(1, true);
 }
 
-void FQPlotWindow::on_LimitZMinSetMinimumButton_clicked(bool checked)
+void UChromaWindow::on_LimitZMinSetMinimumButton_clicked(bool checked)
 {
 	transformLimitSetExtreme(2, true);
 }
 
-void FQPlotWindow::on_LimitXMaxSpin_valueChanged(double value)
+void UChromaWindow::on_LimitXMaxSpin_valueChanged(double value)
 {
 	transformLimitChanged(0, false, value);
 }
 
-void FQPlotWindow::on_LimitYMaxSpin_valueChanged(double value)
+void UChromaWindow::on_LimitYMaxSpin_valueChanged(double value)
 {
 	transformLimitChanged(1, false, value);
 }
 
-void FQPlotWindow::on_LimitZMaxSpin_valueChanged(double value)
+void UChromaWindow::on_LimitZMaxSpin_valueChanged(double value)
 {
 	transformLimitChanged(2, false, value);
 }
 
-void FQPlotWindow::on_LimitXMaxSetMaximumButton_clicked(bool checked)
+void UChromaWindow::on_LimitXMaxSetMaximumButton_clicked(bool checked)
 {
 	transformLimitSetExtreme(0, false);
 }
 
-void FQPlotWindow::on_LimitYMaxSetMaximumButton_clicked(bool checked)
+void UChromaWindow::on_LimitYMaxSetMaximumButton_clicked(bool checked)
 {
 	transformLimitSetExtreme(1, false);
 }
 
-void FQPlotWindow::on_LimitZMaxSetMaximumButton_clicked(bool checked)
+void UChromaWindow::on_LimitZMaxSetMaximumButton_clicked(bool checked)
 {
 	transformLimitSetExtreme(2, false);
 }
 
-void FQPlotWindow::on_TransformXInterpolateCheck_clicked(bool checked)
+void UChromaWindow::on_TransformXInterpolateCheck_clicked(bool checked)
 {
 	transformInterpolateChanged(0, checked);
 	ui.TransformXInterpolateOptions->setEnabled(checked);
 }
 
-void FQPlotWindow::on_TransformXInterpolateStepSpin_valueChanged(double value)
+void UChromaWindow::on_TransformXInterpolateStepSpin_valueChanged(double value)
 {
 	transformInterpolateStepChanged(0, value);
 }
 
-void FQPlotWindow::on_TransformXInterpolateConstrainCheck_clicked(bool checked)
+void UChromaWindow::on_TransformXInterpolateConstrainCheck_clicked(bool checked)
 {
 	transformInterpolateConstrainChanged(0, checked);
 }
 
-void FQPlotWindow::on_TransformZInterpolateCheck_clicked(bool checked)
+void UChromaWindow::on_TransformZInterpolateCheck_clicked(bool checked)
 {
 	transformInterpolateChanged(2, checked);
 	ui.TransformZInterpolateOptions->setEnabled(checked);
 }
 
-void FQPlotWindow::on_TransformZInterpolateStepSpin_valueChanged(double value)
+void UChromaWindow::on_TransformZInterpolateStepSpin_valueChanged(double value)
 {
 	transformInterpolateStepChanged(2, value);
 }
 
-void FQPlotWindow::on_TransformZInterpolateConstrainCheck_clicked(bool checked)
+void UChromaWindow::on_TransformZInterpolateConstrainCheck_clicked(bool checked)
 {
 	transformInterpolateConstrainChanged(2, checked);
 }
 
 // Update Transform tab
-void FQPlotWindow::updateTransformTab()
+void UChromaWindow::updateTransformTab()
 {
 	refreshing_ = true;
 

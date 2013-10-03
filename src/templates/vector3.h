@@ -3,24 +3,24 @@
 	*** src/templates/vector3.h
 	Copyright T. Youngs 2013
 
-	This file is part of FQPlot.
+	This file is part of uChroma.
 
-	FQPlot is free software: you can redistribute it and/or modify
+	uChroma is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	FQPlot is distributed in the hope that it will be useful,
+	uChroma is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
+	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FQPLOT_VECTOR3_H
-#define FQPLOT_VECTOR3_H
+#ifndef UCHROMA_VECTOR3_H
+#define UCHROMA_VECTOR3_H
 
 #include "base/messenger.h"
 #include "math/constants.h"
@@ -544,9 +544,9 @@ template <class T> void Vec3<T>::print() const
 template <class T> void Vec3<T>::randomUnit()
 {
 	// Generates a random unit vector
-	x = FQPlotMath::random()-0.5;
-	y = FQPlotMath::random()-0.5;
-	z = FQPlotMath::random()-0.5;
+	x = uChromaMath::random()-0.5;
+	y = uChromaMath::random()-0.5;
+	z = uChromaMath::random()-0.5;
 	normalise();
 }
 

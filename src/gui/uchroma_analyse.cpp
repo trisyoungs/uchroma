@@ -1,76 +1,78 @@
 /*
 	*** Main Window - Interactive Slicing / Fitting
-	*** src/gui/fqplot_slice.cpp
+	*** src/gui/uchroma_slice.cpp
 	Copyright T. Youngs 2013
 
-	This file is part of FQPlot.
+	This file is part of uChroma.
 
-	FQPlot is free software: you can redistribute it and/or modify
+	uChroma is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	FQPlot is distributed in the hope that it will be useful,
+	uChroma is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
+	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/fqplot.h"
+#include "gui/uchroma.h"
 #include "base/lineparser.h"
 
 /*
  * Private Slots
  */
 
-void FQPlotWindow::on_AnalyseSliceNoneRadio_clicked(bool checked)
+void UChromaWindow::on_AnalyseSliceNoneRadio_clicked(bool checked)
 {
 	ui.MainView->setSliceAxis(-1);
 }
 
-void FQPlotWindow::on_AnalyseSliceXRadio_clicked(bool checked)
+void UChromaWindow::on_AnalyseSliceXRadio_clicked(bool checked)
 {
 	ui.MainView->setSliceAxis(0);
 }
 
-void FQPlotWindow::on_AnalyseSliceYRadio_clicked(bool checked)
+void UChromaWindow::on_AnalyseSliceYRadio_clicked(bool checked)
 {
 	ui.MainView->setSliceAxis(1);
 }
 
-void FQPlotWindow::on_AnalyseSliceZRadio_clicked(bool checked)
+void UChromaWindow::on_AnalyseSliceZRadio_clicked(bool checked)
 {
 	ui.MainView->setSliceAxis(2);
 }
 
-void FQPlotWindow::on_AnalyseSurfaceSliceMonitorCheck_clicked(bool checked)
+void UChromaWindow::on_AnalyseSurfaceSliceMonitorCheck_clicked(bool checked)
 {
 }
 
-void FQPlotWindow::on_AnalyseSurfaceSliceShowLegendCheck_clicked(bool checked)
+void UChromaWindow::on_AnalyseSurfaceSliceShowLegendCheck_clicked(bool checked)
 {
 	ui.AnalyseSurfaceSliceGraph->setShowLegend(checked);
 }
 
-void FQPlotWindow::on_AnalyseSurfaceSliceAutoScaleCheck_clicked(bool checked)
+void UChromaWindow::on_AnalyseSurfaceSliceAutoScaleCheck_clicked(bool checked)
 {
 	ui.AnalyseSurfaceSliceGraph->setAutoScale(checked);
 }
 
-void FQPlotWindow::on_AnalyseSurfaceSliceClearButton_clicked(bool checked)
+void UChromaWindow::on_AnalyseSurfaceSliceClearButton_clicked(bool checked)
 {
 	ui.AnalyseSurfaceSliceList->clear();
 	ui.AnalyseSurfaceSliceGraph->removeAllDataSets();
 }
 
-void FQPlotWindow::on_AnalyseSurfaceSliceSaveButton_clicked(bool checked)
+void UChromaWindow::on_AnalyseSurfaceSliceSaveButton_clicked(bool checked)
 {
+	//if (ui.AnalyseSurfaceSliceList->currentIndex() == -1) return;
+	
 }
 
-void FQPlotWindow::on_AnalyseSurfaceSliceList_currentRowChanged(int index)
+void UChromaWindow::on_AnalyseSurfaceSliceList_currentRowChanged(int index)
 {
 	
 }
@@ -80,7 +82,7 @@ void FQPlotWindow::on_AnalyseSurfaceSliceList_currentRowChanged(int index)
  */
 
 // Slice axis value changed
-void FQPlotWindow::surfaceSliceAxisValueChanged(int axis, double value)
+void UChromaWindow::surfaceSliceAxisValueChanged(int axis, double value)
 {
 	sliceAxis_ = axis;
 	sliceAxisValue_ = value;
@@ -102,7 +104,7 @@ void FQPlotWindow::surfaceSliceAxisValueChanged(int axis, double value)
 }
 
 // Add slice to graph
-void FQPlotWindow::addSurfaceSlice(int axis, double value)
+void UChromaWindow::addSurfaceSlice(int axis, double value)
 {
 	updateSurfaceSliceData(false);
 }
@@ -112,7 +114,7 @@ void FQPlotWindow::addSurfaceSlice(int axis, double value)
  */
 
 // Return axis bin value of closest point to supplied value
-int FQPlotWindow::closestBin(int axis, double value)
+int UChromaWindow::closestBin(int axis, double value)
 {
 	if (slices_.nItems() == 0) return -1;
 
@@ -162,7 +164,7 @@ int FQPlotWindow::closestBin(int axis, double value)
  */
 
 // Update/add slice data
-void FQPlotWindow::updateSurfaceSliceData(bool setStatic)
+void UChromaWindow::updateSurfaceSliceData(bool setStatic)
 {
 	if (setStatic && (!ui.AnalyseSurfaceSliceMonitorCheck->isChecked())) return;
 

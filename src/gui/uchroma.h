@@ -1,28 +1,28 @@
 /*
-	*** FQPlot Main Window
-	*** src/gui/fqplot.h
+	*** uChroma Main Window
+	*** src/gui/uchroma.h
 	Copyright T. Youngs 2013
 
-	This file is part of FQPlot.
+	This file is part of uChroma.
 
-	FQPlot is free software: you can redistribute it and/or modify
+	uChroma is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	FQPlot is distributed in the hope that it will be useful,
+	uChroma is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
+	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FQPLOT_MAINWINDOW_H
-#define FQPLOT_MAINWINDOW_H
+#ifndef UCHROMA_MAINWINDOW_H
+#define UCHROMA_MAINWINDOW_H
 
-#include "gui/ui_fqplot.h"
+#include "gui/ui_uchroma.h"
 #include "gui/saveimage.h"
 #include "gui/dataimport.h"
 #include "base/slice.h"
@@ -30,7 +30,7 @@
 // Forward Declarations
 /* None */
 
-class FQPlotWindow : public QMainWindow
+class UChromaWindow : public QMainWindow
 {
 	// All Qt declarations must include this macro
 	Q_OBJECT
@@ -49,10 +49,10 @@ class FQPlotWindow : public QMainWindow
 
 	public:
 	// Constructor / Destructor
-	FQPlotWindow(QMainWindow *parent = 0);
-	~FQPlotWindow();
+	UChromaWindow(QMainWindow *parent = 0);
+	~UChromaWindow();
 	// Main form declaration
-	Ui::FQPlotWindow ui;
+	Ui::UChromaWindow ui;
 	// Finalise widgets (things that we couldn't do in Qt Designer)
 	void finaliseUi();
 

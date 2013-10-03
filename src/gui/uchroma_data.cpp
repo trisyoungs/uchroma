@@ -1,47 +1,47 @@
 /*
 	*** Main Window - Data 
-	*** src/gui/fqplot_data.cpp
+	*** src/gui/uchroma_data.cpp
 	Copyright T. Youngs 2013
 
-	This file is part of FQPlot.
+	This file is part of uChroma.
 
-	FQPlot is free software: you can redistribute it and/or modify
+	uChroma is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	FQPlot is distributed in the hope that it will be useful,
+	uChroma is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
+	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/fqplot.h"
+#include "gui/uchroma.h"
 #include "base/lineparser.h"
 
 // DataFile Keywords
-const char* DataFileKeywordStrings[FQPlotWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisInvert", "AxisLabelDirection", "AxisLabelRotation", "AxisLabelUp", "AxisLogarithmic", "AxisMinorTicks", "AxisPosition", "AxisStretch", "AxisTickDelta", "AxisVisible", "BoundingBox", "BoundingBoxPlaneY", "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearA", "ColourLinearB", "ColourLinearHSVA", "ColourLinearHSVB", "ColourSingle", "ColourSource", "Data", "ImageExport", "Interpolate", "InterpolateConstrain", "InterpolateStep", "LabelScale", "LimitX", "LimitY", "LimitZ", "Perspective", "PostTransformShift", "PreTransformShift", "SliceDir", "Slice", "TitleScale", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
-FQPlotWindow::DataFileKeyword FQPlotWindow::dataFileKeyword(const char* s)
+const char* DataFileKeywordStrings[UChromaWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisInvert", "AxisLabelDirection", "AxisLabelRotation", "AxisLabelUp", "AxisLogarithmic", "AxisMinorTicks", "AxisPosition", "AxisStretch", "AxisTickDelta", "AxisVisible", "BoundingBox", "BoundingBoxPlaneY", "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearA", "ColourLinearB", "ColourLinearHSVA", "ColourLinearHSVB", "ColourSingle", "ColourSource", "Data", "ImageExport", "Interpolate", "InterpolateConstrain", "InterpolateStep", "LabelScale", "LimitX", "LimitY", "LimitZ", "Perspective", "PostTransformShift", "PreTransformShift", "SliceDir", "Slice", "TitleScale", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
+UChromaWindow::DataFileKeyword UChromaWindow::dataFileKeyword(const char* s)
 {
-	for (int n=0; n<FQPlotWindow::nDataFileKeywords; ++n) if (strcmp(s, DataFileKeywordStrings[n]) == 0) return (FQPlotWindow::DataFileKeyword) n;
-	return FQPlotWindow::nDataFileKeywords;
+	for (int n=0; n<UChromaWindow::nDataFileKeywords; ++n) if (strcmp(s, DataFileKeywordStrings[n]) == 0) return (UChromaWindow::DataFileKeyword) n;
+	return UChromaWindow::nDataFileKeywords;
 }
-const char* FQPlotWindow::dataFileKeyword(FQPlotWindow::DataFileKeyword dfk)
+const char* UChromaWindow::dataFileKeyword(UChromaWindow::DataFileKeyword dfk)
 {
 	return DataFileKeywordStrings[dfk];
 }
 
 // Data Transform types
-const char* DataTransformKeywords[FQPlotWindow::nDataTransforms] = { "Multiply", "Divide", "LogBase10", "NaturalLog" };
-FQPlotWindow::DataTransform FQPlotWindow::dataTransform(const char* s)
+const char* DataTransformKeywords[UChromaWindow::nDataTransforms] = { "Multiply", "Divide", "LogBase10", "NaturalLog" };
+UChromaWindow::DataTransform UChromaWindow::dataTransform(const char* s)
 {
-	for (int n=0; n<FQPlotWindow::nDataTransforms; ++n) if (strcmp(s, DataTransformKeywords[n]) == 0) return (FQPlotWindow::DataTransform) n;
-	return FQPlotWindow::nDataTransforms;
+	for (int n=0; n<UChromaWindow::nDataTransforms; ++n) if (strcmp(s, DataTransformKeywords[n]) == 0) return (UChromaWindow::DataTransform) n;
+	return UChromaWindow::nDataTransforms;
 }
-const char* FQPlotWindow::dataTransform(FQPlotWindow::DataTransform dt)
+const char* UChromaWindow::dataTransform(UChromaWindow::DataTransform dt)
 {
 	return DataTransformKeywords[dt];
 }
@@ -51,7 +51,7 @@ const char* FQPlotWindow::dataTransform(FQPlotWindow::DataTransform dt)
  */
 
 // Recalculate tick deltas for specified axis
-void FQPlotWindow::calculateTickDeltas(int axis)
+void UChromaWindow::calculateTickDeltas(int axis)
 {
 	const int nBaseValues = 5, maxIterations = 10, maxTicks = 10;
 	int power = 1, baseValues[nBaseValues] = { 1, 2, 3, 4, 5 }, baseValueIndex = 0, nTicks, iteration, minTicks = maxTicks/2;
@@ -107,7 +107,7 @@ void FQPlotWindow::calculateTickDeltas(int axis)
 }
 
 // Clear current data
-void FQPlotWindow::clearData()
+void UChromaWindow::clearData()
 {
 	slices_.clear();
 	dataMin_.zero();
@@ -118,9 +118,9 @@ void FQPlotWindow::clearData()
 	interpolateConstrained_.set(false, false, false);
 	interpolationStep_.set(1.0, 1.0, 1.0);
 	transformValue_.set(1.0, 1.0, 1.0);
-	transformType_[0] = FQPlotWindow::MultiplyTransform;
-	transformType_[1] = FQPlotWindow::MultiplyTransform;
-	transformType_[2] = FQPlotWindow::MultiplyTransform;
+	transformType_[0] = UChromaWindow::MultiplyTransform;
+	transformType_[1] = UChromaWindow::MultiplyTransform;
+	transformType_[2] = UChromaWindow::MultiplyTransform;
 	preTransformShift_.zero();
 	postTransformShift_.zero();
 	modified_ = false;
@@ -152,8 +152,8 @@ void FQPlotWindow::clearData()
 	colourHSVGradientBPoint_.set(1.0, QColor(100,40,255));
 	customColourScale_.clear();
 	fixedAlpha_ = 128;
-	alphaControl_ = FQPlotWindow::OwnAlpha;
-	boundingBox_ = FQPlotWindow::NoBox;
+	alphaControl_ = UChromaWindow::OwnAlpha;
+	boundingBox_ = UChromaWindow::NoBox;
 	boundingBoxPlaneY_ = 0.0;
 	imageExportFile_ = "";
 	imageExportWidth_ = 800;
@@ -164,7 +164,7 @@ void FQPlotWindow::clearData()
 }
 
 // Load data from file specified
-bool FQPlotWindow::loadData(QString fileName)
+bool UChromaWindow::loadData(QString fileName)
 {
 	LineParser parser;
 	parser.openInput(qPrintable(fileName));
@@ -175,8 +175,8 @@ bool FQPlotWindow::loadData(QString fileName)
 	}
 
 	// Read line from file and decide what to do with it
-	FQPlotWindow::DataFileKeyword kwd;
-	FQPlotWindow::DataTransform dt;
+	UChromaWindow::DataFileKeyword kwd;
+	UChromaWindow::DataTransform dt;
 	Slice* slice;
 	int xyz, nPoints;
 	Matrix mat;
@@ -189,102 +189,102 @@ bool FQPlotWindow::loadData(QString fileName)
 		switch (kwd)
 		{
 			// Axis auto ticks
-			case (FQPlotWindow::AxisAutoTicksKeyword):
+			case (UChromaWindow::AxisAutoTicksKeyword):
 				axisAutoTicks_.set(parser.argi(1), parser.argi(2), parser.argi(3));
 				break;
 			// Axis first ticks
-			case (FQPlotWindow::AxisFirstTickKeyword):
+			case (UChromaWindow::AxisFirstTickKeyword):
 				axisFirstTick_.set(parser.argd(1), parser.argd(2), parser.argd(3));
 				break;
 			// Axis invert flags
-			case (FQPlotWindow::AxisInvertKeyword):
+			case (UChromaWindow::AxisInvertKeyword):
 				axisInvert_.set(parser.argi(1), parser.argi(2), parser.argi(3));
 				break;
 			// Axis label direction
-			case (FQPlotWindow::AxisLabelDirectionKeyword):
+			case (UChromaWindow::AxisLabelDirectionKeyword):
 				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Axis index is out of range for %s keyword.\n", dataFileKeyword(kwd));
 				else axisLabelDirection_[parser.argi(1)].set(parser.argd(2), parser.argd(3), parser.argd(4));
 				break;
 			// Axis label rotation
-			case (FQPlotWindow::AxisLabelRotationKeyword):
+			case (UChromaWindow::AxisLabelRotationKeyword):
 				axisLabelRotation_.set(parser.argi(1), parser.argi(2), parser.argi(3));
 				break;
 			// Axis label direction
-			case (FQPlotWindow::AxisLabelUpKeyword):
+			case (UChromaWindow::AxisLabelUpKeyword):
 				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Axis index is out of range for %s keyword.\n", dataFileKeyword(kwd));
 				else axisLabelUp_[parser.argi(1)].set(parser.argd(2), parser.argd(3), parser.argd(4));
 				break;
 			// Axis logarithmic flag
-			case (FQPlotWindow::AxisLogarithmicKeyword):
+			case (UChromaWindow::AxisLogarithmicKeyword):
 				axisLogarithmic_.set(parser.argi(1), parser.argi(2), parser.argi(3));
 				break;
 			// Axis minor ticks
-			case (FQPlotWindow::AxisMinorTicksKeyword):
+			case (UChromaWindow::AxisMinorTicksKeyword):
 				axisMinorTicks_.set(parser.argi(1), parser.argi(2), parser.argi(3));
 				break;
 			// Axis position
-			case (FQPlotWindow::AxisPositionKeyword):
+			case (UChromaWindow::AxisPositionKeyword):
 				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Axis index is out of range for %s keyword.\n", dataFileKeyword(kwd));
 				else axisPosition_[parser.argi(1)].set(parser.argd(2), parser.argd(3), parser.argd(4));
 				break;
 			// Axis stretch factors
-			case (FQPlotWindow::AxisStretchKeyword):
+			case (UChromaWindow::AxisStretchKeyword):
 				axisStretch_.set(parser.argd(1), parser.argd(2), parser.argd(3));
 				break;
 			// Axis tick deltas
-			case (FQPlotWindow::AxisTickDeltaKeyword):
+			case (UChromaWindow::AxisTickDeltaKeyword):
 				axisTickDelta_.set(parser.argd(1), parser.argd(2), parser.argd(3));
 				break;
 			// Axis visibility
-			case (FQPlotWindow::AxisVisibleKeyword):
+			case (UChromaWindow::AxisVisibleKeyword):
 				axisVisible_.set(parser.argi(1), parser.argi(2), parser.argi(3));
 				break;
 			// Bounding Box
-			case (FQPlotWindow::BoundingBoxKeyword):
-				if ((parser.argi(1) < 0) || (parser.argi(1) >= FQPlotWindow::nBoundingBoxes)) printf("Value is out of range for %s keyword.\n", dataFileKeyword(kwd));
-				boundingBox_ = (FQPlotWindow::BoundingBox) parser.argi(1);
+			case (UChromaWindow::BoundingBoxKeyword):
+				if ((parser.argi(1) < 0) || (parser.argi(1) >= UChromaWindow::nBoundingBoxes)) printf("Value is out of range for %s keyword.\n", dataFileKeyword(kwd));
+				boundingBox_ = (UChromaWindow::BoundingBox) parser.argi(1);
 				break;
 			// Bounding Box plane y intercept
-			case (FQPlotWindow::BoundingBoxPlaneYKeyword):
+			case (UChromaWindow::BoundingBoxPlaneYKeyword):
 				boundingBoxPlaneY_ = parser.argd(1);
 				break;
 			// Colour alpha control
-			case (FQPlotWindow::ColourAlphaControlKeyword):
-				if ((parser.argi(1) < 0) || (parser.argi(1) >= FQPlotWindow::nAlphaControls)) printf("Value is out of range for %s keyword.\n", dataFileKeyword(kwd));
-				else alphaControl_ = (FQPlotWindow::AlphaControl) parser.argi(1);
+			case (UChromaWindow::ColourAlphaControlKeyword):
+				if ((parser.argi(1) < 0) || (parser.argi(1) >= UChromaWindow::nAlphaControls)) printf("Value is out of range for %s keyword.\n", dataFileKeyword(kwd));
+				else alphaControl_ = (UChromaWindow::AlphaControl) parser.argi(1);
 				break;
 			// Colour alpha fixed value
-			case (FQPlotWindow::ColourAlphaFixedKeyword):
+			case (UChromaWindow::ColourAlphaFixedKeyword):
 				if ((parser.argi(1) < 0) || (parser.argi(1) > 255)) printf("Value is out of range for %s keyword.\n", dataFileKeyword(kwd));
 				else fixedAlpha_ = parser.argi(1);
 				break;
 			// Colour Custom Gradient point definition
-			case (FQPlotWindow::ColourCustomGradientKeyword):
+			case (UChromaWindow::ColourCustomGradientKeyword):
 				customColourScale_.addPoint(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
 				break;
 			// Colour Linear Gradient point definition
-			case (FQPlotWindow::ColourRGBGradientAKeyword):
-			case (FQPlotWindow::ColourRGBGradientBKeyword):
+			case (UChromaWindow::ColourRGBGradientAKeyword):
+			case (UChromaWindow::ColourRGBGradientBKeyword):
 				if (kwd == ColourRGBGradientAKeyword) colourRGBGradientAPoint_.set(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
 				else colourRGBGradientBPoint_.set(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
 				break;
 			// Colour Linear HSV Gradient point definition
-			case (FQPlotWindow::ColourHSVGradientAKeyword):
-			case (FQPlotWindow::ColourHSVGradientBKeyword):
+			case (UChromaWindow::ColourHSVGradientAKeyword):
+			case (UChromaWindow::ColourHSVGradientBKeyword):
 				if (kwd == ColourHSVGradientAKeyword) colourHSVGradientAPoint_.set(parser.argd(1), QColor::fromHsv(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
 				else colourHSVGradientBPoint_.set(parser.argd(1), QColor::fromHsv(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
 				break;
 			// Colour single colour definition
-			case (FQPlotWindow::ColourSingleKeyword):
+			case (UChromaWindow::ColourSingleKeyword):
 				colourSinglePoint_.setColour(QColor(parser.argi(1), parser.argi(2), parser.argi(3), parser.argi(4)));
 				break;
 			// Colour source
-			case (FQPlotWindow::ColourSourceKeyword):
-				if ((parser.argi(1) < 0) || (parser.argi(1) >= FQPlotWindow::nColourSources)) printf("Value is out of range for %s keyword.\n", dataFileKeyword(kwd));
-				else colourSource_ = (FQPlotWindow::ColourSource) parser.argi(1);
+			case (UChromaWindow::ColourSourceKeyword):
+				if ((parser.argi(1) < 0) || (parser.argi(1) >= UChromaWindow::nColourSources)) printf("Value is out of range for %s keyword.\n", dataFileKeyword(kwd));
+				else colourSource_ = (UChromaWindow::ColourSource) parser.argi(1);
 				break;
 			// Data
-			case (FQPlotWindow::DataKeyword):
+			case (UChromaWindow::DataKeyword):
 				// Get title of associated slice and number of points to expect
 				slice = findSlice(parser.argc(1));
 				if (slice == NULL)
@@ -302,7 +302,7 @@ bool FQPlotWindow::loadData(QString fileName)
 				}
 				break;
 			// Image Export info
-			case (FQPlotWindow::ImageExportKeyword):
+			case (UChromaWindow::ImageExportKeyword):
 				imageExportFile_ = parser.argc(1);
 				imageExportWidth_ = parser.argi(2);
 				imageExportHeight_ = parser.argi(3);
@@ -310,43 +310,43 @@ bool FQPlotWindow::loadData(QString fileName)
 				imageExportMaintainAspect_ = parser.argi(5);
 				break;
 			// Interpolate flags
-			case (FQPlotWindow::InterpolateKeyword):
+			case (UChromaWindow::InterpolateKeyword):
 				interpolate_.set(parser.argi(1), false, parser.argi(2));
 				break;
 			// Interpolate constrain flags
-			case (FQPlotWindow::InterpolateConstrainKeyword):
+			case (UChromaWindow::InterpolateConstrainKeyword):
 				interpolateConstrained_.set(parser.argi(1), false, parser.argi(2));
 				break;
 			// Interpolation step flags
-			case (FQPlotWindow::InterpolateStepKeyword):
+			case (UChromaWindow::InterpolateStepKeyword):
 				interpolationStep_.set(parser.argd(1), 0.0, parser.argd(2));
 				break;
 			// Label scale
-			case (FQPlotWindow::LabelScaleKeyword):
+			case (UChromaWindow::LabelScaleKeyword):
 				labelScale_ = parser.argd(1);
 				break;
 			// Limits
-			case (FQPlotWindow::LimitXKeyword):
-			case (FQPlotWindow::LimitYKeyword):
-			case (FQPlotWindow::LimitZKeyword):
-				xyz = kwd - FQPlotWindow::LimitXKeyword;
+			case (UChromaWindow::LimitXKeyword):
+			case (UChromaWindow::LimitYKeyword):
+			case (UChromaWindow::LimitZKeyword):
+				xyz = kwd - UChromaWindow::LimitXKeyword;
 				limitMin_[xyz] = parser.argd(1);
 				limitMax_[xyz] = parser.argd(2);
 				break;
 			// Orthographic view
-			case (FQPlotWindow::PerspectiveKeyword):
+			case (UChromaWindow::PerspectiveKeyword):
 				ui.actionViewPerspective->setChecked(true);
 				break;
 			// Pre-Transform Shifts
-			case (FQPlotWindow::PreTransformShiftKeyword):
+			case (UChromaWindow::PreTransformShiftKeyword):
 				preTransformShift_.set(parser.argd(1), parser.argd(2), parser.argd(3));
 				break;
 			// Post-Transform Shifts
-			case (FQPlotWindow::PostTransformShiftKeyword):
+			case (UChromaWindow::PostTransformShiftKeyword):
 				postTransformShift_.set(parser.argd(1), parser.argd(2), parser.argd(3));
 				break;
 			// Slice directory
-			case (FQPlotWindow::SliceDirectoryKeyword):
+			case (UChromaWindow::SliceDirectoryKeyword):
 				dataFileDirectory_ = parser.argc(1);
 				if (!dataFileDirectory_.isReadable())
 				{
@@ -359,28 +359,28 @@ bool FQPlotWindow::loadData(QString fileName)
 				}
 				break;
 			// Slice specification
-			case (FQPlotWindow::SliceKeyword):
+			case (UChromaWindow::SliceKeyword):
 				slice = addSlice(parser.argd(1), parser.argc(2), parser.argc(3));
 				break;
 			// Title scale
-			case (FQPlotWindow::TitleScaleKeyword):
+			case (UChromaWindow::TitleScaleKeyword):
 				titleScale_ = parser.argd(1);
 				break;
 			// Data Transform
-			case (FQPlotWindow::TransformXKeyword):
-			case (FQPlotWindow::TransformYKeyword):
-			case (FQPlotWindow::TransformZKeyword):
-				xyz = kwd - FQPlotWindow::TransformXKeyword;
+			case (UChromaWindow::TransformXKeyword):
+			case (UChromaWindow::TransformYKeyword):
+			case (UChromaWindow::TransformZKeyword):
+				xyz = kwd - UChromaWindow::TransformXKeyword;
 				dt = dataTransform(parser.argc(1));
 				transformType_[xyz] = dt;
 				transformValue_[xyz] = parser.argd(2);
 				break;
 			// View Matrix
-			case (FQPlotWindow::ViewMatrixXKeyword):
-			case (FQPlotWindow::ViewMatrixYKeyword):
-			case (FQPlotWindow::ViewMatrixZKeyword):
-			case (FQPlotWindow::ViewMatrixWKeyword):
-				xyz = kwd - FQPlotWindow::ViewMatrixXKeyword;
+			case (UChromaWindow::ViewMatrixXKeyword):
+			case (UChromaWindow::ViewMatrixYKeyword):
+			case (UChromaWindow::ViewMatrixZKeyword):
+			case (UChromaWindow::ViewMatrixWKeyword):
+				xyz = kwd - UChromaWindow::ViewMatrixXKeyword;
 				mat = ui.MainView->viewMatrix();
 				mat.setColumn(xyz, parser.argd(1), parser.argd(2), parser.argd(3), parser.argd(4));
 				ui.MainView->setViewMatrix(mat);
@@ -415,7 +415,7 @@ bool FQPlotWindow::loadData(QString fileName)
 }
 
 // Save current data to file specified
-bool FQPlotWindow::saveData(QString fileName)
+bool UChromaWindow::saveData(QString fileName)
 {
 	LineParser parser;
 	parser.openOutput(qPrintable(fileName), true);
@@ -426,93 +426,93 @@ bool FQPlotWindow::saveData(QString fileName)
 	}
 
 	// Write datafile directory
-	parser.writeLineF("%s \"%s\"\n", DataFileKeywordStrings[FQPlotWindow::SliceDirectoryKeyword], qPrintable(dataFileDirectory_.absolutePath()));
+	parser.writeLineF("%s \"%s\"\n", DataFileKeywordStrings[UChromaWindow::SliceDirectoryKeyword], qPrintable(dataFileDirectory_.absolutePath()));
 
 	// Write list of slices
 	// Line format:  slice z "filename" "dataname"
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
 	{
-		parser.writeLineF("%s  %f  \"%s\"  \"%s\"\n", DataFileKeywordStrings[FQPlotWindow::SliceKeyword], slice->z(), qPrintable(slice->sourceFileName()), qPrintable(slice->title()));
+		parser.writeLineF("%s  %f  \"%s\"  \"%s\"\n", DataFileKeywordStrings[UChromaWindow::SliceKeyword], slice->z(), qPrintable(slice->sourceFileName()), qPrintable(slice->title()));
 	}
 
 	// Write image info
-	parser.writeLineF("%s \"%s\" %i %i %s %i\n", DataFileKeywordStrings[FQPlotWindow::ImageExportKeyword], qPrintable(imageExportFile_), imageExportWidth_, imageExportHeight_, Viewer::imageFormatExtension(imageExportFormat_), imageExportMaintainAspect_);
+	parser.writeLineF("%s \"%s\" %i %i %s %i\n", DataFileKeywordStrings[UChromaWindow::ImageExportKeyword], qPrintable(imageExportFile_), imageExportWidth_, imageExportHeight_, Viewer::imageFormatExtension(imageExportFormat_), imageExportMaintainAspect_);
 
 	// Write transform setup
 	// -- Transforms
-	parser.writeLineF("%s %s %f\n", DataFileKeywordStrings[FQPlotWindow::TransformXKeyword], dataTransform(transformType_[0]), transformValue_.x);
-	parser.writeLineF("%s %s %f\n", DataFileKeywordStrings[FQPlotWindow::TransformYKeyword], dataTransform(transformType_[1]), transformValue_.y);
-	parser.writeLineF("%s %s %f\n", DataFileKeywordStrings[FQPlotWindow::TransformZKeyword], dataTransform(transformType_[2]), transformValue_.z);
+	parser.writeLineF("%s %s %f\n", DataFileKeywordStrings[UChromaWindow::TransformXKeyword], dataTransform(transformType_[0]), transformValue_.x);
+	parser.writeLineF("%s %s %f\n", DataFileKeywordStrings[UChromaWindow::TransformYKeyword], dataTransform(transformType_[1]), transformValue_.y);
+	parser.writeLineF("%s %s %f\n", DataFileKeywordStrings[UChromaWindow::TransformZKeyword], dataTransform(transformType_[2]), transformValue_.z);
 	// -- Shifts
-	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::PreTransformShiftKeyword], preTransformShift_.x, preTransformShift_.y, preTransformShift_.z);
-	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::PostTransformShiftKeyword], postTransformShift_.x, postTransformShift_.y, postTransformShift_.z);
+	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[UChromaWindow::PreTransformShiftKeyword], preTransformShift_.x, preTransformShift_.y, preTransformShift_.z);
+	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[UChromaWindow::PostTransformShiftKeyword], postTransformShift_.x, postTransformShift_.y, postTransformShift_.z);
 	// -- Limits
-	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[FQPlotWindow::LimitXKeyword], limitMin_.x, limitMax_.x);
-	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[FQPlotWindow::LimitYKeyword], limitMin_.y, limitMax_.y);
-	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[FQPlotWindow::LimitZKeyword], limitMin_.z, limitMax_.z);
+	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[UChromaWindow::LimitXKeyword], limitMin_.x, limitMax_.x);
+	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[UChromaWindow::LimitYKeyword], limitMin_.y, limitMax_.y);
+	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[UChromaWindow::LimitZKeyword], limitMin_.z, limitMax_.z);
 	// -- Interpolation
-	parser.writeLineF("%s %i %i\n", DataFileKeywordStrings[FQPlotWindow::InterpolateKeyword], interpolate_.x, interpolate_.z);
-	parser.writeLineF("%s %i %i\n", DataFileKeywordStrings[FQPlotWindow::InterpolateConstrainKeyword], interpolateConstrained_.x, interpolateConstrained_.z);
-	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[FQPlotWindow::InterpolateStepKeyword], interpolationStep_.x, interpolationStep_.z);
+	parser.writeLineF("%s %i %i\n", DataFileKeywordStrings[UChromaWindow::InterpolateKeyword], interpolate_.x, interpolate_.z);
+	parser.writeLineF("%s %i %i\n", DataFileKeywordStrings[UChromaWindow::InterpolateConstrainKeyword], interpolateConstrained_.x, interpolateConstrained_.z);
+	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[UChromaWindow::InterpolateStepKeyword], interpolationStep_.x, interpolationStep_.z);
 
 	// Write view setup
 	// -- Font Scaling
-	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::LabelScaleKeyword], labelScale_);
-	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::TitleScaleKeyword], titleScale_);
+	parser.writeLineF("%s %f\n", DataFileKeywordStrings[UChromaWindow::LabelScaleKeyword], labelScale_);
+	parser.writeLineF("%s %f\n", DataFileKeywordStrings[UChromaWindow::TitleScaleKeyword], titleScale_);
 	// -- Axes
-	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisAutoTicksKeyword], axisAutoTicks_.x, axisAutoTicks_.y, axisAutoTicks_.z);
-	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisFirstTickKeyword], axisFirstTick_.x, axisFirstTick_.y, axisFirstTick_.z);
-	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisTickDeltaKeyword], axisTickDelta_.x, axisTickDelta_.y, axisTickDelta_.z);
-	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisMinorTicksKeyword], axisMinorTicks_.x, axisMinorTicks_.y, axisMinorTicks_.z);
+	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisAutoTicksKeyword], axisAutoTicks_.x, axisAutoTicks_.y, axisAutoTicks_.z);
+	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisFirstTickKeyword], axisFirstTick_.x, axisFirstTick_.y, axisFirstTick_.z);
+	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisTickDeltaKeyword], axisTickDelta_.x, axisTickDelta_.y, axisTickDelta_.z);
+	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisMinorTicksKeyword], axisMinorTicks_.x, axisMinorTicks_.y, axisMinorTicks_.z);
 	for (int axis=0; axis<3; ++axis)
 	{
-		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisPositionKeyword], axis, axisPosition_[axis].x, axisPosition_[axis].y, axisPosition_[axis].z);
-		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisLabelDirectionKeyword], axis, axisLabelDirection_[axis].x, axisLabelDirection_[axis].y, axisLabelDirection_[axis].z);
-		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisLabelUpKeyword], axis, axisLabelUp_[axis].x, axisLabelUp_[axis].y, axisLabelUp_[axis].z);
+		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisPositionKeyword], axis, axisPosition_[axis].x, axisPosition_[axis].y, axisPosition_[axis].z);
+		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisLabelDirectionKeyword], axis, axisLabelDirection_[axis].x, axisLabelDirection_[axis].y, axisLabelDirection_[axis].z);
+		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisLabelUpKeyword], axis, axisLabelUp_[axis].x, axisLabelUp_[axis].y, axisLabelUp_[axis].z);
 	}
-	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisLabelRotationKeyword], axisLabelRotation_.x, axisLabelRotation_.y, axisLabelRotation_.z);
-	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisInvertKeyword], axisInvert_.x, axisInvert_.y, axisInvert_.z);
-	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisLogarithmicKeyword], axisLogarithmic_.x, axisLogarithmic_.y, axisLogarithmic_.z);
-	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::AxisVisibleKeyword], axisVisible_.x, axisVisible_.y, axisVisible_.z);
-	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::AxisStretchKeyword], axisStretch_.x, axisStretch_.y, axisStretch_.z);
+	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisLabelRotationKeyword], axisLabelRotation_.x, axisLabelRotation_.y, axisLabelRotation_.z);
+	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisInvertKeyword], axisInvert_.x, axisInvert_.y, axisInvert_.z);
+	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisLogarithmicKeyword], axisLogarithmic_.x, axisLogarithmic_.y, axisLogarithmic_.z);
+	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisVisibleKeyword], axisVisible_.x, axisVisible_.y, axisVisible_.z);
+	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisStretchKeyword], axisStretch_.x, axisStretch_.y, axisStretch_.z);
 	// -- Transformation Matrix
 	Matrix mat = ui.MainView->viewMatrix();
-	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::ViewMatrixXKeyword], mat[0], mat[1], mat[2], mat[3]);
-	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::ViewMatrixYKeyword], mat[4], mat[5], mat[6], mat[7]);
-	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::ViewMatrixZKeyword], mat[8], mat[9], mat[10], mat[11]);
-	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[FQPlotWindow::ViewMatrixWKeyword], mat[12], mat[13], mat[14], mat[15]);
-	if (ui.actionViewPerspective->isChecked()) parser.writeLineF("%s\n", DataFileKeywordStrings[FQPlotWindow::PerspectiveKeyword]);
+	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[UChromaWindow::ViewMatrixXKeyword], mat[0], mat[1], mat[2], mat[3]);
+	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[UChromaWindow::ViewMatrixYKeyword], mat[4], mat[5], mat[6], mat[7]);
+	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[UChromaWindow::ViewMatrixZKeyword], mat[8], mat[9], mat[10], mat[11]);
+	parser.writeLineF("%s %f %f %f %f\n", DataFileKeywordStrings[UChromaWindow::ViewMatrixWKeyword], mat[12], mat[13], mat[14], mat[15]);
+	if (ui.actionViewPerspective->isChecked()) parser.writeLineF("%s\n", DataFileKeywordStrings[UChromaWindow::PerspectiveKeyword]);
 
 	// Write colour setup
-	parser.writeLineF("%s %i\n", DataFileKeywordStrings[FQPlotWindow::ColourSourceKeyword], colourSource_);
+	parser.writeLineF("%s %i\n", DataFileKeywordStrings[UChromaWindow::ColourSourceKeyword], colourSource_);
 	ColourScalePoint* csp;
 	// -- Single Colour
-	parser.writeLineF("%s %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourSingleKeyword], colourSinglePoint_.colour().red(), colourSinglePoint_.colour().green(), colourSinglePoint_.colour().blue(), colourSinglePoint_.colour().alpha());
+	parser.writeLineF("%s %i %i %i %i\n", DataFileKeywordStrings[UChromaWindow::ColourSingleKeyword], colourSinglePoint_.colour().red(), colourSinglePoint_.colour().green(), colourSinglePoint_.colour().blue(), colourSinglePoint_.colour().alpha());
 	// -- RGB Gradient
-	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourRGBGradientAKeyword], colourRGBGradientAPoint_.value(), colourRGBGradientAPoint_.colour().red(), colourRGBGradientAPoint_.colour().green(), colourRGBGradientAPoint_.colour().blue(), colourRGBGradientAPoint_.colour().alpha());
-	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourRGBGradientBKeyword], colourRGBGradientBPoint_.value(), colourHSVGradientBPoint_.colour().red(), colourHSVGradientBPoint_.colour().green(), colourHSVGradientBPoint_.colour().blue(), colourHSVGradientBPoint_.colour().alpha());
+	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[UChromaWindow::ColourRGBGradientAKeyword], colourRGBGradientAPoint_.value(), colourRGBGradientAPoint_.colour().red(), colourRGBGradientAPoint_.colour().green(), colourRGBGradientAPoint_.colour().blue(), colourRGBGradientAPoint_.colour().alpha());
+	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[UChromaWindow::ColourRGBGradientBKeyword], colourRGBGradientBPoint_.value(), colourHSVGradientBPoint_.colour().red(), colourHSVGradientBPoint_.colour().green(), colourHSVGradientBPoint_.colour().blue(), colourHSVGradientBPoint_.colour().alpha());
 	// -- HSV Gradient
-	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourHSVGradientAKeyword], colourHSVGradientAPoint_.value(), colourHSVGradientAPoint_.colour().hue(), colourHSVGradientAPoint_.colour().saturation(), colourHSVGradientAPoint_.colour().value(), colourHSVGradientAPoint_.colour().alpha());
-	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourHSVGradientBKeyword], colourHSVGradientBPoint_.value(), colourHSVGradientBPoint_.colour().hue(), colourHSVGradientBPoint_.colour().saturation(), colourHSVGradientBPoint_.colour().value(), colourHSVGradientBPoint_.colour().alpha());
+	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[UChromaWindow::ColourHSVGradientAKeyword], colourHSVGradientAPoint_.value(), colourHSVGradientAPoint_.colour().hue(), colourHSVGradientAPoint_.colour().saturation(), colourHSVGradientAPoint_.colour().value(), colourHSVGradientAPoint_.colour().alpha());
+	parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[UChromaWindow::ColourHSVGradientBKeyword], colourHSVGradientBPoint_.value(), colourHSVGradientBPoint_.colour().hue(), colourHSVGradientBPoint_.colour().saturation(), colourHSVGradientBPoint_.colour().value(), colourHSVGradientBPoint_.colour().alpha());
 
 	// -- Custom Gradient
 	for (csp = customColourScale_.firstPoint(); csp != NULL; csp = csp->next)
 	{
-		parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[FQPlotWindow::ColourCustomGradientKeyword], csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
+		parser.writeLineF("%s %f %i %i %i %i\n", DataFileKeywordStrings[UChromaWindow::ColourCustomGradientKeyword], csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
 	}
 	// -- Alpha control
-	parser.writeLineF("%s %i\n", DataFileKeywordStrings[FQPlotWindow::ColourAlphaControlKeyword], alphaControl_);
-	parser.writeLineF("%s %i\n", DataFileKeywordStrings[FQPlotWindow::ColourAlphaFixedKeyword], fixedAlpha_);
+	parser.writeLineF("%s %i\n", DataFileKeywordStrings[UChromaWindow::ColourAlphaControlKeyword], alphaControl_);
+	parser.writeLineF("%s %i\n", DataFileKeywordStrings[UChromaWindow::ColourAlphaFixedKeyword], fixedAlpha_);
 
 	// Extras setup
-	parser.writeLineF("%s %i\n", DataFileKeywordStrings[FQPlotWindow::BoundingBoxKeyword], boundingBox_);
-	parser.writeLineF("%s %f\n", DataFileKeywordStrings[FQPlotWindow::BoundingBoxPlaneYKeyword], boundingBoxPlaneY_);
+	parser.writeLineF("%s %i\n", DataFileKeywordStrings[UChromaWindow::BoundingBoxKeyword], boundingBox_);
+	parser.writeLineF("%s %f\n", DataFileKeywordStrings[UChromaWindow::BoundingBoxPlaneYKeyword], boundingBoxPlaneY_);
 
 	// Data Section
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
 	{
 		Data2D& data = slice->data();
-		parser.writeLineF("%s  \"%s\"  %i\n", DataFileKeywordStrings[FQPlotWindow::DataKeyword], qPrintable(slice->title()), data.nPoints());
+		parser.writeLineF("%s  \"%s\"  %i\n", DataFileKeywordStrings[UChromaWindow::DataKeyword], qPrintable(slice->title()), data.nPoints());
 		for (int n=0; n<data.nPoints(); ++n) parser.writeLineF("%10.4e  %10.4e\n", data.x(n), data.y(n));
 	}
 
@@ -521,7 +521,7 @@ bool FQPlotWindow::saveData(QString fileName)
 }
 
 // Add slice
-Slice* FQPlotWindow::addSlice(double z, QString fileName, QString title)
+Slice* UChromaWindow::addSlice(double z, QString fileName, QString title)
 {
 	// Create new slice
 	Slice* slice = slices_.add();
@@ -547,14 +547,14 @@ Slice* FQPlotWindow::addSlice(double z, QString fileName, QString title)
 }
 
 // Find slice with corresponding title
-Slice* FQPlotWindow::findSlice(QString title)
+Slice* UChromaWindow::findSlice(QString title)
 {
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) if (slice->title() == title) return slice;
 	return NULL;
 }
 
 // Return number of slices with no data present
-int FQPlotWindow::nEmptySlices()
+int UChromaWindow::nEmptySlices()
 {
 	int count = 0;
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) if (slice->data().nPoints() < 2) ++count;
@@ -562,7 +562,7 @@ int FQPlotWindow::nEmptySlices()
 }
 
 // Recalculate data limits
-void FQPlotWindow::calculateDataLimits()
+void UChromaWindow::calculateDataLimits()
 {
 	dataMin_ = 0.0;
 	dataMax_ = 0.0;
@@ -591,7 +591,7 @@ void FQPlotWindow::calculateDataLimits()
 }
 
 // Recalculate transform limits
-void FQPlotWindow::calculateTransformLimits()
+void UChromaWindow::calculateTransformLimits()
 {
 	transformMin_ = 0.0;
 	transformMax_ = 0.0;
@@ -634,27 +634,27 @@ void FQPlotWindow::calculateTransformLimits()
 }
 
 // Set display limits to show all available data
-void FQPlotWindow::showAllData()
+void UChromaWindow::showAllData()
 {
 	limitMin_ = transformMin_;
 	limitMax_ = transformMax_;
 }
 
 // Transform single value
-double FQPlotWindow::transformValue(double x, int axis)
+double UChromaWindow::transformValue(double x, int axis)
 {
 	switch (transformType_[axis])
 	{
-		case (FQPlotWindow::MultiplyTransform):
+		case (UChromaWindow::MultiplyTransform):
 			return  (x+preTransformShift_[axis])*transformValue_[axis] + postTransformShift_[axis];
 			break;
-		case (FQPlotWindow::DivideTransform):
+		case (UChromaWindow::DivideTransform):
 			return (x+preTransformShift_[axis])/transformValue_[axis] + postTransformShift_[axis];
 			break;
-		case (FQPlotWindow::LogBase10Transform):
+		case (UChromaWindow::LogBase10Transform):
 			return log10(x+preTransformShift_[axis]) + postTransformShift_[axis];
 			break;
-		case (FQPlotWindow::NaturalLogTransform):
+		case (UChromaWindow::NaturalLogTransform):
 			return log(x+preTransformShift_[axis]) + postTransformShift_[axis];
 			break;
 	}
@@ -662,7 +662,7 @@ double FQPlotWindow::transformValue(double x, int axis)
 }
 
 // Set limits to show all data
-void FQPlotWindow::showAll(bool changeX, bool changeY, bool changeZ)
+void UChromaWindow::showAll(bool changeX, bool changeY, bool changeZ)
 {
 	bool flags[3] = { changeX, changeY, changeZ };
 	for (int axis = 0; axis < 3; ++axis) if (flags[axis])
@@ -673,14 +673,14 @@ void FQPlotWindow::showAll(bool changeX, bool changeY, bool changeZ)
 }
 
 // Flag data as modified, and update titlebar
-void FQPlotWindow::setAsModified()
+void UChromaWindow::setAsModified()
 {
 	modified_ = true;
 	updateTitleBar();
 }
 
 // Update surface data after data change
-void FQPlotWindow::updateSurface(bool dataHasChanged)
+void UChromaWindow::updateSurface(bool dataHasChanged)
 {
 	// Determine surface center and Y clip limits
 	Vec3<double> center;
@@ -775,16 +775,16 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 				// Apply transform
 				switch (transformType_[n])
 				{
-					case (FQPlotWindow::MultiplyTransform):
+					case (UChromaWindow::MultiplyTransform):
 						array[n] *= transformValue_[n];
 						break;
-					case (FQPlotWindow::DivideTransform):
+					case (UChromaWindow::DivideTransform):
 						array[n] /= transformValue_[n];
 						break;
-					case (FQPlotWindow::LogBase10Transform):
+					case (UChromaWindow::LogBase10Transform):
 						array[n].takeLog();
 						break;
-					case (FQPlotWindow::NaturalLogTransform):
+					case (UChromaWindow::NaturalLogTransform):
 						array[n].takeLn();
 						break;
 				}
@@ -830,7 +830,7 @@ void FQPlotWindow::updateSurface(bool dataHasChanged)
 
 	// Create temporary colourScale_
 	ColourScale scale = colourScale_;
-	if (alphaControl_ == FQPlotWindow::FixedAlpha) scale.setAllAlpha(fixedAlpha_);
+	if (alphaControl_ == UChromaWindow::FixedAlpha) scale.setAllAlpha(fixedAlpha_);
 
 	// Update surface GL object
 	ui.MainView->createSurface(surfaceData_, scale, axisStretch_.y);

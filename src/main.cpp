@@ -1,34 +1,34 @@
 /*
-	*** FQPlot Main
+	*** uChroma Main
 	*** src/main.cpp
 	Copyright T. Youngs 2013
 
-	This file is part of FQPlot.
+	This file is part of uChroma.
 
-	FQPlot is free software: you can redistribute it and/or modify
+	uChroma is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	FQPlot is distributed in the hope that it will be useful,
+	uChroma is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
+	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "version.h"
-#include "gui/fqplot.h"
+#include "gui/uchroma.h"
 
 int main(int argc, char *argv[])
 {
 	/* Create the main QApplication */
 	QApplication app(argc, argv, QApplication::GuiClient);
-	QCoreApplication::setOrganizationName("FQPlot");
+	QCoreApplication::setOrganizationName("uChroma");
 	QCoreApplication::setOrganizationDomain("www.projectaten.net");
-	QCoreApplication::setApplicationName("FQPlot");
+	QCoreApplication::setApplicationName("uChroma");
 
 	#if QT_VERSION >= 0x040600
         QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 	QGLFormat::defaultFormat().setSampleBuffers(true);
 
 	/* Create the main window */
-	FQPlotWindow mainWindow;
+	UChromaWindow mainWindow;
 
 	/* Was an input file supplied? */
 	if (argc == 2)

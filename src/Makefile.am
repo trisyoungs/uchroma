@@ -1,13 +1,13 @@
-bin_PROGRAMS = fqplot
+bin_PROGRAMS = uchroma
 
 SUBDIRS = templates base math gui
 
 noinst_HEADERS = version.h
 
-# Target 'fqplot'
+# Target 'uchroma'
 
-fqplot_SOURCES = main.cpp
+uchroma_SOURCES = main.cpp
 
 INCLUDES = -I../ @GUI_CFLAGS@
 
-fqplot_LDADD = gui/libgui.a math/libmath.a base/libbase.a @MAC_LIBS@ @GUI_LDLIBS@
+uchroma_LDADD = gui/libgui.a math/libmath.a base/libbase.a @MAC_LIBS@ @GUI_LDLIBS@

@@ -1,28 +1,28 @@
 /*
 	*** Main Window - View Functions 
-	*** src/gui/fqplot_view.cpp
+	*** src/gui/uchroma_view.cpp
 	Copyright T. Youngs 2013
 
-	This file is part of FQPlot.
+	This file is part of uChroma.
 
-	FQPlot is free software: you can redistribute it and/or modify
+	uChroma is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	FQPlot is distributed in the hope that it will be useful,
+	uChroma is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
+	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/fqplot.h"
+#include "gui/uchroma.h"
 #include "templates/reflist.h"
 
-bool FQPlotWindow::viewAxisInvertChanged(int axis, bool checked)
+bool UChromaWindow::viewAxisInvertChanged(int axis, bool checked)
 {
 	if (refreshing_) return false;
 	axisInvert_[axis] = checked;
@@ -31,7 +31,7 @@ bool FQPlotWindow::viewAxisInvertChanged(int axis, bool checked)
 	return true;
 }
 
-bool FQPlotWindow::viewAxisLogarithmicChanged(int axis, bool checked)
+bool UChromaWindow::viewAxisLogarithmicChanged(int axis, bool checked)
 {
 	if (refreshing_) return false;
 	axisLogarithmic_[axis] = checked;
@@ -40,7 +40,7 @@ bool FQPlotWindow::viewAxisLogarithmicChanged(int axis, bool checked)
 	return true;
 }
 
-bool FQPlotWindow::viewAxisVisibleChanged(int axis, bool checked)
+bool UChromaWindow::viewAxisVisibleChanged(int axis, bool checked)
 {
 	if (refreshing_) return false;
 	axisVisible_[axis] = checked;
@@ -49,7 +49,7 @@ bool FQPlotWindow::viewAxisVisibleChanged(int axis, bool checked)
 	return true;
 }
 
-bool FQPlotWindow::viewAxisStretchChanged(int axis, double value)
+bool UChromaWindow::viewAxisStretchChanged(int axis, double value)
 {
 	if (refreshing_) return false;
 	axisStretch_[axis] = value;
@@ -58,7 +58,7 @@ bool FQPlotWindow::viewAxisStretchChanged(int axis, double value)
 	return true;
 }
 
-bool FQPlotWindow::viewAxisCrossChanged(int axis, int dir, double value)
+bool UChromaWindow::viewAxisCrossChanged(int axis, int dir, double value)
 {
 	if (refreshing_) return false;
 	axisPosition_[axis].set(dir,value);
@@ -67,7 +67,7 @@ bool FQPlotWindow::viewAxisCrossChanged(int axis, int dir, double value)
 	return true;
 }
 
-bool FQPlotWindow::viewAxisCrossSet(int axis, int dir, int type)
+bool UChromaWindow::viewAxisCrossSet(int axis, int dir, int type)
 {
 	if (refreshing_) return false;
 	if (type == -1) axisPosition_[axis].set(dir, limitMin_[dir]);
@@ -80,7 +80,7 @@ bool FQPlotWindow::viewAxisCrossSet(int axis, int dir, int type)
 	return true;
 }
 
-bool FQPlotWindow::viewAxisTicksChanged(int axis, bool start, double value)
+bool UChromaWindow::viewAxisTicksChanged(int axis, bool start, double value)
 {
 	if (refreshing_) return false;
 	if (start) axisFirstTick_[axis] = value;
@@ -90,7 +90,7 @@ bool FQPlotWindow::viewAxisTicksChanged(int axis, bool start, double value)
 	return true;
 }
 
-bool FQPlotWindow::viewAxisOrientationChanged(int axis, int dir, bool direction, double value)
+bool UChromaWindow::viewAxisOrientationChanged(int axis, int dir, bool direction, double value)
 {
 	if (refreshing_) return false;
 	if (direction) axisLabelDirection_[axis].set(dir, value);
@@ -100,7 +100,7 @@ bool FQPlotWindow::viewAxisOrientationChanged(int axis, int dir, bool direction,
 	return true;
 }
 
-bool FQPlotWindow::viewAxisMinorTicksChanged(int axis, int value)
+bool UChromaWindow::viewAxisMinorTicksChanged(int axis, int value)
 {
 	if (refreshing_) return false;
 	axisMinorTicks_[axis] = value;
@@ -109,7 +109,7 @@ bool FQPlotWindow::viewAxisMinorTicksChanged(int axis, int value)
 	return true;
 }
 
-bool FQPlotWindow::viewAxisRotationChanged(int axis, int rotation)
+bool UChromaWindow::viewAxisRotationChanged(int axis, int rotation)
 {
 	if (refreshing_) return false;
 	axisLabelRotation_[axis] = rotation;
@@ -118,7 +118,7 @@ bool FQPlotWindow::viewAxisRotationChanged(int axis, int rotation)
 	return true;
 }
 
-void FQPlotWindow::on_ViewLabelScaleSpin_valueChanged(double value)
+void UChromaWindow::on_ViewLabelScaleSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	labelScale_ = value;
@@ -127,7 +127,7 @@ void FQPlotWindow::on_ViewLabelScaleSpin_valueChanged(double value)
 	updateSurface(false);
 }
 
-void FQPlotWindow::on_ViewTitleScaleSpin_valueChanged(double value)
+void UChromaWindow::on_ViewTitleScaleSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	titleScale_ = value;
@@ -138,357 +138,357 @@ void FQPlotWindow::on_ViewTitleScaleSpin_valueChanged(double value)
 
 // X Axis
 
-void FQPlotWindow::on_ViewXAxisInvertCheck_clicked(bool checked)
+void UChromaWindow::on_ViewXAxisInvertCheck_clicked(bool checked)
 {
 	viewAxisInvertChanged(0, checked);
 }
 
-void FQPlotWindow::on_ViewXAxisLogarithmicCheck_clicked(bool checked)
+void UChromaWindow::on_ViewXAxisLogarithmicCheck_clicked(bool checked)
 {
 	viewAxisLogarithmicChanged(0, checked);
 }
 
-void FQPlotWindow::on_ViewXAxisVisibleCheck_clicked(bool checked)
+void UChromaWindow::on_ViewXAxisVisibleCheck_clicked(bool checked)
 {
 	viewAxisVisibleChanged(0, checked);
 }
 
-void FQPlotWindow::on_ViewXAxisStretchSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisStretchSpin_valueChanged(double value)
 {
 	viewAxisStretchChanged(0, value);
 }
 
-void FQPlotWindow::on_ViewXAxisCrossAtYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisCrossAtYSpin_valueChanged(double value)
 {
 	viewAxisCrossChanged(0, 1, value);
 }
 
-void FQPlotWindow::on_ViewXAxisCrossAtZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisCrossAtZSpin_valueChanged(double value)
 {
 	viewAxisCrossChanged(0, 2, value);
 }
 
-void FQPlotWindow::on_ViewXAxisCrossAtYSetMinimumButton_clicked(bool checked)
+void UChromaWindow::on_ViewXAxisCrossAtYSetMinimumButton_clicked(bool checked)
 {
 	viewAxisCrossSet(0, 1, -1);
 }
 
-void FQPlotWindow::on_ViewXAxisCrossAtYSetZeroButton_clicked(bool checked)
+void UChromaWindow::on_ViewXAxisCrossAtYSetZeroButton_clicked(bool checked)
 {
 	viewAxisCrossSet(0, 1, 0);
 }
 
-void FQPlotWindow::on_ViewXAxisCrossAtYSetMaximumButton_clicked(bool checked)
+void UChromaWindow::on_ViewXAxisCrossAtYSetMaximumButton_clicked(bool checked)
 {
 	viewAxisCrossSet(0, 1, 1);
 }
 
-void FQPlotWindow::on_ViewXAxisCrossAtZSetMinimumButton_clicked(bool checked)
+void UChromaWindow::on_ViewXAxisCrossAtZSetMinimumButton_clicked(bool checked)
 {
 	viewAxisCrossSet(0, 2, -1);
 }
 
-void FQPlotWindow::on_ViewXAxisCrossAtZSetZeroButton_clicked(bool checked)
+void UChromaWindow::on_ViewXAxisCrossAtZSetZeroButton_clicked(bool checked)
 {
 	viewAxisCrossSet(0, 2, 0);
 }
 
-void FQPlotWindow::on_ViewXAxisCrossAtZSetMaximumButton_clicked(bool checked)
+void UChromaWindow::on_ViewXAxisCrossAtZSetMaximumButton_clicked(bool checked)
 {
 	viewAxisCrossSet(0, 2, 1);
 }
 
-void FQPlotWindow::on_ViewXAxisAutoTicksCheck_clicked(bool checked)
+void UChromaWindow::on_ViewXAxisAutoTicksCheck_clicked(bool checked)
 {
 	axisAutoTicks_.x = checked;
 	updateViewTab();
 	updateSurface(false);
 }
 
-void FQPlotWindow::on_ViewXAxisTicksStartSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisTicksStartSpin_valueChanged(double value)
 {
 	viewAxisTicksChanged(0, true, value);
 }
 
-void FQPlotWindow::on_ViewXAxisTicksDeltaSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisTicksDeltaSpin_valueChanged(double value)
 {
 	viewAxisTicksChanged(0, false, value);
 }
 
-void FQPlotWindow::on_ViewXAxisMinorTicksSpin_valueChanged(int value)
+void UChromaWindow::on_ViewXAxisMinorTicksSpin_valueChanged(int value)
 {
 	viewAxisMinorTicksChanged(0, value);
 }
 
-void FQPlotWindow::on_ViewXAxisDirectionXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisDirectionXSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(0, 0, true, value);
 }
 
-void FQPlotWindow::on_ViewXAxisDirectionYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisDirectionYSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(0, 1, true, value);
 }
 
-void FQPlotWindow::on_ViewXAxisDirectionZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisDirectionZSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(0, 2, true, value);
 }
 
-void FQPlotWindow::on_ViewXAxisUpXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisUpXSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(0, 0, false, value);
 }
 
-void FQPlotWindow::on_ViewXAxisUpYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisUpYSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(0, 1, false, value);
 }
 
-void FQPlotWindow::on_ViewXAxisUpZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisUpZSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(0, 2, false, value);
 }
 
-void FQPlotWindow::on_ViewXAxisRotationSpin_valueChanged(int value)
+void UChromaWindow::on_ViewXAxisRotationSpin_valueChanged(int value)
 {
 	viewAxisRotationChanged(0, value);
 }
 
 // Y Axis
 
-void FQPlotWindow::on_ViewYAxisInvertCheck_clicked(bool checked)
+void UChromaWindow::on_ViewYAxisInvertCheck_clicked(bool checked)
 {
 	viewAxisInvertChanged(1, checked);
 }
 
-void FQPlotWindow::on_ViewYAxisLogarithmicCheck_clicked(bool checked)
+void UChromaWindow::on_ViewYAxisLogarithmicCheck_clicked(bool checked)
 {
 	viewAxisLogarithmicChanged(1, checked);
 }
 
-void FQPlotWindow::on_ViewYAxisVisibleCheck_clicked(bool checked)
+void UChromaWindow::on_ViewYAxisVisibleCheck_clicked(bool checked)
 {
 	viewAxisVisibleChanged(1, checked);
 }
 
-void FQPlotWindow::on_ViewYAxisStretchSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisStretchSpin_valueChanged(double value)
 {
 	viewAxisStretchChanged(1, value);
 }
 
-void FQPlotWindow::on_ViewYAxisCrossAtXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisCrossAtXSpin_valueChanged(double value)
 {
 	viewAxisCrossChanged(1, 0, value);
 }
 
-void FQPlotWindow::on_ViewYAxisCrossAtZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisCrossAtZSpin_valueChanged(double value)
 {
 	viewAxisCrossChanged(1, 2, value);
 }
 
-void FQPlotWindow::on_ViewYAxisCrossAtXSetMinimumButton_clicked(bool checked)
+void UChromaWindow::on_ViewYAxisCrossAtXSetMinimumButton_clicked(bool checked)
 {
 	viewAxisCrossSet(1, 0, -1);
 }
 
-void FQPlotWindow::on_ViewYAxisCrossAtXSetZeroButton_clicked(bool checked)
+void UChromaWindow::on_ViewYAxisCrossAtXSetZeroButton_clicked(bool checked)
 {
 	viewAxisCrossSet(1, 0, 0);
 }
 
-void FQPlotWindow::on_ViewYAxisCrossAtXSetMaximumButton_clicked(bool checked)
+void UChromaWindow::on_ViewYAxisCrossAtXSetMaximumButton_clicked(bool checked)
 {
 	viewAxisCrossSet(1, 0, 1);
 }
 
-void FQPlotWindow::on_ViewYAxisCrossAtZSetMinimumButton_clicked(bool checked)
+void UChromaWindow::on_ViewYAxisCrossAtZSetMinimumButton_clicked(bool checked)
 {
 	viewAxisCrossSet(1, 2, -1);
 }
 
-void FQPlotWindow::on_ViewYAxisCrossAtZSetZeroButton_clicked(bool checked)
+void UChromaWindow::on_ViewYAxisCrossAtZSetZeroButton_clicked(bool checked)
 {
 	viewAxisCrossSet(1, 2, 0);
 }
 
-void FQPlotWindow::on_ViewYAxisCrossAtZSetMaximumButton_clicked(bool checked)
+void UChromaWindow::on_ViewYAxisCrossAtZSetMaximumButton_clicked(bool checked)
 {
 	viewAxisCrossSet(1, 2, 1);
 }
 
-void FQPlotWindow::on_ViewYAxisAutoTicksCheck_clicked(bool checked)
+void UChromaWindow::on_ViewYAxisAutoTicksCheck_clicked(bool checked)
 {
 	axisAutoTicks_.y = checked;
 	updateViewTab();
 	updateSurface(false);
 }
 
-void FQPlotWindow::on_ViewYAxisTicksStartSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisTicksStartSpin_valueChanged(double value)
 {
 	viewAxisTicksChanged(1, true, value);
 }
 
-void FQPlotWindow::on_ViewYAxisTicksDeltaSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisTicksDeltaSpin_valueChanged(double value)
 {
 	viewAxisTicksChanged(1, false, value);
 }
 
-void FQPlotWindow::on_ViewYAxisMinorTicksSpin_valueChanged(int value)
+void UChromaWindow::on_ViewYAxisMinorTicksSpin_valueChanged(int value)
 {
 	viewAxisMinorTicksChanged(1, value);
 }
 
-void FQPlotWindow::on_ViewYAxisDirectionXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisDirectionXSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(1, 0, true, value);
 }
 
-void FQPlotWindow::on_ViewYAxisDirectionYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisDirectionYSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(1, 1, true, value);
 }
 
-void FQPlotWindow::on_ViewYAxisDirectionZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisDirectionZSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(1, 2, true, value);
 }
 
-void FQPlotWindow::on_ViewYAxisUpXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisUpXSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(1, 0, false, value);
 }
 
-void FQPlotWindow::on_ViewYAxisUpYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisUpYSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(1, 1, false, value);
 }
 
-void FQPlotWindow::on_ViewYAxisUpZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisUpZSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(1, 2, false, value);
 }
 
-void FQPlotWindow::on_ViewYAxisRotationSpin_valueChanged(int value)
+void UChromaWindow::on_ViewYAxisRotationSpin_valueChanged(int value)
 {
 	viewAxisRotationChanged(1, value);
 }
 
 // Z Axis
 
-void FQPlotWindow::on_ViewZAxisInvertCheck_clicked(bool checked)
+void UChromaWindow::on_ViewZAxisInvertCheck_clicked(bool checked)
 {
 	viewAxisInvertChanged(2, checked);
 }
 
-void FQPlotWindow::on_ViewZAxisLogarithmicCheck_clicked(bool checked)
+void UChromaWindow::on_ViewZAxisLogarithmicCheck_clicked(bool checked)
 {
 	viewAxisLogarithmicChanged(2, checked);
 }
 
-void FQPlotWindow::on_ViewZAxisVisibleCheck_clicked(bool checked)
+void UChromaWindow::on_ViewZAxisVisibleCheck_clicked(bool checked)
 {
 	viewAxisVisibleChanged(2, checked);
 }
 
-void FQPlotWindow::on_ViewZAxisStretchSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisStretchSpin_valueChanged(double value)
 {
 	viewAxisStretchChanged(2, value);
 }
 
-void FQPlotWindow::on_ViewZAxisCrossAtXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisCrossAtXSpin_valueChanged(double value)
 {
 	viewAxisCrossChanged(2, 0, value);
 }
 
-void FQPlotWindow::on_ViewZAxisCrossAtYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisCrossAtYSpin_valueChanged(double value)
 {
 	viewAxisCrossChanged(2, 1, value);
 }
 
-void FQPlotWindow::on_ViewZAxisCrossAtXSetMinimumButton_clicked(bool checked)
+void UChromaWindow::on_ViewZAxisCrossAtXSetMinimumButton_clicked(bool checked)
 {
 	viewAxisCrossSet(2, 0, -1);
 }
 
-void FQPlotWindow::on_ViewZAxisCrossAtXSetZeroButton_clicked(bool checked)
+void UChromaWindow::on_ViewZAxisCrossAtXSetZeroButton_clicked(bool checked)
 {
 	viewAxisCrossSet(2, 0, 0);
 }
 
-void FQPlotWindow::on_ViewZAxisCrossAtXSetMaximumButton_clicked(bool checked)
+void UChromaWindow::on_ViewZAxisCrossAtXSetMaximumButton_clicked(bool checked)
 {
 	viewAxisCrossSet(2, 0, 1);
 }
 
-void FQPlotWindow::on_ViewZAxisCrossAtYSetMinimumButton_clicked(bool checked)
+void UChromaWindow::on_ViewZAxisCrossAtYSetMinimumButton_clicked(bool checked)
 {
 	viewAxisCrossSet(2, 1, -1);
 }
 
-void FQPlotWindow::on_ViewZAxisCrossAtYSetZeroButton_clicked(bool checked)
+void UChromaWindow::on_ViewZAxisCrossAtYSetZeroButton_clicked(bool checked)
 {
 	viewAxisCrossSet(2, 1, 0);
 }
 
-void FQPlotWindow::on_ViewZAxisCrossAtYSetMaximumButton_clicked(bool checked)
+void UChromaWindow::on_ViewZAxisCrossAtYSetMaximumButton_clicked(bool checked)
 {
 	viewAxisCrossSet(2, 1, 1);
 }
 
-void FQPlotWindow::on_ViewZAxisAutoTicksCheck_clicked(bool checked)
+void UChromaWindow::on_ViewZAxisAutoTicksCheck_clicked(bool checked)
 {
 	axisAutoTicks_.z = checked;
 	updateViewTab();
 	updateSurface(false);
 }
 
-void FQPlotWindow::on_ViewZAxisTicksStartSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisTicksStartSpin_valueChanged(double value)
 {
 	viewAxisTicksChanged(2, true, value);
 }
 
-void FQPlotWindow::on_ViewZAxisTicksDeltaSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisTicksDeltaSpin_valueChanged(double value)
 {
 	viewAxisTicksChanged(2, false, value);
 }
 
-void FQPlotWindow::on_ViewZAxisMinorTicksSpin_valueChanged(int value)
+void UChromaWindow::on_ViewZAxisMinorTicksSpin_valueChanged(int value)
 {
 	viewAxisMinorTicksChanged(2, value);
 }
 
-void FQPlotWindow::on_ViewZAxisDirectionXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisDirectionXSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(2, 0, true, value);
 }
 
-void FQPlotWindow::on_ViewZAxisDirectionYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisDirectionYSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(2, 1, true, value);
 }
 
-void FQPlotWindow::on_ViewZAxisDirectionZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisDirectionZSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(2, 2, true, value);
 }
 
-void FQPlotWindow::on_ViewZAxisUpXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisUpXSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(2, 0, false, value);
 }
 
-void FQPlotWindow::on_ViewZAxisUpYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisUpYSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(2, 1, false, value);
 }
 
-void FQPlotWindow::on_ViewZAxisUpZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisUpZSpin_valueChanged(double value)
 {
 	viewAxisOrientationChanged(2, 2, false, value);
 }
 
-void FQPlotWindow::on_ViewZAxisRotationSpin_valueChanged(int value)
+void UChromaWindow::on_ViewZAxisRotationSpin_valueChanged(int value)
 {
 	viewAxisRotationChanged(2, value);
 }
@@ -497,45 +497,45 @@ void FQPlotWindow::on_ViewZAxisRotationSpin_valueChanged(int value)
  * Extras Tab
  */
 
-void FQPlotWindow::on_ViewBoundingBoxNoneRadio_clicked(bool checked)
+void UChromaWindow::on_ViewBoundingBoxNoneRadio_clicked(bool checked)
 {
 	if (refreshing_) return;
-	boundingBox_ = FQPlotWindow::NoBox;
+	boundingBox_ = UChromaWindow::NoBox;
 	updateSurface(false);
 }
 
-void FQPlotWindow::on_ViewBoundingBoxPlaneRadio_clicked(bool checked)
+void UChromaWindow::on_ViewBoundingBoxPlaneRadio_clicked(bool checked)
 {
 	if (refreshing_) return;
-	boundingBox_ = FQPlotWindow::PlaneBox;
+	boundingBox_ = UChromaWindow::PlaneBox;
 	updateSurface(false);
 }
 
-void FQPlotWindow::on_ViewBoundingBoxCubeRadio_clicked(bool checked)
+void UChromaWindow::on_ViewBoundingBoxCubeRadio_clicked(bool checked)
 {
 	if (refreshing_) return;
-	boundingBox_ = FQPlotWindow::CubeBox;
+	boundingBox_ = UChromaWindow::CubeBox;
 	updateSurface(false);
 }
 
-void FQPlotWindow::on_ViewBoundingBoxPlaneYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewBoundingBoxPlaneYSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	boundingBoxPlaneY_ = value;
 	updateSurface(false);
 }
 
-void FQPlotWindow::on_ViewBoundingBoxPlaneYSetMinimumButton_clicked(bool checked)
+void UChromaWindow::on_ViewBoundingBoxPlaneYSetMinimumButton_clicked(bool checked)
 {
 	ui.ViewBoundingBoxPlaneYSpin->setValue(limitMin_.y);
 }
 
-void FQPlotWindow::on_ViewBoundingBoxPlaneYSetZeroButton_clicked(bool checked)
+void UChromaWindow::on_ViewBoundingBoxPlaneYSetZeroButton_clicked(bool checked)
 {
 	ui.ViewBoundingBoxPlaneYSpin->setValue(0.0);
 }
 
-void FQPlotWindow::on_ViewBoundingBoxPlaneYSetMaximumButton_clicked(bool checked)
+void UChromaWindow::on_ViewBoundingBoxPlaneYSetMaximumButton_clicked(bool checked)
 {
 	ui.ViewBoundingBoxPlaneYSpin->setValue(limitMax_.y);
 }
@@ -543,7 +543,7 @@ void FQPlotWindow::on_ViewBoundingBoxPlaneYSetMaximumButton_clicked(bool checked
 /*
  * Update
  */
-void FQPlotWindow::updateViewTab()
+void UChromaWindow::updateViewTab()
 {
 	refreshing_ = true;
 	
@@ -625,9 +625,9 @@ void FQPlotWindow::updateViewTab()
 	ui.ViewZAxisRotationSpin->setValue(axisLabelRotation_.z);
 
 	// Extras
-	if (boundingBox_ == FQPlotWindow::NoBox) ui.ViewBoundingBoxNoneRadio->setChecked(true);
-	else if (boundingBox_ == FQPlotWindow::PlaneBox) ui.ViewBoundingBoxPlaneRadio->setChecked(true);
-	else if (boundingBox_ == FQPlotWindow::CubeBox) ui.ViewBoundingBoxCubeRadio->setChecked(true);
+	if (boundingBox_ == UChromaWindow::NoBox) ui.ViewBoundingBoxNoneRadio->setChecked(true);
+	else if (boundingBox_ == UChromaWindow::PlaneBox) ui.ViewBoundingBoxPlaneRadio->setChecked(true);
+	else if (boundingBox_ == UChromaWindow::CubeBox) ui.ViewBoundingBoxCubeRadio->setChecked(true);
 	ui.ViewBoundingBoxPlaneYSpin->setValue(boundingBoxPlaneY_);
 
 	refreshing_ = false;

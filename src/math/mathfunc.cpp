@@ -3,20 +3,20 @@
 	*** src/math/mathfunc.cpp
 	Copyright T. Youngs 2013
 
-	This file is part of FQPlot.
+	This file is part of uChroma.
 
-	FQPlot is free software: you can redistribute it and/or modify
+	uChroma is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	FQPlot is distributed in the hope that it will be useful,
+	uChroma is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
+	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "math/mathfunc.h"
@@ -25,7 +25,7 @@
 #include <math.h>
 
 // Error Function
-double FQPlotMath::erfc(double x)
+double uChromaMath::erfc(double x)
 {
 	// Approximation to the complementary error function.
 	// Ref: Abramowitz and Stegun, Handbook of Mathematical Functions,
@@ -39,13 +39,13 @@ double FQPlotMath::erfc(double x)
 }
 
 // Complementary error function
-double FQPlotMath::erf(double x)
+double uChromaMath::erf(double x)
 {
 	return (1.0 - erfc(x));
 }
 
 // Random Number Generator (0 - 1)
-double FQPlotMath::random()
+double uChromaMath::random()
 {
 	// Simple random number generator from C++ stdlib.
 	// Returns numbers from 0.0 to 1.0 inclusive.
@@ -54,21 +54,21 @@ double FQPlotMath::random()
 }
 
 // Random number generator (o - RAND_MAX)
-int FQPlotMath::randomimax()
+int uChromaMath::randomimax()
 {
 	// Returns a random number from 0->(range-1) inclusive.
 	return rand();
 }
 
 // Random number generator (0 - range-1)
-int FQPlotMath::randomi(int range)
+int uChromaMath::randomi(int range)
 {
 	// Returns a random number from 0->(range-1) inclusive.
 	return int(range * (double(rand()-1) / RAND_MAX));
 }
 
 // Integer power function
-int FQPlotMath::power(int i, int p)
+int uChromaMath::power(int i, int p)
 {
 	static int result, n;
 	result = i;
