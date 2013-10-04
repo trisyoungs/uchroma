@@ -11,14 +11,14 @@ ${CMAKE_BINARY_DIR}/src/
 
 # Source files (not Qt UI files or custom .h [uih])
 SET(qtproject_SRCS
-fqplot_funcs.cpp
-fqplot_data.cpp
-fqplot_analyse.cpp
-fqplot_colour.cpp
-fqplot_analyse.cpp
-fqplot_sourcedata.cpp
-fqplot_transform.cpp
-fqplot_view.cpp
+uchroma_funcs.cpp
+uchroma_data.cpp
+uchroma_analyse.cpp
+uchroma_colour.cpp
+uchroma_analyse.cpp
+uchroma_sourcedata.cpp
+uchroma_transform.cpp
+uchroma_view.cpp
 dataimport_funcs.cpp
 dataimport_seqxy.cpp
 saveimage_funcs.cpp
@@ -45,7 +45,7 @@ viewer_vertexchunk.h
 )
 
 SET(pro_MOC_HDRS
-  fqplot.h
+  uchroma.h
   dataimport.h
   saveimage.h
   colourbutton.uih
@@ -58,7 +58,7 @@ QT4_WRAP_CPP(pro_MOC_SRCS ${pro_MOC_HDRS} OPTIONS -f)
 SET(pro_UIS
   dataimport.ui
   saveimage.ui
-  fqplot.ui
+  uchroma.ui
 )
 QT4_WRAP_UI(pro_UIS_H ${pro_UIS})
 

@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="icons.qrc">
-    <normaloff>:/fqplot/icons/FQPlot.png</normaloff>:/fqplot/icons/FQPlot.png</iconset>
+    <normaloff>:/uchroma/icons/uchroma.svg</normaloff>:/uchroma/icons/uchroma.svg</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

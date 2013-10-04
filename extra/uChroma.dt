@@ -1,11 +1,11 @@
 [Desktop Entry]
 Version=0.1
 Encoding=UTF-8
-Comment=FQPlot
-Exec=jv
-GenericName=FQPlot
-Icon=/usr/share/pixmaps/FQPlot.png
-Name=FQPlot
+Comment=uChroma
+Exec=uchroma
+GenericName=uChroma
+Icon=/usr/share/pixmaps/uchroma.png
+Name=uChroma
 StartupNotify=false
 Terminal=0
 Type=Application
