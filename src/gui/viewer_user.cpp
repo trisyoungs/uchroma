@@ -332,7 +332,7 @@ void Viewer::constructSliceData(Slice* targetSlice, double yAxisScale, Array< Ve
 }
 
 // Create surface primitive
-void Viewer::createSurface(ColourScale& colourScale, double yAxisScale)
+void Viewer::createSurface(ColourScale colourScale, double yAxisScale)
 {
 	// Check for valid slice list
 	if (sliceData_ == NULL) return;

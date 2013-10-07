@@ -255,7 +255,7 @@ class Viewer : public QGLWidget
 	// Construct normal / colour data for slice specified
 	void constructSliceData(Slice* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale& colourScale, Slice* previousSlice, Slice* nextSlice);
 	// Create surface primitive with supplied colourscale and y axis scaling factor
-	void createSurface(ColourScale& colourScale, double yAxisScale);
+	void createSurface(ColourScale colourScale, double yAxisScale);
 	// Create surface using previous colourscale and y axis scaling factor
 	void createSurface();
 	// Clear specified axis primitive
