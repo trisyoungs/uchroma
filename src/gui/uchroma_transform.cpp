@@ -64,9 +64,8 @@ bool UChromaWindow::transformLimitChanged(int axis, bool minLim, double value)
 	if (refreshing_) return false;
 	if (minLim) limitMin_[axis] = value;
 	else limitMax_[axis] = value;
-// 	calculateTransformLimits();
 	setAsModified();
-// 	updateTransformTab();
+	updateTransformTab();
 	updateViewTab();
 	updateSurface();
 	return true;
@@ -77,9 +76,8 @@ bool UChromaWindow::transformLimitSetExtreme(int axis, bool minLim)
 	if (refreshing_) return false;
 	if (minLim) limitMin_[axis] = transformMin_[axis];
 	else limitMax_[axis] = transformMax_[axis];
-// 	calculateTransformLimits();
 	setAsModified();
-// 	updateTransformTab();
+	updateTransformTab();
 	updateViewTab();
 	updateSurface();
 	return true;

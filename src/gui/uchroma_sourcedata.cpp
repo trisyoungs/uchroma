@@ -73,18 +73,29 @@ void UChromaWindow::on_AddFilesButton_clicked(bool checked)
 		progress.setValue(count);
 		if (progress.wasCanceled()) break;
 
-		if (addSlice(z, fileName, fileName)) ++count;
+		Slice *slice = addSlice(z, fileName, fileName);
+		if (slice && slice->loadData(dataFileDirectory_)) ++count;
+		
 		z += delta;
 	}
 	progress.setValue(files.count());
 
+	// Was any data loaded?
+	if (count == 0) return;
+
 	// Update data limits and file list
 	calculateDataLimits();
 	updateSourceDataTab();
+
+	// Query whether limits should be updated to encompass all data
+	QMessageBox::Button button = QMessageBox::question(this, "New Data Loaded", "New data has been loaded - set current data limts to encompass all data?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+	if (button == QMessageBox::Yes) showAllData();
+
+	// Update transform tab and set as modified
 	updateTransformTab();
 	setAsModified();
-	
-	// Need to update surface
+
+	// Need to update surface, and then we're done
 	updateSurface();
 }
 

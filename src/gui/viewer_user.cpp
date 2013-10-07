@@ -190,6 +190,12 @@ void Viewer::setupGL()
 	msg.exit("Viewer::setupGL");
 }
 
+// Set source slice data
+void Viewer::setSourceSliceList(List<Slice>* sliceData)
+{
+	sliceData_ = sliceData;
+}
+
 // Construct normal / colour data for slice specified
 void Viewer::constructSliceData(Slice* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale& colourScale, Slice* previousSlice, Slice* nextSlice)
 {
@@ -326,32 +332,40 @@ void Viewer::constructSliceData(Slice* targetSlice, double yAxisScale, Array< Ve
 }
 
 // Create surface primitive
-void Viewer::createSurface(const List<Slice>& slices, ColourScale& colourScale, double yAxisScale)
+void Viewer::createSurface(ColourScale& colourScale, double yAxisScale)
 {
+	// Check for valid slice list
+	if (sliceData_ == NULL) return;
+
+	// Take copy of colourscale and yAxisScale values
+	colourScale_ = colourScale;
+	yAxisScale_ = yAxisScale;
+
 	GLfloat zA, zB;
-	
+
+	// Pop old primitive instance - we need to recreate the display list / vertex array
 	surfacePrimitive_.popInstance(context());
 	surfacePrimitive_.forgetAll();
 
 	// Sanity check - are there enough slices to proceed?
-	if (slices.nItems() < 2) return;
+	if (sliceData_->nItems() < 2) return;
 
 	// Temporary variables
 	Array< Vec3<double> > normA, normB;
 	Array< Vec4<GLfloat> > colourA, colourB;
-	int n, nPoints = slices.first()->data().nPoints();
+	int n, nPoints = sliceData_->first()->data().nPoints();
 	QColor colour;
 	Vec3<double> nrm(0.0,1.0,0.0);
 
 	// Construct first slice data and set initial min/max values
-	Slice* sliceA = slices.first();
-	constructSliceData(sliceA, yAxisScale, normA, colourA, colourScale, NULL, sliceA->next);
+	Slice* sliceA = sliceData_->first();
+	constructSliceData(sliceA, yAxisScale_, normA, colourA, colourScale_, NULL, sliceA->next);
 	
 	// Create triangles
 	for (Slice* sliceB = sliceA->next; sliceB != NULL; sliceB = sliceB->next)
 	{
 		// Construct data for current slice
-		constructSliceData(sliceB, yAxisScale, normB, colourB, colourScale, sliceA, sliceB->next);
+		constructSliceData(sliceB, yAxisScale_, normB, colourB, colourScale_, sliceA, sliceB->next);
 
 		// Grab z values
 		zA = (GLfloat) sliceA->z();
@@ -379,9 +393,16 @@ void Viewer::createSurface(const List<Slice>& slices, ColourScale& colourScale, 
 		sliceA = sliceB;
 	}
 
+	// Push a new instance to create the new display list / vertex array
 	surfacePrimitive_.pushInstance(context());
 
 	msg.print("Surface contains %i vertices.\n", surfacePrimitive_.nDefinedVertices());
+}
+
+// Create surface using previous colourscale and y axis scaling factor
+void Viewer::createSurface()
+{
+	createSurface(colourScale_, yAxisScale_);
 }
 
 // Clear specified axix primitive

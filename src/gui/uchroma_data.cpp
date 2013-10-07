@@ -155,7 +155,7 @@ void UChromaWindow::clearData()
 	alphaControl_ = UChromaWindow::OwnAlpha;
 	boundingBox_ = UChromaWindow::NoBox;
 	boundingBoxPlaneY_ = 0.0;
-	imageExportFile_ = "";
+	imageExportFile_ = "image.png";
 	imageExportWidth_ = 800;
 	imageExportHeight_ = 600;
 	imageExportMaintainAspect_ = true;
@@ -833,7 +833,7 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 	if (alphaControl_ == UChromaWindow::FixedAlpha) scale.setAllAlpha(fixedAlpha_);
 
 	// Update surface GL object
-	ui.MainView->createSurface(surfaceData_, scale, axisStretch_.y);
+	ui.MainView->createSurface(scale, axisStretch_.y);
 
 	// Setup Bounding Box
 	ui.MainView->createBoundingBox(boundingBox_, axisLogarithmic_.y ? log10(boundingBoxPlaneY_) : boundingBoxPlaneY_);

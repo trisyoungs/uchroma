@@ -33,7 +33,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveIma
 	ui.setupUi(this);
 
 	// Set variable defaults
-	dataFileDirectory_ = getenv("CWD");
+	dataFileDirectory_ = getenv("PWD");
 #ifdef WIN32
 	viewerFont_ = QDir::current().absoluteFilePath("bin/wright.ttf");
 #else
@@ -49,6 +49,9 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveIma
 
 	// Load font for viewer
 	ui.MainView->setupFont(viewerFont_);
+
+	// Point viewer to the surfacedata list
+	ui.MainView->setSourceSliceList(&surfaceData_);
 
 	// Connect signals / slots between Viewer and main UI
 	connect(ui.MainView, SIGNAL(sliceAxisValueChanged(int,double)), this, SLOT(surfaceSliceAxisValueChanged(int,double)));
@@ -155,7 +158,7 @@ void UChromaWindow::on_actionFileLoad_triggered(bool checked)
 		}
 	}
 
-	QString fileName = QFileDialog::getOpenFileName(this, "Choose file to load", dataFileDirectory_.absolutePath(), "uChroma files (*.fqp);;All files (*.*)");
+	QString fileName = QFileDialog::getOpenFileName(this, "Choose file to load", dataFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
 	if (fileName.isEmpty()) return;
 
 	clearData();
@@ -168,7 +171,7 @@ void UChromaWindow::on_actionFileSave_triggered(bool checked)
 	// Has an input filename already been chosen?
 	if (inputFile_.isEmpty())
 	{
-		QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "uChroma files (*.fqp);;All files (*.*)");
+		QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
 		if (fileName.isEmpty()) return;
 		inputFile_ = fileName;
 	}
@@ -180,7 +183,7 @@ void UChromaWindow::on_actionFileSave_triggered(bool checked)
 void UChromaWindow::on_actionFileSaveAs_triggered(bool checked)
 {
 	// Has an input filename already been chosen?
-	QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "uChroma files (*.fqp);;All files (*.*)");
+	QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
 	if (fileName.isEmpty()) return;
 	
 	inputFile_ = fileName;
@@ -287,6 +290,7 @@ void UChromaWindow::updateColourScale()
 	if (colourSource_ == UChromaWindow::SingleColourSource) colourScale_.addPoint(0.0, colourSinglePoint_.colour());
 	else if (colourSource_ == UChromaWindow::RGBGradientSource)
 	{
+		colourScale_.setUseHSV(false);
 		colourScale_.addPoint(colourRGBGradientAPoint_.value(), colourRGBGradientAPoint_.colour());
 		colourScale_.addPoint(colourRGBGradientBPoint_.value(), colourRGBGradientBPoint_.colour());
 	}

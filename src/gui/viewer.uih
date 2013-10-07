@@ -3,20 +3,20 @@
 	*** src/gui/viewer.uih
 	Copyright T. Youngs 2013
 
-	This file is part of FQPlot.
+	This file is part of uChroma.
 
-	FQPlot is free software: you can redistribute it and/or modify
+	uChroma is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	FQPlot is distributed in the hope that it will be useful,
+	uChroma is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with FQPlot.  If not, see <http://www.gnu.org/licenses/>.
+	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef FQPLOT_VIEWER_H
@@ -29,6 +29,7 @@
 #include "gui/viewer_primitiveinfo.h"
 #include "gui/viewer_textprimitive.h"
 #include "gui/viewer_trianglechopper.h"
+#include "base/colourscale.h"
 #include "base/slice.h"
 #include "templates/list.h"
 #include "templates/reflist.h"
@@ -205,6 +206,12 @@ class Viewer : public QGLWidget
 	Primitive surfacePrimitive_, axisPrimitives_[3], slicePrimitive_, boundingBoxPrimitive_;
 	// Axis text primitives
 	TextPrimitiveList axisTextPrimitives_[3];
+	// Pointer to slice data list from which to create surface
+	List<Slice>* sliceData_;
+	// Colourscale to use when creating surface
+	ColourScale colourScale_;
+	// Y-axis scale factor to use when creating surface
+	double yAxisScale_;
 	// Centrepoint of surface
 	Vec3<double> surfaceCenter_;
 	// Scale factor for axis labels
@@ -243,10 +250,14 @@ class Viewer : public QGLWidget
 	void setupGL();
 
 	public:
+	// Set source slice list
+	void setSourceSliceList(List<Slice>* sliceData);
 	// Construct normal / colour data for slice specified
-	void constructSliceData(Slice* targetSlice, double yAxisScale, Array< Vec3< double > >& normals, Array< Vec4< GLfloat > >& colours, ColourScale& colourScale, Slice* previousSlice, Slice* nextSlice);
-	// Create surface primitive
-	void createSurface(const List<Slice>& slices, ColourScale& colourScale, double yAxisScale);
+	void constructSliceData(Slice* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale& colourScale, Slice* previousSlice, Slice* nextSlice);
+	// Create surface primitive with supplied colourscale and y axis scaling factor
+	void createSurface(ColourScale& colourScale, double yAxisScale);
+	// Create surface using previous colourscale and y axis scaling factor
+	void createSurface();
 	// Clear specified axis primitive
 	void clearAxisPrimitive(int axis);
 	// Create axis primitives

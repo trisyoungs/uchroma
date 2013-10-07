@@ -3,7 +3,7 @@ project(uChroma)
 set(DESCRIPTION "uChroma")
 set(AUTHOR "Tristan Youngs")
 set(VERSION_MAJOR "0")
-set(VERSION_MINOR "36")
+set(VERSION_MINOR "37")
 
 set(CMAKE_BUILD_TYPE "Release")
 
@@ -148,7 +148,7 @@ if (WIN32)
      REGEX ".svn" EXCLUDE
    )
    # Install default font
-   install(FILES  ${CMAKE_SOURCE_DIR}/wright.ttf 
+   install(FILES  ${CMAKE_SOURCE_DIR}/extra/wright.ttf 
      DESTINATION bin
    )
 endif(WIN32)

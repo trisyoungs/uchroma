@@ -87,6 +87,10 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	useFrameBuffer_ = false;
 	lineWidth_ = 2.0;
 
+	// User variables
+	sliceData_ = NULL;
+	yAxisScale_ = 1.0;
+
 	// Prevent QPainter from autofilling widget background
 	setAutoFillBackground(false);
 }
@@ -112,6 +116,9 @@ void Viewer::initializeGL()
 	// objects, rather than having to worry about context sharing etc. Slow, but safer and more compatible.
 	msg.print("In Viewer::initializeGL, pushing instances for %i primitives...\n", primitiveList_.nItems());
 	for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->pushInstance(context());
+
+	// Recreate the surface (so that images are saved correctly)
+	createSurface();
 
 	msg.exit("Viewer::initializeGL");
 }
