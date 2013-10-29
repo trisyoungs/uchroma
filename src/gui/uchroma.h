@@ -85,6 +85,10 @@ class UChromaWindow : public QMainWindow
 	void on_actionFileSaveImage_triggered(bool checked);
 	void on_actionFileQuit_triggered(bool checked);
 
+	private:
+	// Check for modified data before closing
+	bool checkBeforeClose();
+
 
 	/*
 	// View Menu
@@ -228,9 +232,11 @@ class UChromaWindow : public QMainWindow
 	bool viewAxisCrossChanged(int axis, int dir, double value);
 	bool viewAxisCrossSet(int axis, int dir, int type);
 	bool viewAxisTicksChanged(int axis, bool start, double value);
-	bool viewAxisOrientationChanged(int axis, int dir, bool direction, double value);
+	bool viewAxisLabelOrientationChanged(int axis, int dir, bool direction, double value);
+	bool viewAxisTitleOrientationChanged(int axis, int dir, bool direction, double value);
 	bool viewAxisMinorTicksChanged(int axis, int value);
-	bool viewAxisRotationChanged(int axis, int rotation);
+	bool viewAxisLabelRotationChanged(int axis, int rotation);
+	bool viewAxisTitleRotationChanged(int axis, int rotation);
 
 	private slots:
 	void on_ViewLabelScaleSpin_valueChanged(double value);
@@ -239,6 +245,7 @@ class UChromaWindow : public QMainWindow
 	void on_ViewXAxisInvertCheck_clicked(bool checked);
 	void on_ViewXAxisLogarithmicCheck_clicked(bool checked);
 	void on_ViewXAxisVisibleCheck_clicked(bool checked);
+	void on_ViewXAxisTitleEdit_textChanged(QString text);
 	void on_ViewXAxisStretchSpin_valueChanged(double value);
 	void on_ViewXAxisCrossAtYSpin_valueChanged(double value);
 	void on_ViewXAxisCrossAtZSpin_valueChanged(double value);
@@ -252,17 +259,25 @@ class UChromaWindow : public QMainWindow
 	void on_ViewXAxisTicksStartSpin_valueChanged(double value);
 	void on_ViewXAxisTicksDeltaSpin_valueChanged(double value);
 	void on_ViewXAxisMinorTicksSpin_valueChanged(int value);
-	void on_ViewXAxisDirectionXSpin_valueChanged(double value);
-	void on_ViewXAxisDirectionYSpin_valueChanged(double value);
-	void on_ViewXAxisDirectionZSpin_valueChanged(double value);
-	void on_ViewXAxisUpXSpin_valueChanged(double value);
-	void on_ViewXAxisUpYSpin_valueChanged(double value);
-	void on_ViewXAxisUpZSpin_valueChanged(double value);
-	void on_ViewXAxisRotationSpin_valueChanged(int value);
+	void on_ViewXAxisLabelDirectionXSpin_valueChanged(double value);
+	void on_ViewXAxisLabelDirectionYSpin_valueChanged(double value);
+	void on_ViewXAxisLabelDirectionZSpin_valueChanged(double value);
+	void on_ViewXAxisLabelUpXSpin_valueChanged(double value);
+	void on_ViewXAxisLabelUpYSpin_valueChanged(double value);
+	void on_ViewXAxisLabelUpZSpin_valueChanged(double value);
+	void on_ViewXAxisLabelRotationSpin_valueChanged(int value);
+	void on_ViewXAxisTitleDirectionXSpin_valueChanged(double value);
+	void on_ViewXAxisTitleDirectionYSpin_valueChanged(double value);
+	void on_ViewXAxisTitleDirectionZSpin_valueChanged(double value);
+	void on_ViewXAxisTitleUpXSpin_valueChanged(double value);
+	void on_ViewXAxisTitleUpYSpin_valueChanged(double value);
+	void on_ViewXAxisTitleUpZSpin_valueChanged(double value);
+	void on_ViewXAxisTitleRotationSpin_valueChanged(int value);
 	// -- Y Axis Tab
 	void on_ViewYAxisInvertCheck_clicked(bool checked);
 	void on_ViewYAxisLogarithmicCheck_clicked(bool checked);
 	void on_ViewYAxisVisibleCheck_clicked(bool checked);
+	void on_ViewYAxisTitleEdit_textChanged(QString text);
 	void on_ViewYAxisStretchSpin_valueChanged(double value);
 	void on_ViewYAxisCrossAtXSpin_valueChanged(double value);
 	void on_ViewYAxisCrossAtZSpin_valueChanged(double value);
@@ -276,17 +291,25 @@ class UChromaWindow : public QMainWindow
 	void on_ViewYAxisTicksStartSpin_valueChanged(double value);
 	void on_ViewYAxisTicksDeltaSpin_valueChanged(double value);
 	void on_ViewYAxisMinorTicksSpin_valueChanged(int value);
-	void on_ViewYAxisDirectionXSpin_valueChanged(double value);
-	void on_ViewYAxisDirectionYSpin_valueChanged(double value);
-	void on_ViewYAxisDirectionZSpin_valueChanged(double value);
-	void on_ViewYAxisUpXSpin_valueChanged(double value);
-	void on_ViewYAxisUpYSpin_valueChanged(double value);
-	void on_ViewYAxisUpZSpin_valueChanged(double value);
-	void on_ViewYAxisRotationSpin_valueChanged(int value);
+	void on_ViewYAxisLabelDirectionXSpin_valueChanged(double value);
+	void on_ViewYAxisLabelDirectionYSpin_valueChanged(double value);
+	void on_ViewYAxisLabelDirectionZSpin_valueChanged(double value);
+	void on_ViewYAxisLabelUpXSpin_valueChanged(double value);
+	void on_ViewYAxisLabelUpYSpin_valueChanged(double value);
+	void on_ViewYAxisLabelUpZSpin_valueChanged(double value);
+	void on_ViewYAxisLabelRotationSpin_valueChanged(int value);
+	void on_ViewYAxisTitleDirectionXSpin_valueChanged(double value);
+	void on_ViewYAxisTitleDirectionYSpin_valueChanged(double value);
+	void on_ViewYAxisTitleDirectionZSpin_valueChanged(double value);
+	void on_ViewYAxisTitleUpXSpin_valueChanged(double value);
+	void on_ViewYAxisTitleUpYSpin_valueChanged(double value);
+	void on_ViewYAxisTitleUpZSpin_valueChanged(double value);
+	void on_ViewYAxisTitleRotationSpin_valueChanged(int value);
 	// -- Z Axis Tab
 	void on_ViewZAxisInvertCheck_clicked(bool checked);
 	void on_ViewZAxisLogarithmicCheck_clicked(bool checked);
 	void on_ViewZAxisVisibleCheck_clicked(bool checked);
+	void on_ViewZAxisTitleEdit_textChanged(QString text);
 	void on_ViewZAxisStretchSpin_valueChanged(double value);
 	void on_ViewZAxisCrossAtXSpin_valueChanged(double value);
 	void on_ViewZAxisCrossAtYSpin_valueChanged(double value);
@@ -300,13 +323,20 @@ class UChromaWindow : public QMainWindow
 	void on_ViewZAxisTicksStartSpin_valueChanged(double value);
 	void on_ViewZAxisTicksDeltaSpin_valueChanged(double value);
 	void on_ViewZAxisMinorTicksSpin_valueChanged(int value);
-	void on_ViewZAxisDirectionXSpin_valueChanged(double value);
-	void on_ViewZAxisDirectionYSpin_valueChanged(double value);
-	void on_ViewZAxisDirectionZSpin_valueChanged(double value);
-	void on_ViewZAxisUpXSpin_valueChanged(double value);
-	void on_ViewZAxisUpYSpin_valueChanged(double value);
-	void on_ViewZAxisUpZSpin_valueChanged(double value);
-	void on_ViewZAxisRotationSpin_valueChanged(int value);
+	void on_ViewZAxisLabelDirectionXSpin_valueChanged(double value);
+	void on_ViewZAxisLabelDirectionYSpin_valueChanged(double value);
+	void on_ViewZAxisLabelDirectionZSpin_valueChanged(double value);
+	void on_ViewZAxisLabelUpXSpin_valueChanged(double value);
+	void on_ViewZAxisLabelUpYSpin_valueChanged(double value);
+	void on_ViewZAxisLabelUpZSpin_valueChanged(double value);
+	void on_ViewZAxisLabelRotationSpin_valueChanged(int value);
+	void on_ViewZAxisTitleDirectionXSpin_valueChanged(double value);
+	void on_ViewZAxisTitleDirectionYSpin_valueChanged(double value);
+	void on_ViewZAxisTitleDirectionZSpin_valueChanged(double value);
+	void on_ViewZAxisTitleUpXSpin_valueChanged(double value);
+	void on_ViewZAxisTitleUpYSpin_valueChanged(double value);
+	void on_ViewZAxisTitleUpZSpin_valueChanged(double value);
+	void on_ViewZAxisTitleRotationSpin_valueChanged(int value);
 	// -- Extras Tab
 	void on_ViewBoundingBoxNoneRadio_clicked(bool checked);
 	void on_ViewBoundingBoxPlaneRadio_clicked(bool checked);
@@ -362,7 +392,18 @@ class UChromaWindow : public QMainWindow
 	 */
 	public:
 	// Datafile keywords
-	enum DataFileKeyword { AxisAutoTicksKeyword, AxisFirstTickKeyword, AxisInvertKeyword, AxisLabelDirectionKeyword, AxisLabelRotationKeyword, AxisLabelUpKeyword, AxisLogarithmicKeyword, AxisMinorTicksKeyword, AxisPositionKeyword, AxisStretchKeyword, AxisTickDeltaKeyword, AxisVisibleKeyword, BoundingBoxKeyword, BoundingBoxPlaneYKeyword, ColourAlphaControlKeyword, ColourAlphaFixedKeyword, ColourCustomGradientKeyword, ColourRGBGradientAKeyword, ColourRGBGradientBKeyword, ColourHSVGradientAKeyword, ColourHSVGradientBKeyword, ColourSingleKeyword, ColourSourceKeyword, DataKeyword, ImageExportKeyword, InterpolateKeyword, InterpolateConstrainKeyword, InterpolateStepKeyword, LabelScaleKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword, PerspectiveKeyword, PostTransformShiftKeyword, PreTransformShiftKeyword, SliceDirectoryKeyword, SliceKeyword, TitleScaleKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword, ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword, nDataFileKeywords };
+	enum DataFileKeyword {
+		AxisAutoTicksKeyword, AxisFirstTickKeyword, AxisInvertKeyword, AxisLabelDirectionKeyword, AxisLabelRotationKeyword, AxisLabelUpKeyword, AxisLogarithmicKeyword, AxisMinorTicksKeyword, AxisPositionKeyword, AxisStretchKeyword, AxisTickDeltaKeyword, AxisTitleKeyword, AxisTitleDirectionKeyword, AxisTitleRotationKeyword, AxisTitleUpKeyword, AxisVisibleKeyword,
+		BoundingBoxKeyword, BoundingBoxPlaneYKeyword,
+		ColourAlphaControlKeyword, ColourAlphaFixedKeyword, ColourCustomGradientKeyword, ColourRGBGradientAKeyword, ColourRGBGradientBKeyword, ColourHSVGradientAKeyword, ColourHSVGradientBKeyword, ColourSingleKeyword, ColourSourceKeyword,
+		DataKeyword,
+		ImageExportKeyword, InterpolateKeyword, InterpolateConstrainKeyword, InterpolateStepKeyword,
+		LabelScaleKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword,
+		PerspectiveKeyword, PostTransformShiftKeyword, PreTransformShiftKeyword,
+		SliceDirectoryKeyword, SliceKeyword,
+		TitleScaleKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword,
+		ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword,
+		nDataFileKeywords };
 	static DataFileKeyword dataFileKeyword(const char* s);
 	static const char* dataFileKeyword(DataFileKeyword dfk);
 	// Data Transform types
@@ -474,6 +515,12 @@ class UChromaWindow : public QMainWindow
 	Vec3<double> axisLabelDirection_[3], axisLabelUp_[3];
 	// Rotation of axis labels (about calculated Z)
 	Vec3<int> axisLabelRotation_;
+	// Axis titles
+	QString axisTitle_[3];
+	// Orientation of axis titles
+	Vec3<double> axisTitleDirection_[3], axisTitleUp_[3];
+	// Rotation of axis titles (about calculated Z)
+	Vec3<int> axisTitleRotation_;
 	// Whether axes should be plotted as logarithms
 	Vec3<bool> axisLogarithmic_;
 	// Stretch factors to apply to axes

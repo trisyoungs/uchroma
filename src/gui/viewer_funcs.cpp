@@ -175,9 +175,7 @@ void Viewer::paintGL()
 	{
 		font_->FaceSize(1);
 		textPrimitives_.renderAll(viewMatrix_, -surfaceCenter_, font_);
-		axisTextPrimitives_[0].renderAll(viewMatrix_, -surfaceCenter_, font_);
-		axisTextPrimitives_[1].renderAll(viewMatrix_, -surfaceCenter_, font_);
-		axisTextPrimitives_[2].renderAll(viewMatrix_, -surfaceCenter_, font_);
+		for (int n=0; n<3; ++n) if (axisVisible_[n]) axisTextPrimitives_[n].renderAll(viewMatrix_, -surfaceCenter_, font_);
 	}
 
 	// -- Render axis lines

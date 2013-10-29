@@ -258,12 +258,14 @@ class Viewer : public QGLWidget
 	void createSurface(ColourScale colourScale, double yAxisScale);
 	// Create surface using previous colourscale and y axis scaling factor
 	void createSurface();
-	// Clear specified axis primitive
-	void clearAxisPrimitive(int axis);
+	// Clear specified axis primitives
+	void clearAxisPrimitives(int axis);
 	// Create axis primitives
-	void createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted, double stretch);
+	void createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, bool inverted, double stretch, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation);
 	// Create logarithmic axis primitives
-	void createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted, double stretch);
+	void createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, bool inverted, double stretch, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation);
+	// Create axis title
+	void createAxisTitle(int axis, bool inverted, double stretch, bool logarithmic, QString title, Vec3< double > direction, Vec3< double > up, int zrotation);
 	// Set whether axis is visible
 	void setAxisVisible(int axis, bool visible);
 	// Create bounding box

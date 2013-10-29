@@ -102,11 +102,18 @@ void UChromaWindow::on_AddFilesButton_clicked(bool checked)
 // Remove files button clicked
 void UChromaWindow::on_RemoveFilesButton_clicked(bool checked)
 {
-	foreach(QTableWidgetItem* item, ui.SourceFilesTable->selectedItems())
-	{
-		printf("%i\n", item->row());
-	}
+	// From the selected items, construct a row of Slices to remove
+	RefList<Slice,int> slicesToRemove;
+	foreach(QTableWidgetItem* item, ui.SourceFilesTable->selectedItems()) slicesToRemove.addUnique(slices_[item->row()]);
+
+	// Delete slices....
+	for (RefListItem<Slice,int>* ri = slicesToRemove.first(); ri != NULL; ri = ri->next) slices_.remove(ri->item);
+
 	setAsModified();
+	calculateDataLimits();
+	updateTransformTab();
+	updateSourceDataTab();
+	updateSurface();
 }
 
 // Source data item selection changed
@@ -206,9 +213,30 @@ void UChromaWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 void UChromaWindow::on_ReloadFilesButton_clicked(bool checked)
 {
 	// Reload all data and update surface
-	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) slice->loadData(dataFileDirectory_);
+	int nFailed = 0;
+	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
+	{
+		if (!slice->loadData(dataFileDirectory_)) ++nFailed;
+	}
+
+	// Any failed to load?
+	if (nFailed > 0)
+	{
+		QMessageBox::StandardButton button = QMessageBox::warning(this, "Failed to Load Data", QString("Failed to reload data for ") + QString::number(nFailed) + " defined slices.\nWould you like to remove empty slices from the list?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+		if (button == QMessageBox::Yes)
+		{
+			Slice* slice = slices_.first(), *nextSlice;
+			while (slice != NULL)
+			{
+				nextSlice = slice->next;
+				if (slice->data().nPoints() == 0) slices_.remove(slice);
+				slice = nextSlice;
+			}
+		}
+	}
+
 	setAsModified();
-	updateSurface();
+	updateAfterLoad();
 }
 
 // Update source data

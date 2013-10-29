@@ -66,6 +66,7 @@ UChromaWindow::~UChromaWindow()
 // Window close event
 void UChromaWindow::closeEvent(QCloseEvent *event)
 {
+	if (checkBeforeClose()) event->accept();
 }
 
 // Load settings
@@ -232,6 +233,12 @@ void UChromaWindow::on_actionFileSaveImage_triggered(bool checked)
 
 void UChromaWindow::on_actionFileQuit_triggered(bool checked)
 {
+	if (checkBeforeClose()) QApplication::exit(0);
+}
+
+// Check for modified data before closing
+bool UChromaWindow::checkBeforeClose()
+{
 	if (modified_)
 	{
 		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
@@ -239,10 +246,10 @@ void UChromaWindow::on_actionFileQuit_triggered(bool checked)
 		{
 			// Save file, and check modified_ status to make sure it wasn't cancelled.
 			on_actionFileSave_triggered(false);
-			if (modified_) return;
+			if (modified_) return false;
 		}
 	}
-	QApplication::exit(0);
+	return true;
 }
 
 /*

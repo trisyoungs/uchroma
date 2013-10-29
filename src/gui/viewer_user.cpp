@@ -353,19 +353,30 @@ void Viewer::createSurface(ColourScale colourScale, double yAxisScale)
 	// Temporary variables
 	Array< Vec3<double> > normA, normB;
 	Array< Vec4<GLfloat> > colourA, colourB;
-	int n, nPoints = sliceData_->first()->data().nPoints();
+	int n;
 	QColor colour;
 	Vec3<double> nrm(0.0,1.0,0.0);
 
+	// We need to skip over slices with zero points, so construct a reflist here of those which contain usable data
+	RefList<Slice,int> slices;
+	for (Slice* slice = sliceData_->first(); slice != NULL; slice = slice->next) if (slice->data().nPoints() > 1) slices.add(slice);
+
 	// Construct first slice data and set initial min/max values
-	Slice* sliceA = sliceData_->first();
-	constructSliceData(sliceA, yAxisScale_, normA, colourA, colourScale_, NULL, sliceA->next);
+	RefListItem<Slice,int>* ri = slices.first();
+	constructSliceData(ri->item, yAxisScale_, normA, colourA, colourScale_, NULL, ri->next ? ri->next->item : NULL);
+	if (slices.nItems() < 2) return;
+	int nPoints = slices.first()->item->data().nPoints();
 	
 	// Create triangles
-	for (Slice* sliceB = sliceA->next; sliceB != NULL; sliceB = sliceB->next)
+	for (RefListItem<Slice,int>* rj = ri->next; rj != NULL; rj = rj->next)
 	{
+		// Grab slice pointers
+		Slice* sliceA = ri->item;
+		Slice* sliceB = rj->item;
+		Slice* sliceC = (rj->next == NULL ? NULL : rj->next->item);
+
 		// Construct data for current slice
-		constructSliceData(sliceB, yAxisScale_, normB, colourB, colourScale_, sliceA, sliceB->next);
+		constructSliceData(sliceB, yAxisScale_, normB, colourB, colourScale_, sliceA, sliceC);
 
 		// Grab z values
 		zA = (GLfloat) sliceA->z();
@@ -390,7 +401,7 @@ void Viewer::createSurface(ColourScale colourScale, double yAxisScale)
 		// Copy arrays ready for next pass
 		normA = normB;
 		colourA = colourB;
-		sliceA = sliceB;
+		ri = rj;
 	}
 
 	// Push a new instance to create the new display list / vertex array
@@ -405,19 +416,16 @@ void Viewer::createSurface()
 	createSurface(colourScale_, yAxisScale_);
 }
 
-// Clear specified axix primitive
-void Viewer::clearAxisPrimitive(int axis)
+// Clear specified axix primitives
+void Viewer::clearAxisPrimitives(int axis)
 {
 	axisPrimitives_[axis].forgetAll();
 	axisTextPrimitives_[axis].forgetAll();
 }
 
 // Create axis primitives
-void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted, double stretch)
+void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, bool inverted, double stretch, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation)
 {
-	// Clear old primitive data
-	clearAxisPrimitive(axis);
-
 	QString s;
 	FTBBox boundingBox;
 
@@ -435,13 +443,13 @@ void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, dou
 	// Draw a line from min to max limits, passing through the defined axisPosition
 	axisPrimitives_[axis].plotLine(axisCoordMin_[axis], axisCoordMax_[axis]);
 
-	// Plot tickmarks
+	// Plot tickmarks - maximum of 100 minor tickmarks between major lines
 	int count = 0;
 	double delta = tickDelta / (nMinorTicks+1);
 	double value = firstTick;
 	Vec3<double> u = axisCoordMin_[axis];
 	u.set(axis, (inverted ? (axisMax - firstTick) + axisMin : firstTick) * stretch);
-	while (count < 50)
+	while (count < 100)
 	{
 		// Check break condition
 		if (value > axisMax) break;
@@ -458,6 +466,7 @@ void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, dou
 				if (font_) boundingBox = font_->BBox(qPrintable(s));
 
 				axisTextPrimitives_[axis].add(s, labelScale_, fontBaseHeight_, fabs(boundingBox.Upper().X() - boundingBox.Lower().X()), u + direction*0.1, direction, up, zrotation);
+				count = 0;
 			}
 			else axisPrimitives_[axis].plotLine(u, u+direction*0.05);
 		}
@@ -468,11 +477,8 @@ void Viewer::createAxis(int axis, Vec3<double> axisPosition, double axisMin, dou
 }
 
 // Create logarithmic axis primitives
-void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation, bool inverted, double stretch)
+void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, bool inverted, double stretch, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation)
 {
-	// Clear old primitive data
-	clearAxisPrimitive(axis);
-
 	// For the log axis, the associated surface data coordinate will already be in log form
 	if ((axisMin < 0.0) || (axisMax < 0.0))
 	{
@@ -540,6 +546,17 @@ void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, 
 		}
 		else value += pow(10,power);
 	}
+}
+
+// Create axis title
+void Viewer::createAxisTitle(int axis, bool inverted, double stretch, bool logarithmic, QString title, Vec3<double> direction, Vec3<double> up, int zrotation)
+{
+	// All axis min/max and coordinate values have already been set by calls to Viewer::createAxis()...
+	FTBBox boundingBox;
+
+	// Plot label string
+	if (font_) boundingBox = font_->BBox(qPrintable(title));
+	axisTextPrimitives_[axis].add(title, titleScale_, fontBaseHeight_, fabs(boundingBox.Upper().X() - boundingBox.Lower().X()), (axisCoordMax_[axis]+axisCoordMin_[axis])*0.5, direction, up, zrotation);
 }
 
 // Set whether axis is visible
