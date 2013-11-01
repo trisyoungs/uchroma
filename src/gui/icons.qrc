@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/uchroma">
+    <file>icons/tocentre.svg</file>
     <file>icons/uchroma.png</file>
     <file>icons/tozero.svg</file>
     <file>icons/toleftlimit.svg</file>

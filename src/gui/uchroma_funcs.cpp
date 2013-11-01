@@ -131,8 +131,9 @@ void UChromaWindow::on_actionFileNew_triggered(bool checked)
 {
 	if (modified_)
 	{
-		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-		if (button == QMessageBox::Yes)
+		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No, QMessageBox::Cancel);
+		if (button == QMessageBox::Cancel) return;
+		else if (button == QMessageBox::Yes)
 		{
 			// Save file, and check modified_ status to make sure it wasn't cancelled.
 			on_actionFileSave_triggered(false);
@@ -150,8 +151,9 @@ void UChromaWindow::on_actionFileLoad_triggered(bool checked)
 {
 	if (modified_)
 	{
-		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-		if (button == QMessageBox::Yes)
+		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No, QMessageBox::Cancel);
+		if (button == QMessageBox::Cancel) return;
+		else if (button == QMessageBox::Yes)
 		{
 			// Save file, and check modified_ status to make sure it wasn't cancelled.
 			on_actionFileSave_triggered(false);
@@ -241,8 +243,9 @@ bool UChromaWindow::checkBeforeClose()
 {
 	if (modified_)
 	{
-		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-		if (button == QMessageBox::Yes)
+		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No, QMessageBox::Cancel);
+		if (button == QMessageBox::Cancel) return false;
+		else if (button == QMessageBox::Yes)
 		{
 			// Save file, and check modified_ status to make sure it wasn't cancelled.
 			on_actionFileSave_triggered(false);

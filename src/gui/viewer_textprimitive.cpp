@@ -28,28 +28,12 @@
 */
 
 // Set data
-void TextPrimitive::set(QString text, double scale, double fontBaseHeight, double relativeWidth, Vec3<double> origin, Vec3<double> direction, Vec3<double> up, int zrotation)
+void TextPrimitive::set(QString text, Vec3<double> origin, Vec3<double> centre, Matrix& transform)
 {
 	text_ = text;
-
-	// Construct basic transformation matrix
-	direction.normalise();
-	up.normalise();
-	localTransform_.setIdentity();
-	localTransform_.setTranslation(origin + direction*(fabs(cos(zrotation/DEGRAD)*relativeWidth) + fabs(sin(zrotation/DEGRAD)*fontBaseHeight))*scale*0.5);
-	localTransform_.setColumn(0, direction*scale, 0.0);
-	localTransform_.setColumn(1, up*scale, 0.0);
-	localTransform_.setColumn(2, (direction * up)*scale, 0.0);
-	Matrix rotation;
-	rotation.createRotationAxis(localTransform_[8], localTransform_[9], localTransform_[10], zrotation*1.0, true);
-	localTransform_ *= rotation;
-
-	// Calculate the text centerPoint_ so the rotation applied above operates on the centre of the text string
-	// Don't apply the 'scale' multiplier again, since it already exists in the transformation matrix
-	// Work in local coordinates, rather than the transform axes calculated above
-	centerPoint_.X(-relativeWidth*0.5);
-	centerPoint_.Y(-fontBaseHeight*0.5);
-	centerPoint_.Z(0.0);
+	origin_ = origin;
+	centre_ = centre;
+	localTransform_ = transform;
 }
 
 // Return local transform matrix
@@ -59,9 +43,9 @@ Matrix& TextPrimitive::localTransform()
 }
 
 // Return text centerpoint
-FTPoint TextPrimitive::centerPoint()
+Vec3< double > TextPrimitive::center()
 {
-	return centerPoint_;
+	return center_;
 }
 
 // Return text to render
@@ -98,24 +82,41 @@ bool TextPrimitiveChunk::full()
 }
 
 // Add primitive to chunk
-void TextPrimitiveChunk::add(QString text, double scale, double fontBaseHeight, double relativeWidth, Vec3<double> origin, Vec3<double> direction, Vec3<double> up, int zrotation)
+void TextPrimitiveChunk::add(QString text, Vec3<double> origin, Matrix& transform)
 {
-	textPrimitives_[nTextPrimitives_].set(text, scale, fontBaseHeight, relativeWidth, origin, direction, up, zrotation);
+	textPrimitives_[nTextPrimitives_].set(text, origin, transform);
 	++nTextPrimitives_;
 }
 
 // Render all primitives in chunk
-void TextPrimitiveChunk::renderAll(Matrix viewMatrix, Vec3<double> globalCenter, FTFont* font)
+void TextPrimitiveChunk::renderAll(Matrix viewMatrix, bool correctView, Vec3<double> globalCenter, FTFont* font)
 {
-	Matrix A;
+	Matrix A, B;
 	for (int n=0; n<nTextPrimitives_; ++n)
 	{
 		// Grab local transformation matrix and apply globalCenter translation
 		A = textPrimitives_[n].localTransform();
-		A.addTranslation(globalCenter);
+		A.addTranslation(globalCenter + textPrimitives_[n].origin());
 
-		glLoadMatrixd((viewMatrix * A).matrix());
-		font->Render(qPrintable(textPrimitives_[n].text()), -1, textPrimitives_[n].centerPoint());
+		B = viewMatrix * A;
+		if (correctView)
+		{
+			if (A[5] < 0.0)
+			{
+				// Very lazy - could write this out by hand...
+				A.columnMultiply(1, -1.0);
+				B = viewMatrix * A;
+			}
+			if (A[0] < 0.0)
+			{
+				// Very lazy - could write this out by hand...
+				A.columnMultiply(0, -1.0);
+				B = viewMatrix * A;
+			}
+		}
+		
+		glLoadMatrixd(B.matrix());
+		font->Render(qPrintable(textPrimitives_[n].text()), -1, textPrimitives_[n].centre());
 	}
 }
 
@@ -137,16 +138,17 @@ void TextPrimitiveList::forgetAll()
 }
 
 // Set data from literal coordinates and text
-void TextPrimitiveList::add(QString text, double scale, double fontBaseHeight, double relativeWidth, Vec3<double> origin, Vec3<double> direction, Vec3<double> up, int zrotation)
+void TextPrimitiveList::add(QString text, Vec3< double > origin, Vec3< double > centre, Matrix& transform)
 {
 	if (currentChunk_ == NULL) currentChunk_ = textPrimitives_.add();
 	else if (currentChunk_->full()) currentChunk_ = textPrimitives_.add();
+
 	// Add primitive and set data
-	currentChunk_->add(text, scale, fontBaseHeight, relativeWidth, origin, direction, up, zrotation);
+	currentChunk_->add(text, origin, transform);
 }
 
 // Render all primitives in list
-void TextPrimitiveList::renderAll(Matrix viewMatrix, Vec3< double > center, FTFont* font)
+void TextPrimitiveList::renderAll(Matrix viewMatrix, bool correctView, Vec3< double > center, FTFont* font)
 {
 	for (TextPrimitiveChunk *chunk = textPrimitives_.first(); chunk != NULL; chunk = chunk->next) chunk->renderAll(viewMatrix, center, font);
 }

@@ -107,7 +107,7 @@ class Matrix
 	double columnMagnitude(int column);
 	// Multiply single column by single value
 	void columnMultiply(int col, double d);
-	// Multiply first three columns by values insupplied vector
+	// Multiply first three columns by values in supplied vector
 	void columnMultiply(Vec3<double> vec);
 	// Normalise specified column to 1
 	void columnNormalise(int column);

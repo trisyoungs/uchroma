@@ -122,6 +122,8 @@ template <class T> class Vec3
 	void multiply(const Vec3<T> &v);
 	// Normalise the vector to unity
 	void normalise();
+	// Return the normalised vector, leaving the original intact
+	Vec3<T> normalised();
 	// Returns an orthogonal unit vector
 	Vec3<T> orthogonal(bool isNormalised = false) const;
 	// Orthogonalise (Gram-Schmidt) w.r.t. supplied vector
@@ -495,6 +497,14 @@ template <class T> void Vec3<T>::normalise()
 		y /= mag;
 		z /= mag;
 	}
+}
+
+// Return the normalised vector, leaving the original intact
+template <class T> Vec3<T> Vec3<T>::normalised()
+{
+	double mag = sqrt(x*x + y*y + z*z);
+	if (mag < 1.0E-8) return Vec3<T>();
+	return Vec3<T>(x/mag, y/mag, z/mag);
 }
 
 // Get orthogonal vector

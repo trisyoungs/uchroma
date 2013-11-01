@@ -174,7 +174,7 @@ void Viewer::paintGL()
 	if (font_)
 	{
 		font_->FaceSize(1);
-		textPrimitives_.renderAll(viewMatrix_, -surfaceCenter_, font_);
+		textPrimitives_.renderAll(viewMatrix_, labelCorrectOrientation_, -surfaceCenter_, font_);
 		for (int n=0; n<3; ++n) if (axisVisible_[n]) axisTextPrimitives_[n].renderAll(viewMatrix_, -surfaceCenter_, font_);
 	}
 

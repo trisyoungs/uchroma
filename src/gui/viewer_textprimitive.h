@@ -39,18 +39,22 @@ class TextPrimitive
 	private:
 	// Local transform matrix for the text
 	Matrix localTransform_;
-	// Desired centrepoint of text
-	FTPoint centerPoint_;
+	// Origin of text
+	Vec3<double> origin_;
+	// Centre (anchor) of text
+	FTPoint centre_;
 	// Text to render
 	QString text_;
 	
 	public:
 	// Set data
-	void set(QString text, double scale, double fontBaseHeight, double relativeWidth, Vec3<double> origin, Vec3<double> direction, Vec3<double> up, int zrotation);
+	void set(QString text, Vec3<double> origin, Vec3<double> centre, Matrix& transform);
 	// Return local transform 
 	Matrix& localTransform();
-	// Return text centerpoint
-	FTPoint centerPoint();
+	// Return text origin
+	Vec3<double> origin();
+	// Return text centre
+	FTPoint centre();
 	// Return text to render
 	QString& text();
 };
@@ -76,9 +80,9 @@ class TextPrimitiveChunk
 	// Return whether array is full
 	bool full();
 	// Add primitive to list
-	void add(QString text, double scale, double fontBaseHeight, double relativeWidth, Vec3<double> origin, Vec3<double> direction, Vec3<double> up, int zrotation);
+	void add(QString text, Vec3<double> origin, Vec3<double> centre, Matrix& transform);
 	// Render all primitives in chunk
-	void renderAll(Matrix viewMatrix, Vec3<double> center, FTFont* font);
+	void renderAll(Matrix viewMatrix, bool correctView, Vec3<double> globalCenter, FTFont* font);
 };
 
 // Text Primitive List
@@ -98,9 +102,9 @@ class TextPrimitiveList
 	// Forget all text primitives, but keeping lists intact
 	void forgetAll();
 	// Add primitive to list
-	void add(QString text, double scale, double fontBaseHeight, double relativeWidth, Vec3<double> origin, Vec3<double> direction, Vec3<double> up, int zrotation);
+	void add(QString text, Vec3<double> origin, Vec3<double> centre, Matrix& transform);
 	// Render all primitives in list
-	void renderAll(Matrix viewMatrix, Vec3<double> center, FTFont* font);
+	void renderAll(Matrix viewMatrix, bool correctView, Vec3<double> globalCenter, FTFont* font);
 };
 
 #endif

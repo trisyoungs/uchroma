@@ -90,21 +90,28 @@ bool UChromaWindow::viewAxisTicksChanged(int axis, bool start, double value)
 	return true;
 }
 
-bool UChromaWindow::viewAxisLabelOrientationChanged(int axis, int dir, bool direction, double value)
+bool UChromaWindow::viewAxisTickOrientationChanged(int axis, int dir, double value)
 {
 	if (refreshing_) return false;
-	if (direction) axisLabelDirection_[axis].set(dir, value);
-	else axisLabelUp_[axis].set(dir, value);
+	axisTickDirection_[axis].set(dir, value);
 	setAsModified();
 	updateSurface(false);
 	return true;
 }
 
-bool UChromaWindow::viewAxisTitleOrientationChanged(int axis, int dir, bool direction, double value)
+bool UChromaWindow::viewAxisLabelOrientationChanged(int axis, int component, double value)
 {
 	if (refreshing_) return false;
-	if (direction) axisTitleDirection_[axis].set(dir, value);
-	else axisTitleUp_[axis].set(dir, value);
+	axisLabelOrientation_[axis].set(component, value);
+	setAsModified();
+	updateSurface(false);
+	return true;
+}
+
+bool UChromaWindow::viewAxisTitleOrientationChanged(int axis, int component, double value)
+{
+	if (refreshing_) return false;
+	axisTitleOrientation_[axis].set(component, value);
 	setAsModified();
 	updateSurface(false);
 	return true;
@@ -119,40 +126,22 @@ bool UChromaWindow::viewAxisMinorTicksChanged(int axis, int value)
 	return true;
 }
 
-bool UChromaWindow::viewAxisLabelRotationChanged(int axis, int rotation)
+bool UChromaWindow::viewAxisTitleChanged(int axis, QString& title)
 {
 	if (refreshing_) return false;
-	axisLabelRotation_[axis] = rotation;
+	axisTitle_[axis] = title;
 	setAsModified();
 	updateSurface(false);
 	return true;
 }
 
-bool UChromaWindow::viewAxisTitleRotationChanged(int axis, int rotation)
+bool UChromaWindow::viewAxisTitleAlignmentChanged(int axis, int anchor)
 {
 	if (refreshing_) return false;
-	axisTitleRotation_[axis] = rotation;
+	axisTitleAnchor_[axis] = anchor;
 	setAsModified();
 	updateSurface(false);
 	return true;
-}
-
-void UChromaWindow::on_ViewLabelScaleSpin_valueChanged(double value)
-{
-	if (refreshing_) return;
-	labelScale_ = value;
-	ui.MainView->setLabelScale(labelScale_);
-	setAsModified();
-	updateSurface(false);
-}
-
-void UChromaWindow::on_ViewTitleScaleSpin_valueChanged(double value)
-{
-	if (refreshing_) return;
-	titleScale_ = value;
-	ui.MainView->setTitleScale(titleScale_);
-	setAsModified();
-	updateSurface(false);
 }
 
 // X Axis
@@ -170,6 +159,11 @@ void UChromaWindow::on_ViewXAxisLogarithmicCheck_clicked(bool checked)
 void UChromaWindow::on_ViewXAxisVisibleCheck_clicked(bool checked)
 {
 	viewAxisVisibleChanged(0, checked);
+}
+
+void UChromaWindow::on_ViewXAxisTitleEdit_textChanged(QString text)
+{
+	viewAxisTitleChanged(0, text);
 }
 
 void UChromaWindow::on_ViewXAxisStretchSpin_valueChanged(double value)
@@ -239,74 +233,97 @@ void UChromaWindow::on_ViewXAxisMinorTicksSpin_valueChanged(int value)
 	viewAxisMinorTicksChanged(0, value);
 }
 
-void UChromaWindow::on_ViewXAxisLabelDirectionXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisTickDirectionXSpin_valueChanged(double value)
 {
-	viewAxisLabelOrientationChanged(0, 0, true, value);
+	viewAxisTickOrientationChanged(0, 0, value);
 }
 
-void UChromaWindow::on_ViewXAxisLabelDirectionYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisTickDirectionYSpin_valueChanged(double value)
 {
-	viewAxisLabelOrientationChanged(0, 1, true, value);
+	viewAxisTickOrientationChanged(0, 1, value);
 }
 
-void UChromaWindow::on_ViewXAxisLabelDirectionZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisTickDirectionZSpin_valueChanged(double value)
 {
-	viewAxisLabelOrientationChanged(0, 2, true, value);
+	viewAxisTickOrientationChanged(0, 2, value);
 }
 
-void UChromaWindow::on_ViewXAxisLabelUpXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisLabelAxialRotationSlider_valueChanged(int value)
 {
-	viewAxisLabelOrientationChanged(0, 0, false, value);
+	viewAxisLabelOrientationChanged(0, 0, value);
 }
 
-void UChromaWindow::on_ViewXAxisLabelUpYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisLabelAxialRotationSpin_valueChanged(int value)
 {
-	viewAxisLabelOrientationChanged(0, 1, false, value);
+	viewAxisLabelOrientationChanged(0, 0, value);
 }
 
-void UChromaWindow::on_ViewXAxisLabelUpZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisLabelInPlaneRotationSlider_valueChanged(int value)
 {
-	viewAxisLabelOrientationChanged(0, 2, false, value);
+	viewAxisLabelOrientationChanged(0, 1, value);
 }
 
-void UChromaWindow::on_ViewXAxisLabelRotationSpin_valueChanged(int value)
+void UChromaWindow::on_ViewXAxisLabelInPlaneRotationSpin_valueChanged(int value)
 {
-	viewAxisLabelRotationChanged(0, value);
+	viewAxisLabelOrientationChanged(0, 1, value);
 }
 
-void UChromaWindow::on_ViewXAxisTitleDirectionXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisLabelDistanceSpin_valueChanged(double value)
 {
-	viewAxisTitleOrientationChanged(0, 0, true, value);
+	viewAxisLabelOrientationChanged(0, 2, value);
 }
 
-void UChromaWindow::on_ViewXAxisTitleDirectionYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisTitleHOffsetSlider_valueChanged(int value)
 {
-	viewAxisTitleOrientationChanged(0, 1, true, value);
+	viewAxisTitleOrientationChanged(0, 3, double(value) / 1000.0);
 }
 
-void UChromaWindow::on_ViewXAxisTitleDirectionZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisTitleHOffsetLeftButton_clicked(bool checked)
 {
-	viewAxisTitleOrientationChanged(0, 2, true, value);
+	ui.ViewXAxisTitleHOffsetSlider->setValue(0);
+	viewAxisTitleOrientationChanged(0, 3, 0.0);
 }
 
-void UChromaWindow::on_ViewXAxisTitleUpXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisTitleHOffsetCentreButton_clicked(bool checked)
 {
-	viewAxisTitleOrientationChanged(0, 0, false, value);
+	ui.ViewXAxisTitleHOffsetSlider->setValue(500);
+	viewAxisTitleOrientationChanged(0, 3, 0.5);
 }
 
-void UChromaWindow::on_ViewXAxisTitleUpYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisTitleHOffsetRightButton_clicked(bool checked)
 {
-	viewAxisTitleOrientationChanged(0, 1, false, value);
+	ui.ViewXAxisTitleHOffsetSlider->setValue(1000);
+	viewAxisTitleOrientationChanged(0, 3, 1.0);
 }
 
-void UChromaWindow::on_ViewXAxisTitleUpZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewXAxisTitleAnchorCombo_currentIndexChanged(int index)
 {
-	viewAxisTitleOrientationChanged(0, 2, false, value);
+	viewAxisTitleAlignmentChanged(0, index);
 }
 
-void UChromaWindow::on_ViewXAxisTitleRotationSpin_valueChanged(int value)
+void UChromaWindow::on_ViewXAxisTitleAxialRotationSlider_valueChanged(int value)
 {
-	viewAxisTitleRotationChanged(0, value);
+	viewAxisTitleOrientationChanged(0, 0, value);
+}
+
+void UChromaWindow::on_ViewXAxisTitleAxialRotationSpin_valueChanged(int value)
+{
+	viewAxisTitleOrientationChanged(0, 0, value);
+}
+
+void UChromaWindow::on_ViewXAxisTitleInPlaneRotationSlider_valueChanged(int value)
+{
+	viewAxisTitleOrientationChanged(0, 1, value);
+}
+
+void UChromaWindow::on_ViewXAxisTitleInPlaneRotationSpin_valueChanged(int value)
+{
+	viewAxisTitleOrientationChanged(0, 1, value);
+}
+
+void UChromaWindow::on_ViewXAxisTitleDistanceSpin_valueChanged(double value)
+{
+	viewAxisTitleOrientationChanged(0, 2, value);
 }
 
 // Y Axis
@@ -324,6 +341,11 @@ void UChromaWindow::on_ViewYAxisLogarithmicCheck_clicked(bool checked)
 void UChromaWindow::on_ViewYAxisVisibleCheck_clicked(bool checked)
 {
 	viewAxisVisibleChanged(1, checked);
+}
+
+void UChromaWindow::on_ViewYAxisTitleEdit_textChanged(QString text)
+{
+	viewAxisTitleChanged(0, text);
 }
 
 void UChromaWindow::on_ViewYAxisStretchSpin_valueChanged(double value)
@@ -393,74 +415,97 @@ void UChromaWindow::on_ViewYAxisMinorTicksSpin_valueChanged(int value)
 	viewAxisMinorTicksChanged(1, value);
 }
 
-void UChromaWindow::on_ViewYAxisLabelDirectionXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisTickDirectionXSpin_valueChanged(double value)
 {
-	viewAxisLabelOrientationChanged(1, 0, true, value);
+	viewAxisTickOrientationChanged(1, 0, value);
 }
 
-void UChromaWindow::on_ViewYAxisLabelDirectionYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisTickDirectionYSpin_valueChanged(double value)
 {
-	viewAxisLabelOrientationChanged(1, 1, true, value);
+	viewAxisTickOrientationChanged(1, 1, value);
 }
 
-void UChromaWindow::on_ViewYAxisLabelDirectionZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisTickDirectionZSpin_valueChanged(double value)
 {
-	viewAxisLabelOrientationChanged(1, 2, true, value);
+	viewAxisTickOrientationChanged(1, 2, value);
 }
 
-void UChromaWindow::on_ViewYAxisLabelUpXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisLabelAxialRotationSlider_valueChanged(int value)
 {
-	viewAxisLabelOrientationChanged(1, 0, false, value);
+	viewAxisLabelOrientationChanged(1, 0, value);
 }
 
-void UChromaWindow::on_ViewYAxisLabelUpYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisLabelAxialRotationSpin_valueChanged(int value)
 {
-	viewAxisLabelOrientationChanged(1, 1, false, value);
+	viewAxisLabelOrientationChanged(1, 0, value);
 }
 
-void UChromaWindow::on_ViewYAxisLabelUpZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisLabelInPlaneRotationSlider_valueChanged(int value)
 {
-	viewAxisLabelOrientationChanged(1, 2, false, value);
+	viewAxisLabelOrientationChanged(1, 1, value);
 }
 
-void UChromaWindow::on_ViewYAxisLabelRotationSpin_valueChanged(int value)
+void UChromaWindow::on_ViewYAxisLabelInPlaneRotationSpin_valueChanged(int value)
 {
-	viewAxisLabelRotationChanged(1, value);
+	viewAxisLabelOrientationChanged(1, 1, value);
 }
 
-void UChromaWindow::on_ViewYAxisTitleDirectionXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisLabelDistanceSpin_valueChanged(double value)
 {
-	viewAxisTitleOrientationChanged(1, 0, true, value);
+	viewAxisLabelOrientationChanged(1, 2, value);
 }
 
-void UChromaWindow::on_ViewYAxisTitleDirectionYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisTitleHOffsetSlider_valueChanged(int value)
 {
-	viewAxisTitleOrientationChanged(1, 1, true, value);
+	viewAxisTitleOrientationChanged(1, 3, double(value) / 1000.0);
 }
 
-void UChromaWindow::on_ViewYAxisTitleDirectionZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisTitleHOffsetLeftButton_clicked(bool checked)
 {
-	viewAxisTitleOrientationChanged(1, 2, true, value);
+	ui.ViewYAxisTitleHOffsetSlider->setValue(0);
+	viewAxisTitleOrientationChanged(1, 3, 0.0);
 }
 
-void UChromaWindow::on_ViewYAxisTitleUpXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisTitleHOffsetCentreButton_clicked(bool checked)
 {
-	viewAxisTitleOrientationChanged(1, 0, false, value);
+	ui.ViewYAxisTitleHOffsetSlider->setValue(500);
+	viewAxisTitleOrientationChanged(1, 3, 0.5);
 }
 
-void UChromaWindow::on_ViewYAxisTitleUpYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisTitleHOffsetRightButton_clicked(bool checked)
 {
-	viewAxisTitleOrientationChanged(1, 1, false, value);
+	ui.ViewYAxisTitleHOffsetSlider->setValue(1000);
+	viewAxisTitleOrientationChanged(1, 3, 1.0);
 }
 
-void UChromaWindow::on_ViewYAxisTitleUpZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewYAxisTitleAnchorCombo_currentIndexChanged(int index)
 {
-	viewAxisTitleOrientationChanged(1, 2, false, value);
+	viewAxisTitleAlignmentChanged(0, index);
 }
 
-void UChromaWindow::on_ViewYAxisTitleRotationSpin_valueChanged(int value)
+void UChromaWindow::on_ViewYAxisTitleAxialRotationSlider_valueChanged(int value)
 {
-	viewAxisTitleRotationChanged(1, value);
+	viewAxisTitleOrientationChanged(1, 0, value);
+}
+
+void UChromaWindow::on_ViewYAxisTitleAxialRotationSpin_valueChanged(int value)
+{
+	viewAxisTitleOrientationChanged(1, 0, value);
+}
+
+void UChromaWindow::on_ViewYAxisTitleInPlaneRotationSlider_valueChanged(int value)
+{
+	viewAxisTitleOrientationChanged(1, 1, value);
+}
+
+void UChromaWindow::on_ViewYAxisTitleInPlaneRotationSpin_valueChanged(int value)
+{
+	viewAxisTitleOrientationChanged(1, 1, value);
+}
+
+void UChromaWindow::on_ViewYAxisTitleDistanceSpin_valueChanged(double value)
+{
+	viewAxisTitleOrientationChanged(1, 2, value);
 }
 
 // Z Axis
@@ -478,6 +523,11 @@ void UChromaWindow::on_ViewZAxisLogarithmicCheck_clicked(bool checked)
 void UChromaWindow::on_ViewZAxisVisibleCheck_clicked(bool checked)
 {
 	viewAxisVisibleChanged(2, checked);
+}
+
+void UChromaWindow::on_ViewZAxisTitleEdit_textChanged(QString text)
+{
+	viewAxisTitleChanged(0, text);
 }
 
 void UChromaWindow::on_ViewZAxisStretchSpin_valueChanged(double value)
@@ -547,74 +597,97 @@ void UChromaWindow::on_ViewZAxisMinorTicksSpin_valueChanged(int value)
 	viewAxisMinorTicksChanged(2, value);
 }
 
-void UChromaWindow::on_ViewZAxisLabelDirectionXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisTickDirectionXSpin_valueChanged(double value)
 {
-	viewAxisLabelOrientationChanged(2, 0, true, value);
+	viewAxisTickOrientationChanged(2, 0, value);
 }
 
-void UChromaWindow::on_ViewZAxisLabelDirectionYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisTickDirectionYSpin_valueChanged(double value)
 {
-	viewAxisLabelOrientationChanged(2, 1, true, value);
+	viewAxisTickOrientationChanged(2, 1, value);
 }
 
-void UChromaWindow::on_ViewZAxisLabelDirectionZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisTickDirectionZSpin_valueChanged(double value)
 {
-	viewAxisLabelOrientationChanged(2, 2, true, value);
+	viewAxisTickOrientationChanged(2, 2, value);
 }
 
-void UChromaWindow::on_ViewZAxisLabelUpXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisLabelAxialRotationSlider_valueChanged(int value)
 {
-	viewAxisLabelOrientationChanged(2, 0, false, value);
+	viewAxisLabelOrientationChanged(2, 0, value);
 }
 
-void UChromaWindow::on_ViewZAxisLabelUpYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisLabelAxialRotationSpin_valueChanged(int value)
 {
-	viewAxisLabelOrientationChanged(2, 1, false, value);
+	viewAxisLabelOrientationChanged(2, 0, value);
 }
 
-void UChromaWindow::on_ViewZAxisLabelUpZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisLabelInPlaneRotationSlider_valueChanged(int value)
 {
-	viewAxisLabelOrientationChanged(2, 2, false, value);
+	viewAxisLabelOrientationChanged(2, 1, value);
 }
 
-void UChromaWindow::on_ViewZAxisLabelRotationSpin_valueChanged(int value)
+void UChromaWindow::on_ViewZAxisLabelInPlaneRotationSpin_valueChanged(int value)
 {
-	viewAxisLabelRotationChanged(2, value);
+	viewAxisLabelOrientationChanged(2, 1, value);
 }
 
-void UChromaWindow::on_ViewZAxisTitleDirectionXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisLabelDistanceSpin_valueChanged(double value)
 {
-	viewAxisTitleOrientationChanged(2, 0, true, value);
+	viewAxisLabelOrientationChanged(2, 2, value);
 }
 
-void UChromaWindow::on_ViewZAxisTitleDirectionYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisTitleHOffsetSlider_valueChanged(int value)
 {
-	viewAxisTitleOrientationChanged(2, 1, true, value);
+	viewAxisTitleOrientationChanged(2, 3, double(value) / 1000.0);
 }
 
-void UChromaWindow::on_ViewZAxisTitleDirectionZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisTitleHOffsetLeftButton_clicked(bool checked)
 {
-	viewAxisTitleOrientationChanged(2, 2, true, value);
+	ui.ViewZAxisTitleHOffsetSlider->setValue(0);
+	viewAxisTitleOrientationChanged(2, 3, 0.0);
 }
 
-void UChromaWindow::on_ViewZAxisTitleUpXSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisTitleHOffsetCentreButton_clicked(bool checked)
 {
-	viewAxisTitleOrientationChanged(2, 0, false, value);
+	ui.ViewZAxisTitleHOffsetSlider->setValue(500);
+	viewAxisTitleOrientationChanged(2, 3, 0.5);
 }
 
-void UChromaWindow::on_ViewZAxisTitleUpYSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisTitleHOffsetRightButton_clicked(bool checked)
 {
-	viewAxisTitleOrientationChanged(2, 1, false, value);
+	ui.ViewZAxisTitleHOffsetSlider->setValue(1000);
+	viewAxisTitleOrientationChanged(2, 3, 1.0);
 }
 
-void UChromaWindow::on_ViewZAxisTitleUpZSpin_valueChanged(double value)
+void UChromaWindow::on_ViewZAxisTitleAnchorCombo_currentIndexChanged(int index)
 {
-	viewAxisTitleOrientationChanged(2, 2, false, value);
+	viewAxisTitleAlignmentChanged(2, index);
 }
 
-void UChromaWindow::on_ViewZAxisTitleRotationSpin_valueChanged(int value)
+void UChromaWindow::on_ViewZAxisTitleAxialRotationSlider_valueChanged(int value)
 {
-	viewAxisTitleRotationChanged(2, value);
+	viewAxisTitleOrientationChanged(2, 0, value);
+}
+
+void UChromaWindow::on_ViewZAxisTitleAxialRotationSpin_valueChanged(int value)
+{
+	viewAxisTitleOrientationChanged(2, 0, value);
+}
+
+void UChromaWindow::on_ViewZAxisTitleInPlaneRotationSlider_valueChanged(int value)
+{
+	viewAxisTitleOrientationChanged(2, 1, value);
+}
+
+void UChromaWindow::on_ViewZAxisTitleInPlaneRotationSpin_valueChanged(int value)
+{
+	viewAxisTitleOrientationChanged(2, 1, value);
+}
+
+void UChromaWindow::on_ViewZAxisTitleDistanceSpin_valueChanged(double value)
+{
+	viewAxisTitleOrientationChanged(2, 2, value);
 }
 
 /*
@@ -664,6 +737,33 @@ void UChromaWindow::on_ViewBoundingBoxPlaneYSetMaximumButton_clicked(bool checke
 	ui.ViewBoundingBoxPlaneYSpin->setValue(limitMax_.y);
 }
 
+// -- General Options
+void UChromaWindow::on_ViewLabelsFaceViewerCheck_clicked(bool checked)
+{
+	if (refreshing_) return;
+	labelFaceViewer_ = checked;
+	setAsModified();
+	updateSurface(false);
+}
+
+void UChromaWindow::on_ViewLabelScaleSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	labelScale_ = value;
+	ui.MainView->setLabelScale(labelScale_);
+	setAsModified();
+	updateSurface(false);
+}
+
+void UChromaWindow::on_ViewTitleScaleSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	titleScale_ = value;
+	ui.MainView->setTitleScale(titleScale_);
+	setAsModified();
+	updateSurface(false);
+}
+
 /*
  * Update
  */
@@ -707,78 +807,87 @@ void UChromaWindow::updateViewTab()
 	ui.ViewZAxisCrossAtXSpin->setValue(axisPosition_[2].x);
 	ui.ViewZAxisCrossAtYSpin->setValue(axisPosition_[2].y);
 
-	// AxisTicks
+	// Axis Ticks
 	// -- X
 	ui.ViewXAxisAutoTicksCheck->setChecked(axisAutoTicks_.x);
-	ui.ViewXAxisTicksWidget->setEnabled(!axisAutoTicks_.x);
 	ui.ViewXAxisTicksStartSpin->setValue(axisFirstTick_.x);
+	ui.ViewXAxisTicksStartSpin->setEnabled(!axisAutoTicks_.x);
 	ui.ViewXAxisTicksDeltaSpin->setValue(axisTickDelta_.x);
+	ui.ViewXAxisTicksDeltaSpin->setEnabled(!axisAutoTicks_.x);
 	ui.ViewXAxisMinorTicksSpin->setValue(axisMinorTicks_.x);
+	ui.ViewXAxisTickDirectionXSpin->setValue(axisTickDirection_[0].x);
+	ui.ViewXAxisTickDirectionYSpin->setValue(axisTickDirection_[0].y);
+	ui.ViewXAxisTickDirectionZSpin->setValue(axisTickDirection_[0].z);
 	// -- Y
 	ui.ViewYAxisAutoTicksCheck->setChecked(axisAutoTicks_.y);
-	ui.ViewYAxisTicksWidget->setEnabled(!axisAutoTicks_.y);
 	ui.ViewYAxisTicksStartSpin->setValue(axisFirstTick_.y);
+	ui.ViewYAxisTicksStartSpin->setEnabled(!axisAutoTicks_.y);
 	ui.ViewYAxisTicksDeltaSpin->setValue(axisTickDelta_.y);
+	ui.ViewYAxisTicksDeltaSpin->setEnabled(!axisAutoTicks_.y);
 	ui.ViewYAxisMinorTicksSpin->setValue(axisMinorTicks_.y);
+	ui.ViewYAxisTickDirectionXSpin->setValue(axisTickDirection_[1].x);
+	ui.ViewYAxisTickDirectionYSpin->setValue(axisTickDirection_[1].y);
+	ui.ViewYAxisTickDirectionZSpin->setValue(axisTickDirection_[1].z);
 	// -- Z
 	ui.ViewZAxisAutoTicksCheck->setChecked(axisAutoTicks_.z);
-	ui.ViewZAxisTicksWidget->setEnabled(!axisAutoTicks_.z);
 	ui.ViewZAxisTicksStartSpin->setValue(axisFirstTick_.z);
+	ui.ViewZAxisTicksStartSpin->setEnabled(!axisAutoTicks_.z);
 	ui.ViewZAxisTicksDeltaSpin->setValue(axisTickDelta_.z);
+	ui.ViewZAxisTicksDeltaSpin->setEnabled(!axisAutoTicks_.z);
 	ui.ViewZAxisMinorTicksSpin->setValue(axisMinorTicks_.z);
+	ui.ViewZAxisTickDirectionXSpin->setValue(axisTickDirection_[2].x);
+	ui.ViewZAxisTickDirectionYSpin->setValue(axisTickDirection_[2].y);
+	ui.ViewZAxisTickDirectionZSpin->setValue(axisTickDirection_[2].z);
 
 	// Text Orientation
 	// -- X
-	ui.ViewXAxisLabelDirectionXSpin->setValue(axisLabelDirection_[0].x);
-	ui.ViewXAxisLabelDirectionYSpin->setValue(axisLabelDirection_[0].y);
-	ui.ViewXAxisLabelDirectionZSpin->setValue(axisLabelDirection_[0].z);
-	ui.ViewXAxisLabelUpXSpin->setValue(axisLabelUp_[0].x);
-	ui.ViewXAxisLabelUpYSpin->setValue(axisLabelUp_[0].y);
-	ui.ViewXAxisLabelUpZSpin->setValue(axisLabelUp_[0].z);
-	ui.ViewXAxisLabelRotationSpin->setValue(axisLabelRotation_.x);
-	ui.ViewXAxisTitleDirectionXSpin->setValue(axisTitleDirection_[0].x);
-	ui.ViewXAxisTitleDirectionYSpin->setValue(axisTitleDirection_[0].y);
-	ui.ViewXAxisTitleDirectionZSpin->setValue(axisTitleDirection_[0].z);
-	ui.ViewXAxisTitleUpXSpin->setValue(axisTitleUp_[0].x);
-	ui.ViewXAxisTitleUpYSpin->setValue(axisTitleUp_[0].y);
-	ui.ViewXAxisTitleUpZSpin->setValue(axisTitleUp_[0].z);
-	ui.ViewXAxisTitleRotationSpin->setValue(axisTitleRotation_.x);
+	ui.ViewXAxisLabelAxialRotationSlider->setValue(axisLabelOrientation_[0].x);
+	ui.ViewXAxisLabelAxialRotationSpin->setValue(axisLabelOrientation_[0].x);
+	ui.ViewXAxisLabelInPlaneRotationSlider->setValue(axisLabelOrientation_[0].y);
+	ui.ViewXAxisLabelInPlaneRotationSpin->setValue(axisLabelOrientation_[0].y);
+	ui.ViewXAxisLabelDistanceSpin->setValue(axisLabelOrientation_[0].z);
+	ui.ViewYAxisTitleHOffsetSlider->setValue(axisTitleOrientation_[0].w*1000);
+	ui.ViewXAxisTitleAnchorCombo->setCurrentIndex(axisTitleAnchor_.x);
+	ui.ViewXAxisTitleAxialRotationSlider->setValue(axisTitleOrientation_[0].x);
+	ui.ViewXAxisTitleAxialRotationSpin->setValue(axisTitleOrientation_[0].x);
+	ui.ViewXAxisTitleInPlaneRotationSlider->setValue(axisTitleOrientation_[0].y);
+	ui.ViewXAxisTitleInPlaneRotationSpin->setValue(axisTitleOrientation_[0].y);
+	ui.ViewXAxisTitleDistanceSpin->setValue(axisTitleOrientation_[0].z);
 	// -- Y
-	ui.ViewYAxisLabelDirectionXSpin->setValue(axisLabelDirection_[1].x);
-	ui.ViewYAxisLabelDirectionYSpin->setValue(axisLabelDirection_[1].y);
-	ui.ViewYAxisLabelDirectionZSpin->setValue(axisLabelDirection_[1].z);
-	ui.ViewYAxisLabelUpXSpin->setValue(axisLabelUp_[1].x);
-	ui.ViewYAxisLabelUpYSpin->setValue(axisLabelUp_[1].y);
-	ui.ViewYAxisLabelUpZSpin->setValue(axisLabelUp_[1].z);
-	ui.ViewYAxisLabelRotationSpin->setValue(axisLabelRotation_.y);
-	ui.ViewYAxisTitleDirectionXSpin->setValue(axisTitleDirection_[1].x);
-	ui.ViewYAxisTitleDirectionYSpin->setValue(axisTitleDirection_[1].y);
-	ui.ViewYAxisTitleDirectionZSpin->setValue(axisTitleDirection_[1].z);
-	ui.ViewYAxisTitleUpXSpin->setValue(axisTitleUp_[1].x);
-	ui.ViewYAxisTitleUpYSpin->setValue(axisTitleUp_[1].y);
-	ui.ViewYAxisTitleUpZSpin->setValue(axisTitleUp_[1].z);
-	ui.ViewYAxisTitleRotationSpin->setValue(axisTitleRotation_.y);
+	ui.ViewYAxisLabelAxialRotationSlider->setValue(axisLabelOrientation_[1].x);
+	ui.ViewYAxisLabelAxialRotationSpin->setValue(axisLabelOrientation_[1].x);
+	ui.ViewYAxisLabelInPlaneRotationSlider->setValue(axisLabelOrientation_[1].y);
+	ui.ViewYAxisLabelInPlaneRotationSpin->setValue(axisLabelOrientation_[1].y);
+	ui.ViewYAxisLabelDistanceSpin->setValue(axisLabelOrientation_[1].z);
+	ui.ViewYAxisTitleHOffsetSlider->setValue(axisTitleOrientation_[1].w*1000);
+	ui.ViewYAxisTitleAnchorCombo->setCurrentIndex(axisTitleAnchor_.y);
+	ui.ViewYAxisTitleAxialRotationSlider->setValue(axisTitleOrientation_[1].x);
+	ui.ViewYAxisTitleAxialRotationSpin->setValue(axisTitleOrientation_[1].x);
+	ui.ViewYAxisTitleInPlaneRotationSlider->setValue(axisTitleOrientation_[1].y);
+	ui.ViewYAxisTitleInPlaneRotationSpin->setValue(axisTitleOrientation_[1].y);
+	ui.ViewYAxisTitleDistanceSpin->setValue(axisTitleOrientation_[1].z);
 	// -- Z
-	ui.ViewZAxisLabelDirectionXSpin->setValue(axisLabelDirection_[2].x);
-	ui.ViewZAxisLabelDirectionYSpin->setValue(axisLabelDirection_[2].y);
-	ui.ViewZAxisLabelDirectionZSpin->setValue(axisLabelDirection_[2].z);
-	ui.ViewZAxisLabelUpXSpin->setValue(axisLabelUp_[2].x);
-	ui.ViewZAxisLabelUpYSpin->setValue(axisLabelUp_[2].y);
-	ui.ViewZAxisLabelUpZSpin->setValue(axisLabelUp_[2].z);
-	ui.ViewZAxisLabelRotationSpin->setValue(axisLabelRotation_.z);
-	ui.ViewZAxisTitleDirectionXSpin->setValue(axisTitleDirection_[2].x);
-	ui.ViewZAxisTitleDirectionYSpin->setValue(axisTitleDirection_[2].y);
-	ui.ViewZAxisTitleDirectionZSpin->setValue(axisTitleDirection_[2].z);
-	ui.ViewZAxisTitleUpXSpin->setValue(axisTitleUp_[2].x);
-	ui.ViewZAxisTitleUpYSpin->setValue(axisTitleUp_[2].y);
-	ui.ViewZAxisTitleUpZSpin->setValue(axisTitleUp_[2].z);
-	ui.ViewZAxisTitleRotationSpin->setValue(axisTitleRotation_.z);
+	ui.ViewZAxisLabelAxialRotationSlider->setValue(axisLabelOrientation_[2].x);
+	ui.ViewZAxisLabelAxialRotationSpin->setValue(axisLabelOrientation_[2].x);
+	ui.ViewZAxisLabelInPlaneRotationSlider->setValue(axisLabelOrientation_[2].y);
+	ui.ViewZAxisLabelInPlaneRotationSpin->setValue(axisLabelOrientation_[2].y);
+	ui.ViewZAxisLabelDistanceSpin->setValue(axisLabelOrientation_[2].z);
+	ui.ViewZAxisTitleHOffsetSlider->setValue(axisTitleOrientation_[2].w*1000);
+	ui.ViewZAxisTitleAnchorCombo->setCurrentIndex(axisTitleAnchor_.z);
+	ui.ViewZAxisTitleAxialRotationSlider->setValue(axisTitleOrientation_[2].x);
+	ui.ViewZAxisTitleAxialRotationSpin->setValue(axisTitleOrientation_[2].x);
+	ui.ViewZAxisTitleInPlaneRotationSlider->setValue(axisTitleOrientation_[2].y);
+	ui.ViewZAxisTitleInPlaneRotationSpin->setValue(axisTitleOrientation_[2].y);
+	ui.ViewZAxisTitleDistanceSpin->setValue(axisTitleOrientation_[2].z);
 	
 	// Extras
 	if (boundingBox_ == UChromaWindow::NoBox) ui.ViewBoundingBoxNoneRadio->setChecked(true);
 	else if (boundingBox_ == UChromaWindow::PlaneBox) ui.ViewBoundingBoxPlaneRadio->setChecked(true);
 	else if (boundingBox_ == UChromaWindow::CubeBox) ui.ViewBoundingBoxCubeRadio->setChecked(true);
 	ui.ViewBoundingBoxPlaneYSpin->setValue(boundingBoxPlaneY_);
+
+	// General Options
+	ui.ViewLabelsFaceViewerCheck->setChecked(labelFaceViewer_);
 
 	refreshing_ = false;
 }

@@ -65,6 +65,8 @@ class Viewer : public QGLWidget
 	Matrix projectionMatrix_;
 	// View matrix for the scene (modified by mouse/keyboard input)
 	Matrix viewMatrix_;
+	// Inverse of view matrix
+	Matrix viewMatrixInverse_;
 	// Viewport matrix for the scene
 	GLuint viewportMatrix_[4];
 	// Font file last passed to setupFont()
@@ -261,11 +263,11 @@ class Viewer : public QGLWidget
 	// Clear specified axis primitives
 	void clearAxisPrimitives(int axis);
 	// Create axis primitives
-	void createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, bool inverted, double stretch, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation);
+	void createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, bool inverted, double stretch, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> tickDirection, Vec3<double> labelOrientation, Vec4<double> titleOrientation, int titleAlignment, QString titleText);
 	// Create logarithmic axis primitives
-	void createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, bool inverted, double stretch, int nMinorTicks, Vec3<double> direction, Vec3<double> up, int zrotation);
+	void createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, bool inverted, double stretch, int nMinorTicks, Vec3<double> tickDirection, Matrix& labelTransform);
 	// Create axis title
-	void createAxisTitle(int axis, bool inverted, double stretch, bool logarithmic, QString title, Vec3< double > direction, Vec3< double > up, int zrotation);
+	void createAxisTitle(int axis, bool inverted, double stretch, bool logarithmic, QString title, Vec3<double> direction, Vec3<double> up, int zrotation);
 	// Set whether axis is visible
 	void setAxisVisible(int axis, bool visible);
 	// Create bounding box
@@ -280,6 +282,8 @@ class Viewer : public QGLWidget
 	void setLabelScale(double scale);
 	// Set scale factor for titles
 	void setTitleScale(double scale);
+	// Set whether to correct label orientations
+	void setCorrectLabelOrientations(bool correct);
 	// Set current slice axis
 	void setSliceAxis(int axis);
 	
@@ -293,7 +297,7 @@ class Viewer : public QGLWidget
 	 */
 	public:
 	// Available image export formats
-        enum ImageFormat { BMPFormat, PGFormat, PNGFormat, PPMFOrmat, XBMFormat, X11Format, nImageFormats };
+        enum ImageFormat { BMPFormat, PGFormat, PNGFormat, PPMFormat, XBMFormat, X11Format, nImageFormats };
         static ImageFormat imageFormat(const char* name);
         static ImageFormat imageFormatFromFilter(const char* s);
         static const char *imageFormatFilter(ImageFormat bf);

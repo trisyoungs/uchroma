@@ -51,8 +51,8 @@ class Slice : public ListItem<Slice>
 	QString sourceFileName_;
 	// Whether a file has been associated to this slice
 	bool fileAssociated_;
-	// Slice title
-	QString title_;
+	// Data name
+	QString dataName_;
 	// Data
 	Data2D data_;
 	// Z coordinate
@@ -63,10 +63,10 @@ class Slice : public ListItem<Slice>
 	void setSourceFileName(QString fileName);
 	// Return source filename
 	QString sourceFileName();
-	// Set source title
-	void setTitle(QString title);
-	// Return source title
-	QString title();
+	// Set data name
+	void setDataName(QString dataName);
+	// Return data name
+	QString dataName();
 	// Load data from file
 	bool loadData(QDir sourceDir);
 	// Return data

@@ -23,7 +23,7 @@
 #include "base/lineparser.h"
 
 // DataFile Keywords
-const char* DataFileKeywordStrings[UChromaWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisInvert", "AxisLabelDirection", "AxisLabelRotation", "AxisLabelUp", "AxisLogarithmic", "AxisMinorTicks", "AxisPosition", "AxisStretch", "AxisTickDelta", "AxisTitle", "AxisTitleDirection", "AxisTitleRotation", "AxisTitleUp", "AxisVisible", "BoundingBox", "BoundingBoxPlaneY", "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearA", "ColourLinearB", "ColourLinearHSVA", "ColourLinearHSVB", "ColourSingle", "ColourSource", "Data", "ImageExport", "Interpolate", "InterpolateConstrain", "InterpolateStep", "LabelScale", "LimitX", "LimitY", "LimitZ", "Perspective", "PostTransformShift", "PreTransformShift", "SliceDir", "Slice", "TitleScale", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
+const char* DataFileKeywordStrings[UChromaWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisInvert", "AxisLabelOrientation", "AxisLogarithmic", "AxisMinorTicks", "AxisPosition", "AxisStretch", "AxisTickDelta", "AxisTickDirection", "AxisTitle", "AxisTitleAnchor", "AxisTitleOrientation", "AxisVisible", "BoundingBox", "BoundingBoxPlaneY", "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearA", "ColourLinearB", "ColourLinearHSVA", "ColourLinearHSVB", "ColourSingle", "ColourSource", "Data", "ImageExport", "Interpolate", "InterpolateConstrain", "InterpolateStep", "LabelFaceViewer", "LabelScale", "LimitX", "LimitY", "LimitZ", "Perspective", "PostTransformShift", "PreTransformShift", "SliceDir", "Slice", "TitleScale", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
 UChromaWindow::DataFileKeyword UChromaWindow::dataFileKeyword(const char* s)
 {
 	for (int n=0; n<UChromaWindow::nDataFileKeywords; ++n) if (strcmp(s, DataFileKeywordStrings[n]) == 0) return (UChromaWindow::DataFileKeyword) n;
@@ -128,6 +128,8 @@ void UChromaWindow::clearData()
 	axisVisible_.set(true, true, true);
 	labelScale_ = 0.25;
 	titleScale_ = 0.3;
+	labelFaceViewer_ = false;
+	labelCorrectOrientation_ = true;
 	axisPosition_[0].zero();
 	axisPosition_[1].zero();
 	axisPosition_[2].zero();
@@ -135,23 +137,21 @@ void UChromaWindow::clearData()
 	axisTickDelta_.set(1.0,1.0,1.0);
 	axisAutoTicks_.set(true, true, true);
 	axisMinorTicks_.set(1,1,1);
-	axisLabelDirection_[0].set(0.0, 1.0, 0.0);
-	axisLabelDirection_[1].set(1.0, 0.0, 0.0);
-	axisLabelDirection_[2].set(1.0, 0.0, 0.0);
-	axisLabelUp_[0].set(-1.0, 0.0, 0.0);
-	axisLabelUp_[1].set(0.0, 1.0, 0.0);
-	axisLabelUp_[2].set(0.0, 1.0, 0.0);
-	axisLabelRotation_.zero();
+	axisTickDirection_[0].set(0.0, -1.0, 0.0);
+	axisTickDirection_[1].set(-1.0, 0.0, 0.0);
+	axisTickDirection_[2].set(1.0, 0.0, 0.0);
+	axisLabelOrientation_[0].set(0.0, 0.0, 0.2);
+	axisLabelOrientation_[1].set(0.0, 0.0, 0.2);
+	axisLabelOrientation_[2].set(0.0, 180.0, 0.2);
 	axisTitle_[0] = "X Axis";
 	axisTitle_[1] = "Y Axis";
 	axisTitle_[2] = "Z Axis";
-	axisTitleDirection_[0].set(1.0, 0.0, 0.0);
-	axisTitleDirection_[1].set(0.0, 1.0, 0.0);
-	axisTitleDirection_[2].set(0.0, 0.0, 1.0);
-	axisTitleUp_[0].set(0.0, 1.0, 0.0);
-	axisTitleUp_[1].set(-1.0, 0.0, 0.0);
-	axisTitleUp_[2].set(-1.0, 0.0, 0.0);
-	axisTitleRotation_.zero();
+	axisTitleOrientation_[0].set(0.0, 0.0, 1.5, 0.5);
+	axisTitleOrientation_[1].set(0.0, 0.0, 1.5, 0.5);
+	axisTitleOrientation_[2].set(0.0, 0.0, 1.5, 0.5);
+	axisTitleAnchor_[0] = UChromaWindow::CentreAlign;
+	axisTitleAnchor_[1] = UChromaWindow::CentreAlign;
+	axisTitleAnchor_[2] = UChromaWindow::CentreAlign;
 	axisLogarithmic_.set(false, false, false);
 	axisStretch_.set(1.0, 1.0, 1.0);
 	colourSource_ = SingleColourSource;
@@ -210,19 +210,10 @@ bool UChromaWindow::loadData(QString fileName)
 			case (UChromaWindow::AxisInvertKeyword):
 				axisInvert_.set(parser.argi(1), parser.argi(2), parser.argi(3));
 				break;
-			// Axis label direction
-			case (UChromaWindow::AxisLabelDirectionKeyword):
+			// Axis label orientation
+			case (UChromaWindow::AxisLabelOrientationKeyword):
 				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Axis index is out of range for %s keyword.\n", dataFileKeyword(kwd));
-				else axisLabelDirection_[parser.argi(1)].set(parser.argd(2), parser.argd(3), parser.argd(4));
-				break;
-			// Axis label rotation
-			case (UChromaWindow::AxisLabelRotationKeyword):
-				axisLabelRotation_.set(parser.argi(1), parser.argi(2), parser.argi(3));
-				break;
-			// Axis label direction
-			case (UChromaWindow::AxisLabelUpKeyword):
-				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Axis index is out of range for %s keyword.\n", dataFileKeyword(kwd));
-				else axisLabelUp_[parser.argi(1)].set(parser.argd(2), parser.argd(3), parser.argd(4));
+				else axisLabelOrientation_[parser.argi(1)].set(parser.argd(2), parser.argd(3), parser.argd(4));
 				break;
 			// Axis logarithmic flag
 			case (UChromaWindow::AxisLogarithmicKeyword):
@@ -250,19 +241,16 @@ bool UChromaWindow::loadData(QString fileName)
 				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Axis index is out of range for %s keyword.\n", dataFileKeyword(kwd));
 				else axisTitle_[parser.argi(1)] = parser.argc(2);
 				break;
-			// Axis title direction
-			case (UChromaWindow::AxisTitleDirectionKeyword):
-				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Axis index is out of range for %s keyword.\n", dataFileKeyword(kwd));
-				else axisTitleDirection_[parser.argi(1)].set(parser.argd(2), parser.argd(3), parser.argd(4));
+			// Axis title anchors
+			case (UChromaWindow::AxisTitleAnchorKeyword):
+				axisTitleAnchor_[0] = (UChromaWindow::HorizontalAlignment) parser.argi(1);
+				axisTitleAnchor_[1] = (UChromaWindow::HorizontalAlignment) parser.argi(2);
+				axisTitleAnchor_[2] = (UChromaWindow::HorizontalAlignment) parser.argi(3);
 				break;
-			// Axis title rotation
-			case (UChromaWindow::AxisTitleRotationKeyword):
-				axisTitleRotation_.set(parser.argi(1), parser.argi(2), parser.argi(3));
-				break;
-			// Axis title direction
-			case (UChromaWindow::AxisTitleUpKeyword):
+			// Axis title orientation
+			case (UChromaWindow::AxisTitleOrientationKeyword):
 				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Axis index is out of range for %s keyword.\n", dataFileKeyword(kwd));
-				else axisTitleUp_[parser.argi(1)].set(parser.argd(2), parser.argd(3), parser.argd(4));
+				else axisTitleOrientation_[parser.argi(1)].set(parser.argd(2), parser.argd(3), parser.argd(4), parser.argd(4));
 				break;
 			// Axis visibility
 			case (UChromaWindow::AxisVisibleKeyword):
@@ -349,6 +337,10 @@ bool UChromaWindow::loadData(QString fileName)
 			// Interpolation step flags
 			case (UChromaWindow::InterpolateStepKeyword):
 				interpolationStep_.set(parser.argd(1), 0.0, parser.argd(2));
+				break;
+			// Labels face viewer flag
+			case (UChromaWindow::LabelFaceViewerKeyword):
+				labelFaceViewer_ = parser.argb(1);
 				break;
 			// Label scale
 			case (UChromaWindow::LabelScaleKeyword):
@@ -460,7 +452,7 @@ bool UChromaWindow::saveData(QString fileName)
 	// Line format:  slice z "filename" "dataname"
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
 	{
-		parser.writeLineF("%s  %f  \"%s\"  \"%s\"\n", DataFileKeywordStrings[UChromaWindow::SliceKeyword], slice->z(), qPrintable(slice->sourceFileName()), qPrintable(slice->title()));
+		parser.writeLineF("%s  %f  \"%s\"  \"%s\"\n", DataFileKeywordStrings[UChromaWindow::SliceKeyword], slice->z(), qPrintable(slice->sourceFileName()), qPrintable(slice->dataName()));
 	}
 
 	// Write image info
@@ -484,7 +476,8 @@ bool UChromaWindow::saveData(QString fileName)
 	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[UChromaWindow::InterpolateStepKeyword], interpolationStep_.x, interpolationStep_.z);
 
 	// Write view setup
-	// -- Font Scaling
+	// -- Font Scaling / Orientation
+	parser.writeLineF("%s %i\n", DataFileKeywordStrings[UChromaWindow::LabelFaceViewerKeyword], labelFaceViewer_);
 	parser.writeLineF("%s %f\n", DataFileKeywordStrings[UChromaWindow::LabelScaleKeyword], labelScale_);
 	parser.writeLineF("%s %f\n", DataFileKeywordStrings[UChromaWindow::TitleScaleKeyword], titleScale_);
 	// -- Axes
@@ -492,16 +485,14 @@ bool UChromaWindow::saveData(QString fileName)
 	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisFirstTickKeyword], axisFirstTick_.x, axisFirstTick_.y, axisFirstTick_.z);
 	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisTickDeltaKeyword], axisTickDelta_.x, axisTickDelta_.y, axisTickDelta_.z);
 	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisMinorTicksKeyword], axisMinorTicks_.x, axisMinorTicks_.y, axisMinorTicks_.z);
+	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisTitleAnchorKeyword], axisTitleAnchor_.x, axisTitleAnchor_.y, axisTitleAnchor_.z);
 	for (int axis=0; axis<3; ++axis)
 	{
 		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisPositionKeyword], axis, axisPosition_[axis].x, axisPosition_[axis].y, axisPosition_[axis].z);
-		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisLabelDirectionKeyword], axis, axisLabelDirection_[axis].x, axisLabelDirection_[axis].y, axisLabelDirection_[axis].z);
-		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisLabelUpKeyword], axis, axisLabelUp_[axis].x, axisLabelUp_[axis].y, axisLabelUp_[axis].z);
+		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisLabelOrientationKeyword], axis, axisLabelOrientation_[axis].x, axisLabelOrientation_[axis].y, axisLabelOrientation_[axis].z);
 		parser.writeLineF("%s %i '%s'\n", DataFileKeywordStrings[UChromaWindow::AxisTitleKeyword], axis, qPrintable(axisTitle_[axis]));
-		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisTitleDirectionKeyword], axis, axisTitleDirection_[axis].x, axisTitleDirection_[axis].y, axisTitleDirection_[axis].z);
-		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisTitleUpKeyword], axis, axisTitleUp_[axis].x, axisTitleUp_[axis].y, axisTitleUp_[axis].z);
+		parser.writeLineF("%s %i %f %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisTitleOrientationKeyword], axis, axisTitleOrientation_[axis].x, axisTitleOrientation_[axis].y, axisTitleOrientation_[axis].z, axisTitleOrientation_[axis].w);
 	}
-	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisLabelRotationKeyword], axisLabelRotation_.x, axisLabelRotation_.y, axisLabelRotation_.z);
 	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisInvertKeyword], axisInvert_.x, axisInvert_.y, axisInvert_.z);
 	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisLogarithmicKeyword], axisLogarithmic_.x, axisLogarithmic_.y, axisLogarithmic_.z);
 	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisVisibleKeyword], axisVisible_.x, axisVisible_.y, axisVisible_.z);
@@ -543,7 +534,7 @@ bool UChromaWindow::saveData(QString fileName)
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
 	{
 		Data2D& data = slice->data();
-		parser.writeLineF("%s  \"%s\"  %i\n", DataFileKeywordStrings[UChromaWindow::DataKeyword], qPrintable(slice->title()), data.nPoints());
+		parser.writeLineF("%s  \"%s\"  %i\n", DataFileKeywordStrings[UChromaWindow::DataKeyword], qPrintable(slice->dataName()), data.nPoints());
 		for (int n=0; n<data.nPoints(); ++n) parser.writeLineF("%10.4e  %10.4e\n", data.x(n), data.y(n));
 	}
 
@@ -571,16 +562,16 @@ Slice* UChromaWindow::addSlice(double z, QString fileName, QString title)
 		}
 		slice->setSourceFileName(relativeFileName);
 	}
-	slice->setTitle(title);
+	slice->setDataName(title);
 	slice->setZ(z);
 
 	return slice;
 }
 
-// Find slice with corresponding title
-Slice* UChromaWindow::findSlice(QString title)
+// Find slice with corresponding data name
+Slice* UChromaWindow::findSlice(QString dataName)
 {
-	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) if (slice->title() == title) return slice;
+	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) if (slice->dataName() == dataName) return slice;
 	return NULL;
 }
 
@@ -734,6 +725,58 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 		// Clear old axis primitives
 		ui.MainView->clearAxisPrimitives(axis);
 
+		// Create label and title transformation matrices
+		Matrix labelTransform, titleTransform;
+		// Set left-to-right direction of text to be along axis direction
+		Vec3<double> leftToRight(0.0,0.0,0.0);
+		leftToRight.set(axis, 1.0);
+		// Our basic 'up' vector will be another orthogonal axis (but never z)
+		Vec3<double> upVector(0.0,0.0,0.0);
+		if (axis == 0) upVector.set(0.0, 1.0, 0.0);
+		else upVector.set(-1.0, 0.0, 0.0);
+		labelTransform.setColumn(0, leftToRight, 0.0);
+		labelTransform.setColumn(1, upVector, 0.0);
+		labelTransform.setColumn(2, leftToRight * upVector, 0.0);
+		labelTransform.setColumn(3, 0.0, 0.0, 0.0, 1.0);
+		titleTransform = labelTransform;
+	
+		if (labelFaceViewer_)
+		{
+			labelTransform = ui.MainView->viewMatrix();
+			labelTransform.removeTranslationAndScaling();
+			labelTransform.invert();
+
+			titleTransform = ui.MainView->viewMatrix();
+			titleTransform.removeTranslationAndScaling();
+			titleTransform.invert();
+		}
+		else
+		{
+			// Label Transform
+			// -- Apply rotation out of AB plane...
+// 			labelTransform.applyTranslation(0.0, 1.0, 0.0);
+			Matrix rotMat;
+			rotMat.createRotationZ(axisLabelOrientation_[axis].y);
+			rotMat.print();
+			rotMat.createRotationAxis(0.0, 0.0, -1.0, axisLabelOrientation_[axis].y, false);
+			rotMat.print();
+			labelTransform *= rotMat;
+// 			labelTransform.applyRotationAxis(0.0, 0.0, -1.0, axisLabelOrientation_[axis].y, false);
+// 			labelTransform.applyRotationAxis(leftToRight.x, leftToRight.y, leftToRight.z, axisLabelOrientation_[axis].x, false);
+			upVector = labelTransform.columnAsVec3(1);
+			// ...and in current text plane
+
+			// Title transform
+			// -- Apply rotation out of AB plane...
+			titleTransform.applyRotationAxis(leftToRight.x, leftToRight.y, leftToRight.z, axisTitleOrientation_[axis].x, false);
+			upVector = titleTransform.columnAsVec3(1);
+			// ...and in current text plane
+			titleTransform.applyRotationAxis(titleTransform[8], titleTransform[9], titleTransform[10], axisTitleOrientation_[axis].y, false);
+			titleTransform.setTranslation(0.0, axisTitleOrientation_[axis].z, 0.0);
+		}
+		labelTransform.columnMultiply( Vec3<double>(labelScale_,labelScale_,labelScale_) );
+		titleTransform.columnMultiply( Vec3<double>(titleScale_,titleScale_,titleScale_) );
+
 		// Set position, taking into account logarithmic axes and scale factors
 		Vec3<double> pos;
 		for (int n=0; n<3; ++n)
@@ -745,18 +788,16 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 
 		if (axisLogarithmic_[axis])
 		{
-			ui.MainView->createLogAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisInvert_[axis], axisStretch_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis], axisLabelUp_[axis], axisLabelRotation_[axis]);
+			ui.MainView->createLogAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisInvert_[axis], axisStretch_[axis], axisMinorTicks_[axis], axisTickDirection_[axis], labelTransform);
 		}
 		else
 		{
 			// Calculate autoticks if necessary
 			if (axisAutoTicks_[axis]) calculateTickDeltas(axis);
 
-			ui.MainView->createAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisInvert_[axis], axisStretch_[axis], axisFirstTick_[axis], axisTickDelta_[axis], axisMinorTicks_[axis], axisLabelDirection_[axis], axisLabelUp_[axis], axisLabelRotation_[axis]);
+			ui.MainView->createAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisInvert_[axis], axisStretch_[axis], axisFirstTick_[axis], axisTickDelta_[axis], axisMinorTicks_[axis], axisTickDirection_[axis], axisLabelOrientation_[axis], axisTitleOrientation_[axis], axisTitleAnchor_[axis], axisTitle_[axis]);
 		}
 
-		ui.MainView->createAxisTitle(axis, axisInvert_[axis], axisStretch_[axis], axisLogarithmic_[axis], axisTitle_[axis], axisTitleDirection_[axis], axisTitleUp_[axis], axisTitleRotation_[axis]);
-		
 		ui.MainView->setAxisVisible(axis, axisVisible_[axis]);
 	}
 

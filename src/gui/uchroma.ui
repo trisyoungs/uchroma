@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1221</width>
-    <height>1001</height>
+    <width>1207</width>
+    <height>1003</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -65,7 +65,7 @@
            </size>
           </property>
           <property name="currentIndex">
-           <number>3</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="SourceDataTab">
            <attribute name="title">
@@ -1898,68 +1898,18 @@
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_10">
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_20">
-              <item>
-               <widget class="QLabel" name="LabelScaleLabel">
-                <property name="text">
-                 <string>Label Scale</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QDoubleSpinBox" name="ViewLabelScaleSpin">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimum">
-                 <double>0.010000000000000</double>
-                </property>
-                <property name="singleStep">
-                 <double>0.010000000000000</double>
-                </property>
-                <property name="value">
-                 <double>0.500000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="TitleScaleLabel">
-                <property name="text">
-                 <string>Title Scale</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QDoubleSpinBox" name="ViewTitleScaleSpin">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimum">
-                 <double>0.010000000000000</double>
-                </property>
-                <property name="singleStep">
-                 <double>0.010000000000000</double>
-                </property>
-                <property name="value">
-                 <double>0.500000000000000</double>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
              <widget class="QTabWidget" name="AxesTabs">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="toolTip">
                <string>Set to maximum source data value</string>
               </property>
               <property name="currentIndex">
-               <number>2</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="XAxisTab">
                <attribute name="title">
@@ -2282,6 +2232,25 @@
                         <property name="spacing">
                          <number>4</number>
                         </property>
+                        <item row="0" column="3">
+                         <widget class="QDoubleSpinBox" name="ViewXAxisTicksDeltaSpin">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="decimals">
+                           <number>3</number>
+                          </property>
+                          <property name="minimum">
+                           <double>-1000000.000000000000000</double>
+                          </property>
+                          <property name="maximum">
+                           <double>1000000.000000000000000</double>
+                          </property>
+                         </widget>
+                        </item>
                         <item row="0" column="0">
                          <widget class="QLabel" name="label_6">
                           <property name="sizePolicy">
@@ -2314,7 +2283,14 @@
                           </property>
                          </widget>
                         </item>
-                        <item row="1" column="0">
+                        <item row="0" column="4">
+                         <widget class="QCheckBox" name="ViewXAxisAutoTicksCheck">
+                          <property name="text">
+                           <string>Auto</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="0" column="2">
                          <widget class="QLabel" name="label_7">
                           <property name="sizePolicy">
                            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -2324,32 +2300,6 @@
                           </property>
                           <property name="text">
                            <string>Delta</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="1" column="1">
-                         <widget class="QDoubleSpinBox" name="ViewXAxisTicksDeltaSpin">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="decimals">
-                           <number>3</number>
-                          </property>
-                          <property name="minimum">
-                           <double>-1000000.000000000000000</double>
-                          </property>
-                          <property name="maximum">
-                           <double>1000000.000000000000000</double>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="0" column="2">
-                         <widget class="QCheckBox" name="ViewXAxisAutoTicksCheck">
-                          <property name="text">
-                           <string>Automatic</string>
                           </property>
                          </widget>
                         </item>
@@ -2382,6 +2332,86 @@
                      </item>
                     </layout>
                    </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_18">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
+                     <item>
+                      <widget class="QLabel" name="label_31">
+                       <property name="text">
+                        <string>Direction</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QDoubleSpinBox" name="ViewXAxisTickDirectionXSpin">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="decimals">
+                        <number>3</number>
+                       </property>
+                       <property name="minimum">
+                        <double>-1.000000000000000</double>
+                       </property>
+                       <property name="maximum">
+                        <double>1.000000000000000</double>
+                       </property>
+                       <property name="singleStep">
+                        <double>0.100000000000000</double>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QDoubleSpinBox" name="ViewXAxisTickDirectionYSpin">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="decimals">
+                        <number>3</number>
+                       </property>
+                       <property name="minimum">
+                        <double>-1.000000000000000</double>
+                       </property>
+                       <property name="maximum">
+                        <double>1.000000000000000</double>
+                       </property>
+                       <property name="singleStep">
+                        <double>0.100000000000000</double>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QDoubleSpinBox" name="ViewXAxisTickDirectionZSpin">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="decimals">
+                        <number>3</number>
+                       </property>
+                       <property name="minimum">
+                        <double>-1.000000000000000</double>
+                       </property>
+                       <property name="maximum">
+                        <double>1.000000000000000</double>
+                       </property>
+                       <property name="singleStep">
+                        <double>0.100000000000000</double>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
                   </layout>
                  </widget>
                 </item>
@@ -2399,6 +2429,12 @@
                    </property>
                    <item>
                     <widget class="QTabWidget" name="XAxisTextOrientationTabs">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="currentIndex">
                       <number>0</number>
                      </property>
@@ -2406,7 +2442,7 @@
                       <attribute name="title">
                        <string>Tick Labels</string>
                       </attribute>
-                      <layout class="QHBoxLayout" name="horizontalLayout_43">
+                      <layout class="QVBoxLayout" name="verticalLayout_31">
                        <property name="spacing">
                         <number>4</number>
                        </property>
@@ -2414,212 +2450,98 @@
                         <number>4</number>
                        </property>
                        <item>
-                        <layout class="QGridLayout" name="gridLayout_10">
+                        <layout class="QGridLayout" name="gridLayout_18">
                          <property name="spacing">
                           <number>4</number>
                          </property>
-                         <item row="4" column="0">
-                          <widget class="QLabel" name="label_18">
-                           <property name="text">
-                            <string>Z</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="2" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewXAxisLabelDirectionXSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="2" column="0">
-                          <widget class="QLabel" name="label_16">
-                           <property name="text">
-                            <string>X</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="3" column="0">
-                          <widget class="QLabel" name="label_17">
-                           <property name="text">
-                            <string>Y</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="4" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewXAxisLabelDirectionZSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
                          <item row="3" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewXAxisLabelDirectionYSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
+                          <widget class="QLabel" name="LabelD_19">
+                           <property name="text">
+                            <string>Distance</string>
                            </property>
-                           <property name="decimals">
-                            <number>3</number>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
                            </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="3">
+                          <widget class="QSlider" name="ViewXAxisLabelInPlaneRotationSlider">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
+                            <number>360</number>
                            </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
                            </property>
                           </widget>
                          </item>
                          <item row="2" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewXAxisLabelUpXSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                          <widget class="QSpinBox" name="ViewXAxisLabelAxialRotationSpin">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
+                            <number>360</number>
                            </property>
                           </widget>
                          </item>
-                         <item row="3" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewXAxisLabelUpYSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                         <item row="2" column="4">
+                          <widget class="QSpinBox" name="ViewXAxisLabelInPlaneRotationSpin">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="4" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewXAxisLabelUpZSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="1" column="1">
-                          <widget class="QLabel" name="LabelD">
-                           <property name="text">
-                            <string>Direction (H-axis)</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="1" column="2">
-                          <widget class="QLabel" name="LabelD_2">
-                           <property name="text">
-                            <string>Orientation (V-axis)</string>
+                            <number>360</number>
                            </property>
                           </widget>
                          </item>
                          <item row="0" column="1" colspan="2">
-                          <layout class="QHBoxLayout" name="horizontalLayout_18">
-                           <item>
-                            <widget class="QLabel" name="label_33">
-                             <property name="text">
-                              <string>Rotation (Z)</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QSlider" name="ViewXAxisLabelRotationSlider">
-                             <property name="maximum">
-                              <number>360</number>
-                             </property>
-                             <property name="orientation">
-                              <enum>Qt::Horizontal</enum>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QSpinBox" name="ViewXAxisLabelRotationSpin">
-                             <property name="sizePolicy">
-                              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                               <horstretch>0</horstretch>
-                               <verstretch>0</verstretch>
-                              </sizepolicy>
-                             </property>
-                             <property name="maximum">
-                              <number>360</number>
-                             </property>
-                            </widget>
-                           </item>
-                          </layout>
+                          <widget class="QLabel" name="LabelD_20">
+                           <property name="text">
+                            <string>Axial Rotation</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="1">
+                          <widget class="QSlider" name="ViewXAxisLabelAxialRotationSlider">
+                           <property name="maximum">
+                            <number>360</number>
+                           </property>
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="0" column="3" colspan="2">
+                          <widget class="QLabel" name="LabelD_21">
+                           <property name="text">
+                            <string>In-Plane Rotation</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="3" column="2">
+                          <widget class="QDoubleSpinBox" name="ViewXAxisLabelDistanceSpin">
+                           <property name="minimum">
+                            <double>-99.000000000000000</double>
+                           </property>
+                           <property name="singleStep">
+                            <double>0.100000000000000</double>
+                           </property>
+                          </widget>
                          </item>
                         </layout>
+                       </item>
+                       <item>
+                        <spacer name="verticalSpacer_6">
+                         <property name="orientation">
+                          <enum>Qt::Vertical</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>20</width>
+                           <height>5</height>
+                          </size>
+                         </property>
+                        </spacer>
                        </item>
                       </layout>
                      </widget>
@@ -2627,7 +2549,7 @@
                       <attribute name="title">
                        <string>Axis TItle</string>
                       </attribute>
-                      <layout class="QHBoxLayout" name="horizontalLayout_51">
+                      <layout class="QVBoxLayout" name="verticalLayout_34">
                        <property name="spacing">
                         <number>4</number>
                        </property>
@@ -2635,200 +2557,207 @@
                         <number>4</number>
                        </property>
                        <item>
+                        <layout class="QHBoxLayout" name="horizontalLayout_45">
+                         <property name="spacing">
+                          <number>4</number>
+                         </property>
+                         <item>
+                          <widget class="QLabel" name="LabelD_15">
+                           <property name="frameShadow">
+                            <enum>QFrame::Plain</enum>
+                           </property>
+                           <property name="text">
+                            <string>Offset</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QSlider" name="ViewXAxisTitleHOffsetSlider">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
+                           </property>
+                           <property name="maximum">
+                            <number>1000</number>
+                           </property>
+                           <property name="singleStep">
+                            <number>10</number>
+                           </property>
+                           <property name="pageStep">
+                            <number>50</number>
+                           </property>
+                           <property name="value">
+                            <number>500</number>
+                           </property>
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QToolButton" name="ViewXAxisTitleHOffsetLeftButton">
+                           <property name="maximumSize">
+                            <size>
+                             <width>24</width>
+                             <height>24</height>
+                            </size>
+                           </property>
+                           <property name="toolTip">
+                            <string>Set to minimum source data value</string>
+                           </property>
+                           <property name="text">
+                            <string>...</string>
+                           </property>
+                           <property name="icon">
+                            <iconset resource="icons.qrc">
+                             <normaloff>:/uchroma/icons/toleftlimit.svg</normaloff>:/uchroma/icons/toleftlimit.svg</iconset>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QToolButton" name="ViewXAxisTitleHOffsetCentreButton">
+                           <property name="maximumSize">
+                            <size>
+                             <width>24</width>
+                             <height>24</height>
+                            </size>
+                           </property>
+                           <property name="toolTip">
+                            <string>Set to zero</string>
+                           </property>
+                           <property name="text">
+                            <string>...</string>
+                           </property>
+                           <property name="icon">
+                            <iconset resource="icons.qrc">
+                             <normaloff>:/uchroma/icons/tocentre.svg</normaloff>:/uchroma/icons/tocentre.svg</iconset>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QToolButton" name="ViewXAxisTitleHOffsetRightButton">
+                           <property name="maximumSize">
+                            <size>
+                             <width>24</width>
+                             <height>24</height>
+                            </size>
+                           </property>
+                           <property name="toolTip">
+                            <string>Set to maximum source data value</string>
+                           </property>
+                           <property name="text">
+                            <string>...</string>
+                           </property>
+                           <property name="icon">
+                            <iconset resource="icons.qrc">
+                             <normaloff>:/uchroma/icons/torightlimit.svg</normaloff>:/uchroma/icons/torightlimit.svg</iconset>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QComboBox" name="ViewXAxisTitleAnchorCombo">
+                           <property name="toolTip">
+                            <string>Text anchor position for axis title</string>
+                           </property>
+                           <item>
+                            <property name="text">
+                             <string>Left</string>
+                            </property>
+                           </item>
+                           <item>
+                            <property name="text">
+                             <string>Centre</string>
+                            </property>
+                           </item>
+                           <item>
+                            <property name="text">
+                             <string>Right</string>
+                            </property>
+                           </item>
+                          </widget>
+                         </item>
+                        </layout>
+                       </item>
+                       <item>
                         <layout class="QGridLayout" name="gridLayout_17">
                          <property name="spacing">
                           <number>4</number>
                          </property>
-                         <item row="4" column="0">
-                          <widget class="QLabel" name="label_55">
-                           <property name="text">
-                            <string>Z</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="2" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewXAxisTitleDirectionXSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="2" column="0">
-                          <widget class="QLabel" name="label_56">
-                           <property name="text">
-                            <string>X</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="3" column="0">
-                          <widget class="QLabel" name="label_57">
-                           <property name="text">
-                            <string>Y</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="4" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewXAxisTitleDirectionZSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
                          <item row="3" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewXAxisTitleDirectionYSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
+                          <widget class="QLabel" name="LabelD_18">
+                           <property name="text">
+                            <string>Distance</string>
                            </property>
-                           <property name="decimals">
-                            <number>3</number>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
                            </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="3">
+                          <widget class="QSlider" name="ViewXAxisTitleInPlaneRotationSlider">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
+                            <number>360</number>
                            </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
                            </property>
                           </widget>
                          </item>
                          <item row="2" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewXAxisTitleUpXSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                          <widget class="QSpinBox" name="ViewXAxisTitleAxialRotationSpin">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
+                            <number>360</number>
                            </property>
                           </widget>
                          </item>
-                         <item row="3" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewXAxisTitleUpYSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                         <item row="2" column="4">
+                          <widget class="QSpinBox" name="ViewXAxisTitleInPlaneRotationSpin">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="4" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewXAxisTitleUpZSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="1" column="1">
-                          <widget class="QLabel" name="LabelD_13">
-                           <property name="text">
-                            <string>Direction (H-axis)</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="1" column="2">
-                          <widget class="QLabel" name="LabelD_14">
-                           <property name="text">
-                            <string>Orientation (V-axis)</string>
+                            <number>360</number>
                            </property>
                           </widget>
                          </item>
                          <item row="0" column="1" colspan="2">
-                          <layout class="QHBoxLayout" name="horizontalLayout_50">
-                           <item>
-                            <widget class="QLabel" name="label_58">
-                             <property name="text">
-                              <string>Rotation (Z)</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QSpinBox" name="ViewXAxisTitleRotationSpin">
-                             <property name="sizePolicy">
-                              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                               <horstretch>0</horstretch>
-                               <verstretch>0</verstretch>
-                              </sizepolicy>
-                             </property>
-                             <property name="maximum">
-                              <number>360</number>
-                             </property>
-                            </widget>
-                           </item>
-                          </layout>
+                          <widget class="QLabel" name="LabelD_13">
+                           <property name="text">
+                            <string>Axial Rotation</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="1">
+                          <widget class="QSlider" name="ViewXAxisTitleAxialRotationSlider">
+                           <property name="maximum">
+                            <number>360</number>
+                           </property>
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="0" column="3" colspan="2">
+                          <widget class="QLabel" name="LabelD_14">
+                           <property name="text">
+                            <string>In-Plane Rotation</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="3" column="2">
+                          <widget class="QDoubleSpinBox" name="ViewXAxisTitleDistanceSpin">
+                           <property name="minimum">
+                            <double>-99.000000000000000</double>
+                           </property>
+                           <property name="singleStep">
+                            <double>0.100000000000000</double>
+                           </property>
+                          </widget>
                          </item>
                         </layout>
                        </item>
@@ -3188,7 +3117,14 @@
                           </property>
                          </widget>
                         </item>
-                        <item row="1" column="0">
+                        <item row="0" column="4">
+                         <widget class="QCheckBox" name="ViewYAxisAutoTicksCheck">
+                          <property name="text">
+                           <string>Auto</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="0" column="2">
                          <widget class="QLabel" name="label_11">
                           <property name="sizePolicy">
                            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -3201,7 +3137,7 @@
                           </property>
                          </widget>
                         </item>
-                        <item row="1" column="1">
+                        <item row="0" column="3">
                          <widget class="QDoubleSpinBox" name="ViewYAxisTicksDeltaSpin">
                           <property name="sizePolicy">
                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -3217,13 +3153,6 @@
                           </property>
                           <property name="maximum">
                            <double>1000000.000000000000000</double>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="0" column="2">
-                         <widget class="QCheckBox" name="ViewYAxisAutoTicksCheck">
-                          <property name="text">
-                           <string>Automatic</string>
                           </property>
                          </widget>
                         </item>
@@ -3256,6 +3185,86 @@
                      </item>
                     </layout>
                    </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_19">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
+                     <item>
+                      <widget class="QLabel" name="label_32">
+                       <property name="text">
+                        <string>Direction</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QDoubleSpinBox" name="ViewYAxisTickDirectionXSpin">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="decimals">
+                        <number>3</number>
+                       </property>
+                       <property name="minimum">
+                        <double>-1.000000000000000</double>
+                       </property>
+                       <property name="maximum">
+                        <double>1.000000000000000</double>
+                       </property>
+                       <property name="singleStep">
+                        <double>0.100000000000000</double>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QDoubleSpinBox" name="ViewYAxisTickDirectionYSpin">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="decimals">
+                        <number>3</number>
+                       </property>
+                       <property name="minimum">
+                        <double>-1.000000000000000</double>
+                       </property>
+                       <property name="maximum">
+                        <double>1.000000000000000</double>
+                       </property>
+                       <property name="singleStep">
+                        <double>0.100000000000000</double>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QDoubleSpinBox" name="ViewYAxisTickDirectionZSpin">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="decimals">
+                        <number>3</number>
+                       </property>
+                       <property name="minimum">
+                        <double>-1.000000000000000</double>
+                       </property>
+                       <property name="maximum">
+                        <double>1.000000000000000</double>
+                       </property>
+                       <property name="singleStep">
+                        <double>0.100000000000000</double>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
                   </layout>
                  </widget>
                 </item>
@@ -3273,14 +3282,20 @@
                    </property>
                    <item>
                     <widget class="QTabWidget" name="YAxisTextOrientationTabs">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="currentIndex">
-                      <number>0</number>
+                      <number>1</number>
                      </property>
                      <widget class="QWidget" name="YAxisTextOrientationTickTab">
                       <attribute name="title">
                        <string>Tick Labels</string>
                       </attribute>
-                      <layout class="QHBoxLayout" name="horizontalLayout_44">
+                      <layout class="QVBoxLayout" name="verticalLayout_32">
                        <property name="spacing">
                         <number>4</number>
                        </property>
@@ -3288,220 +3303,106 @@
                         <number>4</number>
                        </property>
                        <item>
-                        <layout class="QGridLayout" name="gridLayout_11">
+                        <layout class="QGridLayout" name="gridLayout_19">
                          <property name="spacing">
                           <number>4</number>
                          </property>
-                         <item row="4" column="0">
-                          <widget class="QLabel" name="label_25">
-                           <property name="text">
-                            <string>Z</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="2" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewYAxisLabelDirectionXSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="2" column="0">
-                          <widget class="QLabel" name="label_26">
-                           <property name="text">
-                            <string>X</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="3" column="0">
-                          <widget class="QLabel" name="label_27">
-                           <property name="text">
-                            <string>Y</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="4" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewYAxisLabelDirectionZSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
                          <item row="3" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewYAxisLabelDirectionYSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
+                          <widget class="QLabel" name="Labelage1">
+                           <property name="text">
+                            <string>Distance</string>
                            </property>
-                           <property name="decimals">
-                            <number>3</number>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
                            </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="3">
+                          <widget class="QSlider" name="ViewYAxisLabelInPlaneRotationSlider">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
+                            <number>360</number>
                            </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
                            </property>
                           </widget>
                          </item>
                          <item row="2" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewYAxisLabelUpXSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                          <widget class="QSpinBox" name="ViewYAxisLabelAxialRotationSpin">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
+                            <number>360</number>
                            </property>
                           </widget>
                          </item>
-                         <item row="3" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewYAxisLabelUpYSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                         <item row="2" column="4">
+                          <widget class="QSpinBox" name="ViewYAxisLabelInPlaneRotationSpin">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="4" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewYAxisLabelUpZSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="1" column="1">
-                          <widget class="QLabel" name="LabelD_3">
-                           <property name="text">
-                            <string>Direction (H-axis)</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="1" column="2">
-                          <widget class="QLabel" name="LabelD_4">
-                           <property name="text">
-                            <string>Orientation (V-axis)</string>
+                            <number>360</number>
                            </property>
                           </widget>
                          </item>
                          <item row="0" column="1" colspan="2">
-                          <layout class="QHBoxLayout" name="horizontalLayout_14">
-                           <item>
-                            <widget class="QLabel" name="label_31">
-                             <property name="text">
-                              <string>Rotation (Z)</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QSlider" name="ViewYAxisLabelRotationSlider">
-                             <property name="maximum">
-                              <number>360</number>
-                             </property>
-                             <property name="orientation">
-                              <enum>Qt::Horizontal</enum>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QSpinBox" name="ViewYAxisLabelRotationSpin">
-                             <property name="sizePolicy">
-                              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                               <horstretch>0</horstretch>
-                               <verstretch>0</verstretch>
-                              </sizepolicy>
-                             </property>
-                             <property name="maximum">
-                              <number>360</number>
-                             </property>
-                            </widget>
-                           </item>
-                          </layout>
+                          <widget class="QLabel" name="Labelage2">
+                           <property name="text">
+                            <string>Axial Rotation</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="1">
+                          <widget class="QSlider" name="ViewYAxisLabelAxialRotationSlider">
+                           <property name="maximum">
+                            <number>360</number>
+                           </property>
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="0" column="3" colspan="2">
+                          <widget class="QLabel" name="Labelage3">
+                           <property name="text">
+                            <string>In-Plane Rotation</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="3" column="2">
+                          <widget class="QDoubleSpinBox" name="ViewYAxisLabelDistanceSpin">
+                           <property name="minimum">
+                            <double>-99.000000000000000</double>
+                           </property>
+                           <property name="singleStep">
+                            <double>0.100000000000000</double>
+                           </property>
+                          </widget>
                          </item>
                         </layout>
+                       </item>
+                       <item>
+                        <spacer name="verticalSpacer_7">
+                         <property name="orientation">
+                          <enum>Qt::Vertical</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>20</width>
+                           <height>5</height>
+                          </size>
+                         </property>
+                        </spacer>
                        </item>
                       </layout>
                      </widget>
                      <widget class="QWidget" name="YAxisTextOrientationTitleTab">
                       <attribute name="title">
-                       <string>Axis Title</string>
+                       <string>Axis TItle</string>
                       </attribute>
-                      <layout class="QHBoxLayout" name="horizontalLayout_49">
+                      <layout class="QVBoxLayout" name="verticalLayout_35">
                        <property name="spacing">
                         <number>4</number>
                        </property>
@@ -3509,200 +3410,207 @@
                         <number>4</number>
                        </property>
                        <item>
-                        <layout class="QGridLayout" name="gridLayout_16">
+                        <layout class="QHBoxLayout" name="horizontalLayout_46">
                          <property name="spacing">
                           <number>4</number>
                          </property>
-                         <item row="4" column="0">
-                          <widget class="QLabel" name="label_51">
+                         <item>
+                          <widget class="QLabel" name="LabelD_16">
+                           <property name="frameShadow">
+                            <enum>QFrame::Plain</enum>
+                           </property>
                            <property name="text">
-                            <string>Z</string>
+                            <string>Offset</string>
                            </property>
                           </widget>
                          </item>
-                         <item row="2" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewYAxisTitleDirectionXSpin">
+                         <item>
+                          <widget class="QSlider" name="ViewYAxisTitleHOffsetSlider">
                            <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                              <horstretch>0</horstretch>
                              <verstretch>0</verstretch>
                             </sizepolicy>
                            </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
                            <property name="maximum">
-                            <double>1.000000000000000</double>
+                            <number>1000</number>
                            </property>
                            <property name="singleStep">
-                            <double>0.100000000000000</double>
+                            <number>10</number>
+                           </property>
+                           <property name="pageStep">
+                            <number>50</number>
+                           </property>
+                           <property name="value">
+                            <number>500</number>
+                           </property>
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
                            </property>
                           </widget>
                          </item>
-                         <item row="2" column="0">
-                          <widget class="QLabel" name="label_52">
+                         <item>
+                          <widget class="QToolButton" name="ViewYAxisTitleHOffsetLeftButton">
+                           <property name="maximumSize">
+                            <size>
+                             <width>24</width>
+                             <height>24</height>
+                            </size>
+                           </property>
+                           <property name="toolTip">
+                            <string>Set to minimum source data value</string>
+                           </property>
                            <property name="text">
-                            <string>X</string>
+                            <string>...</string>
+                           </property>
+                           <property name="icon">
+                            <iconset resource="icons.qrc">
+                             <normaloff>:/uchroma/icons/toleftlimit.svg</normaloff>:/uchroma/icons/toleftlimit.svg</iconset>
                            </property>
                           </widget>
                          </item>
-                         <item row="3" column="0">
-                          <widget class="QLabel" name="label_53">
+                         <item>
+                          <widget class="QToolButton" name="ViewYAxisTitleHOffsetCentreButton">
+                           <property name="maximumSize">
+                            <size>
+                             <width>24</width>
+                             <height>24</height>
+                            </size>
+                           </property>
+                           <property name="toolTip">
+                            <string>Set to zero</string>
+                           </property>
                            <property name="text">
-                            <string>Y</string>
+                            <string>...</string>
+                           </property>
+                           <property name="icon">
+                            <iconset resource="icons.qrc">
+                             <normaloff>:/uchroma/icons/tocentre.svg</normaloff>:/uchroma/icons/tocentre.svg</iconset>
                            </property>
                           </widget>
                          </item>
-                         <item row="4" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewYAxisTitleDirectionZSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
+                         <item>
+                          <widget class="QToolButton" name="ViewYAxisTitleHOffsetRightButton">
+                           <property name="maximumSize">
+                            <size>
+                             <width>24</width>
+                             <height>24</height>
+                            </size>
                            </property>
-                           <property name="decimals">
-                            <number>3</number>
+                           <property name="toolTip">
+                            <string>Set to maximum source data value</string>
                            </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
+                           <property name="text">
+                            <string>...</string>
                            </property>
-                           <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
+                           <property name="icon">
+                            <iconset resource="icons.qrc">
+                             <normaloff>:/uchroma/icons/torightlimit.svg</normaloff>:/uchroma/icons/torightlimit.svg</iconset>
                            </property>
                           </widget>
                          </item>
+                         <item>
+                          <widget class="QComboBox" name="ViewYAxisTitleAnchorCombo">
+                           <property name="toolTip">
+                            <string>Text anchor position for axis title</string>
+                           </property>
+                           <item>
+                            <property name="text">
+                             <string>Left</string>
+                            </property>
+                           </item>
+                           <item>
+                            <property name="text">
+                             <string>Centre</string>
+                            </property>
+                           </item>
+                           <item>
+                            <property name="text">
+                             <string>Right</string>
+                            </property>
+                           </item>
+                          </widget>
+                         </item>
+                        </layout>
+                       </item>
+                       <item>
+                        <layout class="QGridLayout" name="gridLayout0">
+                         <property name="spacing">
+                          <number>4</number>
+                         </property>
                          <item row="3" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewYAxisTitleDirectionYSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
+                          <widget class="QLabel" name="LabelD5">
+                           <property name="text">
+                            <string>Distance</string>
                            </property>
-                           <property name="decimals">
-                            <number>3</number>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
                            </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="3">
+                          <widget class="QSlider" name="ViewYAxisTitleInPlaneRotationSlider">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
+                            <number>360</number>
                            </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
                            </property>
                           </widget>
                          </item>
                          <item row="2" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewYAxisTitleUpXSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                          <widget class="QSpinBox" name="ViewYAxisTitleAxialRotationSpin">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
+                            <number>360</number>
                            </property>
                           </widget>
                          </item>
-                         <item row="3" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewYAxisTitleUpYSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                         <item row="2" column="4">
+                          <widget class="QSpinBox" name="ViewYAxisTitleInPlaneRotationSpin">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="4" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewYAxisTitleUpZSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="1" column="1">
-                          <widget class="QLabel" name="LabelD_11">
-                           <property name="text">
-                            <string>Direction (H-axis)</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="1" column="2">
-                          <widget class="QLabel" name="LabelD_12">
-                           <property name="text">
-                            <string>Orientation (V-axis)</string>
+                            <number>360</number>
                            </property>
                           </widget>
                          </item>
                          <item row="0" column="1" colspan="2">
-                          <layout class="QHBoxLayout" name="horizontalLayout_48">
-                           <item>
-                            <widget class="QLabel" name="label_54">
-                             <property name="text">
-                              <string>Rotation (Z)</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QSpinBox" name="ViewYAxisTitleRotationSpin">
-                             <property name="sizePolicy">
-                              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                               <horstretch>0</horstretch>
-                               <verstretch>0</verstretch>
-                              </sizepolicy>
-                             </property>
-                             <property name="maximum">
-                              <number>360</number>
-                             </property>
-                            </widget>
-                           </item>
-                          </layout>
+                          <widget class="QLabel" name="LabelD_17">
+                           <property name="text">
+                            <string>Axial Rotation</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="1">
+                          <widget class="QSlider" name="ViewYAxisTitleAxialRotationSlider">
+                           <property name="maximum">
+                            <number>360</number>
+                           </property>
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="0" column="3" colspan="2">
+                          <widget class="QLabel" name="LabelD6">
+                           <property name="text">
+                            <string>In-Plane Rotation</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="3" column="2">
+                          <widget class="QDoubleSpinBox" name="ViewYAxisTitleDistanceSpin">
+                           <property name="minimum">
+                            <double>-99.000000000000000</double>
+                           </property>
+                           <property name="singleStep">
+                            <double>0.100000000000000</double>
+                           </property>
+                          </widget>
                          </item>
                         </layout>
                        </item>
@@ -4068,7 +3976,14 @@
                           </property>
                          </widget>
                         </item>
-                        <item row="1" column="0">
+                        <item row="0" column="4">
+                         <widget class="QCheckBox" name="ViewZAxisAutoTicksCheck">
+                          <property name="text">
+                           <string>Auto</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="0" column="2">
                          <widget class="QLabel" name="label_15">
                           <property name="sizePolicy">
                            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -4081,7 +3996,7 @@
                           </property>
                          </widget>
                         </item>
-                        <item row="1" column="1">
+                        <item row="0" column="3">
                          <widget class="QDoubleSpinBox" name="ViewZAxisTicksDeltaSpin">
                           <property name="sizePolicy">
                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -4097,13 +4012,6 @@
                           </property>
                           <property name="maximum">
                            <double>1000000.000000000000000</double>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="0" column="2">
-                         <widget class="QCheckBox" name="ViewZAxisAutoTicksCheck">
-                          <property name="text">
-                           <string>Automatic</string>
                           </property>
                          </widget>
                         </item>
@@ -4136,6 +4044,86 @@
                      </item>
                     </layout>
                    </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_42">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
+                     <item>
+                      <widget class="QLabel" name="label_33">
+                       <property name="text">
+                        <string>Direction</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QDoubleSpinBox" name="ViewZAxisTickDirectionXSpin">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="decimals">
+                        <number>3</number>
+                       </property>
+                       <property name="minimum">
+                        <double>-1.000000000000000</double>
+                       </property>
+                       <property name="maximum">
+                        <double>1.000000000000000</double>
+                       </property>
+                       <property name="singleStep">
+                        <double>0.100000000000000</double>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QDoubleSpinBox" name="ViewZAxisTickDirectionYSpin">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="decimals">
+                        <number>3</number>
+                       </property>
+                       <property name="minimum">
+                        <double>-1.000000000000000</double>
+                       </property>
+                       <property name="maximum">
+                        <double>1.000000000000000</double>
+                       </property>
+                       <property name="singleStep">
+                        <double>0.100000000000000</double>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QDoubleSpinBox" name="ViewZAxisTickDirectionZSpin">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="decimals">
+                        <number>3</number>
+                       </property>
+                       <property name="minimum">
+                        <double>-1.000000000000000</double>
+                       </property>
+                       <property name="maximum">
+                        <double>1.000000000000000</double>
+                       </property>
+                       <property name="singleStep">
+                        <double>0.100000000000000</double>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
                   </layout>
                  </widget>
                 </item>
@@ -4153,14 +4141,20 @@
                    </property>
                    <item>
                     <widget class="QTabWidget" name="ZAxisTextOrientationTabs">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="currentIndex">
-                      <number>0</number>
+                      <number>1</number>
                      </property>
                      <widget class="QWidget" name="ZAxisTextOrientationTickTab">
                       <attribute name="title">
                        <string>Tick Labels</string>
                       </attribute>
-                      <layout class="QHBoxLayout" name="horizontalLayout_45">
+                      <layout class="QVBoxLayout" name="verticalLayout_33">
                        <property name="spacing">
                         <number>4</number>
                        </property>
@@ -4168,220 +4162,106 @@
                         <number>4</number>
                        </property>
                        <item>
-                        <layout class="QGridLayout" name="gridLayout_12">
+                        <layout class="QGridLayout" name="gridLayout_20">
                          <property name="spacing">
                           <number>4</number>
                          </property>
-                         <item row="4" column="0">
-                          <widget class="QLabel" name="label_28">
-                           <property name="text">
-                            <string>Z</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="2" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewZAxisLabelDirectionXSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="2" column="0">
-                          <widget class="QLabel" name="label_29">
-                           <property name="text">
-                            <string>X</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="3" column="0">
-                          <widget class="QLabel" name="label_30">
-                           <property name="text">
-                            <string>Y</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="4" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewZAxisLabelDirectionZSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
                          <item row="3" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewZAxisLabelDirectionYSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
+                          <widget class="QLabel" name="Labelage1_2">
+                           <property name="text">
+                            <string>Distance</string>
                            </property>
-                           <property name="decimals">
-                            <number>3</number>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
                            </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="3">
+                          <widget class="QSlider" name="ViewZAxisLabelInPlaneRotationSlider">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
+                            <number>360</number>
                            </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
                            </property>
                           </widget>
                          </item>
                          <item row="2" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewZAxisLabelUpXSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                          <widget class="QSpinBox" name="ViewZAxisLabelAxialRotationSpin">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
+                            <number>360</number>
                            </property>
                           </widget>
                          </item>
-                         <item row="3" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewZAxisLabelUpYSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                         <item row="2" column="4">
+                          <widget class="QSpinBox" name="ViewZAxisLabelInPlaneRotationSpin">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="4" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewZAxisLabelUpZSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="1" column="1">
-                          <widget class="QLabel" name="LabelD_6">
-                           <property name="text">
-                            <string>Direction (H-axis)</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="1" column="2">
-                          <widget class="QLabel" name="LabelD_5">
-                           <property name="text">
-                            <string>Orientation (V-axis)</string>
+                            <number>360</number>
                            </property>
                           </widget>
                          </item>
                          <item row="0" column="1" colspan="2">
-                          <layout class="QHBoxLayout" name="horizontalLayout_19">
-                           <item>
-                            <widget class="QLabel" name="label_32">
-                             <property name="text">
-                              <string>Rotation (Z)</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QSlider" name="ViewZAxisLabelRotationSlider">
-                             <property name="maximum">
-                              <number>260</number>
-                             </property>
-                             <property name="orientation">
-                              <enum>Qt::Horizontal</enum>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QSpinBox" name="ViewZAxisLabelRotationSpin">
-                             <property name="sizePolicy">
-                              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                               <horstretch>0</horstretch>
-                               <verstretch>0</verstretch>
-                              </sizepolicy>
-                             </property>
-                             <property name="maximum">
-                              <number>360</number>
-                             </property>
-                            </widget>
-                           </item>
-                          </layout>
+                          <widget class="QLabel" name="Labelage2_2">
+                           <property name="text">
+                            <string>Axial Rotation</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="1">
+                          <widget class="QSlider" name="ViewZAxisLabelAxialRotationSlider">
+                           <property name="maximum">
+                            <number>360</number>
+                           </property>
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="0" column="3" colspan="2">
+                          <widget class="QLabel" name="Labelage3_2">
+                           <property name="text">
+                            <string>In-Plane Rotation</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="3" column="2">
+                          <widget class="QDoubleSpinBox" name="ViewZAxisLabelDistanceSpin">
+                           <property name="minimum">
+                            <double>-99.000000000000000</double>
+                           </property>
+                           <property name="singleStep">
+                            <double>0.100000000000000</double>
+                           </property>
+                          </widget>
                          </item>
                         </layout>
+                       </item>
+                       <item>
+                        <spacer name="verticalSpacer_8">
+                         <property name="orientation">
+                          <enum>Qt::Vertical</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>20</width>
+                           <height>5</height>
+                          </size>
+                         </property>
+                        </spacer>
                        </item>
                       </layout>
                      </widget>
                      <widget class="QWidget" name="ZAxisTextOrientationTitleTab">
                       <attribute name="title">
-                       <string>Axis Title</string>
+                       <string>Axis TItle</string>
                       </attribute>
-                      <layout class="QHBoxLayout" name="horizontalLayout_47">
+                      <layout class="QVBoxLayout" name="verticalLayout_36">
                        <property name="spacing">
                         <number>4</number>
                        </property>
@@ -4389,200 +4269,207 @@
                         <number>4</number>
                        </property>
                        <item>
-                        <layout class="QGridLayout" name="gridLayout_15">
+                        <layout class="QHBoxLayout" name="horizontalLayout_47">
                          <property name="spacing">
                           <number>4</number>
                          </property>
-                         <item row="4" column="0">
-                          <widget class="QLabel" name="label_47">
+                         <item>
+                          <widget class="QLabel" name="LabelD_22">
+                           <property name="frameShadow">
+                            <enum>QFrame::Plain</enum>
+                           </property>
                            <property name="text">
-                            <string>Z</string>
+                            <string>Offset</string>
                            </property>
                           </widget>
                          </item>
-                         <item row="2" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewZAxisTitleDirectionXSpin">
+                         <item>
+                          <widget class="QSlider" name="ViewZAxisTitleHOffsetSlider">
                            <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                              <horstretch>0</horstretch>
                              <verstretch>0</verstretch>
                             </sizepolicy>
                            </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
                            <property name="maximum">
-                            <double>1.000000000000000</double>
+                            <number>1000</number>
                            </property>
                            <property name="singleStep">
-                            <double>0.100000000000000</double>
+                            <number>10</number>
+                           </property>
+                           <property name="pageStep">
+                            <number>50</number>
+                           </property>
+                           <property name="value">
+                            <number>500</number>
+                           </property>
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
                            </property>
                           </widget>
                          </item>
-                         <item row="2" column="0">
-                          <widget class="QLabel" name="label_48">
+                         <item>
+                          <widget class="QToolButton" name="ViewZAxisTitleHOffsetLeftButton">
+                           <property name="maximumSize">
+                            <size>
+                             <width>24</width>
+                             <height>24</height>
+                            </size>
+                           </property>
+                           <property name="toolTip">
+                            <string>Set to minimum source data value</string>
+                           </property>
                            <property name="text">
-                            <string>X</string>
+                            <string>...</string>
+                           </property>
+                           <property name="icon">
+                            <iconset resource="icons.qrc">
+                             <normaloff>:/uchroma/icons/toleftlimit.svg</normaloff>:/uchroma/icons/toleftlimit.svg</iconset>
                            </property>
                           </widget>
                          </item>
-                         <item row="3" column="0">
-                          <widget class="QLabel" name="label_49">
+                         <item>
+                          <widget class="QToolButton" name="ViewZAxisTitleHOffsetCentreButton">
+                           <property name="maximumSize">
+                            <size>
+                             <width>24</width>
+                             <height>24</height>
+                            </size>
+                           </property>
+                           <property name="toolTip">
+                            <string>Set to zero</string>
+                           </property>
                            <property name="text">
-                            <string>Y</string>
+                            <string>...</string>
+                           </property>
+                           <property name="icon">
+                            <iconset resource="icons.qrc">
+                             <normaloff>:/uchroma/icons/tocentre.svg</normaloff>:/uchroma/icons/tocentre.svg</iconset>
                            </property>
                           </widget>
                          </item>
-                         <item row="4" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewZAxisTitleDirectionZSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
+                         <item>
+                          <widget class="QToolButton" name="ViewZAxisTitleHOffsetRightButton">
+                           <property name="maximumSize">
+                            <size>
+                             <width>24</width>
+                             <height>24</height>
+                            </size>
                            </property>
-                           <property name="decimals">
-                            <number>3</number>
+                           <property name="toolTip">
+                            <string>Set to maximum source data value</string>
                            </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
+                           <property name="text">
+                            <string>...</string>
                            </property>
-                           <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
+                           <property name="icon">
+                            <iconset resource="icons.qrc">
+                             <normaloff>:/uchroma/icons/torightlimit.svg</normaloff>:/uchroma/icons/torightlimit.svg</iconset>
                            </property>
                           </widget>
                          </item>
+                         <item>
+                          <widget class="QComboBox" name="ViewZAxisTitleAnchorCombo">
+                           <property name="toolTip">
+                            <string>Text anchor position for axis title</string>
+                           </property>
+                           <item>
+                            <property name="text">
+                             <string>Left</string>
+                            </property>
+                           </item>
+                           <item>
+                            <property name="text">
+                             <string>Centre</string>
+                            </property>
+                           </item>
+                           <item>
+                            <property name="text">
+                             <string>Right</string>
+                            </property>
+                           </item>
+                          </widget>
+                         </item>
+                        </layout>
+                       </item>
+                       <item>
+                        <layout class="QGridLayout" name="gridLayout0_2">
+                         <property name="spacing">
+                          <number>4</number>
+                         </property>
                          <item row="3" column="1">
-                          <widget class="QDoubleSpinBox" name="ViewZAxisTitleDirectionYSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
+                          <widget class="QLabel" name="LabelD5_2">
+                           <property name="text">
+                            <string>Distance</string>
                            </property>
-                           <property name="decimals">
-                            <number>3</number>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
                            </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="3">
+                          <widget class="QSlider" name="ViewZAxisTitleInPlaneRotationSlider">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
+                            <number>360</number>
                            </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
                            </property>
                           </widget>
                          </item>
                          <item row="2" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewZAxisTitleUpXSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                          <widget class="QSpinBox" name="ViewZAxisTitleAxialRotationSpin">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
+                            <number>360</number>
                            </property>
                           </widget>
                          </item>
-                         <item row="3" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewZAxisTitleUpYSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
+                         <item row="2" column="4">
+                          <widget class="QSpinBox" name="ViewZAxisTitleInPlaneRotationSpin">
                            <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="4" column="2">
-                          <widget class="QDoubleSpinBox" name="ViewZAxisTitleUpZSpin">
-                           <property name="sizePolicy">
-                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                            </sizepolicy>
-                           </property>
-                           <property name="decimals">
-                            <number>3</number>
-                           </property>
-                           <property name="minimum">
-                            <double>-1.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>1.000000000000000</double>
-                           </property>
-                           <property name="singleStep">
-                            <double>0.100000000000000</double>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="1" column="1">
-                          <widget class="QLabel" name="LabelD_9">
-                           <property name="text">
-                            <string>Direction (H-axis)</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item row="1" column="2">
-                          <widget class="QLabel" name="LabelD_10">
-                           <property name="text">
-                            <string>Orientation (V-axis)</string>
+                            <number>360</number>
                            </property>
                           </widget>
                          </item>
                          <item row="0" column="1" colspan="2">
-                          <layout class="QHBoxLayout" name="horizontalLayout_46">
-                           <item>
-                            <widget class="QLabel" name="label_50">
-                             <property name="text">
-                              <string>Rotation (Z)</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QSpinBox" name="ViewZAxisTitleRotationSpin">
-                             <property name="sizePolicy">
-                              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                               <horstretch>0</horstretch>
-                               <verstretch>0</verstretch>
-                              </sizepolicy>
-                             </property>
-                             <property name="maximum">
-                              <number>360</number>
-                             </property>
-                            </widget>
-                           </item>
-                          </layout>
+                          <widget class="QLabel" name="LabelD_23">
+                           <property name="text">
+                            <string>Axial Rotation</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="1">
+                          <widget class="QSlider" name="ViewZAxisTitleAxialRotationSlider">
+                           <property name="maximum">
+                            <number>360</number>
+                           </property>
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="0" column="3" colspan="2">
+                          <widget class="QLabel" name="LabelD6_2">
+                           <property name="text">
+                            <string>In-Plane Rotation</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="3" column="2">
+                          <widget class="QDoubleSpinBox" name="ViewZAxisTitleDistanceSpin">
+                           <property name="minimum">
+                            <double>-99.000000000000000</double>
+                           </property>
+                           <property name="singleStep">
+                            <double>0.100000000000000</double>
+                           </property>
+                          </widget>
                          </item>
                         </layout>
                        </item>
@@ -4766,6 +4653,90 @@
                 </item>
                </layout>
               </widget>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="ViewGeneralOptions">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="title">
+               <string>General Options</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_39">
+               <property name="spacing">
+                <number>4</number>
+               </property>
+               <property name="margin">
+                <number>4</number>
+               </property>
+               <item>
+                <widget class="QCheckBox" name="ViewLabelsFaceViewerCheck">
+                 <property name="text">
+                  <string>Face viewer</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_20">
+                 <item>
+                  <widget class="QLabel" name="LabelScaleLabel">
+                   <property name="text">
+                    <string>Label Scale</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QDoubleSpinBox" name="ViewLabelScaleSpin">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimum">
+                    <double>0.010000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.010000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>0.500000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="TitleScaleLabel">
+                   <property name="text">
+                    <string>Title Scale</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QDoubleSpinBox" name="ViewTitleScaleSpin">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimum">
+                    <double>0.010000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.010000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>0.500000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
              </widget>
             </item>
             <item>
@@ -5054,7 +5025,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1221</width>
+     <width>1207</width>
      <height>27</height>
     </rect>
    </property>
@@ -5185,98 +5156,322 @@
  </resources>
  <connections>
   <connection>
-   <sender>ViewXAxisLabelRotationSlider</sender>
+   <sender>ViewXAxisTitleAxialRotationSlider</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>ViewXAxisLabelRotationSpin</receiver>
+   <receiver>ViewXAxisTitleAxialRotationSpin</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>189</x>
-     <y>521</y>
+     <x>85</x>
+     <y>538</y>
     </hint>
     <hint type="destinationlabel">
-     <x>257</x>
-     <y>526</y>
+     <x>153</x>
+     <y>548</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>ViewXAxisLabelRotationSpin</sender>
+   <sender>ViewXAxisTitleAxialRotationSpin</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>ViewXAxisLabelRotationSlider</receiver>
+   <receiver>ViewXAxisTitleAxialRotationSlider</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>293</x>
-     <y>515</y>
+     <x>140</x>
+     <y>534</y>
     </hint>
     <hint type="destinationlabel">
-     <x>181</x>
+     <x>99</x>
+     <y>539</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewXAxisTitleInPlaneRotationSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewXAxisTitleInPlaneRotationSpin</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>236</x>
+     <y>539</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>281</x>
+     <y>537</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewXAxisTitleInPlaneRotationSpin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewXAxisTitleInPlaneRotationSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>301</x>
+     <y>551</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>249</x>
+     <y>550</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewYAxisLabelAxialRotationSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewYAxisLabelAxialRotationSpin</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>89</x>
+     <y>509</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>141</x>
+     <y>510</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewYAxisLabelInPlaneRotationSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewYAxisLabelInPlaneRotationSpin</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>257</x>
+     <y>507</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>293</x>
+     <y>508</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewYAxisLabelInPlaneRotationSpin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewYAxisLabelInPlaneRotationSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>291</x>
+     <y>503</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>233</x>
+     <y>508</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewYAxisLabelAxialRotationSpin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewYAxisLabelAxialRotationSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>148</x>
+     <y>509</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>81</x>
+     <y>511</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewYAxisTitleAxialRotationSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewYAxisTitleAxialRotationSpin</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>89</x>
+     <y>536</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>163</x>
+     <y>540</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewYAxisTitleAxialRotationSpin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewYAxisTitleAxialRotationSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>150</x>
+     <y>544</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>91</x>
+     <y>545</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewYAxisTitleInPlaneRotationSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewYAxisTitleInPlaneRotationSpin</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>247</x>
+     <y>544</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>285</x>
+     <y>542</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewYAxisTitleInPlaneRotationSpin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewYAxisTitleInPlaneRotationSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>290</x>
+     <y>547</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>236</x>
+     <y>547</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewZAxisLabelAxialRotationSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewZAxisLabelAxialRotationSpin</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>88</x>
+     <y>512</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>154</x>
+     <y>511</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewZAxisLabelInPlaneRotationSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewZAxisLabelInPlaneRotationSpin</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>210</x>
+     <y>508</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>315</x>
+     <y>506</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewZAxisLabelInPlaneRotationSpin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewZAxisLabelInPlaneRotationSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>282</x>
+     <y>514</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>244</x>
      <y>516</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>ViewZAxisLabelRotationSlider</sender>
+   <sender>ViewZAxisLabelAxialRotationSpin</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>ViewZAxisLabelRotationSpin</receiver>
+   <receiver>ViewZAxisLabelAxialRotationSlider</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>194</x>
-     <y>522</y>
+     <x>143</x>
+     <y>504</y>
     </hint>
     <hint type="destinationlabel">
-     <x>290</x>
-     <y>513</y>
+     <x>92</x>
+     <y>506</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>ViewZAxisLabelRotationSpin</sender>
+   <sender>ViewZAxisTitleAxialRotationSlider</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>ViewZAxisLabelRotationSlider</receiver>
+   <receiver>ViewZAxisTitleAxialRotationSpin</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>269</x>
-     <y>529</y>
+     <x>100</x>
+     <y>539</y>
     </hint>
     <hint type="destinationlabel">
-     <x>188</x>
-     <y>529</y>
+     <x>136</x>
+     <y>541</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>ViewYAxisLabelRotationSlider</sender>
+   <sender>ViewZAxisTitleInPlaneRotationSlider</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>ViewYAxisLabelRotationSpin</receiver>
+   <receiver>ViewZAxisTitleInPlaneRotationSpin</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>193</x>
-     <y>515</y>
+     <x>247</x>
+     <y>547</y>
     </hint>
     <hint type="destinationlabel">
-     <x>277</x>
-     <y>528</y>
+     <x>285</x>
+     <y>547</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>ViewYAxisLabelRotationSpin</sender>
+   <sender>ViewZAxisTitleInPlaneRotationSpin</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>ViewYAxisLabelRotationSlider</receiver>
+   <receiver>ViewZAxisTitleInPlaneRotationSlider</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>281</x>
-     <y>513</y>
+     <x>287</x>
+     <y>538</y>
     </hint>
     <hint type="destinationlabel">
-     <x>186</x>
-     <y>513</y>
+     <x>241</x>
+     <y>542</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewZAxisTitleAxialRotationSpin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewZAxisTitleAxialRotationSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>146</x>
+     <y>535</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>90</x>
+     <y>542</y>
     </hint>
    </hints>
   </connection>

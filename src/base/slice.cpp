@@ -28,7 +28,7 @@ Slice::Slice() : ListItem<Slice>()
 {
 	sourceFileName_ = "";
 	fileAssociated_ = false;
-	title_ = "";
+	dataName_ = "";
 	z_ = 0.0;
 }
 
@@ -47,7 +47,7 @@ Slice::Slice(const Slice& source)
 void Slice::operator=(const Slice& source)
 {
 	sourceFileName_ = source.sourceFileName_;
-	title_ = source.title_;
+	dataName_ = source.dataName_;
 	data_ = source.data_;
 	z_ = source.z_;
 	fileAssociated_ = source.fileAssociated_;
@@ -70,16 +70,16 @@ QString Slice::sourceFileName()
 	return sourceFileName_;
 }
 
-// Set source title
-void Slice::setTitle(QString title)
+// Set associated data name
+void Slice::setDataName(QString dataName)
 {
-	title_ = title;
+	dataName_ = dataName;
 }
 
-// Return source title
-QString Slice::title()
+// Return data name
+QString Slice::dataName()
 {
-	return title_;
+	return dataName_;
 }
 
 // Load data from file
