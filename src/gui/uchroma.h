@@ -375,7 +375,7 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * Tabs -- Analyse
+	 * Tabs -- Analyse   MOVE THIS TO A SEPARATE WINDOW
 	 */
 	private slots:
 	void on_AnalyseSliceNoneRadio_clicked(bool checked);
@@ -394,10 +394,6 @@ class UChromaWindow : public QMainWindow
 	void addSurfaceSlice(int axis, double value);
 
 	private:
-	// Current slice axis
-	int sliceAxis_;
-	// Current slice axis value
-	double sliceAxisValue_;
 	// Current slice data
 	Data2D sliceData_;
 	
@@ -481,8 +477,6 @@ class UChromaWindow : public QMainWindow
 	void showAllData();
 	// Flag data as modified, and update titlebar
 	void setAsModified();
-	// Update surface data after data change
-	void updateSurface(bool dataHasChanged = true);
 
 
 	/*
@@ -520,7 +514,7 @@ class UChromaWindow : public QMainWindow
 	 */
 	private:
 	// Whether to invert axes
-	Vec3<bool> axisInvert_;
+	Vec3<bool> axisInverted_;
 	// Axis visibility
 	Vec3<bool> axisVisible_;
 	// Axis position (in real surface-space coordinates)
@@ -547,6 +541,8 @@ class UChromaWindow : public QMainWindow
 	Vec3<bool> axisLogarithmic_;
 	// Stretch factors to apply to axes
 	Vec3<double> axisStretch_;
+	// Axis extreme coordinates
+	Vec3<double> axisCoordMin_[3], axisCoordMax_[3];
 	// Whether axis text labels face the viewer automatically
 	bool labelFaceViewer_;
 	// Whether axis text labels are corrected for left-right / up readability
@@ -555,6 +551,28 @@ class UChromaWindow : public QMainWindow
 	double labelScale_;
 	// Font scaling for titles
 	double titleScale_;
+
+	public:
+	// Return whether axis is logarithmic
+	bool axisLogarithmic(int axis);
+	// Return whether axis is inverted
+	bool axisInverted(int axis);
+	// Return stretch factor for axis
+	double axisStretch(int axis);
+	// Return whether specified axis is visible
+	bool axisVisible(int axis);
+	// Return coordinate at minimum of specified axis
+	Vec3<double> axisCoordMin(int axis);
+	// Return coordinate at maximum of specified axis
+	Vec3<double> axisCoordMax(int axis);
+	// Return whether axis text labels face the viewer automatically
+	bool labelFaceViewer();
+	// Return whether axis text labels are corrected for left-right / up readability
+	bool labelCorrectOrientation();
+	// Return font scaling for axis value labels
+	double labelScale();
+	// Return font scaling for titles
+	double titleScale();
 
 
 	/*
@@ -586,6 +604,31 @@ class UChromaWindow : public QMainWindow
 	// Update colour scale
 	void updateColourScale();
 
+
+	/*
+	 * Surface
+	 */
+	private:
+	// Central coordinate of surface
+	Vec3<double> surfaceCentre_;
+	// Current axis target for slice selection in Viewer
+	int sliceAxis_;
+	// Current value along axis in slice selection
+	double sliceValue_;
+
+	public:
+	// Update surface data after data change
+	void updateSurface(bool dataHasChanged = true);
+	// Return central coordinate of surface
+	Vec3<double> surfaceCentre();
+	// Set slice axis
+	void setSliceAxis(int axis);
+	// Return current axis target for slice selection
+	int sliceAxis();
+	// Update slice axis position from specified screen coordinates
+	bool updateSliceValue(int mouseX, int mouseY);
+	// Return current value along axis in slice selection
+	double sliceValue();
 
 	/*
 	 * Extras

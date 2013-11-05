@@ -41,11 +41,13 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveIma
 #endif
 	clearData();
 	sliceAxis_ = -1;
-	sliceAxisValue_ = 0.0;
 	refreshing_ = false;
 
 	// Load settings...
 	loadSettings();
+
+	// Set UChroma pointer in Viewer
+	ui.MainView->setUChroma(this);
 
 	// Load font for viewer
 	ui.MainView->setupFont(viewerFont_);
@@ -61,12 +63,6 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveIma
 // Destructor
 UChromaWindow::~UChromaWindow()
 {
-}
-
-// Window close event
-void UChromaWindow::closeEvent(QCloseEvent *event)
-{
-	if (checkBeforeClose()) event->accept();
 }
 
 // Load settings
@@ -123,192 +119,68 @@ void UChromaWindow::updateAfterLoad()
 	ui.MainView->setupFont(viewerFont_);
 }
 
-/*
-// File Menu
-*/
-
-void UChromaWindow::on_actionFileNew_triggered(bool checked)
-{
-	if (modified_)
-	{
-		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No, QMessageBox::Cancel);
-		if (button == QMessageBox::Cancel) return;
-		else if (button == QMessageBox::Yes)
-		{
-			// Save file, and check modified_ status to make sure it wasn't cancelled.
-			on_actionFileSave_triggered(false);
-			if (modified_) return;
-		}
-	}
-
-	clearData();
-	updateSurface();
-	ui.AnalyseSurfaceSliceGraph->removeAllDataSets();
-	updateAfterLoad();
-}
-
-void UChromaWindow::on_actionFileLoad_triggered(bool checked)
-{
-	if (modified_)
-	{
-		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No, QMessageBox::Cancel);
-		if (button == QMessageBox::Cancel) return;
-		else if (button == QMessageBox::Yes)
-		{
-			// Save file, and check modified_ status to make sure it wasn't cancelled.
-			on_actionFileSave_triggered(false);
-			if (modified_) return;
-		}
-	}
-
-	QString fileName = QFileDialog::getOpenFileName(this, "Choose file to load", dataFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
-	if (fileName.isEmpty()) return;
-
-	clearData();
-	loadData(fileName);
-	updateAfterLoad();
-}
-
-void UChromaWindow::on_actionFileSave_triggered(bool checked)
-{
-	// Has an input filename already been chosen?
-	if (inputFile_.isEmpty())
-	{
-		QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
-		if (fileName.isEmpty()) return;
-		inputFile_ = fileName;
-	}
-
-	if (saveData(inputFile_)) modified_ = false;
-	updateTitleBar();
-}
-
-void UChromaWindow::on_actionFileSaveAs_triggered(bool checked)
-{
-	// Has an input filename already been chosen?
-	QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
-	if (fileName.isEmpty()) return;
-	
-	inputFile_ = fileName;
-	if (saveData(inputFile_)) modified_ = false;
-	updateTitleBar();
-}
-
-void UChromaWindow::on_actionFileImportData_triggered(bool checked)
-{
-	// Raise the Data Import dialog
-	bool fitData = slices_.nItems() == 0;
-	bool result = dataImportDialog_.import();
-	if (!result) return;
-
-	// Loop over list of imported slices and copy them to our local list
-	for (Slice* slice = dataImportDialog_.importedSlices(); slice != NULL; slice = slice->next)
-	{
-		Slice* newSlice = slices_.add();
-		(*newSlice) = (*slice);
-	}
-
-	// Update data limits and file list
-	calculateDataLimits();
-	if (fitData) showAll();
-	updateSourceDataTab();
-	updateTransformTab();
-	setAsModified();
-	
-	// Need to update surface
-	updateSurface();
-}
-
-void UChromaWindow::on_actionFileSaveImage_triggered(bool checked)
-{
-	if (saveImageDialog_.getImageDetails(imageExportFile_, imageExportWidth_, imageExportHeight_, imageExportFormat_, imageExportMaintainAspect_, double(ui.MainView->width()) / double(ui.MainView->height())))
-	{
-		imageExportFile_ = saveImageDialog_.imageFileName();
-		imageExportFormat_ = saveImageDialog_.imageFormat();
-		imageExportHeight_ = saveImageDialog_.imageHeight();
-		imageExportWidth_ = saveImageDialog_.imageWidth();
-		imageExportMaintainAspect_ = saveImageDialog_.imageAspectRatioMaintained();
-		QPixmap pixmap = ui.MainView->generateImage(imageExportWidth_, imageExportHeight_);
-		pixmap.save(imageExportFile_, Viewer::imageFormatExtension(imageExportFormat_), -1);
-	}
-}
-
-void UChromaWindow::on_actionFileQuit_triggered(bool checked)
-{
-	if (checkBeforeClose()) QApplication::exit(0);
-}
-
-// Check for modified data before closing
-bool UChromaWindow::checkBeforeClose()
-{
-	if (modified_)
-	{
-		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No, QMessageBox::Cancel);
-		if (button == QMessageBox::Cancel) return false;
-		else if (button == QMessageBox::Yes)
-		{
-			// Save file, and check modified_ status to make sure it wasn't cancelled.
-			on_actionFileSave_triggered(false);
-			if (modified_) return false;
-		}
-	}
-	return true;
-}
 
 /*
- * View Menu
+ * Axes
  */
 
-void UChromaWindow::on_actionViewPerspective_triggered(bool checked)
+// Return whether axis is logarithmic
+bool UChromaWindow::axisLogarithmic(int axis)
 {
-	ui.MainView->setHasPerspective(checked);
-	ui.MainView->update();
+	return axisLogarithmic_[axis];
 }
 
-void UChromaWindow::on_actionViewReset_triggered(bool checked)
+// Return whether axis is inverted
+bool UChromaWindow::axisInverted(int axis)
 {
-	Matrix A;
-	A[14] = -5.0;
-	ui.MainView->setViewMatrix(A);
-	ui.MainView->update();
+	return axisInverted_[axis];
 }
 
-/*
- * Settings Menu
- */
-
-void UChromaWindow::on_actionSettingsChooseFont_triggered(bool checked)
+// Return stretch factor for axis
+double UChromaWindow::axisStretch(int axis)
 {
-	static QDir currentFontDirectory = viewerFont_;
-	QString newFont = QFileDialog::getOpenFileName(this, "Choose truetype font", currentFontDirectory.path(), "TrueType font files (*.ttf);;All files (*.*)");
-	if (!newFont.isEmpty())
-	{
-		viewerFont_ = newFont;
-		ui.MainView->setupFont(viewerFont_);
-		saveSettings();
-	}
+	return axisStretch_[axis];
 }
 
-/*
- * Colours
- */
-
-// Update colour scale
-void UChromaWindow::updateColourScale()
+// Return whether specified axis is visible
+bool UChromaWindow::axisVisible(int axis)
 {
-	colourScale_.clear();
-	if (colourSource_ == UChromaWindow::SingleColourSource) colourScale_.addPoint(0.0, colourSinglePoint_.colour());
-	else if (colourSource_ == UChromaWindow::RGBGradientSource)
-	{
-		colourScale_.setUseHSV(false);
-		colourScale_.addPoint(colourRGBGradientAPoint_.value(), colourRGBGradientAPoint_.colour());
-		colourScale_.addPoint(colourRGBGradientBPoint_.value(), colourRGBGradientBPoint_.colour());
-	}
-	else if (colourSource_ == UChromaWindow::HSVGradientSource)
-	{
-		colourScale_.setUseHSV(true);
-		colourScale_.addPoint(colourHSVGradientAPoint_.value(), colourHSVGradientAPoint_.colour());
-		colourScale_.addPoint(colourHSVGradientBPoint_.value(), colourHSVGradientBPoint_.colour());
-	}
-	else if (colourSource_ == UChromaWindow::CustomGradientSource) colourScale_ = customColourScale_;
+	return axisVisible_[axis];
 }
+
+// Return coordinate at minimum of specified axis
+Vec3<double> UChromaWindow::axisCoordMin(int axis)
+{
+	return axisCoordMin_[axis];
+}
+
+// Return coordinate at maximum of specified axis
+Vec3<double> UChromaWindow::axisCoordMax(int axis)
+{
+	return axisCoordMax_[axis];
+}
+
+// Return whether axis text labels face the viewer automatically
+bool UChromaWindow::labelFaceViewer()
+{
+	return labelFaceViewer_;
+}
+
+// Return whether axis text labels are corrected for left-right / up readability
+bool UChromaWindow::labelCorrectOrientation()
+{
+	return labelCorrectOrientation_;
+}
+
+// Return font scaling for axis value labels
+double UChromaWindow::labelScale()
+{
+	return labelScale_;
+}
+
+// Return font scaling for titles
+double UChromaWindow::titleScale()
+{
+	return titleScale_;
+}
+

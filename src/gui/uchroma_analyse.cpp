@@ -28,22 +28,22 @@
 
 void UChromaWindow::on_AnalyseSliceNoneRadio_clicked(bool checked)
 {
-	ui.MainView->setSliceAxis(-1);
+	sliceAxis_ = -1;
 }
 
 void UChromaWindow::on_AnalyseSliceXRadio_clicked(bool checked)
 {
-	ui.MainView->setSliceAxis(0);
+	sliceAxis_ = 0;
 }
 
 void UChromaWindow::on_AnalyseSliceYRadio_clicked(bool checked)
 {
-	ui.MainView->setSliceAxis(1);
+	sliceAxis_ = 1;
 }
 
 void UChromaWindow::on_AnalyseSliceZRadio_clicked(bool checked)
 {
-	ui.MainView->setSliceAxis(2);
+	sliceAxis_ = 2;
 }
 
 void UChromaWindow::on_AnalyseSurfaceSliceMonitorCheck_clicked(bool checked)
@@ -85,7 +85,6 @@ void UChromaWindow::on_AnalyseSurfaceSliceList_currentRowChanged(int index)
 void UChromaWindow::surfaceSliceAxisValueChanged(int axis, double value)
 {
 	sliceAxis_ = axis;
-	sliceAxisValue_ = value;
 	if (sliceAxis_ == 0) ui.AnalyseSliceXRadio->setChecked(true);
 	else if (sliceAxis_ == 1) ui.AnalyseSliceYRadio->setChecked(true);
 	else if (sliceAxis_ == 2) ui.AnalyseSliceZRadio->setChecked(true);
@@ -168,7 +167,7 @@ void UChromaWindow::updateSurfaceSliceData(bool setStatic)
 {
 	if (setStatic && (!ui.AnalyseSurfaceSliceMonitorCheck->isChecked())) return;
 
-	int bin = closestBin(sliceAxis_, sliceAxisValue_);
+	int bin = closestBin(sliceAxis_, 0.0);	// TODO Needs proper slice axis value
 	QString title;
 
 	// Grab slice data

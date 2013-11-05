@@ -36,6 +36,7 @@
 
 // Forward Declarations
 class ColourScale;
+class UChromaWindow;
 
 // Base rendering widget
 class Viewer : public QGLWidget
@@ -46,6 +47,18 @@ class Viewer : public QGLWidget
 	// Constructor / Destructor
 	Viewer(QWidget *parent);
 	~Viewer();
+
+
+	/*
+	 * Link to UChroma
+	 */
+	private:
+	// UChromaWindow pointer
+	UChromaWindow* uChroma_;
+	
+	public:
+	// Set UChromaWindow pointer
+	void setUChroma(UChromaWindow* ptr);
 
 
 	/*
@@ -115,7 +128,7 @@ class Viewer : public QGLWidget
 	// Convert screen coordinates into model space coordinates
 	Vec3<double> screenToModel(int x, int y, double z);
 
-	
+
 	/*
 	// Mouse / Keyboard Input
 	// (in viewer_input.cpp)
@@ -199,7 +212,7 @@ class Viewer : public QGLWidget
 
 	/*
 	// User Functions / Data
-	// (in viewer_scene.cpp)
+	// (in viewer_user.cpp)
 	*/
 	private:
 	// Reference list of all created primitives (to which all user primitives must be added)
@@ -214,40 +227,16 @@ class Viewer : public QGLWidget
 	ColourScale colourScale_;
 	// Y-axis scale factor to use when creating surface
 	double yAxisScale_;
-	// Centrepoint of surface
-	Vec3<double> surfaceCenter_;
-	// Scale factor for axis labels
-	double labelScale_;
-	// Scale factor for titles
-	double titleScale_;
 	// Y axis clip plane definitions
 	GLdouble clipPlaneBottom_[4], clipPlaneTop_[4], clipPlaneYMin_, clipPlaneYMax_;
 	// Delta to add to Y clip plane limits
 	double clipPlaneDelta_;
-	// Axis extreme values
-	Vec3<double> axisMin_, axisMax_;
-	// Axis extreme coordinates
-	Vec3<double> axisCoordMin_[3], axisCoordMax_[3];
-	// Whether axes are logarithmic
-	Vec3<bool> axisLogarithmic_;
-	// Whether axes are inverted
-	Vec3<bool> axisInverted_;
-	// Stretch factors for axes
-	Vec3<double> axisStretch_;
-	// Whether axes are visible
-	Vec3<bool> axisVisible_;
-	// Current axis target for temporary slice selection
-	int sliceAxis_;
-	// Current axis value for temporary slice selection
-	double sliceAxisValue_;
+	// Current axis position of slice primitive
+	double slicePrimitivePosition_;
 
 	private:
-	// Calculate active axis values at current mouse position
-	void calculateMouseAxisValues();
 	// Create necessary primitives (called once when Viewer is constructed)
 	void createPrimitives();
-	// Regenerate slice primitive
-	void regenerateSlicePrimitive();
 	// Setup basic GL properties
 	void setupGL();
 
@@ -262,30 +251,20 @@ class Viewer : public QGLWidget
 	void createSurface();
 	// Clear specified axis primitives
 	void clearAxisPrimitives(int axis);
-	// Create axis primitives
-	void createAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, bool inverted, double stretch, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> tickDirection, Vec3<double> labelOrientation, Vec4<double> titleOrientation, int titleAlignment, QString titleText);
-	// Create logarithmic axis primitives
-	void createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, bool inverted, double stretch, int nMinorTicks, Vec3<double> tickDirection, Matrix& labelTransform);
-	// Create axis title
-	void createAxisTitle(int axis, bool inverted, double stretch, bool logarithmic, QString title, Vec3<double> direction, Vec3<double> up, int zrotation);
-	// Set whether axis is visible
-	void setAxisVisible(int axis, bool visible);
+	// Add line to axis primitive
+	void addAxisLine(int axis, Vec3<double> v1, Vec3<double> v2);
+	// Add entry to axis text primitive
+	void addAxisText(int axis, QString text, Vec3<double> origin, Matrix transform, double labelScale);
+	// Calculate axis slice value at current mouse position
+	void calculateMouseAxisValue();
+	// Set slice primitive to specified axis
+	void setSlicePrimitive(int axis);
 	// Create bounding box
 	void createBoundingBox(int type, double planeY);
-	// Set surface centre
-	void setSurfaceCenter(Vec3<double> center);
 	// Set Y clip plane limits
 	void setYClip(double yMin, double yMax);
 	// Return number of triangles in surface
 	int surfaceNTriangles();
-	// Set scale factor for axis labels
-	void setLabelScale(double scale);
-	// Set scale factor for titles
-	void setTitleScale(double scale);
-	// Set whether to correct label orientations
-	void setCorrectLabelOrientations(bool correct);
-	// Set current slice axis
-	void setSliceAxis(int axis);
 	
 	signals:
 	void sliceAxisValueChanged(int, double);

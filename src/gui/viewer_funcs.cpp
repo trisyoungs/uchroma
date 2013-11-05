@@ -20,6 +20,7 @@
 */
 
 #include "gui/viewer.uih"
+#include "gui/uchroma.h"
 #include "base/messenger.h"
 
 /*
@@ -57,6 +58,8 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	format.setDirectRendering(true);
 	setFormat(format);
 
+	uChroma_ = NULL;
+
 	// Character / Setup
 	contextWidth_ = 0;
 	contextHeight_ = 0;
@@ -64,8 +67,7 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	drawing_ = false;
 	renderingOffscreen_ = false;
 	hasPerspective_ = false;
-	sliceAxis_ = -1;
-	sliceAxisValue_ = 0.0;
+	slicePrimitivePosition_ = 0.0;
 
 	// Engine Setup
 	triangleChopper_.initialise(0.0, 1000, 0.2);
@@ -100,6 +102,12 @@ Viewer::~Viewer()
 {
 }
 
+// Set UChromaWindow pointer
+void Viewer::setUChroma(UChromaWindow* ptr)
+{
+	uChroma_ = ptr;
+}
+
 /*
 // Protected Qt Virtuals
 */
@@ -109,7 +117,7 @@ void Viewer::initializeGL()
 {
 	// Initialize GL
 	msg.enter("Viewer::initializeGL");
-	valid_ = TRUE;
+	valid_ = true;
 	
 	// Create an instance for each defined user primitive - we do this in every call to initialiseGL so
 	// that, when saving a bitmap using QGLWidget::renderPixmap(), we automatically create new display list
@@ -127,8 +135,8 @@ void Viewer::paintGL()
 {
 	msg.enter("Viewer::paintGL");
 
-	// Do nothing if the canvas is not valid, or we are still drawing from last time.
-	if ((!valid_) || drawing_)
+	// Do nothing if the canvas is not valid, or we are still drawing from last time, or the uChroma pointer has not been set
+	if ((!valid_) || drawing_ || (!uChroma_))
 	{
 		msg.exit("Viewer::paintGL");
 		return;
@@ -160,9 +168,10 @@ void Viewer::paintGL()
 	glMatrixMode(GL_MODELVIEW);
 
 	// Set up our transformation matrix
+	Vec3<double> centreTranslation = -uChroma_->surfaceCentre();
 	Matrix A;
 	A.setIdentity();
-	A.setTranslation(-surfaceCenter_.x, -surfaceCenter_.y, -surfaceCenter_.z);
+	A.setTranslation(centreTranslation);
 	A = viewMatrix_ * A;
 	
 	// Send axis primitives to the display first
@@ -174,8 +183,8 @@ void Viewer::paintGL()
 	if (font_)
 	{
 		font_->FaceSize(1);
-		textPrimitives_.renderAll(viewMatrix_, labelCorrectOrientation_, -surfaceCenter_, font_);
-		for (int n=0; n<3; ++n) if (axisVisible_[n]) axisTextPrimitives_[n].renderAll(viewMatrix_, -surfaceCenter_, font_);
+		textPrimitives_.renderAll(viewMatrix_, uChroma_->labelCorrectOrientation(), centreTranslation, font_);
+		for (int n=0; n<3; ++n) if (uChroma_->axisVisible(n)) axisTextPrimitives_[n].renderAll(viewMatrix_, uChroma_->labelCorrectOrientation(), centreTranslation, font_);
 	}
 
 	// -- Render axis lines
@@ -183,7 +192,7 @@ void Viewer::paintGL()
 	glLoadMatrixd(A.matrix());
 	glLineWidth(lineWidth_);
 	glDisable(GL_LIGHTING);
-	for (int axis=0; axis<3; ++axis) if (axisVisible_[axis]) axisPrimitives_[axis].sendToGL();
+	for (int axis=0; axis<3; ++axis) if (uChroma_->axisVisible(axis)) axisPrimitives_[axis].sendToGL();
 	glEnable(GL_LIGHTING);
 	glDisable(GL_LINE_SMOOTH);
 
@@ -192,10 +201,11 @@ void Viewer::paintGL()
 
 	// Render locator slices
 	glLoadMatrixd(A.matrix());
-	if (sliceAxis_ != -1)
+	int sliceAxis = uChroma_->sliceAxis();
+	if (sliceAxis != -1)
 	{
 		Vec3<double> v(0.0, 0.0, 0.0);
-		v[sliceAxis_] = sliceAxisValue_ * axisStretch_[sliceAxis_];
+		v[sliceAxis] = uChroma_->sliceValue() * uChroma_->axisStretch(sliceAxis);
 		glTranslated(v.x, v.y, v.z);
 		glColor4d(0.0, 0.0, 0.0, 0.5);
 		slicePrimitive_.sendToGL();
@@ -509,7 +519,7 @@ Vec4<double> Viewer::modelToScreen(Vec3<double> &modelr, double screenradius)
 	pos.set(modelr, 1.0);
 	// Get the world coordinates of the point - Multiply by modelview matrix 'view'
 	vmat = viewMatrix_;
-	vmat.applyTranslation(-surfaceCenter_.x, -surfaceCenter_.y, -surfaceCenter_.z);
+	vmat.applyTranslation(-uChroma_->surfaceCentre());
 	worldr = vmat * pos;
 
 	screenr = projectionMatrix_ * worldr;

@@ -22,44 +22,6 @@
 #include "gui/viewer.uih"
 #include "gui/uchroma.h"
 
-// Calculate axis slice selection for given axis at current mouse position
-void Viewer::calculateMouseAxisValues()
-{
-	if (sliceAxis_ != -1)
-	{
-// 		printf("Test: min=%f, max=%f\n", axisMin_[0], axisMax_[0]);
-// 		rMouseLast_.print();
-// 		axisCoordMin_[0].print();
-		// Project axis coordinates to get a screen-based yardstick
-		Vec4<double> axmin = modelToScreen(axisCoordMin_[sliceAxis_]);
-		Vec4<double> axmax = modelToScreen(axisCoordMax_[sliceAxis_]);
-// 		axmin.print();
-// 		axmax.print();
-
-		// Calculate vectors between axis minimum and mouse position (AM) and axis maximum (AB)
-		Vec3<double> ab(axmax.x - axmin.x, axmax.y - axmin.y, 0.0);
-		Vec3<double> am(rMouseLast_.x - axmin.x, (contextHeight_ - rMouseLast_.y) - axmin.y, 0.0);
-		Vec3<double> amNorm = am, abNorm = ab;
-		double ratio = am.magnitude() / ab.magnitude();
-		abNorm.normalise();
-		amNorm.normalise();
-		double angle = acos(abNorm.dp(amNorm)) ;
-// 		printf("Angle = %f, %f\n", angle, angle * DEGRAD);
-		
-		// Calculate slice axis value - no need to account for inverted axes here, since this is accounted for by axmin and axmax
-		sliceAxisValue_ = abNorm.dp(amNorm)*ratio * (axisMax_[sliceAxis_] - axisMin_[sliceAxis_]) + axisMin_[sliceAxis_];
-		
-		// Clamp value to data range
-		if (sliceAxisValue_ < axisMin_[sliceAxis_]) sliceAxisValue_ = axisMin_[sliceAxis_];
-		else if (sliceAxisValue_ > axisMax_[sliceAxis_]) sliceAxisValue_ = axisMax_[sliceAxis_];
-// 		printf("ACMAG = %f, X = %f\n", ratio, sliceAxisValue_[sliceAxis_]);
-
-		// Account for log and inverted scales
-		if (axisLogarithmic_[sliceAxis_]) emit(sliceAxisValueChanged(sliceAxis_, pow(10.0, sliceAxisValue_)));
-		else emit(sliceAxisValueChanged(sliceAxis_, sliceAxisValue_));
-	}
-	else emit(sliceAxisValueChanged(-1, 0.0));
-}
 
 // Create necessary primitives (must be called before any rendering is done)
 void Viewer::createPrimitives()
@@ -77,51 +39,6 @@ void Viewer::createPrimitives()
 
 	// Every primitive using instances must be added to the primitiveList_
 	primitiveList_.add(&surfacePrimitive_);
-}
-
-// Regenerate slice primitive
-void Viewer::regenerateSlicePrimitive()
-{
-	slicePrimitive_.forgetAll();
-	if (sliceAxis_ == -1) return;
-	
-	const int nPoints = 100;
-	double delta, value;
-	Vec4<GLfloat> colour(0.0, 0.0, 0.0, 0.5);
-	Vec3<double> normal(0.0, 0.0, 0.0);
-	
-	if (sliceAxis_ == 0)
-	{
-		value = axisCoordMin_[2].z;
-		delta = (axisCoordMax_[2].z - axisCoordMin_[2].z) / nPoints;
-		normal[sliceAxis_] = 1.0;
-		for (int n=0; n<nPoints; ++n)
-		{
-			slicePrimitive_.defineVertex(0.0, axisCoordMin_[1].y, value, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(0.0, axisCoordMax_[1].y, value, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(0.0, axisCoordMax_[1].y, value+delta, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(0.0, axisCoordMax_[1].y, value+delta, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(0.0, axisCoordMin_[1].y, value+delta, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(0.0, axisCoordMin_[1].y, value, normal.x, normal.y, normal.z, true);
-			value += delta;
-		}
-	}
-	if (sliceAxis_ == 2)
-	{
-		value = axisCoordMin_[0].x;
-		delta = (axisCoordMax_[0].x - axisCoordMin_[0].x) / nPoints;
-		normal[sliceAxis_] = 1.0;
-		for (int n=0; n<nPoints; ++n)
-		{
-			slicePrimitive_.defineVertex(axisCoordMin_[0].x, value, 0.0, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(axisCoordMax_[0].x, value, 0.0, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(axisCoordMax_[0].x, value+delta, 0.0, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(axisCoordMax_[0].x, value+delta, 0.0, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(axisCoordMin_[0].x, value+delta, 0.0, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(axisCoordMin_[0].x, value, 0.0, normal.x, normal.y, normal.z, true);
-			value += delta;
-		}
-	}
 }
 
 // Setup basic GL properties (called each time before renderScene())
@@ -214,7 +131,7 @@ void Viewer::constructSliceData(Slice* targetSlice, double yAxisScale, Array< Ve
 	QColor colour;
 	for (n=0; n<nPoints; ++n)
 	{
-		colour = colourScale.colour((axisLogarithmic_.y ? pow(10.0, yTarget[n]): yTarget[n]) / yAxisScale);
+		colour = colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, yTarget[n]): yTarget[n]) / yAxisScale);
 		colours.add(Vec4<GLfloat>(colour.redF(), colour.greenF(), colour.blueF(), colour.alphaF()));
 	}
 
@@ -423,252 +340,22 @@ void Viewer::clearAxisPrimitives(int axis)
 	axisTextPrimitives_[axis].forgetAll();
 }
 
-// Create axis primitives
-void Viewer::createAxis(int axis, Vec3< double > axisPosition, double axisMin, double axisMax, bool inverted, double stretch, double firstTick, double tickDelta, int nMinorTicks, Vec3<double> tickDirection, Vec3<double> labelOrientation, Vec4<double> titleOrientation, int titleAlignment, QString titleText)
+// Add line to axis primitive
+void Viewer::addAxisLine(int axis, Vec3<double> v1, Vec3<double> v2)
 {
-	QString s;
-	FTBBox boundingBox;
-	Vec3<double> centre;
-	double dpX, dpY, textWidth;
-
-	// Store min/max values and coordinates
-	axisLogarithmic_[axis] = false;
-	axisInverted_[axis] = inverted;
-	axisStretch_[axis] = stretch;
-	axisMin_[axis] = axisMin;
-	axisMax_[axis] = axisMax;
-	axisCoordMin_[axis] = axisPosition;
-	axisCoordMin_[axis].set(axis, (inverted ? axisMax : axisMin) * stretch);
-	axisCoordMax_[axis] = axisPosition;
-	axisCoordMax_[axis].set(axis, (inverted ? axisMin : axisMax) * stretch);
-	
-	// Draw a line from min to max limits, passing through the defined axisPosition
-	axisPrimitives_[axis].plotLine(axisCoordMin_[axis], axisCoordMax_[axis]);
-
-	// Check tickDelta
-	if (((axisMax-axisMin) / tickDelta) > 1e6) return;
-
-	// Normalise tickDirection and titleOffsetDir
-	tickDirection.normalise();
-
-	// Create label and title transformation matrices
-	Matrix A, baseLabelTransform;
-	Vec3<double> leftToRight(0.0, 0.0, 0.0), upVector(0.0, 0.0, 0.0);
-	// Set left-to-right direction of text to be along axis direction
-	leftToRight.set(axis, 1.0);
-	// Our basic 'up' vector will be another orthogonal axis (but never z)
-	if (axis == 0) upVector.set(0.0, 1.0, 0.0);
-	else upVector.set(-1.0, 0.0, 0.0);
-
-	baseLabelTransform.setColumn(0, leftToRight, 0.0);
-	baseLabelTransform.setColumn(1, upVector, 0.0);
-	baseLabelTransform.setColumn(2, leftToRight * upVector, 0.0);
-	baseLabelTransform.setColumn(3, 0.0, 0.0, 0.0, 1.0);
-
-// 	if (labelFaceViewer_)
-// 	{
-// 		labelTransform = ui.MainView->viewMatrix();
-// 		labelTransform.removeTranslationAndScaling();
-// 		labelTransform.invert();
-// 
-// 		titleTransform = ui.MainView->viewMatrix();
-// 		titleTransform.removeTranslationAndScaling();
-// 		titleTransform.invert();
-// 	}
-// 	else
-	{
-		// Label Transform
-		// -- Apply rotation out of AB plane...
-// 			labelTransform.applyTranslation(0.0, 1.0, 0.0);
-// 		Matrix rotMat;
-// 		rotMat.createRotationZ(axisLabelOrientation_[axis].y);
-// 		rotMat.print();
-// 		rotMat.createRotationAxis(0.0, 0.0, -1.0, axisLabelOrientation_[axis].y, false);
-// 		rotMat.print();
-// 		labelTransform *= rotMat;
-// // 			labelTransform.applyRotationAxis(0.0, 0.0, -1.0, axisLabelOrientation_[axis].y, false);
-// // 			labelTransform.applyRotationAxis(leftToRight.x, leftToRight.y, leftToRight.z, axisLabelOrientation_[axis].x, false);
-// 		upVector = labelTransform.columnAsVec3(1);
-		// ...and in current text planeY
-	}
-	// Grab label translation vector from transform matrix, and remove it
-// 	Vec3<double> labelTranslate = labelTransform.columnAsVec3(3);
-// 	labelTransform.removeTranslationAndScaling();
-
-	// Plot tickmarks - maximum of 100 minor tickmarks between major lines
-	int count = 0;
-	double delta = tickDelta / (nMinorTicks+1);
-	double value = firstTick;
-	Vec3<double> u = axisCoordMin_[axis];
-	u.set(axis, (inverted ? (axisMax - firstTick) + axisMin : firstTick) * stretch);
-	while (value <= axisMax)
-	{
-		// Draw tick here, only if value >= limitMin_
-		if (value >= axisMin)
-		{
-			if (count %(nMinorTicks+1) == 0)
-			{
-				axisPrimitives_[axis].plotLine(u, u+ tickDirection *0.1);
-				
-				// Determine resulting text primitive width (so we can do label rotations)
-				s = QString::number(value);
-				if (font_) boundingBox = font_->BBox(qPrintable(s));
-				textWidth = fabs(boundingBox.Upper().X() - boundingBox.Lower().X());
-
-				// Create transformation matrix for text label
-				A.setIdentity();
-				// 1) Translate to anchor point of text
-// 				A.applyTranslation(textWidth*0.5, fontBaseHeight_*0.5, 0.0);
-				// 2) Apply rotation in plane of text
-				// 3) Translate to 'end of tick' position
-				// 4) Perform axial rotation
-				A.applyRotationAxis(leftToRight.x, leftToRight.y, leftToRight.z, labelOrientation.x, false);
-				A.applyTranslation(upVector * labelOrientation.z);
-				A.applyRotationAxis(0.0, 0.0, 1.0, labelOrientation.y, false);
-				A.applyScaling(labelScale_, labelScale_, labelScale_);
-
-				// Project the tick direction onto the X and Y axes of the basic text projection matrix
-				// The matrix has already had the labelScale_ factor applied...
-// 				dpX = tickDirection.dp(labelTransform.columnAsVec3(0));
-// 				dpY = tickDirection.dp(labelTransform.columnAsVec3(1));
-				dpX = 0.0;
-				dpY = 0.0;
-
-				// Construct final centre coordinate and rotation matrix
-// 				centre.set(-textWidth*0.5*labelScale_ + dpX*textWidth*0.5, -fontBaseHeight_*0.5*labelScale_ + dpY*fontBaseHeight_*0.5, 0.0);
-				centre.set(-textWidth*0.5*labelScale_, -fontBaseHeight_*0.5*labelScale_, 0.0);
-				axisTextPrimitives_[axis].add(s, u, A);
-				
-				count = 0;
-			}
-			else axisPrimitives_[axis].plotLine(u, u+ tickDirection *0.05);
-		}
-		u.add(axis, inverted ? -delta*stretch : delta*stretch);
-		value += delta;
-		++count;
-	}
-
-// 	// Draw axis title
-// 	Vec3<double> textSize;
-// 	if (font_) boundingBox = font_->BBox(qPrintable(titleText));
-// 	textSize.set(fabs(boundingBox.Upper().X() - boundingBox.Lower().X()), fontBaseHeight_);
-// 	textSize = titleTransform * textSize;
-// 
-// // 	dpX = titleOffsetVector.dp(titleTransform.columnAsVec3(0));
-// // 	dpY = titleOffsetVector.dp(titleTransform.columnAsVec3(1));
-// 
-// 	// Set general (horizontal) centre of text
-// 	centre = axisCoordMin_[axis] + (axisCoordMax_[axis] - axisCoordMin_[axis]) * titleHOffset;
-// 
-// 	// Apply offset away from axis line - the translation vector of titleTransform is the direction we move in (we also remove it afterwards)
-// 	centre += titleTransform.columnAsVec3(3)*titleDistance*titleScale_;
-// 
-// 	// Adjust anchor point to reflect text alignment chosen
-// 	if (titleAlignment == UChromaWindow::LeftAlign) centre.add(0.0, -textSize.y*0.5*titleScale_, 0.0);
-// 	else if (titleAlignment == UChromaWindow::RightAlign) centre.add(-textSize.x*titleScale_, -textSize.y*0.5*titleScale_, 0.0);
-// 	else centre.add(-textSize.x*0.5*titleScale_, -textSize.y*0.5*titleScale_, 0.0);
-// 
-// 	titleTransform.removeTranslationAndScaling();
-// 	axisTextPrimitives_[axis].add(titleText, centre, titleTransform);
+	axisPrimitives_[axis].plotLine(v1, v2);
 }
 
-// Create logarithmic axis primitives
-void Viewer::createLogAxis(int axis, Vec3<double> axisPosition, double axisMin, double axisMax, bool inverted, double stretch, int nMinorTicks, Vec3<double> tickDirection, Matrix& labelTransform)
+// Add entry to axis text primitive
+void Viewer::addAxisText(int axis, QString text, Vec3<double> origin, Matrix transform, double labelScale)
 {
-	// For the log axis, the associated surface data coordinate will already be in log form
-	if ((axisMin < 0.0) || (axisMax < 0.0))
-	{
-		msg.print("Axis range is inappropriate for a log scale (%f < x < %f). Axis will not be drawn.\n", axisMin, axisMax);
-		return;
-	}
-
-	// Enforce sensible minimum for log axes
-	if (axisMin <= 0.0) axisMin = 1.0e-10;
-
-	// Store min/max values and coordinates
-	axisLogarithmic_[axis] = true;
-	axisInverted_[axis] = inverted;
-	axisStretch_[axis] = stretch;
-	axisMin_[axis] = log10(axisMin);
-	axisMax_[axis] = log10(axisMax);
-	axisCoordMin_[axis] = axisPosition;
-	axisCoordMin_[axis].set(axis, (inverted ? log10(axisMax/axisMin) : log10(axisMin)) * stretch);
-	axisCoordMax_[axis] = axisPosition;
-	axisCoordMax_[axis].set(axis, (inverted ? 0.0 : log10(axisMax)) * stretch);
-	
-	QString s;
 	FTBBox boundingBox;
-	Vec3<double> centre;
-	double dpX, dpY, textWidth;
+	if (font_) boundingBox = font_->BBox(qPrintable(text));
+	double textWidth = fabs(boundingBox.Upper().X() - boundingBox.Lower().X());
 
-	// Draw a line from min to max range, passing through the defined axisPosition
-	axisPrimitives_[axis].plotLine(axisCoordMin_[axis], axisCoordMax_[axis]);
-
-	// Plot tickmarks
-	if (nMinorTicks > 8) nMinorTicks = 8;
-	// Start at floored (ceiling'd) integer of logAxisMin (logAxisMax), and go from there.
-	int count = 0;
-	double power = floor(axisMin_[axis]);
-	double value = pow(10,power);
-	Vec3<double> u = axisCoordMin_[axis];
-	while (true)
-	{
-		// Check break condition
-		if (value > axisMax) break;
-
-		// If the current value is in range, plot a tick
-		u[axis] = (inverted ? log10(axisMax/value) : log10(value)) * stretch;
-		if (value >= axisMin)
-		{
-			// Tick mark
-			axisPrimitives_[axis].plotLine(u, u+tickDirection*(count == 0 ? 0.1 : 0.05));
-
-			// Tick label
-			if (count == 0)
-			{
-				// Determine resulting text primitive width (so we can do label rotations)
-				s = QString::number(value);
-				if (font_) boundingBox = font_->BBox(qPrintable(s));
-				textWidth = fabs(boundingBox.Upper().X() - boundingBox.Lower().X());
-
-				// Project the tick direction onto the X and Y axes of the basic text projection matrix
-				// The matrix has already had the labelScale_ factor applied...
-				dpX = tickDirection.dp(labelTransform.columnAsVec3(0));
-				dpY = tickDirection.dp(labelTransform.columnAsVec3(1));
-
-				// Construct final centre coordinate and rotation matrix
-				centre.set(-textWidth*0.5*labelScale_ + dpX*textWidth*0.5, -fontBaseHeight_*0.5*labelScale_ + dpY*fontBaseHeight_*0.5, 0.0);
-				axisTextPrimitives_[axis].add(s, centre + (u + tickDirection*0.1), labelTransform);
-			}
-		}
-
-		// Increase tick counter, value, and power if necessary
-		++count;
-		if (count > nMinorTicks)
-		{
-			count = 0;
-			power = power + 1.0;
-			value = pow(10,power);
-		}
-		else value += pow(10,power);
-	}
-}
-
-// Create axis title
-void Viewer::createAxisTitle(int axis, bool inverted, double stretch, bool logarithmic, QString title, Vec3<double> direction, Vec3<double> up, int zrotation)
-{
-	// All axis min/max and coordinate values have already been set by calls to Viewer::createAxis()...
-	FTBBox boundingBox;
-
-	// Plot label string
-	if (font_) boundingBox = font_->BBox(qPrintable(title));
-// 	axisTextPrimitives_[axis].add(title, titleScale_, fontBaseHeight_, fabs(boundingBox.Upper().X() - boundingBox.Lower().X()), (axisCoordMax_[axis]+axisCoordMin_[axis])*0.5, direction, up, zrotation);
-}
-
-// Set whether axis is visible
-void Viewer::setAxisVisible(int axis, bool visible)
-{
-	axisVisible_[axis] = visible;
+	// Construct final centre coordinate and rotation matrix
+	Vec3<double> textCentre(-textWidth*0.5*labelScale, -fontBaseHeight_*0.5*labelScale, 0.0);
+	axisTextPrimitives_[axis].add(text, origin, textCentre, transform);
 }
 
 // Create bounding box
@@ -679,18 +366,12 @@ void Viewer::createBoundingBox(int type, double planeY)
 	if (type == 0) return;
 	else if (type == 1)
 	{
-		// Plane in XZ, spanning data range
-		boundingBoxPrimitive_.plotLine(Vec3<double>(axisCoordMin_[0].x, planeY, axisCoordMin_[2].z), Vec3<double>(axisCoordMin_[0].x, planeY, axisCoordMax_[2].z));
-		boundingBoxPrimitive_.plotLine(Vec3<double>(axisCoordMin_[0].x, planeY, axisCoordMax_[2].z), Vec3<double>(axisCoordMax_[0].x, planeY, axisCoordMax_[2].z));
-		boundingBoxPrimitive_.plotLine(Vec3<double>(axisCoordMax_[0].x, planeY, axisCoordMax_[2].z), Vec3<double>(axisCoordMax_[0].x, planeY, axisCoordMin_[2].z));
-		boundingBoxPrimitive_.plotLine(Vec3<double>(axisCoordMax_[0].x, planeY, axisCoordMin_[2].z), Vec3<double>(axisCoordMin_[0].x, planeY, axisCoordMin_[2].z));
+		// Plane in XZ, spanning data range   // TODO
+// 		boundingBoxPrimitive_.plotLine(Vec3<double>(axisCoordMin_[0].x, planeY, axisCoordMin_[2].z), Vec3<double>(axisCoordMin_[0].x, planeY, axisCoordMax_[2].z));
+// 		boundingBoxPrimitive_.plotLine(Vec3<double>(axisCoordMin_[0].x, planeY, axisCoordMax_[2].z), Vec3<double>(axisCoordMax_[0].x, planeY, axisCoordMax_[2].z));
+// 		boundingBoxPrimitive_.plotLine(Vec3<double>(axisCoordMax_[0].x, planeY, axisCoordMax_[2].z), Vec3<double>(axisCoordMax_[0].x, planeY, axisCoordMin_[2].z));
+// 		boundingBoxPrimitive_.plotLine(Vec3<double>(axisCoordMax_[0].x, planeY, axisCoordMin_[2].z), Vec3<double>(axisCoordMin_[0].x, planeY, axisCoordMin_[2].z));
 	}
-}
-
-// Set surface centre
-void Viewer::setSurfaceCenter(Vec3<double> center)
-{
-	surfaceCenter_ = center;
 }
 
 // Set Y clip plane limits
@@ -706,23 +387,76 @@ int Viewer::surfaceNTriangles()
 	return surfacePrimitive_.nDefinedVertices() / 3;
 }
 
-// Set scale factor for axis labels
-void Viewer::setLabelScale(double scale)
+// Setup slice primitive
+void Viewer::setSlicePrimitive(int axis)
 {
-	labelScale_ = scale;
-}
+	slicePrimitive_.forgetAll();
+	if (axis == -1) return;
 
-// Set scale factor for titles
-void Viewer::setTitleScale(double scale)
-{
-	titleScale_ = scale;
-}
+	// Grab axes, and knock out values in the supplied vectors which correspond to the activated axis
+	Vec3<double> axisMinA = uChroma_->axisCoordMin((axis+1)%3), axisMaxA = uChroma_->axisCoordMax((axis+1)%3);
+	Vec3<double> axisMinB = uChroma_->axisCoordMin((axis+2)%3), axisMaxB = uChroma_->axisCoordMax((axis+2)%3);
+	axisMinA[axis] = 0.0;
+	axisMaxA[axis] = 0.0;
+	axisMinB[axis] = 0.0;
+	axisMaxB[axis] = 0.0;
 
-// Set current slice axis
-void Viewer::setSliceAxis(int axis)
-{
-	sliceAxis_ = axis;
-	regenerateSlicePrimitive();
-	calculateMouseAxisValues();
-	repaint();
+	// Work out deltas for each direction
+	const int nPoints = 50;
+	Vec3<double> deltaA, deltaB, pos;
+	deltaA = (axisMaxA - axisMinA) / nPoints;
+	deltaB = (axisMaxB - axisMinB) / nPoints;
+
+	// Set normal
+	Vec3<double> normal(0.0, 0.0, 0.0);
+	normal[axis] = 1.0;
+
+	// Construct plane
+	for (int n=0; n<nPoints; ++n)
+	{
+		pos = axisMinA + deltaA*n;
+		for (int m=0; m<nPoints; ++m)
+		{
+			slicePrimitive_.defineVertex(pos, normal, true);
+			slicePrimitive_.defineVertex(pos + deltaA, normal, true);
+			slicePrimitive_.defineVertex(pos + deltaA + deltaB, normal, true);
+			slicePrimitive_.defineVertex(pos + deltaA + deltaB, normal, true);
+			slicePrimitive_.defineVertex(pos + deltaB, normal, true);
+			slicePrimitive_.defineVertex(pos, normal, true);
+			pos += deltaB;
+		}
+	}
+/*	
+	if (axis == 0)
+	{
+		value = axisCoordMin_[2].z;
+		delta = (axisCoordMax_[2].z - axisCoordMin_[2].z) / nPoints;
+		normal[sliceAxis_] = 1.0;
+		for (int n=0; n<nPoints; ++n)
+		{
+			slicePrimitive_.defineVertex(0.0, axisCoordMin_[1].y, value, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(0.0, axisCoordMax_[1].y, value, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(0.0, axisCoordMax_[1].y, value+delta, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(0.0, axisCoordMax_[1].y, value+delta, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(0.0, axisCoordMin_[1].y, value+delta, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(0.0, axisCoordMin_[1].y, value, normal.x, normal.y, normal.z, true);
+			value += delta;
+		}
+	}
+	if (axis == 2)
+	{
+		value = [0].x;
+		delta = (axisCoordMax_[0].x - axisCoordMin_[0].x) / nPoints;
+		normal[sliceAxis_] = 1.0;
+		for (int n=0; n<nPoints; ++n)
+		{
+			slicePrimitive_.defineVertex(axisCoordMin_[0].x, value, 0.0, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(axisCoordMax_[0].x, value, 0.0, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(axisCoordMax_[0].x, value+delta, 0.0, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(axisCoordMax_[0].x, value+delta, 0.0, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(axisCoordMin_[0].x, value+delta, 0.0, normal.x, normal.y, normal.z, true);
+			slicePrimitive_.defineVertex(axisCoordMin_[0].x, value, 0.0, normal.x, normal.y, normal.z, true);
+			value += delta;
+		}
+	}*/
 }

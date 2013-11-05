@@ -124,7 +124,7 @@ void UChromaWindow::clearData()
 	preTransformShift_.zero();
 	postTransformShift_.zero();
 	modified_ = false;
-	axisInvert_.set(false, false, false);
+	axisInverted_.set(false, false, false);
 	axisVisible_.set(true, true, true);
 	labelScale_ = 0.25;
 	titleScale_ = 0.3;
@@ -208,7 +208,7 @@ bool UChromaWindow::loadData(QString fileName)
 				break;
 			// Axis invert flags
 			case (UChromaWindow::AxisInvertKeyword):
-				axisInvert_.set(parser.argi(1), parser.argi(2), parser.argi(3));
+				axisInverted_.set(parser.argi(1), parser.argi(2), parser.argi(3));
 				break;
 			// Axis label orientation
 			case (UChromaWindow::AxisLabelOrientationKeyword):
@@ -493,7 +493,7 @@ bool UChromaWindow::saveData(QString fileName)
 		parser.writeLineF("%s %i '%s'\n", DataFileKeywordStrings[UChromaWindow::AxisTitleKeyword], axis, qPrintable(axisTitle_[axis]));
 		parser.writeLineF("%s %i %f %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisTitleOrientationKeyword], axis, axisTitleOrientation_[axis].x, axisTitleOrientation_[axis].y, axisTitleOrientation_[axis].z, axisTitleOrientation_[axis].w);
 	}
-	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisInvertKeyword], axisInvert_.x, axisInvert_.y, axisInvert_.z);
+	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisInvertKeyword], axisInverted_.x, axisInverted_.y, axisInverted_.z);
 	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisLogarithmicKeyword], axisLogarithmic_.x, axisLogarithmic_.y, axisLogarithmic_.z);
 	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisVisibleKeyword], axisVisible_.x, axisVisible_.y, axisVisible_.z);
 	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisStretchKeyword], axisStretch_.x, axisStretch_.y, axisStretch_.z);
@@ -699,226 +699,4 @@ void UChromaWindow::setAsModified()
 {
 	modified_ = true;
 	updateTitleBar();
-}
-
-// Update surface data after data change
-void UChromaWindow::updateSurface(bool dataHasChanged)
-{
-	// Determine surface center and Y clip limits
-	Vec3<double> center;
-	for (int n=0; n<3; ++n)
-	{
-		if (axisLogarithmic_[n]) center[n] = (axisInvert_[n] ? log10(limitMax_[n]/limitMin_[n]) : log10(limitMax_[n]*limitMin_[n])) * 0.5 * axisStretch_[n];
-		else center[n] = (limitMax_[n]+limitMin_[n]) * 0.5 * axisStretch_[n];
-	}
-	ui.MainView->setSurfaceCenter(center);
-	if (axisLogarithmic_.y) ui.MainView->setYClip(log10(limitMin_.y) * axisStretch_.y, log10(limitMax_.y) * axisStretch_.y);
-	else ui.MainView->setYClip(limitMin_.y * axisStretch_.y, limitMax_.y * axisStretch_.y);
-
-	// Make sure view variables are up-to-date
-	ui.MainView->setLabelScale(labelScale_);
-	ui.MainView->setTitleScale(titleScale_);
-
-	// Construct axes
-	for (int axis = 0; axis < 3; ++axis)
-	{
-		// Clear old axis primitives
-		ui.MainView->clearAxisPrimitives(axis);
-
-		// Create label and title transformation matrices
-		Matrix labelTransform, titleTransform;
-		// Set left-to-right direction of text to be along axis direction
-		Vec3<double> leftToRight(0.0,0.0,0.0);
-		leftToRight.set(axis, 1.0);
-		// Our basic 'up' vector will be another orthogonal axis (but never z)
-		Vec3<double> upVector(0.0,0.0,0.0);
-		if (axis == 0) upVector.set(0.0, 1.0, 0.0);
-		else upVector.set(-1.0, 0.0, 0.0);
-		labelTransform.setColumn(0, leftToRight, 0.0);
-		labelTransform.setColumn(1, upVector, 0.0);
-		labelTransform.setColumn(2, leftToRight * upVector, 0.0);
-		labelTransform.setColumn(3, 0.0, 0.0, 0.0, 1.0);
-		titleTransform = labelTransform;
-	
-		if (labelFaceViewer_)
-		{
-			labelTransform = ui.MainView->viewMatrix();
-			labelTransform.removeTranslationAndScaling();
-			labelTransform.invert();
-
-			titleTransform = ui.MainView->viewMatrix();
-			titleTransform.removeTranslationAndScaling();
-			titleTransform.invert();
-		}
-		else
-		{
-			// Label Transform
-			// -- Apply rotation out of AB plane...
-// 			labelTransform.applyTranslation(0.0, 1.0, 0.0);
-			Matrix rotMat;
-			rotMat.createRotationZ(axisLabelOrientation_[axis].y);
-			rotMat.print();
-			rotMat.createRotationAxis(0.0, 0.0, -1.0, axisLabelOrientation_[axis].y, false);
-			rotMat.print();
-			labelTransform *= rotMat;
-// 			labelTransform.applyRotationAxis(0.0, 0.0, -1.0, axisLabelOrientation_[axis].y, false);
-// 			labelTransform.applyRotationAxis(leftToRight.x, leftToRight.y, leftToRight.z, axisLabelOrientation_[axis].x, false);
-			upVector = labelTransform.columnAsVec3(1);
-			// ...and in current text plane
-
-			// Title transform
-			// -- Apply rotation out of AB plane...
-			titleTransform.applyRotationAxis(leftToRight.x, leftToRight.y, leftToRight.z, axisTitleOrientation_[axis].x, false);
-			upVector = titleTransform.columnAsVec3(1);
-			// ...and in current text plane
-			titleTransform.applyRotationAxis(titleTransform[8], titleTransform[9], titleTransform[10], axisTitleOrientation_[axis].y, false);
-			titleTransform.setTranslation(0.0, axisTitleOrientation_[axis].z, 0.0);
-		}
-		labelTransform.columnMultiply( Vec3<double>(labelScale_,labelScale_,labelScale_) );
-		titleTransform.columnMultiply( Vec3<double>(titleScale_,titleScale_,titleScale_) );
-
-		// Set position, taking into account logarithmic axes and scale factors
-		Vec3<double> pos;
-		for (int n=0; n<3; ++n)
-		{
-			if (n == axis) pos.set(n, 0.0);
-			else if (axisLogarithmic_[n]) pos.set(n, (axisInvert_[n] ? log10(limitMax_[n] / axisPosition_[axis][n]) : log10(axisPosition_[axis][n])) * axisStretch_[n]);
-			else pos.set(n, (axisInvert_[n] ? limitMax_[n] - axisPosition_[axis][n] : axisPosition_[axis][n]) * axisStretch_[n]);
-		}
-
-		if (axisLogarithmic_[axis])
-		{
-			ui.MainView->createLogAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisInvert_[axis], axisStretch_[axis], axisMinorTicks_[axis], axisTickDirection_[axis], labelTransform);
-		}
-		else
-		{
-			// Calculate autoticks if necessary
-			if (axisAutoTicks_[axis]) calculateTickDeltas(axis);
-
-			ui.MainView->createAxis(axis, pos, limitMin_[axis], limitMax_[axis], axisInvert_[axis], axisStretch_[axis], axisFirstTick_[axis], axisTickDelta_[axis], axisMinorTicks_[axis], axisTickDirection_[axis], axisLabelOrientation_[axis], axisTitleOrientation_[axis], axisTitleAnchor_[axis], axisTitle_[axis]);
-		}
-
-		ui.MainView->setAxisVisible(axis, axisVisible_[axis]);
-	}
-
-	// Reconstruct surface
-	if (dataHasChanged)
-	{
-		// Clear existing display slices
-		surfaceData_.clear();
-		double x, y;
-
-		// Loop over slices, apply any transforms (X or Y) and check limits
-		Slice* slice = axisInvert_.z ? slices_.last() : slices_.first();
-		while (slice)
-		{
-			// Z
-			double z = transformValue(slice->z(), 2);
-			// -- Is the transformed Z value within range?
-			if ((z < limitMin_.z) || (z > limitMax_.z))
-			{
-				slice = axisInvert_.z ? slice->prev : slice->next;
-				continue;
-			}
-			if (axisInvert_.z) z = (limitMax_.z - z) + limitMin_.z;
-			if (axisLogarithmic_.z) z = log10(z);
-
-			// Add new item to surfaceData_ array
-			Slice* surfaceSlice = surfaceData_.add();
-			surfaceSlice->setZ(z * axisStretch_.z);
-
-			// Copy / interpolate arrays
-			Array<double> array[2];
-			if (interpolate_.x)
-			{
-				slice->data().interpolate(interpolateConstrained_.x);
-				double x = limitMin_.x;
-				while (x <= limitMax_.x)
-				{
-					array[0].add(x);
-					array[1].add(slice->data().interpolated(x));
-					x += interpolationStep_.x;
-				}
-			}
-			else
-			{
-				array[0] = slice->data().arrayX();
-				array[1] = slice->data().arrayY();
-			}
-
-			// X / Y
-			for (int n=0; n<2; ++n)
-			{
-				// Apply pre-transform shift
-				array[n] += preTransformShift_[n];
-
-				// Apply transform
-				switch (transformType_[n])
-				{
-					case (UChromaWindow::MultiplyTransform):
-						array[n] *= transformValue_[n];
-						break;
-					case (UChromaWindow::DivideTransform):
-						array[n] /= transformValue_[n];
-						break;
-					case (UChromaWindow::LogBase10Transform):
-						array[n].takeLog();
-						break;
-					case (UChromaWindow::NaturalLogTransform):
-						array[n].takeLn();
-						break;
-				}
-				// Apply post-transform shift
-				array[n] += postTransformShift_[n];
-			}
-
-			// Add data to surfaceSlice, obeying defined x-limits
-			if (axisInvert_.x) for (int n=array[0].nItems()-1; n >= 0; --n)
-			{
-				x = array[0].value(n);
-				if ((x < limitMin_.x) || (x > limitMax_.x)) continue;
-				if (axisLogarithmic_.x) x = log10(limitMax_.x / x);
-				else x = (limitMax_.x - x) + limitMin_.x;
-				x *= axisStretch_.x;
-				y = array[1].value(n);
-				if (axisLogarithmic_.y) y = (axisInvert_.y ? log10(limitMax_.y / y) : log10(y));
-				else if (axisInvert_.y) y = (limitMax_.y - y) + limitMin_.y;
-				y *= axisStretch_.y;
-				surfaceSlice->data().addPoint(x, y);
-			}
-			else for (int n=0; n<array[0].nItems(); ++n)
-			{
-				x = array[0].value(n);
-				if ((x < limitMin_.x) || (x > limitMax_.x)) continue;
-				if (axisLogarithmic_.x) x = log10(x);
-				x *= axisStretch_.x;
-				y = array[1].value(n);
-				if (axisLogarithmic_.y)
-				{
-					if (y < 0.0) y = 1.0e-10;
-					else y = (axisInvert_.y ? log10(limitMax_.y / y) : log10(y));
-				}
-				else if (axisInvert_.y) y = (limitMax_.y - y) + limitMin_.y;
-				y *= axisStretch_.y;
-				surfaceSlice->data().addPoint(x, y);
-			}
-
-			// Move to next Z slice
-			slice = axisInvert_.z ? slice->prev : slice->next;
-		}
-	}
-
-	// Create temporary colourScale_
-	ColourScale scale = colourScale_;
-	if (alphaControl_ == UChromaWindow::FixedAlpha) scale.setAllAlpha(fixedAlpha_);
-
-	// Update surface GL object
-	ui.MainView->createSurface(scale, axisStretch_.y);
-
-	// Setup Bounding Box
-	ui.MainView->createBoundingBox(boundingBox_, axisLogarithmic_.y ? log10(boundingBoxPlaneY_) : boundingBoxPlaneY_);
-
-	ui.MainView->update();
-
-	ui.NTrianglesLabel->setText("NTriangles: " + QString::number(ui.MainView->surfaceNTriangles()));
 }

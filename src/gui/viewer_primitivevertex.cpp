@@ -45,6 +45,12 @@ void Primitive::defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloa
 	++nDefinedVertices_;
 }
 
+// Define next vertex and normal (as Vec3<double>)
+void Primitive::defineVertex(Vec3<double> vertex, Vec3<double> normal, bool calcCentroid)
+{
+	defineVertex(vertex.x, vertex.y, vertex.z, normal.x, normal.y, normal.z, calcCentroid);
+}
+
 // Define next vertex and normal with colour
 void Primitive::defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat r, GLfloat g, GLfloat b, GLfloat a, bool calcCentroid)
 {

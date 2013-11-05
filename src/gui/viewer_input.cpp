@@ -40,11 +40,11 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 
 	if (buttonState_&Qt::LeftButton)
 	{
-		if (sliceAxis_ != -1)
+		if (uChroma_->sliceAxis() != -1)
 		{
-			calculateMouseAxisValues();
-			if (axisLogarithmic_[sliceAxis_]) emit(sliceAxisClicked(sliceAxis_, pow(10.0, sliceAxisValue_)));
-			else emit(sliceAxisClicked(sliceAxis_, sliceAxisValue_));
+// 			calculateMouseAxisValues();
+// 			if (uChroma_->axisLogarithmic(sliceAxis_)) emit(sliceAxisClicked(sliceAxis_, pow(10.0, sliceAxisValue_))); // TODO
+// 			else emit(sliceAxisClicked(sliceAxis_, sliceAxisValue_));
 		}
 		
 	}
@@ -111,12 +111,9 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 		refresh = true;
 	}
 	
-	// Recalculate slice values?
-	if (sliceAxis_ != -1)
-	{
-		calculateMouseAxisValues();
-		refresh = true;
-	}
+	// Recalculate slice value
+	if (uChroma_->updateSliceValue(event->x(), contextHeight_-event->y())) refresh = true;
+
 	rMouseLast_.set(event->x(), event->y(), 0.0);
 	setFocus();
 	
@@ -202,9 +199,9 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 		case (Qt::Key_X):
 		case (Qt::Key_Y):
 		case (Qt::Key_Z):
-			sliceAxis_ = sliceAxis_ == (event->key() - Qt::Key_X) ? -1 : (event->key() - Qt::Key_X);
-			regenerateSlicePrimitive();
-			calculateMouseAxisValues();
+			uChroma_->setSliceAxis(uChroma_->sliceAxis() == (event->key() - Qt::Key_X) ? -1 : (event->key() - Qt::Key_X));
+			setSlicePrimitive(uChroma_->sliceAxis());
+			uChroma_->updateSliceValue(rMouseLast_.x, contextHeight_ - rMouseLast_.y);
 			refresh = true;
 			ignore = false;
 			break;

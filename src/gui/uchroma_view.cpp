@@ -25,7 +25,7 @@
 bool UChromaWindow::viewAxisInvertChanged(int axis, bool checked)
 {
 	if (refreshing_) return false;
-	axisInvert_[axis] = checked;
+	axisInverted_[axis] = checked;
 	setAsModified();
 	updateSurface();
 	return true;
@@ -750,7 +750,6 @@ void UChromaWindow::on_ViewLabelScaleSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	labelScale_ = value;
-	ui.MainView->setLabelScale(labelScale_);
 	setAsModified();
 	updateSurface(false);
 }
@@ -759,7 +758,6 @@ void UChromaWindow::on_ViewTitleScaleSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	titleScale_ = value;
-	ui.MainView->setTitleScale(titleScale_);
 	setAsModified();
 	updateSurface(false);
 }
@@ -776,9 +774,9 @@ void UChromaWindow::updateViewTab()
 	ui.ViewTitleScaleSpin->setValue(titleScale_);
 
 	// Invert / Visible / Logarithmic
-	ui.ViewXAxisInvertCheck->setChecked(axisInvert_.x);
-	ui.ViewYAxisInvertCheck->setChecked(axisInvert_.y);
-	ui.ViewZAxisInvertCheck->setChecked(axisInvert_.z);
+	ui.ViewXAxisInvertCheck->setChecked(axisInverted_.x);
+	ui.ViewYAxisInvertCheck->setChecked(axisInverted_.y);
+	ui.ViewZAxisInvertCheck->setChecked(axisInverted_.z);
 	ui.ViewXAxisVisibleCheck->setChecked(axisVisible_.x);
 	ui.ViewYAxisVisibleCheck->setChecked(axisVisible_.y);
 	ui.ViewZAxisVisibleCheck->setChecked(axisVisible_.z);

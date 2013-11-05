@@ -21,7 +21,7 @@ SUFFIXES: .ui .uih .qrc
 clean:
 	rm -f *.o ui_* viewer.cpp
 
-libgui_a_SOURCES = icons.qrc dataimport.ui saveimage.ui uchroma.ui uchroma_funcs.cpp uchroma_data.cpp uchroma_analyse.cpp uchroma_colour.cpp uchroma_analyse.cpp uchroma_sourcedata.cpp uchroma_transform.cpp uchroma_view.cpp
+libgui_a_SOURCES = icons.qrc dataimport.ui saveimage.ui uchroma.ui uchroma_funcs.cpp uchroma_data.cpp uchroma_analyse.cpp uchroma_colour.cpp uchroma_analyse.cpp uchroma_slots.cpp uchroma_sourcedata.cpp uchroma_surface.cpp uchroma_transform.cpp uchroma_view.cpp
 
 libgui_a_SOURCES += dataimport_funcs.cpp dataimport_seqxy.cpp saveimage_funcs.cpp
 libgui_a_SOURCES += colourbutton.uih colourbutton_funcs.cpp

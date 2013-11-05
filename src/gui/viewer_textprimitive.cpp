@@ -32,7 +32,9 @@ void TextPrimitive::set(QString text, Vec3<double> origin, Vec3<double> centre, 
 {
 	text_ = text;
 	origin_ = origin;
-	centre_ = centre;
+	centre_.X(centre.x);
+	centre_.Y(centre.y);
+	centre_.Z(centre.z);
 	localTransform_ = transform;
 }
 
@@ -42,10 +44,16 @@ Matrix& TextPrimitive::localTransform()
 	return localTransform_;
 }
 
-// Return text centerpoint
-Vec3< double > TextPrimitive::center()
+// Return text origin
+Vec3<double> TextPrimitive::origin()
 {
-	return center_;
+	return origin_;
+}
+
+// Return text centerpoint
+FTPoint TextPrimitive::centre()
+{
+	return centre_;
 }
 
 // Return text to render
@@ -82,9 +90,9 @@ bool TextPrimitiveChunk::full()
 }
 
 // Add primitive to chunk
-void TextPrimitiveChunk::add(QString text, Vec3<double> origin, Matrix& transform)
+void TextPrimitiveChunk::add(QString text, Vec3<double> origin, Vec3<double> centre, Matrix& transform)
 {
-	textPrimitives_[nTextPrimitives_].set(text, origin, transform);
+	textPrimitives_[nTextPrimitives_].set(text, origin, centre, transform);
 	++nTextPrimitives_;
 }
 
@@ -138,18 +146,18 @@ void TextPrimitiveList::forgetAll()
 }
 
 // Set data from literal coordinates and text
-void TextPrimitiveList::add(QString text, Vec3< double > origin, Vec3< double > centre, Matrix& transform)
+void TextPrimitiveList::add(QString text, Vec3<double> origin, Vec3<double> centre, Matrix& transform)
 {
 	if (currentChunk_ == NULL) currentChunk_ = textPrimitives_.add();
 	else if (currentChunk_->full()) currentChunk_ = textPrimitives_.add();
 
 	// Add primitive and set data
-	currentChunk_->add(text, origin, transform);
+	currentChunk_->add(text, origin, centre, transform);
 }
 
 // Render all primitives in list
-void TextPrimitiveList::renderAll(Matrix viewMatrix, bool correctView, Vec3< double > center, FTFont* font)
+void TextPrimitiveList::renderAll(Matrix viewMatrix, bool correctView, Vec3<double> globalCentre, FTFont* font)
 {
-	for (TextPrimitiveChunk *chunk = textPrimitives_.first(); chunk != NULL; chunk = chunk->next) chunk->renderAll(viewMatrix, center, font);
+	for (TextPrimitiveChunk *chunk = textPrimitives_.first(); chunk != NULL; chunk = chunk->next) chunk->renderAll(viewMatrix, correctView, globalCentre, font);
 }
 

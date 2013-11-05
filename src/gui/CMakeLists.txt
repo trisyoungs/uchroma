@@ -16,7 +16,9 @@ uchroma_data.cpp
 uchroma_analyse.cpp
 uchroma_colour.cpp
 uchroma_analyse.cpp
+uchroma_slots.cpp
 uchroma_sourcedata.cpp
+uchroma_surface.cpp
 uchroma_transform.cpp
 uchroma_view.cpp
 dataimport_funcs.cpp
