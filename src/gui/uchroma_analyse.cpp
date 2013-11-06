@@ -29,41 +29,35 @@
 void UChromaWindow::on_AnalyseSliceNoneRadio_clicked(bool checked)
 {
 	sliceAxis_ = -1;
+	ui.AnalyseSliceNoneRadio->setChecked(true);
 }
 
 void UChromaWindow::on_AnalyseSliceXRadio_clicked(bool checked)
 {
 	sliceAxis_ = 0;
+	ui.AnalyseSliceXRadio->setChecked(true);
 }
 
 void UChromaWindow::on_AnalyseSliceYRadio_clicked(bool checked)
 {
 	sliceAxis_ = 1;
+	ui.AnalyseSliceYRadio->setChecked(true);
 }
 
 void UChromaWindow::on_AnalyseSliceZRadio_clicked(bool checked)
 {
 	sliceAxis_ = 2;
+	ui.AnalyseSliceZRadio->setChecked(true);
 }
 
 void UChromaWindow::on_AnalyseSurfaceSliceMonitorCheck_clicked(bool checked)
 {
 }
 
-void UChromaWindow::on_AnalyseSurfaceSliceShowLegendCheck_clicked(bool checked)
-{
-	ui.AnalyseSurfaceSliceGraph->setShowLegend(checked);
-}
-
-void UChromaWindow::on_AnalyseSurfaceSliceAutoScaleCheck_clicked(bool checked)
-{
-	ui.AnalyseSurfaceSliceGraph->setAutoScale(checked);
-}
-
 void UChromaWindow::on_AnalyseSurfaceSliceClearButton_clicked(bool checked)
 {
 	ui.AnalyseSurfaceSliceList->clear();
-	ui.AnalyseSurfaceSliceGraph->removeAllDataSets();
+// 	ui.AnalyseSurfaceSliceGraph->removeAllDataSets();
 }
 
 void UChromaWindow::on_AnalyseSurfaceSliceSaveButton_clicked(bool checked)
@@ -74,38 +68,16 @@ void UChromaWindow::on_AnalyseSurfaceSliceSaveButton_clicked(bool checked)
 
 void UChromaWindow::on_AnalyseSurfaceSliceList_currentRowChanged(int index)
 {
-	
 }
 
 /*
  * Public Slots
  */
 
-// Slice axis value changed
-void UChromaWindow::surfaceSliceAxisValueChanged(int axis, double value)
-{
-	sliceAxis_ = axis;
-	if (sliceAxis_ == 0) ui.AnalyseSliceXRadio->setChecked(true);
-	else if (sliceAxis_ == 1) ui.AnalyseSliceYRadio->setChecked(true);
-	else if (sliceAxis_ == 2) ui.AnalyseSliceZRadio->setChecked(true);
-	else ui.AnalyseSliceNoneRadio->setChecked(true);
-
-	// Update label
-	ui.SliceSelectorLabel->setEnabled(axis != -1);
-	if (axis != -1)
-	{
-		// Update label
-		ui.SliceSelectorLabel->setText( QString("Slice @ ") + QChar(88 + axis) + " = " + QString::number(value));
-	}
-
-	// If we are monitoring, construct a slice and add it as the static data of the graph
-	if (ui.AnalyseSurfaceSliceMonitorCheck->isChecked()) updateSurfaceSliceData(true);
-}
-
 // Add slice to graph
-void UChromaWindow::addSurfaceSlice(int axis, double value)
+void UChromaWindow::addSurfaceSlice()
 {
-	updateSurfaceSliceData(false);
+// 	updateSurfaceSliceData(false);
 }
 
 /*
@@ -117,7 +89,7 @@ int UChromaWindow::closestBin(int axis, double value)
 {
 	if (slices_.nItems() == 0) return -1;
 
-	if (sliceAxis_ == 0)
+	if (axis == 0)
 	{
 		// Check X array of first slice
 		Array<double>& x = slices_.first()->data().arrayX();
@@ -134,11 +106,11 @@ int UChromaWindow::closestBin(int axis, double value)
 		if (fabs(x.value(loIndex) - value) < fabs(x.value(hiIndex) - value)) return loIndex;
 		else return hiIndex;
 	}
-	else if (sliceAxis_ == 1)
+	else if (axis == 1)
 	{
 		// ???
 	}
-	else if (sliceAxis_ == 2)
+	else if (axis == 2)
 	{
 		// Check z-values
 		int closest = 0, n = 0;
@@ -162,39 +134,8 @@ int UChromaWindow::closestBin(int axis, double value)
  * Public Functions
  */
 
-// Update/add slice data
-void UChromaWindow::updateSurfaceSliceData(bool setStatic)
+// Return current slice data
+Data2D UChromaWindow::sliceData()
 {
-	if (setStatic && (!ui.AnalyseSurfaceSliceMonitorCheck->isChecked())) return;
-
-	int bin = closestBin(sliceAxis_, 0.0);	// TODO Needs proper slice axis value
-	QString title;
-
-	// Grab slice data
-	if (sliceAxis_ == 0)
-	{
-		// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated)
-		sliceData_.clear();
-		for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) sliceData_.addPoint(transformValue(slice->z(), 2), transformValue(slice->data().y(bin), 1));
-		title = "X = " + QString::number(transformValue(slices_.first()->data().x(bin), 0));
-	}
-	else if (sliceAxis_ == 1)
-	{
-		return;
-	}
-	else if (sliceAxis_ == 2)
-	{
-		// Slice through Z - i.e. original slice data
-		sliceData_.clear();
-		sliceData_ = slices_[bin]->data();
-		title = "Z = " + QString::number(slices_[bin]->z());
-	}
-
-	// Set static data, or add other dataset?
-	if (setStatic) ui.AnalyseSurfaceSliceGraph->setStaticData(sliceData_, title);
-	else
-	{
-		ui.AnalyseSurfaceSliceGraph->addDataSet(sliceData_, title, "Data");
-		ui.AnalyseSurfaceSliceList->addItem(title);
-	}
+	return sliceData_;
 }

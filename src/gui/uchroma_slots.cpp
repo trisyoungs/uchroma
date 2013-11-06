@@ -50,7 +50,6 @@ void UChromaWindow::on_actionFileNew_triggered(bool checked)
 
 	clearData();
 	updateSurface();
-	ui.AnalyseSurfaceSliceGraph->removeAllDataSets();
 	updateAfterLoad();
 }
 

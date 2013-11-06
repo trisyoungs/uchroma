@@ -46,6 +46,8 @@ class UChromaWindow : public QMainWindow
 	SaveImageDialog saveImageDialog_;
 	// Data Import Dialog
 	DataImportDialog dataImportDialog_;
+	// Slice Monitor Dialog
+// 	SliceMonitorWidget sliceMonitorWidget_;
 
 	public:
 	// Constructor / Destructor
@@ -375,27 +377,28 @@ class UChromaWindow : public QMainWindow
 	void on_AnalyseSliceYRadio_clicked(bool checked);
 	void on_AnalyseSliceZRadio_clicked(bool checked);
 	void on_AnalyseSurfaceSliceMonitorCheck_clicked(bool checked);
-	void on_AnalyseSurfaceSliceShowLegendCheck_clicked(bool checked);
-	void on_AnalyseSurfaceSliceAutoScaleCheck_clicked(bool checked);
 	void on_AnalyseSurfaceSliceClearButton_clicked(bool checked);
 	void on_AnalyseSurfaceSliceSaveButton_clicked(bool checked);
 	void on_AnalyseSurfaceSliceList_currentRowChanged(int index);
 
 	public slots:
-	void surfaceSliceAxisValueChanged(int axis, double value);
-	void addSurfaceSlice(int axis, double value);
+	void addSurfaceSlice();
 
 	private:
 	// Current slice data
 	Data2D sliceData_;
-	
+
 	private:
 	// Return axis bin value of closest point to supplied value
 	int closestBin(int axis, double value);
 
 	public:
-	// Update slice data
-	void updateSurfaceSliceData(bool setStatic);
+	// Return current slice data
+	Data2D sliceData();
+
+	signals:
+	// Slice data has changed
+	void sliceDataChanged();
 
 
 	/*
@@ -619,8 +622,11 @@ class UChromaWindow : public QMainWindow
 	int sliceAxis();
 	// Update slice axis position from specified screen coordinates
 	bool updateSliceValue(int mouseX, int mouseY);
-	// Return current value along axis in slice selection
+	// Return current slice value along axis
 	double sliceValue();
+	// Return current slice coordinate along axis
+	double sliceCoordinate();
+
 
 	/*
 	 * Extras

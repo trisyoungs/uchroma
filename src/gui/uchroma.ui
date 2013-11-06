@@ -2227,6 +2227,18 @@
                       <property name="margin">
                        <number>0</number>
                       </property>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="ViewXAxisTicksStartDeltaAutoWidget" native="true">
+                     <layout class="QHBoxLayout" name="horizontalLayout_14">
+                      <property name="spacing">
+                       <number>0</number>
+                      </property>
+                      <property name="margin">
+                       <number>0</number>
+                      </property>
                       <item>
                        <layout class="QGridLayout" name="gridLayout_5">
                         <property name="spacing">
@@ -3074,6 +3086,18 @@
                    <item>
                     <widget class="QWidget" name="ViewYAxisTicksWidget" native="true">
                      <layout class="QVBoxLayout" name="verticalLayout_15">
+                      <property name="spacing">
+                       <number>0</number>
+                      </property>
+                      <property name="margin">
+                       <number>0</number>
+                      </property>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="ViewYAxisTicksStartDeltaAutoWidget" native="true">
+                     <layout class="QHBoxLayout" name="horizontalLayout_38">
                       <property name="spacing">
                        <number>0</number>
                       </property>
@@ -3933,6 +3957,18 @@
                    <item>
                     <widget class="QWidget" name="ViewZAxisTicksWidget" native="true">
                      <layout class="QVBoxLayout" name="verticalLayout_19">
+                      <property name="spacing">
+                       <number>0</number>
+                      </property>
+                      <property name="margin">
+                       <number>0</number>
+                      </property>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="ViewZAxisTicksStartDeltaAutoWidget" native="true">
+                     <layout class="QHBoxLayout" name="horizontalLayout_40">
                       <property name="spacing">
                        <number>0</number>
                       </property>
@@ -4812,35 +4848,14 @@
              </widget>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_40">
-              <item>
-               <widget class="QCheckBox" name="AnalyseSurfaceSliceMonitorCheck">
-                <property name="text">
-                 <string>Monitor</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="AnalyseSurfaceSliceShowLegendCheck">
-                <property name="text">
-                 <string>Legend</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="AnalyseSurfaceSliceAutoScaleCheck">
-                <property name="text">
-                 <string>AutoScale</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <widget class="QCheckBox" name="AnalyseSurfaceSliceMonitorCheck">
+              <property name="text">
+               <string>Monitor</string>
+              </property>
+             </widget>
             </item>
             <item>
-             <widget class="QFrame" name="AnalyseSurfaceSliceGraphFrame">
+             <widget class="GraphWidget" name="TestWidget" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
@@ -4853,23 +4868,6 @@
                 <height>300</height>
                </size>
               </property>
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Sunken</enum>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_38">
-               <property name="spacing">
-                <number>2</number>
-               </property>
-               <property name="margin">
-                <number>2</number>
-               </property>
-               <item>
-                <widget class="PlotWidget" name="AnalyseSurfaceSliceGraph" native="true"/>
-               </item>
-              </layout>
              </widget>
             </item>
             <item>
@@ -5134,12 +5132,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>PlotWidget</class>
-   <extends>QWidget</extends>
-   <header>gui/plotwidget.uih</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>GradientBar</class>
    <extends>QWidget</extends>
    <header>gui/gradientbar.uih</header>
@@ -5149,6 +5141,12 @@
    <class>ColourButton</class>
    <extends>QPushButton</extends>
    <header>gui/colourbutton.uih</header>
+  </customwidget>
+  <customwidget>
+   <class>GraphWidget</class>
+   <extends>QWidget</extends>
+   <header>gui/graphwidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
@@ -5162,12 +5160,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>108</x>
-     <y>514</y>
+     <x>59</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
-     <x>139</x>
-     <y>514</y>
+     <x>83</x>
+     <y>493</y>
     </hint>
    </hints>
   </connection>
@@ -5178,12 +5176,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>139</x>
-     <y>514</y>
+     <x>83</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
-     <x>122</x>
-     <y>514</y>
+     <x>59</x>
+     <y>493</y>
     </hint>
    </hints>
   </connection>
@@ -5194,12 +5192,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>139</x>
-     <y>514</y>
+     <x>106</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
-     <x>139</x>
-     <y>514</y>
+     <x>130</x>
+     <y>493</y>
     </hint>
    </hints>
   </connection>
@@ -5210,12 +5208,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>139</x>
-     <y>514</y>
+     <x>130</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
-     <x>139</x>
-     <y>514</y>
+     <x>106</x>
+     <y>493</y>
     </hint>
    </hints>
   </connection>
@@ -5290,12 +5288,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>89</x>
-     <y>536</y>
+     <x>59</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
-     <x>163</x>
-     <y>540</y>
+     <x>83</x>
+     <y>493</y>
     </hint>
    </hints>
   </connection>
@@ -5306,12 +5304,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>150</x>
-     <y>544</y>
+     <x>83</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
-     <x>91</x>
-     <y>545</y>
+     <x>59</x>
+     <y>493</y>
     </hint>
    </hints>
   </connection>
@@ -5322,12 +5320,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>247</x>
-     <y>544</y>
+     <x>106</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
-     <x>285</x>
-     <y>542</y>
+     <x>130</x>
+     <y>493</y>
     </hint>
    </hints>
   </connection>
@@ -5338,12 +5336,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>290</x>
-     <y>547</y>
+     <x>130</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
-     <x>236</x>
-     <y>547</y>
+     <x>106</x>
+     <y>493</y>
     </hint>
    </hints>
   </connection>
@@ -5418,12 +5416,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>100</x>
-     <y>539</y>
+     <x>59</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
-     <x>136</x>
-     <y>541</y>
+     <x>83</x>
+     <y>493</y>
     </hint>
    </hints>
   </connection>
@@ -5434,12 +5432,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>247</x>
-     <y>547</y>
+     <x>106</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
-     <x>285</x>
-     <y>547</y>
+     <x>130</x>
+     <y>493</y>
     </hint>
    </hints>
   </connection>
@@ -5450,12 +5448,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>287</x>
-     <y>538</y>
+     <x>130</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
-     <x>241</x>
-     <y>542</y>
+     <x>106</x>
+     <y>493</y>
     </hint>
    </hints>
   </connection>
@@ -5466,12 +5464,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>146</x>
-     <y>535</y>
+     <x>83</x>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
-     <x>90</x>
-     <y>542</y>
+     <x>59</x>
+     <y>493</y>
     </hint>
    </hints>
   </connection>
@@ -5536,6 +5534,54 @@
     <hint type="destinationlabel">
      <x>251</x>
      <y>515</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewXAxisLogarithmicCheck</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>ViewXAxisTicksStartDeltaAutoWidget</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>159</x>
+     <y>150</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>80</x>
+     <y>319</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewYAxisLogarithmicCheck</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>ViewYAxisTicksStartDeltaAutoWidget</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>184</x>
+     <y>156</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>79</x>
+     <y>333</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewZAxisLogarithmicCheck</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>ViewZAxisTicksStartDeltaAutoWidget</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>172</x>
+     <y>156</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>176</x>
+     <y>344</y>
     </hint>
    </hints>
   </connection>

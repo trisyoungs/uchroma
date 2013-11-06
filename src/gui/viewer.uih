@@ -267,8 +267,7 @@ class Viewer : public QGLWidget
 	int surfaceNTriangles();
 	
 	signals:
-	void sliceAxisValueChanged(int, double);
-	void sliceAxisClicked(int, double);
+	void sliceAxisClicked();
 
 
 	/*

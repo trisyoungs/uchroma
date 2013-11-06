@@ -26,6 +26,7 @@ dataimport_seqxy.cpp
 saveimage_funcs.cpp
 colourbutton_funcs.cpp
 gradientbar_funcs.cpp
+graphwidget_funcs.cpp
 plotwidget_data.cpp
 plotwidget_funcs.cpp
 plotwidget_paintevent.cpp
@@ -48,6 +49,7 @@ viewer_vertexchunk.h
 
 SET(pro_MOC_HDRS
   uchroma.h
+  graphwidget.h
   dataimport.h
   saveimage.h
   colourbutton.uih

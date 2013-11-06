@@ -24,7 +24,7 @@
 #include "version.h"
 
 // Constructor
-UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveImageDialog_(this), dataImportDialog_(this)
+UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveImageDialog_(this), dataImportDialog_(this)//, sliceMonitorWidget_(this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -46,8 +46,9 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveIma
 	// Load settings...
 	loadSettings();
 
-	// Set UChroma pointer in Viewer
+	// Set UChroma pointers in widgets where necessary
 	ui.MainView->setUChroma(this);
+	GraphWidget::setUChroma(this);
 
 	// Load font for viewer
 	ui.MainView->setupFont(viewerFont_);
@@ -56,8 +57,10 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveIma
 	ui.MainView->setSourceSliceList(&surfaceData_);
 
 	// Connect signals / slots between Viewer and main UI
-	connect(ui.MainView, SIGNAL(sliceAxisValueChanged(int,double)), this, SLOT(surfaceSliceAxisValueChanged(int,double)));
-	connect(ui.MainView, SIGNAL(sliceAxisClicked(int,double)), this, SLOT(addSurfaceSlice(int,double)));
+	connect(ui.MainView, SIGNAL(sliceAxisClicked()), this, SLOT(addSurfaceSlice()));
+
+	// Connect signals / slots between SliceMonitor and main UI
+	connect(this, SIGNAL(sliceDataChanged()), ui.TestWidget, SLOT(staticDataChanged()));
 }
 
 // Destructor

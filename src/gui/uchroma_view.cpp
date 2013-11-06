@@ -783,6 +783,7 @@ void UChromaWindow::updateViewTab()
 	ui.ViewXAxisLogarithmicCheck->setChecked(axisLogarithmic_.x);
 	ui.ViewYAxisLogarithmicCheck->setChecked(axisLogarithmic_.y);
 	ui.ViewZAxisLogarithmicCheck->setChecked(axisLogarithmic_.z);
+	ui.ViewXAxisTicksStartDeltaAutoWidget->setDisabled(axisLogarithmic_.x);
 
 	// Axis titles
 	ui.ViewXAxisTitleEdit->setText(axisTitle_[0]);

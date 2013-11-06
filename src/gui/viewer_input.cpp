@@ -43,10 +43,8 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 		if (uChroma_->sliceAxis() != -1)
 		{
 // 			calculateMouseAxisValues();
-// 			if (uChroma_->axisLogarithmic(sliceAxis_)) emit(sliceAxisClicked(sliceAxis_, pow(10.0, sliceAxisValue_))); // TODO
-// 			else emit(sliceAxisClicked(sliceAxis_, sliceAxisValue_));
+			emit(sliceAxisClicked());
 		}
-		
 	}
 
 	// Do something with the button press event (e.g. context menu function)?

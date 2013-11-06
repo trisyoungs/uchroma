@@ -199,13 +199,13 @@ void Viewer::paintGL()
 	// Render bounding box
 	boundingBoxPrimitive_.sendToGL();
 
-	// Render locator slices
+	// Render locator slice
 	glLoadMatrixd(A.matrix());
 	int sliceAxis = uChroma_->sliceAxis();
 	if (sliceAxis != -1)
 	{
 		Vec3<double> v(0.0, 0.0, 0.0);
-		v[sliceAxis] = uChroma_->sliceValue() * uChroma_->axisStretch(sliceAxis);
+		v[sliceAxis] = uChroma_->sliceCoordinate() * uChroma_->axisStretch(sliceAxis);
 		glTranslated(v.x, v.y, v.z);
 		glColor4d(0.0, 0.0, 0.0, 0.5);
 		slicePrimitive_.sendToGL();

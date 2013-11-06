@@ -365,21 +365,45 @@ bool UChromaWindow::updateSliceValue(int mouseX, int mouseY)
 		amNorm.normalise();
 		double angle = acos(abNorm.dp(amNorm)) ;
 // 		printf("Angle = %f, %f\n", angle, angle * DEGRAD);
-		
-		// Calculate slice axis value - no need to account for inverted axes here, since this is accounted for by axmin and axmax
-		sliceValue_ = abNorm.dp(amNorm)*ratio * (limitMax_[sliceAxis_] - limitMin_[sliceAxis_]) + limitMin_[sliceAxis_];
-		
+
+		// Calculate slice axis value - no need to account for inverted axes here, since this is accounted for in the vectors axmin and axmax
+		if (axisLogarithmic_[sliceAxis_]) sliceValue_ = pow(10, abNorm.dp(amNorm)*ratio * (log10(limitMax_[sliceAxis_]) - log10(limitMin_[sliceAxis_])) + log10(limitMin_[sliceAxis_]));
+		else sliceValue_ = abNorm.dp(amNorm)*ratio * (limitMax_[sliceAxis_] - limitMin_[sliceAxis_]) + limitMin_[sliceAxis_];
+// 		printf("slicevalue = %f (%f)\n", sliceValue_, abNorm.dp(amNorm)*ratio);
+
 		// Clamp value to data range
 		if (sliceValue_ < limitMin_[sliceAxis_]) sliceValue_ = limitMin_[sliceAxis_];
 		else if (sliceValue_ > limitMax_[sliceAxis_]) sliceValue_ = limitMax_[sliceAxis_];
-// 		printf("ACMAG = %f, X = %f\n", ratio, sliceAxisValue_[sliceAxis_]);
+// 		printf("ACMAG = %f, X = %f\n", ratio, sliceValue_);
 
-		// Account for log and inverted scales
-// 		if (uChroma_->axisLogarithmic(sliceAxis_)) emit(sliceAxisValueChanged(sliceAxis_, pow(10.0, sliceValue_)));
-// 		else emit(sliceAxisValueChanged(sliceAxis_, sliceValue_));
+		// Extract slice from data
+		int bin = closestBin(sliceAxis_, sliceValue_);
+		QString title;
+
+		// Grab slice data
+		if (sliceAxis_ == 0)
+		{
+			// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated)
+			sliceData_.clear();
+			for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) sliceData_.addPoint(transformValue(slice->z(), 2), transformValue(slice->data().y(bin), 1));
+			title = "X = " + QString::number(transformValue(slices_.first()->data().x(bin), 0));
+		}
+		else if (sliceAxis_ == 1)
+		{
+			return false;
+		}
+		else if (sliceAxis_ == 2)
+		{
+			// Slice through Z - i.e. original slice data
+			sliceData_.clear();
+			sliceData_ = slices_[bin]->data();
+			title = "Z = " + QString::number(slices_[bin]->z());
+		}
+
+		emit(sliceDataChanged());
 		return true;
 	}
-// 	else emit(sliceAxisValueChanged(-1, 0.0));
+
 	return false;
 }
 
@@ -387,4 +411,13 @@ bool UChromaWindow::updateSliceValue(int mouseX, int mouseY)
 double UChromaWindow::sliceValue()
 {
 	return sliceValue_;
+}
+
+// Return current slice coordinate along axis
+double UChromaWindow::sliceCoordinate()
+{
+	if (sliceAxis_ == -1) return 0.0;
+
+	if (axisLogarithmic_[sliceAxis_]) return (axisInverted_[sliceAxis_] ? log10(limitMax_[sliceAxis_]/sliceValue_) : log10(sliceValue_));
+	else return (axisInverted_[sliceAxis_] ? limitMax_[sliceAxis_] - sliceValue_ : sliceValue_);
 }
