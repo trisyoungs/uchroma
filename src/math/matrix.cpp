@@ -604,21 +604,75 @@ void Matrix::applyRotationX(double angle)
 	cosx = cos(theta);
 	sinx = sin(theta);
 
-	// Recalculate second column and store in temp values
+	// Recalculate second column and store in temp array
 	temp[0] = matrix_[4]*cosx + matrix_[8]*-sinx;
 	temp[1] = matrix_[5]*cosx + matrix_[9]*-sinx;
 	temp[2] = matrix_[6]*cosx + matrix_[10]*-sinx;
 	temp[3] = matrix_[7]*cosx + matrix_[11]*-sinx;
 
+	// Set third column immediately
 	matrix_[8] = matrix_[4]*sinx + matrix_[8]*cosx;
 	matrix_[9] = matrix_[5]*sinx + matrix_[9]*cosx;
 	matrix_[10] = matrix_[6]*sinx + matrix_[10]*cosx;
 	matrix_[11] = matrix_[7]*sinx + matrix_[11]*cosx;
 
+	// Put temporary values back into first column
 	matrix_[4] = temp[0];
 	matrix_[5] = temp[1];
 	matrix_[6] = temp[2];
 	matrix_[7] = temp[3];
+}
+
+// Apply rotation about Y axis
+void Matrix::applyRotationY(double angle)
+{
+	double cosx, sinx, theta = angle/DEGRAD, temp[4];
+	cosx = cos(theta);
+	sinx = sin(theta);
+
+	// Recalculate first column and store in temp array
+	temp[0] = matrix_[0]*cosx + matrix_[8]*sinx;
+	temp[1] = matrix_[1]*cosx + matrix_[9]*sinx;
+	temp[2] = matrix_[2]*cosx + matrix_[10]*sinx;
+	temp[3] = matrix_[3]*cosx + matrix_[11]*sinx;
+
+	// Set third column immediately
+	matrix_[8] = matrix_[0]*-sinx + matrix_[8]*cosx;
+	matrix_[9] = matrix_[1]*-sinx + matrix_[9]*cosx;
+	matrix_[10] = matrix_[2]*-sinx + matrix_[10]*cosx;
+	matrix_[11] = matrix_[3]*-sinx + matrix_[11]*cosx;
+
+	// Put temporary values back into first column
+	matrix_[0] = temp[0];
+	matrix_[1] = temp[1];
+	matrix_[2] = temp[2];
+	matrix_[3] = temp[3];
+}
+
+// Apply rotation about Z axis
+void Matrix::applyRotationZ(double angle)
+{
+	double cosx, sinx, theta = angle/DEGRAD, temp[4];
+	cosx = cos(theta);
+	sinx = sin(theta);
+
+	// Recalculate first column and store in temp array
+	temp[0] = matrix_[0]*cosx + matrix_[4]*-sinx;
+	temp[1] = matrix_[1]*cosx + matrix_[5]*-sinx;
+	temp[2] = matrix_[2]*cosx + matrix_[6]*-sinx;
+	temp[3] = matrix_[3]*cosx + matrix_[7]*-sinx;
+
+	// Set second column immediately
+	matrix_[4] = matrix_[0]*sinx + matrix_[4]*cosx;
+	matrix_[5] = matrix_[1]*sinx + matrix_[5]*cosx;
+	matrix_[6] = matrix_[2]*sinx + matrix_[6]*cosx;
+	matrix_[7] = matrix_[3]*sinx + matrix_[7]*cosx;
+
+	// Put temporary values back into first column
+	matrix_[0] = temp[0];
+	matrix_[1] = temp[1];
+	matrix_[2] = temp[2];
+	matrix_[3] = temp[3];
 }
 
 // Apply axis rotation quaternion

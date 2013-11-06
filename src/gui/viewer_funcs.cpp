@@ -122,7 +122,7 @@ void Viewer::initializeGL()
 	// Create an instance for each defined user primitive - we do this in every call to initialiseGL so
 	// that, when saving a bitmap using QGLWidget::renderPixmap(), we automatically create new display list
 	// objects, rather than having to worry about context sharing etc. Slow, but safer and more compatible.
-	msg.print("In Viewer::initializeGL, pushing instances for %i primitives...\n", primitiveList_.nItems());
+// 	msg.print("In Viewer::initializeGL, pushing instances for %i primitives...\n", primitiveList_.nItems());
 	for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->pushInstance(context());
 
 	// Recreate the surface (so that images are saved correctly)
@@ -272,7 +272,7 @@ void Viewer::paintGL()
 	// If we were rendering offscreen, we may delete the topmost primitive instance here
 	if (renderingOffscreen_)
 	{
-		msg.print("In Viewer::PaintGL, popping instances for %i primitives...\n", primitiveList_.nItems());
+// 		msg.print("In Viewer::PaintGL, popping instances for %i primitives...\n", primitiveList_.nItems());
 		for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->popInstance(context());
 	}
 	

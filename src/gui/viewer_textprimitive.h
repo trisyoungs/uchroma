@@ -36,6 +36,10 @@ class Viewer;
 // Text Primitive
 class TextPrimitive
 {
+	public:
+	// Horizontal anchor enum
+	enum HorizontalAnchor { AnchorLeft=0, AnchorCentre=1, AnchorRight=2 };
+
 	private:
 	// Local transform matrix for the text
 	Matrix localTransform_;
@@ -45,7 +49,7 @@ class TextPrimitive
 	FTPoint centre_;
 	// Text to render
 	QString text_;
-	
+
 	public:
 	// Set data
 	void set(QString text, Vec3<double> origin, Vec3<double> centre, Matrix& transform);

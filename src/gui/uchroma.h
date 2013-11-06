@@ -36,14 +36,6 @@ class UChromaWindow : public QMainWindow
 	Q_OBJECT
 
 
-	/* 
-	 * General Enumerations
-	 */
-	public:
-	// Horizontal position enum
-	enum HorizontalAlignment { LeftAlign=0, CentreAlign=1, RightAlign=2 };
-
-
 	/*
 	// Window Functions
 	*/
@@ -245,7 +237,7 @@ class UChromaWindow : public QMainWindow
 	bool viewAxisMinorTicksChanged(int axis, int value);
 	bool viewAxisTitleChanged(int axis, QString& title);
 	bool viewAxisTitleOrientationChanged(int axis, int component, double value);
-	bool viewAxisTitleAlignmentChanged(int axis, int anchor);
+	bool viewAxisTitleAlignmentChanged(int axis, TextPrimitive::HorizontalAnchor anchor);
 
 	private slots:
 	// -- X Axis Tab
@@ -536,7 +528,7 @@ class UChromaWindow : public QMainWindow
 	// Orientation of axis titles (axial rot, in-plane rot, distance, h-offset)
 	Vec4<double> axisTitleOrientation_[3];
 	// Axis title text anchor positions
-	Vec3<int> axisTitleAnchor_;
+	TextPrimitive::HorizontalAnchor axisTitleAnchor_[3];
 	// Whether axes should be plotted as logarithms
 	Vec3<bool> axisLogarithmic_;
 	// Stretch factors to apply to axes

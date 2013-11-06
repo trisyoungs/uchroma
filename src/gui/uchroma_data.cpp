@@ -46,6 +46,18 @@ const char* UChromaWindow::dataTransform(UChromaWindow::DataTransform dt)
 	return DataTransformKeywords[dt];
 }
 
+// Return boolean string based on integer value
+const char* stringBool(int i)
+{
+	return (i > 0 ? "true" : "false");
+}
+
+// Return boolean string based on boolean value
+const char* stringBool(bool b)
+{
+	return (b ? "true" : "false");
+}
+
 /*
  * Data
  */
@@ -149,9 +161,9 @@ void UChromaWindow::clearData()
 	axisTitleOrientation_[0].set(0.0, 0.0, 1.5, 0.5);
 	axisTitleOrientation_[1].set(0.0, 0.0, 1.5, 0.5);
 	axisTitleOrientation_[2].set(0.0, 0.0, 1.5, 0.5);
-	axisTitleAnchor_[0] = UChromaWindow::CentreAlign;
-	axisTitleAnchor_[1] = UChromaWindow::CentreAlign;
-	axisTitleAnchor_[2] = UChromaWindow::CentreAlign;
+	axisTitleAnchor_[0] = TextPrimitive::AnchorCentre;
+	axisTitleAnchor_[1] = TextPrimitive::AnchorCentre;
+	axisTitleAnchor_[2] = TextPrimitive::AnchorCentre;
 	axisLogarithmic_.set(false, false, false);
 	axisStretch_.set(1.0, 1.0, 1.0);
 	colourSource_ = SingleColourSource;
@@ -208,7 +220,7 @@ bool UChromaWindow::loadData(QString fileName)
 				break;
 			// Axis invert flags
 			case (UChromaWindow::AxisInvertKeyword):
-				axisInverted_.set(parser.argi(1), parser.argi(2), parser.argi(3));
+				axisInverted_.set(parser.argb(1), parser.argb(2), parser.argb(3));
 				break;
 			// Axis label orientation
 			case (UChromaWindow::AxisLabelOrientationKeyword):
@@ -217,7 +229,7 @@ bool UChromaWindow::loadData(QString fileName)
 				break;
 			// Axis logarithmic flag
 			case (UChromaWindow::AxisLogarithmicKeyword):
-				axisLogarithmic_.set(parser.argi(1), parser.argi(2), parser.argi(3));
+				axisLogarithmic_.set(parser.argb(1), parser.argb(2), parser.argb(3));
 				break;
 			// Axis minor ticks
 			case (UChromaWindow::AxisMinorTicksKeyword):
@@ -243,18 +255,18 @@ bool UChromaWindow::loadData(QString fileName)
 				break;
 			// Axis title anchors
 			case (UChromaWindow::AxisTitleAnchorKeyword):
-				axisTitleAnchor_[0] = (UChromaWindow::HorizontalAlignment) parser.argi(1);
-				axisTitleAnchor_[1] = (UChromaWindow::HorizontalAlignment) parser.argi(2);
-				axisTitleAnchor_[2] = (UChromaWindow::HorizontalAlignment) parser.argi(3);
+				axisTitleAnchor_[0] = (TextPrimitive::HorizontalAnchor) parser.argi(1);
+				axisTitleAnchor_[1] = (TextPrimitive::HorizontalAnchor) parser.argi(2);
+				axisTitleAnchor_[2] = (TextPrimitive::HorizontalAnchor) parser.argi(3);
 				break;
 			// Axis title orientation
 			case (UChromaWindow::AxisTitleOrientationKeyword):
 				if ((parser.argi(1) < 0) || (parser.argi(1) > 2)) printf("Axis index is out of range for %s keyword.\n", dataFileKeyword(kwd));
-				else axisTitleOrientation_[parser.argi(1)].set(parser.argd(2), parser.argd(3), parser.argd(4), parser.argd(4));
+				else axisTitleOrientation_[parser.argi(1)].set(parser.argd(2), parser.argd(3), parser.argd(4), parser.argd(5));
 				break;
 			// Axis visibility
 			case (UChromaWindow::AxisVisibleKeyword):
-				axisVisible_.set(parser.argi(1), parser.argi(2), parser.argi(3));
+				axisVisible_.set(parser.argb(1), parser.argb(2), parser.argb(3));
 				break;
 			// Bounding Box
 			case (UChromaWindow::BoundingBoxKeyword):
@@ -303,6 +315,7 @@ bool UChromaWindow::loadData(QString fileName)
 			// Data
 			case (UChromaWindow::DataKeyword):
 				// Get title of associated slice and number of points to expect
+				if (strlen(parser.argc(1)) == 0) break;
 				slice = findSlice(parser.argc(1));
 				if (slice == NULL)
 				{
@@ -332,7 +345,7 @@ bool UChromaWindow::loadData(QString fileName)
 				break;
 			// Interpolate constrain flags
 			case (UChromaWindow::InterpolateConstrainKeyword):
-				interpolateConstrained_.set(parser.argi(1), false, parser.argi(2));
+				interpolateConstrained_.set(parser.argb(1), false, parser.argb(2));
 				break;
 			// Interpolation step flags
 			case (UChromaWindow::InterpolateStepKeyword):
@@ -471,21 +484,21 @@ bool UChromaWindow::saveData(QString fileName)
 	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[UChromaWindow::LimitYKeyword], limitMin_.y, limitMax_.y);
 	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[UChromaWindow::LimitZKeyword], limitMin_.z, limitMax_.z);
 	// -- Interpolation
-	parser.writeLineF("%s %i %i\n", DataFileKeywordStrings[UChromaWindow::InterpolateKeyword], interpolate_.x, interpolate_.z);
-	parser.writeLineF("%s %i %i\n", DataFileKeywordStrings[UChromaWindow::InterpolateConstrainKeyword], interpolateConstrained_.x, interpolateConstrained_.z);
+	parser.writeLineF("%s %s %s\n", DataFileKeywordStrings[UChromaWindow::InterpolateKeyword], stringBool(interpolate_.x), stringBool(interpolate_.z));
+	parser.writeLineF("%s %s %s\n", DataFileKeywordStrings[UChromaWindow::InterpolateConstrainKeyword], stringBool(interpolateConstrained_.x), stringBool(interpolateConstrained_.z));
 	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[UChromaWindow::InterpolateStepKeyword], interpolationStep_.x, interpolationStep_.z);
 
 	// Write view setup
 	// -- Font Scaling / Orientation
-	parser.writeLineF("%s %i\n", DataFileKeywordStrings[UChromaWindow::LabelFaceViewerKeyword], labelFaceViewer_);
+	parser.writeLineF("%s %s\n", DataFileKeywordStrings[UChromaWindow::LabelFaceViewerKeyword], stringBool(labelFaceViewer_));
 	parser.writeLineF("%s %f\n", DataFileKeywordStrings[UChromaWindow::LabelScaleKeyword], labelScale_);
 	parser.writeLineF("%s %f\n", DataFileKeywordStrings[UChromaWindow::TitleScaleKeyword], titleScale_);
 	// -- Axes
-	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisAutoTicksKeyword], axisAutoTicks_.x, axisAutoTicks_.y, axisAutoTicks_.z);
+	parser.writeLineF("%s %s %s %s\n", DataFileKeywordStrings[UChromaWindow::AxisAutoTicksKeyword], stringBool(axisAutoTicks_.x), stringBool(axisAutoTicks_.y), stringBool(axisAutoTicks_.z));
 	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisFirstTickKeyword], axisFirstTick_.x, axisFirstTick_.y, axisFirstTick_.z);
 	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisTickDeltaKeyword], axisTickDelta_.x, axisTickDelta_.y, axisTickDelta_.z);
 	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisMinorTicksKeyword], axisMinorTicks_.x, axisMinorTicks_.y, axisMinorTicks_.z);
-	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisTitleAnchorKeyword], axisTitleAnchor_.x, axisTitleAnchor_.y, axisTitleAnchor_.z);
+	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisTitleAnchorKeyword], axisTitleAnchor_[0], axisTitleAnchor_[1], axisTitleAnchor_[2]);
 	for (int axis=0; axis<3; ++axis)
 	{
 		parser.writeLineF("%s %i %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisPositionKeyword], axis, axisPosition_[axis].x, axisPosition_[axis].y, axisPosition_[axis].z);
@@ -493,9 +506,9 @@ bool UChromaWindow::saveData(QString fileName)
 		parser.writeLineF("%s %i '%s'\n", DataFileKeywordStrings[UChromaWindow::AxisTitleKeyword], axis, qPrintable(axisTitle_[axis]));
 		parser.writeLineF("%s %i %f %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisTitleOrientationKeyword], axis, axisTitleOrientation_[axis].x, axisTitleOrientation_[axis].y, axisTitleOrientation_[axis].z, axisTitleOrientation_[axis].w);
 	}
-	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisInvertKeyword], axisInverted_.x, axisInverted_.y, axisInverted_.z);
-	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisLogarithmicKeyword], axisLogarithmic_.x, axisLogarithmic_.y, axisLogarithmic_.z);
-	parser.writeLineF("%s %i %i %i\n", DataFileKeywordStrings[UChromaWindow::AxisVisibleKeyword], axisVisible_.x, axisVisible_.y, axisVisible_.z);
+	parser.writeLineF("%s %s %s %s\n", DataFileKeywordStrings[UChromaWindow::AxisInvertKeyword], stringBool(axisInverted_.x), stringBool(axisInverted_.y), stringBool(axisInverted_.z));
+	parser.writeLineF("%s %s %s %s\n", DataFileKeywordStrings[UChromaWindow::AxisLogarithmicKeyword], stringBool(axisLogarithmic_.x), stringBool(axisLogarithmic_.y), stringBool(axisLogarithmic_.z));
+	parser.writeLineF("%s %s %s %s\n", DataFileKeywordStrings[UChromaWindow::AxisVisibleKeyword], stringBool(axisVisible_.x), stringBool(axisVisible_.y), stringBool(axisVisible_.z));
 	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[UChromaWindow::AxisStretchKeyword], axisStretch_.x, axisStretch_.y, axisStretch_.z);
 	// -- Transformation Matrix
 	Matrix mat = ui.MainView->viewMatrix();
@@ -534,6 +547,7 @@ bool UChromaWindow::saveData(QString fileName)
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
 	{
 		Data2D& data = slice->data();
+		if (slice->dataName().isEmpty()) continue;
 		parser.writeLineF("%s  \"%s\"  %i\n", DataFileKeywordStrings[UChromaWindow::DataKeyword], qPrintable(slice->dataName()), data.nPoints());
 		for (int n=0; n<data.nPoints(); ++n) parser.writeLineF("%10.4e  %10.4e\n", data.x(n), data.y(n));
 	}

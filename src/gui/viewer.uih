@@ -254,7 +254,7 @@ class Viewer : public QGLWidget
 	// Add line to axis primitive
 	void addAxisLine(int axis, Vec3<double> v1, Vec3<double> v2);
 	// Add entry to axis text primitive
-	void addAxisText(int axis, QString text, Vec3<double> origin, Matrix transform, double labelScale);
+	void addAxisText(int axis, QString text, Vec3<double> origin, Matrix transform, TextPrimitive::HorizontalAnchor textAlignment = TextPrimitive::AnchorCentre);
 	// Calculate axis slice value at current mouse position
 	void calculateMouseAxisValue();
 	// Set slice primitive to specified axis

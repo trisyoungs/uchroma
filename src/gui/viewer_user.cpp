@@ -347,14 +347,18 @@ void Viewer::addAxisLine(int axis, Vec3<double> v1, Vec3<double> v2)
 }
 
 // Add entry to axis text primitive
-void Viewer::addAxisText(int axis, QString text, Vec3<double> origin, Matrix transform, double labelScale)
+void Viewer::addAxisText(int axis, QString text, Vec3<double> origin, Matrix transform, TextPrimitive::HorizontalAnchor anchor)
 {
 	FTBBox boundingBox;
 	if (font_) boundingBox = font_->BBox(qPrintable(text));
 	double textWidth = fabs(boundingBox.Upper().X() - boundingBox.Lower().X());
 
-	// Construct final centre coordinate and rotation matrix
-	Vec3<double> textCentre(-textWidth*0.5*labelScale, -fontBaseHeight_*0.5*labelScale, 0.0);
+	// Construct final centre coordinate based on alignment requested
+	Vec3<double> textCentre(0.0, -fontBaseHeight_*0.5, 0.0);
+	if (anchor == TextPrimitive::AnchorLeft) textCentre.x = 0.0;
+	else if (anchor == TextPrimitive::AnchorRight) textCentre.x = -textWidth;
+	else textCentre.x = -textWidth*0.5;
+
 	axisTextPrimitives_[axis].add(text, origin, textCentre, transform);
 }
 

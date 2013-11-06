@@ -131,6 +131,10 @@ class Matrix
 	void createRotationAxis(double ax, double ay, double az, double angle, bool normalise);
 	// Apply rotation about X axis
 	void applyRotationX(double angle);
+	// Apply rotation about Y axis
+	void applyRotationY(double angle);
+	// Apply rotation about Z axis
+	void applyRotationZ(double angle);
 	// Apply axis rotation quaternion
 	void applyRotationAxis(double ax, double ay, double az, double angle, bool normalise);
 

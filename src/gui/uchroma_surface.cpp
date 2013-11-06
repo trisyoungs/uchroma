@@ -30,7 +30,7 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 	double dpX, dpY, textWidth, delta, value;
 	int n;
 	Vec3<double> u, tickDir;
-	Matrix A, baseLabelTransform;
+	Matrix labelTransform, titleTransform;
 
 	// Determine surface center and Y clip limits
 	for (int n=0; n<3; ++n)
@@ -38,7 +38,6 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 		if (axisLogarithmic_[n]) surfaceCentre_[n] = (axisInverted_[n] ? log10(limitMax_[n]/limitMin_[n]) : log10(limitMax_[n]*limitMin_[n])) * 0.5 * axisStretch_[n];
 		else surfaceCentre_[n] = (limitMax_[n]+limitMin_[n]) * 0.5 * axisStretch_[n];
 	}
-	printf("SURFACECENTRE = "); surfaceCentre_.print();
 	if (axisLogarithmic_.y) ui.MainView->setYClip(log10(limitMin_.y) * axisStretch_.y, log10(limitMax_.y) * axisStretch_.y);
 	else ui.MainView->setYClip(limitMin_.y * axisStretch_.y, limitMax_.y * axisStretch_.y);
 	
@@ -47,10 +46,9 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 	{
 		for (int n=0; n<3; ++n)
 		{
-			if (axisLogarithmic_[n]) axisCoordMin_[axis].set(n, (axisInverted_[n] ? log10(limitMax_[n] - axisPosition_[axis][n]) : log10(axisPosition_[axis][n])) * axisStretch_[n]);
+			if (axisLogarithmic_[n]) axisCoordMin_[axis].set(n, (axisInverted_[n] ? log10(limitMax_[n]/axisPosition_[axis][n]) : log10(axisPosition_[axis][n])) * axisStretch_[n]);
 			else axisCoordMin_[axis].set(n, (axisInverted_[n] ? limitMax_[n] - axisPosition_[axis][n] : axisPosition_[axis][n]) * axisStretch_[n]);
 		}
-		printf("ORIGIN Min %i = ", axis); axisCoordMin_[axis].print();
 		axisCoordMax_[axis] = axisCoordMin_[axis];
 	}
 
@@ -60,61 +58,29 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 		// Clear old axis primitives
 		ui.MainView->clearAxisPrimitives(axis);
 
-		// Create label and title transformation matrices
-		Matrix labelTransform, titleTransform;
-		// -- Set left-to-right direction of text to be along axis direction
-		Vec3<double> leftToRight(0.0,0.0,0.0);
-		leftToRight.set(axis, 1.0);
-		// -- Our basic 'up' vector will be another orthogonal axis (but never z)
-		Vec3<double> upVector(0.0,0.0,0.0);
-		if (axis == 0) upVector.set(0.0, 1.0, 0.0);
-		else upVector.set(-1.0, 0.0, 0.0);
-		labelTransform.setColumn(0, leftToRight, 0.0);
-		labelTransform.setColumn(1, upVector, 0.0);
-		labelTransform.setColumn(2, leftToRight * upVector, 0.0);
-		labelTransform.setColumn(3, 0.0, 0.0, 0.0, 1.0);
-		titleTransform = labelTransform;
-	
-		if (labelFaceViewer_)
-		{
-			labelTransform = ui.MainView->viewMatrix();
-			labelTransform.removeTranslationAndScaling();
-			labelTransform.invert();
-
-			titleTransform = ui.MainView->viewMatrix();
-			titleTransform.removeTranslationAndScaling();
-			titleTransform.invert();
-		}
-		else
-		{printf("Axis %i MINCOORD = ", axis); axisCoordMin_[axis].print();
-			// Label Transform
-			// -- Apply rotation out of AB plane...
-// 			labelTransform.applyTranslation(0.0, 1.0, 0.0);
-			Matrix rotMat;
-			rotMat.createRotationZ(axisLabelOrientation_[axis].y);
-// 			rotMat.print();
-			rotMat.createRotationAxis(0.0, 0.0, -1.0, axisLabelOrientation_[axis].y, false);
-// 			rotMat.print();
-			labelTransform *= rotMat;
-// 			labelTransform.applyRotationAxis(0.0, 0.0, -1.0, axisLabelOrientation_[axis].y, false);
-// 			labelTransform.applyRotationAxis(leftToRight.x, leftToRight.y, leftToRight.z, axisLabelOrientation_[axis].x, false);
-			upVector = labelTransform.columnAsVec3(1);
-			// ...and in current text plane
-
-			// Title transform
-			// -- Apply rotation out of AB plane...
-			titleTransform.applyRotationAxis(leftToRight.x, leftToRight.y, leftToRight.z, axisTitleOrientation_[axis].x, false);
-			upVector = titleTransform.columnAsVec3(1);
-			// ...and in current text plane
-			titleTransform.applyRotationAxis(titleTransform[8], titleTransform[9], titleTransform[10], axisTitleOrientation_[axis].y, false);
-			titleTransform.setTranslation(0.0, axisTitleOrientation_[axis].z, 0.0);
-		}
-		labelTransform.columnMultiply( Vec3<double>(labelScale_,labelScale_,labelScale_) );
-		titleTransform.columnMultiply( Vec3<double>(titleScale_,titleScale_,titleScale_) );
-
 		// Normalise tickDirection
 		tickDir = axisTickDirection_[axis];
 		tickDir.normalise();
+
+		// Create tick label transformation matrix
+		labelTransform.setIdentity();
+		// 1) Apply axial rotation along X axis (left-to-right direction)
+		labelTransform.applyRotationX(axisLabelOrientation_[axis].x);
+		// 2) Translate to 'end of tick' position
+		labelTransform.applyTranslation(tickDir * axisLabelOrientation_[axis].z);
+		// 3) Perform in-plane rotation
+		labelTransform.applyRotationZ(axisLabelOrientation_[axis].y);
+		labelTransform.applyScaling(labelScale_, labelScale_, labelScale_);
+
+		// Create axis title transformation matrix
+		titleTransform.setIdentity();
+		// 1) Apply axial rotation along X axis (left-to-right direction)
+		titleTransform.applyRotationX(axisTitleOrientation_[axis].x);
+		// 2) Translate to 'end of tick' position
+		titleTransform.applyTranslation(tickDir * axisTitleOrientation_[axis].z);
+		// 3) Perform in-plane rotation
+		titleTransform.applyRotationZ(axisTitleOrientation_[axis].y);
+		titleTransform.applyScaling(titleScale_, titleScale_, titleScale_);
 
 		if (axisLogarithmic_[axis])
 		{
@@ -122,8 +88,6 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 			axisCoordMin_[axis].set(axis, (axisInverted_[axis] ? log10(limitMax_[axis] / limitMin_[axis]) : log10(limitMin_[axis])) * axisStretch_[axis]);
 			axisCoordMax_[axis].set(axis, (axisInverted_[axis] ? log10(limitMax_[axis] / limitMax_[axis]) : log10(limitMax_[axis])) * axisStretch_[axis]);
 
-			printf("Axis %i LOGMINCOORD = ", axis); axisCoordMin_[axis].print();
-			printf("Axis %i LOGMAXCOORD = ", axis); axisCoordMax_[axis].print();
 			// For the log axis, the associated surface data coordinate will already be in log form
 			if (limitMax_[axis] < 0.0)
 			{
@@ -143,7 +107,6 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 			int count = 0;
 			double power = floor(axisMin);
 			double value = pow(10,power);
-			printf("Power, value = %f, %f\n", power, value);
 			Vec3<double> u = axisCoordMin_[axis];
 			while (true)
 			{
@@ -163,19 +126,7 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 						// Determine resulting text primitive width (so we can do label rotations)
 						s = QString::number(value);
 
-						// Create transformation matrix for text label
-						A.setIdentity();
-						// 1) Translate to anchor point of text
-		// 				A.applyTranslation(textWidth*0.5, fontBaseHeight_*0.5, 0.0);
-						// 2) Apply rotation in plane of text
-						// 3) Translate to 'end of tick' position
-						// 4) Perform axial rotation
-						A.applyRotationAxis(leftToRight.x, leftToRight.y, leftToRight.z, axisLabelOrientation_[axis].x, false);
-						A.applyTranslation(upVector * axisLabelOrientation_[axis].z);
-						A.applyRotationAxis(0.0, 0.0, 1.0, axisLabelOrientation_[axis].y, false);
-						A.applyScaling(labelScale_, labelScale_, labelScale_);
-
-						ui.MainView->addAxisText(axis, s, u, A, labelScale_);
+						ui.MainView->addAxisText(axis, s, u, labelTransform);
 					}
 				}
 
@@ -189,6 +140,13 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 				}
 				else value += pow(10,power);
 			}
+
+			// Add axis title
+			u = axisCoordMin_[axis];
+			value = limitMin_[axis] + (limitMax_[axis] - limitMin_[axis]) * axisTitleOrientation_[axis].w;
+			u.set(axis, (axisInverted_[axis] ? log10(limitMax_[axis]/value) : log10(value)) * axisStretch_[axis]);
+			u += tickDir * axisTitleOrientation_[axis].z;
+			ui.MainView->addAxisText(axis, axisTitle_[axis], u, titleTransform, axisTitleAnchor_[axis]);
 		}
 		else
 		{
@@ -205,24 +163,11 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 			// Check tickDelta
 			if (((limitMax_[axis]-limitMin_[axis]) / axisTickDelta_[axis]) > 1e6) return;
 
-			// Create label and title transformation matrices
-			Vec3<double> leftToRight(0.0, 0.0, 0.0), upVector(0.0, 0.0, 0.0);
-			// Set left-to-right direction of text to be along axis direction
-			leftToRight.set(axis, 1.0);
-			// Our basic 'up' vector will be another orthogonal axis (but never z)
-			if (axis == 0) upVector.set(0.0, 1.0, 0.0);
-			else upVector.set(-1.0, 0.0, 0.0);
-
-			baseLabelTransform.setColumn(0, leftToRight, 0.0);
-			baseLabelTransform.setColumn(1, upVector, 0.0);
-			baseLabelTransform.setColumn(2, leftToRight * upVector, 0.0);
-			baseLabelTransform.setColumn(3, 0.0, 0.0, 0.0, 1.0);
-
 			// Plot tickmarks - maximum of 100 minor tickmarks between major lines
 			int count = 0;
 			delta = axisTickDelta_[axis] / (axisMinorTicks_[axis]+1);
 			value = axisFirstTick_[axis];
-			Vec3<double> u = axisCoordMin_[axis];
+			u = axisCoordMin_[axis];
 			u.set(axis, (axisInverted_[axis] ? (limitMax_[axis] - axisFirstTick_[axis]) + limitMin_[axis]: axisFirstTick_[axis]) * axisStretch_[axis]);
 			while (value <= limitMax_[axis])
 			{
@@ -236,19 +181,7 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 						// Get formatted label text
 						s = QString::number(value);
 
-						// Create transformation matrix for text label
-						A.setIdentity();
-						// 1) Translate to anchor point of text
-		// 				A.applyTranslation(textWidth*0.5, fontBaseHeight_*0.5, 0.0);
-						// 2) Apply rotation in plane of text
-						// 3) Translate to 'end of tick' position
-						// 4) Perform axial rotation
-						A.applyRotationAxis(leftToRight.x, leftToRight.y, leftToRight.z, axisLabelOrientation_[axis].x, false);
-						A.applyTranslation(upVector * axisLabelOrientation_[axis].z);
-						A.applyRotationAxis(0.0, 0.0, 1.0, axisLabelOrientation_[axis].y, false);
-						A.applyScaling(labelScale_, labelScale_, labelScale_);
-
-						ui.MainView->addAxisText(axis, s, u, A, labelScale_);
+						ui.MainView->addAxisText(axis, s, u, labelTransform);
 						
 						count = 0;
 					}
@@ -258,6 +191,13 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 				value += delta;
 				++count;
 			}
+
+			// Add axis title
+			u = axisCoordMin_[axis];
+			value = limitMin_[axis] + (limitMax_[axis] - limitMin_[axis]) * axisTitleOrientation_[axis].w;
+			u.set(axis, (axisInverted_[axis] ? (limitMax_[axis] - value) + limitMin_[axis]: value) * axisStretch_[axis]);
+			u += tickDir * axisTitleOrientation_[axis].z;
+			ui.MainView->addAxisText(axis, axisTitle_[axis], u, titleTransform, axisTitleAnchor_[axis]);
 		}
 	}
 
@@ -280,8 +220,9 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 				slice = axisInverted_.z ? slice->prev : slice->next;
 				continue;
 			}
-			if (axisInverted_.z) z = (limitMax_.z - z) + limitMin_.z;
-			if (axisLogarithmic_.z) z = log10(z);
+			if (axisInverted_.z && axisLogarithmic_.z) z = log10(limitMax_[n]/z);
+			else if (axisInverted_.z) z = (limitMax_.z - z) + limitMin_.z;
+			else if (axisLogarithmic_.z) z = log10(z);
 
 			// Add new item to surfaceData_ array
 			Slice* surfaceSlice = surfaceData_.add();

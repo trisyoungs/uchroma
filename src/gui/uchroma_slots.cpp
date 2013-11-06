@@ -27,6 +27,7 @@
 void UChromaWindow::closeEvent(QCloseEvent *event)
 {
 	if (checkBeforeClose()) event->accept();
+	else event->setAccepted(false);
 }
 
 /*

@@ -3289,7 +3289,7 @@
                       </sizepolicy>
                      </property>
                      <property name="currentIndex">
-                      <number>1</number>
+                      <number>0</number>
                      </property>
                      <widget class="QWidget" name="YAxisTextOrientationTickTab">
                       <attribute name="title">
@@ -4148,7 +4148,7 @@
                       </sizepolicy>
                      </property>
                      <property name="currentIndex">
-                      <number>1</number>
+                      <number>0</number>
                      </property>
                      <widget class="QWidget" name="ZAxisTextOrientationTickTab">
                       <attribute name="title">
@@ -5162,12 +5162,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>85</x>
-     <y>538</y>
+     <x>108</x>
+     <y>514</y>
     </hint>
     <hint type="destinationlabel">
-     <x>153</x>
-     <y>548</y>
+     <x>139</x>
+     <y>514</y>
     </hint>
    </hints>
   </connection>
@@ -5178,12 +5178,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>140</x>
-     <y>534</y>
+     <x>139</x>
+     <y>514</y>
     </hint>
     <hint type="destinationlabel">
-     <x>99</x>
-     <y>539</y>
+     <x>122</x>
+     <y>514</y>
     </hint>
    </hints>
   </connection>
@@ -5194,12 +5194,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>236</x>
-     <y>539</y>
+     <x>139</x>
+     <y>514</y>
     </hint>
     <hint type="destinationlabel">
-     <x>281</x>
-     <y>537</y>
+     <x>139</x>
+     <y>514</y>
     </hint>
    </hints>
   </connection>
@@ -5210,12 +5210,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>301</x>
-     <y>551</y>
+     <x>139</x>
+     <y>514</y>
     </hint>
     <hint type="destinationlabel">
-     <x>249</x>
-     <y>550</y>
+     <x>139</x>
+     <y>514</y>
     </hint>
    </hints>
   </connection>
@@ -5472,6 +5472,70 @@
     <hint type="destinationlabel">
      <x>90</x>
      <y>542</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewXAxisLabelAxialRotationSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewXAxisLabelAxialRotationSpin</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>83</x>
+     <y>503</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>134</x>
+     <y>501</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewXAxisLabelAxialRotationSpin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewXAxisLabelAxialRotationSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>153</x>
+     <y>518</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>112</x>
+     <y>517</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewXAxisLabelInPlaneRotationSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewXAxisLabelInPlaneRotationSpin</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>234</x>
+     <y>504</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>295</x>
+     <y>505</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ViewXAxisLabelInPlaneRotationSpin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ViewXAxisLabelInPlaneRotationSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>279</x>
+     <y>518</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>251</x>
+     <y>515</y>
     </hint>
    </hints>
   </connection>
