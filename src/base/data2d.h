@@ -22,7 +22,7 @@
 #ifndef UCHROMA_DATA2D_H
 #define UCHROMA_DATA2D_H
 
-#include "base/dnchar.h"
+#include <QtCore/QString>
 #include "templates/array.h"
 
 #define OPTOLERANCE 1.0e-6
@@ -50,7 +50,7 @@ class Data2D : public ListItem<Data2D>
 	// Array of y values
 	Array<double> y_;
 	// Name
-	Dnchar name_;
+	QString name_;
 	
 	private:
 	// Resize arrays
@@ -90,9 +90,9 @@ class Data2D : public ListItem<Data2D>
 	// Add new data point
 	void addPoint(double x, double y);
 	// Set name of data
-	void setName(const char* name);
+	void setName(QString name);
 	// Return name of data
-	const char* name() const;
+	QString name() const;
 
 
 	/*!

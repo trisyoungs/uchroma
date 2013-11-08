@@ -20,8 +20,11 @@
 */
 
 #include "base/slice.h"
-#include "base/nxs.h"
 #include <QtGui/QMessageBox>
+
+/*
+ * Slice
+ */
 
 // Constructor
 Slice::Slice() : ListItem<Slice>()
@@ -30,6 +33,8 @@ Slice::Slice() : ListItem<Slice>()
 	fileAssociated_ = false;
 	dataName_ = "";
 	z_ = 0.0;
+	sliceAxis_ = -1;
+	sliceValue_ = 0.0;
 }
 
 // Destructor
@@ -51,11 +56,9 @@ void Slice::operator=(const Slice& source)
 	data_ = source.data_;
 	z_ = source.z_;
 	fileAssociated_ = source.fileAssociated_;
+	sliceAxis_ = source.sliceAxis_;
+	sliceValue_ = source.sliceValue_;
 }
-
-/*
-// Data
-*/
 
 // Set source filename
 void Slice::setSourceFileName(QString fileName)
@@ -120,3 +123,129 @@ double Slice::z()
 	return z_;
 }
 
+// Return axis along which slice was generated (if a generated slice)
+int Slice::sliceAxis()
+{
+	return sliceAxis_;
+}
+
+// Return axis value at which slice was generated (if a generated slice)
+double Slice::sliceValue()
+{
+	return sliceValue_;
+}
+
+/*
+ * Extracted Slice
+ */
+
+// Constructor
+ExtractedSlice::ExtractedSlice() : ListItem<ExtractedSlice>()
+{
+	title_ = "";
+	axis_ = -1;
+	axisValue_ = 0.0;
+}
+
+// Destructor
+ExtractedSlice::~ExtractedSlice()
+{
+}
+
+// Copy constructor
+ExtractedSlice::ExtractedSlice(const ExtractedSlice& source)
+{
+	(*this) = source;
+}
+
+// Assignment operator
+void ExtractedSlice::operator=(const ExtractedSlice& source)
+{
+	title_ = source.title_;
+	axis_ = source.axis_;
+	axisValue_ = source.axisValue_;
+	originalData_ = source.originalData_;
+	transformedData_ = source.transformedData_;
+}
+
+// Set title
+void ExtractedSlice::setTitle(QString title)
+{
+	title_ = title;
+}
+
+// Return title
+QString ExtractedSlice::title()
+{
+	return title_;
+}
+
+// Return original data
+Data2D& ExtractedSlice::originalData()
+{
+	return originalData_;
+}
+
+// Transform original data
+void ExtractedSlice::transformData(int xTransform, int yTransform)
+{
+	// Copy original data
+	transformedData_ = originalData_;
+
+	// Transform X axis data
+	Array<double>& x = transformedData_.arrayX();
+// 	for (int n=0; n<x.nItems(); ++n) x[n] = transformPoint
+}
+
+// Return transformed data
+Data2D& ExtractedSlice::transformedData()
+{
+	return transformedData_;
+}
+
+// Return axis along which slice was generated
+int ExtractedSlice::axis()
+{
+	return axis_;
+}
+
+// Return axis value at which slice was generated
+double ExtractedSlice::axisValue()
+{
+	return axisValue_;
+}
+
+/*
+ * Extracted Slice Group
+ */
+
+// Constructor
+ExtractedSliceGroup::ExtractedSliceGroup() : ListItem<ExtractedSliceGroup>()
+{
+	name_ = "New Group";
+	xAxisTransform_ = 0;
+	yAxisTransform_ = 0;
+}
+
+// Destructor
+ExtractedSliceGroup::~ExtractedSliceGroup()
+{
+}
+
+// Set name
+void ExtractedSliceGroup::setName(QString name)
+{
+	name_ = name;
+}
+
+// Return name
+QString ExtractedSliceGroup::name()
+{
+	return name_;
+}
+
+// Return list of extracted slices in group
+ExtractedSlice* ExtractedSliceGroup::extractedSlices()
+{
+	return extractedSlices_.first();
+}

@@ -12,15 +12,16 @@ ${CMAKE_BINARY_DIR}/src/
 # Source files (not Qt UI files or custom .h [uih])
 SET(qtproject_SRCS
 uchroma_funcs.cpp
-uchroma_data.cpp
-uchroma_analyse.cpp
 uchroma_colour.cpp
-uchroma_analyse.cpp
+uchroma_slices.cpp
 uchroma_slots.cpp
 uchroma_sourcedata.cpp
 uchroma_surface.cpp
 uchroma_transform.cpp
 uchroma_view.cpp
+data.cpp
+slices.cpp
+surface.cpp
 dataimport_funcs.cpp
 dataimport_seqxy.cpp
 saveimage_funcs.cpp
@@ -30,6 +31,7 @@ graphwidget_funcs.cpp
 plotwidget_data.cpp
 plotwidget_funcs.cpp
 plotwidget_paintevent.cpp
+slicemonitor_funcs.cpp
 viewer_funcs.cpp
 viewer_input.cpp
 viewer_prefs.cpp
@@ -52,6 +54,7 @@ SET(pro_MOC_HDRS
   graphwidget.h
   dataimport.h
   saveimage.h
+  slicemonitor.h
   colourbutton.uih
   gradientbar.uih
   plotwidget.uih
@@ -61,7 +64,9 @@ QT4_WRAP_CPP(pro_MOC_SRCS ${pro_MOC_HDRS} OPTIONS -f)
 
 SET(pro_UIS
   dataimport.ui
+  graphwidget.ui
   saveimage.ui
+  slicemonitor.ui
   uchroma.ui
 )
 QT4_WRAP_UI(pro_UIS_H ${pro_UIS})

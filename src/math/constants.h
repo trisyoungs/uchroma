@@ -40,6 +40,21 @@
 // Degrees per Radian
 #define DEGRAD 57.295779578552
 
+// Bohr radius (m)
+#define BOHRRADIUS 5.2917720859E-11
+
+// Boltzmann's constant (m2 kg s-2 K-1)
+#define BOLTZMANN 1.3806503E-23
+
+// Planck's constant (m2 kg s-1)
+#define PLANCK 6.626068E-34
+
+// Planck's constant divided by 2PI (m2 kg s-1)
+#define HBAR 1.054571628E10-34
+
+// Speed of light (m s-1)
+#define SPEEDOFLIGHT 299792458
+
 // Angstroms per Bohr
 #define ANGBOHR 0.529177249
 

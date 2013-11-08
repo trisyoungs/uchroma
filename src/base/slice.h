@@ -57,6 +57,10 @@ class Slice : public ListItem<Slice>
 	Data2D data_;
 	// Z coordinate
 	double z_;
+	// Axis along which slice was generated (if a generated slice)
+	int sliceAxis_;
+	// Axis value at which slice was generated (if a generated slice)
+	double sliceValue_;
 
 	public:
 	// Set source filename
@@ -75,6 +79,86 @@ class Slice : public ListItem<Slice>
 	void setZ(double z);
 	// Return z-coordinate of slice
 	double z();
+	// Return axis along which slice was generated (if a generated slice)
+	int sliceAxis();
+	// Return axis value at which slice was generated (if a generated slice)
+	double sliceValue();
+};
+
+// Extracted Slice
+class ExtractedSlice : public ListItem<ExtractedSlice>
+{
+	public:
+	// Constructor / Destructor
+	ExtractedSlice();
+	~ExtractedSlice();
+	// Copy constructor
+	ExtractedSlice(const ExtractedSlice& source);
+	// Assignment operator
+	void operator=(const ExtractedSlice& source);
+
+
+	/*
+	// Data
+	*/
+	private:
+	// Slice title
+	QString title_;
+	// Original slice data, acquired from raw loaded data
+	Data2D originalData_;
+	// Transformed data
+	Data2D transformedData_;
+	// Axis along which slice was taken
+	int axis_;
+	// Axis value at which slice was taken
+	double axisValue_;
+
+	public:
+	// Set title
+	void setTitle(QString title);
+	// Return title
+	QString title();
+	// Return original data
+	Data2D& originalData();
+	// Transform original data
+	void transformData(int xTransform, int yTransform);
+	// Return transformed data
+	Data2D& transformedData();
+	// Return axis along which slice was generated
+	int axis();
+	// Return axis value at which slice was generated
+	double axisValue();
+};
+
+// Extracted Slice Group
+class ExtractedSliceGroup : public ListItem<ExtractedSliceGroup>
+{
+	public:
+	// Constructor / Destructor
+	ExtractedSliceGroup();
+	~ExtractedSliceGroup();
+
+
+	/*
+	// Data
+	*/
+	private:
+	// Group name
+	QString name_;
+	// List of extracted slices contained within group
+	List<ExtractedSlice> extractedSlices_;
+	// X axis transformation to apply to generate transformed data
+	int xAxisTransform_;
+	// Y axis transformation to apply to generate transformed data
+	int yAxisTransform_;
+
+	public:
+	// Set name
+	void setName(QString name);
+	// Return name
+	QString name();
+	// Return list of extracted slices in group
+	ExtractedSlice* extractedSlices();
 };
 
 #endif

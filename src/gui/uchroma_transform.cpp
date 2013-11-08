@@ -22,22 +22,24 @@
 #include "gui/uchroma.h"
 #include "templates/reflist.h"
 
-bool UChromaWindow::transformTypeChanged(int axis, int index)
+
+bool UChromaWindow::transformEnabledChanged(int axis, bool enabled)
 {
 	if (refreshing_) return false;
-	transformType_[axis] = (DataTransform) index;
+	transformEnabled_[axis] = enabled;
 	calculateTransformLimits();
 	setAsModified();
 	updateTransformTab();
 	updateViewTab();
 	updateSurface();
 	return true;
+
 }
 
-bool UChromaWindow::transformValueChanged(int axis, double value)
+bool UChromaWindow::transformEquationChanged(int axis, QString equation)
 {
 	if (refreshing_) return false;
-	transformValue_[axis] = value;
+	transforms_[axis].setEquation(equation);
 	calculateTransformLimits();
 	setAsModified();
 	updateTransformTab();
@@ -110,34 +112,34 @@ bool UChromaWindow::transformInterpolateConstrainChanged(int axis, bool checked)
 	return true;
 }
 
-void UChromaWindow::on_TransformXTypeCombo_currentIndexChanged(int index)
+void UChromaWindow::on_TransformXCheck_clicked(bool checked)
 {
-	if (transformTypeChanged(0, index)) ui.TransformXValueSpin->setEnabled(index < 2);
+	transformEnabledChanged(0, checked);
 }
 
-void UChromaWindow::on_TransformYTypeCombo_currentIndexChanged(int index)
+void UChromaWindow::on_TransformYCheck_clicked(bool checked)
 {
-	if (transformTypeChanged(1, index)) ui.TransformYValueSpin->setEnabled(index < 2);
+	transformEnabledChanged(1, checked);
 }
 
-void UChromaWindow::on_TransformZTypeCombo_currentIndexChanged(int index)
+void UChromaWindow::on_TransformZCheck_clicked(bool checked)
 {
-	if (transformTypeChanged(2, index)) ui.TransformZValueSpin->setEnabled(index < 2);
+	transformEnabledChanged(2, checked);
 }
 
-void UChromaWindow::on_TransformXValueSpin_valueChanged(double value)
+void UChromaWindow::on_TransformXEquationEdit_textEdited(QString text)
 {
-	transformValueChanged(0, value);
+	transformEquationChanged(0, text);
 }
 
-void UChromaWindow::on_TransformYValueSpin_valueChanged(double value)
+void UChromaWindow::on_TransformYEquationEdit_textEdited(QString text)
 {
-	transformValueChanged(1, value);
+	transformEquationChanged(0, text);
 }
 
-void UChromaWindow::on_TransformZValueSpin_valueChanged(double value)
+void UChromaWindow::on_TransformZEquationEdit_textEdited(QString text)
 {
-	transformValueChanged(2, value);
+	transformEquationChanged(0, text);
 }
 
 void UChromaWindow::on_TransformXPreShiftSpin_valueChanged(double value)
@@ -268,15 +270,12 @@ void UChromaWindow::updateTransformTab()
 	refreshing_ = true;
 
 	// Transform type / value
-	ui.TransformXTypeCombo->setCurrentIndex(transformType_[0]);
-	ui.TransformYTypeCombo->setCurrentIndex(transformType_[1]);
-	ui.TransformZTypeCombo->setCurrentIndex(transformType_[2]);
-	ui.TransformXValueSpin->setEnabled(transformType_[0] < 2);
-	ui.TransformYValueSpin->setEnabled(transformType_[1] < 2);
-	ui.TransformZValueSpin->setEnabled(transformType_[2] < 2);
-	ui.TransformXValueSpin->setValue(transformValue_.x);
-	ui.TransformYValueSpin->setValue(transformValue_.y);
-	ui.TransformZValueSpin->setValue(transformValue_.z);
+	ui.TransformXCheck->setChecked(transformEnabled_[0]);
+	ui.TransformYCheck->setChecked(transformEnabled_[1]);
+	ui.TransformZCheck->setChecked(transformEnabled_[2]);
+	ui.TransformXEquationEdit->setText(transforms_[0].text());
+	ui.TransformYEquationEdit->setText(transforms_[1].text());
+	ui.TransformZEquationEdit->setText(transforms_[2].text());
 
 	// Shifts
 	ui.TransformXPreShiftSpin->setValue(preTransformShift_.x);

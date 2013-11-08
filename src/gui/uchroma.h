@@ -25,7 +25,9 @@
 #include "gui/ui_uchroma.h"
 #include "gui/saveimage.h"
 #include "gui/dataimport.h"
+#include "gui/slicemonitor.h"
 #include "base/slice.h"
+#include "base/transformer.h"
 
 // Forward Declarations
 /* None */
@@ -47,7 +49,7 @@ class UChromaWindow : public QMainWindow
 	// Data Import Dialog
 	DataImportDialog dataImportDialog_;
 	// Slice Monitor Dialog
-// 	SliceMonitorWidget sliceMonitorWidget_;
+	SliceMonitorDialog sliceMonitorDialog_;
 
 	public:
 	// Constructor / Destructor
@@ -108,7 +110,7 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * Tabs -- Source Data
+	 * Left Tabs -- Source Data
 	 */
 	private slots:
 	void on_SourceDirSelectButton_clicked(bool checked);
@@ -125,12 +127,12 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * Tabs -- Transform
+	 * Left Tabs -- Transform
 	 */
 	private:
 	// Change functions
-	bool transformTypeChanged(int axis, int index);
-	bool transformValueChanged(int axis, double value);
+	bool transformEnabledChanged(int axis, bool enabled);
+	bool transformEquationChanged(int axis, QString equation);
 	bool transformShiftChanged(int axis, bool pre, double value);
 	bool transformLimitChanged(int axis, bool minLim, double value);
 	bool transformLimitSetExtreme(int axis, bool minLim);
@@ -138,12 +140,12 @@ class UChromaWindow : public QMainWindow
 	bool transformInterpolateStepChanged(int axis, double step);
 	bool transformInterpolateConstrainChanged(int axis, bool checked);
 	private slots:
-	void on_TransformXTypeCombo_currentIndexChanged(int index);
-	void on_TransformYTypeCombo_currentIndexChanged(int index);
-	void on_TransformZTypeCombo_currentIndexChanged(int index);
-	void on_TransformXValueSpin_valueChanged(double value);
-	void on_TransformYValueSpin_valueChanged(double value);
-	void on_TransformZValueSpin_valueChanged(double value);
+	void on_TransformXCheck_clicked(bool checked);
+	void on_TransformYCheck_clicked(bool checked);
+	void on_TransformZCheck_clicked(bool checked);
+	void on_TransformXEquationEdit_textEdited(QString text);
+	void on_TransformYEquationEdit_textEdited(QString text);
+	void on_TransformZEquationEdit_textEdited(QString text);
 	void on_TransformXPreShiftSpin_valueChanged(double value);
 	void on_TransformYPreShiftSpin_valueChanged(double value);
 	void on_TransformZPreShiftSpin_valueChanged(double value);
@@ -176,7 +178,7 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * Tabs -- Colour
+	 * Left Tabs -- Colour
 	 */
 	private:
 	// Update Gradient Bar
@@ -224,7 +226,7 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * Tabs -- View
+	 * Left Tabs -- View
 	 */
 	private:
 	bool viewAxisInvertChanged(int axis, bool checked);
@@ -369,36 +371,27 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * Tabs -- Analyse   MOVE THIS TO A SEPARATE WINDOW
+	 * Right Tabs -- Surface
 	 */
 	private slots:
-	void on_AnalyseSliceNoneRadio_clicked(bool checked);
-	void on_AnalyseSliceXRadio_clicked(bool checked);
-	void on_AnalyseSliceYRadio_clicked(bool checked);
-	void on_AnalyseSliceZRadio_clicked(bool checked);
-	void on_AnalyseSurfaceSliceMonitorCheck_clicked(bool checked);
-	void on_AnalyseSurfaceSliceClearButton_clicked(bool checked);
-	void on_AnalyseSurfaceSliceSaveButton_clicked(bool checked);
-	void on_AnalyseSurfaceSliceList_currentRowChanged(int index);
-
-	public slots:
-	void addSurfaceSlice();
-
-	private:
-	// Current slice data
-	Data2D sliceData_;
-
-	private:
-	// Return axis bin value of closest point to supplied value
-	int closestBin(int axis, double value);
+	void on_SurfaceSliceNoneRadio_clicked(bool checked);
+	void on_SurfaceSliceXRadio_clicked(bool checked);
+	void on_SurfaceSliceYRadio_clicked(bool checked);
+	void on_SurfaceSliceZRadio_clicked(bool checked);
+	void on_SurfaceSliceMonitorCheck_clicked(bool checked);
 
 	public:
-	// Return current slice data
-	Data2D sliceData();
+	// Update Surface tab (except main view)
+	void updateSurfaceTab();
 
-	signals:
-	// Slice data has changed
-	void sliceDataChanged();
+
+	/*
+	 * Right Tabs -- Slices
+	 */
+	private slots:
+	void on_SlicesClearButton_clicked(bool checked);
+	void on_SlicesSaveButton_clicked(bool checked);
+	void on_SlicesList_currentRowChanged(int index);
 
 
 	/*
@@ -420,10 +413,6 @@ class UChromaWindow : public QMainWindow
 		nDataFileKeywords };
 	static DataFileKeyword dataFileKeyword(const char* s);
 	static const char* dataFileKeyword(DataFileKeyword dfk);
-	// Data Transform types
-	enum DataTransform { MultiplyTransform, DivideTransform, LogBase10Transform, NaturalLogTransform, nDataTransforms };
-	static DataTransform dataTransform(const char* s);
-	static const char* dataTransform(DataTransform dt);
 
 	private:
 	// Whether current data has been modified
@@ -484,10 +473,10 @@ class UChromaWindow : public QMainWindow
 	Vec3<double> transformMin_, transformMax_;
 	// Data limits for surface generation
 	Vec3<double> limitMin_, limitMax_;
-	// Transform multipliers for data
-	Vec3<double> transformValue_;
+	// Whether data transform is enabled
+	Vec3<bool> transformEnabled_;
 	// Transform types for data
-	DataTransform transformType_[3];
+	Transformer transforms_[3];
 	// Pre-transform shift value
 	Vec3<double> preTransformShift_;
 	// Post-transform shift value
@@ -510,6 +499,8 @@ class UChromaWindow : public QMainWindow
 	private:
 	// Whether to invert axes
 	Vec3<bool> axisInverted_;
+	// Whether axes should be plotted as logarithms
+	Vec3<bool> axisLogarithmic_;
 	// Axis visibility
 	Vec3<bool> axisVisible_;
 	// Axis position (in real surface-space coordinates)
@@ -532,8 +523,6 @@ class UChromaWindow : public QMainWindow
 	Vec4<double> axisTitleOrientation_[3];
 	// Axis title text anchor positions
 	TextPrimitive::HorizontalAnchor axisTitleAnchor_[3];
-	// Whether axes should be plotted as logarithms
-	Vec3<bool> axisLogarithmic_;
 	// Stretch factors to apply to axes
 	Vec3<double> axisStretch_;
 	// Axis extreme coordinates
@@ -548,14 +537,14 @@ class UChromaWindow : public QMainWindow
 	double titleScale_;
 
 	public:
-	// Return whether axis is logarithmic
-	bool axisLogarithmic(int axis);
 	// Return whether axis is inverted
 	bool axisInverted(int axis);
-	// Return stretch factor for axis
-	double axisStretch(int axis);
+	// Return whether axis is logarithmic
+	bool axisLogarithmic(int axis);
 	// Return whether specified axis is visible
 	bool axisVisible(int axis);
+	// Return stretch factor for axis
+	double axisStretch(int axis);
 	// Return coordinate at minimum of specified axis
 	Vec3<double> axisCoordMin(int axis);
 	// Return coordinate at maximum of specified axis
@@ -626,6 +615,30 @@ class UChromaWindow : public QMainWindow
 	double sliceValue();
 	// Return current slice coordinate along axis
 	double sliceCoordinate();
+
+
+	/*
+	 * Slices
+	 */
+	private:
+	// List of user-defined groups containing extracted slices
+	List<ExtractedSliceGroup> extractedSliceGroups_;
+
+	// Current slice data
+	ExtractedSlice currentSlice_;
+
+	public:
+	// Return axis bin value of closest point to supplied value
+	int closestBin(int axis, double value);
+	// Return current slice data
+	ExtractedSlice currentSlice();
+
+	public slots:
+	void addSurfaceSlice();
+
+	signals:
+	// Slice data has changed
+	void sliceDataChanged();
 
 
 	/*

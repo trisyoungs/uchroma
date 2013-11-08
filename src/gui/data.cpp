@@ -1,6 +1,6 @@
 /*
-	*** Main Window - Data 
-	*** src/gui/uchroma_data.cpp
+	*** Data 
+	*** src/gui/data.cpp
 	Copyright T. Youngs 2013
 
 	This file is part of uChroma.
@@ -32,18 +32,6 @@ UChromaWindow::DataFileKeyword UChromaWindow::dataFileKeyword(const char* s)
 const char* UChromaWindow::dataFileKeyword(UChromaWindow::DataFileKeyword dfk)
 {
 	return DataFileKeywordStrings[dfk];
-}
-
-// Data Transform types
-const char* DataTransformKeywords[UChromaWindow::nDataTransforms] = { "Multiply", "Divide", "LogBase10", "NaturalLog" };
-UChromaWindow::DataTransform UChromaWindow::dataTransform(const char* s)
-{
-	for (int n=0; n<UChromaWindow::nDataTransforms; ++n) if (strcmp(s, DataTransformKeywords[n]) == 0) return (UChromaWindow::DataTransform) n;
-	return UChromaWindow::nDataTransforms;
-}
-const char* UChromaWindow::dataTransform(UChromaWindow::DataTransform dt)
-{
-	return DataTransformKeywords[dt];
 }
 
 // Return boolean string based on integer value
@@ -121,37 +109,50 @@ void UChromaWindow::calculateTickDeltas(int axis)
 // Clear current data
 void UChromaWindow::clearData()
 {
+	// Data
+	modified_ = false;
+	inputFile_ = "";
+	dataFileDirectory_ = "";
+	imageExportFile_ = "image.png";
+	imageExportWidth_ = 800;
+	imageExportHeight_ = 600;
+	imageExportMaintainAspect_ = true;
+	imageExportFormat_ = Viewer::PNGFormat;
 	slices_.clear();
+	surfaceData_.clear();
+	// viewerFont_ = ??
+
+	// Transform
 	dataMin_.zero();
-	dataMax_.zero();
-	limitMin_.set(0.0, 0.0, 0.0);
+	dataMax_.set(10.0, 10.0, 10.0);
+	transformMin_.zero();
+	transformMax_.set(10.0, 10.0, 10.0);
+	limitMin_.zero();
 	limitMax_.set(10.0, 10.0, 10.0);
+	transformEnabled_.set(false, false, false);
+	transforms_[0].setEquation("x");
+	transforms_[1].setEquation("y");
+	transforms_[2].setEquation("z");
+	preTransformShift_.zero();
+	postTransformShift_.zero();
 	interpolate_.set(false, false, false);
 	interpolateConstrained_.set(false, false, false);
 	interpolationStep_.set(1.0, 1.0, 1.0);
-	transformValue_.set(1.0, 1.0, 1.0);
-	transformType_[0] = UChromaWindow::MultiplyTransform;
-	transformType_[1] = UChromaWindow::MultiplyTransform;
-	transformType_[2] = UChromaWindow::MultiplyTransform;
-	preTransformShift_.zero();
-	postTransformShift_.zero();
-	modified_ = false;
+
+	// Axes
 	axisInverted_.set(false, false, false);
+	axisLogarithmic_.set(false, false, false);
 	axisVisible_.set(true, true, true);
-	labelScale_ = 0.25;
-	titleScale_ = 0.3;
-	labelFaceViewer_ = false;
-	labelCorrectOrientation_ = true;
 	axisPosition_[0].zero();
 	axisPosition_[1].zero();
 	axisPosition_[2].zero();
+	axisTickDirection_[0].set(0.0, -1.0, 0.0);
+	axisTickDirection_[1].set(-1.0, 0.0, 0.0);
+	axisTickDirection_[2].set(1.0, 0.0, 0.0);
 	axisFirstTick_.zero();
 	axisTickDelta_.set(1.0,1.0,1.0);
 	axisAutoTicks_.set(true, true, true);
 	axisMinorTicks_.set(1,1,1);
-	axisTickDirection_[0].set(0.0, -1.0, 0.0);
-	axisTickDirection_[1].set(-1.0, 0.0, 0.0);
-	axisTickDirection_[2].set(1.0, 0.0, 0.0);
 	axisLabelOrientation_[0].set(0.0, 0.0, 0.2);
 	axisLabelOrientation_[1].set(0.0, 0.0, 0.2);
 	axisLabelOrientation_[2].set(0.0, 180.0, 0.2);
@@ -164,24 +165,42 @@ void UChromaWindow::clearData()
 	axisTitleAnchor_[0] = TextPrimitive::AnchorCentre;
 	axisTitleAnchor_[1] = TextPrimitive::AnchorCentre;
 	axisTitleAnchor_[2] = TextPrimitive::AnchorCentre;
-	axisLogarithmic_.set(false, false, false);
 	axisStretch_.set(1.0, 1.0, 1.0);
-	colourSource_ = SingleColourSource;
+	axisCoordMin_[0].zero();
+	axisCoordMin_[1].zero();
+	axisCoordMin_[2].zero();
+	axisCoordMax_[0].zero();
+	axisCoordMax_[1].zero();
+	axisCoordMax_[2].zero();
+	labelFaceViewer_ = false;
+	labelCorrectOrientation_ = true;
+	labelScale_ = 0.25;
+	titleScale_ = 0.3;
+
+	// Colours
 	colourSinglePoint_.set(0.0, QColor(255,255,255));
 	colourRGBGradientAPoint_.set(0.0, QColor(255,255,255));
 	colourRGBGradientBPoint_.set(1.0, QColor(0,0,255));
 	colourHSVGradientAPoint_.set(0.0, QColor(255,0,0));
 	colourHSVGradientBPoint_.set(1.0, QColor(100,40,255));
 	customColourScale_.clear();
-	fixedAlpha_ = 128;
+	colourSource_ = SingleColourSource;
 	alphaControl_ = UChromaWindow::OwnAlpha;
+	fixedAlpha_ = 128;
+
+	// Surface
+	surfaceCentre_.zero();
+	sliceAxis_ = -1;
+	sliceValue_ = 0.0;
+	
+	// Slices
+	extractedSliceGroups_.clear();
+	extractedSliceGroups_.add();
+
+	// Extra
 	boundingBox_ = UChromaWindow::NoBox;
 	boundingBoxPlaneY_ = 0.0;
-	imageExportFile_ = "image.png";
-	imageExportWidth_ = 800;
-	imageExportHeight_ = 600;
-	imageExportMaintainAspect_ = true;
-	imageExportFormat_ = Viewer::PNGFormat;
+
 	ui.actionViewPerspective->setChecked(false);
 }
 
@@ -198,7 +217,6 @@ bool UChromaWindow::loadData(QString fileName)
 
 	// Read line from file and decide what to do with it
 	UChromaWindow::DataFileKeyword kwd;
-	UChromaWindow::DataTransform dt;
 	Slice* slice;
 	int xyz, nPoints;
 	Matrix mat;
@@ -405,9 +423,8 @@ bool UChromaWindow::loadData(QString fileName)
 			case (UChromaWindow::TransformYKeyword):
 			case (UChromaWindow::TransformZKeyword):
 				xyz = kwd - UChromaWindow::TransformXKeyword;
-				dt = dataTransform(parser.argc(1));
-				transformType_[xyz] = dt;
-				transformValue_[xyz] = parser.argd(2);
+				transformEnabled_[xyz] = parser.argb(1);
+				transforms_[xyz].setEquation( parser.argc(2) );
 				break;
 			// View Matrix
 			case (UChromaWindow::ViewMatrixXKeyword):

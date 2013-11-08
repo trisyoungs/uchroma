@@ -1,6 +1,6 @@
 /*
-	*** Main Window - Interactive Slicing / Fitting
-	*** src/gui/uchroma_slice.cpp
+	*** Slice Acquisition / Fitting
+	*** src/gui/slices.cpp
 	Copyright T. Youngs 2013
 
 	This file is part of uChroma.
@@ -20,64 +20,17 @@
 */
 
 #include "gui/uchroma.h"
-#include "base/lineparser.h"
-
-/*
- * Private Slots
- */
-
-void UChromaWindow::on_AnalyseSliceNoneRadio_clicked(bool checked)
-{
-	sliceAxis_ = -1;
-	ui.AnalyseSliceNoneRadio->setChecked(true);
-}
-
-void UChromaWindow::on_AnalyseSliceXRadio_clicked(bool checked)
-{
-	sliceAxis_ = 0;
-	ui.AnalyseSliceXRadio->setChecked(true);
-}
-
-void UChromaWindow::on_AnalyseSliceYRadio_clicked(bool checked)
-{
-	sliceAxis_ = 1;
-	ui.AnalyseSliceYRadio->setChecked(true);
-}
-
-void UChromaWindow::on_AnalyseSliceZRadio_clicked(bool checked)
-{
-	sliceAxis_ = 2;
-	ui.AnalyseSliceZRadio->setChecked(true);
-}
-
-void UChromaWindow::on_AnalyseSurfaceSliceMonitorCheck_clicked(bool checked)
-{
-}
-
-void UChromaWindow::on_AnalyseSurfaceSliceClearButton_clicked(bool checked)
-{
-	ui.AnalyseSurfaceSliceList->clear();
-// 	ui.AnalyseSurfaceSliceGraph->removeAllDataSets();
-}
-
-void UChromaWindow::on_AnalyseSurfaceSliceSaveButton_clicked(bool checked)
-{
-	//if (ui.AnalyseSurfaceSliceList->currentIndex() == -1) return;
-	
-}
-
-void UChromaWindow::on_AnalyseSurfaceSliceList_currentRowChanged(int index)
-{
-}
-
-/*
- * Public Slots
- */
 
 // Add slice to graph
 void UChromaWindow::addSurfaceSlice()
 {
+	
 // 	updateSurfaceSliceData(false);
+// 	QTableWidgetItem* item = new QTableWidgetItem(ui.SlicesTable);
+// 	printf("Here.\n");
+// 	ui.SlicesTable->setRowCount(ui.SlicesTable->rowCount()+1);
+// 	GraphWidget* widget = new GraphWidget(ui.SlicesTable);
+// 	ui.SlicesTable->setCellWidget(0, 0, widget);
 }
 
 /*
@@ -135,7 +88,7 @@ int UChromaWindow::closestBin(int axis, double value)
  */
 
 // Return current slice data
-Data2D UChromaWindow::sliceData()
+ExtractedSlice UChromaWindow::currentSlice()
 {
-	return sliceData_;
+	return currentSlice_;
 }

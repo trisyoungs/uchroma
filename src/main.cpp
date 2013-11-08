@@ -22,8 +22,13 @@
 #include "version.h"
 #include "gui/uchroma.h"
 
+#include "parser/tree.h"
+
 int main(int argc, char *argv[])
 {
+	// Uncomment here for extra debug output
+// 	msg.addOutputType(Messenger::Verbose);
+
 	/* Create the main QApplication */
 	QApplication app(argc, argv, QApplication::GuiClient);
 	QCoreApplication::setOrganizationName("uChroma");
@@ -33,6 +38,14 @@ int main(int argc, char *argv[])
 	#if QT_VERSION >= 0x040600
         QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
         #endif
+
+	Tree testTree;
+	Variable* x = testTree.addGlobalVariable("x");
+	x->set(ReturnValue(9.0));
+	testTree.setCommands("1.0; cos(x)");
+	ReturnValue rv;
+	printf("Result = %f\n", testTree.execute());
+	return 0;
 	
 	/* Tweak the default QGLFormat */
 	QGLFormat::defaultFormat().setSampleBuffers(true);

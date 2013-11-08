@@ -143,5 +143,7 @@ src/Makefile
 src/base/Makefile
 src/gui/Makefile
 src/math/Makefile
+src/parser/Makefile
+src/command/Makefile
 src/templates/Makefile
 )

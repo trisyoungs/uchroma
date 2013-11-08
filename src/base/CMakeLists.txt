@@ -7,6 +7,7 @@ messenger.cpp
 nxs.cpp
 slice.cpp
 sysfunc.cpp
+transformer.cpp
 colourscale.h
 data2d.h
 dnchar.h
@@ -15,6 +16,7 @@ messenger.h
 nxs.h
 slice.h
 sysfunc.h
+transformer.h
 )
 
 include_directories(

@@ -24,7 +24,6 @@
 
 #include <QtGui/QWidget>
 #include <QtCore/QObject>
-// #include <QtSvg/QSvgGenerator>
 #include "gui/ui_graphwidget.h"
 
 // Forward Declarations

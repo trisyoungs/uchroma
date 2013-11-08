@@ -100,14 +100,14 @@ PlotData::~PlotData()
 }
 
 // Set source data
-void PlotData::setData(Data2D& source, QString name)
+void PlotData::setData(ExtractedSlice& source, QString name)
 {
 	data_ = source;
 	name_ = name;
 }
 
 // Return reference to contained data
-Data2D& PlotData::data()
+ExtractedSlice& PlotData::data()
 {
 	return data_;
 }
@@ -115,8 +115,8 @@ Data2D& PlotData::data()
 // Determine data limits
 void PlotData::determineLimits()
 {
-	const double* xarray = data_.arrayX().array();
-	const double* yarray = data_.arrayY().array();
+	const double* xarray = data_.transformedData().arrayX().array();
+	const double* yarray = data_.transformedData().arrayY().array();
 	double x, y;
 	if ((xarray != NULL) && (yarray != NULL))
 	{
@@ -127,7 +127,7 @@ void PlotData::determineLimits()
 		xMax_ = x;
 		yMin_ = y;
 		yMax_ = y;
-		for (int n=1; n<data_.arrayX().nItems(); ++n)
+		for (int n=1; n<data_.transformedData().arrayX().nItems(); ++n)
 		{
 			// Grab modified array values
 			x = xarray[n];
@@ -151,8 +151,8 @@ void PlotData::generatePainterPaths(double xScale, double yScale)
 	// Generate QPainterPath, determining minimum / maximum values along the way
 	linePath_ = QPainterPath();
 	QRect symbolRect(0, 0, 7, 7);
-	const double* xarray = data_.arrayX().array();
-	const double* yarray = data_.arrayY().array();
+	const double* xarray = data_.transformedData().arrayX().array();
+	const double* yarray = data_.transformedData().arrayY().array();
 	int enumY;
 	double x, y, lastX, lastScaledY, scaledX, scaledY;
 	if ((xarray != NULL) && (yarray != NULL))
@@ -163,7 +163,7 @@ void PlotData::generatePainterPaths(double xScale, double yScale)
 		linePath_.moveTo(x * xScale, y * yScale);
 		lastX = x;
 		lastScaledY = y * yScale;
-		for (int n=1; n<data_.arrayX().nItems(); ++n)
+		for (int n=1; n<data_.transformedData().arrayX().nItems(); ++n)
 		{
 			// Grab modified array values
 			x = xarray[n];

@@ -18,12 +18,13 @@ SUFFIXES: .ui .uih .qrc
 	$(CXX) -I$(top_srcdir)/src -I../ -I./ $(CXXFLAGS) $(QTGUI_CFLAGS) -c -o $@ $*.cpp
 	rm $*.cpp
 
-clean:
-	rm -f *.o ui_* viewer.cpp
+clean-local:
+	-rm -f ui_* viewer.cpp
 
-libgui_a_SOURCES = icons.qrc dataimport.ui graphwidget.ui saveimage.ui uchroma.ui uchroma_funcs.cpp uchroma_data.cpp uchroma_analyse.cpp uchroma_colour.cpp uchroma_analyse.cpp uchroma_slots.cpp uchroma_sourcedata.cpp uchroma_surface.cpp uchroma_transform.cpp uchroma_view.cpp
+libgui_a_SOURCES = icons.qrc dataimport.ui graphwidget.ui saveimage.ui slicemonitor.ui uchroma.ui uchroma_funcs.cpp uchroma_colour.cpp uchroma_slices.cpp uchroma_slots.cpp uchroma_sourcedata.cpp uchroma_surface.cpp uchroma_transform.cpp uchroma_view.cpp
 
-libgui_a_SOURCES += dataimport_funcs.cpp dataimport_seqxy.cpp graphwidget_funcs.cpp saveimage_funcs.cpp
+libgui_a_SOURCES += data.cpp slices.cpp surface.cpp
+libgui_a_SOURCES += dataimport_funcs.cpp dataimport_seqxy.cpp graphwidget_funcs.cpp saveimage_funcs.cpp slicemonitor_funcs.cpp
 libgui_a_SOURCES += colourbutton.uih colourbutton_funcs.cpp
 libgui_a_SOURCES += gradientbar.uih gradientbar_funcs.cpp
 libgui_a_SOURCES += plotwidget.uih plotwidget_data.cpp plotwidget_funcs.cpp plotwidget_paintevent.cpp 

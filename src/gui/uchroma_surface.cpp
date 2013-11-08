@@ -21,403 +21,50 @@
 
 #include "gui/uchroma.h"
 
-// Update surface data after data change
-void UChromaWindow::updateSurface(bool dataHasChanged)
+/*
+ * Private Slots
+ */
+
+void UChromaWindow::on_SurfaceSliceNoneRadio_clicked(bool checked)
 {
-	QString s;
-	FTBBox boundingBox;
-	Vec3<double> centre;
-	double dpX, dpY, textWidth, delta, value;
-	int n;
-	Vec3<double> u, tickDir;
-	Matrix labelTransform, titleTransform;
-
-	// Determine surface center and Y clip limits
-	for (int n=0; n<3; ++n)
-	{
-		if (axisLogarithmic_[n]) surfaceCentre_[n] = (axisInverted_[n] ? log10(limitMax_[n]/limitMin_[n]) : log10(limitMax_[n]*limitMin_[n])) * 0.5 * axisStretch_[n];
-		else surfaceCentre_[n] = (limitMax_[n]+limitMin_[n]) * 0.5 * axisStretch_[n];
-	}
-	if (axisLogarithmic_.y) ui.MainView->setYClip(log10(limitMin_.y) * axisStretch_.y, log10(limitMax_.y) * axisStretch_.y);
-	else ui.MainView->setYClip(limitMin_.y * axisStretch_.y, limitMax_.y * axisStretch_.y);
-	
-	// Set basic extreme coordinates for axes - actual limits on axes will be set in following loop
-	for (int axis=0; axis < 3; ++axis)
-	{
-		for (int n=0; n<3; ++n)
-		{
-			if (axisLogarithmic_[n]) axisCoordMin_[axis].set(n, (axisInverted_[n] ? log10(limitMax_[n]/axisPosition_[axis][n]) : log10(axisPosition_[axis][n])) * axisStretch_[n]);
-			else axisCoordMin_[axis].set(n, (axisInverted_[n] ? limitMax_[n] - axisPosition_[axis][n] : axisPosition_[axis][n]) * axisStretch_[n]);
-		}
-		axisCoordMax_[axis] = axisCoordMin_[axis];
-	}
-
-	// Construct axes
-	for (int axis = 0; axis < 3; ++axis)
-	{
-		// Clear old axis primitives
-		ui.MainView->clearAxisPrimitives(axis);
-
-		// Normalise tickDirection
-		tickDir = axisTickDirection_[axis];
-		tickDir.normalise();
-
-		// Create tick label transformation matrix
-		labelTransform.setIdentity();
-		// 1) Apply axial rotation along X axis (left-to-right direction)
-		labelTransform.applyRotationX(axisLabelOrientation_[axis].x);
-		// 2) Translate to 'end of tick' position
-		labelTransform.applyTranslation(tickDir * axisLabelOrientation_[axis].z);
-		// 3) Perform in-plane rotation
-		labelTransform.applyRotationZ(axisLabelOrientation_[axis].y);
-		labelTransform.applyScaling(labelScale_, labelScale_, labelScale_);
-
-		// Create axis title transformation matrix
-		titleTransform.setIdentity();
-		// 1) Apply axial rotation along X axis (left-to-right direction)
-		titleTransform.applyRotationX(axisTitleOrientation_[axis].x);
-		// 2) Translate to 'end of tick' position
-		titleTransform.applyTranslation(tickDir * axisTitleOrientation_[axis].z);
-		// 3) Perform in-plane rotation
-		titleTransform.applyRotationZ(axisTitleOrientation_[axis].y);
-		titleTransform.applyScaling(titleScale_, titleScale_, titleScale_);
-
-		if (axisLogarithmic_[axis])
-		{
-			// Set axis min/max coordinates
-			axisCoordMin_[axis].set(axis, (axisInverted_[axis] ? log10(limitMax_[axis] / limitMin_[axis]) : log10(limitMin_[axis])) * axisStretch_[axis]);
-			axisCoordMax_[axis].set(axis, (axisInverted_[axis] ? log10(limitMax_[axis] / limitMax_[axis]) : log10(limitMax_[axis])) * axisStretch_[axis]);
-
-			// For the log axis, the associated surface data coordinate will already be in log form
-			if (limitMax_[axis] < 0.0)
-			{
-				msg.print("Axis range is inappropriate for a log scale (%f < x < %f). Axis will not be drawn.\n", limitMin_[axis], limitMax_[axis]);
-				return;
-			}
-
-			// Draw a line from min to max range, passing through the defined axisPosition
-			ui.MainView->addAxisLine(axis, axisCoordMin_[axis], axisCoordMax_[axis]);
-
-			// Grab logged min/max values for convenience, enforcing sensible minimum
-			double axisMin = log10(limitMin_[axis] <= 0.0 ? 1.0e-10 : limitMin_[axis]);
-			double axisMax = log10(limitMax_[axis]);
-
-			// Plot tickmarks - Start at floored (ceiling'd) integer of logAxisMin (logAxisMax), and go from there.
-			int nMinorTicks = axisMinorTicks_[axis] > 8 ? 8 : axisMinorTicks_[axis];
-			int count = 0;
-			double power = floor(axisMin);
-			double value = pow(10,power);
-			Vec3<double> u = axisCoordMin_[axis];
-			while (true)
-			{
-				// Check break condition
-				if (value > limitMax_[axis]) break;
-
-				// If the current value is in range, plot a tick
-				u[axis] = (axisInverted_[axis] ? log10(limitMax_[axis]/value): log10(value)) * axisStretch_[axis];
-				if (value >= axisMin)
-				{
-					// Tick mark
-					ui.MainView->addAxisLine(axis, u, u+tickDir*(count == 0 ? 0.1 : 0.05));
-
-					// Tick label
-					if (count == 0)
-					{
-						// Determine resulting text primitive width (so we can do label rotations)
-						s = QString::number(value);
-
-						ui.MainView->addAxisText(axis, s, u, labelTransform);
-					}
-				}
-
-				// Increase tick counter, value, and power if necessary
-				++count;
-				if (count > nMinorTicks)
-				{
-					count = 0;
-					power = power + 1.0;
-					value = pow(10,power);
-				}
-				else value += pow(10,power);
-			}
-
-			// Add axis title
-			u = axisCoordMin_[axis];
-			value = limitMin_[axis] + (limitMax_[axis] - limitMin_[axis]) * axisTitleOrientation_[axis].w;
-			u.set(axis, (axisInverted_[axis] ? log10(limitMax_[axis]/value) : log10(value)) * axisStretch_[axis]);
-			u += tickDir * axisTitleOrientation_[axis].z;
-			ui.MainView->addAxisText(axis, axisTitle_[axis], u, titleTransform, axisTitleAnchor_[axis]);
-		}
-		else
-		{
-			// Set axis min/max coordinates
-			axisCoordMin_[axis].set(axis, (axisInverted_[axis] ? limitMax_[axis] : limitMin_[axis]) * axisStretch_[axis]);
-			axisCoordMax_[axis].set(axis, (axisInverted_[axis] ? limitMin_[axis] : limitMax_[axis]) * axisStretch_[axis]);
-		
-			// Calculate autoticks if necessary
-			if (axisAutoTicks_[axis]) calculateTickDeltas(axis);
-
-			// Draw a line from min to max limits, passing through the defined axisPosition
-			ui.MainView->addAxisLine(axis, axisCoordMin_[axis], axisCoordMax_[axis]);
-
-			// Check tickDelta
-			if (((limitMax_[axis]-limitMin_[axis]) / axisTickDelta_[axis]) > 1e6) return;
-
-			// Plot tickmarks - maximum of 100 minor tickmarks between major lines
-			int count = 0;
-			delta = axisTickDelta_[axis] / (axisMinorTicks_[axis]+1);
-			value = axisFirstTick_[axis];
-			u = axisCoordMin_[axis];
-			u.set(axis, (axisInverted_[axis] ? (limitMax_[axis] - axisFirstTick_[axis]) + limitMin_[axis]: axisFirstTick_[axis]) * axisStretch_[axis]);
-			while (value <= limitMax_[axis])
-			{
-				// Draw tick here, only if value >= limitMin_
-				if (value >= limitMin_[axis])
-				{
-					if (count %(axisMinorTicks_[axis]+1) == 0)
-					{
-						ui.MainView->addAxisLine(axis, u, u + tickDir*0.1);
-						
-						// Get formatted label text
-						s = QString::number(value);
-
-						ui.MainView->addAxisText(axis, s, u, labelTransform);
-						
-						count = 0;
-					}
-					else ui.MainView->addAxisLine(axis, u, u + tickDir*0.05);
-				}
-				u.add(axis, delta * (axisInverted_[axis] ? -axisStretch_[axis] : axisStretch_[axis]));
-				value += delta;
-				++count;
-			}
-
-			// Add axis title
-			u = axisCoordMin_[axis];
-			value = limitMin_[axis] + (limitMax_[axis] - limitMin_[axis]) * axisTitleOrientation_[axis].w;
-			u.set(axis, (axisInverted_[axis] ? (limitMax_[axis] - value) + limitMin_[axis]: value) * axisStretch_[axis]);
-			u += tickDir * axisTitleOrientation_[axis].z;
-			ui.MainView->addAxisText(axis, axisTitle_[axis], u, titleTransform, axisTitleAnchor_[axis]);
-		}
-	}
-
-	// Reconstruct surface
-	if (dataHasChanged)
-	{
-		// Clear existing display slices
-		surfaceData_.clear();
-		double x, y;
-
-		// Loop over slices, apply any transforms (X or Y) and check limits
-		Slice* slice = axisInverted_.z ? slices_.last() : slices_.first();
-		while (slice)
-		{
-			// Z
-			double z = transformValue(slice->z(), 2);
-			// -- Is the transformed Z value within range?
-			if ((z < limitMin_.z) || (z > limitMax_.z))
-			{
-				slice = axisInverted_.z ? slice->prev : slice->next;
-				continue;
-			}
-			if (axisInverted_.z && axisLogarithmic_.z) z = log10(limitMax_[n]/z);
-			else if (axisInverted_.z) z = (limitMax_.z - z) + limitMin_.z;
-			else if (axisLogarithmic_.z) z = log10(z);
-
-			// Add new item to surfaceData_ array
-			Slice* surfaceSlice = surfaceData_.add();
-			surfaceSlice->setZ(z * axisStretch_.z);
-
-			// Copy / interpolate arrays
-			Array<double> array[2];
-			if (interpolate_.x)
-			{
-				slice->data().interpolate(interpolateConstrained_.x);
-				double x = limitMin_.x;
-				while (x <= limitMax_.x)
-				{
-					array[0].add(x);
-					array[1].add(slice->data().interpolated(x));
-					x += interpolationStep_.x;
-				}
-			}
-			else
-			{
-				array[0] = slice->data().arrayX();
-				array[1] = slice->data().arrayY();
-			}
-
-			// X / Y
-			for (int n=0; n<2; ++n)
-			{
-				// Apply pre-transform shift
-				array[n] += preTransformShift_[n];
-
-				// Apply transform
-				switch (transformType_[n])
-				{
-					case (UChromaWindow::MultiplyTransform):
-						array[n] *= transformValue_[n];
-						break;
-					case (UChromaWindow::DivideTransform):
-						array[n] /= transformValue_[n];
-						break;
-					case (UChromaWindow::LogBase10Transform):
-						array[n].takeLog();
-						break;
-					case (UChromaWindow::NaturalLogTransform):
-						array[n].takeLn();
-						break;
-				}
-				// Apply post-transform shift
-				array[n] += postTransformShift_[n];
-			}
-
-			// Add data to surfaceSlice, obeying defined x-limits
-			if (axisInverted_.x) for (int n=array[0].nItems()-1; n >= 0; --n)
-			{
-				x = array[0].value(n);
-				if ((x < limitMin_.x) || (x > limitMax_.x)) continue;
-				if (axisLogarithmic_.x) x = log10(limitMax_.x / x);
-				else x = (limitMax_.x - x) + limitMin_.x;
-				x *= axisStretch_.x;
-				y = array[1].value(n);
-				if (axisLogarithmic_.y) y = (axisInverted_.y ? log10(limitMax_.y / y) : log10(y));
-				else if (axisInverted_.y) y = (limitMax_.y - y) + limitMin_.y;
-				y *= axisStretch_.y;
-				surfaceSlice->data().addPoint(x, y);
-			}
-			else for (int n=0; n<array[0].nItems(); ++n)
-			{
-				x = array[0].value(n);
-				if ((x < limitMin_.x) || (x > limitMax_.x)) continue;
-				if (axisLogarithmic_.x) x = log10(x);
-				x *= axisStretch_.x;
-				y = array[1].value(n);
-				if (axisLogarithmic_.y)
-				{
-					if (y < 0.0) y = 1.0e-10;
-					else y = (axisInverted_.y ? log10(limitMax_.y / y) : log10(y));
-				}
-				else if (axisInverted_.y) y = (limitMax_.y - y) + limitMin_.y;
-				y *= axisStretch_.y;
-				surfaceSlice->data().addPoint(x, y);
-			}
-
-			// Move to next Z slice
-			slice = axisInverted_.z ? slice->prev : slice->next;
-		}
-	}
-
-	// Create temporary colourScale_
-	ColourScale scale = colourScale_;
-	if (alphaControl_ == UChromaWindow::FixedAlpha) scale.setAllAlpha(fixedAlpha_);
-
-	// Update surface GL object
-	ui.MainView->createSurface(scale, axisStretch_.y);
-
-	// Setup Bounding Box
-	ui.MainView->createBoundingBox(boundingBox_, axisLogarithmic_.y ? log10(boundingBoxPlaneY_) : boundingBoxPlaneY_);
-
-	ui.MainView->update();
-
-	ui.NTrianglesLabel->setText("NTriangles: " + QString::number(ui.MainView->surfaceNTriangles()));
+	if (refreshing_) return;
+	sliceAxis_ = -1;
+	updateSurfaceTab();
 }
 
-// Return central coordinate of surface
-Vec3<double> UChromaWindow::surfaceCentre()
+void UChromaWindow::on_SurfaceSliceXRadio_clicked(bool checked)
 {
-	return surfaceCentre_;
+	if (refreshing_) return;
+	sliceAxis_ = 0;
+	updateSurfaceTab();
 }
 
-// Set slice axis
-void UChromaWindow::setSliceAxis(int axis)
+void UChromaWindow::on_SurfaceSliceYRadio_clicked(bool checked)
 {
-	sliceAxis_ = axis;
+	if (refreshing_) return;
+	sliceAxis_ = 1;
+	updateSurfaceTab();
 }
 
-// Return current axis target for slice selection
-int UChromaWindow::sliceAxis()
+void UChromaWindow::on_SurfaceSliceZRadio_clicked(bool checked)
 {
-	return sliceAxis_;
+	if (refreshing_) return;
+	sliceAxis_ = 2;
+	updateSurfaceTab();
 }
 
-// Calculate axis slice value at supplied mouse position
-bool UChromaWindow::updateSliceValue(int mouseX, int mouseY)
+void UChromaWindow::on_SurfaceSliceMonitorCheck_clicked(bool checked)
 {
-	if (sliceAxis_ != -1)
-	{
-// 		printf("Test: min=%f, max=%f\n", axisMin_[0], axisMax_[0]);
-// 		rMouseLast_.print();
-// 		axisCoordMin_[0].print();
-		// Project axis coordinates to get a screen-based yardstick
-		Vec4<double> axmin = ui.MainView->modelToScreen(axisCoordMin_[sliceAxis_]);
-		Vec4<double> axmax = ui.MainView->modelToScreen(axisCoordMax_[sliceAxis_]);
-// 		axmin.print();
-// 		axmax.print();
-
-		// Calculate vectors between axis minimum and mouse position (AM) and axis maximum (AB)
-		Vec3<double> ab(axmax.x - axmin.x, axmax.y - axmin.y, 0.0);
-		Vec3<double> am(mouseX - axmin.x, mouseY - axmin.y, 0.0);
-		Vec3<double> amNorm = am, abNorm = ab;
-		double ratio = am.magnitude() / ab.magnitude();
-		abNorm.normalise();
-		amNorm.normalise();
-		double angle = acos(abNorm.dp(amNorm)) ;
-// 		printf("Angle = %f, %f\n", angle, angle * DEGRAD);
-
-		// Calculate slice axis value - no need to account for inverted axes here, since this is accounted for in the vectors axmin and axmax
-		if (axisLogarithmic_[sliceAxis_]) sliceValue_ = pow(10, abNorm.dp(amNorm)*ratio * (log10(limitMax_[sliceAxis_]) - log10(limitMin_[sliceAxis_])) + log10(limitMin_[sliceAxis_]));
-		else sliceValue_ = abNorm.dp(amNorm)*ratio * (limitMax_[sliceAxis_] - limitMin_[sliceAxis_]) + limitMin_[sliceAxis_];
-// 		printf("slicevalue = %f (%f)\n", sliceValue_, abNorm.dp(amNorm)*ratio);
-
-		// Clamp value to data range
-		if (sliceValue_ < limitMin_[sliceAxis_]) sliceValue_ = limitMin_[sliceAxis_];
-		else if (sliceValue_ > limitMax_[sliceAxis_]) sliceValue_ = limitMax_[sliceAxis_];
-// 		printf("ACMAG = %f, X = %f\n", ratio, sliceValue_);
-
-		// Extract slice from data
-		int bin = closestBin(sliceAxis_, sliceValue_);
-		QString title;
-
-		// Grab slice data
-		if (sliceAxis_ == 0)
-		{
-			// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated)
-			sliceData_.clear();
-			for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) sliceData_.addPoint(transformValue(slice->z(), 2), transformValue(slice->data().y(bin), 1));
-			title = "X = " + QString::number(transformValue(slices_.first()->data().x(bin), 0));
-		}
-		else if (sliceAxis_ == 1)
-		{
-			return false;
-		}
-		else if (sliceAxis_ == 2)
-		{
-			// Slice through Z - i.e. original slice data
-			sliceData_.clear();
-			sliceData_ = slices_[bin]->data();
-			title = "Z = " + QString::number(slices_[bin]->z());
-		}
-
-		emit(sliceDataChanged());
-		return true;
-	}
-
-	return false;
+	if (refreshing_) return;
+	if (checked) sliceMonitorDialog_.show();
+	else sliceMonitorDialog_.hide();
 }
 
-// Return current axis value for slice selection
-double UChromaWindow::sliceValue()
+// Update Surface tab (except main view)
+void UChromaWindow::updateSurfaceTab()
 {
-	return sliceValue_;
-}
-
-// Return current slice coordinate along axis
-double UChromaWindow::sliceCoordinate()
-{
-	if (sliceAxis_ == -1) return 0.0;
-
-	if (axisLogarithmic_[sliceAxis_]) return (axisInverted_[sliceAxis_] ? log10(limitMax_[sliceAxis_]/sliceValue_) : log10(sliceValue_));
-	else return (axisInverted_[sliceAxis_] ? limitMax_[sliceAxis_] - sliceValue_ : sliceValue_);
+	if (sliceAxis_ == -1) ui.SurfaceSliceNoneRadio->setChecked(true);
+	else if (sliceAxis_ == 0) ui.SurfaceSliceXRadio->setChecked(true);
+	else if (sliceAxis_ == 1) ui.SurfaceSliceYRadio->setChecked(true);
+	else if (sliceAxis_ == 2) ui.SurfaceSliceZRadio->setChecked(true);
 }

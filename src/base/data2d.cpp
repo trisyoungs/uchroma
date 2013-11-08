@@ -302,7 +302,7 @@ void Data2D::addPoint(double x, double y)
 /*!
  * \brief Set name of data
  */
-void Data2D::setName(const char* name)
+void Data2D::setName(QString name)
 {
 	name_ = name;
 }
@@ -310,9 +310,9 @@ void Data2D::setName(const char* name)
 /*!
  * \brief Return name of data
  */
-const char* Data2D::name() const
+QString Data2D::name() const
 {
-	return name_.get();
+	return name_;
 }
 
 /*

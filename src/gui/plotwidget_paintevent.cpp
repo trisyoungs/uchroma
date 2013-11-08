@@ -322,7 +322,7 @@ void PlotWidget::drawTitles(QPainter& painter)
 	// Draw X-axis title
 	xAxisArea_.setLeft( graphArea_.left() );
 	xAxisArea_.moveTop( xAxisArea_.top() + (spacing_ + textHeight_) );
-	painter.drawText(xAxisArea_, Qt::AlignHCenter | Qt::AlignTop, "Time (hh:mm:ss)");
+	painter.drawText(xAxisArea_, Qt::AlignHCenter | Qt::AlignTop, xAxisTitle_);
 	
 	// Draw Y-axis title(s)
 	QTransform transform = globalTransform_;

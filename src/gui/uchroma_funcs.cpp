@@ -24,7 +24,7 @@
 #include "version.h"
 
 // Constructor
-UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveImageDialog_(this), dataImportDialog_(this)//, sliceMonitorWidget_(this)
+UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveImageDialog_(this), dataImportDialog_(this), sliceMonitorDialog_(this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -60,7 +60,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveIma
 	connect(ui.MainView, SIGNAL(sliceAxisClicked()), this, SLOT(addSurfaceSlice()));
 
 	// Connect signals / slots between SliceMonitor and main UI
-	connect(this, SIGNAL(sliceDataChanged()), ui.TestWidget, SLOT(staticDataChanged()));
+	connect(this, SIGNAL(sliceDataChanged()), sliceMonitorDialog_.ui.MonitorGraph, SLOT(staticDataChanged()));
 }
 
 // Destructor
@@ -121,7 +121,6 @@ void UChromaWindow::updateAfterLoad()
 	// Setup font
 	ui.MainView->setupFont(viewerFont_);
 }
-
 
 /*
  * Axes

@@ -30,6 +30,15 @@ UChromaWindow* GraphWidget::uChroma_ = NULL;
 GraphWidget::GraphWidget(QWidget* parent) : QWidget(parent)
 {
 	ui.setupUi(this);
+
+	// Connect signals/slots to PlotWidget
+	connect(ui.AutoScaleCheck, SIGNAL(clicked(bool)), ui.Graph, SLOT(setAutoScale(bool)));
+	connect(ui.Graph, SIGNAL(autoScaleChanged(bool)), ui.AutoScaleCheck, SLOT(setChecked(bool)));
+	connect(ui.ShowLegendCheck, SIGNAL(clicked(bool)), ui.Graph, SLOT(setShowLegend(bool)));
+	connect(ui.Graph, SIGNAL(showLegendChanged(bool)), ui.ShowLegendCheck, SLOT(setChecked(bool)));
+
+	// Ensure that initial widget state represents the PlotWidget
+	ui.AutoScaleCheck->setChecked(ui.Graph->autoScale());
 }
 
 /*!
@@ -50,13 +59,13 @@ void GraphWidget::setUChroma(UChromaWindow* ptr)
 }
 
 /*
-// Widgets / Slots / Reimplementations
-*/
+ * Widgets / Slots / Reimplementations
+ */
 
 // Source static data has changed, so update it
 void GraphWidget::staticDataChanged()
 {
 	// Change the static data in PlotWidget for that currently in uChroma
 	if (!uChroma_) return;
-	ui.Graph->setStaticData(uChroma_->sliceData(), "Hello");
+	ui.Graph->setStaticData(uChroma_->currentSlice(), "Hello");
 }

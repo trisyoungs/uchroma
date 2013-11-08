@@ -27,7 +27,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 #include <QtSvg/QSvgGenerator>
-#include "base/data2d.h"
+#include "base/slice.h"
 #include "templates/reflist.h"
 
 // Forward Declarations
@@ -96,7 +96,7 @@ class PlotData : public ListItem<PlotData>
 	 */
 	private:
 	// Data to plot
-	Data2D data_;
+	ExtractedSlice data_;
 	// Block index (or -1 for no block)
 	int blockIndex_;
 	// QPainterPath of data
@@ -116,9 +116,9 @@ class PlotData : public ListItem<PlotData>
 
 	public:
 	// Set data
-	void setData(Data2D& source, QString runNumber);
+	void setData(ExtractedSlice& source, QString name);
 	// Return reference to contained data
-	Data2D& data();
+	ExtractedSlice& data();
 	// Determine data limits
 	void determineLimits();
 	// Set block
@@ -357,12 +357,14 @@ class PlotWidget : public QWidget
 	void setXLimits(bool setMinLimit, bool applyMinLimit, double minLimit, bool setMaxLimit, bool applyMaxLimit, double maxLimit);
 	// Set soft Y limits for plot area
 	void setYLimits(bool setMinLimit, bool applyMinLimit, double minLimit, bool setMaxLimit, bool applyMaxLimit, double maxLimit);
-	// Set whether legend is visible
-	void setShowLegend(bool on);
 	// Return whether legend is visible
 	bool showLegend();
+	// Return whether autoscaling is on
+	bool autoScale();
 
 	public slots:
+	// Enable/disable legend visibility
+	void setShowLegend(bool enabled);
 	// Enable/disable autoscaling
 	void setAutoScale(bool enabled);
 	// Enable/disable soft x minimum limit
@@ -373,6 +375,10 @@ class PlotWidget : public QWidget
 	void setYMinLimit(bool enabled);
 	// Enable/disable soft y maxiimum limit
 	void setYMaxLimit(bool enabled);
+
+	signals:
+	void autoScaleChanged(bool enabled);
+	void showLegendChanged(bool enabled);
 	///@}
 
 
@@ -404,10 +410,10 @@ class PlotWidget : public QWidget
 	PlotData staticDataSet_;
 
 	public:
-	// Add data to Plot (local Data2D)
-	PlotData* addDataSet(Data2D& data, QString name, QString blockName, int yOffset = 0);
+	// Add data to Plot
+	PlotData* addDataSet(ExtractedSlice& data, QString name, QString blockName, int yOffset = 0);
 	// Set static data
-	void setStaticData(Data2D data, QString name);
+	void setStaticData(ExtractedSlice data, QString name);
 	// Remove all data from plot
 	void removeAllDataSets();
 	// Return dataset list

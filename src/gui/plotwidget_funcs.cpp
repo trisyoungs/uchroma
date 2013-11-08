@@ -474,17 +474,23 @@ void PlotWidget::setYLimits(bool setMinLimit, bool applyMinLimit, double minLimi
 	fitData(true);
 }
 
-// Set whether legend is visible
-void PlotWidget::setShowLegend(bool on)
-{
-	showLegend_ = on;
-	update();
-}
-
 // Return whether legend is visible
 bool PlotWidget::showLegend()
 {
 	return showLegend_;
+}
+
+// Return whether autoscaling is on
+bool PlotWidget::autoScale()
+{
+	return autoScale_;
+}
+
+// Set whether legend is visible
+void PlotWidget::setShowLegend(bool enabled)
+{
+	showLegend_ = enabled;
+	update();
 }
 
 /*!
@@ -539,7 +545,7 @@ void PlotWidget::setYMaxLimit(bool enabled)
 /*!
  * \brief Add data to Plot (local Data2D)
  */
-PlotData* PlotWidget::addDataSet(Data2D& data, QString name, QString blockName, int yOffset)
+PlotData* PlotWidget::addDataSet(ExtractedSlice& data, QString name, QString blockName, int yOffset)
 {
 	PlotData* pd = dataSets_.add();
 	pd->setData(data, name);
@@ -568,9 +574,14 @@ PlotData* PlotWidget::addDataSet(Data2D& data, QString name, QString blockName, 
 }
 
 // Set static data
-void PlotWidget::setStaticData(Data2D data, QString name)
+void PlotWidget::setStaticData(ExtractedSlice data, QString name)
 {
+	// Take copy of data
 	staticDataSet_.setData(data, name);
+
+	// Transform it according to the current settings // TODO
+	staticDataSet_.data().transformData(0, 0);
+
 	staticDataSet_.determineLimits();
 
 	// Autoscale view if requested
@@ -586,7 +597,7 @@ void PlotWidget::setStaticData(Data2D data, QString name)
 void PlotWidget::removeAllDataSets()
 {
 	dataSets_.clear();
-	staticDataSet_.data().clear();
+	staticDataSet_.data().originalData().clear();
 
 	repaint();
 }
