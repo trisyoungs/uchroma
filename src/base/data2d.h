@@ -49,6 +49,8 @@ class Data2D : public ListItem<Data2D>
 	Array<double> x_;
 	// Array of y values
 	Array<double> y_;
+	// Z value
+	double z_;
 	// Name
 	QString name_;
 	
@@ -89,6 +91,10 @@ class Data2D : public ListItem<Data2D>
 	Array<double>& arrayY();
 	// Add new data point
 	void addPoint(double x, double y);
+	// Set z data
+	void setZ(double z);
+	// Return z data
+	double z();
 	// Set name of data
 	void setName(QString name);
 	// Return name of data

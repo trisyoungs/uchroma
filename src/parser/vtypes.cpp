@@ -72,7 +72,6 @@ int VTypes::dataPair(DataType type1, DataType type2)
 	}
 	int bit1 = (1 << (type1 < nDataTypes ? type1-1 : nDataTypes-1));
 	int bit2 = (1 << (type2 < nDataTypes ? type2-1 : nDataTypes-1));
-	printf("bit1/2 = %i/%i\n", bit2, bit2);
 	return (bit1 + (bit2 << 2));
 }
 

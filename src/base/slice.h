@@ -24,6 +24,7 @@
 
 #include "base/data2d.h"
 #include "base/dnchar.h"
+#include "base/transformer.h"
 #include "templates/list.h"
 #include <QtCore/QDir>
 
@@ -55,12 +56,8 @@ class Slice : public ListItem<Slice>
 	QString dataName_;
 	// Data
 	Data2D data_;
-	// Z coordinate
-	double z_;
-	// Axis along which slice was generated (if a generated slice)
-	int sliceAxis_;
-	// Axis value at which slice was generated (if a generated slice)
-	double sliceValue_;
+	// Transformed data
+	Data2D transformedData_;
 
 	public:
 	// Set source filename
@@ -75,14 +72,10 @@ class Slice : public ListItem<Slice>
 	bool loadData(QDir sourceDir);
 	// Return data
 	Data2D& data();
-	// Set z-coordinate of slice
-	void setZ(double z);
-	// Return z-coordinate of slice
-	double z();
-	// Return axis along which slice was generated (if a generated slice)
-	int sliceAxis();
-	// Return axis value at which slice was generated (if a generated slice)
-	double sliceValue();
+	// Transform original data with supplied transformers
+	void transform(Transformer& xTransformer, Transformer& yTransformer, Transformer& zTransformer);
+	// Return transformed data
+	Data2D& transformedData();
 };
 
 // Extracted Slice
@@ -105,7 +98,7 @@ class ExtractedSlice : public ListItem<ExtractedSlice>
 	// Slice title
 	QString title_;
 	// Original slice data, acquired from raw loaded data
-	Data2D originalData_;
+	Data2D data_;
 	// Transformed data
 	Data2D transformedData_;
 	// Axis along which slice was taken
@@ -119,7 +112,7 @@ class ExtractedSlice : public ListItem<ExtractedSlice>
 	// Return title
 	QString title();
 	// Return original data
-	Data2D& originalData();
+	Data2D& data();
 	// Transform original data
 	void transformData(int xTransform, int yTransform);
 	// Return transformed data

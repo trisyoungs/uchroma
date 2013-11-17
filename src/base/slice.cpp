@@ -32,9 +32,6 @@ Slice::Slice() : ListItem<Slice>()
 	sourceFileName_ = "";
 	fileAssociated_ = false;
 	dataName_ = "";
-	z_ = 0.0;
-	sliceAxis_ = -1;
-	sliceValue_ = 0.0;
 }
 
 // Destructor
@@ -54,10 +51,8 @@ void Slice::operator=(const Slice& source)
 	sourceFileName_ = source.sourceFileName_;
 	dataName_ = source.dataName_;
 	data_ = source.data_;
-	z_ = source.z_;
+	transformedData_ = source.transformedData_;
 	fileAssociated_ = source.fileAssociated_;
-	sliceAxis_ = source.sliceAxis_;
-	sliceValue_ = source.sliceValue_;
 }
 
 // Set source filename
@@ -92,7 +87,8 @@ bool Slice::loadData(QDir sourceDir)
 	if (!fileAssociated_) return false;
 
 	// Clear any existing data
-	data_.clear();
+	data_.arrayX().clear();
+	data_.arrayY().clear();
 
 	// Check file exists
 	if (!QFile::exists(sourceDir.absoluteFilePath(sourceFileName_)))
@@ -111,28 +107,26 @@ Data2D& Slice::data()
 	return data_;
 }
 
-// Set z-coordinate of slice
-void Slice::setZ(double z)
+// Transform original data with supplied transformers
+void Slice::transform(Transformer& xTransformer, Transformer& yTransformer, Transformer& zTransformer)
 {
-	z_ = z;
+	// X
+	if (xTransformer.enabled()) transformedData_.arrayX() = xTransformer.transformArray(data_.arrayX(), data_.arrayY(), data_.z(), 0);
+	else transformedData_.arrayX() = data_.arrayX();
+
+	// Y
+	if (yTransformer.enabled()) transformedData_.arrayY() = yTransformer.transformArray(data_.arrayX(), data_.arrayY(), data_.z(), 1);
+	else transformedData_.arrayY() = data_.arrayY();
+
+	// Z
+	if (zTransformer.enabled()) transformedData_.setZ(zTransformer.transform(0.0, 0.0, data_.z()));
+	else transformedData_.setZ(data_.z());
 }
 
-// Return z-coordinate of slice
-double Slice::z()
+// Return transformed data
+Data2D& Slice::transformedData()
 {
-	return z_;
-}
-
-// Return axis along which slice was generated (if a generated slice)
-int Slice::sliceAxis()
-{
-	return sliceAxis_;
-}
-
-// Return axis value at which slice was generated (if a generated slice)
-double Slice::sliceValue()
-{
-	return sliceValue_;
+	return transformedData_;
 }
 
 /*
@@ -164,7 +158,7 @@ void ExtractedSlice::operator=(const ExtractedSlice& source)
 	title_ = source.title_;
 	axis_ = source.axis_;
 	axisValue_ = source.axisValue_;
-	originalData_ = source.originalData_;
+	data_ = source.data_;
 	transformedData_ = source.transformedData_;
 }
 
@@ -181,16 +175,16 @@ QString ExtractedSlice::title()
 }
 
 // Return original data
-Data2D& ExtractedSlice::originalData()
+Data2D& ExtractedSlice::data()
 {
-	return originalData_;
+	return data_;
 }
 
 // Transform original data
 void ExtractedSlice::transformData(int xTransform, int yTransform)
 {
 	// Copy original data
-	transformedData_ = originalData_;
+	transformedData_ = data_;
 
 	// Transform X axis data
 	Array<double>& x = transformedData_.arrayX();

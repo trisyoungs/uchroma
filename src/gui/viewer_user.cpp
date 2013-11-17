@@ -22,13 +22,14 @@
 #include "gui/viewer.uih"
 #include "gui/uchroma.h"
 
-
 // Create necessary primitives (must be called before any rendering is done)
 void Viewer::createPrimitives()
 {
 	// Setup primitives
 	surfacePrimitive_.setColourData(true);
 	slicePrimitive_.setNoInstances();
+	slicePrimitiveBox_.setNoInstances();
+	slicePrimitiveBox_.setType(GL_LINES);
 	boundingBoxPrimitive_.setNoInstances();
 	boundingBoxPrimitive_.setType(GL_LINES);
 	for (int n=0; n<3; ++n)
@@ -108,21 +109,21 @@ void Viewer::setupGL()
 }
 
 // Set source slice data
-void Viewer::setSourceSliceList(List<Slice>* sliceData)
+void Viewer::setSourceSliceList(List<Data2D>* sliceData)
 {
 	sliceData_ = sliceData;
 }
 
 // Construct normal / colour data for slice specified
-void Viewer::constructSliceData(Slice* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale& colourScale, Slice* previousSlice, Slice* nextSlice)
+void Viewer::constructSliceData(Data2D* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale& colourScale, Data2D* previousSlice, Data2D* nextSlice)
 {
 	normals.clear();
 	colours.clear();
 	if ((previousSlice == NULL) && (nextSlice == NULL)) return;
 	
 	// Grab references to target arrays
-	Array<double>& xTarget = targetSlice->data().arrayX();
-	Array<double>& yTarget = targetSlice->data().arrayY();
+	Array<double>& xTarget = targetSlice->arrayX();
+	Array<double>& yTarget = targetSlice->arrayY();
 	int nPoints = xTarget.nItems();
 	if (nPoints < 2) return;
 
@@ -141,10 +142,10 @@ void Viewer::constructSliceData(Slice* targetSlice, double yAxisScale, Array< Ve
 	if (previousSlice && nextSlice)
 	{
 		// Grab other array references
-		Array<double>& xPrev = previousSlice->data().arrayX();
-		Array<double>& xNext = nextSlice->data().arrayX();
-		Array<double>& yPrev = previousSlice->data().arrayY();
-		Array<double>& yNext = nextSlice->data().arrayY();
+		Array<double>& xPrev = previousSlice->arrayX();
+		Array<double>& xNext = nextSlice->arrayX();
+		Array<double>& yPrev = previousSlice->arrayY();
+		Array<double>& yNext = nextSlice->arrayY();
 		dz = previousSlice->z() - nextSlice->z();
 
 		// -- First point
@@ -178,7 +179,7 @@ void Viewer::constructSliceData(Slice* targetSlice, double yAxisScale, Array< Ve
 	else if (previousSlice)
 	{
 		// Grab other array reference
-		Array<double>& yPrev = previousSlice->data().arrayY();
+		Array<double>& yPrev = previousSlice->arrayY();
 		dz = previousSlice->z() - targetSlice->z();
 
 		// -- First point
@@ -212,7 +213,7 @@ void Viewer::constructSliceData(Slice* targetSlice, double yAxisScale, Array< Ve
 	else
 	{
 		// Grab other array reference
-		Array<double>& yNext = nextSlice->data().arrayY();
+		Array<double>& yNext = nextSlice->arrayY();
 		dz = targetSlice->z() - nextSlice->z();
 
 		// -- First point
@@ -275,22 +276,22 @@ void Viewer::createSurface(ColourScale colourScale, double yAxisScale)
 	Vec3<double> nrm(0.0,1.0,0.0);
 
 	// We need to skip over slices with zero points, so construct a reflist here of those which contain usable data
-	RefList<Slice,int> slices;
-	for (Slice* slice = sliceData_->first(); slice != NULL; slice = slice->next) if (slice->data().nPoints() > 1) slices.add(slice);
+	RefList<Data2D,int> slices;
+	for (Data2D* slice = sliceData_->first(); slice != NULL; slice = slice->next) if (slice->nPoints() > 1) slices.add(slice);
 
 	// Construct first slice data and set initial min/max values
-	RefListItem<Slice,int>* ri = slices.first();
+	RefListItem<Data2D,int>* ri = slices.first();
 	constructSliceData(ri->item, yAxisScale_, normA, colourA, colourScale_, NULL, ri->next ? ri->next->item : NULL);
 	if (slices.nItems() < 2) return;
-	int nPoints = slices.first()->item->data().nPoints();
+	int nPoints = slices.first()->item->nPoints();
 	
 	// Create triangles
-	for (RefListItem<Slice,int>* rj = ri->next; rj != NULL; rj = rj->next)
+	for (RefListItem<Data2D,int>* rj = ri->next; rj != NULL; rj = rj->next)
 	{
 		// Grab slice pointers
-		Slice* sliceA = ri->item;
-		Slice* sliceB = rj->item;
-		Slice* sliceC = (rj->next == NULL ? NULL : rj->next->item);
+		Data2D* sliceA = ri->item;
+		Data2D* sliceB = rj->item;
+		Data2D* sliceC = (rj->next == NULL ? NULL : rj->next->item);
 
 		// Construct data for current slice
 		constructSliceData(sliceB, yAxisScale_, normB, colourB, colourScale_, sliceA, sliceC);
@@ -300,10 +301,10 @@ void Viewer::createSurface(ColourScale colourScale, double yAxisScale)
 		zB = (GLfloat) sliceB->z();
 	
 		// Get nPoints, and initial coordinates
-		Array<double>& xA = sliceA->data().arrayX();
-		Array<double>& yA = sliceA->data().arrayY();
-		Array<double>& xB = sliceB->data().arrayX();
-		Array<double>& yB = sliceB->data().arrayY();
+		Array<double>& xA = sliceA->arrayX();
+		Array<double>& yA = sliceA->arrayY();
+		Array<double>& xB = sliceB->arrayX();
+		Array<double>& yB = sliceB->arrayY();
 		for (int n=0; n<nPoints-1; ++n)
 		{
 			// Add triangles for this quadrant
@@ -395,6 +396,7 @@ int Viewer::surfaceNTriangles()
 void Viewer::setSlicePrimitive(int axis)
 {
 	slicePrimitive_.forgetAll();
+	slicePrimitiveBox_.forgetAll();
 	if (axis == -1) return;
 
 	// Grab axes, and knock out values in the supplied vectors which correspond to the activated axis
@@ -410,6 +412,12 @@ void Viewer::setSlicePrimitive(int axis)
 	Vec3<double> deltaA, deltaB, pos;
 	deltaA = (axisMaxA - axisMinA) / nPoints;
 	deltaB = (axisMaxB - axisMinB) / nPoints;
+
+	// Create 'bounding box' for slice primitive
+	slicePrimitiveBox_.plotLine(axisMinA, axisMaxA);
+	slicePrimitiveBox_.plotLine(axisMaxA, axisMaxA + axisMaxB - axisMinB);
+	slicePrimitiveBox_.plotLine(axisMaxA + axisMaxB - axisMinB, axisMinA + axisMaxB - axisMinB);
+	slicePrimitiveBox_.plotLine(axisMinA + axisMaxB - axisMinB, axisMinA);
 
 	// Set normal
 	Vec3<double> normal(0.0, 0.0, 0.0);
@@ -430,37 +438,4 @@ void Viewer::setSlicePrimitive(int axis)
 			pos += deltaB;
 		}
 	}
-/*	
-	if (axis == 0)
-	{
-		value = axisCoordMin_[2].z;
-		delta = (axisCoordMax_[2].z - axisCoordMin_[2].z) / nPoints;
-		normal[sliceAxis_] = 1.0;
-		for (int n=0; n<nPoints; ++n)
-		{
-			slicePrimitive_.defineVertex(0.0, axisCoordMin_[1].y, value, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(0.0, axisCoordMax_[1].y, value, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(0.0, axisCoordMax_[1].y, value+delta, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(0.0, axisCoordMax_[1].y, value+delta, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(0.0, axisCoordMin_[1].y, value+delta, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(0.0, axisCoordMin_[1].y, value, normal.x, normal.y, normal.z, true);
-			value += delta;
-		}
-	}
-	if (axis == 2)
-	{
-		value = [0].x;
-		delta = (axisCoordMax_[0].x - axisCoordMin_[0].x) / nPoints;
-		normal[sliceAxis_] = 1.0;
-		for (int n=0; n<nPoints; ++n)
-		{
-			slicePrimitive_.defineVertex(axisCoordMin_[0].x, value, 0.0, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(axisCoordMax_[0].x, value, 0.0, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(axisCoordMax_[0].x, value+delta, 0.0, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(axisCoordMax_[0].x, value+delta, 0.0, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(axisCoordMin_[0].x, value+delta, 0.0, normal.x, normal.y, normal.z, true);
-			slicePrimitive_.defineVertex(axisCoordMin_[0].x, value, 0.0, normal.x, normal.y, normal.z, true);
-			value += delta;
-		}
-	}*/
 }

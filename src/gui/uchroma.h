@@ -133,7 +133,6 @@ class UChromaWindow : public QMainWindow
 	// Change functions
 	bool transformEnabledChanged(int axis, bool enabled);
 	bool transformEquationChanged(int axis, QString equation);
-	bool transformShiftChanged(int axis, bool pre, double value);
 	bool transformLimitChanged(int axis, bool minLim, double value);
 	bool transformLimitSetExtreme(int axis, bool minLim);
 	bool transformInterpolateChanged(int axis, bool checked);
@@ -146,12 +145,6 @@ class UChromaWindow : public QMainWindow
 	void on_TransformXEquationEdit_textEdited(QString text);
 	void on_TransformYEquationEdit_textEdited(QString text);
 	void on_TransformZEquationEdit_textEdited(QString text);
-	void on_TransformXPreShiftSpin_valueChanged(double value);
-	void on_TransformYPreShiftSpin_valueChanged(double value);
-	void on_TransformZPreShiftSpin_valueChanged(double value);
-	void on_TransformXPostShiftSpin_valueChanged(double value);
-	void on_TransformYPostShiftSpin_valueChanged(double value);
-	void on_TransformZPostShiftSpin_valueChanged(double value);
 	void on_LimitXMinSpin_valueChanged(double value);
 	void on_LimitYMinSpin_valueChanged(double value);
 	void on_LimitZMinSpin_valueChanged(double value);
@@ -406,7 +399,7 @@ class UChromaWindow : public QMainWindow
 		DataKeyword,
 		ImageExportKeyword, InterpolateKeyword, InterpolateConstrainKeyword, InterpolateStepKeyword,
 		LabelFaceViewerKeyword, LabelScaleKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword,
-		PerspectiveKeyword, PostTransformShiftKeyword, PreTransformShiftKeyword,
+		PerspectiveKeyword,
 		SliceDirectoryKeyword, SliceKeyword,
 		TitleScaleKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword,
 		ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword,
@@ -431,8 +424,9 @@ class UChromaWindow : public QMainWindow
 	bool imageExportMaintainAspect_;
 	// List of slices
 	List<Slice> slices_;
-	// List of slices for display
-	List<Slice> surfaceData_;
+	// List of data slices todisplay
+	List<Data2D> surfaceData_;
+	
 	// Font file to use for viewer
 	QString viewerFont_;
 
@@ -455,8 +449,8 @@ class UChromaWindow : public QMainWindow
 	int nEmptySlices();
 	// Recalculate data limits
 	void calculateDataLimits();
-	// Recalculate transform limits
-	void calculateTransformLimits();
+	// Update data transforms and calculate transform limits
+	void updateDataTransforms();
 	// Set display limits to show all available data
 	void showAllData();
 	// Flag data as modified, and update titlebar
@@ -473,9 +467,7 @@ class UChromaWindow : public QMainWindow
 	Vec3<double> transformMin_, transformMax_;
 	// Data limits for surface generation
 	Vec3<double> limitMin_, limitMax_;
-	// Whether data transform is enabled
-	Vec3<bool> transformEnabled_;
-	// Transform types for data
+	// Transform for data
 	Transformer transforms_[3];
 	// Pre-transform shift value
 	Vec3<double> preTransformShift_;
@@ -487,10 +479,12 @@ class UChromaWindow : public QMainWindow
 	Vec3<double> interpolationStep_;
 
 	public:
-	// Transform single value on the axis specified
-	double transformValue(double x, int axis);
 	// Set limits to show all data
 	void showAll(bool changeX = true, bool changeY = true, bool changeZ = true);
+	// Return minimum limit for specified axis
+	double limitMin(int axis);
+	// Return maximum limit for specified axis
+	double limitMax(int axis);
 
 
 	/*
@@ -595,16 +589,28 @@ class UChromaWindow : public QMainWindow
 	private:
 	// Central coordinate of surface
 	Vec3<double> surfaceCentre_;
-	// Current axis target for slice selection in Viewer
-	int sliceAxis_;
-	// Current value along axis in slice selection
-	double sliceValue_;
 
 	public:
 	// Update surface data after data change
 	void updateSurface(bool dataHasChanged = true);
 	// Return central coordinate of surface
 	Vec3<double> surfaceCentre();
+
+
+	/*
+	 * Slices
+	 */
+	private:
+	// List of user-defined groups containing extracted slices
+	List<ExtractedSliceGroup> extractedSliceGroups_;
+	// Current axis target for slice selection in Viewer
+	int sliceAxis_;
+	// Current value along axis in slice selection
+	double sliceValue_;
+	// Current slice data
+	ExtractedSlice currentSlice_;
+
+	public:
 	// Set slice axis
 	void setSliceAxis(int axis);
 	// Return current axis target for slice selection
@@ -615,19 +621,6 @@ class UChromaWindow : public QMainWindow
 	double sliceValue();
 	// Return current slice coordinate along axis
 	double sliceCoordinate();
-
-
-	/*
-	 * Slices
-	 */
-	private:
-	// List of user-defined groups containing extracted slices
-	List<ExtractedSliceGroup> extractedSliceGroups_;
-
-	// Current slice data
-	ExtractedSlice currentSlice_;
-
-	public:
 	// Return axis bin value of closest point to supplied value
 	int closestBin(int axis, double value);
 	// Return current slice data

@@ -205,10 +205,13 @@ void Viewer::paintGL()
 	if (sliceAxis != -1)
 	{
 		Vec3<double> v(0.0, 0.0, 0.0);
-		v[sliceAxis] = uChroma_->sliceCoordinate() * uChroma_->axisStretch(sliceAxis);
+		v.x = uChroma_->surfaceCentre().x;
+// 		if (uChroma_->axisInverted(sliceAxis)) v[sliceAxis] = uChroma_->sliceCoordinate()  * uChroma_->axisStretch(sliceAxis);
+// 		else v[sliceAxis] = uChroma_->sliceCoordinate() * uChroma_->axisStretch(sliceAxis);
 		glTranslated(v.x, v.y, v.z);
 		glColor4d(0.0, 0.0, 0.0, 0.5);
 		slicePrimitive_.sendToGL();
+		slicePrimitiveBox_.sendToGL();
 	}
 
 	// Render main surface

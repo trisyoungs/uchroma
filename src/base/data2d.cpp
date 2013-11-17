@@ -35,6 +35,7 @@
 Data2D::Data2D() : ListItem<Data2D>()
 {
 	name_ = "Untitled";
+	z_ = 0.0;
 	splineInterval_ = -1;
 }
 
@@ -53,6 +54,7 @@ Data2D::Data2D(const Data2D& source)
 {
 	x_ = source.x_;
 	y_ = source.y_;
+	z_ = source.z_;
 	splineB_ = source.splineB_;
 	splineC_ = source.splineC_;
 	splineD_ = source.splineD_;
@@ -68,6 +70,7 @@ void Data2D::clear()
 {
 	x_.clear();
 	y_.clear();
+	z_ = 0.0;
 	splineB_.clear();
 	splineC_.clear();
 	splineD_.clear();
@@ -297,6 +300,22 @@ void Data2D::addPoint(double x, double y)
 	x_.add(x);
 	y_.add(y);
 	splineInterval_ = -1;
+}
+
+/*
+ * \brief Set z data
+ */
+void Data2D::setZ(double z)
+{
+	z_ = z;
+}
+
+/*
+ * \brief Return z data
+ */
+double Data2D::z()
+{
+	return z_;
 }
 
 /*!
@@ -1352,6 +1371,7 @@ bool Data2D::load(const char* fileName)
 	}
 
 	int success, nCols = -1;
+	double oldZ = z_;
 	clear();
 	while (!parser.eofOrBlank())
 	{
@@ -1369,6 +1389,7 @@ bool Data2D::load(const char* fileName)
 	parser.closeFiles();
 	
 	msg.print("Loaded %i points from file '%s'.\n", nPoints(), fileName);
+	z_ = oldZ;
 	
 	return true;
 }

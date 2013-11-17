@@ -63,8 +63,19 @@ void UChromaWindow::on_SurfaceSliceMonitorCheck_clicked(bool checked)
 // Update Surface tab (except main view)
 void UChromaWindow::updateSurfaceTab()
 {
-	if (sliceAxis_ == -1) ui.SurfaceSliceNoneRadio->setChecked(true);
-	else if (sliceAxis_ == 0) ui.SurfaceSliceXRadio->setChecked(true);
-	else if (sliceAxis_ == 1) ui.SurfaceSliceYRadio->setChecked(true);
-	else if (sliceAxis_ == 2) ui.SurfaceSliceZRadio->setChecked(true);
+	if (sliceAxis_ == -1)
+	{
+		ui.SurfaceSliceNoneRadio->setChecked(true);
+		ui.SliceSelectorLabel->setText("");
+		ui.SliceSelectorLabel->setEnabled(false);
+	}
+	else
+	{
+		if (sliceAxis_ == 0) ui.SurfaceSliceXRadio->setChecked(true);
+		else if (sliceAxis_ == 1) ui.SurfaceSliceYRadio->setChecked(true);
+		else if (sliceAxis_ == 2) ui.SurfaceSliceZRadio->setChecked(true);
+		Dnchar s(-1, "%c = %f", char(82+sliceAxis_), sliceValue_);
+		ui.SliceSelectorLabel->setText(s.get()	);
+		ui.SliceSelectorLabel->setEnabled(true);
+	}
 }

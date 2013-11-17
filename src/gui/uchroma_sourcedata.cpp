@@ -44,7 +44,7 @@ void UChromaWindow::on_SourceDirSelectButton_clicked(bool checked)
 	progress.setValue(slices_.nItems());
 	
 	calculateDataLimits();
-	calculateTransformLimits();
+	updateDataTransforms();
 	showAllData();
 		
 	setAsModified();
@@ -59,13 +59,14 @@ void UChromaWindow::on_AddFilesButton_clicked(bool checked)
 	QProgressDialog progress("Loading data...", "Abort Loading", 0, files.count(), this);
 	progress.setWindowModality(Qt::WindowModal);
 	int count = 0;
+	
 	// Determine automatic Z placement for slice
 	double z = 0.0, delta = 1.0;
-	if (slices_.nItems() == 1) z = slices_.last()->z() + 1.0;
+	if (slices_.nItems() == 1) z = slices_.last()->data().z() + 1.0;
 	else if (slices_.nItems() > 1)
 	{
-		delta = slices_.last()->z() - slices_.last()->prev->z();
-		z = slices_.last()->prev->z() + delta;
+		delta = slices_.last()->data().z() - slices_.last()->prev->data().z();
+		z = slices_.last()->prev->data().z() + delta;
 	}
 
 	foreach (QString fileName, files)
@@ -137,23 +138,23 @@ void UChromaWindow::on_SourceFilesTable_cellChanged(int row, int column)
 		if (item == NULL) return;
 
 		// Set new value of z and check its position in the list
-		slice->setZ(item->text().toDouble());
+		slice->data().setZ(item->text().toDouble());
 
 		bool minBad = true, maxBad = true;
 		int dummy = 0;
 		do
 		{
 			// Shift item if necessary
-			if (slice->prev && (slice->prev->z() > slice->z()))
+			if (slice->prev && (slice->prev->data().z() > slice->data().z()))
 			{
 				slices_.shiftUp(slice);
-				minBad = (slice->prev ? (slice->prev->z() > slice->z()) : false);
+				minBad = (slice->prev ? (slice->prev->data().z() > slice->data().z()) : false);
 			}
 			else minBad = false;
-			if (slice->next && (slice->next->z() < slice->z()))
+			if (slice->next && (slice->next->data().z() < slice->data().z()))
 			{
 				slices_.shiftDown(slice);
-				maxBad = (slice->next ? (slice->next->z() < slice->z()) : false);
+				maxBad = (slice->next ? (slice->next->data().z() < slice->data().z()) : false);
 			}
 			else maxBad = false;
 			if (++dummy == 10) break;
@@ -161,7 +162,7 @@ void UChromaWindow::on_SourceFilesTable_cellChanged(int row, int column)
 		} while (minBad || maxBad);
 		
 		calculateDataLimits();
-		calculateTransformLimits();
+		updateDataTransforms();
 		updateSourceDataTab();
 		updateTransformTab();
 		updateSurface();
@@ -197,13 +198,13 @@ void UChromaWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 			QMessageBox::warning(this, "Failed to Open File", "The file '" + s + "' could not be found.");
 			break;
 		}
-		slice->setZ(referenceTime.secsTo(fileInfo.lastModified()));
+		slice->data().setZ(referenceTime.secsTo(fileInfo.lastModified()));
 		
-		if ((earliest == 0) || (slice->z() < earliest)) earliest = slice->z();
+		if ((earliest == 0) || (slice->data().z() < earliest)) earliest = slice->data().z();
 	}
 	
 	// Set correct offset
-	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) slice->setZ(slice->z() - earliest);
+	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) slice->data().setZ(slice->data().z() - earliest);
 
 	setAsModified();
 	updateSourceDataTab();
@@ -253,7 +254,7 @@ void UChromaWindow::updateSourceDataTab()
 		QTableWidgetItem* item = new QTableWidgetItem(slice->sourceFileName());
 		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 		ui.SourceFilesTable->setItem(count, 0, item);
-		item = new QTableWidgetItem(QString::number(slice->z()));
+		item = new QTableWidgetItem(QString::number(slice->data().z()));
 		ui.SourceFilesTable->setItem(count, 1, item);
 		++count;
 	}

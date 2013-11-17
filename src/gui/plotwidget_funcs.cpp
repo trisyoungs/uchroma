@@ -597,7 +597,7 @@ void PlotWidget::setStaticData(ExtractedSlice data, QString name)
 void PlotWidget::removeAllDataSets()
 {
 	dataSets_.clear();
-	staticDataSet_.data().originalData().clear();
+	staticDataSet_.data().data().clear();
 
 	repaint();
 }

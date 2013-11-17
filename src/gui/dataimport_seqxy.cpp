@@ -87,7 +87,7 @@ bool DataImportDialog::importSequentialXY()
 		slice->data().addPoint(columns.x == -1 ? count.x : parser.argd(columns.x), parser.argd(columns.y));
 
 		// Set z value for slice
-		slice->setZ(columns.z == -1 ? count.z : parser.argd(columns.z));
+		slice->data().setZ(columns.z == -1 ? count.z : parser.argd(columns.z));
 
 		// Increase x count
 		++count.x;

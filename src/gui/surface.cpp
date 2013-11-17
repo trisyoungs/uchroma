@@ -213,7 +213,7 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 		while (slice)
 		{
 			// Z
-			double z = transformValue(slice->z(), 2);
+			double z = slice->transformedData().z();
 			// -- Is the transformed Z value within range?
 			if ((z < limitMin_.z) || (z > limitMax_.z))
 			{
@@ -225,40 +225,26 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 			else if (axisLogarithmic_.z) z = log10(z);
 
 			// Add new item to surfaceData_ array
-			Slice* surfaceSlice = surfaceData_.add();
+			Data2D* surfaceSlice = surfaceData_.add();
 			surfaceSlice->setZ(z * axisStretch_.z);
 
 			// Copy / interpolate arrays
 			Array<double> array[2];
 			if (interpolate_.x)
 			{
-				slice->data().interpolate(interpolateConstrained_.x);
+				slice->transformedData().interpolate(interpolateConstrained_.x);
 				double x = limitMin_.x;
 				while (x <= limitMax_.x)
 				{
 					array[0].add(x);
-					array[1].add(slice->data().interpolated(x));
+					array[1].add(slice->transformedData().interpolated(x));
 					x += interpolationStep_.x;
 				}
 			}
 			else
 			{
-				if (transformEnabled_[n]) array[0] = transforms_[n].transformArray(slice->data().arrayX(), slice->data().arrayY(), slice->z(), 0, preTransformShift_[0], postTransformShift_[0]);
-				else array[0] = slice->data().arrayX();
-				array[1] = slice->data().arrayY();
-			}
-
-			// X / Y
-			for (int n=0; n<2; ++n)
-			{
-				// Apply pre-transform shift
-				array[n] += preTransformShift_[n];
-
-				// Apply transform
-				if (transformEnabled_[n]) transforms_[n].transformArray(array[0], array[1], 
-				
-				// Apply post-transform shift
-				array[n] += postTransformShift_[n];
+				array[0] = slice->transformedData().arrayX();
+				array[1] = slice->transformedData().arrayY();
 			}
 
 			// Add data to surfaceSlice, obeying defined x-limits
@@ -273,7 +259,7 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 				if (axisLogarithmic_.y) y = (axisInverted_.y ? log10(limitMax_.y / y) : log10(y));
 				else if (axisInverted_.y) y = (limitMax_.y - y) + limitMin_.y;
 				y *= axisStretch_.y;
-				surfaceSlice->data().addPoint(x, y);
+				surfaceSlice->addPoint(x, y);
 			}
 			else for (int n=0; n<array[0].nItems(); ++n)
 			{
@@ -289,7 +275,7 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 				}
 				else if (axisInverted_.y) y = (limitMax_.y - y) + limitMin_.y;
 				y *= axisStretch_.y;
-				surfaceSlice->data().addPoint(x, y);
+				surfaceSlice->addPoint(x, y);
 			}
 
 			// Move to next Z slice
@@ -316,97 +302,4 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 Vec3<double> UChromaWindow::surfaceCentre()
 {
 	return surfaceCentre_;
-}
-
-// Set slice axis
-void UChromaWindow::setSliceAxis(int axis)
-{
-	sliceAxis_ = axis;
-}
-
-// Return current axis target for slice selection
-int UChromaWindow::sliceAxis()
-{
-	return sliceAxis_;
-}
-
-// Calculate axis slice value at supplied mouse position
-bool UChromaWindow::updateSliceValue(int mouseX, int mouseY)
-{
-	if (sliceAxis_ != -1)
-	{
-// 		printf("Test: min=%f, max=%f\n", axisMin_[0], axisMax_[0]);
-// 		rMouseLast_.print();
-// 		axisCoordMin_[0].print();
-		// Project axis coordinates to get a screen-based yardstick
-		Vec4<double> axmin = ui.MainView->modelToScreen(axisCoordMin_[sliceAxis_]);
-		Vec4<double> axmax = ui.MainView->modelToScreen(axisCoordMax_[sliceAxis_]);
-// 		axmin.print();
-// 		axmax.print();
-
-		// Calculate vectors between axis minimum and mouse position (AM) and axis maximum (AB)
-		Vec3<double> ab(axmax.x - axmin.x, axmax.y - axmin.y, 0.0);
-		Vec3<double> am(mouseX - axmin.x, mouseY - axmin.y, 0.0);
-		Vec3<double> amNorm = am, abNorm = ab;
-		double ratio = am.magnitude() / ab.magnitude();
-		abNorm.normalise();
-		amNorm.normalise();
-		double angle = acos(abNorm.dp(amNorm)) ;
-// 		printf("Angle = %f, %f\n", angle, angle * DEGRAD);
-
-		// Calculate slice axis value - no need to account for inverted axes here, since this is accounted for in the vectors axmin and axmax
-		if (axisLogarithmic_[sliceAxis_]) sliceValue_ = pow(10, abNorm.dp(amNorm)*ratio * (log10(limitMax_[sliceAxis_]) - log10(limitMin_[sliceAxis_])) + log10(limitMin_[sliceAxis_]));
-		else sliceValue_ = abNorm.dp(amNorm)*ratio * (limitMax_[sliceAxis_] - limitMin_[sliceAxis_]) + limitMin_[sliceAxis_];
-// 		printf("slicevalue = %f (%f)\n", sliceValue_, abNorm.dp(amNorm)*ratio);
-
-		// Clamp value to data range
-		if (sliceValue_ < limitMin_[sliceAxis_]) sliceValue_ = limitMin_[sliceAxis_];
-		else if (sliceValue_ > limitMax_[sliceAxis_]) sliceValue_ = limitMax_[sliceAxis_];
-// 		printf("ACMAG = %f, X = %f\n", ratio, sliceValue_);
-
-		// Extract slice from data
-		int bin = closestBin(sliceAxis_, sliceValue_);
-		QString title;
-
-		// Grab slice data
-		if (sliceAxis_ == 0)
-		{
-			// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated)
-			currentSlice_.originalData().clear();
-			for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) currentSlice_.originalData().addPoint(transformValue(slice->z(), 2), transformValue(slice->data().y(bin), 1));
-			currentSlice_.originalData().setName("X = " + QString::number(transformValue(slices_.first()->data().x(bin), 0)));
-			
-		}
-		else if (sliceAxis_ == 1)
-		{
-			return false;
-		}
-		else if (sliceAxis_ == 2)
-		{
-			// Slice through Z - i.e. original slice data
-			currentSlice_.originalData().clear();
-			currentSlice_.originalData() = slices_[bin]->data();
-			title = "Z = " + QString::number(slices_[bin]->z());
-		}
-
-		emit(sliceDataChanged());
-		return true;
-	}
-
-	return false;
-}
-
-// Return current axis value for slice selection
-double UChromaWindow::sliceValue()
-{
-	return sliceValue_;
-}
-
-// Return current slice coordinate along axis
-double UChromaWindow::sliceCoordinate()
-{
-	if (sliceAxis_ == -1) return 0.0;
-
-	if (axisLogarithmic_[sliceAxis_]) return (axisInverted_[sliceAxis_] ? log10(limitMax_[sliceAxis_]/sliceValue_) : log10(sliceValue_));
-	else return (axisInverted_[sliceAxis_] ? limitMax_[sliceAxis_] - sliceValue_ : sliceValue_);
 }

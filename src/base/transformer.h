@@ -41,7 +41,9 @@ class Transformer
 	 * Tree containing transform equation
 	 */
 	private:
-	// Tree
+	// Whether transform is enabled
+	bool enabled_;
+	// Tree containing equation
 	Tree equation_;
 	// Text used to generate last equation_
 	QString text_;
@@ -55,6 +57,10 @@ class Transformer
 	Variable* z_;
 
 	public:
+	// Set whether transform is enabled
+	void setEnabled(bool b);
+	// Return whether transform is enabled
+	bool enabled();
 	// Set equation, returning if Tree construction was successful
 	bool setEquation(QString equation);
 	// Return text used to generate last equation_
@@ -64,7 +70,7 @@ class Transformer
 	// Transform single value
 	double transform(double x, double y, double z);
 	// Transform whole array, including application of pre/post transform shift
-	Array<double> transformArray(Array< double > sourceX, Array< double > sourceY, double z, int target, double preShift, double postShift);
+	Array<double> transformArray(Array< double > sourceX, Array< double > sourceY, double z, int target);
 };
 
 #endif

@@ -115,7 +115,7 @@ void Tree::clear()
 // Set commands in Tree
 bool Tree::setCommands(QString commands)
 {
-	cmdparser.generateSingleTree(this, qPrintable(commands));
+	return cmdparser.generateSingleTree(this, qPrintable(commands));
 }
 
 // Add variable to global Tree scope

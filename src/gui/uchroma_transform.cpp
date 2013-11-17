@@ -26,8 +26,8 @@
 bool UChromaWindow::transformEnabledChanged(int axis, bool enabled)
 {
 	if (refreshing_) return false;
-	transformEnabled_[axis] = enabled;
-	calculateTransformLimits();
+	transforms_[axis].setEnabled(enabled);
+	updateDataTransforms();
 	setAsModified();
 	updateTransformTab();
 	updateViewTab();
@@ -40,20 +40,7 @@ bool UChromaWindow::transformEquationChanged(int axis, QString equation)
 {
 	if (refreshing_) return false;
 	transforms_[axis].setEquation(equation);
-	calculateTransformLimits();
-	setAsModified();
-	updateTransformTab();
-	updateViewTab();
-	updateSurface();
-	return true;
-}
-
-bool UChromaWindow::transformShiftChanged(int axis, bool pre, double value)
-{
-	if (refreshing_) return false;
-	if (pre) preTransformShift_[axis] = value;
-	else postTransformShift_[axis] = value;
-	calculateTransformLimits();
+	updateDataTransforms();
 	setAsModified();
 	updateTransformTab();
 	updateViewTab();
@@ -134,42 +121,12 @@ void UChromaWindow::on_TransformXEquationEdit_textEdited(QString text)
 
 void UChromaWindow::on_TransformYEquationEdit_textEdited(QString text)
 {
-	transformEquationChanged(0, text);
+	transformEquationChanged(1, text);
 }
 
 void UChromaWindow::on_TransformZEquationEdit_textEdited(QString text)
 {
-	transformEquationChanged(0, text);
-}
-
-void UChromaWindow::on_TransformXPreShiftSpin_valueChanged(double value)
-{
-	transformShiftChanged(0, true, value);
-}
-
-void UChromaWindow::on_TransformYPreShiftSpin_valueChanged(double value)
-{
-	transformShiftChanged(1, true, value);
-}
-
-void UChromaWindow::on_TransformZPreShiftSpin_valueChanged(double value)
-{
-	transformShiftChanged(2, true, value);
-}
-
-void UChromaWindow::on_TransformXPostShiftSpin_valueChanged(double value)
-{
-	transformShiftChanged(0, false, value);
-}
-
-void UChromaWindow::on_TransformYPostShiftSpin_valueChanged(double value)
-{
-	transformShiftChanged(1, false, value);
-}
-
-void UChromaWindow::on_TransformZPostShiftSpin_valueChanged(double value)
-{
-	transformShiftChanged(2, false, value);
+	transformEquationChanged(2, text);
 }
 
 void UChromaWindow::on_LimitXMinSpin_valueChanged(double value)
@@ -270,20 +227,15 @@ void UChromaWindow::updateTransformTab()
 	refreshing_ = true;
 
 	// Transform type / value
-	ui.TransformXCheck->setChecked(transformEnabled_[0]);
-	ui.TransformYCheck->setChecked(transformEnabled_[1]);
-	ui.TransformZCheck->setChecked(transformEnabled_[2]);
+	ui.TransformXCheck->setChecked(transforms_[0].enabled());
+	ui.TransformYCheck->setChecked(transforms_[1].enabled());
+	ui.TransformZCheck->setChecked(transforms_[2].enabled());
+	ui.TransformXEquationEdit->setEnabled(transforms_[0].enabled());
+	ui.TransformYEquationEdit->setEnabled(transforms_[1].enabled());
+	ui.TransformZEquationEdit->setEnabled(transforms_[2].enabled());
 	ui.TransformXEquationEdit->setText(transforms_[0].text());
 	ui.TransformYEquationEdit->setText(transforms_[1].text());
 	ui.TransformZEquationEdit->setText(transforms_[2].text());
-
-	// Shifts
-	ui.TransformXPreShiftSpin->setValue(preTransformShift_.x);
-	ui.TransformYPreShiftSpin->setValue(preTransformShift_.y);
-	ui.TransformZPreShiftSpin->setValue(preTransformShift_.z);
-	ui.TransformXPostShiftSpin->setValue(postTransformShift_.x);
-	ui.TransformYPostShiftSpin->setValue(postTransformShift_.y);
-	ui.TransformZPostShiftSpin->setValue(postTransformShift_.z);
 
 	// Limits
 	ui.LimitXMinSpin->setRange(transformMin_.x, transformMax_.x);

@@ -23,7 +23,7 @@
 #include "base/lineparser.h"
 
 // DataFile Keywords
-const char* DataFileKeywordStrings[UChromaWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisInvert", "AxisLabelOrientation", "AxisLogarithmic", "AxisMinorTicks", "AxisPosition", "AxisStretch", "AxisTickDelta", "AxisTickDirection", "AxisTitle", "AxisTitleAnchor", "AxisTitleOrientation", "AxisVisible", "BoundingBox", "BoundingBoxPlaneY", "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearA", "ColourLinearB", "ColourLinearHSVA", "ColourLinearHSVB", "ColourSingle", "ColourSource", "Data", "ImageExport", "Interpolate", "InterpolateConstrain", "InterpolateStep", "LabelFaceViewer", "LabelScale", "LimitX", "LimitY", "LimitZ", "Perspective", "PostTransformShift", "PreTransformShift", "SliceDir", "Slice", "TitleScale", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
+const char* DataFileKeywordStrings[UChromaWindow::nDataFileKeywords] = { "AxisAutoTicks", "AxisFirstTick", "AxisInvert", "AxisLabelOrientation", "AxisLogarithmic", "AxisMinorTicks", "AxisPosition", "AxisStretch", "AxisTickDelta", "AxisTickDirection", "AxisTitle", "AxisTitleAnchor", "AxisTitleOrientation", "AxisVisible", "BoundingBox", "BoundingBoxPlaneY", "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearA", "ColourLinearB", "ColourLinearHSVA", "ColourLinearHSVB", "ColourSingle", "ColourSource", "Data", "ImageExport", "Interpolate", "InterpolateConstrain", "InterpolateStep", "LabelFaceViewer", "LabelScale", "LimitX", "LimitY", "LimitZ", "Perspective", "SliceDir", "Slice", "TitleScale", "TransformX", "TransformY", "TransformZ", "ViewMatrixX", "ViewMatrixY", "ViewMatrixZ", "ViewMatrixW" };
 UChromaWindow::DataFileKeyword UChromaWindow::dataFileKeyword(const char* s)
 {
 	for (int n=0; n<UChromaWindow::nDataFileKeywords; ++n) if (strcmp(s, DataFileKeywordStrings[n]) == 0) return (UChromaWindow::DataFileKeyword) n;
@@ -129,7 +129,9 @@ void UChromaWindow::clearData()
 	transformMax_.set(10.0, 10.0, 10.0);
 	limitMin_.zero();
 	limitMax_.set(10.0, 10.0, 10.0);
-	transformEnabled_.set(false, false, false);
+	transforms_[0].setEnabled(false);
+	transforms_[1].setEnabled(false);
+	transforms_[2].setEnabled(false);
 	transforms_[0].setEquation("x");
 	transforms_[1].setEquation("y");
 	transforms_[2].setEquation("z");
@@ -389,14 +391,6 @@ bool UChromaWindow::loadData(QString fileName)
 			case (UChromaWindow::PerspectiveKeyword):
 				ui.actionViewPerspective->setChecked(true);
 				break;
-			// Pre-Transform Shifts
-			case (UChromaWindow::PreTransformShiftKeyword):
-				preTransformShift_.set(parser.argd(1), parser.argd(2), parser.argd(3));
-				break;
-			// Post-Transform Shifts
-			case (UChromaWindow::PostTransformShiftKeyword):
-				postTransformShift_.set(parser.argd(1), parser.argd(2), parser.argd(3));
-				break;
 			// Slice directory
 			case (UChromaWindow::SliceDirectoryKeyword):
 				dataFileDirectory_ = parser.argc(1);
@@ -423,7 +417,7 @@ bool UChromaWindow::loadData(QString fileName)
 			case (UChromaWindow::TransformYKeyword):
 			case (UChromaWindow::TransformZKeyword):
 				xyz = kwd - UChromaWindow::TransformXKeyword;
-				transformEnabled_[xyz] = parser.argb(1);
+				transforms_[xyz].setEnabled(parser.argb(1));
 				transforms_[xyz].setEquation( parser.argc(2) );
 				break;
 			// View Matrix
@@ -482,7 +476,7 @@ bool UChromaWindow::saveData(QString fileName)
 	// Line format:  slice z "filename" "dataname"
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next)
 	{
-		parser.writeLineF("%s  %f  \"%s\"  \"%s\"\n", DataFileKeywordStrings[UChromaWindow::SliceKeyword], slice->z(), qPrintable(slice->sourceFileName()), qPrintable(slice->dataName()));
+		parser.writeLineF("%s  %f  \"%s\"  \"%s\"\n", DataFileKeywordStrings[UChromaWindow::SliceKeyword], slice->data().z(), qPrintable(slice->sourceFileName()), qPrintable(slice->dataName()));
 	}
 
 	// Write image info
@@ -490,12 +484,9 @@ bool UChromaWindow::saveData(QString fileName)
 
 	// Write transform setup
 	// -- Transforms
-	parser.writeLineF("%s %s %f\n", DataFileKeywordStrings[UChromaWindow::TransformXKeyword], dataTransform(transformType_[0]), transformValue_.x);
-	parser.writeLineF("%s %s %f\n", DataFileKeywordStrings[UChromaWindow::TransformYKeyword], dataTransform(transformType_[1]), transformValue_.y);
-	parser.writeLineF("%s %s %f\n", DataFileKeywordStrings[UChromaWindow::TransformZKeyword], dataTransform(transformType_[2]), transformValue_.z);
-	// -- Shifts
-	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[UChromaWindow::PreTransformShiftKeyword], preTransformShift_.x, preTransformShift_.y, preTransformShift_.z);
-	parser.writeLineF("%s %f %f %f\n", DataFileKeywordStrings[UChromaWindow::PostTransformShiftKeyword], postTransformShift_.x, postTransformShift_.y, postTransformShift_.z);
+	parser.writeLineF("%s %s %s\n", DataFileKeywordStrings[UChromaWindow::TransformXKeyword], stringBool(transforms_[0].enabled()), qPrintable(transforms_[2].text()));
+	parser.writeLineF("%s %s %s\n", DataFileKeywordStrings[UChromaWindow::TransformYKeyword], stringBool(transforms_[1].enabled()), qPrintable(transforms_[2].text()));
+	parser.writeLineF("%s %s %s\n", DataFileKeywordStrings[UChromaWindow::TransformZKeyword], stringBool(transforms_[2].enabled()), qPrintable(transforms_[2].text()));
 	// -- Limits
 	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[UChromaWindow::LimitXKeyword], limitMin_.x, limitMax_.x);
 	parser.writeLineF("%s %f %f\n", DataFileKeywordStrings[UChromaWindow::LimitYKeyword], limitMin_.y, limitMax_.y);
@@ -594,7 +585,7 @@ Slice* UChromaWindow::addSlice(double z, QString fileName, QString title)
 		slice->setSourceFileName(relativeFileName);
 	}
 	slice->setDataName(title);
-	slice->setZ(z);
+	slice->data().setZ(z);
 
 	return slice;
 }
@@ -623,11 +614,12 @@ void UChromaWindow::calculateDataLimits()
 	{
 		// Grab first slice and set initial values
 		Slice* slice = slices_.first();
-		dataMin_.set(slice->data().xMin(), slice->data().yMin(), slice->z());
-		dataMax_.set(slice->data().xMax(), slice->data().yMax(), slice->z());
+		dataMin_.set(slice->data().xMin(), slice->data().yMin(), slice->data().z());
+		dataMax_.set(slice->data().xMax(), slice->data().yMax(), slice->data().z());
 		double mmin, mmax;
 		for (slice = slice->next; slice != NULL; slice = slice->next)
 		{
+			printf("Z = %f\n", slice->data().z());
 			mmin = slice->data().xMin();
 			mmax = slice->data().xMax();
 			if (mmin < dataMin_.x) dataMin_.x = mmin;
@@ -636,33 +628,47 @@ void UChromaWindow::calculateDataLimits()
 			mmax = slice->data().yMax();
 			if (mmin < dataMin_.y) dataMin_.y = mmin;
 			if (mmax > dataMax_.y) dataMax_.y = mmax;
-			if (slice->z() < dataMin_.z) dataMin_.z = slice->z();
-			else if (slice->z() > dataMax_.z) dataMax_.z = slice->z();
+			if (slice->data().z() < dataMin_.z) dataMin_.z = slice->data().z();
+			else if (slice->data().z() > dataMax_.z) dataMax_.z = slice->data().z();
 		}
 	}
-	calculateTransformLimits();
+	printf("updated limits are:\n");
+	dataMin_.print();
+	dataMax_.print();
+	updateDataTransforms();
 }
 
-// Recalculate transform limits
-void UChromaWindow::calculateTransformLimits()
+// Update data transforms and calculate transform limits
+void UChromaWindow::updateDataTransforms()
 {
+	// Loop over slices_ list, updating transforms as we go
+	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) slice->transform(transforms_[0], transforms_[1], transforms_[2]);
+
 	transformMin_ = 0.0;
 	transformMax_ = 0.0;
 	if (slices_.nItems() == 0) return;
 	
+	// Grab first slice and set initial values
+	Slice* slice = slices_.first();
+	transformMin_.set(slice->transformedData().xMin(), slice->transformedData().yMin(), slice->transformedData().z());
+	transformMax_.set(slice->transformedData().xMax(), slice->transformedData().yMax(), slice->transformedData().z());
+	double mmin, mmax;
+	for (slice = slice->next; slice != NULL; slice = slice->next)
+	{
+		mmin = slice->transformedData().xMin();
+		mmax = slice->transformedData().xMax();
+		if (mmin < transformMin_.x) transformMin_.x = mmin;
+		if (mmax > transformMax_.x) transformMax_.x = mmax;
+		mmin = slice->transformedData().yMin();
+		mmax = slice->transformedData().yMax();
+		if (mmin < transformMin_.y) transformMin_.y = mmin;
+		if (mmax > transformMax_.y) transformMax_.y = mmax;
+		if (slice->transformedData().z() < transformMin_.z) transformMin_.z = slice->transformedData().z();
+		else if (slice->transformedData().z() > transformMax_.z) transformMax_.z = slice->transformedData().z();
+	}
+
 	for (int n=0; n<3; ++n)
 	{
-		transformMin_[n] = transformValue(dataMin_[n], n);
-		transformMax_[n] = transformValue(dataMax_[n], n);
-
-		// Values may have swapped...
-		if (transformMin_[n] > transformMax_[n])
-		{
-			double x = transformMin_[n];
-			transformMin_[n] = transformMax_[n];
-			transformMax_[n] = x;
-		}
-
 		// Might also need to clamp current limits to the new range...
 		if (limitMin_[n] < transformMin_[n]) limitMin_[n] = transformMin_[n];
 		else if (limitMin_[n] > transformMax_[n]) limitMin_[n] = transformMax_[n];
@@ -676,7 +682,7 @@ void UChromaWindow::calculateTransformLimits()
 			limitMax_[n] = transformMax_[n];
 		}
 
-		// Are axis positions acceptable
+		// Are axis positions acceptable?
 		for (int m=0; m < 3; ++m)
 		{
 			if (n == m) continue;
@@ -684,6 +690,10 @@ void UChromaWindow::calculateTransformLimits()
 			if (axisPosition_[m].get(n) > limitMax_[n]) axisPosition_[m].set(n, limitMax_[n]);
 		}
 	}
+
+	printf("updated transform limits are:\n");
+	transformMin_.print();
+	transformMax_.print();
 }
 
 // Set display limits to show all available data
@@ -691,27 +701,6 @@ void UChromaWindow::showAllData()
 {
 	limitMin_ = transformMin_;
 	limitMax_ = transformMax_;
-}
-
-// Transform single value
-double UChromaWindow::transformValue(double x, int axis)
-{
-	switch (transformType_[axis])
-	{
-		case (UChromaWindow::MultiplyTransform):
-			return  (x+preTransformShift_[axis])*transformValue_[axis] + postTransformShift_[axis];
-			break;
-		case (UChromaWindow::DivideTransform):
-			return (x+preTransformShift_[axis])/transformValue_[axis] + postTransformShift_[axis];
-			break;
-		case (UChromaWindow::LogBase10Transform):
-			return log10(x+preTransformShift_[axis]) + postTransformShift_[axis];
-			break;
-		case (UChromaWindow::NaturalLogTransform):
-			return log(x+preTransformShift_[axis]) + postTransformShift_[axis];
-			break;
-	}
-	return 0.0;
 }
 
 // Set limits to show all data
@@ -723,6 +712,18 @@ void UChromaWindow::showAll(bool changeX, bool changeY, bool changeZ)
 		limitMin_[axis] = transformMin_[axis];
 		limitMax_[axis] = transformMax_[axis];
 	}
+}
+
+// Return minimum limit for specified axis
+double UChromaWindow::limitMin(int axis)
+{
+	return limitMin_[axis];
+}
+
+// Return maximum limit for specified axis
+double UChromaWindow::limitMax(int axis)
+{
+	return limitMax_[axis];
 }
 
 // Flag data as modified, and update titlebar

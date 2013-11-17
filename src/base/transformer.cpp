@@ -29,6 +29,7 @@ Transformer::Transformer()
 	x_ = equation_.addGlobalVariable("x");
 	y_ = equation_.addGlobalVariable("y");
 	z_ = equation_.addGlobalVariable("z");
+	valid_ = false;
 }
 
 // Destructor
@@ -36,11 +37,25 @@ Transformer::~Transformer()
 {
 }
 
+// Set whether transform is enabled
+void Transformer::setEnabled(bool b)
+{
+	enabled_ = b;
+}
+
+// Return whether transform is enabled
+bool Transformer::enabled()
+{
+	return enabled_;
+}
+
 // Set equation, returning if Tree construction was successful
 bool Transformer::setEquation(QString equation)
 {
+	printf("Setting equation to '%s'\n", qPrintable(equation));
 	text_ = equation;
 	valid_ = equation_.setCommands(equation);
+	return valid_;
 }
 
 // Return text used to generate last equation_
@@ -58,25 +73,36 @@ bool Transformer::valid()
 // Transform single value
 double Transformer::transform(double x, double y, double z)
 {
+	// If equation is not valid, just return
+	if (!valid_)
+	{
+		msg.print("Equation is not valid, so returning 0.0.\n");
+		return 0.0;
+	}
+
 	x_->set(ReturnValue(x));
 	y_->set(ReturnValue(y));
 	z_->set(ReturnValue(z));
+	return equation_.execute();
 }
 
 // Transform whole array, including application of pre/post transform shift
-Array<double> Transformer::transformArray(Array<double> sourceX, Array<double> sourceY, double z, int target, double preShift, double postShift)
+Array<double> Transformer::transformArray(Array<double> sourceX, Array<double> sourceY, double z, int target)
 {
-	if (sourceX.nItems() != sourceY.nItems())
-	{
-		msg.print("Error in Transformer::transformArray() - x and y array sizes do not match.\n");
-		return Array<double>();
-	}
+	// If transform is not enabled, return original array
+	if (!enabled_) return (target == 0 ? sourceX : sourceY);
 
 	// If equation is not valid, just return original array
 	if (!valid_)
 	{
 		msg.print("Equation is not valid, so returning original array.\n");
 		return (target == 0 ? sourceX : sourceY);
+	}
+
+	if (sourceX.nItems() != sourceY.nItems())
+	{
+		msg.print("Error in Transformer::transformArray() - x and y array sizes do not match.\n");
+		return Array<double>();
 	}
 
 	// Create new array, and create reference to target array
