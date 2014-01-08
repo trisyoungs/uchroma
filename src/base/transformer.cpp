@@ -52,7 +52,6 @@ bool Transformer::enabled()
 // Set equation, returning if Tree construction was successful
 bool Transformer::setEquation(QString equation)
 {
-	printf("Setting equation to '%s'\n", qPrintable(equation));
 	text_ = equation;
 	valid_ = equation_.setCommands(equation);
 	return valid_;
@@ -116,6 +115,9 @@ Array<double> Transformer::transformArray(Array<double> sourceX, Array<double> s
 		// Set values in equation
 		rv[0] = sourceX[n];
 		rv[1] = sourceY[n];
+		x_->set(rv[0]);
+		y_->set(rv[1]);
+		z_->set(rv[2]);
 		newArray[n] = equation_.execute();
 	}
 

@@ -71,8 +71,10 @@ void PlotWidget::renderPlot(QPainter& painter)
 {
 	// Setup plot variables etc.
 	plotSetup(painter);
+
 	drawGridLines(painter);
 	drawData(painter);
+
 	// Reset transform to cover whole area again
 	painter.setTransform(globalTransform_);
 	painter.setClipping(false);
@@ -319,29 +321,26 @@ void PlotWidget::drawAxes(QPainter& painter)
 // Draw axis titles
 void PlotWidget::drawTitles(QPainter& painter)
 {
+	QRectF tempRect;
+
+	// Draw main graph title
+	tempRect = graphArea_;
+	tempRect.setTop(10.0);
+	painter.drawText(tempRect, Qt::AlignHCenter | Qt::AlignTop, mainTitle_);
+
 	// Draw X-axis title
-	xAxisArea_.setLeft( graphArea_.left() );
-	xAxisArea_.moveTop( xAxisArea_.top() + (spacing_ + textHeight_) );
-	painter.drawText(xAxisArea_, Qt::AlignHCenter | Qt::AlignTop, xAxisTitle_);
+	tempRect = xAxisArea_;
+	tempRect.setLeft( graphArea_.left() );
+	tempRect.moveTop( xAxisArea_.top() + (spacing_ + textHeight_) );
+	painter.drawText(tempRect, Qt::AlignHCenter | Qt::AlignTop, xAxisTitle_);
 	
 	// Draw Y-axis title(s)
 	QTransform transform = globalTransform_;
-	QRectF tempRect;
+
 	transform.translate(0, graphArea_.center().y());
 	transform.rotate(-90);
 	painter.setTransform(transform);
 	tempRect.setRect(-0.5*graphArea_.height(), 0.5*(textHeight_+spacing_), graphArea_.height(), textHeight_);
-	// First, loop over group data to work out maximum rect width required
-	yAxisTitle_ = "";
-	for (PlotDataBlock* pdb = dataSetBlocks_.first(); pdb != NULL; pdb = pdb->next)
-	{
-		if (pdb->visible())
-		{
-			if (!yAxisTitle_.isEmpty()) yAxisTitle_ += " / ";
-			yAxisTitle_ += pdb->blockName();
-		}
-	}
-
 	painter.drawText(tempRect, Qt::AlignHCenter | Qt::AlignVCenter, yAxisTitle_);
 }
 
@@ -356,9 +355,10 @@ void PlotWidget::drawLegend(QPainter& painter)
 	for (PlotData* pd = dataSets_.first(); pd != NULL; pd = pd->next)
 	{
 		// Is dataset to be drawn?
-		if (!pd->visible()) continue;
+		if (!pd->visible() || (!pd->data())) continue;
 
-		tempRect = painter.boundingRect(QRectF(), Qt::AlignLeft, pd->name());
+
+		tempRect = painter.boundingRect(QRectF(), Qt::AlignLeft, pd->data()->title());
 		if (tempRect.width() > textRect.width()) textRect = tempRect;
 		++nDataSets;
 	}
@@ -388,13 +388,13 @@ void PlotWidget::drawLegend(QPainter& painter)
 	for (PlotData* pd = dataSets_.first(); pd != NULL; pd = pd->next)
 	{
 		// Is dataset visible?
-		if (!pd->visible()) continue;
+		if (!pd->visible() || (!pd->data())) continue;
 
 		painter.setPen(Qt::black);
-		painter.drawText(textRect, Qt::AlignLeft, pd->name());
+		painter.drawText(textRect, Qt::AlignLeft, pd->data()->title());
 		textRect.moveTop( textRect.top() + textRect.height() + legendSpacing);
 		
-		if (pd->block() != NULL) pen.setDashPattern(pd->block()->dashes());
+		if (pd->data()->group() != NULL) pen.setDashPattern(pd->data()->group()->dashes());
 		pen.setColor(lineColour(count));
 		painter.setPen(pen);
 		painter.drawLine(legendLine);

@@ -139,6 +139,8 @@ ExtractedSlice::ExtractedSlice() : ListItem<ExtractedSlice>()
 	title_ = "";
 	axis_ = -1;
 	axisValue_ = 0.0;
+	group_ = NULL;
+	treeItem_ = NULL;
 }
 
 // Destructor
@@ -160,6 +162,7 @@ void ExtractedSlice::operator=(const ExtractedSlice& source)
 	axisValue_ = source.axisValue_;
 	data_ = source.data_;
 	transformedData_ = source.transformedData_;
+	group_ = source.group_;
 }
 
 // Set title
@@ -209,9 +212,40 @@ double ExtractedSlice::axisValue()
 	return axisValue_;
 }
 
+// Set group
+void ExtractedSlice::setGroup(ExtractedSliceGroup* group)
+{
+	group_ = group;
+}
+
+// Return group
+ExtractedSliceGroup* ExtractedSlice::group()
+{
+	return group_;
+}
+
+// Set tree node associated to the slice
+void ExtractedSlice::setTreeItem(QTreeWidgetItem* item)
+{
+	treeItem_ = item;
+}
+
+// Return tree node associated to the slice
+QTreeWidgetItem* ExtractedSlice::treeItem()
+{
+	return treeItem_;
+}
+
 /*
  * Extracted Slice Group
  */
+
+// Static member
+QVector<qreal> ExtractedSliceGroup::lineStyles_[] = {
+	QVector<qreal>() << 10 << 1,
+	QVector<qreal>() << 2 << 2,
+	QVector<qreal>() << 5 << 2
+};
 
 // Constructor
 ExtractedSliceGroup::ExtractedSliceGroup() : ListItem<ExtractedSliceGroup>()
@@ -219,6 +253,9 @@ ExtractedSliceGroup::ExtractedSliceGroup() : ListItem<ExtractedSliceGroup>()
 	name_ = "New Group";
 	xAxisTransform_ = 0;
 	yAxisTransform_ = 0;
+	lineStyle_ = ExtractedSliceGroup::SolidStyle;
+	visible_ = true;
+	treeItem_ = NULL;
 }
 
 // Destructor
@@ -238,8 +275,53 @@ QString ExtractedSliceGroup::name()
 	return name_;
 }
 
+// Add extracted slice to group
+ExtractedSlice* ExtractedSliceGroup::addSlice(const ExtractedSlice& slice)
+{
+	ExtractedSlice* newSlice = extractedSlices_.add();
+	(*newSlice) = slice;
+	newSlice->setGroup(this);
+	return newSlice;
+}
+
 // Return list of extracted slices in group
 ExtractedSlice* ExtractedSliceGroup::extractedSlices()
 {
 	return extractedSlices_.first();
+}
+
+// Set associated line style
+void ExtractedSliceGroup::setLineStyle(ExtractedSliceGroup::GroupLineStyle style)
+{
+	lineStyle_ = style;
+}
+
+// Return associated line dash pattern
+const QVector<qreal>& ExtractedSliceGroup::dashes()
+{
+	return lineStyles_[lineStyle_];
+}
+
+// Set visibility of group
+void ExtractedSliceGroup::setVisible(bool visible)
+{
+	visible_ = visible;
+}
+
+// Return visibility of group
+bool ExtractedSliceGroup::visible()
+{
+	return visible_;
+}
+
+// Set tree node associated to the group
+void ExtractedSliceGroup::setTreeItem(QTreeWidgetItem* item)
+{
+	treeItem_ = item;
+}
+
+// Return tree node associated to the group
+QTreeWidgetItem* ExtractedSliceGroup::treeItem()
+{
+	return treeItem_;
 }

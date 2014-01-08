@@ -82,7 +82,7 @@ VTypes::DataType Tree::checkBinaryOperatorTypes(Command::Function func, VTypes::
 		msg.exit("Tree::checkBinaryOperatorTypes");
 		return VTypes::NoData;
 	}
-	printf("ID = %i, type1 = %i, type2 = %i\n", id, type1, type2);
+
 	VTypes::DataType result = VTypes::NoData;
 	switch (func)
 	{

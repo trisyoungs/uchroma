@@ -29,34 +29,50 @@ void UChromaWindow::on_SurfaceSliceNoneRadio_clicked(bool checked)
 {
 	if (refreshing_) return;
 	sliceAxis_ = -1;
+	updateSurface(false);
 	updateSurfaceTab();
+	updateSlicesTab();
+	updateSliceMonitor();
 }
 
 void UChromaWindow::on_SurfaceSliceXRadio_clicked(bool checked)
 {
 	if (refreshing_) return;
 	sliceAxis_ = 0;
+	updateSurface(false);
 	updateSurfaceTab();
+	updateSlicesTab();
+	updateSliceMonitor();
 }
 
 void UChromaWindow::on_SurfaceSliceYRadio_clicked(bool checked)
 {
 	if (refreshing_) return;
 	sliceAxis_ = 1;
+	updateSurface(false);
 	updateSurfaceTab();
+	updateSlicesTab();
+	updateSliceMonitor();
 }
 
 void UChromaWindow::on_SurfaceSliceZRadio_clicked(bool checked)
 {
 	if (refreshing_) return;
 	sliceAxis_ = 2;
+	updateSurface(false);
 	updateSurfaceTab();
+	updateSlicesTab();
+	updateSliceMonitor();
 }
 
 void UChromaWindow::on_SurfaceSliceMonitorCheck_clicked(bool checked)
 {
 	if (refreshing_) return;
-	if (checked) sliceMonitorDialog_.show();
+	if (checked)
+	{
+		updateSliceMonitor();
+		sliceMonitorDialog_.show();
+	}
 	else sliceMonitorDialog_.hide();
 }
 
@@ -68,14 +84,18 @@ void UChromaWindow::updateSurfaceTab()
 		ui.SurfaceSliceNoneRadio->setChecked(true);
 		ui.SliceSelectorLabel->setText("");
 		ui.SliceSelectorLabel->setEnabled(false);
+
+		// Update the axis titles on the necessary graphs
+		sliceMonitorDialog_.ui.MonitorGraph->ui.Graph->setTitles("", "", "");
 	}
 	else
 	{
 		if (sliceAxis_ == 0) ui.SurfaceSliceXRadio->setChecked(true);
 		else if (sliceAxis_ == 1) ui.SurfaceSliceYRadio->setChecked(true);
 		else if (sliceAxis_ == 2) ui.SurfaceSliceZRadio->setChecked(true);
-		Dnchar s(-1, "%c = %f", char(82+sliceAxis_), sliceValue_);
-		ui.SliceSelectorLabel->setText(s.get()	);
+		Dnchar s(-1, "%c = %f", char(88+sliceAxis_), sliceValue_);
+		ui.SliceSelectorLabel->setText(s.get());
 		ui.SliceSelectorLabel->setEnabled(true);
 	}
+
 }

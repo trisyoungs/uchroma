@@ -619,7 +619,7 @@ void UChromaWindow::calculateDataLimits()
 		double mmin, mmax;
 		for (slice = slice->next; slice != NULL; slice = slice->next)
 		{
-			printf("Z = %f\n", slice->data().z());
+// 			printf("Z = %f\n", slice->data().z());
 			mmin = slice->data().xMin();
 			mmax = slice->data().xMax();
 			if (mmin < dataMin_.x) dataMin_.x = mmin;
@@ -632,9 +632,6 @@ void UChromaWindow::calculateDataLimits()
 			else if (slice->data().z() > dataMax_.z) dataMax_.z = slice->data().z();
 		}
 	}
-	printf("updated limits are:\n");
-	dataMin_.print();
-	dataMax_.print();
 	updateDataTransforms();
 }
 
@@ -690,10 +687,6 @@ void UChromaWindow::updateDataTransforms()
 			if (axisPosition_[m].get(n) > limitMax_[n]) axisPosition_[m].set(n, limitMax_[n]);
 		}
 	}
-
-	printf("updated transform limits are:\n");
-	transformMin_.print();
-	transformMax_.print();
 }
 
 // Set display limits to show all available data

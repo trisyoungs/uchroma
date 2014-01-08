@@ -162,6 +162,12 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 	
 	switch (event->key())
 	{
+		case (Qt::Key_Escape):
+			uChroma_->setSliceAxis(-1);
+			setSlicePrimitive(-1);
+			refresh = true;
+			ignore = false;
+			break;
 		case (Qt::Key_Left):
 			A.createRotationXY(0.0, km.testFlag(Qt::ShiftModifier) ? -1.0 : -10.0);
 			A.copyTranslationAndScaling(viewMatrix_);
@@ -201,14 +207,6 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 			setSlicePrimitive(uChroma_->sliceAxis());
 			uChroma_->updateSliceValue(rMouseLast_.x, contextHeight_ - rMouseLast_.y);
 			refresh = true;
-			ignore = false;
-			break;
-		// Cycle render styles
-		case (Qt::Key_F8):
-			ignore = false;
-			break;
-		// Cycle colouring styles
-		case (Qt::Key_F9):
 			ignore = false;
 			break;
 		default:

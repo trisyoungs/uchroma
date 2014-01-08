@@ -23,60 +23,6 @@
 #include <math.h>
 
 /*
- * PlotDataBlock
- */
-
-// Static member
-QVector<qreal> PlotDataBlock::lineStyles_[] = {
-	QVector<qreal>() << 10 << 1,
-	QVector<qreal>() << 2 << 2,
-	QVector<qreal>() << 5 << 2
-};
-
-// Constructor
-PlotDataBlock::PlotDataBlock(QString blockName) : ListItem<PlotDataBlock>()
-{
-	blockName_ = blockName;
-	lineStyle_ = PlotDataBlock::SolidStyle;
-	visible_ = true;
-}
-
-// Destructor
-PlotDataBlock::~PlotDataBlock()
-{
-}
-
-// Return name of block
-QString PlotDataBlock::blockName()
-{
-	return blockName_;
-}
-
-// Set associated line style
-void PlotDataBlock::setLineStyle(PlotDataBlock::BlockLineStyle style)
-{
-	lineStyle_ = style;
-}
-
-// Return associated line dash pattern
-const QVector<qreal>& PlotDataBlock::dashes()
-{
-	return lineStyles_[lineStyle_];
-}
-
-// Set visibility of block
-void PlotDataBlock::setVisible(bool visible)
-{
-	visible_ = visible;
-}
-
-// Return visibility of block
-bool PlotDataBlock::visible()
-{
-	return visible_;
-}
-
-/*
 // Plot Data
 */
 
@@ -88,7 +34,11 @@ PlotData::PlotData() : ListItem<PlotData>()
 {
 	lineColour_ = Qt::black;
 	lineStyle_ = Qt::SolidLine;
-	block_ = NULL;
+	xMin_ = 0.0;
+	xMax_ = 0.0;
+	yMin_ = 0.0;
+	yMax_ = 0.0;
+	data_ = NULL;
 }
 
 /*!
@@ -100,14 +50,13 @@ PlotData::~PlotData()
 }
 
 // Set source data
-void PlotData::setData(ExtractedSlice& source, QString name)
+void PlotData::setData(ExtractedSlice* source)
 {
 	data_ = source;
-	name_ = name;
 }
 
 // Return reference to contained data
-ExtractedSlice& PlotData::data()
+ExtractedSlice* PlotData::data()
 {
 	return data_;
 }
@@ -115,8 +64,15 @@ ExtractedSlice& PlotData::data()
 // Determine data limits
 void PlotData::determineLimits()
 {
-	const double* xarray = data_.transformedData().arrayX().array();
-	const double* yarray = data_.transformedData().arrayY().array();
+	// Check validity of data_ pointer
+	if (data_ == NULL)
+	{
+// 		msg.print("Internal Error: PlotData has no valid data_ pointer.\n");
+		return;
+	}
+
+	const double* xarray = data_->transformedData().arrayX().array();
+	const double* yarray = data_->transformedData().arrayY().array();
 	double x, y;
 	if ((xarray != NULL) && (yarray != NULL))
 	{
@@ -127,7 +83,7 @@ void PlotData::determineLimits()
 		xMax_ = x;
 		yMin_ = y;
 		yMax_ = y;
-		for (int n=1; n<data_.transformedData().arrayX().nItems(); ++n)
+		for (int n=1; n<data_->transformedData().arrayX().nItems(); ++n)
 		{
 			// Grab modified array values
 			x = xarray[n];
@@ -148,11 +104,20 @@ void PlotData::generatePainterPaths(double xScale, double yScale)
 	// Check the scale values at which the path was last created at - if it hasn't changed, don't bother recreating the path again...
 	if ( (fabs(xScale-lastXScale_) < 1.0e-10) && (fabs(yScale-lastYScale_) < 1.0e-10)) return;
 
-	// Generate QPainterPath, determining minimum / maximum values along the way
+	// Reset painter path
 	linePath_ = QPainterPath();
+	
+	// Check validity of data_ pointer
+	if (data_ == NULL)
+	{
+// 		msg.print("Internal Error: PlotData has no valid data_ pointer.\n");
+		return;
+	}
+
+	// Generate QPainterPath, determining minimum / maximum values along the way
 	QRect symbolRect(0, 0, 7, 7);
-	const double* xarray = data_.transformedData().arrayX().array();
-	const double* yarray = data_.transformedData().arrayY().array();
+	const double* xarray = data_->transformedData().arrayX().array();
+	const double* yarray = data_->transformedData().arrayY().array();
 	int enumY;
 	double x, y, lastX, lastScaledY, scaledX, scaledY;
 	if ((xarray != NULL) && (yarray != NULL))
@@ -163,7 +128,7 @@ void PlotData::generatePainterPaths(double xScale, double yScale)
 		linePath_.moveTo(x * xScale, y * yScale);
 		lastX = x;
 		lastScaledY = y * yScale;
-		for (int n=1; n<data_.transformedData().arrayX().nItems(); ++n)
+		for (int n=1; n<data_->transformedData().arrayX().nItems(); ++n)
 		{
 			// Grab modified array values
 			x = xarray[n];
@@ -184,22 +149,6 @@ void PlotData::generatePainterPaths(double xScale, double yScale)
 }
 
 /*!
- * \brief Set block
- */
-void PlotData::setBlock(PlotDataBlock* block)
-{
-	block_ = block;
-}
-
-/*!
- * \brief Return block
- */
-PlotDataBlock* PlotData::block()
-{
-	return block_;
-}
-
-/*!
  * \brief Return line QPainterPath
  */
 QPainterPath& PlotData::linePath()
@@ -212,7 +161,7 @@ QPainterPath& PlotData::linePath()
  */
 bool PlotData::visible()
 {
-	if (block_) return block_->visible();
+	if (data_ && data_->group()) return data_->group()->visible();
 	else return true;
 }
 
@@ -264,14 +213,6 @@ double PlotData::yMax()
 	return yMax_;
 }
 
-/*!
- * \brief Return name
- */
-QString PlotData::name()
-{
-	return name_;
-}
-
 /*
 // Style
 */
@@ -314,6 +255,6 @@ void PlotData::stylePen(QPen& pen)
 	// Get colour from PlotDataGroup parent (if available)
 	pen.setColor(lineColour_);
 
-	// Get line style from PlotDataBlock (if available)
-	if (block_) pen.setDashPattern(block_->dashes());
+	// Get line style from PlotDataGroup (if available)
+	if (data_ && data_->group()) pen.setDashPattern(data_->group()->dashes());
 }

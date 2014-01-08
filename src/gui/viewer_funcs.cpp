@@ -199,15 +199,14 @@ void Viewer::paintGL()
 	// Render bounding box
 	boundingBoxPrimitive_.sendToGL();
 
-	// Render locator slice
+	// Render current slice (if any)
 	glLoadMatrixd(A.matrix());
 	int sliceAxis = uChroma_->sliceAxis();
 	if (sliceAxis != -1)
 	{
-		Vec3<double> v(0.0, 0.0, 0.0);
-		v.x = uChroma_->surfaceCentre().x;
-// 		if (uChroma_->axisInverted(sliceAxis)) v[sliceAxis] = uChroma_->sliceCoordinate()  * uChroma_->axisStretch(sliceAxis);
-// 		else v[sliceAxis] = uChroma_->sliceCoordinate() * uChroma_->axisStretch(sliceAxis);
+		Vec3<double> v;
+		// Note - we do not need to check for inverted or logarithmic axes here, since the transformation matrix A takes care of that
+		v[sliceAxis] = uChroma_->sliceCoordinate() * uChroma_->axisStretch(sliceAxis);
 		glTranslated(v.x, v.y, v.z);
 		glColor4d(0.0, 0.0, 0.0, 0.5);
 		slicePrimitive_.sendToGL();

@@ -74,7 +74,7 @@ PlotWidget::PlotWidget(QWidget* parent) : QWidget(parent)
 	limitYMin_ = false;
 	limitYMax_ = false;
 	autoScale_ = true;
-	nDataSetBlocksVisible_ = 0;
+	nGroupsVisible_ = 0;
 	
 	// Style
 	// -- Pre-defined colours
@@ -90,8 +90,8 @@ PlotWidget::PlotWidget(QWidget* parent) : QWidget(parent)
 
 	// Titles
 	mainTitle_ = "NewGraph";
-	xAxisTitle_ = "Time";
-	yAxisTitle_ = "YAxis";
+	xAxisTitle_ = "X Axis";
+	yAxisTitle_ = "Y Axis";
 }
 
 /*!
@@ -233,12 +233,19 @@ void PlotWidget::keyPressEvent(QKeyEvent* event)
 		// Toggle autoscaling
 		case (Qt::Key_A):
 			autoScale_ = !autoScale_;
+			emit(autoScaleChanged(autoScale_));
 			update();
 			break;
 		// Fit graph to data (optionally obeying soft limits)
 		case (Qt::Key_F):
 			if (event->modifiers().testFlag(Qt::ShiftModifier)) fitData(false);
 			else fitData(true);
+			update();
+			break;
+		// Toggle legend
+		case (Qt::Key_L):
+			showLegend_ = !showLegend_;
+			emit(showLegendChanged(showLegend_));
 			update();
 			break;
 		// Toggle X axis soft limits
@@ -543,26 +550,26 @@ void PlotWidget::setYMaxLimit(bool enabled)
 */
 
 /*!
- * \brief Add data to Plot (local Data2D)
+ * \brief Add data to Plot
  */
-PlotData* PlotWidget::addDataSet(ExtractedSlice& data, QString name, QString blockName, int yOffset)
+PlotData* PlotWidget::addDataSet(ExtractedSlice* data, int yOffset)
 {
+	// Check supplied data pointer
+	if (data == NULL)
+	{
+		msg.print("Refusing to add PlotData with an invalid data pointer.\n");
+		return NULL;
+	}
+
 	PlotData* pd = dataSets_.add();
-	pd->setData(data, name);
+	pd->setData(data);
 	pd->setVerticalOffset(yOffset);
-	
+
+	// Transform it according to the current settings // TODO
+	pd->data()->transformData(0, 0);
+
 	// Determine limits for this data, and adjust parent's relative limits if necessary
 	pd->determineLimits();
-
-	// Set group index - does the group exist already?
-	PlotDataBlock* pdb;
-	for (pdb = dataSetBlocks_.first(); pdb != NULL; pdb = pdb->next) if (pdb->blockName() == blockName) break;
-	if (pdb == NULL)
-	{
-		pdb = new PlotDataBlock(blockName);
-		dataSetBlocks_.own(pdb);
-	}
-	pd->setBlock(pdb);
 
 	// Autoscale view if requested
 	if (autoScale_) fitData(true);
@@ -574,13 +581,13 @@ PlotData* PlotWidget::addDataSet(ExtractedSlice& data, QString name, QString blo
 }
 
 // Set static data
-void PlotWidget::setStaticData(ExtractedSlice data, QString name)
+void PlotWidget::setStaticData(ExtractedSlice* data)
 {
 	// Take copy of data
-	staticDataSet_.setData(data, name);
+	staticDataSet_.setData(data);
 
 	// Transform it according to the current settings // TODO
-	staticDataSet_.data().transformData(0, 0);
+	staticDataSet_.data()->transformData(0, 0);
 
 	staticDataSet_.determineLimits();
 
@@ -597,7 +604,7 @@ void PlotWidget::setStaticData(ExtractedSlice data, QString name)
 void PlotWidget::removeAllDataSets()
 {
 	dataSets_.clear();
-	staticDataSet_.data().data().clear();
+	staticDataSet_.setData(NULL);
 
 	repaint();
 }
@@ -613,42 +620,6 @@ void PlotWidget::determineDataSetLimits()
 {
 	for (PlotData* pd = dataSets_.first(); pd != NULL; pd = pd->next) pd->determineLimits();
 	staticDataSet_.determineLimits();
-}
-
-// Return list of data set groups
-const List<PlotDataBlock>& PlotWidget::dataSetBlocks()
-{
-	return dataSetBlocks_;
-}
-
-// Hide all datasets
-void PlotWidget::hideAllDataSets()
-{
-	for (PlotDataBlock* pdb = dataSetBlocks_.first(); pdb != NULL; pdb = pdb->next) pdb->setVisible(false);
-	nDataSetBlocksVisible_ = 0;
-}
-
-// Show all datasets containing specified block data
-void PlotWidget::setBlockVisible(QString blockName, bool visible)
-{
-	nDataSetBlocksVisible_ = 0;
-	for (PlotDataBlock* pdb = dataSetBlocks_.first(); pdb != NULL; pdb = pdb->next)
-	{
-		if (pdb->blockName() == blockName)
-		{
-			pdb->setVisible(visible);
-		}
-		
-		// Set block linestyle
-		if (pdb->visible())
-		{
-			pdb->setLineStyle( (PlotDataBlock::BlockLineStyle) (nDataSetBlocksVisible_%PlotDataBlock::nBlockLineStyles) );
-			++nDataSetBlocksVisible_;
-		}
-	}
-
-	fitData(true);
-	update();
 }
 
 /*
@@ -699,15 +670,31 @@ void PlotWidget::zoomToGraph(double x1, double y1, double x2, double y2)
  */
 void PlotWidget::fitData(bool obeySoftLimits)
 {
-	// Static data first
-	// -- X axis first
-	xMin_ = staticDataSet_.xMin();
-	xMax_ = staticDataSet_.xMax();
+	if ((staticDataSet_.data() == NULL) && (dataSets_.nItems() == 0)) return;
 
-	// -- Now Y
-	yMin_ = staticDataSet_.yMin();
-	yMax_ = staticDataSet_.yMax();
-	
+	// Static data first (if there is anything there
+	if (staticDataSet_.data() != NULL)
+	{
+		// -- X axis first
+		xMin_ = staticDataSet_.xMin();
+		xMax_ = staticDataSet_.xMax();
+
+		// -- Now Y
+		yMin_ = staticDataSet_.yMin();
+		yMax_ = staticDataSet_.yMax();
+	}
+	else if (dataSets_.first() != NULL)
+	{
+		PlotData* pd = dataSets_.first();
+		// -- X axis first
+		xMin_ = pd->xMin();
+		xMax_ = pd->xMax();
+
+		// -- Now Y
+		yMin_ = pd->yMin();
+		yMax_ = pd->yMax();
+	}
+
 	// Set initial values
 	for (PlotData* pd = dataSets_.first(); pd != NULL; pd = pd->next)
 	{

@@ -36,51 +36,6 @@ class QPushButton;
 class QLabel;
 class PlotData;
 
-// PlotDataBlock
-class PlotDataBlock : public ListItem<PlotDataBlock>
-{
-	public:
-	// Constructor
-	PlotDataBlock(QString blockName);
-	// Destructor
-	~PlotDataBlock();
-
-	
-	/*
-	 * Pen Styles
-	 */
-	public:
-	// Available line styles
-	enum BlockLineStyle { SolidStyle, DotStyle, DashedStyle, nBlockLineStyles };
-
-	private:
-	// Array of line (dash) definitions
-	static QVector<qreal> lineStyles_[nBlockLineStyles];
-
-	/*
-	 * Data
-	 */
-	private:
-	// Name of the block
-	QString blockName_;
-	// Line style
-	PlotDataBlock::BlockLineStyle lineStyle_;
-	// Whether block is visible
-	bool visible_;
-
-	public:
-	// Return name of block
-	QString blockName();
-	// Set associated line style
-	void setLineStyle(PlotDataBlock::BlockLineStyle style);
-	// Return associated line dash pattern
-	const QVector<qreal>& dashes();
-	// Set visibility of block
-	void setVisible(bool visible);
-	// Return visibility of block
-	bool visible();
-};
-
 // PlotData
 class PlotData : public ListItem<PlotData>
 {
@@ -95,10 +50,8 @@ class PlotData : public ListItem<PlotData>
 	 * Plot Data
 	 */
 	private:
-	// Data to plot
-	ExtractedSlice data_;
-	// Block index (or -1 for no block)
-	int blockIndex_;
+	// Associated data
+	ExtractedSlice* data_;
 	// QPainterPath of data
 	QPainterPath linePath_;
 	// Vertical offset to apply to data
@@ -107,24 +60,16 @@ class PlotData : public ListItem<PlotData>
 	double xMin_, xMax_;
 	// Y range of data
 	double yMin_, yMax_;
-	// Data name
-	QString name_;
-	// Associated PlotDataBlock
-	PlotDataBlock* block_;
 	// Scales used in last path generation
 	double lastXScale_, lastYScale_;
 
 	public:
 	// Set data
-	void setData(ExtractedSlice& source, QString name);
+	void setData(ExtractedSlice* source);
 	// Return reference to contained data
-	ExtractedSlice& data();
+	ExtractedSlice* data();
 	// Determine data limits
 	void determineLimits();
-	// Set block
-	void setBlock(PlotDataBlock* block);
-	// Return block
-	PlotDataBlock* block();
 	// Regenerate QPainterPath
 	void generatePainterPaths(double xScale, double yScale);
 	// Return line QPainterPath
@@ -143,8 +88,6 @@ class PlotData : public ListItem<PlotData>
 	double yMin();
 	// Return maximum y value for data
 	double yMax();
-	// Return name
-	QString name();
 
 
 	/*
@@ -400,10 +343,8 @@ class PlotWidget : public QWidget
 	 * Source Data
 	 */
 	private:
-	// Blockname list
-	List<PlotDataBlock> dataSetBlocks_;
-	// Number of visible dataSetBlocks_
-	int nDataSetBlocksVisible_;
+	// Number of visible data set groups
+	int nGroupsVisible_;
 	// List of individual datasets
 	List<PlotData> dataSets_;
 	// Static data (always displayed)
@@ -411,17 +352,15 @@ class PlotWidget : public QWidget
 
 	public:
 	// Add data to Plot
-	PlotData* addDataSet(ExtractedSlice& data, QString name, QString blockName, int yOffset = 0);
+	PlotData* addDataSet(ExtractedSlice* data, int yOffset = 0);
 	// Set static data
-	void setStaticData(ExtractedSlice data, QString name);
+	void setStaticData(ExtractedSlice* data);
 	// Remove all data from plot
 	void removeAllDataSets();
 	// Return dataset list
 	const List<PlotData>& dataSets();
 	// Determine dataset limits
 	void determineDataSetLimits();
-	// Return list of data blocks
-	const List<PlotDataBlock>& dataSetBlocks();
 	// Hide all datasets
 	void hideAllDataSets();
 	// Show all datasets containing the specified block data

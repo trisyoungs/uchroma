@@ -132,6 +132,8 @@ bool UChromaWindow::viewAxisTitleChanged(int axis, QString& title)
 	axisTitle_[axis] = title;
 	setAsModified();
 	updateSurface(false);
+	updateSlicesTab();
+	updateSliceMonitor();
 	return true;
 }
 
@@ -345,7 +347,7 @@ void UChromaWindow::on_ViewYAxisVisibleCheck_clicked(bool checked)
 
 void UChromaWindow::on_ViewYAxisTitleEdit_textChanged(QString text)
 {
-	viewAxisTitleChanged(0, text);
+	viewAxisTitleChanged(1, text);
 }
 
 void UChromaWindow::on_ViewYAxisStretchSpin_valueChanged(double value)
@@ -527,7 +529,7 @@ void UChromaWindow::on_ViewZAxisVisibleCheck_clicked(bool checked)
 
 void UChromaWindow::on_ViewZAxisTitleEdit_textChanged(QString text)
 {
-	viewAxisTitleChanged(0, text);
+	viewAxisTitleChanged(2, text);
 }
 
 void UChromaWindow::on_ViewZAxisStretchSpin_valueChanged(double value)

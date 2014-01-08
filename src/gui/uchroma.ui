@@ -293,7 +293,7 @@
                    <item row="2" column="0">
                     <widget class="QCheckBox" name="TransformZCheck">
                      <property name="text">
-                      <string>Z</string>
+                      <string>Z =</string>
                      </property>
                     </widget>
                    </item>
@@ -306,14 +306,14 @@
                    <item row="0" column="0">
                     <widget class="QCheckBox" name="TransformXCheck">
                      <property name="text">
-                      <string>X</string>
+                      <string>X =</string>
                      </property>
                     </widget>
                    </item>
                    <item row="1" column="0">
                     <widget class="QCheckBox" name="TransformYCheck">
                      <property name="text">
-                      <string>Y</string>
+                      <string>Y =</string>
                      </property>
                     </widget>
                    </item>
@@ -1898,7 +1898,7 @@
                            <number>3</number>
                           </property>
                           <property name="minimum">
-                           <double>-1000000.000000000000000</double>
+                           <double>0.000000000000000</double>
                           </property>
                           <property name="maximum">
                            <double>1000000.000000000000000</double>
@@ -2815,7 +2815,7 @@
                            <number>3</number>
                           </property>
                           <property name="minimum">
-                           <double>-1000000.000000000000000</double>
+                           <double>0.000000000000000</double>
                           </property>
                           <property name="maximum">
                            <double>1000000.000000000000000</double>
@@ -3686,7 +3686,7 @@
                            <number>3</number>
                           </property>
                           <property name="minimum">
-                           <double>-1000000.000000000000000</double>
+                           <double>0.000000000000000</double>
                           </property>
                           <property name="maximum">
                            <double>1000000.000000000000000</double>
@@ -4620,9 +4620,43 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="editTriggers">
+                   <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+                  </property>
+                  <property name="showDropIndicator" stdset="0">
+                   <bool>false</bool>
+                  </property>
+                  <property name="dragEnabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="dragDropMode">
+                   <enum>QAbstractItemView::InternalMove</enum>
+                  </property>
+                  <property name="defaultDropAction">
+                   <enum>Qt::MoveAction</enum>
+                  </property>
+                  <property name="selectionMode">
+                   <enum>QAbstractItemView::ExtendedSelection</enum>
+                  </property>
+                  <property name="columnCount">
+                   <number>3</number>
+                  </property>
+                  <attribute name="headerVisible">
+                   <bool>false</bool>
+                  </attribute>
                   <column>
                    <property name="text">
                     <string notr="true">1</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string notr="true">2</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string notr="true">3</string>
                    </property>
                   </column>
                  </widget>
@@ -4733,7 +4767,7 @@
      <x>0</x>
      <y>0</y>
      <width>1207</width>
-     <height>31</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

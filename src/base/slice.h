@@ -29,7 +29,8 @@
 #include <QtCore/QDir>
 
 // Forward Declarations
-/* None */
+class ExtractedSliceGroup;
+class QTreeWidgetItem;
 
 // Slice
 class Slice : public ListItem<Slice>
@@ -105,6 +106,10 @@ class ExtractedSlice : public ListItem<ExtractedSlice>
 	int axis_;
 	// Axis value at which slice was taken
 	double axisValue_;
+	// Parent slice group
+	ExtractedSliceGroup* group_;
+	// Tree node associated to the slice
+	QTreeWidgetItem* treeItem_;
 
 	public:
 	// Set title
@@ -121,6 +126,14 @@ class ExtractedSlice : public ListItem<ExtractedSlice>
 	int axis();
 	// Return axis value at which slice was generated
 	double axisValue();
+	// Set group
+	void setGroup(ExtractedSliceGroup* group);
+	// Return group
+	ExtractedSliceGroup* group();
+	// Set tree node associated to the slice
+	void setTreeItem(QTreeWidgetItem* item);
+	// Return tree node associated to the slice
+	QTreeWidgetItem* treeItem();
 };
 
 // Extracted Slice Group
@@ -130,6 +143,18 @@ class ExtractedSliceGroup : public ListItem<ExtractedSliceGroup>
 	// Constructor / Destructor
 	ExtractedSliceGroup();
 	~ExtractedSliceGroup();
+
+
+	/*
+	 * Pen Styles
+	 */
+	public:
+	// Available line styles
+	enum GroupLineStyle { SolidStyle, DotStyle, DashedStyle, nGroupLineStyles };
+
+	private:
+	// Array of line (dash) definitions
+	static QVector<qreal> lineStyles_[nGroupLineStyles];
 
 
 	/*
@@ -144,14 +169,34 @@ class ExtractedSliceGroup : public ListItem<ExtractedSliceGroup>
 	int xAxisTransform_;
 	// Y axis transformation to apply to generate transformed data
 	int yAxisTransform_;
+	// Line style
+	ExtractedSliceGroup::GroupLineStyle lineStyle_;
+	// Whether group is visible
+	bool visible_;
+	// Tree node associated to the group
+	QTreeWidgetItem* treeItem_;
 
 	public:
 	// Set name
 	void setName(QString name);
 	// Return name
 	QString name();
+	// Add extracted slice to group
+	ExtractedSlice* addSlice(const ExtractedSlice& slice);
 	// Return list of extracted slices in group
 	ExtractedSlice* extractedSlices();
+	// Set associated line style
+	void setLineStyle(ExtractedSliceGroup::GroupLineStyle style);
+	// Return associated line dash pattern
+	const QVector<qreal>& dashes();
+	// Set visibility of group
+	void setVisible(bool visible);
+	// Return visibility of group
+	bool visible();
+	// Set tree node associated to the group
+	void setTreeItem(QTreeWidgetItem* item);
+	// Return tree node associated to the group
+	QTreeWidgetItem* treeItem();
 };
 
 #endif

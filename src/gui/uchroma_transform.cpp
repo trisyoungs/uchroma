@@ -236,6 +236,11 @@ void UChromaWindow::updateTransformTab()
 	ui.TransformXEquationEdit->setText(transforms_[0].text());
 	ui.TransformYEquationEdit->setText(transforms_[1].text());
 	ui.TransformZEquationEdit->setText(transforms_[2].text());
+	QPalette redText = ui.TransformXCheck->palette();
+	redText.setColor(QPalette::Text, Qt::red);
+	ui.TransformXEquationEdit->setPalette(transforms_[0].valid() ? ui.TransformXCheck->palette() : redText);
+	ui.TransformYEquationEdit->setPalette(transforms_[1].valid() ? ui.TransformXCheck->palette() : redText);
+	ui.TransformZEquationEdit->setPalette(transforms_[2].valid() ? ui.TransformXCheck->palette() : redText);
 
 	// Limits
 	ui.LimitXMinSpin->setRange(transformMin_.x, transformMax_.x);

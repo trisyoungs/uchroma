@@ -279,6 +279,9 @@ void Viewer::createSurface(ColourScale colourScale, double yAxisScale)
 	RefList<Data2D,int> slices;
 	for (Data2D* slice = sliceData_->first(); slice != NULL; slice = slice->next) if (slice->nPoints() > 1) slices.add(slice);
 
+	// If there are not enough slices with a valid number of points
+	if (slices.nItems() < 2) return;
+
 	// Construct first slice data and set initial min/max values
 	RefListItem<Data2D,int>* ri = slices.first();
 	constructSliceData(ri->item, yAxisScale_, normA, colourA, colourScale_, NULL, ri->next ? ri->next->item : NULL);

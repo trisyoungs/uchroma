@@ -24,6 +24,7 @@
 
 // Static singletons
 UChromaWindow* GraphWidget::uChroma_ = NULL;
+
 /*!
  * \brief Constructor
  */
@@ -39,6 +40,7 @@ GraphWidget::GraphWidget(QWidget* parent) : QWidget(parent)
 
 	// Ensure that initial widget state represents the PlotWidget
 	ui.AutoScaleCheck->setChecked(ui.Graph->autoScale());
+	ui.ShowLegendCheck->setChecked(ui.Graph->showLegend());
 }
 
 /*!
@@ -67,5 +69,15 @@ void GraphWidget::staticDataChanged()
 {
 	// Change the static data in PlotWidget for that currently in uChroma
 	if (!uChroma_) return;
-	ui.Graph->setStaticData(uChroma_->currentSlice(), "Hello");
+	ui.Graph->setStaticData(uChroma_->currentSlice());
+}
+
+/*
+ * Public Functions
+ */
+
+// Add data to graph
+void GraphWidget::addData(ExtractedSlice* data)
+{
+	ui.Graph->addDataSet(data);
 }

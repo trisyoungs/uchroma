@@ -386,6 +386,12 @@ class UChromaWindow : public QMainWindow
 	void on_SlicesSaveButton_clicked(bool checked);
 	void on_SlicesList_currentRowChanged(int index);
 
+	public:
+	// Update the Slices tab
+	void updateSlicesTab();
+	// Update the slice monitor widget
+	void updateSliceMonitor();
+
 
 	/*
 	 * Data
@@ -610,6 +616,10 @@ class UChromaWindow : public QMainWindow
 	// Current slice data
 	ExtractedSlice currentSlice_;
 
+	private:
+	// Add / retrieve group
+	ExtractedSliceGroup* addOrRetrieveGroup(QString name);
+
 	public:
 	// Set slice axis
 	void setSliceAxis(int axis);
@@ -624,9 +634,10 @@ class UChromaWindow : public QMainWindow
 	// Return axis bin value of closest point to supplied value
 	int closestBin(int axis, double value);
 	// Return current slice data
-	ExtractedSlice currentSlice();
+	ExtractedSlice* currentSlice();
 
 	public slots:
+	// Add current slice data to extracted slices list
 	void addSurfaceSlice();
 
 	signals:
