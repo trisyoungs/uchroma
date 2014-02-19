@@ -25,20 +25,22 @@
 // Mathematical functions
 class uChromaMath
 {
-	// Error functions
 	public:
+
+	// Error functions
 	static double erfc(double);
 	static double erf(double);
 
 	// Random number generation
-	public:
 	static double random();
 	static int randomimax();
 	static int randomi(int range);
 
 	// Integer power function
-	public:
 	static int power(int i, int p);
+
+	// Sign function
+	static int sgn(int x);
 };
 
 #endif

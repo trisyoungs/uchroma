@@ -76,3 +76,9 @@ int uChromaMath::power(int i, int p)
 	else for (n=1; n<p; n++) result *= i;
 	return result;
 }
+
+// Sign function
+int uChromaMath::sgn(int x)
+{
+	return (x < 0 ? -1 : x > 0);
+}

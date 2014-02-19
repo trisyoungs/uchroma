@@ -91,26 +91,29 @@ bool UChromaWindow::updateSliceValue(int mouseX, int mouseY)
 
 		// Extract slice from data
 		int bin = closestBin(sliceAxis_, sliceValue_);
-		QString title;
+		currentSlice_.data().clear();
 
 		// Grab slice data
-		if (sliceAxis_ == 0)
+		if (bin != -1)
 		{
-			// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated - TODO)
-			currentSlice_.data().clear();
-			for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) currentSlice_.data().addPoint(slice->transformedData().z(), slice->transformedData().y(bin));
-			currentSlice_.setTitle("X = " + QString::number(slices_.first()->transformedData().x(bin)));
-		}
-		else if (sliceAxis_ == 1)
-		{
-			return false;
-		}
-		else if (sliceAxis_ == 2)
-		{
-			// Slice through Z - i.e. original slice data
-			currentSlice_.data().clear();
-			currentSlice_.data() = slices_[bin]->data();
-			currentSlice_.setTitle("Z = " + QString::number(slices_[bin]->transformedData().z()));
+			if (sliceAxis_ == 0)
+			{
+				// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated - TODO)
+				currentSlice_.data().clear();
+				for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) currentSlice_.data().addPoint(slice->transformedData().z(), slice->transformedData().y(bin));
+				currentSlice_.setTitle("X = " + QString::number(slices_.first()->transformedData().x(bin)));
+			}
+			else if (sliceAxis_ == 1)
+			{
+				return false;
+			}
+			else if (sliceAxis_ == 2)
+			{
+				// Slice through Z - i.e. original slice data
+				currentSlice_.data().clear();
+				currentSlice_.data() = slices_[bin]->data();
+				currentSlice_.setTitle("Z = " + QString::number(slices_[bin]->transformedData().z()));
+			}
 		}
 
 		emit(sliceDataChanged());

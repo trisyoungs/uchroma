@@ -1048,7 +1048,15 @@ void Data2D::interpolate(bool constrained)
 		
 		// Calculate first derivatives at each point
 		Array<double> fp(nPoints);
-		for (i=1; i<nPoints-1; ++i) fp[i] = 2.0 / ((x_[i+1] - x_[i])/(y_[i+1] - y_[i]) + (x_[i] - x_[i-1])/(y_[i] - y_[i-1]));
+		double gradA, gradB;
+		for (i=1; i<nPoints-1; ++i)
+		{
+			gradA = (x_[i+1] - x_[i])/(y_[i+1] - y_[i]);
+			gradB = (x_[i] - x_[i-1])/(y_[i] - y_[i-1]);
+			if (uChromaMath::sgn(gradA) != uChromaMath::sgn(gradB)) fp[i] = 0.0;
+			else fp[i] = 2.0 / (gradA + gradB);
+			
+		}
 // 		fp[0] = (3.0*(y_[1] - y_[0])) / (2.0*x_[1]-x_[0]) - 0.5*fp[1];
 // 		fp[nPoints-1] = (3.0*(y_[nPoints-1] - y_[nPoints-2])) / (2.0*x_[nPoints-1]-x_[nPoints-2]) - 0.5*fp[nPoints-2];
 		fp[0] = 0.0;
