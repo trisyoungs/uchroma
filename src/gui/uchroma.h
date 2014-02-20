@@ -430,9 +430,8 @@ class UChromaWindow : public QMainWindow
 	bool imageExportMaintainAspect_;
 	// List of slices
 	List<Slice> slices_;
-	// List of data slices todisplay
+	// List of data slices to display
 	List<Data2D> surfaceData_;
-	
 	// Font file to use for viewer
 	QString viewerFont_;
 
