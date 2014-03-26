@@ -69,6 +69,7 @@ QT4_WRAP_CPP(pro_MOC_SRCS ${pro_MOC_HDRS} OPTIONS -f)
 
 SET(pro_UIS
   dataimport.ui
+  fit.ui
   graphwidget.ui
   saveimage.ui
   slicemonitor.ui

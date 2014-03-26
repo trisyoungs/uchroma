@@ -102,9 +102,9 @@ add_executable(${target_name}  MACOSX_BUNDLE
 # Link line
 link_directories (${LIBRARY_OUTPUT_PATH})
 IF(WIN32 OR APPLE)
-	target_link_libraries(${target_name} gui base math ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${FTGL_LIBRARIES} ${OPENGL_LIBRARIES} ${FT2_LIBRARIES} ${HDF5_LIBS})
+	target_link_libraries(${target_name} gui base math parser command ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${FTGL_LIBRARIES} ${OPENGL_LIBRARIES} ${FT2_LIBRARIES} ${HDF5_LIBS})
 ELSE(WIN32 OR APPLE)
-	target_link_libraries(${target_name} gui base math ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${HDF5_LIBRARIES})
+	target_link_libraries(${target_name} gui base math parser command ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${HDF5_LIBRARIES})
 ENDIF(WIN32 OR APPLE)
 
 # -----------------------------------

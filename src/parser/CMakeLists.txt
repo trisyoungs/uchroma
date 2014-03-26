@@ -1,7 +1,7 @@
 add_library(parser
 commandnode.cpp
 double.cpp
-grammar.yy
+grammar.cc
 integer.cpp
 parser.cpp
 parser_lexer.cpp
