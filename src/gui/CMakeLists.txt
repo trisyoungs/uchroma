@@ -12,14 +12,17 @@ ${CMAKE_BINARY_DIR}/src/
 # Source files (not Qt UI files or custom .h [uih])
 SET(qtproject_SRCS
 uchroma_funcs.cpp
-uchroma_colour.cpp
+uchroma_axes.cpp
+uchroma_collection.cpp
+uchroma_collection_data.cpp
+uchroma_collection_style.cpp
+uchroma_collection_transform.cpp
 uchroma_slices.cpp
 uchroma_slots.cpp
-uchroma_sourcedata.cpp
 uchroma_surface.cpp
-uchroma_transform.cpp
-uchroma_view.cpp
 data.cpp
+io.cpp
+keywords.cpp
 slices.cpp
 surface.cpp
 dataimport_funcs.cpp

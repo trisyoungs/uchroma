@@ -37,6 +37,7 @@
 // Forward Declarations
 class ColourScale;
 class UChromaWindow;
+class Collection;
 
 // Base rendering widget
 class Viewer : public QGLWidget
@@ -218,15 +219,9 @@ class Viewer : public QGLWidget
 	// Reference list of all created primitives (to which all user primitives must be added)
 	RefList<Primitive,int> primitiveList_;
 	// Display primitives
-	Primitive surfacePrimitive_, axisPrimitives_[3], slicePrimitive_, slicePrimitiveBox_, boundingBoxPrimitive_;
+	Primitive axisPrimitives_[3], slicePrimitive_, slicePrimitiveBox_, boundingBoxPrimitive_;
 	// Axis text primitives
 	TextPrimitiveList axisTextPrimitives_[3];
-	// Pointer to slice data list from which to create surface
-	List<Data2D>* sliceData_;
-	// Colourscale to use when creating surface
-	ColourScale colourScale_;
-	// Y-axis scale factor to use when creating surface
-	double yAxisScale_;
 	// Y axis clip plane definitions
 	GLdouble clipPlaneBottom_[4], clipPlaneTop_[4], clipPlaneYMin_, clipPlaneYMax_;
 	// Delta to add to Y clip plane limits
@@ -239,16 +234,16 @@ class Viewer : public QGLWidget
 	void createPrimitives();
 	// Setup basic GL properties
 	void setupGL();
+	// Construct normal / colour data for slice specified
+	void constructSliceData(Data2D* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, const ColourScale& colourScale, Data2D* previousSlice, Data2D* nextSlice);
+	// Create/update surface primitive for specified collection
+	void updateSurfacePrimitive(Collection* collection, bool forceUpdate = false);
 
 	public:
-	// Set source slice list
-	void setSourceSliceList(List<Data2D>* sliceData);
-	// Construct normal / colour data for slice specified
-	void constructSliceData(Data2D* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale& colourScale, Data2D* previousSlice, Data2D* nextSlice);
-	// Create surface primitive with supplied colourscale and y axis scaling factor
-	void createSurface(ColourScale colourScale, double yAxisScale);
-	// Create surface using previous colourscale and y axis scaling factor
-	void createSurface();
+	// Add supplied surface primitive to list
+	void addSurfacePrimitive(Primitive* primitive);
+	// Remove surface primitive from primitive list
+	void removeSurfacePrimitive(Primitive* primitive);
 	// Clear specified axis primitives
 	void clearAxisPrimitives(int axis);
 	// Add line to axis primitive
@@ -263,8 +258,6 @@ class Viewer : public QGLWidget
 	void createBoundingBox(int type, double planeY);
 	// Set Y clip plane limits
 	void setYClip(double yMin, double yMax);
-	// Return number of triangles in surface
-	int surfaceNTriangles();
 	
 	signals:
 	void sliceAxisClicked();

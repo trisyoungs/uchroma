@@ -40,6 +40,7 @@ Tree::Tree()
 	// Private variables
 	acceptedFail_ = Command::NoFunction;
 	rootNode_ = NULL;
+	generateMissingVariables_ = false;
 
 	// Initialise
 	clear();
@@ -110,6 +111,18 @@ void Tree::clear()
 	nodes_.own(rootNode_);
 	scopeStack_.add(rootNode_);
 	statements_.add(rootNode_);
+}
+
+// Set flag to specify that missing variables should be generated
+void Tree::setGenerateMissingVariables(bool generate)
+{
+	generateMissingVariables_ = generate;
+}
+
+// Return whether missing variables will be generated
+bool Tree::generateMissingVariables()
+{
+	return generateMissingVariables_;
 }
 
 // Set commands in Tree
@@ -432,6 +445,12 @@ TreeNode *Tree::wrapVariable(Variable *var)
 /*
 // Paths
 */
+
+// Return root ScopeNode
+ScopeNode* Tree::rootNode()
+{
+	return rootNode_;
+}
 
 // Create a new path on the stack
 TreeNode *Tree::createPath(TreeNode *node)

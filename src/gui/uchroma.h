@@ -1,7 +1,7 @@
 /*
 	*** uChroma Main Window
 	*** src/gui/uchroma.h
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -25,9 +25,11 @@
 #include "gui/ui_uchroma.h"
 #include "gui/saveimage.h"
 #include "gui/dataimport.h"
+#include "gui/fit.h"
 #include "gui/slicemonitor.h"
-#include "base/slice.h"
+#include "base/collection.h"
 #include "base/transformer.h"
+#include "base/lineparser.h"
 
 // Forward Declarations
 /* None */
@@ -50,6 +52,8 @@ class UChromaWindow : public QMainWindow
 	DataImportDialog dataImportDialog_;
 	// Slice Monitor Dialog
 	SliceMonitorDialog sliceMonitorDialog_;
+	// Fit Window Dialog
+	FitDialog fitDialog_;
 
 	public:
 	// Constructor / Destructor
@@ -69,12 +73,6 @@ class UChromaWindow : public QMainWindow
 	void loadSettings();
 	// Save program settings
 	void saveSettings();
-	// Update all tabs
-	void updateAllTabs();
-	// Update title bar
-	void updateTitleBar();
-	// Update GUI after loading data
-	void updateAfterLoad();
 
 
 	/*
@@ -103,6 +101,14 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
+	// Tools Menu
+	*/
+	private slots:
+	void on_actionToolsSliceMonitor_triggered(bool checked);
+	void on_actionToolsFitWindow_triggered(bool checked);
+
+
+	/*
 	// Settings Menu
 	*/
 	private slots:
@@ -110,7 +116,20 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * Left Tabs -- Source Data
+	 * Left Tabs -- Collections
+	 */
+	private slots:
+	void on_CollectionList_currentRowChanged(int index);
+	void on_CollectionAddButton_clicked(bool checked);
+	void on_CollectionRemoveButton_clicked(bool checked);
+
+	public:
+	// Update collection tab
+	void updateCollectionTab();
+
+
+	/*
+	 * Left Tabs -- Collection -- Source Data
 	 */
 	private slots:
 	void on_SourceDirSelectButton_clicked(bool checked);
@@ -123,18 +142,16 @@ class UChromaWindow : public QMainWindow
 
 	public:
 	// Update source data tab
-	void updateSourceDataTab();
+	void updateCollectionDataTab();
 
 
 	/*
-	 * Left Tabs -- Transform
+	 * Left Tabs -- Collection -- Transform
 	 */
 	private:
 	// Change functions
 	bool transformEnabledChanged(int axis, bool enabled);
 	bool transformEquationChanged(int axis, QString equation);
-	bool transformLimitChanged(int axis, bool minLim, double value);
-	bool transformLimitSetExtreme(int axis, bool minLim);
 	bool transformInterpolateChanged(int axis, bool checked);
 	bool transformInterpolateStepChanged(int axis, double step);
 	bool transformInterpolateConstrainChanged(int axis, bool checked);
@@ -145,18 +162,6 @@ class UChromaWindow : public QMainWindow
 	void on_TransformXEquationEdit_textEdited(QString text);
 	void on_TransformYEquationEdit_textEdited(QString text);
 	void on_TransformZEquationEdit_textEdited(QString text);
-	void on_LimitXMinSpin_valueChanged(double value);
-	void on_LimitYMinSpin_valueChanged(double value);
-	void on_LimitZMinSpin_valueChanged(double value);
-	void on_LimitXMinSetMinimumButton_clicked(bool checked);
-	void on_LimitYMinSetMinimumButton_clicked(bool checked);
-	void on_LimitZMinSetMinimumButton_clicked(bool checked);
-	void on_LimitXMaxSpin_valueChanged(double value);
-	void on_LimitYMaxSpin_valueChanged(double value);
-	void on_LimitZMaxSpin_valueChanged(double value);
-	void on_LimitXMaxSetMaximumButton_clicked(bool checked);
-	void on_LimitYMaxSetMaximumButton_clicked(bool checked);
-	void on_LimitZMaxSetMaximumButton_clicked(bool checked);
 	void on_TransformXInterpolateCheck_clicked(bool checked);
 	void on_TransformXInterpolateStepSpin_valueChanged(double value);
 	void on_TransformXInterpolateConstrainCheck_clicked(bool checked);
@@ -167,11 +172,11 @@ class UChromaWindow : public QMainWindow
 
 	public:
 	// Update Transform tab
-	void updateTransformTab();
+	void updateCollectionTransformTab();
 
 
 	/*
-	 * Left Tabs -- Colour
+	 * Left Tabs -- Collection -- Style
 	 */
 	private:
 	// Update Gradient Bar
@@ -215,136 +220,151 @@ class UChromaWindow : public QMainWindow
 
 	public:
 	// Update
-	void updateColourTab();
+	void updateCollectionColourTab();
 
 
 	/*
-	 * Left Tabs -- View
+	 * Left Tabs -- Axes
 	 */
 	private:
-	bool viewAxisInvertChanged(int axis, bool checked);
-	bool viewAxisLogarithmicChanged(int axis, bool checked);
-	bool viewAxisVisibleChanged(int axis, bool checked);
-	bool viewAxisStretchChanged(int axis, double value);
-	bool viewAxisCrossChanged(int axis, int dir, double value);
-	bool viewAxisCrossSet(int axis, int dir, int type);
-	bool viewAxisTicksChanged(int axis, bool start, double value);
-	bool viewAxisTickOrientationChanged(int axis, int dir, double value);
-	bool viewAxisLabelOrientationChanged(int axis, int component, double value);
-	bool viewAxisMinorTicksChanged(int axis, int value);
-	bool viewAxisTitleChanged(int axis, QString& title);
-	bool viewAxisTitleOrientationChanged(int axis, int component, double value);
-	bool viewAxisTitleAlignmentChanged(int axis, TextPrimitive::HorizontalAnchor anchor);
+	bool axisInvertChanged(int axis, bool checked);
+	bool axisLogarithmicChanged(int axis, bool checked);
+	bool axisVisibleChanged(int axis, bool checked);
+	bool axisStretchChanged(int axis, double value);
+	bool axisLimitChanged(int axis, bool minLim, double value);
+	bool axisLimitSetExtreme(int axis, bool minLim);
+	bool axisCrossChanged(int axis, int dir, double value);
+	bool axisCrossSet(int axis, int dir, int type);
+	bool axisAutoTicksChanged(int axis, bool enabled);
+	bool axisTicksChanged(int axis, bool start, double value);
+	bool axisTickOrientationChanged(int axis, int dir, double value);
+	bool axisLabelOrientationChanged(int axis, int component, double value);
+	bool axisMinorTicksChanged(int axis, int value);
+	bool axisTitleChanged(int axis, QString& title);
+	bool axisTitleOrientationChanged(int axis, int component, double value);
+	bool axisTitleAlignmentChanged(int axis, TextPrimitive::HorizontalAnchor anchor);
 
 	private slots:
 	// -- X Axis Tab
-	void on_ViewXAxisInvertCheck_clicked(bool checked);
-	void on_ViewXAxisLogarithmicCheck_clicked(bool checked);
-	void on_ViewXAxisVisibleCheck_clicked(bool checked);
-	void on_ViewXAxisTitleEdit_textChanged(QString text);
-	void on_ViewXAxisStretchSpin_valueChanged(double value);
-	void on_ViewXAxisCrossAtYSpin_valueChanged(double value);
-	void on_ViewXAxisCrossAtZSpin_valueChanged(double value);
-	void on_ViewXAxisCrossAtYSetMinimumButton_clicked(bool checked);
-	void on_ViewXAxisCrossAtYSetZeroButton_clicked(bool checked);
-	void on_ViewXAxisCrossAtYSetMaximumButton_clicked(bool checked);
-	void on_ViewXAxisCrossAtZSetMinimumButton_clicked(bool checked);
-	void on_ViewXAxisCrossAtZSetZeroButton_clicked(bool checked);
-	void on_ViewXAxisCrossAtZSetMaximumButton_clicked(bool checked);
-	void on_ViewXAxisAutoTicksCheck_clicked(bool checked);
-	void on_ViewXAxisTicksStartSpin_valueChanged(double value);
-	void on_ViewXAxisTicksDeltaSpin_valueChanged(double value);
-	void on_ViewXAxisMinorTicksSpin_valueChanged(int value);
-	void on_ViewXAxisTickDirectionXSpin_valueChanged(double value);
-	void on_ViewXAxisTickDirectionYSpin_valueChanged(double value);
-	void on_ViewXAxisTickDirectionZSpin_valueChanged(double value);
-	void on_ViewXAxisLabelAxialRotationSlider_valueChanged(int value);
-	void on_ViewXAxisLabelAxialRotationSpin_valueChanged(int value);
-	void on_ViewXAxisLabelInPlaneRotationSlider_valueChanged(int value);
-	void on_ViewXAxisLabelInPlaneRotationSpin_valueChanged(int value);
-	void on_ViewXAxisLabelDistanceSpin_valueChanged(double value);
-	void on_ViewXAxisTitleHOffsetSlider_valueChanged(int value);
-	void on_ViewXAxisTitleHOffsetLeftButton_clicked(bool checked);
-	void on_ViewXAxisTitleHOffsetCentreButton_clicked(bool checked);
-	void on_ViewXAxisTitleHOffsetRightButton_clicked(bool checked);
-	void on_ViewXAxisTitleAnchorCombo_currentIndexChanged(int index);
-	void on_ViewXAxisTitleAxialRotationSlider_valueChanged(int value);
-	void on_ViewXAxisTitleAxialRotationSpin_valueChanged(int value);
-	void on_ViewXAxisTitleInPlaneRotationSlider_valueChanged(int value);
-	void on_ViewXAxisTitleInPlaneRotationSpin_valueChanged(int value);
-	void on_ViewXAxisTitleDistanceSpin_valueChanged(double value);
+	void on_AxisXInvertCheck_clicked(bool checked);
+	void on_AxisXLogarithmicCheck_clicked(bool checked);
+	void on_AxisXVisibleCheck_clicked(bool checked);
+	void on_AxisXTitleEdit_textChanged(QString text);
+	void on_AxisXStretchSpin_valueChanged(double value);
+	void on_AxisXMinSpin_valueChanged(double value);
+	void on_AxisYMinSpin_valueChanged(double value);
+	void on_AxisZMinSpin_valueChanged(double value);
+	void on_AxisXMinSetMinimumButton_clicked(bool checked);
+	void on_AxisYMinSetMinimumButton_clicked(bool checked);
+	void on_AxisZMinSetMinimumButton_clicked(bool checked);
+	void on_AxisXMaxSpin_valueChanged(double value);
+	void on_AxisYMaxSpin_valueChanged(double value);
+	void on_AxisZMaxSpin_valueChanged(double value);
+	void on_AxisXMaxSetMaximumButton_clicked(bool checked);
+	void on_AxisYMaxSetMaximumButton_clicked(bool checked);
+	void on_AxisZMaxSetMaximumButton_clicked(bool checked);
+	void on_AxisXCrossAtYSpin_valueChanged(double value);
+	void on_AxisXCrossAtZSpin_valueChanged(double value);
+	void on_AxisXCrossAtYSetMinimumButton_clicked(bool checked);
+	void on_AxisXCrossAtYSetZeroButton_clicked(bool checked);
+	void on_AxisXCrossAtYSetMaximumButton_clicked(bool checked);
+	void on_AxisXCrossAtZSetMinimumButton_clicked(bool checked);
+	void on_AxisXCrossAtZSetZeroButton_clicked(bool checked);
+	void on_AxisXCrossAtZSetMaximumButton_clicked(bool checked);
+	void on_AxisXAutoTicksCheck_clicked(bool checked);
+	void on_AxisXTicksStartSpin_valueChanged(double value);
+	void on_AxisXTicksDeltaSpin_valueChanged(double value);
+	void on_AxisXMinorTicksSpin_valueChanged(int value);
+	void on_AxisXTickDirectionXSpin_valueChanged(double value);
+	void on_AxisXTickDirectionYSpin_valueChanged(double value);
+	void on_AxisXTickDirectionZSpin_valueChanged(double value);
+	void on_AxisXLabelAxialRotationSlider_valueChanged(int value);
+	void on_AxisXLabelAxialRotationSpin_valueChanged(int value);
+	void on_AxisXLabelInPlaneRotationSlider_valueChanged(int value);
+	void on_AxisXLabelInPlaneRotationSpin_valueChanged(int value);
+	void on_AxisXLabelDistanceSpin_valueChanged(double value);
+	void on_AxisXTitleHOffsetSlider_valueChanged(int value);
+	void on_AxisXTitleHOffsetLeftButton_clicked(bool checked);
+	void on_AxisXTitleHOffsetCentreButton_clicked(bool checked);
+	void on_AxisXTitleHOffsetRightButton_clicked(bool checked);
+	void on_AxisXTitleAnchorCombo_currentIndexChanged(int index);
+	void on_AxisXTitleAxialRotationSlider_valueChanged(int value);
+	void on_AxisXTitleAxialRotationSpin_valueChanged(int value);
+	void on_AxisXTitleInPlaneRotationSlider_valueChanged(int value);
+	void on_AxisXTitleInPlaneRotationSpin_valueChanged(int value);
+	void on_AxisXTitleDistanceSpin_valueChanged(double value);
 	// -- Y Axis Tab
-	void on_ViewYAxisInvertCheck_clicked(bool checked);
-	void on_ViewYAxisLogarithmicCheck_clicked(bool checked);
-	void on_ViewYAxisVisibleCheck_clicked(bool checked);
-	void on_ViewYAxisTitleEdit_textChanged(QString text);
-	void on_ViewYAxisStretchSpin_valueChanged(double value);
-	void on_ViewYAxisCrossAtXSpin_valueChanged(double value);
-	void on_ViewYAxisCrossAtZSpin_valueChanged(double value);
-	void on_ViewYAxisCrossAtXSetMinimumButton_clicked(bool checked);
-	void on_ViewYAxisCrossAtXSetZeroButton_clicked(bool checked);
-	void on_ViewYAxisCrossAtXSetMaximumButton_clicked(bool checked);
-	void on_ViewYAxisCrossAtZSetMinimumButton_clicked(bool checked);
-	void on_ViewYAxisCrossAtZSetZeroButton_clicked(bool checked);
-	void on_ViewYAxisCrossAtZSetMaximumButton_clicked(bool checked);
-	void on_ViewYAxisAutoTicksCheck_clicked(bool checked);
-	void on_ViewYAxisTicksStartSpin_valueChanged(double value);
-	void on_ViewYAxisTicksDeltaSpin_valueChanged(double value);
-	void on_ViewYAxisMinorTicksSpin_valueChanged(int value);
-	void on_ViewYAxisTickDirectionXSpin_valueChanged(double value);
-	void on_ViewYAxisTickDirectionYSpin_valueChanged(double value);
-	void on_ViewYAxisTickDirectionZSpin_valueChanged(double value);
-	void on_ViewYAxisLabelAxialRotationSlider_valueChanged(int value);
-	void on_ViewYAxisLabelAxialRotationSpin_valueChanged(int value);
-	void on_ViewYAxisLabelInPlaneRotationSlider_valueChanged(int value);
-	void on_ViewYAxisLabelInPlaneRotationSpin_valueChanged(int value);
-	void on_ViewYAxisLabelDistanceSpin_valueChanged(double value);
-	void on_ViewYAxisTitleHOffsetSlider_valueChanged(int value);
-	void on_ViewYAxisTitleHOffsetLeftButton_clicked(bool checked);
-	void on_ViewYAxisTitleHOffsetCentreButton_clicked(bool checked);
-	void on_ViewYAxisTitleHOffsetRightButton_clicked(bool checked);
-	void on_ViewYAxisTitleAnchorCombo_currentIndexChanged(int index);
-	void on_ViewYAxisTitleAxialRotationSlider_valueChanged(int value);
-	void on_ViewYAxisTitleAxialRotationSpin_valueChanged(int value);
-	void on_ViewYAxisTitleInPlaneRotationSlider_valueChanged(int value);
-	void on_ViewYAxisTitleInPlaneRotationSpin_valueChanged(int value);
-	void on_ViewYAxisTitleDistanceSpin_valueChanged(double value);
+	void on_AxisYInvertCheck_clicked(bool checked);
+	void on_AxisYLogarithmicCheck_clicked(bool checked);
+	void on_AxisYVisibleCheck_clicked(bool checked);
+	void on_AxisYTitleEdit_textChanged(QString text);
+	void on_AxisYStretchSpin_valueChanged(double value);
+	void on_AxisYCrossAtXSpin_valueChanged(double value);
+	void on_AxisYCrossAtZSpin_valueChanged(double value);
+	void on_AxisYCrossAtXSetMinimumButton_clicked(bool checked);
+	void on_AxisYCrossAtXSetZeroButton_clicked(bool checked);
+	void on_AxisYCrossAtXSetMaximumButton_clicked(bool checked);
+	void on_AxisYCrossAtZSetMinimumButton_clicked(bool checked);
+	void on_AxisYCrossAtZSetZeroButton_clicked(bool checked);
+	void on_AxisYCrossAtZSetMaximumButton_clicked(bool checked);
+	void on_AxisYAutoTicksCheck_clicked(bool checked);
+	void on_AxisYTicksStartSpin_valueChanged(double value);
+	void on_AxisYTicksDeltaSpin_valueChanged(double value);
+	void on_AxisYMinorTicksSpin_valueChanged(int value);
+	void on_AxisYTickDirectionXSpin_valueChanged(double value);
+	void on_AxisYTickDirectionYSpin_valueChanged(double value);
+	void on_AxisYTickDirectionZSpin_valueChanged(double value);
+	void on_AxisYLabelAxialRotationSlider_valueChanged(int value);
+	void on_AxisYLabelAxialRotationSpin_valueChanged(int value);
+	void on_AxisYLabelInPlaneRotationSlider_valueChanged(int value);
+	void on_AxisYLabelInPlaneRotationSpin_valueChanged(int value);
+	void on_AxisYLabelDistanceSpin_valueChanged(double value);
+	void on_AxisYTitleHOffsetSlider_valueChanged(int value);
+	void on_AxisYTitleHOffsetLeftButton_clicked(bool checked);
+	void on_AxisYTitleHOffsetCentreButton_clicked(bool checked);
+	void on_AxisYTitleHOffsetRightButton_clicked(bool checked);
+	void on_AxisYTitleAnchorCombo_currentIndexChanged(int index);
+	void on_AxisYTitleAxialRotationSlider_valueChanged(int value);
+	void on_AxisYTitleAxialRotationSpin_valueChanged(int value);
+	void on_AxisYTitleInPlaneRotationSlider_valueChanged(int value);
+	void on_AxisYTitleInPlaneRotationSpin_valueChanged(int value);
+	void on_AxisYTitleDistanceSpin_valueChanged(double value);
 	// -- Z Axis Tab
-	void on_ViewZAxisInvertCheck_clicked(bool checked);
-	void on_ViewZAxisLogarithmicCheck_clicked(bool checked);
-	void on_ViewZAxisVisibleCheck_clicked(bool checked);
-	void on_ViewZAxisTitleEdit_textChanged(QString text);
-	void on_ViewZAxisStretchSpin_valueChanged(double value);
-	void on_ViewZAxisCrossAtXSpin_valueChanged(double value);
-	void on_ViewZAxisCrossAtYSpin_valueChanged(double value);
-	void on_ViewZAxisCrossAtXSetMinimumButton_clicked(bool checked);
-	void on_ViewZAxisCrossAtXSetZeroButton_clicked(bool checked);
-	void on_ViewZAxisCrossAtXSetMaximumButton_clicked(bool checked);
-	void on_ViewZAxisCrossAtYSetMinimumButton_clicked(bool checked);
-	void on_ViewZAxisCrossAtYSetZeroButton_clicked(bool checked);
-	void on_ViewZAxisCrossAtYSetMaximumButton_clicked(bool checked);
-	void on_ViewZAxisAutoTicksCheck_clicked(bool checked);
-	void on_ViewZAxisTicksStartSpin_valueChanged(double value);
-	void on_ViewZAxisTicksDeltaSpin_valueChanged(double value);
-	void on_ViewZAxisMinorTicksSpin_valueChanged(int value);
-	void on_ViewZAxisTickDirectionXSpin_valueChanged(double value);
-	void on_ViewZAxisTickDirectionYSpin_valueChanged(double value);
-	void on_ViewZAxisTickDirectionZSpin_valueChanged(double value);
-	void on_ViewZAxisLabelAxialRotationSlider_valueChanged(int value);
-	void on_ViewZAxisLabelAxialRotationSpin_valueChanged(int value);
-	void on_ViewZAxisLabelInPlaneRotationSlider_valueChanged(int value);
-	void on_ViewZAxisLabelInPlaneRotationSpin_valueChanged(int value);
-	void on_ViewZAxisLabelDistanceSpin_valueChanged(double value);
-	void on_ViewZAxisTitleHOffsetSlider_valueChanged(int value);
-	void on_ViewZAxisTitleHOffsetLeftButton_clicked(bool checked);
-	void on_ViewZAxisTitleHOffsetCentreButton_clicked(bool checked);
-	void on_ViewZAxisTitleHOffsetRightButton_clicked(bool checked);
-	void on_ViewZAxisTitleAnchorCombo_currentIndexChanged(int index);
-	void on_ViewZAxisTitleAxialRotationSlider_valueChanged(int value);
-	void on_ViewZAxisTitleAxialRotationSpin_valueChanged(int value);
-	void on_ViewZAxisTitleInPlaneRotationSlider_valueChanged(int value);
-	void on_ViewZAxisTitleInPlaneRotationSpin_valueChanged(int value);
-	void on_ViewZAxisTitleDistanceSpin_valueChanged(double value);
+	void on_AxisZInvertCheck_clicked(bool checked);
+	void on_AxisZLogarithmicCheck_clicked(bool checked);
+	void on_AxisZVisibleCheck_clicked(bool checked);
+	void on_AxisZTitleEdit_textChanged(QString text);
+	void on_AxisZStretchSpin_valueChanged(double value);
+	void on_AxisZCrossAtXSpin_valueChanged(double value);
+	void on_AxisZCrossAtYSpin_valueChanged(double value);
+	void on_AxisZCrossAtXSetMinimumButton_clicked(bool checked);
+	void on_AxisZCrossAtXSetZeroButton_clicked(bool checked);
+	void on_AxisZCrossAtXSetMaximumButton_clicked(bool checked);
+	void on_AxisZCrossAtYSetMinimumButton_clicked(bool checked);
+	void on_AxisZCrossAtYSetZeroButton_clicked(bool checked);
+	void on_AxisZCrossAtYSetMaximumButton_clicked(bool checked);
+	void on_AxisZAutoTicksCheck_clicked(bool checked);
+	void on_AxisZTicksStartSpin_valueChanged(double value);
+	void on_AxisZTicksDeltaSpin_valueChanged(double value);
+	void on_AxisZMinorTicksSpin_valueChanged(int value);
+	void on_AxisZTickDirectionXSpin_valueChanged(double value);
+	void on_AxisZTickDirectionYSpin_valueChanged(double value);
+	void on_AxisZTickDirectionZSpin_valueChanged(double value);
+	void on_AxisZLabelAxialRotationSlider_valueChanged(int value);
+	void on_AxisZLabelAxialRotationSpin_valueChanged(int value);
+	void on_AxisZLabelInPlaneRotationSlider_valueChanged(int value);
+	void on_AxisZLabelInPlaneRotationSpin_valueChanged(int value);
+	void on_AxisZLabelDistanceSpin_valueChanged(double value);
+	void on_AxisZTitleHOffsetSlider_valueChanged(int value);
+	void on_AxisZTitleHOffsetLeftButton_clicked(bool checked);
+	void on_AxisZTitleHOffsetCentreButton_clicked(bool checked);
+	void on_AxisZTitleHOffsetRightButton_clicked(bool checked);
+	void on_AxisZTitleAnchorCombo_currentIndexChanged(int index);
+	void on_AxisZTitleAxialRotationSlider_valueChanged(int value);
+	void on_AxisZTitleAxialRotationSpin_valueChanged(int value);
+	void on_AxisZTitleInPlaneRotationSlider_valueChanged(int value);
+	void on_AxisZTitleInPlaneRotationSpin_valueChanged(int value);
+	void on_AxisZTitleDistanceSpin_valueChanged(double value);
 	// -- Extras Tab
 	void on_ViewBoundingBoxNoneRadio_clicked(bool checked);
 	void on_ViewBoundingBoxPlaneRadio_clicked(bool checked);
@@ -359,8 +379,8 @@ class UChromaWindow : public QMainWindow
 	void on_ViewTitleScaleSpin_valueChanged(double value);
 
 	public:
-	// Update View tab
-	void updateViewTab();
+	// Update Axes tab
+	void updateAxesTab();
 
 
 	/*
@@ -371,7 +391,6 @@ class UChromaWindow : public QMainWindow
 	void on_SurfaceSliceXRadio_clicked(bool checked);
 	void on_SurfaceSliceYRadio_clicked(bool checked);
 	void on_SurfaceSliceZRadio_clicked(bool checked);
-	void on_SurfaceSliceMonitorCheck_clicked(bool checked);
 
 	public:
 	// Update Surface tab (except main view)
@@ -394,32 +413,57 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * Data
+	 * Update
 	 */
 	public:
-	// Datafile keywords
-	enum DataFileKeyword {
-		AxisAutoTicksKeyword, AxisFirstTickKeyword, AxisInvertKeyword, AxisLabelOrientationKeyword, AxisLogarithmicKeyword, AxisMinorTicksKeyword, AxisPositionKeyword, AxisStretchKeyword, AxisTickDeltaKeyword, AxisTickDirectionKeyword, AxisTitleKeyword, AxisTitleAnchorKeyword, AxisTitleOrientationKeyword, AxisVisibleKeyword,
-		BoundingBoxKeyword, BoundingBoxPlaneYKeyword,
-		ColourAlphaControlKeyword, ColourAlphaFixedKeyword, ColourCustomGradientKeyword, ColourRGBGradientAKeyword, ColourRGBGradientBKeyword, ColourHSVGradientAKeyword, ColourHSVGradientBKeyword, ColourSingleKeyword, ColourSourceKeyword,
-		DataKeyword,
-		ImageExportKeyword, InterpolateKeyword, InterpolateConstrainKeyword, InterpolateStepKeyword,
-		LabelFaceViewerKeyword, LabelScaleKeyword, LimitXKeyword, LimitYKeyword, LimitZKeyword,
-		PerspectiveKeyword,
-		SliceDirectoryKeyword, SliceKeyword,
-		TitleScaleKeyword, TransformXKeyword, TransformYKeyword, TransformZKeyword,
-		ViewMatrixXKeyword, ViewMatrixYKeyword, ViewMatrixZKeyword, ViewMatrixWKeyword,
-		nDataFileKeywords };
-	static DataFileKeyword dataFileKeyword(const char* s);
-	static const char* dataFileKeyword(DataFileKeyword dfk);
+	// Update all tabs
+	void updateAllTabs();
+	// Update title bar
+	void updateTitleBar();
+	// Update GUI after loading data
+	void updateAfterLoad();
+	// Update display data
+	void updateDisplayData();
+	// Update main display
+	void updateDisplay();
 
+
+	/*
+	 * Input File
+	 */
 	private:
 	// Whether current data has been modified
 	bool modified_;
+	// Current input file directory
+	QDir inputFileDirectory_;
 	// Current input filename
 	QString inputFile_;
-	// Root directory for datafiles
-	QDir dataFileDirectory_;
+
+	private:
+	// Read AxisBlock keywords
+	bool readAxisBlock(LineParser& parser, int axis);
+	// Read CollectionBlock keywords
+	bool readCollectionBlock(LineParser& parser, Collection* collection);
+	// Read SettingsBlock keywords
+	bool readSettingsBlock(LineParser& parser);
+	// Read SliceBlock keywords
+	bool readSliceBlock(LineParser& parser, Slice* slice, Collection* collection);
+	// Read AxisBlock keywords
+	bool readViewBlock(LineParser& parser);
+
+	public:
+	// Load input from file specified
+	bool loadInputFile(QString fileName);
+	// Save current input to file specified
+	bool saveInputFile(QString fileName);
+	// Flag data as modified and update titlebar
+	void setAsModified();
+
+
+	/*
+	 * Data
+	 */
+	private:
 	// Current image export filename
 	QString imageExportFile_;
 	// Format for exported image
@@ -428,74 +472,44 @@ class UChromaWindow : public QMainWindow
 	int imageExportWidth_, imageExportHeight_;
 	// Whether to maintain current aspect ratio on image export
 	bool imageExportMaintainAspect_;
-	// List of slices
-	List<Slice> slices_;
-	// List of data slices to display
-	List<Data2D> surfaceData_;
 	// Font file to use for viewer
 	QString viewerFont_;
+	// List of Collections
+	List<Collection> collections_;
+	// Currently-selected Collection
+	Collection* currentCollection_;
 
 	private:
+	// Add new collection
+	Collection* addCollection();
+	// Remove existing collection
+	void removeCollection(Collection* collection);
+	// Flag all surface data for regeneration
+	void regenerateAll();
 	// Recalculate tick deltas for specified axis
 	void calculateTickDeltas(int axis);
+	// Return absolute minimum transformed values over all collections
+	Vec3<double> transformedDataMinima();
+	// Return absolute maximum transformed values over all collections
+	Vec3<double> transformedDataMaxima();
 
 	public:
+	// Return first collection in list
+	Collection* collections();
 	// Clear current data
 	void clearData();
-	// Load data from file specified
-	bool loadData(QString fileName);
-	// Save current data to file specified
-	bool saveData(QString fileName);
-	// Add slice
-	Slice* addSlice(double z, QString fileName, QString title);
-	// Find slice with corresponding title
-	Slice* findSlice(QString dataName);
-	// Return number of slices with no data present
-	int nEmptySlices();
-	// Recalculate data limits
-	void calculateDataLimits();
-	// Update data transforms and calculate transform limits
-	void updateDataTransforms();
 	// Set display limits to show all available data
 	void showAllData();
-	// Flag data as modified, and update titlebar
-	void setAsModified();
-
-
-	/*
-	 * Transform
-	 */
-	private:
-	// Extreme values of raw data
-	Vec3<double> dataMin_, dataMax_;
-	// Extreme values of transformed data 
-	Vec3<double> transformMin_, transformMax_;
-	// Data limits for surface generation
-	Vec3<double> limitMin_, limitMax_;
-	// Transform for data
-	Transformer transforms_[3];
-	// Pre-transform shift value
-	Vec3<double> preTransformShift_;
-	// Post-transform shift value
-	Vec3<double> postTransformShift_;
-	// Interpolation flags
-	Vec3<bool> interpolate_, interpolateConstrained_;
-	// Interpolation step sizes
-	Vec3<double> interpolationStep_;
-
-	public:
-	// Set limits to show all data
-	void showAll(bool changeX = true, bool changeY = true, bool changeZ = true);
-	// Return minimum limit for specified axis
-	double limitMin(int axis);
-	// Return maximum limit for specified axis
-	double limitMax(int axis);
 
 
 	/*
 	 * Axes
 	 */
 	private:
+	// Data limits for surface generation
+	Vec3<double> axisMin_, axisMax_;
+	// Central coordinate of current axes
+	Vec3<double> axesCentre_;
 	// Whether to invert axes
 	Vec3<bool> axisInverted_;
 	// Whether axes should be plotted as logarithms
@@ -535,7 +549,17 @@ class UChromaWindow : public QMainWindow
 	// Font scaling for titles
 	double titleScale_;
 
+	private:
+	// Update axes
+	void updateAxes();
+
 	public:
+	// Return minimum limit for specified axis
+	double axisMin(int axis);
+	// Return maximum limit for specified axis
+	double axisMax(int axis);
+	// Return central coordinate of current axes
+	Vec3<double> axesCentre();
 	// Return whether axis is inverted
 	bool axisInverted(int axis);
 	// Return whether axis is logarithmic
@@ -556,50 +580,6 @@ class UChromaWindow : public QMainWindow
 	double labelScale();
 	// Return font scaling for titles
 	double titleScale();
-
-
-	/*
-	 * Colours
-	 */
-	public:
-	// Available colourscale sources
-	enum ColourSource { SingleColourSource, RGBGradientSource, HSVGradientSource, CustomGradientSource, nColourSources };
-	// Alpha control options
-	enum AlphaControl { OwnAlpha, FixedAlpha, nAlphaControls };
-
-	private:
-	// Points for SingleColour, RGBGradient and HSVGradient sources
-	ColourScalePoint colourSinglePoint_;
-	ColourScalePoint colourRGBGradientAPoint_, colourRGBGradientBPoint_;
-	ColourScalePoint colourHSVGradientAPoint_, colourHSVGradientBPoint_;
-	// ColourScale used by surface
-	ColourScale colourScale_;
-	// Custom ColourScale source
-	ColourScale customColourScale_;
-	// Current colourscale source to use
-	ColourSource colourSource_;
-	// Current alpha control
-	AlphaControl alphaControl_;
-	// Fixed alpha value (for FixedAlpha option)
-	int fixedAlpha_;
-
-	public:
-	// Update colour scale
-	void updateColourScale();
-
-
-	/*
-	 * Surface
-	 */
-	private:
-	// Central coordinate of surface
-	Vec3<double> surfaceCentre_;
-
-	public:
-	// Update surface data after data change
-	void updateSurface(bool dataHasChanged = true);
-	// Return central coordinate of surface
-	Vec3<double> surfaceCentre();
 
 
 	/*

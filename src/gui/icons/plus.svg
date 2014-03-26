@@ -38,11 +38,11 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:window-width="1920"
-     inkscape:window-height="1152"
+     inkscape:window-height="1140"
      id="namedview3022"
      showgrid="false"
      inkscape:zoom="3.337544"
-     inkscape:cx="-58.713157"
+     inkscape:cx="-110.54768"
      inkscape:cy="50.11536"
      inkscape:window-x="1920"
      inkscape:window-y="25"
@@ -192,16 +192,9 @@
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(1.2327317,0,0,1.2327317,210.21173,-13.704323)" />
   </defs>
-  <rect
-     style="fill:#000000;fill-opacity:1;stroke:#000056;stroke-width:0.10000001;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-     id="rect2990"
-     width="97.56926"
-     height="97.56926"
-     x="1.2153702"
-     y="1.2153702" />
   <text
      xml:space="preserve"
-     style="font-size:124.04289246px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:url(#linearGradient3790);stroke-width:5;stroke-miterlimit:4;stroke-dasharray:none;font-family:Sans"
+     style="font-size:124.04289246000000446px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00008f;fill-opacity:1;stroke:url(#linearGradient3790);stroke-width:5;stroke-miterlimit:4;stroke-dasharray:none;font-family:Sans"
      x="-1.9677283"
      y="88.885078"
      id="text3780"
@@ -211,5 +204,5 @@
        id="tspan3782"
        x="-1.9677283"
        y="88.885078"
-       style="font-weight:bold;fill:#ffffff;fill-opacity:1;stroke:url(#linearGradient3790);stroke-width:5;stroke-miterlimit:4;stroke-dasharray:none">+</tspan></text>
+       style="font-weight:bold;fill:#00008f;fill-opacity:1;stroke:url(#linearGradient3790);stroke-width:5;stroke-miterlimit:4;stroke-dasharray:none">+</tspan></text>
 </svg>

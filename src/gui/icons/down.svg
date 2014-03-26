@@ -14,8 +14,8 @@
    width="100"
    height="100"
    id="svg2"
-   inkscape:version="0.48.3.1 r9886"
-   sodipodi:docname="up.svg">
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="down.svg">
   <metadata
      id="metadata3024">
     <rdf:RDF>
@@ -24,7 +24,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -37,15 +37,15 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1366"
-     inkscape:window-height="709"
+     inkscape:window-width="1920"
+     inkscape:window-height="1140"
      id="namedview3022"
      showgrid="false"
      inkscape:zoom="3.337544"
-     inkscape:cx="-12.271822"
+     inkscape:cx="-64.106345"
      inkscape:cy="50.11536"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:window-x="1920"
+     inkscape:window-y="25"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
   <defs
@@ -148,16 +148,9 @@
        xlink:href="#linearGradient3189-6"
        inkscape:collect="always" />
   </defs>
-  <rect
-     style="fill:#000000;fill-opacity:1;stroke:#000056;stroke-width:0.10000001;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-     id="rect2990"
-     width="97.56926"
-     height="97.56926"
-     x="1.2153702"
-     y="1.2153702" />
   <path
      inkscape:connector-curvature="0"
-     style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:url(#radialGradient3136);stroke-width:4.67425442;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dashoffset:0"
+     style="fill:#00008f;fill-opacity:1;fill-rule:evenodd;stroke:url(#radialGradient3136);stroke-width:4.67425441999999958;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dashoffset:0"
      id="path3176"
      d="M 40.870599,39.870328 20.712874,37.089163 50.000003,91.433195 79.287126,37.089163 59.713687,39.870328 c 0,-2.146518 -0.212598,-29.212729 0,-31.3035229 l -18.843088,0 0,31.3035229 z" />
 </svg>

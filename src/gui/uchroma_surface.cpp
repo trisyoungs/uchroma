@@ -1,7 +1,7 @@
 /*
 	*** Main Window - Surface 
 	*** src/gui/uchroma_surface.cpp
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -29,7 +29,7 @@ void UChromaWindow::on_SurfaceSliceNoneRadio_clicked(bool checked)
 {
 	if (refreshing_) return;
 	sliceAxis_ = -1;
-	updateSurface(false);
+	updateDisplay();
 	updateSurfaceTab();
 	updateSlicesTab();
 	updateSliceMonitor();
@@ -39,7 +39,7 @@ void UChromaWindow::on_SurfaceSliceXRadio_clicked(bool checked)
 {
 	if (refreshing_) return;
 	sliceAxis_ = 0;
-	updateSurface(false);
+	updateDisplay();
 	updateSurfaceTab();
 	updateSlicesTab();
 	updateSliceMonitor();
@@ -49,7 +49,7 @@ void UChromaWindow::on_SurfaceSliceYRadio_clicked(bool checked)
 {
 	if (refreshing_) return;
 	sliceAxis_ = 1;
-	updateSurface(false);
+	updateDisplay();
 	updateSurfaceTab();
 	updateSlicesTab();
 	updateSliceMonitor();
@@ -59,21 +59,10 @@ void UChromaWindow::on_SurfaceSliceZRadio_clicked(bool checked)
 {
 	if (refreshing_) return;
 	sliceAxis_ = 2;
-	updateSurface(false);
+	updateDisplay();
 	updateSurfaceTab();
 	updateSlicesTab();
 	updateSliceMonitor();
-}
-
-void UChromaWindow::on_SurfaceSliceMonitorCheck_clicked(bool checked)
-{
-	if (refreshing_) return;
-	if (checked)
-	{
-		updateSliceMonitor();
-		sliceMonitorDialog_.show();
-	}
-	else sliceMonitorDialog_.hide();
 }
 
 // Update Surface tab (except main view)

@@ -31,7 +31,6 @@
 #include "base/dnchar.h"
 #include <QtCore/QString>
 
-
 // Forward declarations
 class TreeNode;
 class ScopeNode;
@@ -68,14 +67,20 @@ class Tree
 	private:
 	// Flag to indicate that recent failure of this token is known and we should continue
 	Command::Function acceptedFail_;
+	// Flag to specify that missing variables should be generated
+	bool generateMissingVariables_;
 	
 	private:
 	// Reset Tree, ready for new statement(s) to be added
 	void reset();
-	// Clear all data contained in the Tree
-	void clear();
 
 	public:
+	// Clear all data contained in the Tree
+	void clear();
+	// Set whether missing variables should be generated
+	void setGenerateMissingVariables(bool generate);
+	// Return whether missing variables will be generated
+	bool generateMissingVariables();
 	// Set commands in Tree
 	bool setCommands(QString commands);
 	// Add variable to global Tree scope
@@ -110,6 +115,8 @@ class Tree
 	VTypes::DataType checkBinaryOperatorTypes(Command::Function func, VTypes::DataType type1, VTypes::DataType type2);
 	
 	public:
+	// Return root ScopeNode
+	ScopeNode* rootNode();
 	// Create a new path on the stack with the specified base 'variable'
 	TreeNode *createPath(TreeNode *var);
 	// Expand topmost path

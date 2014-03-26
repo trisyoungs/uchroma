@@ -14,7 +14,7 @@
    width="100"
    height="100"
    id="svg2"
-   inkscape:version="0.48.3.1 r9886"
+   inkscape:version="0.48.4 r9939"
    sodipodi:docname="left.svg">
   <metadata
      id="metadata3024">
@@ -36,15 +36,15 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1366"
-     inkscape:window-height="709"
+     inkscape:window-width="1920"
+     inkscape:window-height="1140"
      id="namedview3022"
      showgrid="false"
      inkscape:zoom="3.337544"
-     inkscape:cx="-12.271822"
+     inkscape:cx="-64.106345"
      inkscape:cy="50.11536"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:window-x="1920"
+     inkscape:window-y="25"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
   <defs
@@ -147,16 +147,9 @@
        xlink:href="#linearGradient3189-6"
        inkscape:collect="always" />
   </defs>
-  <rect
-     style="fill:#000000;fill-opacity:1;stroke:#000056;stroke-width:0.10000001;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-     id="rect2990"
-     width="97.56926"
-     height="97.56926"
-     x="1.2153702"
-     y="1.2153702" />
   <path
      inkscape:connector-curvature="0"
-     style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:url(#radialGradient3136);stroke-width:4.67425441999999958;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dashoffset:0"
+     style="fill:#00008f;fill-opacity:1;fill-rule:evenodd;stroke:url(#radialGradient3136);stroke-width:4.67425441999999958;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dashoffset:0"
      id="path3176"
      d="M 60.129672,40.870599 62.910837,20.712874 8.5668052,50.000003 62.910837,79.287126 60.129672,59.713687 c 2.146518,0 29.212729,-0.212598 31.303523,0 l 0,-18.843088 -31.303523,0 z" />
 </svg>

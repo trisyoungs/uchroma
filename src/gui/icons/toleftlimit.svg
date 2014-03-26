@@ -36,16 +36,16 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1024"
-     inkscape:window-height="778"
+     inkscape:window-width="1920"
+     inkscape:window-height="1140"
      id="namedview3022"
      showgrid="false"
      inkscape:zoom="1.668772"
-     inkscape:cx="-34.557186"
+     inkscape:cx="-138.22623"
      inkscape:cy="14.919132"
-     inkscape:window-x="2403"
-     inkscape:window-y="268"
-     inkscape:window-maximized="0"
+     inkscape:window-x="1920"
+     inkscape:window-y="25"
+     inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
   <defs
      id="defs4">
@@ -178,13 +178,6 @@
        fy="48.853989"
        r="42.138134" />
   </defs>
-  <rect
-     style="fill:#000000;fill-opacity:1;stroke:#000056;stroke-width:0.10000001;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-     id="rect2990"
-     width="97.56926"
-     height="97.56926"
-     x="1.2153702"
-     y="1.2153702" />
   <g
      id="g3069"
      transform="translate(14.017888,0)">
@@ -194,12 +187,12 @@
        height="88.211868"
        width="23.336363"
        id="rect3000"
-       style="fill:#ffffff;fill-opacity:1;stroke:url(#linearGradient3073);stroke-width:4.67399979;stroke-miterlimit:4;stroke-dasharray:none" />
+       style="fill:#00008f;fill-opacity:1;stroke:url(#linearGradient3073);stroke-width:4.67399978999999988;stroke-miterlimit:4;stroke-dasharray:none" />
     <path
        sodipodi:nodetypes="cccccc"
        d="M 63.720139,44.048727 65.526155,30.908311 30.236556,50.000002 65.526155,69.091689 63.720139,56.332158 c 0,-4.094477 0,-8.188954 0,-12.283431 z"
        id="path3176-1"
-       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:url(#radialGradient3075);stroke-width:4.67399979;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:#00008f;fill-opacity:1;fill-rule:evenodd;stroke:url(#radialGradient3075);stroke-width:4.67399978999999988;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        inkscape:connector-curvature="0" />
   </g>
 </svg>

@@ -1,7 +1,7 @@
 /*
 	*** Two-Dimensional Data
 	*** src/base/data2d.h
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -57,10 +57,10 @@ class Data2D : public ListItem<Data2D>
 	private:
 	// Resize arrays
 	void resize(int size);
-	// Reset arrays to zero
-	void reset();
 	
 	public:
+	// Reset arrays to zero
+	void reset();
 	// Initialise arrays to specified size
 	void initialise(int size);
 	// Return current array size

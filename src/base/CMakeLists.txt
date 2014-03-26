@@ -1,4 +1,5 @@
 add_library(base
+collection.cpp
 colourscale.cpp
 data2d.cpp
 dnchar.cpp
@@ -8,6 +9,7 @@ nxs.cpp
 slice.cpp
 sysfunc.cpp
 transformer.cpp
+collection.h
 colourscale.h
 data2d.h
 dnchar.h

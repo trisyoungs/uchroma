@@ -34,9 +34,9 @@ class Variable :  public TreeNode
 	// Constructor / Destructor
 	Variable();
 	virtual ~Variable();
-	// List pointers (old style)
 	// List pointers (old style - need to keep these here and not subclass ListItem since Variable needs to subclass this)
 	Variable* prev, *next;
+
 
 	/*
 	// Variable Character
@@ -60,6 +60,7 @@ class Variable :  public TreeNode
 	virtual void reset() = 0;
 	// Search accessors (if any) available for node
 	virtual StepNode *findAccessor(const char* s, TreeNode* arglist = 0);
+
 
 	/*
 	// Inherited Virtuals

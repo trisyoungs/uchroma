@@ -38,12 +38,12 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:window-width="1920"
-     inkscape:window-height="1152"
+     inkscape:window-height="1140"
      id="namedview3022"
      showgrid="false"
-     inkscape:zoom="0.1475"
-     inkscape:cx="3033.8329"
-     inkscape:cy="-2187.5805"
+     inkscape:zoom="2.36"
+     inkscape:cx="128.93824"
+     inkscape:cy="19.107058"
      inkscape:window-x="1920"
      inkscape:window-y="25"
      inkscape:window-maximized="1"
@@ -194,13 +194,6 @@
        fy="48.853989"
        r="42.138134" />
   </defs>
-  <rect
-     style="fill:#000000;fill-opacity:1;stroke:#000056;stroke-width:0.10000001;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-     id="rect2990"
-     width="97.56926"
-     height="97.56926"
-     x="1.2153702"
-     y="1.2153702" />
   <g
      id="g3795"
      transform="translate(0,24)">
@@ -209,14 +202,14 @@
        inkscape:connector-curvature="0"
        id="path3002"
        d="m 65.88983,48.516949 c 0,6.260007 -0.327309,10.407973 -0.327309,16.029751 0,5.056843 -16.772294,6.63974 -23.295572,6.63974 -6.523278,0 1.952834,-15.199526 -2.322066,-19.301897 -4.274901,-4.102371 -21.300815,2.892413 -21.300815,-3.367594 0,-12.520014 10.576324,-22.669491 23.622881,-22.669491 13.046557,0 23.622881,10.149477 23.622881,22.669491 z"
-       style="fill:#ffffff;fill-opacity:1;stroke:#118c00;stroke-width:4.36190557000000023;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dashoffset:0"
+       style="fill:#646464;fill-opacity:1;stroke:#118c00;stroke-width:4.36190557000000023;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dashoffset:0"
        transform="matrix(1,0,0,1.1121495,7.7330511,-43.061743)" />
     <path
        sodipodi:nodetypes="ssssss"
        inkscape:connector-curvature="0"
        id="path3002-2"
        d="m 64.298806,11.234327 c 0,4.261231 -0.09663,23.004916 -0.09663,26.783427 0,3.826784 -9.204172,-2.03011 -13.196838,-2.03011 -7.985332,0 -15.623977,-16.230855 -15.623977,-24.753317 0,-8.5224623 6.473391,-15.4312831 14.458723,-15.4312831 7.985333,0 14.458724,6.9088208 14.458722,15.4312831 z"
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dashoffset:0" />
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dashoffset:0" />
   </g>
   <path
      inkscape:connector-curvature="0"

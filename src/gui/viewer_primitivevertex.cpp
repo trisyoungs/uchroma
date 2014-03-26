@@ -1,7 +1,7 @@
 /*
 	*** Primitive Vertex Generation Functions
 	*** src/render/viewer_primitivevertex.cpp
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 

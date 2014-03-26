@@ -1,7 +1,7 @@
 /*
 	*** Slice
 	*** src/base/slice.h
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -43,32 +43,44 @@ class Slice : public ListItem<Slice>
 	Slice(const Slice& source);
 	// Assignment operator
 	void operator=(const Slice& source);
+	// Data Sources
+	enum DataSource { FileSource, InternalSource, nDataSources };
+	// Convert text string to DataSource
+	static DataSource dataSource(const char* s);
+	// Convert DataSource to text string
+	static const char* dataSource(DataSource kwd);
 
 
 	/*
 	// Data
 	*/
 	private:
+	// Source of data
+	DataSource dataSource_;
 	// Source file, if one is specified (not including path)
 	QString sourceFileName_;
-	// Whether a file has been associated to this slice
-	bool fileAssociated_;
-	// Data name
-	QString dataName_;
+// 	// Whether a file has been associated to this slice
+// 	bool fileAssociated_;
+	// Title
+	QString title_;
 	// Data
 	Data2D data_;
 	// Transformed data
 	Data2D transformedData_;
 
 	public:
+	// Set source of data
+	void setDataSource(Slice::DataSource source);
+	// Return source of data
+	Slice::DataSource dataSource();
 	// Set source filename
 	void setSourceFileName(QString fileName);
 	// Return source filename
 	QString sourceFileName();
-	// Set data name
-	void setDataName(QString dataName);
-	// Return data name
-	QString dataName();
+	// Set title
+	void setTitle(QString title);
+	// Return title
+	QString title();
 	// Load data from file
 	bool loadData(QDir sourceDir);
 	// Return data

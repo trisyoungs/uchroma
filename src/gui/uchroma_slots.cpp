@@ -1,7 +1,7 @@
 /*
 	*** Main Window - Slots
 	*** src/gui/uchroma_slots.cpp
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -48,8 +48,11 @@ void UChromaWindow::on_actionFileNew_triggered(bool checked)
 		}
 	}
 
+	// Clear data and create new, empty collection ready for use
 	clearData();
-	updateSurface();
+	currentCollection_ = collections_.add();
+	ui.MainView->addSurfacePrimitive(&currentCollection_->surfacePrimitive());
+
 	updateAfterLoad();
 }
 
@@ -67,11 +70,13 @@ void UChromaWindow::on_actionFileLoad_triggered(bool checked)
 		}
 	}
 
-	QString fileName = QFileDialog::getOpenFileName(this, "Choose file to load", dataFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
+	QString fileName = QFileDialog::getOpenFileName(this, "Choose file to load", inputFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
 	if (fileName.isEmpty()) return;
+	inputFileDirectory_ = fileName;
 
+	// Clear existing data and load input file
 	clearData();
-	loadData(fileName);
+	loadInputFile(fileName);
 	updateAfterLoad();
 }
 
@@ -80,49 +85,48 @@ void UChromaWindow::on_actionFileSave_triggered(bool checked)
 	// Has an input filename already been chosen?
 	if (inputFile_.isEmpty())
 	{
-		QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
+		QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", inputFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
 		if (fileName.isEmpty()) return;
 		inputFile_ = fileName;
 	}
 
-	if (saveData(inputFile_)) modified_ = false;
+	if (saveInputFile(inputFile_)) modified_ = false;
 	updateTitleBar();
 }
 
 void UChromaWindow::on_actionFileSaveAs_triggered(bool checked)
 {
 	// Has an input filename already been chosen?
-	QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", dataFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
+	QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", inputFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
 	if (fileName.isEmpty()) return;
 	
 	inputFile_ = fileName;
-	if (saveData(inputFile_)) modified_ = false;
+	if (saveInputFile(inputFile_)) modified_ = false;
 	updateTitleBar();
 }
 
 void UChromaWindow::on_actionFileImportData_triggered(bool checked)
 {
+	// Check for valid current collection
+	if (!currentCollection_) return;
+
 	// Raise the Data Import dialog
-	bool fitData = slices_.nItems() == 0;
+	bool fitData = currentCollection_->nSlices() == 0;
 	bool result = dataImportDialog_.import();
 	if (!result) return;
 
 	// Loop over list of imported slices and copy them to our local list
-	for (Slice* slice = dataImportDialog_.importedSlices(); slice != NULL; slice = slice->next)
-	{
-		Slice* newSlice = slices_.add();
-		(*newSlice) = (*slice);
-	}
+	for (Slice* slice = dataImportDialog_.importedSlices(); slice != NULL; slice = slice->next) currentCollection_->addSlice(slice);
 
 	// Update data limits and file list
-	calculateDataLimits();
-	if (fitData) showAll();
-	updateSourceDataTab();
-	updateTransformTab();
+	currentCollection_->calculateDataLimits();
+
+	updateCollectionDataTab();
+	updateCollectionTransformTab();
 	setAsModified();
 	
-	// Need to update surface
-	updateSurface();
+	// Need to update display
+	updateDisplay();
 }
 
 void UChromaWindow::on_actionFileSaveImage_triggered(bool checked)
@@ -180,6 +184,31 @@ void UChromaWindow::on_actionViewReset_triggered(bool checked)
 }
 
 /*
+ * Tools Menu
+ */
+void UChromaWindow::on_actionToolsSliceMonitor_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked)
+	{
+		updateSliceMonitor();
+		sliceMonitorDialog_.show();
+	}
+	else sliceMonitorDialog_.hide();
+}
+
+void UChromaWindow::on_actionToolsFitWindow_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked)
+	{
+// 		updateSliceMonitor();
+		fitDialog_.show();
+	}
+	else fitDialog_.hide();
+}
+
+/*
  * Settings Menu
  */
 
@@ -193,28 +222,4 @@ void UChromaWindow::on_actionSettingsChooseFont_triggered(bool checked)
 		ui.MainView->setupFont(viewerFont_);
 		saveSettings();
 	}
-}
-
-/*
- * Colours
- */
-
-// Update colour scale
-void UChromaWindow::updateColourScale()
-{
-	colourScale_.clear();
-	if (colourSource_ == UChromaWindow::SingleColourSource) colourScale_.addPoint(0.0, colourSinglePoint_.colour());
-	else if (colourSource_ == UChromaWindow::RGBGradientSource)
-	{
-		colourScale_.setUseHSV(false);
-		colourScale_.addPoint(colourRGBGradientAPoint_.value(), colourRGBGradientAPoint_.colour());
-		colourScale_.addPoint(colourRGBGradientBPoint_.value(), colourRGBGradientBPoint_.colour());
-	}
-	else if (colourSource_ == UChromaWindow::HSVGradientSource)
-	{
-		colourScale_.setUseHSV(true);
-		colourScale_.addPoint(colourHSVGradientAPoint_.value(), colourHSVGradientAPoint_.colour());
-		colourScale_.addPoint(colourHSVGradientBPoint_.value(), colourHSVGradientBPoint_.colour());
-	}
-	else if (colourSource_ == UChromaWindow::CustomGradientSource) colourScale_ = customColourScale_;
 }

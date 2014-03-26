@@ -1,7 +1,7 @@
 /*
 	*** Line Parsing Routines
 	*** src/base/lineparser.cpp
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 

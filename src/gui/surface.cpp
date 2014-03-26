@@ -1,7 +1,7 @@
 /*
 	*** Surface Generation
 	*** src/gui/surface.cpp
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -21,8 +21,8 @@
 
 #include "gui/uchroma.h"
 
-// Update surface data after data change
-void UChromaWindow::updateSurface(bool dataHasChanged)
+// Update axes primitives
+ void UChromaWindow::updateAxes()
 {
 	QString s;
 	FTBBox boundingBox;
@@ -32,22 +32,22 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 	Vec3<double> u, tickDir;
 	Matrix labelTransform, titleTransform;
 
-	// Determine surface center and Y clip limits
+	// Determine central coordinate within current axes and the Y clip limits
 	for (int n=0; n<3; ++n)
 	{
-		if (axisLogarithmic_[n]) surfaceCentre_[n] = (axisInverted_[n] ? log10(limitMax_[n]/limitMin_[n]) : log10(limitMax_[n]*limitMin_[n])) * 0.5 * axisStretch_[n];
-		else surfaceCentre_[n] = (limitMax_[n]+limitMin_[n]) * 0.5 * axisStretch_[n];
+		if (axisLogarithmic_[n]) axesCentre_[n] = (axisInverted_[n] ? log10(axisMax_[n]/axisMin_[n]) : log10(axisMax_[n]*axisMin_[n])) * 0.5 * axisStretch_[n];
+		else axesCentre_[n] = (axisMax_[n]+axisMin_[n]) * 0.5 * axisStretch_[n];
 	}
-	if (axisLogarithmic_.y) ui.MainView->setYClip(log10(limitMin_.y) * axisStretch_.y, log10(limitMax_.y) * axisStretch_.y);
-	else ui.MainView->setYClip(limitMin_.y * axisStretch_.y, limitMax_.y * axisStretch_.y);
+	if (axisLogarithmic_.y) ui.MainView->setYClip(log10(axisMin_.y) * axisStretch_.y, log10(axisMax_.y) * axisStretch_.y);
+	else ui.MainView->setYClip(axisMin_.y * axisStretch_.y, axisMax_.y * axisStretch_.y);
 	
 	// Set basic extreme coordinates for axes - actual limits on axes will be set in following loop
 	for (int axis=0; axis < 3; ++axis)
 	{
 		for (int n=0; n<3; ++n)
 		{
-			if (axisLogarithmic_[n]) axisCoordMin_[axis].set(n, (axisInverted_[n] ? log10(limitMax_[n]/axisPosition_[axis][n]) : log10(axisPosition_[axis][n])) * axisStretch_[n]);
-			else axisCoordMin_[axis].set(n, (axisInverted_[n] ? limitMax_[n] - axisPosition_[axis][n] : axisPosition_[axis][n]) * axisStretch_[n]);
+			if (axisLogarithmic_[n]) axisCoordMin_[axis].set(n, (axisInverted_[n] ? log10(axisMax_[n]/axisPosition_[axis][n]) : log10(axisPosition_[axis][n])) * axisStretch_[n]);
+			else axisCoordMin_[axis].set(n, (axisInverted_[n] ? axisMax_[n] - axisPosition_[axis][n] : axisPosition_[axis][n]) * axisStretch_[n]);
 		}
 		axisCoordMax_[axis] = axisCoordMin_[axis];
 	}
@@ -85,13 +85,13 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 		if (axisLogarithmic_[axis])
 		{
 			// Set axis min/max coordinates
-			axisCoordMin_[axis].set(axis, (axisInverted_[axis] ? log10(limitMax_[axis] / limitMin_[axis]) : log10(limitMin_[axis])) * axisStretch_[axis]);
-			axisCoordMax_[axis].set(axis, (axisInverted_[axis] ? log10(limitMax_[axis] / limitMax_[axis]) : log10(limitMax_[axis])) * axisStretch_[axis]);
+			axisCoordMin_[axis].set(axis, (axisInverted_[axis] ? log10(axisMax_[axis] / axisMin_[axis]) : log10(axisMin_[axis])) * axisStretch_[axis]);
+			axisCoordMax_[axis].set(axis, (axisInverted_[axis] ? log10(axisMax_[axis] / axisMax_[axis]) : log10(axisMax_[axis])) * axisStretch_[axis]);
 
 			// For the log axis, the associated surface data coordinate will already be in log form
-			if (limitMax_[axis] < 0.0)
+			if (axisMax_[axis] < 0.0)
 			{
-				msg.print("Axis range is inappropriate for a log scale (%f < x < %f). Axis will not be drawn.\n", limitMin_[axis], limitMax_[axis]);
+				msg.print("Axis range is inappropriate for a log scale (%f < x < %f). Axis will not be drawn.\n", axisMin_[axis], axisMax_[axis]);
 				return;
 			}
 
@@ -99,8 +99,8 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 			ui.MainView->addAxisLine(axis, axisCoordMin_[axis], axisCoordMax_[axis]);
 
 			// Grab logged min/max values for convenience, enforcing sensible minimum
-			double axisMin = log10(limitMin_[axis] <= 0.0 ? 1.0e-10 : limitMin_[axis]);
-			double axisMax = log10(limitMax_[axis]);
+			double axisMin = log10(axisMin_[axis] <= 0.0 ? 1.0e-10 : axisMin_[axis]);
+			double axisMax = log10(axisMax_[axis]);
 
 			// Plot tickmarks - Start at floored (ceiling'd) integer of logAxisMin (logAxisMax), and go from there.
 			int nMinorTicks = axisMinorTicks_[axis] > 8 ? 8 : axisMinorTicks_[axis];
@@ -111,10 +111,10 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 			while (true)
 			{
 				// Check break condition
-				if (value > limitMax_[axis]) break;
+				if (value > axisMax_[axis]) break;
 
 				// If the current value is in range, plot a tick
-				u[axis] = (axisInverted_[axis] ? log10(limitMax_[axis]/value): log10(value)) * axisStretch_[axis];
+				u[axis] = (axisInverted_[axis] ? log10(axisMax_[axis]/value): log10(value)) * axisStretch_[axis];
 				if (value >= axisMin)
 				{
 					// Tick mark
@@ -143,16 +143,16 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 
 			// Add axis title
 			u = axisCoordMin_[axis];
-			value = limitMin_[axis] + (limitMax_[axis] - limitMin_[axis]) * axisTitleOrientation_[axis].w;
-			u.set(axis, (axisInverted_[axis] ? log10(limitMax_[axis]/value) : log10(value)) * axisStretch_[axis]);
+			value = axisMin_[axis] + (axisMax_[axis] - axisMin_[axis]) * axisTitleOrientation_[axis].w;
+			u.set(axis, (axisInverted_[axis] ? log10(axisMax_[axis]/value) : log10(value)) * axisStretch_[axis]);
 			u += tickDir * axisTitleOrientation_[axis].z;
 			ui.MainView->addAxisText(axis, axisTitle_[axis], u, titleTransform, axisTitleAnchor_[axis]);
 		}
 		else
 		{
 			// Set axis min/max coordinates
-			axisCoordMin_[axis].set(axis, (axisInverted_[axis] ? limitMax_[axis] : limitMin_[axis]) * axisStretch_[axis]);
-			axisCoordMax_[axis].set(axis, (axisInverted_[axis] ? limitMin_[axis] : limitMax_[axis]) * axisStretch_[axis]);
+			axisCoordMin_[axis].set(axis, (axisInverted_[axis] ? axisMax_[axis] : axisMin_[axis]) * axisStretch_[axis]);
+			axisCoordMax_[axis].set(axis, (axisInverted_[axis] ? axisMin_[axis] : axisMax_[axis]) * axisStretch_[axis]);
 		
 			// Calculate autoticks if necessary
 			if (axisAutoTicks_[axis]) calculateTickDeltas(axis);
@@ -161,18 +161,18 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 			ui.MainView->addAxisLine(axis, axisCoordMin_[axis], axisCoordMax_[axis]);
 
 			// Check tickDelta
-			if (((limitMax_[axis]-limitMin_[axis]) / axisTickDelta_[axis]) > 1e6) return;
+			if (((axisMax_[axis]-axisMin_[axis]) / axisTickDelta_[axis]) > 1e6) return;
 
 			// Plot tickmarks - maximum of 100 minor tickmarks between major lines
 			int count = 0;
 			delta = axisTickDelta_[axis] / (axisMinorTicks_[axis]+1);
 			value = axisFirstTick_[axis];
 			u = axisCoordMin_[axis];
-			u.set(axis, (axisInverted_[axis] ? (limitMax_[axis] - axisFirstTick_[axis]) + limitMin_[axis]: axisFirstTick_[axis]) * axisStretch_[axis]);
-			while (value <= limitMax_[axis])
+			u.set(axis, (axisInverted_[axis] ? (axisMax_[axis] - axisFirstTick_[axis]) + axisMin_[axis]: axisFirstTick_[axis]) * axisStretch_[axis]);
+			while (value <= axisMax_[axis])
 			{
-				// Draw tick here, only if value >= limitMin_
-				if (value >= limitMin_[axis])
+				// Draw tick here, only if value >= axisMin_
+				if (value >= axisMin_[axis])
 				{
 					if (count %(axisMinorTicks_[axis]+1) == 0)
 					{
@@ -194,112 +194,21 @@ void UChromaWindow::updateSurface(bool dataHasChanged)
 
 			// Add axis title
 			u = axisCoordMin_[axis];
-			value = limitMin_[axis] + (limitMax_[axis] - limitMin_[axis]) * axisTitleOrientation_[axis].w;
-			u.set(axis, (axisInverted_[axis] ? (limitMax_[axis] - value) + limitMin_[axis]: value) * axisStretch_[axis]);
+			value = axisMin_[axis] + (axisMax_[axis] - axisMin_[axis]) * axisTitleOrientation_[axis].w;
+			u.set(axis, (axisInverted_[axis] ? (axisMax_[axis] - value) + axisMin_[axis]: value) * axisStretch_[axis]);
 			u += tickDir * axisTitleOrientation_[axis].z;
 			ui.MainView->addAxisText(axis, axisTitle_[axis], u, titleTransform, axisTitleAnchor_[axis]);
 		}
 	}
 
-	// Reconstruct surface
-	if (dataHasChanged)
-	{
-		// Clear existing display slices
-		surfaceData_.clear();
-		double x, y;
-
-		// Loop over slices, apply any transforms (X or Y) and check limits
-		Slice* slice = axisInverted_.z ? slices_.last() : slices_.first();
-		while (slice)
-		{
-			// Z
-			double z = slice->transformedData().z();
-			// -- Is the transformed Z value within range?
-			if ((z < limitMin_.z) || (z > limitMax_.z))
-			{
-				slice = axisInverted_.z ? slice->prev : slice->next;
-				continue;
-			}
-			if (axisInverted_.z && axisLogarithmic_.z) z = log10(limitMax_[n]/z);
-			else if (axisInverted_.z) z = (limitMax_.z - z) + limitMin_.z;
-			else if (axisLogarithmic_.z) z = log10(z);
-
-			// Add new item to surfaceData_ array
-			Data2D* surfaceSlice = surfaceData_.add();
-			surfaceSlice->setZ(z * axisStretch_.z);
-
-			// Copy / interpolate arrays
-			Array<double> array[2];
-			if (interpolate_.x)
-			{
-				slice->transformedData().interpolate(interpolateConstrained_.x);
-				double x = limitMin_.x;
-				while (x <= limitMax_.x)
-				{
-					array[0].add(x);
-					array[1].add(slice->transformedData().interpolated(x));
-					x += interpolationStep_.x;
-				}
-			}
-			else
-			{
-				array[0] = slice->transformedData().arrayX();
-				array[1] = slice->transformedData().arrayY();
-			}
-
-			// Add data to surfaceSlice, obeying defined x-limits
-			if (axisInverted_.x) for (int n=array[0].nItems()-1; n >= 0; --n)
-			{
-				x = array[0].value(n);
-				if ((x < limitMin_.x) || (x > limitMax_.x)) continue;
-				if (axisLogarithmic_.x) x = log10(limitMax_.x / x);
-				else x = (limitMax_.x - x) + limitMin_.x;
-				x *= axisStretch_.x;
-				y = array[1].value(n);
-				if (axisLogarithmic_.y) y = (axisInverted_.y ? log10(limitMax_.y / y) : log10(y));
-				else if (axisInverted_.y) y = (limitMax_.y - y) + limitMin_.y;
-				y *= axisStretch_.y;
-				surfaceSlice->addPoint(x, y);
-			}
-			else for (int n=0; n<array[0].nItems(); ++n)
-			{
-				x = array[0].value(n);
-				if ((x < limitMin_.x) || (x > limitMax_.x)) continue;
-				if (axisLogarithmic_.x) x = log10(x);
-				x *= axisStretch_.x;
-				y = array[1].value(n);
-				if (axisLogarithmic_.y)
-				{
-					if (y < 0.0) y = 1.0e-10;
-					else y = (axisInverted_.y ? log10(limitMax_.y / y) : log10(y));
-				}
-				else if (axisInverted_.y) y = (limitMax_.y - y) + limitMin_.y;
-				y *= axisStretch_.y;
-				surfaceSlice->addPoint(x, y);
-			}
-
-			// Move to next Z slice
-			slice = axisInverted_.z ? slice->prev : slice->next;
-		}
-	}
-
-	// Create temporary colourScale_
-	ColourScale scale = colourScale_;
-	if (alphaControl_ == UChromaWindow::FixedAlpha) scale.setAllAlpha(fixedAlpha_);
-
-	// Update surface GL object
-	ui.MainView->createSurface(scale, axisStretch_.y);
-
 	// Setup Bounding Box
 	ui.MainView->createBoundingBox(boundingBox_, axisLogarithmic_.y ? log10(boundingBoxPlaneY_) : boundingBoxPlaneY_);
 
 	ui.MainView->update();
-
-	ui.NTrianglesLabel->setText("NTriangles: " + QString::number(ui.MainView->surfaceNTriangles()));
 }
 
 // Return central coordinate of surface
-Vec3<double> UChromaWindow::surfaceCentre()
+Vec3<double> UChromaWindow::axesCentre()
 {
-	return surfaceCentre_;
+	return axesCentre_;
 }

@@ -1,7 +1,7 @@
 /*
 	*** Scene Rendering Functions (User)
 	*** src/gui/viewer_user.cpp
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -26,7 +26,6 @@
 void Viewer::createPrimitives()
 {
 	// Setup primitives
-	surfacePrimitive_.setColourData(true);
 	slicePrimitive_.setNoInstances();
 	slicePrimitiveBox_.setNoInstances();
 	slicePrimitiveBox_.setType(GL_LINES);
@@ -37,9 +36,6 @@ void Viewer::createPrimitives()
 		axisPrimitives_[n].setType(GL_LINES);
 		axisPrimitives_[n].setNoInstances();
 	}
-
-	// Every primitive using instances must be added to the primitiveList_
-	primitiveList_.add(&surfacePrimitive_);
 }
 
 // Setup basic GL properties (called each time before renderScene())
@@ -108,14 +104,8 @@ void Viewer::setupGL()
 	msg.exit("Viewer::setupGL");
 }
 
-// Set source slice data
-void Viewer::setSourceSliceList(List<Data2D>* sliceData)
-{
-	sliceData_ = sliceData;
-}
-
 // Construct normal / colour data for slice specified
-void Viewer::constructSliceData(Data2D* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, ColourScale& colourScale, Data2D* previousSlice, Data2D* nextSlice)
+void Viewer::constructSliceData(Data2D* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, const ColourScale& colourScale, Data2D* previousSlice, Data2D* nextSlice)
 {
 	normals.clear();
 	colours.clear();
@@ -249,42 +239,47 @@ void Viewer::constructSliceData(Data2D* targetSlice, double yAxisScale, Array< V
 	for (n=0; n<normals.nItems(); ++n) normals[n].normalise();
 }
 
-// Create surface primitive
-void Viewer::createSurface(ColourScale colourScale, double yAxisScale)
+// Create/update surface primitive
+void Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate)
 {
-	// Check for valid slice list
-	if (sliceData_ == NULL) return;
+	// Check for valid collection, and whether primitive needs updating
+	if (!collection) return;
+	if ((!collection->regenerateSurfacePrimitive()) && (!collection->regenerateColourScale()) && (!forceUpdate)) return;
 
-	// Take copy of colourscale and yAxisScale values
-	colourScale_ = colourScale;
-	yAxisScale_ = yAxisScale;
+	// Grab reference to primitive
+	Primitive& surfacePrimitive = collection->surfacePrimitive();
 
 	GLfloat zA, zB;
 
 	// Pop old primitive instance - we need to recreate the display list / vertex array
-	surfacePrimitive_.popInstance(context());
-	surfacePrimitive_.forgetAll();
+	surfacePrimitive.popInstance(context());
+	surfacePrimitive.forgetAll();
 
 	// Sanity check - are there enough slices to proceed?
-	if (sliceData_->nItems() < 2) return;
+	if (collection->nSlices() < 2)
+	{
+		collection->setSurfacePrimitiveUpdated();
+		return;
+	}
 
 	// Temporary variables
 	Array< Vec3<double> > normA, normB;
 	Array< Vec4<GLfloat> > colourA, colourB;
 	int n;
 	QColor colour;
-	Vec3<double> nrm(0.0,1.0,0.0);
+	double yAxisScale = uChroma_->axisStretch(1);
+	Vec3<double> nrm(0.0, 1.0, 0.0);
 
 	// We need to skip over slices with zero points, so construct a reflist here of those which contain usable data
 	RefList<Data2D,int> slices;
-	for (Data2D* slice = sliceData_->first(); slice != NULL; slice = slice->next) if (slice->nPoints() > 1) slices.add(slice);
+	for (Data2D* slice = collection->surfaceData().first(); slice != NULL; slice = slice->next) if (slice->nPoints() > 1) slices.add(slice);
 
 	// If there are not enough slices with a valid number of points
 	if (slices.nItems() < 2) return;
 
 	// Construct first slice data and set initial min/max values
 	RefListItem<Data2D,int>* ri = slices.first();
-	constructSliceData(ri->item, yAxisScale_, normA, colourA, colourScale_, NULL, ri->next ? ri->next->item : NULL);
+	constructSliceData(ri->item, yAxisScale, normA, colourA, collection->colourScale(), NULL, ri->next ? ri->next->item : NULL);
 	if (slices.nItems() < 2) return;
 	int nPoints = slices.first()->item->nPoints();
 	
@@ -297,7 +292,7 @@ void Viewer::createSurface(ColourScale colourScale, double yAxisScale)
 		Data2D* sliceC = (rj->next == NULL ? NULL : rj->next->item);
 
 		// Construct data for current slice
-		constructSliceData(sliceB, yAxisScale_, normB, colourB, colourScale_, sliceA, sliceC);
+		constructSliceData(sliceB, yAxisScale, normB, colourB, collection->colourScale(), sliceA, sliceC);
 
 		// Grab z values
 		zA = (GLfloat) sliceA->z();
@@ -311,12 +306,12 @@ void Viewer::createSurface(ColourScale colourScale, double yAxisScale)
 		for (int n=0; n<nPoints-1; ++n)
 		{
 			// Add triangles for this quadrant
-			surfacePrimitive_.defineVertex(xA[n], yA[n], zA, normA[n], colourA[n], true);
-			surfacePrimitive_.defineVertex(xA[n+1], yA[n+1], zA, normA[n+1], colourA[n+1], true);
-			surfacePrimitive_.defineVertex(xB[n+1], yB[n+1], zB, normB[n+1], colourB[n+1], true);
-			surfacePrimitive_.defineVertex(xA[n], yA[n], zA, normA[n], colourA[n], true);
-			surfacePrimitive_.defineVertex(xB[n], yB[n], zB, normB[n], colourB[n], true);
-			surfacePrimitive_.defineVertex(xB[n+1], yB[n+1], zB, normB[n+1], colourB[n+1], true);
+			surfacePrimitive.defineVertex(xA[n], yA[n], zA, normA[n], colourA[n], true);
+			surfacePrimitive.defineVertex(xA[n+1], yA[n+1], zA, normA[n+1], colourA[n+1], true);
+			surfacePrimitive.defineVertex(xB[n+1], yB[n+1], zB, normB[n+1], colourB[n+1], true);
+			surfacePrimitive.defineVertex(xA[n], yA[n], zA, normA[n], colourA[n], true);
+			surfacePrimitive.defineVertex(xB[n], yB[n], zB, normB[n], colourB[n], true);
+			surfacePrimitive.defineVertex(xB[n+1], yB[n+1], zB, normB[n+1], colourB[n+1], true);
 		}
 
 		// Copy arrays ready for next pass
@@ -326,18 +321,25 @@ void Viewer::createSurface(ColourScale colourScale, double yAxisScale)
 	}
 
 	// Push a new instance to create the new display list / vertex array
-	surfacePrimitive_.pushInstance(context());
+	surfacePrimitive.pushInstance(context());
+	collection->setSurfacePrimitiveUpdated();
 
-	msg.print("Surface contains %i vertices.\n", surfacePrimitive_.nDefinedVertices());
+	msg.print("Surface contains %i vertices.\n", surfacePrimitive.nDefinedVertices());
 }
 
-// Create surface using previous colourscale and y axis scaling factor
-void Viewer::createSurface()
+// Add supplied surface primitive to list
+void Viewer::addSurfacePrimitive(Primitive* primitive)
 {
-	createSurface(colourScale_, yAxisScale_);
+	primitiveList_.add(primitive);
 }
 
-// Clear specified axix primitives
+// Remove surface primitive from primitive list
+void Viewer::removeSurfacePrimitive(Primitive* primitive)
+{
+	primitiveList_.remove(primitive);
+}
+
+// Clear specified axis primitives
 void Viewer::clearAxisPrimitives(int axis)
 {
 	axisPrimitives_[axis].forgetAll();
@@ -387,12 +389,6 @@ void Viewer::setYClip(double yMin, double yMax)
 {
 	clipPlaneYMin_ = yMin - clipPlaneDelta_;
 	clipPlaneYMax_ = yMax + clipPlaneDelta_;
-}
-
-// Return number of triangles in surface
-int Viewer::surfaceNTriangles()
-{
-	return surfacePrimitive_.nDefinedVertices() / 3;
 }
 
 // Setup slice primitive

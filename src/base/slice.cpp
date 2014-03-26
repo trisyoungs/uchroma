@@ -1,7 +1,7 @@
 /*
 	*** Slice
 	*** src/base/slice.cpp
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -26,12 +26,32 @@
  * Slice
  */
 
+// Data Sources
+const char* DataSourceKeywords[] = { "File", "Internal" };
+
+/*!
+ * \brief Convert text string to SettingsKeyword
+ */
+Slice::DataSource Slice::dataSource(const char* s)
+{
+	for (int n=0; n<nDataSources; ++n) if (strcmp(s,DataSourceKeywords[n]) == 0) return (Slice::DataSource) n;
+	return nDataSources;
+}
+
+/*!
+ * \brief Convert SettingsKeyword to text string
+ */
+const char* Slice::dataSource(Slice::DataSource kwd)
+{
+	return DataSourceKeywords[kwd];
+}
+
 // Constructor
 Slice::Slice() : ListItem<Slice>()
 {
 	sourceFileName_ = "";
-	fileAssociated_ = false;
-	dataName_ = "";
+	dataSource_ = Slice::InternalSource;
+	title_ = "";
 }
 
 // Destructor
@@ -49,17 +69,28 @@ Slice::Slice(const Slice& source)
 void Slice::operator=(const Slice& source)
 {
 	sourceFileName_ = source.sourceFileName_;
-	dataName_ = source.dataName_;
+	title_ = source.title_;
 	data_ = source.data_;
 	transformedData_ = source.transformedData_;
-	fileAssociated_ = source.fileAssociated_;
+	dataSource_ = source.dataSource_;
+}
+
+// Set source of data
+void Slice::setDataSource(Slice::DataSource source)
+{
+	dataSource_ = source;
+}
+
+// Return source of data
+Slice::DataSource Slice::dataSource()
+{
+	return dataSource_;
 }
 
 // Set source filename
 void Slice::setSourceFileName(QString fileName)
 {
 	sourceFileName_ = fileName;
-	fileAssociated_ = true;
 }
 
 // Return source filename
@@ -69,22 +100,22 @@ QString Slice::sourceFileName()
 }
 
 // Set associated data name
-void Slice::setDataName(QString dataName)
+void Slice::setTitle(QString title)
 {
-	dataName_ = dataName;
+	title_ = title;
 }
 
-// Return data name
-QString Slice::dataName()
+// Return title
+QString Slice::title()
 {
-	return dataName_;
+	return title_;
 }
 
 // Load data from file
 bool Slice::loadData(QDir sourceDir)
 {
 	// Check that a fileName is specified - otherwise there is nothing to do
-	if (!fileAssociated_) return false;
+	if (dataSource_ != Slice::FileSource) return false;
 
 	// Clear any existing data
 	data_.arrayX().clear();

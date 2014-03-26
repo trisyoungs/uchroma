@@ -1,7 +1,7 @@
 /*
 	*** Text Primitive
 	*** src/gui/viewer_textprimitive.cpp
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 

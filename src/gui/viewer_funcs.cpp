@@ -1,7 +1,7 @@
 /*
 	*** Viewer Functions
 	*** src/gui/viewer_funcs.cpp
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -89,10 +89,6 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	useFrameBuffer_ = false;
 	lineWidth_ = 2.0;
 
-	// User variables
-	sliceData_ = NULL;
-	yAxisScale_ = 1.0;
-
 	// Prevent QPainter from autofilling widget background
 	setAutoFillBackground(false);
 }
@@ -125,8 +121,8 @@ void Viewer::initializeGL()
 // 	msg.print("In Viewer::initializeGL, pushing instances for %i primitives...\n", primitiveList_.nItems());
 	for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->pushInstance(context());
 
-	// Recreate the surface (so that images are saved correctly)
-	createSurface();
+	// Recreate surface primitives (so that images are saved correctly)
+	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) updateSurfacePrimitive(collection, true);
 
 	msg.exit("Viewer::initializeGL");
 }
@@ -144,6 +140,10 @@ void Viewer::paintGL()
 
 	// Set the drawing flag so we don't have any rendering clashes
 	drawing_ = true;
+
+	// Update / recreate display data and surface primitives if necessary
+	uChroma_->updateDisplayData();
+	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) updateSurfacePrimitive(collection);
 
 	// Setup basic GL stuff
 	setupGL();
@@ -168,7 +168,7 @@ void Viewer::paintGL()
 	glMatrixMode(GL_MODELVIEW);
 
 	// Set up our transformation matrix
-	Vec3<double> centreTranslation = -uChroma_->surfaceCentre();
+	Vec3<double> centreTranslation = -uChroma_->axesCentre();
 	Matrix A;
 	A.setIdentity();
 	A.setTranslation(centreTranslation);
@@ -235,7 +235,8 @@ void Viewer::paintGL()
 // 	triangleChopper_.sendToGL();
 // 	glPopClientAttrib();
 
-	surfacePrimitive_.sendToGL();
+	// Loop over surface primitives
+	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) collection->surfacePrimitive().sendToGL();
 	
 	glDisable(GL_MULTISAMPLE);
 	glDisable(GL_CLIP_PLANE0);
@@ -374,7 +375,7 @@ void Viewer::checkGlError()
 		switch (glGetError())
 		{
 			case (GL_INVALID_ENUM): msg.print(Messenger::Verbose, "GLenum argument out of range\n"); break;
-			case (GL_INVALID_VALUE): msg.print(Messenger::Verbose, "N(umeric argument out of range\n"); break;
+			case (GL_INVALID_VALUE): msg.print(Messenger::Verbose, "Numeric argument out of range\n"); break;
 			case (GL_INVALID_OPERATION): msg.print(Messenger::Verbose, "Operation illegal in current state\n"); break;
 			case (GL_STACK_OVERFLOW): msg.print(Messenger::Verbose, "Command would cause a stack overflow\n"); break;
 			case (GL_STACK_UNDERFLOW): msg.print(Messenger::Verbose, "Command would cause a stack underflow\n"); break;
@@ -521,7 +522,7 @@ Vec4<double> Viewer::modelToScreen(Vec3<double> &modelr, double screenradius)
 	pos.set(modelr, 1.0);
 	// Get the world coordinates of the point - Multiply by modelview matrix 'view'
 	vmat = viewMatrix_;
-	vmat.applyTranslation(-uChroma_->surfaceCentre());
+	vmat.applyTranslation(-uChroma_->axesCentre());
 	worldr = vmat * pos;
 
 	screenr = projectionMatrix_ * worldr;

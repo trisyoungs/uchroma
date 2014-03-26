@@ -6,12 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>713</width>
-    <height>314</height>
+    <width>607</width>
+    <height>292</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Slice Monitor</string>
+   <string>Fitting</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="icons.qrc">
+    <normaloff>:/uchroma/icons/uchroma.png</normaloff>:/uchroma/icons/uchroma.png</iconset>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_2">
    <item>
@@ -48,7 +52,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="EquationEdit"/>
+         <widget class="QLineEdit" name="EquationEdit">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="SelectEquationButton">
@@ -79,7 +90,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="groupBox">
+      <widget class="QGroupBox" name="VariablesGroup">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -87,9 +98,12 @@
         </sizepolicy>
        </property>
        <property name="title">
-        <string>VariablesGroup</string>
+        <string>Variables</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="leftMargin">
+         <number>9</number>
+        </property>
         <item>
          <widget class="QTableWidget" name="VariablesTable">
           <column>
@@ -104,12 +118,12 @@
           </column>
           <column>
            <property name="text">
-            <string>Minimum Limit</string>
+            <string>Minimum Value</string>
            </property>
           </column>
           <column>
            <property name="text">
-            <string>Maximum Limit</string>
+            <string>Maximum Value</string>
            </property>
           </column>
          </widget>

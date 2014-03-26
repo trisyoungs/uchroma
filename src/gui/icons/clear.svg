@@ -13,7 +13,7 @@
    width="100"
    height="100"
    id="svg2"
-   inkscape:version="0.48.3.1 r9886"
+   inkscape:version="0.48.4 r9939"
    sodipodi:docname="clear.svg">
   <metadata
      id="metadata13">
@@ -36,33 +36,26 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:window-width="1920"
-     inkscape:window-height="1137"
+     inkscape:window-height="1140"
      id="namedview11"
      showgrid="false"
-     inkscape:zoom="1.18"
-     inkscape:cx="-154.03769"
-     inkscape:cy="111.80717"
+     inkscape:zoom="3.337544"
+     inkscape:cx="-96.987023"
+     inkscape:cy="58.145898"
      inkscape:window-x="1920"
-     inkscape:window-y="0"
+     inkscape:window-y="25"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
   <defs
      id="defs4" />
-  <rect
-     style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000056;stroke-width:0.10000001000000000;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-     id="rect2990"
-     width="97.56926"
-     height="97.56926"
-     x="1.215371"
-     y="1.2153703" />
   <g
      id="text2992"
-     style="font-size:63.13714600000000132px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
+     style="font-size:63.13714600000000132px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00008f;fill-opacity:1;stroke:none;font-family:Sans"
      transform="matrix(1.8782342,0,0,1.8212165,-29.740336,-48.940715)">
     <path
        inkscape:connector-curvature="0"
        id="path3002"
-       style="fill:#ffffff;fill-opacity:1"
+       style="fill:#00008f;fill-opacity:1"
        d="m 58.547523,37.062655 -12.485617,16.801634 13.13302,17.726493 -6.689825,0 -10.050151,-13.564621 -10.050151,13.564621 -6.689825,0 13.410478,-18.065609 -12.269816,-16.462518 6.689824,0 9.15612,12.300646 9.156119,-12.300646 6.689824,0" />
   </g>
 </svg>

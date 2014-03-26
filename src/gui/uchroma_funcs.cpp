@@ -1,7 +1,7 @@
 /*
 	*** Main Window - Functions 
 	*** src/gui/uchroma_funcs.cpp
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -24,7 +24,7 @@
 #include "version.h"
 
 // Constructor
-UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveImageDialog_(this), dataImportDialog_(this), sliceMonitorDialog_(this)
+UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveImageDialog_(this), dataImportDialog_(this), fitDialog_(this), sliceMonitorDialog_(this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -33,7 +33,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveIma
 	ui.setupUi(this);
 
 	// Set variable defaults
-	dataFileDirectory_ = getenv("PWD");
+	inputFileDirectory_ = getenv("PWD");
 #ifdef WIN32
 	viewerFont_ = QDir::current().absoluteFilePath("bin/wright.ttf");
 #else
@@ -42,6 +42,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveIma
 	clearData();
 	sliceAxis_ = -1;
 	refreshing_ = false;
+	addCollection();
 
 	// Load settings...
 	loadSettings();
@@ -52,9 +53,6 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveIma
 
 	// Load font for viewer
 	ui.MainView->setupFont(viewerFont_);
-
-	// Point viewer to the surfacedata list
-	ui.MainView->setSourceSliceList(&surfaceData_);
 
 	// Connect signals / slots between Viewer and main UI
 	connect(ui.MainView, SIGNAL(sliceAxisClicked()), this, SLOT(addSurfaceSlice()));
@@ -86,13 +84,15 @@ void UChromaWindow::saveSettings()
 	settings.setValue("ViewerFont", viewerFont_);
 }
 
+/*
+ * Update
+ */
+
 // Update all tabs
 void UChromaWindow::updateAllTabs()
 {
-	updateSourceDataTab();
-	updateTransformTab();
-	updateColourTab();
-	updateViewTab();
+	updateCollectionTab();
+	updateAxesTab();
 }
 
 // Update title bar
@@ -106,25 +106,44 @@ void UChromaWindow::updateTitleBar()
 void UChromaWindow::updateAfterLoad()
 {
 	// Update data and transform limits
-	calculateDataLimits();
+	for (Collection* c = collections_.first(); c != NULL; c = c->next) c->calculateDataLimits();
 
-	// Update colour scale
-	updateColourScale();
-	
 	// Update GUI
+	updateAxes();
 	updateAllTabs();
 	updateTitleBar();
-
-	// Update surface
-	updateSurface();
 
 	// Setup font
 	ui.MainView->setupFont(viewerFont_);
 }
 
+// Update display data
+void UChromaWindow::updateDisplayData()
+{
+	for (Collection* c = collections_.first(); c != NULL; c = c->next) c->updateSurfaceData(axisMin_, axisMax_, axisInverted_, axisLogarithmic_, axisStretch_);
+}
+
+// Update display
+void UChromaWindow::updateDisplay()
+{
+	ui.MainView->postRedisplay();
+}
+
 /*
  * Axes
  */
+
+// Return minimum limit for specified axis
+double UChromaWindow::axisMin(int axis)
+{
+	return axisMin_[axis];
+}
+
+// Return maximum limit for specified axis
+double UChromaWindow::axisMax(int axis)
+{
+	return axisMax_[axis];
+}
 
 // Return whether axis is logarithmic
 bool UChromaWindow::axisLogarithmic(int axis)

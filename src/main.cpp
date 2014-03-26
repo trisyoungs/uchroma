@@ -1,7 +1,7 @@
 /*
 	*** uChroma Main
 	*** src/main.cpp
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 	/* Was an input file supplied? */
 	if (argc == 2)
 	{
-		if (!mainWindow.loadData(argv[1])) return 1;
+		if (!mainWindow.loadInputFile(argv[1])) return 1;
 	}
 
 	/* Update main window */

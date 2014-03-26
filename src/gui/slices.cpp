@@ -1,7 +1,7 @@
 /*
 	*** Slice Acquisition / Fitting
 	*** src/gui/slices.cpp
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -80,13 +80,13 @@ bool UChromaWindow::updateSliceValue(int mouseX, int mouseY)
 // 		printf("Angle = %f, %f\n", angle, angle * DEGRAD);
 
 		// Calculate slice axis value - no need to account for inverted axes here, since this is accounted for in the vectors axmin and axmax
-		if (axisLogarithmic_[sliceAxis_]) sliceValue_ = pow(10, abNorm.dp(amNorm)*ratio * (log10(limitMax_[sliceAxis_]) - log10(limitMin_[sliceAxis_])) + log10(limitMin_[sliceAxis_]));
-		else sliceValue_ = abNorm.dp(amNorm)*ratio * (limitMax_[sliceAxis_] - limitMin_[sliceAxis_]) + limitMin_[sliceAxis_];
+		if (axisLogarithmic_[sliceAxis_]) sliceValue_ = pow(10, abNorm.dp(amNorm)*ratio * (log10(axisMax_[sliceAxis_]) - log10(axisMin_[sliceAxis_])) + log10(axisMin_[sliceAxis_]));
+		else sliceValue_ = abNorm.dp(amNorm)*ratio * (axisMax_[sliceAxis_] - axisMin_[sliceAxis_]) + axisMin_[sliceAxis_];
 // 		printf("slicevalue = %f (%f)\n", sliceValue_, abNorm.dp(amNorm)*ratio);
 
 		// Clamp value to data range
-		if (sliceValue_ < limitMin_[sliceAxis_]) sliceValue_ = limitMin_[sliceAxis_];
-		else if (sliceValue_ > limitMax_[sliceAxis_]) sliceValue_ = limitMax_[sliceAxis_];
+		if (sliceValue_ < axisMin_[sliceAxis_]) sliceValue_ = axisMin_[sliceAxis_];
+		else if (sliceValue_ > axisMax_[sliceAxis_]) sliceValue_ = axisMax_[sliceAxis_];
 // 		printf("ACMAG = %f, X = %f\n", ratio, sliceValue_);
 
 		// Extract slice from data
@@ -100,8 +100,8 @@ bool UChromaWindow::updateSliceValue(int mouseX, int mouseY)
 			{
 				// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated - TODO)
 				currentSlice_.data().clear();
-				for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) currentSlice_.data().addPoint(slice->transformedData().z(), slice->transformedData().y(bin));
-				currentSlice_.setTitle("X = " + QString::number(slices_.first()->transformedData().x(bin)));
+				for (Slice* slice = currentCollection_->slices(); slice != NULL; slice = slice->next) currentSlice_.data().addPoint(slice->transformedData().z(), slice->transformedData().y(bin));
+				currentSlice_.setTitle("X = " + QString::number(currentCollection_->slices()->transformedData().x(bin)));
 			}
 			else if (sliceAxis_ == 1)
 			{
@@ -111,8 +111,8 @@ bool UChromaWindow::updateSliceValue(int mouseX, int mouseY)
 			{
 				// Slice through Z - i.e. original slice data
 				currentSlice_.data().clear();
-				currentSlice_.data() = slices_[bin]->data();
-				currentSlice_.setTitle("Z = " + QString::number(slices_[bin]->transformedData().z()));
+				currentSlice_.data() = currentCollection_->slice(bin)->data();
+				currentSlice_.setTitle("Z = " + QString::number(currentCollection_->slice(bin)->transformedData().z()));
 			}
 		}
 
@@ -138,19 +138,20 @@ double UChromaWindow::sliceCoordinate()
 {
 	if (sliceAxis_ == -1) return 0.0;
 
-	if (axisLogarithmic_[sliceAxis_]) return (axisInverted_[sliceAxis_] ? log10(limitMax_[sliceAxis_]/sliceValue_) : log10(sliceValue_));
-	else return (axisInverted_[sliceAxis_] ? limitMax_[sliceAxis_] - sliceValue_ : sliceValue_);
+	if (axisLogarithmic_[sliceAxis_]) return (axisInverted_[sliceAxis_] ? log10(axisMax_[sliceAxis_]/sliceValue_) : log10(sliceValue_));
+	else return (axisInverted_[sliceAxis_] ? axisMax_[sliceAxis_] - sliceValue_ : sliceValue_);
 }
 
 // Return axis bin value of closest point to supplied value
 int UChromaWindow::closestBin(int axis, double value)
 {
-	if (slices_.nItems() == 0) return -1;
+	if (!currentCollection_) return -1;
+	if (currentCollection_->nSlices() == 0) return -1;
 
 	if (axis == 0)
 	{
 		// Check X array of first slice
-		Array<double>& x = slices_.first()->transformedData().arrayX();
+		Array<double>& x = currentCollection_->slices()->transformedData().arrayX();
 		int midIndex, loIndex = 0, hiIndex = x.nItems() - 1;
 		if (value < x.value(0)) return 0;
 		if (value > x.value(hiIndex)) return hiIndex;
@@ -172,8 +173,8 @@ int UChromaWindow::closestBin(int axis, double value)
 	{
 		// Check z-values
 		int closest = 0, n = 0;
-		double delta, closestDelta = fabs(slices_.first()->transformedData().z() - value);
-		for (Slice* slice = slices_.first()->next; slice != NULL; slice = slice->next)
+		double delta, closestDelta = fabs(currentCollection_->slices()->transformedData().z() - value);
+		for (Slice* slice = currentCollection_->slices()->next; slice != NULL; slice = slice->next)
 		{
 			delta = fabs(slice->transformedData().z() - value);
 			++n;

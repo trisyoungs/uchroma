@@ -1,7 +1,7 @@
 /*
 	*** Rendering Primitive
 	*** src/gui/viewer_primitive.cpp
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -323,7 +323,7 @@ void Primitive::sendToGL()
 {
 	// If no vertices are defined, nothing to do...
 	if (nDefinedVertices_ == 0) return;
-	
+
 	// Check if using instances...
 	if (useInstances_)
 	{

@@ -1,7 +1,7 @@
 /*
 	*** Array Classes
 	*** src/templates/array.h
-	Copyright T. Youngs 2013
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
