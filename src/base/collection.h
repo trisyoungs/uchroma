@@ -93,6 +93,8 @@ class Collection : public ListItem<Collection>
 	Vec3<double> dataMin_, dataMax_;
 	// Extreme values of transformed data 
 	Vec3<double> transformMin_, transformMax_;
+	// Extreme positive values of transformed data
+	Vec3<double> transformMinPositive_, transformMaxPositive_;
 	// Transform for data
 	Transformer transforms_[3];
 	// Interpolation flags
@@ -109,6 +111,10 @@ class Collection : public ListItem<Collection>
 	Vec3<double> transformMin();
 	// Return transformed data maxima
 	Vec3<double> transformMax();
+	// Return transformed positive data minima
+	Vec3<double> transformMinPositive();
+	// Return transformed positive data maxima
+	Vec3<double> transformMaxPositive();
 	// Set transform equation for data
 	void setTransformEquation(int axis, QString transformEquation);
 	// Return transform equation for data

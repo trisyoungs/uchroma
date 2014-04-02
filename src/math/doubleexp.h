@@ -21,6 +21,7 @@
 
 #ifndef UCHROMA_DOUBLEEXP_H
 #define UCHROMA_DOUBLEEXP_H
+#include <QtCore/QString>
 
 // Mantissa/exponent class
 class DoubleExp
@@ -50,10 +51,14 @@ class DoubleExp
 	public:
 	// Retrieve full, real value
 	double value() const;
+	// Retrieve text representation of value
+	QString text(int precision = 4);
 	// Set mantissa and exponent
 	void set(double mantissa, int exponent);
 	// Set from normal value
 	void set(double value);
+	// Set from supplied text
+	void set(QString text);
 	// Set mantissa
 	void setMantissa(double mantissa);
 	// Return mantissa
@@ -64,6 +69,14 @@ class DoubleExp
 	int exponent() const;
 	// Operator =
 	void operator=(double d);
+
+
+	/*
+	 * Static Member Functions
+	 */
+	public:
+	// Return text representation of supplied value
+	QString text(double value, int precision = 4);
 };
 
 #endif

@@ -141,7 +141,8 @@ void Viewer::paintGL()
 	// Set the drawing flag so we don't have any rendering clashes
 	drawing_ = true;
 
-	// Update / recreate display data and surface primitives if necessary
+	// Update / recreate axes, display data and surface primitives if necessary
+	uChroma_->updateAxesPrimitives();
 	uChroma_->updateDisplayData();
 	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) updateSurfacePrimitive(collection);
 

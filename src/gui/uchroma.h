@@ -492,6 +492,10 @@ class UChromaWindow : public QMainWindow
 	Vec3<double> transformedDataMinima();
 	// Return absolute maximum transformed values over all collections
 	Vec3<double> transformedDataMaxima();
+	// Return absolute minimum positive transformed values over all collections
+	Vec3<double> transformedDataPositiveMinima();
+	// Return absolute maximum positive transformed values over all collections
+	Vec3<double> transformedDataPositiveMaxima();
 
 	public:
 	// Return first collection in list
@@ -508,6 +512,8 @@ class UChromaWindow : public QMainWindow
 	private:
 	// Data limits for surface generation
 	Vec3<double> axisMin_, axisMax_;
+	// Limiting values for axis limits (accounting for data, log scales etc.)
+	Vec3<double> axisLimitMin_, axisLimitMax_;
 	// Central coordinate of current axes
 	Vec3<double> axesCentre_;
 	// Whether to invert axes
@@ -548,10 +554,8 @@ class UChromaWindow : public QMainWindow
 	double labelScale_;
 	// Font scaling for titles
 	double titleScale_;
-
-	private:
-	// Update axes
-	void updateAxes();
+	// Whether axes need to be regenerated
+	bool regenerateAxes_;
 
 	public:
 	// Return minimum limit for specified axis
@@ -580,6 +584,8 @@ class UChromaWindow : public QMainWindow
 	double labelScale();
 	// Return font scaling for titles
 	double titleScale();
+	// Update axes primitives if necessary
+	void updateAxesPrimitives();
 
 
 	/*

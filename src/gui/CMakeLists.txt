@@ -20,11 +20,11 @@ uchroma_collection_transform.cpp
 uchroma_slices.cpp
 uchroma_slots.cpp
 uchroma_surface.cpp
+axes.cpp
 data.cpp
 io.cpp
 keywords.cpp
 slices.cpp
-surface.cpp
 dataimport_funcs.cpp
 dataimport_seqxy.cpp
 saveimage_funcs.cpp
@@ -36,6 +36,7 @@ plotwidget_data.cpp
 plotwidget_funcs.cpp
 plotwidget_paintevent.cpp
 slicemonitor_funcs.cpp
+texponentialspin_funcs.cpp
 viewer_funcs.cpp
 viewer_input.cpp
 viewer_prefs.cpp
@@ -63,6 +64,7 @@ SET(pro_MOC_HDRS
   colourbutton.uih
   gradientbar.uih
   plotwidget.uih
+  texponentialspin.uih
   viewer.uih
 )
 QT4_WRAP_CPP(pro_MOC_SRCS ${pro_MOC_HDRS} OPTIONS -f)

@@ -1,6 +1,6 @@
 /*
-	*** Surface Generation
-	*** src/gui/surface.cpp
+	*** Axes Functions
+	*** src/gui/axes.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -22,8 +22,11 @@
 #include "gui/uchroma.h"
 
 // Update axes primitives
- void UChromaWindow::updateAxes()
+ void UChromaWindow::updateAxesPrimitives()
 {
+	// Check whether we need to regenerate the axes primitives / data
+	if (!regenerateAxes_) return;
+
 	QString s;
 	FTBBox boundingBox;
 	Vec3<double> centre;
@@ -204,6 +207,7 @@
 	// Setup Bounding Box
 	ui.MainView->createBoundingBox(boundingBox_, axisLogarithmic_.y ? log10(boundingBoxPlaneY_) : boundingBoxPlaneY_);
 
+	regenerateAxes_ = false;
 	ui.MainView->update();
 }
 

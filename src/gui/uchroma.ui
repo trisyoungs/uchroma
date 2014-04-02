@@ -47,7 +47,7 @@
            </size>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="CollectionsTab">
            <attribute name="title">
@@ -166,7 +166,7 @@
                </size>
               </property>
               <property name="currentIndex">
-               <number>2</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="SourceDataTab">
                <attribute name="title">
@@ -1535,28 +1535,6 @@
                        </property>
                       </widget>
                      </item>
-                     <item row="0" column="1">
-                      <widget class="QDoubleSpinBox" name="AxisXMinSpin">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="decimals">
-                        <number>4</number>
-                       </property>
-                       <property name="minimum">
-                        <double>-1000000.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>1000000.000000000000000</double>
-                       </property>
-                       <property name="value">
-                        <double>1.000000000000000</double>
-                       </property>
-                      </widget>
-                     </item>
                      <item row="1" column="1">
                       <widget class="QLabel" name="AxisXMinLabel">
                        <property name="font">
@@ -1639,6 +1617,16 @@
                        </property>
                        <property name="text">
                         <string>&lt; X &lt; </string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="TExponentialSpin" name="AxisXMinSpin" native="true">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
                        </property>
                       </widget>
                      </item>
@@ -5275,7 +5263,7 @@
      <x>0</x>
      <y>0</y>
      <width>1207</width>
-     <height>31</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -5422,6 +5410,12 @@
    <class>ColourButton</class>
    <extends>QPushButton</extends>
    <header>gui/colourbutton.uih</header>
+  </customwidget>
+  <customwidget>
+   <class>TExponentialSpin</class>
+   <extends>QWidget</extends>
+   <header>gui/texponentialspin.uih</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

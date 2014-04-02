@@ -34,6 +34,8 @@ Collection::Collection() : ListItem<Collection>()
 	dataMax_.set(10.0, 10.0, 10.0);
 	transformMin_.zero();
 	transformMax_.set(10.0, 10.0, 10.0);
+	transformMinPositive_.set(0.1, 0.1, 0.1);
+	transformMaxPositive_.set(10.0, 10.0, 10.0);
 	transforms_[0].setEnabled(false);
 	transforms_[1].setEnabled(false);
 	transforms_[2].setEnabled(false);
@@ -246,6 +248,18 @@ Vec3<double> Collection::transformMax()
 	return transformMax_;
 }
 
+// Return transformed positive data minima
+Vec3<double> Collection::transformMinPositive()
+{
+	return transformMinPositive_;
+}
+
+// Return transformed positive data maxima
+Vec3<double> Collection::transformMaxPositive()
+{
+	return transformMaxPositive_;
+}
+
 // Set transform equation for data
 void Collection::setTransformEquation(int axis, QString transformEquation)
 {
@@ -316,6 +330,8 @@ void Collection::updateDataTransforms()
 
 	transformMin_ = 0.0;
 	transformMax_ = 0.0;
+	transformMinPositive_ = 0.1;
+	transformMaxPositive_ = -1.0;
 	if (slices_.nItems() == 0) return;
 	
 	// Grab first slice and set initial values
@@ -336,6 +352,40 @@ void Collection::updateDataTransforms()
 		if (slice->transformedData().z() < transformMin_.z) transformMin_.z = slice->transformedData().z();
 		else if (slice->transformedData().z() > transformMax_.z) transformMax_.z = slice->transformedData().z();
 	}
+
+	// Now determine minimum positive limits
+	for (slice = slices_.first(); slice != NULL; slice = slice->next)
+	{
+		// Loop over XY points in data, searching for first positive, non-zero value
+		Data2D& data = slice->transformedData();
+		for (int n=0; n<data.nPoints(); ++n)
+		{
+			// X
+			if (data.x(n) > 0.0)
+			{
+				if (data.x(n) < transformMinPositive_.x) transformMinPositive_.x = data.x(n);
+				if (data.x(n) > transformMaxPositive_.x) transformMaxPositive_.x = data.x(n);
+			}
+			// Y
+			if (data.y(n) > 0.0)
+			{
+				if (data.y(n) < transformMinPositive_.y) transformMinPositive_.y = data.y(n);
+				if (data.y(n) > transformMaxPositive_.y) transformMaxPositive_.y = data.y(n);
+			}
+		}
+		
+		// Z
+		if (data.z() > 0.0)
+		{
+			if (data.z() < transformMinPositive_.z) transformMinPositive_.z = data.z();
+			if (data.z() > transformMaxPositive_.z) transformMaxPositive_.z = data.z();
+		}
+	}
+
+	// Check maximum positive values (since all datapoints might have been negative
+	if (transformMaxPositive_.x < 0.0) transformMaxPositive_.x = 1.0;
+	if (transformMaxPositive_.y < 0.0) transformMaxPositive_.y = 1.0;
+	if (transformMaxPositive_.z < 0.0) transformMaxPositive_.z = 1.0;
 }
 
 // Set whether interpolation is enabled

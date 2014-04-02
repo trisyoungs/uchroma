@@ -28,9 +28,8 @@ bool UChromaWindow::axisInvertChanged(int axis, bool checked)
 	if (refreshing_) return false;
 	axisInverted_[axis] = checked;
 
-	// Update relevant parts of gui, the axes primitives, flag to regenerate collection's surface data, and finally the display
+	// Update relevant parts of gui, flag to regenerate axis primitives and collection's surface data, and finally update the display
 	setAsModified();
-	updateAxes();
 	regenerateAll();
 	updateDisplay();
 
@@ -42,9 +41,9 @@ bool UChromaWindow::axisLogarithmicChanged(int axis, bool checked)
 	if (refreshing_) return false;
 	axisLogarithmic_[axis] = checked;
 
-	// Update relevant parts of gui, the axes primitives, flag to regenerate collection's surface data, and finally the display
+	// Update relevant parts of gui, flag to regenerate axis primitives and collection's surface data, and finally update the display
 	setAsModified();
-	updateAxes();
+	updateAxesTab();
 	regenerateAll();
 	updateDisplay();
 
@@ -56,9 +55,9 @@ bool UChromaWindow::axisVisibleChanged(int axis, bool checked)
 	if (refreshing_) return false;
 	axisVisible_[axis] = checked;
 
-	// Update relevant parts of gui, the axes primitives, and finally the display
+	// Update relevant parts of gui, flag to regenerate axis primitives, and finally update the display
 	setAsModified();
-	updateAxes();
+	regenerateAxes_ = true;
 	updateDisplay();
 
 	return true;
@@ -69,9 +68,8 @@ bool UChromaWindow::axisStretchChanged(int axis, double value)
 	if (refreshing_) return false;
 	axisStretch_[axis] = value;
 
-	// Update relevant parts of gui, the axes primitives, flag to regenerate collection's surface data, and finally the display
+	// Update relevant parts of gui, flag to regenerate axis primitives and collection's surface data, and finally update the display
 	setAsModified();
-	updateAxes();
 	regenerateAll();
 	updateDisplay();
 
@@ -84,10 +82,9 @@ bool UChromaWindow::axisLimitChanged(int axis, bool minLim, double value)
 	if (minLim) axisMin_[axis] = value;
 	else axisMax_[axis] = value;
 
-	// Update relevant parts of gui, the axes primitives, flag to regenerate collection's surface data, and finally the display
+	// Update relevant parts of gui, flag to regenerate axis primitives and collection's surface data, and finally update the display
 	setAsModified();
 	updateAxesTab();
-	updateAxes();
 	regenerateAll();
 	updateDisplay();
 
@@ -97,13 +94,12 @@ bool UChromaWindow::axisLimitChanged(int axis, bool minLim, double value)
 bool UChromaWindow::axisLimitSetExtreme(int axis, bool minLim)
 {
 	if (refreshing_) return false;
-	if (minLim) axisMin_[axis] = transformedDataMinima()[axis];
-	else axisMax_[axis] = transformedDataMaxima()[axis];
+	if (minLim) axisMin_[axis] = axisLimitMin_[axis];
+	else axisMax_[axis] = axisLimitMax_[axis];
 
-	// Update relevant parts of gui, the axes primitives, flag to regenerate collection's surface data, and finally the display
+	// Update relevant parts of gui, flag to regenerate axis primitives and collection's surface data, and finally update the display
 	setAsModified();
 	updateAxesTab();
-	updateAxes();
 	regenerateAll();
 	updateDisplay();
 
@@ -115,9 +111,9 @@ bool UChromaWindow::axisCrossChanged(int axis, int dir, double value)
 	if (refreshing_) return false;
 	axisPosition_[axis].set(dir,value);
 
-	// Update relevant parts of gui, the axes primitives, and finally the display
+	// Update relevant parts of gui, flag to regenerate axis primitives, and finally update the display
 	setAsModified();
-	updateAxes();
+	regenerateAxes_ = true;
 	updateDisplay();
 
 	return true;
@@ -131,10 +127,10 @@ bool UChromaWindow::axisCrossSet(int axis, int dir, int type)
 	else if (type == 1) axisPosition_[axis].set(dir, axisMax_[dir]);
 	else return false;
 
-	// Update relevant parts of gui, the axes primitives, and finally the display
+	// Update relevant parts of gui, flag to regenerate axis primitives, and finally update the display
 	setAsModified();
+	regenerateAxes_ = true;
 	updateAxesTab();
-	updateAxes();
 	updateDisplay();
 	
 	return true;
@@ -145,10 +141,10 @@ bool UChromaWindow::axisAutoTicksChanged(int axis, bool enabled)
 	if (refreshing_) return false;
 	axisAutoTicks_[axis] = enabled;
 
-	// Update relevant parts of gui, the axes primitives, and finally the display
+	// Update relevant parts of gui, flag to regenerate axis primitives, and finally update the display
 	setAsModified();
+	regenerateAxes_ = true;
 	updateAxesTab();
-	updateAxes();
 	updateDisplay();
 	
 	return true;
@@ -160,11 +156,11 @@ bool UChromaWindow::axisTicksChanged(int axis, bool start, double value)
 	if (start) axisFirstTick_[axis] = value;
 	else axisTickDelta_[axis] = value;
 
-	// Update relevant parts of gui, the axes primitives, and finally the display
+	// Update relevant parts of gui, flag to regenerate axis primitives, and finally update the display
 	setAsModified();
-	updateAxes();
+	regenerateAxes_ = true;
 	updateDisplay();
-	
+
 	return true;
 }
 
@@ -173,11 +169,11 @@ bool UChromaWindow::axisTickOrientationChanged(int axis, int dir, double value)
 	if (refreshing_) return false;
 	axisTickDirection_[axis].set(dir, value);
 
-	// Update relevant parts of gui, the axes primitives, and finally the display
+	// Update relevant parts of gui, flag to regenerate axis primitives, and finally update the display
 	setAsModified();
-	updateAxes();
+	regenerateAxes_ = true;
 	updateDisplay();
-	
+
 	return true;
 }
 
@@ -186,11 +182,11 @@ bool UChromaWindow::axisLabelOrientationChanged(int axis, int component, double 
 	if (refreshing_) return false;
 	axisLabelOrientation_[axis].set(component, value);
 
-	// Update relevant parts of gui, the axes primitives, and finally the display
+	// Update relevant parts of gui, flag to regenerate axis primitives, and finally update the display
 	setAsModified();
-	updateAxes();
+	regenerateAxes_ = true;
 	updateDisplay();
-	
+
 	return true;
 }
 
@@ -199,11 +195,11 @@ bool UChromaWindow::axisTitleOrientationChanged(int axis, int component, double 
 	if (refreshing_) return false;
 	axisTitleOrientation_[axis].set(component, value);
 
-	// Update relevant parts of gui, the axes primitives, and finally the display
+	// Update relevant parts of gui, flag to regenerate axis primitives, and finally update the display
 	setAsModified();
-	updateAxes();
+	regenerateAxes_ = true;
 	updateDisplay();
-	
+
 	return true;
 }
 
@@ -212,11 +208,11 @@ bool UChromaWindow::axisMinorTicksChanged(int axis, int value)
 	if (refreshing_) return false;
 	axisMinorTicks_[axis] = value;
 
-	// Update relevant parts of gui, the axes primitives, and finally the display
+	// Update relevant parts of gui, flag to regenerate axis primitives, and finally update the display
 	setAsModified();
-	updateAxes();
+	regenerateAxes_ = true;
 	updateDisplay();
-	
+
 	return true;
 }
 
@@ -225,13 +221,13 @@ bool UChromaWindow::axisTitleChanged(int axis, QString& title)
 	if (refreshing_) return false;
 	axisTitle_[axis] = title;
 
-	// Update relevant parts of gui, the axes primitives, and finally the display
+	// Update relevant parts of gui, flag to regenerate axis primitives, and finally update the display
 	setAsModified();
-	updateAxes();
+	regenerateAxes_ = true;
 	updateDisplay();
 	updateSlicesTab();
 	updateSliceMonitor();
-	
+
 	return true;
 }
 
@@ -240,11 +236,11 @@ bool UChromaWindow::axisTitleAlignmentChanged(int axis, TextPrimitive::Horizonta
 	if (refreshing_) return false;
 	axisTitleAnchor_[axis] = anchor;
 
-	// Update relevant parts of gui, the axes primitives, and finally the display
+	// Update relevant parts of gui, flag to regenerate axis primitives, and finally update the display
 	setAsModified();
-	updateAxes();
+	regenerateAxes_ = true;
 	updateDisplay();
-	
+
 	return true;
 }
 
@@ -856,7 +852,7 @@ void UChromaWindow::on_ViewBoundingBoxNoneRadio_clicked(bool checked)
 {
 	if (refreshing_) return;
 	boundingBox_ = UChromaWindow::NoBox;
-	updateAxes();
+	regenerateAxes_ = true;
 	updateDisplay();
 }
 
@@ -864,7 +860,7 @@ void UChromaWindow::on_ViewBoundingBoxPlaneRadio_clicked(bool checked)
 {
 	if (refreshing_) return;
 	boundingBox_ = UChromaWindow::PlaneBox;
-	updateAxes();
+	regenerateAxes_ = true;
 	updateDisplay();
 }
 
@@ -872,7 +868,7 @@ void UChromaWindow::on_ViewBoundingBoxCubeRadio_clicked(bool checked)
 {
 	if (refreshing_) return;
 	boundingBox_ = UChromaWindow::CubeBox;
-	updateAxes();
+	regenerateAxes_ = true;
 	updateDisplay();
 }
 
@@ -880,7 +876,7 @@ void UChromaWindow::on_ViewBoundingBoxPlaneYSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	boundingBoxPlaneY_ = value;
-	updateAxes();
+	regenerateAxes_ = true;
 	updateDisplay();
 }
 
@@ -905,7 +901,7 @@ void UChromaWindow::on_ViewLabelsFaceViewerCheck_clicked(bool checked)
 	if (refreshing_) return;
 	labelFaceViewer_ = checked;
 	setAsModified();
-	updateAxes();
+	regenerateAxes_ = true;
 	updateDisplay();
 }
 
@@ -914,7 +910,7 @@ void UChromaWindow::on_ViewLabelScaleSpin_valueChanged(double value)
 	if (refreshing_) return;
 	labelScale_ = value;
 	setAsModified();
-	updateAxes();
+	regenerateAxes_ = true;
 	updateDisplay();
 }
 
@@ -923,7 +919,7 @@ void UChromaWindow::on_ViewTitleScaleSpin_valueChanged(double value)
 	if (refreshing_) return;
 	titleScale_ = value;
 	setAsModified();
-	updateAxes();
+	regenerateAxes_ = true;
 	updateDisplay();
 }
 
@@ -933,7 +929,35 @@ void UChromaWindow::on_ViewTitleScaleSpin_valueChanged(double value)
 void UChromaWindow::updateAxesTab()
 {
 	refreshing_ = true;
-	
+
+	// Recalculate axes limits based on current data limits and use of logarithmic axes
+	axisLimitMin_ = transformedDataMinima();
+	axisLimitMax_ = transformedDataMaxima();
+	Vec3<double> minPos = transformedDataPositiveMinima(), maxPos = transformedDataPositiveMaxima();
+
+	// Account for logarithmic axes, and clamp axis range
+	for (int axis=0; axis < 3; ++axis)
+	{
+		if (axisLogarithmic_[axis])
+		{
+			// Logarithmic axis, so must set allowable range to avoid negative numbers
+			axisLimitMin_[axis] = minPos[axis];
+			axisLimitMax_[axis] = maxPos[axis];
+		}
+
+		// Clamp current axis values if necessary
+		if (axisMin_[axis] < axisLimitMin_[axis])
+		{
+			axisMin_[axis] = axisLimitMin_[axis];
+			regenerateAxes_ = true;
+		}
+		if (axisMax_[axis] > axisLimitMax_[axis])
+		{
+			axisMax_[axis] = axisLimitMax_[axis];
+			regenerateAxes_ = true;
+		}
+	}
+
 	// Label scales
 	ui.ViewLabelScaleSpin->setValue(labelScale_);
 	ui.ViewTitleScaleSpin->setValue(titleScale_);
@@ -961,32 +985,31 @@ void UChromaWindow::updateAxesTab()
 	ui.AxisZStretchSpin->setValue(axisStretch_.z);
 
 	// Axis Min/Max Limits
-	Vec3<double> transformMin = transformedDataMinima(), transformMax = transformedDataMaxima();
-	ui.AxisXMinSpin->setRange(transformMin.x, transformMax.x);
-	ui.AxisYMinSpin->setRange(transformMin.y, transformMax.y);
-	ui.AxisZMinSpin->setRange(transformMin.z, transformMax.z);
-	ui.AxisXMinSpin->setSingleStep(max((transformMax.x-transformMin.x)*0.01, 1.0));
-	ui.AxisYMinSpin->setSingleStep(max((transformMax.y-transformMin.y)*0.01, 1.0));
-	ui.AxisZMinSpin->setSingleStep(max((transformMax.z-transformMin.z)*0.01, 1.0));
+	ui.AxisXMinSpin->setRange(axisLimitMin_.x, axisLimitMax_.x);
+	ui.AxisYMinSpin->setRange(axisLimitMin_.y, axisLimitMax_.y);
+	ui.AxisZMinSpin->setRange(axisLimitMin_.z, axisLimitMax_.z);
+	ui.AxisXMinSpin->setSingleStep(max((axisLimitMax_.x-axisLimitMin_.x)*0.01, 1.0));
+	ui.AxisYMinSpin->setSingleStep(max((axisLimitMax_.y-axisLimitMin_.y)*0.01, 1.0));
+	ui.AxisZMinSpin->setSingleStep(max((axisLimitMax_.z-axisLimitMin_.z)*0.01, 1.0));
 
-	ui.AxisXMaxSpin->setRange(transformMin.x, transformMax.x);
-	ui.AxisYMaxSpin->setRange(transformMin.y, transformMax.y);
-	ui.AxisZMaxSpin->setRange(transformMin.z, transformMax.z);
-	ui.AxisXMaxSpin->setSingleStep(max((transformMax.x-transformMin.x)*0.01, 1.0));
-	ui.AxisYMaxSpin->setSingleStep(max((transformMax.y-transformMin.y)*0.01, 1.0));
-	ui.AxisZMaxSpin->setSingleStep(max((transformMax.z-transformMin.z)*0.01, 1.0));
+	ui.AxisXMaxSpin->setRange(axisLimitMin_.x, axisLimitMax_.x);
+	ui.AxisYMaxSpin->setRange(axisLimitMin_.y, axisLimitMax_.y);
+	ui.AxisZMaxSpin->setRange(axisLimitMin_.z, axisLimitMax_.z);
+	ui.AxisXMaxSpin->setSingleStep(max((axisLimitMax_.x-axisLimitMin_.x)*0.01, 1.0));
+	ui.AxisYMaxSpin->setSingleStep(max((axisLimitMax_.y-axisLimitMin_.y)*0.01, 1.0));
+	ui.AxisZMaxSpin->setSingleStep(max((axisLimitMax_.z-axisLimitMin_.z)*0.01, 1.0));
 	ui.AxisXMinSpin->setValue(axisMin_.x);
 	ui.AxisYMinSpin->setValue(axisMin_.y);
 	ui.AxisZMinSpin->setValue(axisMin_.z);
 	ui.AxisXMaxSpin->setValue(axisMax_.x);
 	ui.AxisYMaxSpin->setValue(axisMax_.y);
 	ui.AxisZMaxSpin->setValue(axisMax_.z);
-	ui.AxisXMinLabel->setText("DataMin: " + QString::number(transformMin.x));
-	ui.AxisXMaxLabel->setText("DataMax: " + QString::number(transformMax.x));
-	ui.AxisYMinLabel->setText("DataMin: " + QString::number(transformMin.y));
-	ui.AxisYMaxLabel->setText("DataMax: " + QString::number(transformMax.y));
-	ui.AxisZMinLabel->setText("DataMin: " + QString::number(transformMin.z));
-	ui.AxisZMaxLabel->setText("DataMax: " + QString::number(transformMax.z));
+	ui.AxisXMinLabel->setText("DataMin: " + QString::number(axisLimitMin_.x));
+	ui.AxisXMaxLabel->setText("DataMax: " + QString::number(axisLimitMax_.x));
+	ui.AxisYMinLabel->setText("DataMin: " + QString::number(axisLimitMin_.y));
+	ui.AxisYMaxLabel->setText("DataMax: " + QString::number(axisLimitMax_.y));
+	ui.AxisZMinLabel->setText("DataMin: " + QString::number(axisLimitMin_.z));
+	ui.AxisZMaxLabel->setText("DataMax: " + QString::number(axisLimitMax_.z));
 
 	// Axis positions
 	// -- X

@@ -47,10 +47,11 @@ void UChromaWindow::removeCollection(Collection* collection)
 	collections_.remove(collection);
 }
 
-// Flag all surface data for regeneration
+// Flag all surface and axis data for regeneration
 void UChromaWindow::regenerateAll()
 {
 	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next) collection->setRegenerateDisplayData();
+	regenerateAxes_ = true;
 }
 
 // Recalculate tick deltas for specified axis
@@ -143,6 +144,40 @@ Vec3<double> UChromaWindow::transformedDataMaxima()
 	return maxima;
 }
 
+// Return absolute minimum positive transformed values over all collections
+Vec3<double> UChromaWindow::transformedDataPositiveMinima()
+{
+	if (collections_.nItems() == 0) return Vec3<double>(0.1,0.1,0.1);
+
+	// Set starting values from first collection
+	Vec3<double> v, minima = collections_.first()->transformMinPositive();
+	for (Collection* collection = collections_.first()->next; collection != NULL; collection = collection->next)
+	{
+		v = collection->transformMinPositive();
+		if (v.x < minima.x) minima.x = v.x;
+		if (v.y < minima.y) minima.y = v.y;
+		if (v.z < minima.z) minima.z = v.z;
+	}
+	return minima;
+}
+
+// Return absolute maximum positive transformed values over all collections
+Vec3<double> UChromaWindow::transformedDataPositiveMaxima()
+{
+	if (collections_.nItems() == 0) return Vec3<double>(1.0, 1.0, 1.0);
+
+	// Set starting values from first collection
+	Vec3<double> v, maxima = collections_.first()->transformMaxPositive();
+	for (Collection* collection = collections_.first()->next; collection != NULL; collection = collection->next)
+	{
+		v = collection->transformMaxPositive();
+		if (v.x > maxima.x) maxima.x = v.x;
+		if (v.y > maxima.y) maxima.y = v.y;
+		if (v.z > maxima.z) maxima.z = v.z;
+	}
+	return maxima;
+}
+
 // Return first collection in list
 Collection* UChromaWindow::collections()
 {
@@ -205,6 +240,7 @@ void UChromaWindow::clearData()
 	labelCorrectOrientation_ = true;
 	labelScale_ = 0.25;
 	titleScale_ = 0.3;
+	regenerateAxes_ = true;
 
 	// Slices
 	sliceAxis_ = -1;
@@ -221,10 +257,9 @@ void UChromaWindow::clearData()
 // Set display limits to show all available data
 void UChromaWindow::showAllData()
 {
-	axisMin_ = transformedDataMinima();
-	axisMax_ = transformedDataMaxima();
+	axisMin_ = axisLimitMin_;
+	axisMax_ = axisLimitMax_;
 
-	// Regenerate axes and flag that all surfaces should be regenerated (data and primitive)
-	updateAxes();
+	// Flag that all surfaces and axes should be regenerated (data and primitive)
 	regenerateAll();
 }

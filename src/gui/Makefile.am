@@ -21,10 +21,11 @@ SUFFIXES: .ui .uih .qrc
 clean-local:
 	-rm -f ui_* colourbutton.cpp gradientbar.cpp icons.cpp plotwidget.cpp viewer.cpp 
 
-libgui_a_SOURCES = icons.qrc graphwidget.ui 
+libgui_a_SOURCES = icons.qrc graphwidget.ui texponentialspin.uih
+libgui_a_SOURCES += texponentialspin.uih texponentialspin_funcs.cpp
 libgui_a_SOURCES += dataimport.ui fit.ui saveimage.ui slicemonitor.ui uchroma.ui uchroma_funcs.cpp uchroma_axes.cpp uchroma_collection.cpp uchroma_collection_data.cpp uchroma_collection_style.cpp uchroma_collection_transform.cpp uchroma_slices.cpp uchroma_slots.cpp uchroma_surface.cpp
 
-libgui_a_SOURCES += data.cpp io.cpp keywords.cpp slices.cpp surface.cpp
+libgui_a_SOURCES += axes.cpp data.cpp io.cpp keywords.cpp slices.cpp
 libgui_a_SOURCES += plotwidget.uih plotwidget_data.cpp plotwidget_funcs.cpp plotwidget_paintevent.cpp
 libgui_a_SOURCES += dataimport_funcs.cpp dataimport_seqxy.cpp fit_funcs.cpp graphwidget_funcs.cpp saveimage_funcs.cpp slicemonitor_funcs.cpp
 libgui_a_SOURCES += colourbutton.uih colourbutton_funcs.cpp

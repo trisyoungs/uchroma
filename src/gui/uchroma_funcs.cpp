@@ -109,7 +109,6 @@ void UChromaWindow::updateAfterLoad()
 	for (Collection* c = collections_.first(); c != NULL; c = c->next) c->calculateDataLimits();
 
 	// Update GUI
-	updateAxes();
 	updateAllTabs();
 	updateTitleBar();
 
