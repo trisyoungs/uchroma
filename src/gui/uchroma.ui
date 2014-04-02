@@ -47,7 +47,7 @@
            </size>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="CollectionsTab">
            <attribute name="title">
@@ -816,15 +816,18 @@
                           </widget>
                          </item>
                          <item>
-                          <widget class="QDoubleSpinBox" name="ColourRGBGradientASpin">
-                           <property name="decimals">
-                            <number>3</number>
+                          <widget class="TExponentialSpin" name="ColourRGBGradientASpin" native="true">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
                            </property>
-                           <property name="minimum">
-                            <double>-10000000.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>10000000.000000000000000</double>
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>31</height>
+                            </size>
                            </property>
                           </widget>
                          </item>
@@ -920,15 +923,18 @@
                           </widget>
                          </item>
                          <item>
-                          <widget class="QDoubleSpinBox" name="ColourRGBGradientBSpin">
-                           <property name="decimals">
-                            <number>3</number>
+                          <widget class="TExponentialSpin" name="ColourRGBGradientBSpin" native="true">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
                            </property>
-                           <property name="minimum">
-                            <double>-10000000.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>10000000.000000000000000</double>
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>31</height>
+                            </size>
                            </property>
                           </widget>
                          </item>
@@ -1034,15 +1040,18 @@
                           </widget>
                          </item>
                          <item>
-                          <widget class="QDoubleSpinBox" name="ColourHSVGradientASpin">
-                           <property name="decimals">
-                            <number>3</number>
+                          <widget class="TExponentialSpin" name="ColourHSVGradientASpin" native="true">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
                            </property>
-                           <property name="minimum">
-                            <double>-10000000.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>10000000.000000000000000</double>
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>31</height>
+                            </size>
                            </property>
                           </widget>
                          </item>
@@ -1138,15 +1147,18 @@
                           </widget>
                          </item>
                          <item>
-                          <widget class="QDoubleSpinBox" name="ColourHSVGradientBSpin">
-                           <property name="decimals">
-                            <number>3</number>
+                          <widget class="TExponentialSpin" name="ColourHSVGradientBSpin" native="true">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
                            </property>
-                           <property name="minimum">
-                            <double>-10000000.000000000000000</double>
-                           </property>
-                           <property name="maximum">
-                            <double>10000000.000000000000000</double>
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>31</height>
+                            </size>
                            </property>
                           </widget>
                          </item>
@@ -1585,28 +1597,6 @@
                        </property>
                       </widget>
                      </item>
-                     <item row="0" column="4">
-                      <widget class="QDoubleSpinBox" name="AxisXMaxSpin">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="decimals">
-                        <number>4</number>
-                       </property>
-                       <property name="minimum">
-                        <double>-1000000.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>1000000.000000000000000</double>
-                       </property>
-                       <property name="value">
-                        <double>1.000000000000000</double>
-                       </property>
-                      </widget>
-                     </item>
                      <item row="0" column="3">
                       <widget class="QLabel" name="XAxisLabel">
                        <property name="sizePolicy">
@@ -1623,10 +1613,38 @@
                      <item row="0" column="1">
                       <widget class="TExponentialSpin" name="AxisXMinSpin" native="true">
                        <property name="sizePolicy">
-                        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                          <horstretch>0</horstretch>
                          <verstretch>0</verstretch>
                         </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>31</height>
+                        </size>
+                       </property>
+                       <property name="toolTip">
+                        <string>Minimum value to display on the X axis</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="4">
+                      <widget class="TExponentialSpin" name="AxisXMaxSpin" native="true">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>31</height>
+                        </size>
+                       </property>
+                       <property name="toolTip">
+                        <string>Maximum value to display on the X axis</string>
                        </property>
                       </widget>
                      </item>
@@ -1666,21 +1684,21 @@
                       </widget>
                      </item>
                      <item row="0" column="1">
-                      <widget class="QDoubleSpinBox" name="AxisXCrossAtYSpin">
+                      <widget class="TExponentialSpin" name="AxisXCrossAtYSpin" native="true">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                          <horstretch>0</horstretch>
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="decimals">
-                        <number>3</number>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>31</height>
+                        </size>
                        </property>
-                       <property name="minimum">
-                        <double>-1000000.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>1000000.000000000000000</double>
+                       <property name="toolTip">
+                        <string>Y axis value at which the X axis crosses</string>
                        </property>
                       </widget>
                      </item>
@@ -1698,21 +1716,21 @@
                       </widget>
                      </item>
                      <item row="1" column="1">
-                      <widget class="QDoubleSpinBox" name="AxisXCrossAtZSpin">
+                      <widget class="TExponentialSpin" name="AxisXCrossAtZSpin" native="true">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                          <horstretch>0</horstretch>
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="decimals">
-                        <number>3</number>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>31</height>
+                        </size>
                        </property>
-                       <property name="minimum">
-                        <double>-1000000.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>1000000.000000000000000</double>
+                       <property name="toolTip">
+                        <string>Z axis value at which the X axis crosses</string>
                        </property>
                       </widget>
                      </item>
@@ -2602,24 +2620,21 @@
                       </widget>
                      </item>
                      <item row="0" column="4">
-                      <widget class="QDoubleSpinBox" name="AxisYMaxSpin">
+                      <widget class="TExponentialSpin" name="AxisYMaxSpin" native="true">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                          <horstretch>0</horstretch>
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="decimals">
-                        <number>4</number>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>31</height>
+                        </size>
                        </property>
-                       <property name="minimum">
-                        <double>-1000000.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>1000000.000000000000000</double>
-                       </property>
-                       <property name="value">
-                        <double>1.000000000000000</double>
+                       <property name="toolTip">
+                        <string>Maximum value to display on the Y axis</string>
                        </property>
                       </widget>
                      </item>
@@ -2663,24 +2678,21 @@
                       </widget>
                      </item>
                      <item row="0" column="1">
-                      <widget class="QDoubleSpinBox" name="AxisYMinSpin">
+                      <widget class="TExponentialSpin" name="AxisYMinSpin" native="true">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                          <horstretch>0</horstretch>
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="decimals">
-                        <number>4</number>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>31</height>
+                        </size>
                        </property>
-                       <property name="minimum">
-                        <double>-1000000.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>1000000.000000000000000</double>
-                       </property>
-                       <property name="value">
-                        <double>1.000000000000000</double>
+                       <property name="toolTip">
+                        <string>Minimum value to display on the Y axis</string>
                        </property>
                       </widget>
                      </item>
@@ -2746,21 +2758,21 @@
                       </widget>
                      </item>
                      <item row="0" column="1">
-                      <widget class="QDoubleSpinBox" name="AxisYCrossAtXSpin">
+                      <widget class="TExponentialSpin" name="AxisYCrossAtXSpin" native="true">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                          <horstretch>0</horstretch>
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="decimals">
-                        <number>3</number>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>31</height>
+                        </size>
                        </property>
-                       <property name="minimum">
-                        <double>-1000000.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>1000000.000000000000000</double>
+                       <property name="toolTip">
+                        <string>Z axis value at which the X axis crosses</string>
                        </property>
                       </widget>
                      </item>
@@ -2778,21 +2790,21 @@
                       </widget>
                      </item>
                      <item row="1" column="1">
-                      <widget class="QDoubleSpinBox" name="AxisYCrossAtZSpin">
+                      <widget class="TExponentialSpin" name="AxisYCrossAtZSpin" native="true">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                          <horstretch>0</horstretch>
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="decimals">
-                        <number>3</number>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>31</height>
+                        </size>
                        </property>
-                       <property name="minimum">
-                        <double>-1000000.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>1000000.000000000000000</double>
+                       <property name="toolTip">
+                        <string>Z axis value at which the Y axis crosses</string>
                        </property>
                       </widget>
                      </item>
@@ -3664,24 +3676,21 @@
                       </widget>
                      </item>
                      <item row="0" column="1">
-                      <widget class="QDoubleSpinBox" name="AxisZMinSpin">
+                      <widget class="TExponentialSpin" name="AxisZMinSpin" native="true">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                          <horstretch>0</horstretch>
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="decimals">
-                        <number>4</number>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>31</height>
+                        </size>
                        </property>
-                       <property name="minimum">
-                        <double>-1000000.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>1000000.000000000000000</double>
-                       </property>
-                       <property name="value">
-                        <double>1.000000000000000</double>
+                       <property name="toolTip">
+                        <string>Minimum value to display on the Z axis</string>
                        </property>
                       </widget>
                      </item>
@@ -3737,24 +3746,21 @@
                       </widget>
                      </item>
                      <item row="0" column="4">
-                      <widget class="QDoubleSpinBox" name="AxisZMaxSpin">
+                      <widget class="TExponentialSpin" name="AxisZMaxSpin" native="true">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                          <horstretch>0</horstretch>
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="decimals">
-                        <number>4</number>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>31</height>
+                        </size>
                        </property>
-                       <property name="minimum">
-                        <double>-1000000.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>1000000.000000000000000</double>
-                       </property>
-                       <property name="value">
-                        <double>1.000000000000000</double>
+                       <property name="toolTip">
+                        <string>Maximum value to display on the Z axis</string>
                        </property>
                       </widget>
                      </item>
@@ -3820,21 +3826,21 @@
                       </widget>
                      </item>
                      <item row="0" column="1">
-                      <widget class="QDoubleSpinBox" name="AxisZCrossAtXSpin">
+                      <widget class="TExponentialSpin" name="AxisZCrossAtXSpin" native="true">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                          <horstretch>0</horstretch>
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="decimals">
-                        <number>3</number>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>31</height>
+                        </size>
                        </property>
-                       <property name="minimum">
-                        <double>-1000000.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>1000000.000000000000000</double>
+                       <property name="toolTip">
+                        <string>X axis value at which the Z axis crosses</string>
                        </property>
                       </widget>
                      </item>
@@ -3852,21 +3858,21 @@
                       </widget>
                      </item>
                      <item row="1" column="1">
-                      <widget class="QDoubleSpinBox" name="AxisZCrossAtYSpin">
+                      <widget class="TExponentialSpin" name="AxisZCrossAtYSpin" native="true">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                          <horstretch>0</horstretch>
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="decimals">
-                        <number>3</number>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>31</height>
+                        </size>
                        </property>
-                       <property name="minimum">
-                        <double>-1000000.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>1000000.000000000000000</double>
+                       <property name="toolTip">
+                        <string>Y axis value at which the Z axis crosses</string>
                        </property>
                       </widget>
                      </item>
@@ -4831,9 +4837,9 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab">
+          <widget class="QWidget" name="OptionsTab">
            <attribute name="title">
-            <string>Page</string>
+            <string>Options</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_30">
             <item>
@@ -5263,7 +5269,7 @@
      <x>0</x>
      <y>0</y>
      <width>1207</width>
-     <height>23</height>
+     <height>31</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

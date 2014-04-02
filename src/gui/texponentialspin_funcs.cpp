@@ -25,6 +25,14 @@
 // Constructor
 TExponentialSpin::TExponentialSpin(QWidget *parent) : QAbstractSpinBox(parent)
 {
+	// Set default values
+	value_ = 0.0;
+	valueMin_ = -10.0;
+	valueMax_ = 10.0;
+	valueStep_ = 1.0;
+	limitMinValue_ = false;
+	limitMaxValue_ = false;
+
 	// Set validator
 	QRegExp regExp("[-+]?[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?");
 	validator_.setRegExp(regExp);
@@ -41,13 +49,13 @@ TExponentialSpin::TExponentialSpin(QWidget *parent) : QAbstractSpinBox(parent)
 // Clamp current value to allowable range
 bool TExponentialSpin::clamp()
 {
-	if (value_.value() < valueMin_)
+	if (limitMinValue_ && (value_.value() < valueMin_))
 	{
 		value_ = valueMin_;
 		emit(valueChanged(value_.value()));
 		return true;
 	}
-	else if (value_.value() > valueMax_)
+	else if (limitMaxValue_ && (value_.value() > valueMax_))
 	{
 		value_ = valueMax_;
 		emit(valueChanged(value_.value()));
@@ -79,14 +87,37 @@ void TExponentialSpin::setValue(double value)
 	updateText();
 }
 
-// Set allowable range of value
-void TExponentialSpin::setRange(double minvalue, double maxvalue)
+// Set minimum limit
+void TExponentialSpin::setMinimumValue(double value)
 {
-	valueMin_ = minvalue;
-	valueMax_ = maxvalue;
+	valueMin_ = value;
+	limitMinValue_ = true;
+}
+
+// Set minimum limit
+void TExponentialSpin::setMaximumValue(double value)
+{
+	valueMax_ = value;
+	limitMaxValue_ = true;
+}
+
+// Set allowable range of value
+void TExponentialSpin::setRange(bool limitMin, double minValue, bool limitMax, double maxValue)
+{
+	valueMin_ = minValue;
+	limitMinValue_ = limitMin;
+	valueMax_ = maxValue;
+	limitMaxValue_ = limitMax;
 
 	// Clamp current value if necessary
 	if (clamp()) updateText();
+}
+
+// Remove range limits
+void TExponentialSpin::setUnlimitedRange()
+{
+	limitMinValue_ = false;
+	limitMaxValue_ = false;
 }
 
 // Set single step value
@@ -124,8 +155,8 @@ void TExponentialSpin::stepBy(int nSteps)
 // Return which steps should be enabled
 QAbstractSpinBox::StepEnabled TExponentialSpin::stepEnabled() const
 {
-	bool up = value_.value() < valueMax_;
-	bool down = value_.value() > valueMin_;
+	bool up = (value_.value() < valueMax_) || (!limitMaxValue_);
+	bool down = (value_.value() > valueMin_) || (!limitMinValue_);
 
 	if (up && down) return (QAbstractSpinBox::StepUpEnabled | QAbstractSpinBox::StepDownEnabled);
 	else if (up) return QAbstractSpinBox::StepUpEnabled;

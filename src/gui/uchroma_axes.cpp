@@ -935,7 +935,7 @@ void UChromaWindow::updateAxesTab()
 	axisLimitMax_ = transformedDataMaxima();
 	Vec3<double> minPos = transformedDataPositiveMinima(), maxPos = transformedDataPositiveMaxima();
 
-	// Account for logarithmic axes, and clamp axis range
+	// Account for logarithmic axes, clamp axis range / cross points if necessary, and 
 	for (int axis=0; axis < 3; ++axis)
 	{
 		if (axisLogarithmic_[axis])
@@ -943,18 +943,18 @@ void UChromaWindow::updateAxesTab()
 			// Logarithmic axis, so must set allowable range to avoid negative numbers
 			axisLimitMin_[axis] = minPos[axis];
 			axisLimitMax_[axis] = maxPos[axis];
-		}
 
-		// Clamp current axis values if necessary
-		if (axisMin_[axis] < axisLimitMin_[axis])
-		{
-			axisMin_[axis] = axisLimitMin_[axis];
-			regenerateAxes_ = true;
-		}
-		if (axisMax_[axis] > axisLimitMax_[axis])
-		{
-			axisMax_[axis] = axisLimitMax_[axis];
-			regenerateAxes_ = true;
+			// Clamp current axis values if necessary
+			if (axisMin_[axis] < axisLimitMin_[axis])
+			{
+				axisMin_[axis] = axisLimitMin_[axis];
+				regenerateAxes_ = true;
+			}
+			if (axisMax_[axis] > axisLimitMax_[axis])
+			{
+				axisMax_[axis] = axisLimitMax_[axis];
+				regenerateAxes_ = true;
+			}
 		}
 	}
 
@@ -985,16 +985,16 @@ void UChromaWindow::updateAxesTab()
 	ui.AxisZStretchSpin->setValue(axisStretch_.z);
 
 	// Axis Min/Max Limits
-	ui.AxisXMinSpin->setRange(axisLimitMin_.x, axisLimitMax_.x);
-	ui.AxisYMinSpin->setRange(axisLimitMin_.y, axisLimitMax_.y);
-	ui.AxisZMinSpin->setRange(axisLimitMin_.z, axisLimitMax_.z);
+	ui.AxisXMinSpin->setRange(axisLogarithmic_.x, axisLimitMin_.x, false, 0.0);
+	ui.AxisYMinSpin->setRange(axisLogarithmic_.y, axisLimitMin_.y, false, 0.0);
+	ui.AxisZMinSpin->setRange(axisLogarithmic_.z, axisLimitMin_.z, false, 0.0);
 	ui.AxisXMinSpin->setSingleStep(max((axisLimitMax_.x-axisLimitMin_.x)*0.01, 1.0));
 	ui.AxisYMinSpin->setSingleStep(max((axisLimitMax_.y-axisLimitMin_.y)*0.01, 1.0));
 	ui.AxisZMinSpin->setSingleStep(max((axisLimitMax_.z-axisLimitMin_.z)*0.01, 1.0));
 
-	ui.AxisXMaxSpin->setRange(axisLimitMin_.x, axisLimitMax_.x);
-	ui.AxisYMaxSpin->setRange(axisLimitMin_.y, axisLimitMax_.y);
-	ui.AxisZMaxSpin->setRange(axisLimitMin_.z, axisLimitMax_.z);
+	ui.AxisXMaxSpin->setRange(axisLogarithmic_.x, axisLimitMin_.x, false, 0.0);
+	ui.AxisYMaxSpin->setRange(axisLogarithmic_.y, axisLimitMin_.y, false, 0.0);
+	ui.AxisZMaxSpin->setRange(axisLogarithmic_.z, axisLimitMin_.z, false, 0.0);
 	ui.AxisXMaxSpin->setSingleStep(max((axisLimitMax_.x-axisLimitMin_.x)*0.01, 1.0));
 	ui.AxisYMaxSpin->setSingleStep(max((axisLimitMax_.y-axisLimitMin_.y)*0.01, 1.0));
 	ui.AxisZMaxSpin->setSingleStep(max((axisLimitMax_.z-axisLimitMin_.z)*0.01, 1.0));
@@ -1013,14 +1013,20 @@ void UChromaWindow::updateAxesTab()
 
 	// Axis positions
 	// -- X
+	ui.AxisXCrossAtYSpin->setRange(axisLogarithmic_.y, axisLimitMin_.y, false, 0.0);
 	ui.AxisXCrossAtYSpin->setValue(axisPosition_[0].y);
+	ui.AxisXCrossAtZSpin->setRange(axisLogarithmic_.z, axisLimitMin_.z, false, 0.0);
 	ui.AxisXCrossAtZSpin->setValue(axisPosition_[0].z);
 	// -- Y
 	ui.AxisYCrossAtXSpin->setValue(axisPosition_[1].x);
+	ui.AxisYCrossAtXSpin->setRange(axisLogarithmic_.x, axisLimitMin_.x, false, 0.0);
 	ui.AxisYCrossAtZSpin->setValue(axisPosition_[1].z);
+	ui.AxisYCrossAtZSpin->setRange(axisLogarithmic_.z, axisLimitMin_.z, false, 0.0);
 	// -- Z
 	ui.AxisZCrossAtXSpin->setValue(axisPosition_[2].x);
+	ui.AxisZCrossAtXSpin->setRange(axisLogarithmic_.x, axisLimitMin_.x, false, 0.0);
 	ui.AxisZCrossAtYSpin->setValue(axisPosition_[2].y);
+	ui.AxisZCrossAtYSpin->setRange(axisLogarithmic_.y, axisLimitMin_.y, false, 0.0);
 
 	// Axis Ticks
 	// -- X

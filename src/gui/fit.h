@@ -25,9 +25,13 @@
 #include <QtGui/QWidget>
 #include <QtCore/QObject>
 #include "gui/ui_fit.h"
+#include "base/dnchar.h"
+#include "parser/tree.h"
+#include "templates/list.h"
 
 // Forward Declarations
 class UChromaWindow;
+class Variable;
 
 /*
  * Fit Variable

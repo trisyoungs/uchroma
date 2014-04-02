@@ -118,7 +118,7 @@
 
 				// If the current value is in range, plot a tick
 				u[axis] = (axisInverted_[axis] ? log10(axisMax_[axis]/value): log10(value)) * axisStretch_[axis];
-				if (value >= axisMin)
+				if (log10(value) >= axisMin)
 				{
 					// Tick mark
 					ui.MainView->addAxisLine(axis, u, u+tickDir*(count == 0 ? 0.1 : 0.05));
@@ -126,8 +126,9 @@
 					// Tick label
 					if (count == 0)
 					{
-						// Determine resulting text primitive width (so we can do label rotations)
-						s = QString::number(value);
+						// Create text, accounting for zero-roundoff, and add a text primitive
+						if (fabs(value) < pow(10,power-5)) s = "0";
+						else s = QString::number(value);
 
 						ui.MainView->addAxisText(axis, s, u, labelTransform);
 					}
@@ -181,8 +182,9 @@
 					{
 						ui.MainView->addAxisLine(axis, u, u + tickDir*0.1);
 						
-						// Get formatted label text
-						s = QString::number(value);
+						// Get formatted label text, acounting for roundoff error
+						if (fabs(value) < axisTickDelta_[axis]*1.0e-10) s = "0";
+						else s = QString::number(value);
 
 						ui.MainView->addAxisText(axis, s, u, labelTransform);
 						

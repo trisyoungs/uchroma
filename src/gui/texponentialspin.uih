@@ -31,7 +31,7 @@ class TExponentialSpin : public QAbstractSpinBox
 	
 	public:
 	// Constructor
-	TExponentialSpin(QWidget *parent = 0);
+	TExponentialSpin(QWidget* parent = 0);
 
 
 	/*
@@ -40,8 +40,10 @@ class TExponentialSpin : public QAbstractSpinBox
 	private:
 	// Validator for data
 	QRegExpValidator validator_;
-	// Limits for value
+	// Limits for value (if enabled)
 	double valueMin_, valueMax_;
+	// Whether limits are enabled
+	bool limitMinValue_, limitMaxValue_;
 	// Step value
 	double valueStep_;
 	// Mantissa/exponent representation of current value
@@ -49,7 +51,7 @@ class TExponentialSpin : public QAbstractSpinBox
 	
 	private:
 	// Clamp current value to allowable range
-		bool clamp();
+	bool clamp();
 	// Create text from current value, and display in lineEdit
 	void updateText(int precision = 4);
 
@@ -58,8 +60,14 @@ class TExponentialSpin : public QAbstractSpinBox
 	double value();
 	// Set value
 	void setValue(double value);
+	// Set minimum limit
+	void setMinimumValue(double value);
+	// Set minimum limit
+	void setMaximumValue(double value);
 	// Set allowable range of value
-	void setRange(double minvalue, double maxvalue);
+	void setRange(bool limitMin, double minValue, bool limitMax, double maxvalue);
+	// Remove range limits
+	void setUnlimitedRange();
 	// Set single step value
 	void setSingleStep(double step);
 
