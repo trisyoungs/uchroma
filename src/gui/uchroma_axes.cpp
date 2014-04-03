@@ -122,9 +122,9 @@ bool UChromaWindow::axisCrossChanged(int axis, int dir, double value)
 bool UChromaWindow::axisCrossSet(int axis, int dir, int type)
 {
 	if (refreshing_) return false;
-	if (type == -1) axisPosition_[axis].set(dir, axisMin_[dir]);
-	else if ((type == 0) && (axisMin_[dir] <= 0.0) && (axisMax_[dir] >= 0.0)) axisPosition_[axis].set(dir, 0.0);
-	else if (type == 1) axisPosition_[axis].set(dir, axisMax_[dir]);
+	if (type == -1) axisPosition_[axis].set(dir, axisLimitMin_[dir]);
+	else if ((type == 0) && (axisLimitMin_[dir] <= 0.0) && (axisLimitMax_[dir] >= 0.0)) axisPosition_[axis].set(dir, 0.0);
+	else if (type == 1) axisPosition_[axis].set(dir, axisLimitMax_[dir]);
 	else return false;
 
 	// Update relevant parts of gui, flag to regenerate axis primitives, and finally update the display
@@ -955,6 +955,21 @@ void UChromaWindow::updateAxesTab()
 				axisMax_[axis] = axisLimitMax_[axis];
 				regenerateAxes_ = true;
 			}
+		}
+	}
+
+	// Check axis position values
+	for (int axis=0; axis < 3; ++axis)
+	{
+		if (axisPosition_[axis][(axis+1)%3] < axisLimitMin_[(axis+1)%3])
+		{
+			axisPosition_[axis].set((axis+1)%3, axisLimitMin_[(axis+1)%3]);
+			regenerateAxes_ = true;
+		}
+		if (axisPosition_[axis][(axis+2)%3] < axisLimitMin_[(axis+2)%3])
+		{
+			axisPosition_[axis].set((axis+2)%3, axisLimitMin_[(axis+2)%3]);
+			regenerateAxes_ = true;
 		}
 	}
 

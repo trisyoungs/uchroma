@@ -210,7 +210,6 @@
 	ui.MainView->createBoundingBox(boundingBox_, axisLogarithmic_.y ? log10(boundingBoxPlaneY_) : boundingBoxPlaneY_);
 
 	regenerateAxes_ = false;
-	ui.MainView->update();
 }
 
 // Return central coordinate of surface

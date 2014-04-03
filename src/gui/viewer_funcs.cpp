@@ -151,7 +151,7 @@ void Viewer::paintGL()
 
 	// Clear view
 	msg.print(Messenger::Verbose, " --> Clearing context, background, and setting pen colour\n");
-	glViewport(0,0,contextWidth_,contextHeight_);
+	glViewport(0, 0, contextWidth_, contextHeight_);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
