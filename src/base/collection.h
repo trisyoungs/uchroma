@@ -175,8 +175,8 @@ class Collection : public ListItem<Collection>
 	AlphaControl alphaControl_;
 	// Fixed alpha value (for FixedAlpha option)
 	int fixedAlpha_;
-	// Flag indicating that colourscale needs to be regenerated
-	bool regenerateColourScale_;
+	// Flag indicating that colourscale is valid (and doesn't need to be regenerated)
+	bool colourScaleValid_;
 
 	public:
 	// Update colour scale
@@ -215,50 +215,50 @@ class Collection : public ListItem<Collection>
 	double fixedAlpha();
 	// Return current colourscale
 	const ColourScale& colourScale();
-	// Return whether colourscale needs to be updated
-	bool regenerateColourScale();
+	// Return whether colourscale is valid
+	bool colourScaleValid();
 
 
 	/*
-	 * Surface
+	 * Display
 	 */
 	public:
-	// Surface types enum
-	enum SurfaceStyle { LineSurface, FullSurface, GridSurface, nSurfaceStyles };
-	// Convert text string to SurfaceStyle
-	static SurfaceStyle surfaceStyle(const char* s);
-	// Convert SurfaceStyle to text string
-	static const char* surfaceStyle(SurfaceStyle kwd);
+	// Display types enum
+	enum DisplayStyle { LineStyle, GridStyle, SurfaceStyle, nDisplayStyles };
+	// Convert text string to DisplayStyle
+	static DisplayStyle displayStyle(const char* s);
+	// Convert DisplayStyle to text string
+	static const char* displayStyle(DisplayStyle kwd);
 
 	private:
 	// Transformed data to display
-	List<Data2D> surfaceData_;
+	List<Data2D> displayData_;
 	// Display style of data
-	SurfaceStyle surfaceStyle_;
-	// Flag indicating that display data needs to be regenerated
-	bool regenerateDisplayData_;
-	// GL primitive containing surface
-	Primitive surfacePrimitive_;
-	// Flag indicating that display data needs to be regenerated
-	bool regenerateSurfacePrimitive_;
+	DisplayStyle displayStyle_;
+	// Flag indicating whether display data is valid (and doesn't need to be regenerated)
+	bool displayDataValid_;
+	// GL primitive containing display data
+	Primitive displayPrimitive_;
+	// Flag indicating whether display primitive is valid (and doesn't need to be regenerated)
+	bool displayPrimitiveValid_;
 
 	public:
 	// Return transformed data to display
-	List<Data2D>& surfaceData();
+	List<Data2D>& displayData();
 	// Set display style of data
-	void setSurfaceStyle(SurfaceStyle style);
-	// R%eturn display style of data
-	SurfaceStyle surfaceStyle();
+	void setDisplayStyle(DisplayStyle style);
+	// Return display style of data
+	DisplayStyle displayStyle();
 	// Manually set the flag to force regeneration of surface data
-	void setRegenerateDisplayData();
+	void setDisplayDataInvalid();
 	// Flag that the primitive has been updated
-	void setSurfacePrimitiveUpdated();
-	// Return whether primitive needs to be updated
-	bool regenerateSurfacePrimitive();
-	// Return surface primitive
-	Primitive& surfacePrimitive();
+	void setDisplayPrimitiveValid();
+	// Return whether primitive is valid
+	bool displayPrimitiveValid();
+	// Return display primitive
+	Primitive& displayPrimitive();
 	// Update display data and surface if necessary
-	void updateSurfaceData(Vec3<double> axisMin, Vec3<double> axisMax, Vec3<bool> axisInverted, Vec3<bool> axisLogarithmic, Vec3<double> axisStretch);
+	void updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, Vec3<bool> axisInverted, Vec3<bool> axisLogarithmic, Vec3<double> axisStretch);
 };
 
 #endif

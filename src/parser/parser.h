@@ -61,6 +61,8 @@ class CommandParser
 	ParserSource source_;
 	// Whether the next token to expect is a path step
 	bool expectPathStep_;
+	// Whether to use additional pre-defined constants
+	bool useAdditionalConstants_;
 
 	public:
 	// Reset structure ready for next source

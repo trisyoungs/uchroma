@@ -86,5 +86,4 @@ void UChromaWindow::updateSurfaceTab()
 		ui.SliceSelectorLabel->setText(s.get());
 		ui.SliceSelectorLabel->setEnabled(true);
 	}
-
 }

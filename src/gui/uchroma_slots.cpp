@@ -51,7 +51,7 @@ void UChromaWindow::on_actionFileNew_triggered(bool checked)
 	// Clear data and create new, empty collection ready for use
 	clearData();
 	currentCollection_ = collections_.add();
-	ui.MainView->addSurfacePrimitive(&currentCollection_->surfacePrimitive());
+	ui.MainView->addSurfacePrimitive(&currentCollection_->displayPrimitive());
 
 	updateAfterLoad();
 }
@@ -202,7 +202,7 @@ void UChromaWindow::on_actionToolsFitWindow_triggered(bool checked)
 	if (refreshing_) return;
 	if (checked)
 	{
-// 		updateSliceMonitor();
+		fitDialog_.updateAll();
 		fitDialog_.show();
 	}
 	else fitDialog_.hide();

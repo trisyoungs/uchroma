@@ -31,7 +31,7 @@ UChromaWindow* FitDialog::uChroma_ = NULL;
  */
 
 // Constructor
-FitVariable::FitVariable() : ListItem<FitVariable>()
+EquationVariable::EquationVariable() : ListItem<EquationVariable>()
 {
 	variable_ = NULL;
 	value_ = 10203.4;
@@ -44,104 +44,104 @@ FitVariable::FitVariable() : ListItem<FitVariable>()
 }
 
 // Destructor
-FitVariable::~FitVariable()
+EquationVariable::~EquationVariable()
 {
 }
 
 // Set name
-void FitVariable::setName(const char* name)
+void EquationVariable::setName(const char* name)
 {
 	name_ = name;
 }
 
 // Return name
-const char* FitVariable::name()
+const char* EquationVariable::name()
 {
 	return name_.get();
 }
 
 // Set variable target
-void FitVariable::setVariable(Variable* variable)
+void EquationVariable::setVariable(Variable* variable)
 {
 	variable_ = variable;
 }
 
 // Return variable target
-Variable* FitVariable::variable()
+Variable* EquationVariable::variable()
 {
 	return variable_;
 }
 
 // Set initial value
-void FitVariable::setValue(double value)
+void EquationVariable::setValue(double value)
 {
 	value_ = value;
 }
 
 // Return initial value
-double FitVariable::value()
+double EquationVariable::value()
 {
 	return value_;
 }
 
 // Set minimum limit
-void FitVariable::setMinimumLimit(bool enabled, double value)
+void EquationVariable::setMinimumLimit(bool enabled, double value)
 {
 	minimumLimit_ = value;
 	minimumLimitEnabled_ = enabled;
 }
 
 // Return whether minimum limit is enabled
-bool FitVariable::minimumLimitEnabled()
+bool EquationVariable::minimumLimitEnabled()
 {
 	return minimumLimitEnabled_;
 }
 
 // Return minimum limit value
-double FitVariable::minimumLimit()
+double EquationVariable::minimumLimit()
 {
 	return minimumLimit_;
 }
 
 // Set maximum limit
-void FitVariable::setMaximumLimit(bool enabled, double value)
+void EquationVariable::setMaximumLimit(bool enabled, double value)
 {
 	maximumLimit_ = value;
 	maximumLimitEnabled_ = enabled;
 }
 
 // Return whether maximum limit is enabled
-bool FitVariable::maximumLimitEnabled()
+bool EquationVariable::maximumLimitEnabled()
 {
 	return maximumLimitEnabled_;
 }
 
 // Return maximum limit value
-double FitVariable::maximumLimit()
+double EquationVariable::maximumLimit()
 {
 	return maximumLimit_;
 }
 
 // Set whether this variable should be fit
-void FitVariable::setFit(bool fit)
+void EquationVariable::setFit(bool fit)
 {
 	fit_ = fit;
 }
 
 // Return whether this variable should be fit
-bool FitVariable::fit()
+bool EquationVariable::fit()
 {
 	return fit_;
 }
 
 // Set whether this variable is used in the current equation
-void FitVariable::setUsed(bool used)
+void EquationVariable::setUsed(bool used)
 {
 	used_ = used;
 }
 
 // Return whether this variable is used in the current equation
-bool FitVariable::used()
+bool EquationVariable::used()
 {
 	return used_;
 }
@@ -153,10 +153,13 @@ bool FitVariable::used()
 // Constructor
 FitDialog::FitDialog(QWidget* parent) : QDialog(parent)
 {
+	ui.setupUi(this);
+
 	refreshing_ = false;
 	resetEquation();
+	ui.EquationEdit->setText("cos(x)");
+	equationValid_ = equation_.setCommands("cos(x)");
 	updateFitVariables();
-	ui.setupUi(this);
 }
 
 // Destructor
@@ -174,6 +177,13 @@ void FitDialog::setUChroma(UChromaWindow* ptr)
 	uChroma_ = ptr;
 }
 
+// Update data in window
+void FitDialog::updateAll()
+{
+	updateSourceGroup();
+	updateDestinationGroup();
+}
+
 /*
  * Fit Data
  */
@@ -182,9 +192,9 @@ void FitDialog::setUChroma(UChromaWindow* ptr)
 void FitDialog::resetEquation()
 {
 	equation_.clear();
-	equation_.addGlobalVariable("x");
-	equation_.addGlobalVariable("y");
-	equation_.addGlobalVariable("z");
+	xVariable_ = equation_.addGlobalVariable("x");
+	yVariable_ = equation_.addGlobalVariable("y");
+	zVariable_ = equation_.addGlobalVariable("z");
 	equation_.setGenerateMissingVariables(true);
 	equationValid_ = false;
 }
@@ -193,17 +203,18 @@ void FitDialog::resetEquation()
 void FitDialog::updateFitVariables()
 {
 	// First, clear all 'used' flags
-	FitVariable* fitVar;
-	for (fitVar = fitVariables_.first(); fitVar != NULL; fitVar = fitVar->next)
+	EquationVariable* eqVar;
+	for (eqVar = equationVariables_.first(); eqVar != NULL; eqVar = eqVar->next)
 	{
-		fitVar->setVariable(NULL);
-		fitVar->setUsed(false);
+		eqVar->setVariable(NULL);
+		eqVar->setUsed(false);
 	}
-	nFitVariablesUsed_ = 0;
+	nVariablesUsed_ = 0;
+	fitVariables_.clear();
 
 	// Now, loop over current variables in the equation_
 	// Ignore 'x', 'y', and 'z' if they exist
-	// If a variable already exists in fitVariables_, set it's 'used' status to true.
+	// If a variable already exists in equationVariables_, set it's 'used' status to true.
 	// If it doesn't, create it and set it's 'used' status to true
 	ScopeNode* rootNode = equation_.rootNode();
 	for (Variable* var = rootNode->variables.variables(); var != NULL; var = var->next)
@@ -211,17 +222,18 @@ void FitDialog::updateFitVariables()
 		// Is this variable one of 'x', 'y', or 'z'?
 		if (strcmp(var->name(),"x") == 0 || strcmp(var->name(),"y") == 0 || strcmp(var->name(),"z") == 0) continue;
 
-		for (fitVar = fitVariables_.first(); fitVar != NULL; fitVar = fitVar->next) if (strcmp(fitVar->name(),var->name()) == 0) break;
-		if (fitVar == NULL)
+		for (eqVar = equationVariables_.first(); eqVar != NULL; eqVar = eqVar->next) if (strcmp(eqVar->name(),var->name()) == 0) break;
+		if (eqVar == NULL)
 		{
-			fitVar = fitVariables_.add();
-			fitVar->setName(var->name());
+			eqVar = equationVariables_.add();
+			eqVar->setName(var->name());
 		}
 
 		// Update variable pointer
-		fitVar->setVariable(var);
-		fitVar->setUsed(true);
-		++nFitVariablesUsed_;
+		eqVar->setVariable(var);
+		eqVar->setUsed(true);
+		fitVariables_.add(eqVar);
+		++nVariablesUsed_;
 	}
 }
 
@@ -229,77 +241,14 @@ void FitDialog::updateFitVariables()
 // Widgets / Slots / Reimplementations
 */
 
-// Update variable table
-void FitDialog::updateVariableTable()
-{
-	refreshing_ = true;
-
-	// Get rootnode of the equation
-	ScopeNode* rootNode = equation_.rootNode();
-
-	// Clear table, but don't display anything if equation is not valid
-	ui.VariablesTable->clearContents();
-	if (!equationValid_)
-	{
-		refreshing_ = false;
-		return;
-	}
-	ui.VariablesTable->setRowCount(nFitVariablesUsed_);
-
-	QTableWidgetItem* item;
-	bool status, isXYZ;
-	ReturnValue rv;
-	int count = 0, n;
-	for (int n=0; n<fitVariables_.nItems(); ++n)
-	{
-		// Grab the fit variable and see if it's used in the current equation?
-		FitVariable* fitVar = fitVariables_[n];
-		if (!fitVar->used()) continue;
-
-		// Grab variable pointer from FitVariable
-		Variable* var = fitVar->variable();
-
-		// -- Variable Name / Fit flag
-		item = new QTableWidgetItem();
-		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
-		item->setCheckState(fitVar->fit() ? Qt::Checked : Qt::Unchecked);
-		item->setText(var->name());
-		item->setData(Qt::UserRole, n);
-		ui.VariablesTable->setItem(count, 0, item);
-
-		// -- Value
-		item = new QTableWidgetItem();
-		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
-		item->setText(QString::number(fitVar->value()));
-		item->setData(Qt::UserRole, n);
-		ui.VariablesTable->setItem(count, 1, item);
-
-		// -- Minimum limit
-		item = new QTableWidgetItem();
-		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
-		item->setCheckState(fitVar->minimumLimitEnabled() ? Qt::Checked : Qt::Unchecked);
-		item->setText(QString::number(fitVar->minimumLimit()));
-		item->setData(Qt::UserRole, n);
-		ui.VariablesTable->setItem(count, 2, item);
-
-		// -- Maximum limit
-		item = new QTableWidgetItem();
-		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
-		item->setCheckState(fitVar->maximumLimitEnabled() ? Qt::Checked : Qt::Unchecked);
-		item->setText(QString::number(fitVar->maximumLimit()));
-		item->setData(Qt::UserRole, n);
-		ui.VariablesTable->setItem(count, 3, item);
-		
-		++count;
-	}
-
-	refreshing_ = false;
-}
+/*
+ * Equations Group
+ */
 
 void FitDialog::on_EquationEdit_textChanged(QString text)
 {
 	resetEquation();
-	equationValid_= equation_.setCommands(text);
+	equationValid_ = equation_.setCommands(text);
 	if (equationValid_)
 	{
 		ui.EquationEdit->setPalette(ui.EquationGroup->palette());
@@ -320,6 +269,124 @@ void FitDialog::on_SelectEquationButton_clicked(bool checked)
 {
 }
 
+void FitDialog::on_FitButton_clicked(bool checked)
+{
+	// Grab source collection, and construct a list of data to fit, obeying all defined data limits
+	fitData_.clear();
+	Collection* collection = uChroma_->collection(ui.SourceCollectionCombo->currentIndex());
+	if (!collection) return;
+	if (ui.SourceXYSlicesRadio->isChecked())
+	{
+		// Source data is normal XY slices from the current collection
+		double xMin = ui.SourceXYXMinSpin->value(), xMax = ui.SourceXYXMaxSpin->value();
+		for (int n=ui.SourceXYSliceFromSpin->value(); n<ui.SourceXYSliceToSpin->value(); ++n)
+		{
+			Data2D& oldData = collection->slice(n)->data();
+			Slice* newSlice = fitData_.add();
+			newSlice->data().setZ(oldData.z());
+
+			// Copy x-range specified
+			for (int m=0; m<oldData.nPoints(); ++m)
+			{
+				if (oldData.x(m) < xMin) continue;
+				if (oldData.x(m) > xMax) break;
+				newSlice->data().addPoint(oldData.x(m), oldData.y(m));
+			}
+		}
+	}
+	else if (ui.SourceYZSlicesRadio->isChecked())
+	{
+		// TODO
+	}
+
+	if (ui.FitAtOnceCheck->isChecked())
+	{
+		 currentFitSlice_ = NULL;
+
+		// Call the relevant minimiser
+		simplexMinimise();
+	}
+	else
+	{
+		for (currentFitSlice_ = fitData_.first(); currentFitSlice_ != NULL; currentFitSlice_ = currentFitSlice_->next)
+		{
+			// Call the relevant minimiser
+			simplexMinimise();
+		}
+	}
+}
+
+/*
+ * Variables Group
+ */
+
+// Update variable table
+void FitDialog::updateVariableTable()
+{
+	refreshing_ = true;
+
+	// Get rootnode of the equation
+	ScopeNode* rootNode = equation_.rootNode();
+
+	// Clear table, but don't display anything if equation is not valid
+	ui.VariablesTable->clearContents();
+	if (!equationValid_)
+	{
+		refreshing_ = false;
+		return;
+	}
+	ui.VariablesTable->setRowCount(nVariablesUsed_);
+
+	QTableWidgetItem* item;
+	bool status, isXYZ;
+	ReturnValue rv;
+	int count = 0, n;
+	for (int n=0; n<equationVariables_.nItems(); ++n)
+	{
+		// Grab the fit variable and see if it's used in the current equation?
+		EquationVariable* eqVar = equationVariables_[n];
+		if (!eqVar->used()) continue;
+
+		// Grab variable pointer from FitVariable
+		Variable* var = eqVar->variable();
+
+		// -- Variable Name / Fit flag
+		item = new QTableWidgetItem();
+		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
+		item->setCheckState(eqVar->fit() ? Qt::Checked : Qt::Unchecked);
+		item->setText(var->name());
+		item->setData(Qt::UserRole, n);
+		ui.VariablesTable->setItem(count, 0, item);
+
+		// -- Value
+		item = new QTableWidgetItem();
+		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
+		item->setText(QString::number(eqVar->value()));
+		item->setData(Qt::UserRole, n);
+		ui.VariablesTable->setItem(count, 1, item);
+
+		// -- Minimum limit
+		item = new QTableWidgetItem();
+		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
+		item->setCheckState(eqVar->minimumLimitEnabled() ? Qt::Checked : Qt::Unchecked);
+		item->setText(QString::number(eqVar->minimumLimit()));
+		item->setData(Qt::UserRole, n);
+		ui.VariablesTable->setItem(count, 2, item);
+
+		// -- Maximum limit
+		item = new QTableWidgetItem();
+		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
+		item->setCheckState(eqVar->maximumLimitEnabled() ? Qt::Checked : Qt::Unchecked);
+		item->setText(QString::number(eqVar->maximumLimit()));
+		item->setData(Qt::UserRole, n);
+		ui.VariablesTable->setItem(count, 3, item);
+		
+		++count;
+	}
+
+	refreshing_ = false;
+}
+
 void FitDialog::on_VariablesTable_cellChanged(int row, int column)
 {
 	if (refreshing_) return;
@@ -330,27 +397,101 @@ void FitDialog::on_VariablesTable_cellChanged(int row, int column)
 
 	// Get associated data
 	int index = item->data(Qt::UserRole).toInt();
-	FitVariable* fitVariable = fitVariables_[index];
-	if (!fitVariable) return;
+	EquationVariable* eqVariable = equationVariables_[index];
+	if (!eqVariable) return;
 
 	// Our action depends on the column edited...
 	switch (column)
 	{
 		// Variable name / fit flag
 		case (0):
-			fitVariable->setFit(item->checkState() == Qt::Checked);
+			eqVariable->setFit(item->checkState() == Qt::Checked);
 			break;
 		// Variable value
 		case (1):
-			fitVariable->setValue(item->text().toDouble());
+			eqVariable->setValue(item->text().toDouble());
 			break;
 		// Minimum value and limit flag
 		case (2):
-			fitVariable->setMinimumLimit(item->checkState() == Qt::Checked, item->text().toDouble());
+			eqVariable->setMinimumLimit(item->checkState() == Qt::Checked, item->text().toDouble());
 			break;
 		// Maximum value and limit flag
 		case (3):
-			fitVariable->setMaximumLimit(item->checkState() == Qt::Checked, item->text().toDouble());
+			eqVariable->setMaximumLimit(item->checkState() == Qt::Checked, item->text().toDouble());
 			break;
+	}
+}
+
+/*
+ * Source Group
+ */
+
+// Update source data group
+void FitDialog::updateSourceGroup(bool refreshList)
+{
+	refreshing_ = true;
+
+	// Get currently selected collection (by index)
+	if (refreshList)
+	{
+		int currentIndex = ui.SourceCollectionCombo->currentIndex();
+		ui.SourceCollectionCombo->clear();
+		for (Collection* c = uChroma_->collections(); c != NULL; c = c->next) ui.SourceCollectionCombo->addItem(c->title());
+		if ((currentIndex != -1) && (currentIndex < ui.SourceCollectionCombo->count())) ui.SourceCollectionCombo->setCurrentIndex(currentIndex);
+		else ui.SourceCollectionCombo->setCurrentIndex(0);
+	}
+
+	// Grab current collection
+	Collection* collection = uChroma_->collection(ui.SourceCollectionCombo->currentIndex());
+	if (!collection)
+	{
+		refreshing_ = false;
+		return;
+	}
+
+	// Update spin boxes with limits
+	ui.SourceXYSliceFromSpin->setRange(1, ui.SourceXYSliceToSpin->value());
+	ui.SourceXYSliceToSpin->setRange(ui.SourceXYSliceFromSpin->value(), collection->nSlices());
+	ui.SourceXYFromZLabel->setText("Z = " + QString::number(collection->slice(ui.SourceXYSliceFromSpin->value())->data().z()));
+	ui.SourceXYToZLabel->setText("Z = " + QString::number(collection->slice(ui.SourceXYSliceToSpin->value())->data().z()));
+	ui.SourceXYXMinSpin->setRange(true, collection->transformMin().x, true, collection->transformMax().x);
+	ui.SourceXYXMaxSpin->setRange(true, collection->transformMin().x, true, collection->transformMax().x);
+}
+
+void FitDialog::on_SourceCollectionCombo_currentIndexChanged(int index)
+{
+}
+
+void FitDialog::on_SourceXYSliceFromSpin_valueChanged(int value)
+{
+	ui.SourceXYSliceToSpin->setMinimum(value);
+}
+
+void FitDialog::on_SourceXYSliceToSpin_valueChanged(int value)
+{
+	ui.SourceXYSliceFromSpin->setMaximum(value);
+}
+
+/*
+ * Destination Group
+ */
+
+// Update destination data group
+void FitDialog::updateDestinationGroup()
+{
+	// Get currently selected collection (by user data value)
+	QVariant data = ui.DestinationCollectionCombo->itemData(ui.DestinationCollectionCombo->currentIndex());
+	int currentIndex = data.toInt();
+
+	// Grab current collection
+	Collection* collection = uChroma_->collection(ui.SourceCollectionCombo->currentIndex());
+	if (!collection) return;
+
+	ui.DestinationCollectionCombo->clear();
+	int index = 0;
+	for (Collection* c = uChroma_->collections(); c != NULL; c = c->next, ++index) if (c != collection)
+	{
+		ui.DestinationCollectionCombo->addItem(c->title(), QVariant(index));
+		if (currentIndex == index) ui.DestinationCollectionCombo->setCurrentIndex(currentIndex);
 	}
 }

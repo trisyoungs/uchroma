@@ -234,8 +234,12 @@ class Viewer : public QGLWidget
 	void createPrimitives();
 	// Setup basic GL properties
 	void setupGL();
-	// Construct normal / colour data for slice specified
-	void constructSliceData(Data2D* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, const ColourScale& colourScale, Data2D* previousSlice, Data2D* nextSlice);
+	// Construct line surface representation of data
+	void constructLineSurface(Primitive& primitive, List< Data2D >& displayData, ColourScale colourScale);
+	// Construct normal / colour surface data for slice specified
+	void constructSurfaceStrip(Data2D* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, const ColourScale& colourScale, Data2D* previousSlice, Data2D* nextSlice);
+	// Construct full surface representation of data
+	void constructFullSurface(Primitive& primitive, List< Data2D >& displayData, ColourScale colourScale);
 	// Create/update surface primitive for specified collection
 	void updateSurfacePrimitive(Collection* collection, bool forceUpdate = false);
 

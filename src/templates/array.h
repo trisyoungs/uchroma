@@ -203,6 +203,7 @@ template <class A> class Array : public ListItem< Array<A> >
 	// Operator+= (add to all)
 	void operator+=(const double value) { for (int n=0; n<nItems_; ++n) array_[n] += value; }
 	void operator+=(const int value) { for (int n=0; n<nItems_; ++n) array_[n] += value; }
+	void operator+=(const Array<A> array) { for (int n=0; n<nItems_; ++n) array_[n] += array.value(n); }
 	// Operator-= (subtract from all)
 	void operator-=(const double value) { for (int n=0; n<nItems_; ++n) array_[n] -= value; }
 	void operator-=(const int value) { for (int n=0; n<nItems_; ++n) array_[n] -= value; }

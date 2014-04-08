@@ -57,13 +57,14 @@ Collection::Collection() : ListItem<Collection>()
 	colourSource_ = SingleColourSource;
 	alphaControl_ = Collection::OwnAlpha;
 	fixedAlpha_ = 128;
-	regenerateColourScale_ = true;
+	colourScaleValid_ = false;
 
-	// Surface
-	surfaceData_.clear();
-	surfacePrimitive_.setColourData(true);
-	regenerateDisplayData_ = true;
-	regenerateSurfacePrimitive_ = true;
+	// Display
+	displayData_.clear();
+	displayStyle_ = Collection::SurfaceStyle;
+	displayPrimitive_.setColourData(true);
+	displayDataValid_ = false;
+	displayPrimitiveValid_ = false;
 }
 
 // Destructor
@@ -93,7 +94,7 @@ Slice* Collection::addSlice()
 	// Create new slice
 	Slice* slice = slices_.add();
 
-	regenerateDisplayData_ = true;
+	displayDataValid_ = false;
 	return slice;
 }
 
@@ -112,7 +113,7 @@ void Collection::addSlice(Slice* source)
 	Slice* slice = slices_.add();
 	(*slice) = (*source);
 
-	regenerateDisplayData_ = true;
+	displayDataValid_ = false;
 }
 
 // Return number of slices
@@ -125,7 +126,7 @@ int Collection::nSlices()
 void Collection::removeSlice(Slice* slice)
 {
 	slices_.remove(slice);
-	regenerateDisplayData_ = true;
+	displayDataValid_ = false;
 }
 
 // Set z value of specified slice
@@ -150,7 +151,7 @@ void Collection::setSliceZ(Slice* target, double z)
 		{
 			// Shift specified target up the list
 			slices_.shiftUp(target);
-			regenerateDisplayData_ = true;
+			displayDataValid_ = false;
 			minBad = (target->prev ? (target->prev->data().z() > target->data().z()) : false);
 		}
 		else minBad = false;
@@ -158,7 +159,7 @@ void Collection::setSliceZ(Slice* target, double z)
 		{
 			// Move specified target down the list
 			slices_.shiftDown(target);
-			regenerateDisplayData_ = true;
+			displayDataValid_ = false;
 			maxBad = (target->next ? (target->next->data().z() < target->data().z()) : false);
 		}
 		else maxBad = false;
@@ -264,7 +265,7 @@ Vec3<double> Collection::transformMaxPositive()
 void Collection::setTransformEquation(int axis, QString transformEquation)
 {
 	transforms_[axis].setEquation(transformEquation);
-	regenerateDisplayData_ = true;
+	displayDataValid_ = false;
 }
 
 // Return transform equation for data
@@ -283,7 +284,7 @@ bool Collection::transformEquationValid(int axis)
 void Collection::setTransformEnabled(int axis, bool enabled)
 {
 	transforms_[axis].setEnabled(enabled);
-	regenerateDisplayData_ = true;
+	displayDataValid_ = false;
 }
 
 // Return whether specified transform is enabled
@@ -450,17 +451,17 @@ void Collection::updateColourScale()
 	// Set alpha value for all points if alphaControl_ == FixedAlpha
 	if (alphaControl_ == Collection::FixedAlpha) colourScale_.setAllAlpha(fixedAlpha_);
 
-	regenerateColourScale_ = false;
+	colourScaleValid_ = true;
 
-	// Surface will now need to be regenerated...
-	regenerateSurfacePrimitive_ = true;
+	// Primitive will now need to be regenerated...
+	displayPrimitiveValid_ = false;
 }
 
 // Set colourscale source to use
 void Collection::setColourSource(ColourSource source)
 {
 	colourSource_ = source;
-	regenerateColourScale_ = true;
+	colourScaleValid_ = false;
 }
 
 // Return colourscale source to use
@@ -491,7 +492,7 @@ void Collection::setColourScalePoint(ColourSource source, QColor colour, double 
 	}
 
 	// Update colourscale?
-	if (source == colourSource_) regenerateColourScale_ = true;
+	if (source == colourSource_) colourScaleValid_ = false;
 }
 
 // Return colourscale point specified
@@ -536,7 +537,7 @@ void Collection::addCustomColourScalePoint()
 	customColourScale_.addPoint(customColourScale_.lastPoint() ? customColourScale_.lastPoint()->value() + 1.0 : 0.0, Qt::white);
 
 	// Update colourscale?
-	if (colourSource_ == Collection::CustomGradientSource) regenerateColourScale_ = true;
+	if (colourSource_ == Collection::CustomGradientSource) colourScaleValid_ = false;
 }
 
 // Add point to custom colourscale
@@ -569,7 +570,7 @@ void Collection::removeCustomColourScalePoint(ColourScalePoint* point)
 	customColourScale_.removePoint(point);
 
 	// Update colourscale?
-	if (colourSource_ == Collection::CustomGradientSource) regenerateColourScale_ = true;
+	if (colourSource_ == Collection::CustomGradientSource) colourScaleValid_ = false;
 }
 
 // Set alpha control
@@ -577,7 +578,7 @@ void Collection::setAlphaControl(Collection::AlphaControl alpha)
 {
 
 	alphaControl_ = alpha;
-	regenerateColourScale_ = true;
+	colourScaleValid_ = false;
 }
 
 // Return current alpha control
@@ -590,7 +591,7 @@ Collection::AlphaControl Collection::alphaControl()
 void Collection::setFixedAlpha(double alpha)
 {
 	fixedAlpha_ = alpha;
-	regenerateColourScale_ = true;
+	colourScaleValid_ = false;
 }
 
 // Return fixed alpha value
@@ -603,15 +604,15 @@ double Collection::fixedAlpha()
 const ColourScale& Collection::colourScale()
 {
 	// Does the colourscale need updating first?
-	if (regenerateColourScale_) updateColourScale();
+	if (!colourScaleValid_) updateColourScale();
 	
 	return colourScale_;
 }
 
-// Return whether colourscale needs to be updated
-bool Collection::regenerateColourScale()
+// Return whether colourscale is valid
+bool Collection::colourScaleValid()
 {
-	return regenerateColourScale_;
+	return colourScaleValid_;
 }
 
 /*
@@ -619,75 +620,73 @@ bool Collection::regenerateColourScale()
  */
 
 // Suface Style Keywords
-const char* SurfaceStyleKeywords[] = { "Line", "Full", "Grid" };
+const char* SurfaceStyleKeywords[] = { "Line", "Grid", "Surface" };
 
-// Convert text string to SurfaceStyle
-Collection::SurfaceStyle Collection::surfaceStyle(const char* s)
+// Convert text string to DisplayStyle
+Collection::DisplayStyle Collection::displayStyle(const char* s)
 {
-	for (int n=0; n<nSurfaceStyles; ++n) if (strcmp(s,SurfaceStyleKeywords[n]) == 0) return (Collection::SurfaceStyle) n;
-	return nSurfaceStyles;
+	for (int n=0; n<nDisplayStyles; ++n) if (strcmp(s,SurfaceStyleKeywords[n]) == 0) return (Collection::DisplayStyle) n;
+	return nDisplayStyles;
 }
 
-// Convert SurfaceStyle to text string
-const char* Collection::surfaceStyle(Collection::SurfaceStyle kwd)
+// Convert DisplayStyle to text string
+const char* Collection::displayStyle(Collection::DisplayStyle kwd)
 {
 	return SurfaceStyleKeywords[kwd];
 }
 
 // Return transformed data to display
-List<Data2D>& Collection::surfaceData()
+List<Data2D>& Collection::displayData()
 {
-	return surfaceData_;
+	return displayData_;
 }
 
 // Set display style of data
-void Collection::setSurfaceStyle(SurfaceStyle style)
+void Collection::setDisplayStyle(DisplayStyle style)
 {
-	surfaceStyle_ = style;
+	displayStyle_ = style;
 
-	// Adjust primitive settings here 
-	if (surfaceStyle_ == Collection::FullSurface) surfacePrimitive_.setType(GL_TRIANGLES);
-	else surfacePrimitive_.setType(GL_LINES);
+	displayPrimitiveValid_ = false;
 }
 
 // Return display style of data
-Collection::SurfaceStyle Collection::surfaceStyle()
+Collection::DisplayStyle Collection::displayStyle()
 {
-	return surfaceStyle_;
+	return displayStyle_;
 }
 
 // Manually set the flag to force regeneration of surface data
-void Collection::setRegenerateDisplayData()
+void Collection::setDisplayDataInvalid()
 {
-	regenerateDisplayData_ = true;
+	displayDataValid_ = false;
 }
 
 // Flag that the primitive has been updated
-void Collection::setSurfacePrimitiveUpdated()
+void Collection::setDisplayPrimitiveValid()
 {
-	regenerateSurfacePrimitive_ = false;
+	displayPrimitiveValid_ = true;
 }
 
-// Return whether primitive needs to be updated
-bool Collection::regenerateSurfacePrimitive()
+// Return whether surface primitive is valid
+bool Collection::displayPrimitiveValid()
 {
-	return regenerateSurfacePrimitive_;
+	return displayPrimitiveValid_;
 }
 
 // Return surface primitive
-Primitive& Collection::surfacePrimitive()
+Primitive& Collection::displayPrimitive()
 {
-	return surfacePrimitive_;
+	return displayPrimitive_;
 }
 
 // Update surface data if necessary
-void Collection::updateSurfaceData(Vec3<double> axisMin, Vec3<double> axisMax, Vec3<bool> axisInverted, Vec3<bool> axisLogarithmic, Vec3<double> axisStretch)
+void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, Vec3<bool> axisInverted, Vec3<bool> axisLogarithmic, Vec3<double> axisStretch)
 {
 	// Is surface reconstruction necessary?
-	if (!regenerateDisplayData_) return;
+	if (displayDataValid_) return;
 
 	// Clear existing display slices
-	surfaceData_.clear();
+	displayData_.clear();
 	double x, y;
 
 	// Loop over slices, apply any transforms (X or Y) and check limits
@@ -707,7 +706,7 @@ void Collection::updateSurfaceData(Vec3<double> axisMin, Vec3<double> axisMax, V
 		else if (axisLogarithmic.z) z = log10(z);
 
 		// Add new item to surfaceData_ array
-		Data2D* surfaceSlice = surfaceData_.add();
+		Data2D* surfaceSlice = displayData_.add();
 		surfaceSlice->setZ(z * axisStretch.z);
 
 		// Copy / interpolate arrays
@@ -764,6 +763,7 @@ void Collection::updateSurfaceData(Vec3<double> axisMin, Vec3<double> axisMax, V
 		slice = axisInverted.z ? slice->prev : slice->next;
 	}
 
-	regenerateSurfacePrimitive_ = true;
-	regenerateDisplayData_ = false;
+	// Data has been updated - surface primitive will need to be reconstructed
+	displayPrimitiveValid_ = false;
+	displayDataValid_ = true;
 }

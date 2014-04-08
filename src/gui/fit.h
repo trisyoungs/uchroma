@@ -26,7 +26,9 @@
 #include <QtCore/QObject>
 #include "gui/ui_fit.h"
 #include "base/dnchar.h"
+#include "base/slice.h"
 #include "parser/tree.h"
+#include "templates/array.h"
 #include "templates/list.h"
 
 // Forward Declarations
@@ -34,14 +36,15 @@ class UChromaWindow;
 class Variable;
 
 /*
- * Fit Variable
+ * Equation Variable
  */
-class FitVariable : public ListItem<FitVariable>
+class EquationVariable : public ListItem<EquationVariable>
 {
 	public:
 	// Constructor / Destructor
-	FitVariable();
-	~FitVariable();
+	EquationVariable();
+	~EquationVariable();
+
 
 	/*
 	 * Variable Target
@@ -120,6 +123,10 @@ class FitDialog : public QDialog
 	// Whether the window is refreshing / updating its controls
 	bool refreshing_;
 
+	public:
+	// Update data in window
+	void updateAll();
+
 
 	/*
 	 * Link to UChroma
@@ -137,14 +144,22 @@ class FitDialog : public QDialog
 	 * Fit Data
 	 */
 	private:
-	// Local list of fit variables, including limits
-	List<FitVariable> fitVariables_;
-	// Number of FitVariables which are used in the current equation
-	int nFitVariablesUsed_;
+	// Local list of variables use in equations, including limits
+	List<EquationVariable> equationVariables_;
+	// Number of variables which are used in the current equation
+	int nVariablesUsed_;
 	// Tree containing equation to use for fitting
 	Tree equation_;
 	// Whether current equation is valid
 	bool equationValid_;
+	// Standard x, y, and z variables
+	Variable* xVariable_, *yVariable_, *zVariable_;
+	// Data to fit (as slices)
+	List<Slice> fitData_;
+	// Current slice to fit (or NULL for all slices)
+	Slice* currentFitSlice_;
+	// List of variables targetted in fit process
+	RefList<EquationVariable,bool> fitVariables_;
 
 	private:
 	// Reset equation
@@ -154,18 +169,57 @@ class FitDialog : public QDialog
 
 
 	/*
+	 * Minimisation Functions
+	 */
+	private:
+	private:
+	// Cost function for simplex minimise
+	double simplexCost(Array<double>& alpha);
+	// Simplex minimise
+	void simplexMinimise();
+
+
+	/*
 	 * Slots / Reimplementations
+	 */
+
+	/*
+	 * Equation Group
+	 */
+	public slots:
+	void on_EquationEdit_textChanged(QString text);
+	void on_SelectEquationButton_clicked(bool checked);
+	void on_FitButton_clicked(bool checked);
+
+	/*
+	 * Variables Group
 	 */
 	private:
 	// Update variable table
 	void updateVariableTable();
 
 	public slots:
-	void on_EquationEdit_textChanged(QString text);
-	void on_SelectEquationButton_clicked(bool checked);
 	void on_VariablesTable_cellChanged(int row, int column);
-	
-	public:
+
+	/*
+	 * Source Group
+	 */
+	private:
+	// Update source data group
+	void updateSourceGroup(bool refreshList = true);
+
+	public slots:
+	void on_SourceCollectionCombo_currentIndexChanged(int index);
+	void on_SourceXYSliceFromSpin_valueChanged(int value);
+	void on_SourceXYSliceToSpin_valueChanged(int value);
+
+	/*
+	 * Destination Group
+	 */
+	private:
+	// Update destination data group
+	void updateDestinationGroup();
+
 };
 
 #endif

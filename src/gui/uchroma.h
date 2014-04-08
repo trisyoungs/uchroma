@@ -183,6 +183,8 @@ class UChromaWindow : public QMainWindow
 	void updateGradientBar();
 
 	private slots:
+	// -- Style
+	void on_StyleCombo_currentIndexChanged(int index);
 	// -- Single Colour
 	void on_ColourSingleColourRadio_clicked(bool checked);
 	void on_ColourSingleColourButton_clicked(bool checked);
@@ -500,6 +502,8 @@ class UChromaWindow : public QMainWindow
 	public:
 	// Return first collection in list
 	Collection* collections();
+	// Return nth collection in list
+	Collection* collection(int index);
 	// Clear current data
 	void clearData();
 	// Set display limits to show all available data

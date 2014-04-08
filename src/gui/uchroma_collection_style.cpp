@@ -32,8 +32,22 @@ void UChromaWindow::updateGradientBar()
 }
 
 /*
+ * Style
+ */
+
+void UChromaWindow::on_StyleCombo_currentIndexChanged(int index)
+{
+	// Check for window refreshing or invalid Collection
+	if (refreshing_ || (!currentCollection_)) return;
+
+	currentCollection_->setDisplayStyle( (Collection::DisplayStyle) index );
+	updateDisplay();
+}
+
+/*
  * Single Colour
  */
+
 void UChromaWindow::on_ColourSingleColourRadio_clicked(bool checked)
 {
 	// Check for window refreshing or invalid Collection
@@ -99,8 +113,7 @@ void UChromaWindow::on_ColourRGBGradientASetMinimumButton_clicked(bool checked)
 	// Check for a current Collection
 	if (!currentCollection_) return;
 
-	// XXX TODO SHould this not be the transformLimit of the currentCollection_
-	ui.ColourRGBGradientASpin->setValue(axisMin_.y);
+	ui.ColourRGBGradientASpin->setValue(axisLimitMin_.y);
 }
 
 void UChromaWindow::on_ColourRGBGradientASetMaximumButton_clicked(bool checked)
@@ -108,8 +121,7 @@ void UChromaWindow::on_ColourRGBGradientASetMaximumButton_clicked(bool checked)
 	// Check for a current Collection
 	if (!currentCollection_) return;
 
-	// XXX TODO SHould this not be the transformLimit of the currentCollection_
-	ui.ColourRGBGradientASpin->setValue(axisMax_.y);
+	ui.ColourRGBGradientASpin->setValue(axisLimitMax_.y);
 }
 
 void UChromaWindow::on_ColourRGBGradientBButton_clicked(bool checked)
@@ -140,8 +152,7 @@ void UChromaWindow::on_ColourRGBGradientBSetMinimumButton_clicked(bool checked)
 	// Check for a current Collection
 	if (!currentCollection_) return;
 
-	// XXX TODO SHould this not be the transformLimit of the currentCollection_
-	ui.ColourRGBGradientBSpin->setValue(axisMin_.y);
+	ui.ColourRGBGradientBSpin->setValue(axisLimitMin_.y);
 }
 
 void UChromaWindow::on_ColourRGBGradientBSetMaximumButton_clicked(bool checked)
@@ -149,8 +160,7 @@ void UChromaWindow::on_ColourRGBGradientBSetMaximumButton_clicked(bool checked)
 	// Check for a current Collection
 	if (!currentCollection_) return;
 
-	// XXX TODO SHould this not be the transformLimit of the currentCollection_
-	ui.ColourRGBGradientBSpin->setValue(axisMax_.y);
+	ui.ColourRGBGradientBSpin->setValue(axisLimitMax_.y);
 }
 
 /*
@@ -195,8 +205,7 @@ void UChromaWindow::on_ColourHSVGradientASetMinimumButton_clicked(bool checked)
 	// Check for a current Collection
 	if (!currentCollection_) return;
 
-	// XXX TODO SHould this not be the transformLimit of the currentCollection_
-	ui.ColourHSVGradientASpin->setValue(axisMin_.y);
+	ui.ColourHSVGradientASpin->setValue(axisLimitMin_.y);
 }
 
 void UChromaWindow::on_ColourHSVGradientASetMaximumButton_clicked(bool checked)
@@ -204,8 +213,7 @@ void UChromaWindow::on_ColourHSVGradientASetMaximumButton_clicked(bool checked)
 	// Check for a current Collection
 	if (!currentCollection_) return;
 
-	// XXX TODO SHould this not be the transformLimit of the currentCollection_
-	ui.ColourHSVGradientASpin->setValue(axisMax_.y);
+	ui.ColourHSVGradientASpin->setValue(axisLimitMax_.y);
 }
 
 void UChromaWindow::on_ColourHSVGradientBButton_clicked(bool checked)
@@ -236,8 +244,7 @@ void UChromaWindow::on_ColourHSVGradientBSetMinimumButton_clicked(bool checked)
 	// Check for a current Collection
 	if (!currentCollection_) return;
 
-	// XXX TODO SHould this not be the transformLimit of the currentCollection_
-	ui.ColourHSVGradientBSpin->setValue(axisMin_.y);
+	ui.ColourHSVGradientBSpin->setValue(axisLimitMin_.y);
 }
 
 void UChromaWindow::on_ColourHSVGradientBSetMaximumButton_clicked(bool checked)
@@ -245,8 +252,7 @@ void UChromaWindow::on_ColourHSVGradientBSetMaximumButton_clicked(bool checked)
 	// Check for a current Collection
 	if (!currentCollection_) return;
 
-	// XXX TODO SHould this not be the transformLimit of the currentCollection_
-	ui.ColourHSVGradientBSpin->setValue(axisMax_.y);
+	ui.ColourHSVGradientBSpin->setValue(axisLimitMax_.y);
 }
 
 /*
@@ -399,6 +405,9 @@ void UChromaWindow::updateCollectionColourTab()
 	if (!currentCollection_) return;
 
 	refreshing_ = true;
+
+	// Style Combo
+	ui.StyleCombo->setCurrentIndex(currentCollection_->displayStyle());
 
 	// Single Colour
 	ui.ColourSingleColourButton->setColour(currentCollection_->colourScalePointColour(Collection::SingleColourSource));

@@ -50,6 +50,10 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveIma
 	// Set UChroma pointers in widgets where necessary
 	ui.MainView->setUChroma(this);
 	GraphWidget::setUChroma(this);
+	FitDialog::setUChroma(this);
+
+	// Add display styles to StyleCombo on Collection->Style tab
+	for (int n=0; n<Collection::nDisplayStyles; ++n) ui.StyleCombo->addItem( Collection::displayStyle((Collection::DisplayStyle) n));
 
 	// Load font for viewer
 	ui.MainView->setupFont(viewerFont_);
@@ -119,7 +123,7 @@ void UChromaWindow::updateAfterLoad()
 // Update display data
 void UChromaWindow::updateDisplayData()
 {
-	for (Collection* c = collections_.first(); c != NULL; c = c->next) c->updateSurfaceData(axisMin_, axisMax_, axisInverted_, axisLogarithmic_, axisStretch_);
+	for (Collection* c = collections_.first(); c != NULL; c = c->next) c->updateDisplayData(axisMin_, axisMax_, axisInverted_, axisLogarithmic_, axisStretch_);
 }
 
 // Update display

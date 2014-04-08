@@ -26,7 +26,7 @@ Collection* UChromaWindow::addCollection()
 {
 	// -- Add an empty collection
 	currentCollection_ = collections_.add();
-	ui.MainView->addSurfacePrimitive(&currentCollection_->surfacePrimitive());
+	ui.MainView->addSurfacePrimitive(&currentCollection_->displayPrimitive());
 	return currentCollection_;
 }
 
@@ -36,7 +36,7 @@ void UChromaWindow::removeCollection(Collection* collection)
 	if (!collection) return;
 
 	// Remove link to rendering primitive
-	ui.MainView->removeSurfacePrimitive(&currentCollection_->surfacePrimitive());
+	ui.MainView->removeSurfacePrimitive(&currentCollection_->displayPrimitive());
 
 	// Set new currentCollection_
 	if (collection->next) currentCollection_ = collection->next;
@@ -50,7 +50,7 @@ void UChromaWindow::removeCollection(Collection* collection)
 // Flag all surface and axis data for regeneration
 void UChromaWindow::regenerateAll()
 {
-	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next) collection->setRegenerateDisplayData();
+	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next) collection->setDisplayDataInvalid();
 	regenerateAxes_ = true;
 }
 
@@ -178,6 +178,12 @@ Vec3<double> UChromaWindow::transformedDataPositiveMaxima()
 	return maxima;
 }
 
+// Return nth collection in list
+Collection* UChromaWindow::collection(int index)
+{
+	return collections_[index];
+}
+
 // Return first collection in list
 Collection* UChromaWindow::collections()
 {
@@ -188,7 +194,7 @@ Collection* UChromaWindow::collections()
 void UChromaWindow::clearData()
 {
 	// Collections - remove links to Primitives first
-	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next) ui.MainView->removeSurfacePrimitive(&collection->surfacePrimitive());
+	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next) ui.MainView->removeSurfacePrimitive(&collection->displayPrimitive());
 	collections_.clear();
 
 	// Data

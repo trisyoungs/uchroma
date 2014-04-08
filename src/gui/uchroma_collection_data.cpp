@@ -203,7 +203,7 @@ void UChromaWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 	
 	// Set correct offset
 	for (Slice* slice = currentCollection_->slices(); slice != NULL; slice = slice->next) slice->data().setZ(slice->data().z() - earliest);
-	currentCollection_->setRegenerateDisplayData();
+	currentCollection_->setDisplayDataInvalid();
 
 	setAsModified();
 	updateCollectionDataTab();

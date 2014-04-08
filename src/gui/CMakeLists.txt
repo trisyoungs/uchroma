@@ -30,6 +30,7 @@ dataimport_seqxy.cpp
 saveimage_funcs.cpp
 colourbutton_funcs.cpp
 fit_funcs.cpp
+fit_simplex.cpp
 gradientbar_funcs.cpp
 graphwidget_funcs.cpp
 plotwidget_data.cpp
@@ -51,6 +52,8 @@ viewer_primitiveinfo.h
 viewer_textprimitive.h
 viewer_trianglechopper.h
 viewer_user.cpp
+viewer_user_line.cpp
+viewer_user_surface.cpp
 viewer_vertexchunk.h
 )
 

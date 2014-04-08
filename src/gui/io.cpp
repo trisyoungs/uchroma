@@ -452,7 +452,7 @@ bool UChromaWindow::loadInputFile(QString fileName)
 			case (Keywords::CollectionBlock):
 				// Create new Collection and set its title
 				currentCollection_ = collections_.add();
-				ui.MainView->addSurfacePrimitive(&currentCollection_->surfacePrimitive());
+				ui.MainView->addSurfacePrimitive(&currentCollection_->displayPrimitive());
 				currentCollection_->setTitle(parser.argc(1));
 				success = readCollectionBlock(parser, currentCollection_);
 				// Check for empty slices

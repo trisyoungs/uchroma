@@ -71,7 +71,7 @@ void VertexChunk::initialise(GLenum type, bool colourData)
 	type_ = type;
 	dataPerVertex_ = (colourData ? 10 : 6);
 	if (type_ == GL_TRIANGLES) verticesPerType_ = 3;
-	else if (type_ == GL_LINES) verticesPerType_ = 2;
+	else if ((type_ == GL_LINES) || (type_ == GL_LINE_LOOP) || (type_ == GL_LINE_STRIP)) verticesPerType_ = 2;
 	else if (type_ == GL_POINTS) verticesPerType_ = 1;
 	else printf("Warning - Invalid GLenum type given to VertexChunk::initialise (%i)\n", type_);
 	maxVertices_ = VERTEXCHUNKSIZE*verticesPerType_;

@@ -174,40 +174,45 @@ int CommandParser::lex()
 				CommandParser_lval.doubleconst = PI;
 				return DOUBLECONST;
 			}
-			else if (token == "DEGRAD")
+			
+			// Additional numeric constants
+			if (useAdditionalConstants_)
 			{
-				CommandParser_lval.doubleconst = DEGRAD;
-				return DOUBLECONST;
-			}
-			else if (token == "Bohr")
-			{
-				CommandParser_lval.doubleconst = BOHRRADIUS;
-				return DOUBLECONST;
-			}
-			else if (token == "NA")
-			{
-				CommandParser_lval.doubleconst = AVOGADRO;
-				return DOUBLECONST;
-			}
-			else if (token == "c")
-			{
-				CommandParser_lval.doubleconst = SPEEDOFLIGHT;
-				return DOUBLECONST;
-			}
-			else if (token == "kb")
-			{
-				CommandParser_lval.doubleconst = BOLTZMANN;
-				return DOUBLECONST;
-			}
-			else if (token == "h")
-			{
-				CommandParser_lval.doubleconst = PLANCK;
-				return DOUBLECONST;
-			}
-			else if (token == "hbar")
-			{
-				CommandParser_lval.doubleconst = HBAR;
-				return DOUBLECONST;
+				if (token == "DEGRAD")
+				{
+					CommandParser_lval.doubleconst = DEGRAD;
+					return DOUBLECONST;
+				}
+				else if (token == "Bohr")
+				{
+					CommandParser_lval.doubleconst = BOHRRADIUS;
+					return DOUBLECONST;
+				}
+				else if (token == "NA")
+				{
+					CommandParser_lval.doubleconst = AVOGADRO;
+					return DOUBLECONST;
+				}
+				else if (token == "c")
+				{
+					CommandParser_lval.doubleconst = SPEEDOFLIGHT;
+					return DOUBLECONST;
+				}
+				else if (token == "kb")
+				{
+					CommandParser_lval.doubleconst = BOLTZMANN;
+					return DOUBLECONST;
+				}
+				else if (token == "h")
+				{
+					CommandParser_lval.doubleconst = PLANCK;
+					return DOUBLECONST;
+				}
+				else if (token == "hbar")
+				{
+					CommandParser_lval.doubleconst = HBAR;
+					return DOUBLECONST;
+				}
 			}
 
 			// Is this a recognised high-level keyword?

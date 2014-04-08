@@ -50,6 +50,7 @@ void CommandParser::reset()
 	stringLength_ = 0;
 	lineNumber_ = 0;
 	expectPathStep_ = false;
+	useAdditionalConstants_ = false;
 	tree_ = NULL;
 	failed_ = false;
 	stack_.clear();
