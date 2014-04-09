@@ -71,6 +71,9 @@
               <property name="horizontalScrollBarPolicy">
                <enum>Qt::ScrollBarAlwaysOff</enum>
               </property>
+              <property name="showDropIndicator" stdset="0">
+               <bool>false</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -5386,6 +5389,12 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>TExponentialSpin</class>
+   <extends>QWidget</extends>
+   <header>gui/texponentialspin.uih</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>GraphWidget</class>
    <extends>QWidget</extends>
    <header>gui/graphwidget.h</header>
@@ -5407,12 +5416,6 @@
    <class>ColourButton</class>
    <extends>QPushButton</extends>
    <header>gui/colourbutton.uih</header>
-  </customwidget>
-  <customwidget>
-   <class>TExponentialSpin</class>
-   <extends>QWidget</extends>
-   <header>gui/texponentialspin.uih</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

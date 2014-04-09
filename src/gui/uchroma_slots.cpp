@@ -50,8 +50,7 @@ void UChromaWindow::on_actionFileNew_triggered(bool checked)
 
 	// Clear data and create new, empty collection ready for use
 	clearData();
-	currentCollection_ = collections_.add();
-	ui.MainView->addSurfacePrimitive(&currentCollection_->displayPrimitive());
+	currentCollection_ = addCollection();
 
 	updateAfterLoad();
 }

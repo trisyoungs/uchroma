@@ -48,7 +48,7 @@ Collection::Collection() : ListItem<Collection>()
 
 	// Colours
 	colourScale_.clear();
-	colourSinglePoint_.set(0.0, QColor(255,255,255));
+	colourSinglePoint_.set(0.0, QColor(0,0,0));
 	colourRGBGradientAPoint_.set(0.0, QColor(255,255,255));
 	colourRGBGradientBPoint_.set(1.0, QColor(0,0,255));
 	colourHSVGradientAPoint_.set(0.0, QColor(255,0,0));
@@ -60,8 +60,9 @@ Collection::Collection() : ListItem<Collection>()
 	colourScaleValid_ = false;
 
 	// Display
+	visible_ = true;
 	displayData_.clear();
-	displayStyle_ = Collection::SurfaceStyle;
+	displayStyle_ = Collection::LineStyle;
 	displayPrimitive_.setColourData(true);
 	displayDataValid_ = false;
 	displayPrimitiveValid_ = false;
@@ -192,6 +193,15 @@ int Collection::nEmptySlices()
 	int count = 0;
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) if (slice->data().nPoints() < 2) ++count;
 	return count;
+}
+
+// Clear slice data from collection
+void Collection::clearSlices()
+{
+	slices_.clear();
+	displayData_.clear();
+	displayDataValid_ = false;
+	displayPrimitiveValid_ = false;
 }
 
 // Set root directory for datafiles
@@ -633,6 +643,18 @@ Collection::DisplayStyle Collection::displayStyle(const char* s)
 const char* Collection::displayStyle(Collection::DisplayStyle kwd)
 {
 	return SurfaceStyleKeywords[kwd];
+}
+
+// Set whether data is visible
+bool Collection::setVisible(bool visible)
+{
+	visible_ = visible;
+}
+
+// Return hether data is visible
+bool Collection::visible()
+{
+	return visible_;
 }
 
 // Return transformed data to display

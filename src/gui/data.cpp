@@ -21,15 +21,6 @@
 
 #include "gui/uchroma.h"
 
-// Add new collection
-Collection* UChromaWindow::addCollection()
-{
-	// -- Add an empty collection
-	currentCollection_ = collections_.add();
-	ui.MainView->addSurfacePrimitive(&currentCollection_->displayPrimitive());
-	return currentCollection_;
-}
-
 // Remove existing collection
 void UChromaWindow::removeCollection(Collection* collection)
 {
@@ -176,6 +167,22 @@ Vec3<double> UChromaWindow::transformedDataPositiveMaxima()
 		if (v.z > maxima.z) maxima.z = v.z;
 	}
 	return maxima;
+}
+
+// Add new collection
+Collection* UChromaWindow::addCollection(QString title)
+{
+	static int collectionCount = 1;
+
+	// -- Add an empty collection
+	currentCollection_ = collections_.add();
+	ui.MainView->addSurfacePrimitive(&currentCollection_->displayPrimitive());
+
+	// Set the title
+	if (title.isEmpty()) currentCollection_->setTitle("Empty Collection " + QString::number(collectionCount++));
+	else currentCollection_->setTitle(title);
+
+	return currentCollection_;
 }
 
 // Return nth collection in list

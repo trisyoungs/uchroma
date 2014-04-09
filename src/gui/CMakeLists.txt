@@ -30,6 +30,8 @@ dataimport_seqxy.cpp
 saveimage_funcs.cpp
 colourbutton_funcs.cpp
 fit_funcs.cpp
+fit_main.cpp
+fit_sd.cpp
 fit_simplex.cpp
 gradientbar_funcs.cpp
 graphwidget_funcs.cpp

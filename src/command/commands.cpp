@@ -27,6 +27,9 @@
 // Static singleton
 Command commands;
 
+// Default settings
+bool Command::assumeDegrees_ = false;
+
 /* Argument Specification Tokens:
        Char	Meaning		Acceptable Types in VTypes
 	N	Number		IntegerData, DoubleData
@@ -189,6 +192,27 @@ Command::Function Command::command(const char *s)
 	for (result = Command::NoFunction; result < Command::nCommands; result++) if (strcmp(data[result].keyword,s) == 0) break;
 	return (Command::Function) result;
 }
+
+
+/*
+ * Settings
+ */
+
+// Set whether to assume values used in trig functions are degrees
+void Command::setAssumeDegrees(bool b)
+{
+	assumeDegrees_ = b;
+}
+
+// Return whether to assume values used in trig functions are degrees
+bool Command::assumeDegrees()
+{
+	return assumeDegrees_;
+}
+
+/*
+ * Commands
+ */
 
 // Constructor
 Command::Command()

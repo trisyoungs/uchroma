@@ -34,10 +34,26 @@ void UChromaWindow::on_CollectionList_currentRowChanged(int index)
 	updateCollectionColourTab();
 }
 
+void UChromaWindow::on_CollectionList_itemClicked(QListWidgetItem* item)
+{
+	// Set the checkstate of the collection
+	QVariant data = item->data(Qt::UserRole);
+	Collection* collection = collections_[data.toInt()];
+	if (!collection) return;
+	collection->setVisible(item->checkState() == Qt::Checked);
+	updateDisplay();
+}
+
+void UChromaWindow::on_CollectionList_currentTextChanged(const QString& text)
+{
+	printf("lkjlkjsaldj\n");
+}
+
 void UChromaWindow::on_CollectionAddButton_clicked(bool checked)
 {
 	addCollection();
 	updateCollectionTab();
+	updateDisplay();
 }
 
 void UChromaWindow::on_CollectionRemoveButton_clicked(bool checked)
@@ -45,6 +61,7 @@ void UChromaWindow::on_CollectionRemoveButton_clicked(bool checked)
 	if (!currentCollection_) return;
 	removeCollection(currentCollection_);
 	updateCollectionTab();
+	updateDisplay();
 }
 
 // Update Transform tab
@@ -54,12 +71,14 @@ void UChromaWindow::updateCollectionTab()
 
 	// Repopulate list
 	ui.CollectionList->clear();
+	int index = 0;
 	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
 	{
 		QListWidgetItem* item = new QListWidgetItem(ui.CollectionList, 0);
 		item->setText(collection->title());
+		item->setData(Qt::UserRole, QVariant(index++));
 		item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-// 		item->setCheckState(collection->isVisible() ? Qt::Checked : Qt::Unchecked);
+		item->setCheckState(collection->visible() ? Qt::Checked : Qt::Unchecked);
 
 		// If this is the current collection, select it
 		if (collection == currentCollection_) item->setSelected(true);

@@ -34,28 +34,28 @@ bool Command::function_Abs(CommandNode *c, ReturnValue &rv)
 // Return invserse cosine of argument
 bool Command::function_ACos(CommandNode *c, ReturnValue &rv)
 {
-	rv.set( acos(c->argd(0)) * DEGRAD );
+	rv.set( (assumeDegrees_ ? acos(c->argd(0)) * DEGRAD : acos(c->argd(0)) ) );
 	return true;
 }
 
 // Return invserse sine of argument
 bool Command::function_ASin(CommandNode *c, ReturnValue &rv)
 {
-	rv.set( asin(c->argd(0)) * DEGRAD );
+	rv.set( (assumeDegrees_ ? asin(c->argd(0)) * DEGRAD : asin(c->argd(0)) ) );
 	return true;
 }
 
 // Return invserse tangent of argument
 bool Command::function_ATan(CommandNode *c, ReturnValue &rv)
 {
-	rv.set( atan(c->argd(0)) * DEGRAD );
+	rv.set( (assumeDegrees_ ? atan(c->argd(0)) * DEGRAD : atan(c->argd(0)) ) );
 	return true;
 }
 
 // Return cosine of argument (supplied in degrees)
 bool Command::function_Cos(CommandNode *c, ReturnValue &rv)
 {
-	rv.set( cos(c->argd(0) / DEGRAD) );
+	rv.set( (assumeDegrees_ ? cos(c->argd(0)) * DEGRAD : cos(c->argd(0)) ) );
 	return true;
 }
 
@@ -90,7 +90,7 @@ bool Command::function_Nint(CommandNode *c, ReturnValue &rv)
 // Return sine of argument (supplied in degrees)
 bool Command::function_Sin(CommandNode *c, ReturnValue &rv)
 {
-	rv.set( sin(c->argd(0) / DEGRAD) );
+	rv.set( (assumeDegrees_ ? sin(c->argd(0)) * DEGRAD : sin(c->argd(0)) ) );
 	return true;
 }
 
@@ -104,6 +104,7 @@ bool Command::function_Sqrt(CommandNode *c, ReturnValue &rv)
 // Return tangent of argument (supplied in degrees)
 bool Command::function_Tan(CommandNode *c, ReturnValue &rv)
 {
+	rv.set( (assumeDegrees_ ? tan(c->argd(0)) * DEGRAD : tan(c->argd(0)) ) );
 	rv.set( tan(c->argd(0) / DEGRAD) );
 	return true;
 }

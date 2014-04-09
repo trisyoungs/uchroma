@@ -141,7 +141,7 @@ class FitDialog : public QDialog
 
 
 	/*
-	 * Fit Data
+	 * Main Fitting Data
 	 */
 	private:
 	// Local list of variables use in equations, including limits
@@ -154,10 +154,14 @@ class FitDialog : public QDialog
 	bool equationValid_;
 	// Standard x, y, and z variables
 	Variable* xVariable_, *yVariable_, *zVariable_;
-	// Data to fit (as slices)
-	List<Slice> fitData_;
-	// Current slice to fit (or NULL for all slices)
-	Slice* currentFitSlice_;
+	// Data to fit
+	List<Data2D> fitData_;
+	// Current fitted datapoints
+	List<Data2D> fittedData_;
+	// Current Data2D to fit, or NULL for all Data2D simultaneously
+	Data2D* currentFitData_;
+	// Current fitted Data2D, or NULL if fitting all simultaneously
+	Data2D* currentFittedData_;
 	// List of variables targetted in fit process
 	RefList<EquationVariable,bool> fitVariables_;
 
@@ -166,22 +170,31 @@ class FitDialog : public QDialog
 	void resetEquation();
 	// Update fit variables list
 	void updateFitVariables();
+	// Generate fitted data for current targets
+	bool generateFittedData();
+	// Calculate SOS error for current targets
+	double sosError(Array<double>& alpha);
+	// Calculate RMS error for current targets
+	double rmsError(Array<double>& alpha);
+	// Perform fitting with current settings
+	bool doFitting();
 
 
 	/*
 	 * Minimisation Functions
 	 */
 	private:
-	private:
-	// Cost function for simplex minimise
-	double simplexCost(Array<double>& alpha);
 	// Simplex minimise
-	void simplexMinimise();
+	void simplexMinimise(Array<double>& alpha);
+	// Steepest Descent minimise
+	void sdMinimise(Array<double>& alpha);
 
 
 	/*
 	 * Slots / Reimplementations
 	 */
+	public slots:
+	void on_CloseButton_clicked(bool checked);
 
 	/*
 	 * Equation Group

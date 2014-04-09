@@ -52,15 +52,7 @@ Data2D::~Data2D()
  */
 Data2D::Data2D(const Data2D& source)
 {
-	x_ = source.x_;
-	y_ = source.y_;
-	z_ = source.z_;
-	splineB_ = source.splineB_;
-	splineC_ = source.splineC_;
-	splineD_ = source.splineD_;
-	splineH_ = source.splineH_;
-	splineInterval_ = source.splineInterval_;
-	name_ = source.name_;
+	(*this) = source;
 }
 
 /*!
@@ -345,6 +337,7 @@ void Data2D::operator=(const Data2D& source)
 {
 	x_ = source.x_;
 	y_ = source.y_;
+	z_ = source.z_;
 	splineB_ = source.splineB_;
 	splineC_ = source.splineC_;
 	splineD_ = source.splineD_;

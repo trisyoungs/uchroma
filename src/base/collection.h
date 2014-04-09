@@ -75,6 +75,8 @@ class Collection : public ListItem<Collection>
 	Slice* slice(int index);
 	// Return number of slices with no data present
 	int nEmptySlices();
+	// Clear slice data from collection
+	void clearSlices();
 	// Set root directory for datafiles
 	void setDataFileDirectory(QDir directory);
 	// Return root directory for datafiles
@@ -231,6 +233,8 @@ class Collection : public ListItem<Collection>
 	static const char* displayStyle(DisplayStyle kwd);
 
 	private:
+	// Whether data is visible
+	bool visible_;
 	// Transformed data to display
 	List<Data2D> displayData_;
 	// Display style of data
@@ -243,6 +247,10 @@ class Collection : public ListItem<Collection>
 	bool displayPrimitiveValid_;
 
 	public:
+	// Set whether data is visible
+	bool setVisible(bool visible);
+	// Return hether data is visible
+	bool visible();
 	// Return transformed data to display
 	List<Data2D>& displayData();
 	// Set display style of data

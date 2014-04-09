@@ -110,7 +110,7 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, int axis)
 				axisTitleOrientation_[axis].set(parser.argd(1), parser.argd(2), parser.argd(3), parser.argd(4));
 				break;
 			// Axis visibility
-			case (Keywords::VisibleKeyword):
+			case (Keywords::VisibleAxisKeyword):
 				axisVisible_[axis] = parser.argb(1);
 				break;
 			// Unrecognised keyword
@@ -128,6 +128,7 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 {
 	Slice* slice;
 	int xyz;
+	Collection::DisplayStyle ds;
 	while (!parser.eofOrBlank())
 	{
 		// Get line from file
@@ -214,6 +215,12 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				slice->setTitle(parser.argc(1));
 				if (!readSliceBlock(parser, slice, collection)) return false;
 				break;
+			// Display style
+			case (Keywords::StyleKeyword):
+				ds = Collection::displayStyle(parser.argc(1));
+				if (ds == Collection::nDisplayStyles) return false;
+				collection->setDisplayStyle(ds);
+				break;
 			// Data Transform
 			case (Keywords::TransformXKeyword):
 			case (Keywords::TransformYKeyword):
@@ -221,6 +228,10 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				xyz = collectionKwd - Keywords::TransformXKeyword;
 				collection->setTransformEnabled(xyz, parser.argb(1));
 				collection->setTransformEquation(xyz,  parser.argc(2));
+				break;
+			// Visible flag
+			case (Keywords::VisibleCollectionKeyword):
+				collection->setVisible(parser.argb(1));
 				break;
 			// Unrecognised Keyword
 			default:
@@ -451,9 +462,8 @@ bool UChromaWindow::loadInputFile(QString fileName)
 			// Collection Block
 			case (Keywords::CollectionBlock):
 				// Create new Collection and set its title
-				currentCollection_ = collections_.add();
-				ui.MainView->addSurfacePrimitive(&currentCollection_->displayPrimitive());
-				currentCollection_->setTitle(parser.argc(1));
+				currentCollection_ = addCollection(parser.argc(1));
+				
 				success = readCollectionBlock(parser, currentCollection_);
 				// Check for empty slices
 				nEmpty = currentCollection_->nEmptySlices();
@@ -520,7 +530,7 @@ bool UChromaWindow::saveInputFile(QString fileName)
 		parser.writeLineF("  %s %s\n", Keywords::axisKeyword(Keywords::InvertKeyword), stringBool(axisInverted_[axis]));
 		parser.writeLineF("  %s %f %f\n", Keywords::axisKeyword(Keywords::LimitsKeyword), axisMin_[axis], axisMax_[axis]);
 		parser.writeLineF("  %s %s\n", Keywords::axisKeyword(Keywords::LogarithmicKeyword), stringBool(axisLogarithmic_[axis]));
-		parser.writeLineF("  %s %s\n", Keywords::axisKeyword(Keywords::VisibleKeyword), stringBool(axisVisible_[axis]));
+		parser.writeLineF("  %s %s\n", Keywords::axisKeyword(Keywords::VisibleAxisKeyword), stringBool(axisVisible_[axis]));
 		parser.writeLineF("  %s %f\n", Keywords::axisKeyword(Keywords::StretchKeyword), axisStretch_[axis]);
 		parser.writeLineF("EndAxis\n");
 	}
@@ -591,6 +601,10 @@ bool UChromaWindow::saveInputFile(QString fileName)
 		// -- Alpha control
 		parser.writeLineF("  %s %i\n", Keywords::collectionKeyword(Keywords::ColourAlphaControlKeyword), collection->alphaControl());
 		parser.writeLineF("  %s %i\n", Keywords::collectionKeyword(Keywords::ColourAlphaFixedKeyword), collection->fixedAlpha());
+
+		// Display
+		parser.writeLineF("  %s %s\n", Keywords::collectionKeyword(Keywords::StyleKeyword), Collection::displayStyle(collection->displayStyle()));
+		parser.writeLineF("  %s %s\n", Keywords::collectionKeyword(Keywords::VisibleCollectionKeyword), stringBool(collection->visible()));
 
 		// Loop over slices
 		for (Slice* slice = collection->slices(); slice != NULL; slice = slice->next)

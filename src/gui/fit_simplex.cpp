@@ -23,52 +23,15 @@
 #include "gui/uchroma.h"
 #include "templates/simplex.h"
 
-// Cost function for simplex minimise
-double FitDialog::simplexCost(Array<double>& alpha)
-{
-	// Poke current values back into the equation variables
-	int n = 0;
-	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next) ri->item->variable()->set(alpha[n++]);
-	
-	double yCalc, sos = 0.0;
-	if (currentFitSlice_ == NULL)
-	{
-		// Get current SOS error over all points in all slices
-		// TODO
-		return 0.0;
-	}
-	else
-	{
-		// Get SOS error over points in current slice
-		Data2D& data = currentFitSlice_->data();
-		zVariable_->set(data.z());
-		for (n = 0; n<data.nPoints(); ++n)
-		{
-			xVariable_->set(data.x(n));
-			yVariable_->set(data.y(n));
-			yCalc = equation_.execute();
-			sos += (data.y(n) - yCalc) * (data.y(n) - yCalc);
-		}
-	}
-	return sos;
-}
-
 // Simplex Minimise
-void FitDialog::simplexMinimise()
+void FitDialog::simplexMinimise(Array<double>& alpha)
 {
 	// Setup the simplex minimiser 
-        Simplex<FitDialog> simplex(this, &FitDialog::simplexCost);
-        Array<double> alpha;
-	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next)
-	{
-		// Grab variable pointer from FitVariable
-		EquationVariable* var = ri->item;
-		alpha.add(var->value());
-	}
+	ui.OutputEdit->append("Initialising Simplex minimiser");
+        Simplex<FitDialog> simplex(this, &FitDialog::sosError);
+
 	simplex.initialise(alpha, 0.0, 0.01);
 
 	// Perform minimisation
 	Array<double> best = simplex.minimise(100, 10, 0.001, 1.0);
-	for (int n=0; n< best.nItems(); ++n) printf("%i  %f\n", n, best[n]);
-	simplexCost(best);
 }

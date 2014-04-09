@@ -24,7 +24,9 @@
 
 #include "templates/list.h"
 #include "templates/reflist.h"
+#include "templates/vector4.h"
 #include <QtGui/QColor>
+#include <QtOpenGL/QtOpenGL>
 
 // Forward declarations
 /* none */
@@ -55,6 +57,8 @@ class ColourScalePoint : public ListItem<ColourScalePoint>
 	void setColour(QColor colour);
 	// Return colour
 	QColor colour() const;
+	// Return colour as GLfloat*
+	void colour(Vec4<GLfloat>& target) const;
 };
 
 // Colour scale delta
@@ -81,6 +85,8 @@ class ColourScaleDelta : public ListItem<ColourScaleDelta>
 	void set(ColourScalePoint* point1, ColourScalePoint* point2, bool useHSV);
 	// Get colour for value, assuming that v is within the range 0 -> value_
 	QColor colour(double v, bool useHSV) const;
+	// Get colour for value as GLfloat*, assuming that v is within the range 0 -> value_
+	void colour(double v, bool useHSV, Vec4<GLfloat>& target) const;
 	// Return the starting value of the range
 	double start() const;
 	// Return the range of the delta
@@ -157,6 +163,8 @@ class ColourScale
 	void removePoint(ColourScalePoint* point);
 	// Get colour associated with value supplied
 	QColor colour(double value) const;
+	// Get colour associated with value supplied (as GLfloat[4])
+	void colour(double value, Vec4<GLfloat>& target) const;
 	// Set all alpha values to that specified
 	void setAllAlpha(int alpha);
 };

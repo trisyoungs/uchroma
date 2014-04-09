@@ -73,7 +73,7 @@ class Keywords
 		TitleKeyword,
 		TitleAnchorKeyword,
 		TitleOrientationKeyword,
-		VisibleKeyword,
+		VisibleAxisKeyword,
 		nAxisKeywords
 	};
 	// Convert text string to AxisKeyword
@@ -106,10 +106,11 @@ class Keywords
 		InterpolateConstrainKeyword,
 		InterpolateStepKeyword,
 		SliceDefinitionKeyword,
-		SurfaceStyleKeyword,
+		StyleKeyword,
 		TransformXKeyword,
 		TransformYKeyword,
 		TransformZKeyword,
+		VisibleCollectionKeyword,
 		nCollectionKeywords
 	};
 	// Convert text string to CollectionKeyword

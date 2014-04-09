@@ -120,6 +120,8 @@ class UChromaWindow : public QMainWindow
 	 */
 	private slots:
 	void on_CollectionList_currentRowChanged(int index);
+	void on_CollectionList_itemClicked(QListWidgetItem* item);
+	void on_CollectionList_currentTextChanged(const QString& text);
 	void on_CollectionAddButton_clicked(bool checked);
 	void on_CollectionRemoveButton_clicked(bool checked);
 
@@ -168,7 +170,6 @@ class UChromaWindow : public QMainWindow
 	void on_TransformZInterpolateCheck_clicked(bool checked);
 	void on_TransformZInterpolateStepSpin_valueChanged(double value);
 	void on_TransformZInterpolateConstrainCheck_clicked(bool checked);
-
 
 	public:
 	// Update Transform tab
@@ -482,8 +483,6 @@ class UChromaWindow : public QMainWindow
 	Collection* currentCollection_;
 
 	private:
-	// Add new collection
-	Collection* addCollection();
 	// Remove existing collection
 	void removeCollection(Collection* collection);
 	// Flag all surface data for regeneration
@@ -500,6 +499,8 @@ class UChromaWindow : public QMainWindow
 	Vec3<double> transformedDataPositiveMaxima();
 
 	public:
+	// Add new collection
+	Collection* addCollection(QString title = QString());
 	// Return first collection in list
 	Collection* collections();
 	// Return nth collection in list

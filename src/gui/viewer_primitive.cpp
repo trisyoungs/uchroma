@@ -129,6 +129,7 @@ int Primitive::nDefinedVertices()
 void Primitive::setType(GLenum type)
 {
 	type_ = type;
+	clear();
 }
 
 // Set name of primitive

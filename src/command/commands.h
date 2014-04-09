@@ -60,11 +60,25 @@ class CommandData
 // Command actions
 class Command
 {
-
 	public:
 	// Constructor / Destructor
 	Command();
 	~Command();
+
+
+	/*
+	 * Settings
+	 */
+	private:
+	// Whether to assume values used in trig functions are degrees, and need to be converted to radians
+	static bool assumeDegrees_;
+
+	public:
+	// Set whether to assume values used in trig functions are degrees
+	static void setAssumeDegrees(bool b);
+	// Return whether to assume values used in trig functions are degrees
+	static bool assumeDegrees();
+
 
 	// Command list
 	enum Function

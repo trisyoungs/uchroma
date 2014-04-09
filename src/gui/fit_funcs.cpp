@@ -34,7 +34,7 @@ UChromaWindow* FitDialog::uChroma_ = NULL;
 EquationVariable::EquationVariable() : ListItem<EquationVariable>()
 {
 	variable_ = NULL;
-	value_ = 10203.4;
+	value_ = 1.0;
 	minimumLimitEnabled_ = false;
 	maximumLimitEnabled_ = false;
 	minimumLimit_ = -10.0;
@@ -157,8 +157,8 @@ FitDialog::FitDialog(QWidget* parent) : QDialog(parent)
 
 	refreshing_ = false;
 	resetEquation();
-	ui.EquationEdit->setText("cos(x)");
-	equationValid_ = equation_.setCommands("cos(x)");
+	ui.EquationEdit->setText("cos(2.0*Pi*x)");
+	equationValid_ = equation_.setCommands("cos(2.0*Pi*x)");
 	updateFitVariables();
 }
 
@@ -185,61 +185,13 @@ void FitDialog::updateAll()
 }
 
 /*
- * Fit Data
- */
-
-// Reset equation
-void FitDialog::resetEquation()
-{
-	equation_.clear();
-	xVariable_ = equation_.addGlobalVariable("x");
-	yVariable_ = equation_.addGlobalVariable("y");
-	zVariable_ = equation_.addGlobalVariable("z");
-	equation_.setGenerateMissingVariables(true);
-	equationValid_ = false;
-}
-
-// Update fit variables list
-void FitDialog::updateFitVariables()
-{
-	// First, clear all 'used' flags
-	EquationVariable* eqVar;
-	for (eqVar = equationVariables_.first(); eqVar != NULL; eqVar = eqVar->next)
-	{
-		eqVar->setVariable(NULL);
-		eqVar->setUsed(false);
-	}
-	nVariablesUsed_ = 0;
-	fitVariables_.clear();
-
-	// Now, loop over current variables in the equation_
-	// Ignore 'x', 'y', and 'z' if they exist
-	// If a variable already exists in equationVariables_, set it's 'used' status to true.
-	// If it doesn't, create it and set it's 'used' status to true
-	ScopeNode* rootNode = equation_.rootNode();
-	for (Variable* var = rootNode->variables.variables(); var != NULL; var = var->next)
-	{
-		// Is this variable one of 'x', 'y', or 'z'?
-		if (strcmp(var->name(),"x") == 0 || strcmp(var->name(),"y") == 0 || strcmp(var->name(),"z") == 0) continue;
-
-		for (eqVar = equationVariables_.first(); eqVar != NULL; eqVar = eqVar->next) if (strcmp(eqVar->name(),var->name()) == 0) break;
-		if (eqVar == NULL)
-		{
-			eqVar = equationVariables_.add();
-			eqVar->setName(var->name());
-		}
-
-		// Update variable pointer
-		eqVar->setVariable(var);
-		eqVar->setUsed(true);
-		fitVariables_.add(eqVar);
-		++nVariablesUsed_;
-	}
-}
-
-/*
 // Widgets / Slots / Reimplementations
 */
+
+void FitDialog::on_CloseButton_clicked(bool checked)
+{
+	hide();
+}
 
 /*
  * Equations Group
@@ -252,12 +204,14 @@ void FitDialog::on_EquationEdit_textChanged(QString text)
 	if (equationValid_)
 	{
 		ui.EquationEdit->setPalette(ui.EquationGroup->palette());
+		ui.FitButton->setEnabled(true);
 	}
 	else
 	{
 		QPalette redText;
 		redText.setColor(QPalette::Text, Qt::red);
 		ui.EquationEdit->setPalette(redText);
+		ui.FitButton->setEnabled(false);
 	}
 
 	// Update list of variables
@@ -271,49 +225,8 @@ void FitDialog::on_SelectEquationButton_clicked(bool checked)
 
 void FitDialog::on_FitButton_clicked(bool checked)
 {
-	// Grab source collection, and construct a list of data to fit, obeying all defined data limits
-	fitData_.clear();
-	Collection* collection = uChroma_->collection(ui.SourceCollectionCombo->currentIndex());
-	if (!collection) return;
-	if (ui.SourceXYSlicesRadio->isChecked())
-	{
-		// Source data is normal XY slices from the current collection
-		double xMin = ui.SourceXYXMinSpin->value(), xMax = ui.SourceXYXMaxSpin->value();
-		for (int n=ui.SourceXYSliceFromSpin->value(); n<ui.SourceXYSliceToSpin->value(); ++n)
-		{
-			Data2D& oldData = collection->slice(n)->data();
-			Slice* newSlice = fitData_.add();
-			newSlice->data().setZ(oldData.z());
-
-			// Copy x-range specified
-			for (int m=0; m<oldData.nPoints(); ++m)
-			{
-				if (oldData.x(m) < xMin) continue;
-				if (oldData.x(m) > xMax) break;
-				newSlice->data().addPoint(oldData.x(m), oldData.y(m));
-			}
-		}
-	}
-	else if (ui.SourceYZSlicesRadio->isChecked())
-	{
-		// TODO
-	}
-
-	if (ui.FitAtOnceCheck->isChecked())
-	{
-		 currentFitSlice_ = NULL;
-
-		// Call the relevant minimiser
-		simplexMinimise();
-	}
-	else
-	{
-		for (currentFitSlice_ = fitData_.first(); currentFitSlice_ != NULL; currentFitSlice_ = currentFitSlice_->next)
-		{
-			// Call the relevant minimiser
-			simplexMinimise();
-		}
-	}
+	if (doFitting()) uChroma_->setAsModified();
+	uChroma_->updateAllTabs();
 }
 
 /*
@@ -452,24 +365,41 @@ void FitDialog::updateSourceGroup(bool refreshList)
 	// Update spin boxes with limits
 	ui.SourceXYSliceFromSpin->setRange(1, ui.SourceXYSliceToSpin->value());
 	ui.SourceXYSliceToSpin->setRange(ui.SourceXYSliceFromSpin->value(), collection->nSlices());
-	ui.SourceXYFromZLabel->setText("Z = " + QString::number(collection->slice(ui.SourceXYSliceFromSpin->value())->data().z()));
-	ui.SourceXYToZLabel->setText("Z = " + QString::number(collection->slice(ui.SourceXYSliceToSpin->value())->data().z()));
 	ui.SourceXYXMinSpin->setRange(true, collection->transformMin().x, true, collection->transformMax().x);
 	ui.SourceXYXMaxSpin->setRange(true, collection->transformMin().x, true, collection->transformMax().x);
+
+	// Set initial values for x range if refreshing list
+	if (refreshList)
+	{
+		ui.SourceXYSliceFromSpin->setValue(1);
+		ui.SourceXYSliceToSpin->setValue(collection->nSlices());
+		ui.SourceXYXMinSpin->setValue(collection->transformMin().x);
+		ui.SourceXYXMaxSpin->setValue(collection->transformMax().x);
+	}
+
+	// Update info labels
+	Slice* slice = collection->slice(ui.SourceXYSliceFromSpin->value()-1);
+	ui.SourceXYFromZLabel->setText("Z = " + (slice ? QString::number(slice->data().z()) : "???"));
+	slice = collection->slice(ui.SourceXYSliceToSpin->value()-1);
+	ui.SourceXYToZLabel->setText("Z = " + (slice ? QString::number(slice->data().z()) : "???"));
 }
 
 void FitDialog::on_SourceCollectionCombo_currentIndexChanged(int index)
 {
+	if (refreshing_) return;
+	updateSourceGroup();
 }
 
 void FitDialog::on_SourceXYSliceFromSpin_valueChanged(int value)
 {
-	ui.SourceXYSliceToSpin->setMinimum(value);
+	if (refreshing_) return;
+	updateSourceGroup(false);
 }
 
 void FitDialog::on_SourceXYSliceToSpin_valueChanged(int value)
 {
-	ui.SourceXYSliceFromSpin->setMaximum(value);
+	if (refreshing_) return;
+	updateSourceGroup(false);
 }
 
 /*

@@ -64,6 +64,15 @@ QColor ColourScalePoint::colour() const
 	return colour_;
 }
 
+// Return colour as GLfloat*
+void ColourScalePoint::colour(Vec4<GLfloat>& target) const
+{
+	target.x = colour_.redF();
+	target.y = colour_.greenF();
+	target.z = colour_.blueF();
+	target.w = colour_.alphaF();
+}
+
 /*
 // ColourScaleDelta
 */
@@ -126,6 +135,30 @@ QColor ColourScaleDelta::colour(double value, bool useHSV) const
 	}
 	col.setAlpha(startColour_.alpha() + deltaColour_[3] * clampv);
 	return col;
+}
+
+// Get colour for value as GLfloat*, assuming that v is within the range 0 -> value_
+void ColourScaleDelta::colour(double v, bool useHSV, Vec4< GLfloat >& target) const
+{
+	// Clamp 'v' to range 0.0 - 1.0 to span range of delta
+	double clampv = (v - start_) / delta_;
+	if (clampv < 0.0) clampv = 0.0;
+	else if (clampv > 1.0) clampv = 1.0;
+	if (useHSV)
+	{
+		QColor col;
+		col.setHsv(startColour_.hue() + deltaColour_[0] * clampv, startColour_.saturation() + deltaColour_[1] * clampv, startColour_.value() + deltaColour_[2] * clampv);
+		target.x = col.redF();
+		target.y = col.greenF();
+		target.z = col.blueF();
+	}
+	else
+	{
+		target.x = startColour_.red() + deltaColour_[0] * clampv;
+		target.y = startColour_.green() + deltaColour_[1] * clampv;
+		target.z = startColour_.blue() + deltaColour_[2]* clampv;
+	}
+	target.w = startColour_.alpha() + deltaColour_[3] * clampv;
 }
 
 // Return the starting value of the range
@@ -330,6 +363,42 @@ QColor ColourScale::colour(double value) const
 
 	// If we get to here then the supplied value is outside the range of all values, so take colour from the endpoint
 	return points_.last()->colour();
+}
+
+// Get colour associated with value supplied (as Vec4<GLfloat>)
+void ColourScale::colour(double value, Vec4<GLfloat>& target) const
+{
+	// Step through points associated to scale and find the two that we are inbetween.
+	// Check for no points being defined
+	if (points_.nItems() == 0)
+	{
+		target.x = 0.0;
+		target.y = 0.0;
+		target.z = 0.0;
+		target.w = 1.0;
+		return;
+	}
+
+	ColourScalePoint *csp = points_.first();	
+	// Is supplied value less than the value at the first point?
+	if (value < csp->value())
+	{
+		csp->colour(target);
+		return;
+	}
+	
+	// Find the correct delta to use
+	for (ColourScaleDelta *delta = deltas_.first(); delta != NULL; delta = delta->next)
+	{
+		if (delta->containsValue(value))
+		{
+			delta->colour(interpolated_ ? value : delta->start(), useHSV_, target);
+			return;
+		}
+	}
+
+	// If we get to here then the supplied value is outside the range of all values, so take colour from the endpoint
+	points_.last()->colour(target);
 }
 
 // Return number of points in colourscale

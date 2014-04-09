@@ -26,14 +26,13 @@
 void Viewer::constructLineSurface(Primitive& primitive, List<Data2D>& displayData, ColourScale colourScale)
 {
 	// Set primitive options
-	primitive.setType(GL_LINE_STRIP);
+	primitive.setType(GL_LINES);
 
 	GLfloat zA;
 
 	// Temporary variables
-	Vec4<GLfloat> colourA;
+	Vec4<GLfloat> colourA(0,0,0,1);
 	int n, nPoints;
-	QColor colour;
 	double yAxisScale = uChroma_->axisStretch(1);
 	Vec3<double> nrm(0.0, 1.0, 0.0);
 
@@ -50,9 +49,6 @@ void Viewer::constructLineSurface(Primitive& primitive, List<Data2D>& displayDat
 		// Grab slice pointers
 		Data2D* data = ri->item;
 
-		// Construct data for current slice
-// 		constructSurfaceStrip(sliceB, yAxisScale, normB, colourB, colourScale, sliceA, sliceC);
-
 		// Grab z values
 		zA = (GLfloat) data->z();
 
@@ -60,10 +56,13 @@ void Viewer::constructLineSurface(Primitive& primitive, List<Data2D>& displayDat
 		nPoints = data->nPoints();
 		Array<double>& xA = data->arrayX();
 		Array<double>& yA = data->arrayY();
-		for (n=0; n<nPoints-1; ++n)
+		for (n=1; n<nPoints-1; ++n)
 		{
 			// Add vertex for this point
-			colour = colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, yA[n]): yA[n]) / yAxisScale);
+			colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, yA[n-1]) : yA[n-1]) / yAxisScale, colourA);
+			primitive.defineVertex(xA[n-1], yA[n-1], zA, nrm, colourA, false);
+
+			colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, yA[n]) : yA[n]) / yAxisScale, colourA);
 			primitive.defineVertex(xA[n], yA[n], zA, nrm, colourA, false);
 		}
 	}

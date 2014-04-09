@@ -237,7 +237,24 @@ void Viewer::paintGL()
 // 	glPopClientAttrib();
 
 	// Loop over surface primitives
-	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) collection->displayPrimitive().sendToGL();
+	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next)
+	{
+		// If this collection is not visible, move on...
+		if (!collection->visible()) continue;
+
+		if (collection->displayStyle() == Collection::SurfaceStyle)
+		{
+			glEnable(GL_LIGHTING);
+			glDisable(GL_LINE_SMOOTH);
+		}
+		else
+		{
+			glEnable(GL_LINE_SMOOTH);
+			glLineWidth(lineWidth_);
+			glDisable(GL_LIGHTING);
+		}
+		collection->displayPrimitive().sendToGL();
+	}
 	
 	glDisable(GL_MULTISAMPLE);
 	glDisable(GL_CLIP_PLANE0);
