@@ -227,7 +227,7 @@ void Viewer::paintGL()
 	glClipPlane (GL_CLIP_PLANE1, clipPlaneTop_);
 	glEnable(GL_CLIP_PLANE1);
 	glPopMatrix();
-	
+
 // 	triangleChopper_.emptyTriangles();
 // 	triangleChopper_.storeTriangles(&surface_, A);
 // 	glLoadIdentity();

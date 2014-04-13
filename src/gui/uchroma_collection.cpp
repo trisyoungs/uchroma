@@ -46,6 +46,7 @@ void UChromaWindow::on_CollectionList_itemClicked(QListWidgetItem* item)
 
 void UChromaWindow::on_CollectionList_currentTextChanged(const QString& text)
 {
+	// TODO
 	printf("lkjlkjsaldj\n");
 }
 

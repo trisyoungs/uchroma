@@ -28,7 +28,7 @@ void FitDialog::resetEquation()
 {
 	equation_.clear();
 	xVariable_ = equation_.addGlobalVariable("x");
-	yVariable_ = equation_.addGlobalVariable("y");
+// 	yVariable_ = equation_.addGlobalVariable("y");
 	zVariable_ = equation_.addGlobalVariable("z");
 	equation_.setGenerateMissingVariables(true);
 	equationValid_ = false;
@@ -57,7 +57,7 @@ void FitDialog::updateFitVariables()
 		// Is this variable one of 'x', 'y', or 'z'?
 		if (strcmp(var->name(),"x") == 0 || strcmp(var->name(),"y") == 0 || strcmp(var->name(),"z") == 0) continue;
 
-		for (eqVar = equationVariables_.first(); eqVar != NULL; eqVar = eqVar->next) if (strcmp(eqVar->name(),var->name()) == 0) break;
+		for (eqVar = equationVariables_.first(); eqVar != NULL; eqVar = eqVar->next) if (eqVar->name() == var->name()) break;
 		if (eqVar == NULL)
 		{
 			eqVar = equationVariables_.add();
@@ -80,8 +80,17 @@ bool FitDialog::generateFittedData()
 	if (currentFittedData_ == NULL)
 	{
 		// Generate fitted data over all available fitData_
-		ui.OutputEdit->append("Simultaneous fitting not yet enabled.");
-		return false;
+		for (Data2D* fittedData = fittedData_.first(); fittedData != NULL; fittedData = fittedData->next)
+		{
+			zVariable_->set(fittedData->z());
+			Array<double>& x = fittedData->arrayX();
+			Array<double>& y = fittedData->arrayY();
+			for (int n = 0; n<x.nItems(); ++n)
+			{
+				xVariable_->set(x[n]);
+				y[n] = equation_.execute();
+			}
+		}
 	}
 	else
 	{
@@ -91,7 +100,6 @@ bool FitDialog::generateFittedData()
 		for (int n = 0; n<x.nItems(); ++n)
 		{
 			xVariable_->set(x[n]);
-			yVariable_->set(0.0);
 			y[n] = equation_.execute();
 		}
 	}
@@ -111,12 +119,24 @@ double FitDialog::sosError(Array<double>& alpha)
 	double yDiff, sos = 0.0;
 	if (currentFittedData_ == NULL)
 	{
-		// Generate fitted data over all available fitData_
-		ui.OutputEdit->append("Simultaneous fitting not yet enabled.");
-		return 0.0;
+		// Sum error over all fit data
+		Data2D* fittedData = fittedData_.first();
+		for (Data2D* fitData = fitData_.first(); fitData != NULL; fitData = fitData->next)
+		{
+			Array<double>& yOrig = fitData->arrayY();
+			Array<double>& yNew = fittedData->arrayY();
+			for (n = 0; n<yOrig.nItems(); ++n)
+			{
+				yDiff = yOrig[n] - yNew[n];
+				sos += yDiff * yDiff;
+			}
+
+			fittedData = fittedData->next;
+		}
 	}
 	else
 	{
+		// Sum error over current fit data
 		Array<double>& yOrig = currentFitData_->arrayY();
 		Array<double>& yNew = currentFittedData_->arrayY();
 		for (n = 0; n<yOrig.nItems(); ++n)
@@ -131,37 +151,30 @@ double FitDialog::sosError(Array<double>& alpha)
 // Generate RMS error for current targets
 double FitDialog::rmsError(Array<double>& alpha)
 {
-	// Poke current values back into the equation variables
-	int n = 0;
-	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next) ri->item->variable()->set(alpha[n++]);
-	
-	// Generate new data from current variable values
-	generateFittedData();
+	// Get sos error to start with
+	double rms = sosError(alpha);
 
-	double yDiff, rms = 0.0;
+	// Normalise  to number of data points, and take sqrt
+	int nPoints = 0;
 	if (currentFittedData_ == NULL)
 	{
-		// Generate fitted data over all available fitData_
-		ui.OutputEdit->append("Simultaneous fitting not yet enabled.");
-		return 0.0;
+		for (Data2D* data = fittedData_.first(); data != NULL; data = data->next) nPoints += data->nPoints();
 	}
-	else
-	{
-		Array<double>& yOrig = currentFitData_->arrayY();
-		Array<double>& yNew = currentFittedData_->arrayY();
-		for (n = 0; n<yOrig.nItems(); ++n)
-		{
-			yDiff = yOrig[n] - yNew[n];
-			rms += yDiff * yDiff;
-		}
-		rms = sqrt(rms/yOrig.nItems());
-	}
-	return rms;
+	else nPoints = currentFittedData_->nPoints();
+
+	return sqrt(rms/nPoints);
 }
 
 // Perform fitting with current settings
 bool FitDialog::doFitting()
 {
+	// Check number of variables to fit
+	if (fitVariables_.nItems() == 0)
+	{
+		ui.OutputEdit->append("ERROR: No variables to fit!");
+		return false;
+	}
+
 	// Grab source collection, and construct a list of data to fit, obeying all defined data limits
 	fitData_.clear();
 	fittedData_.clear();
@@ -212,22 +225,24 @@ bool FitDialog::doFitting()
 	}
 	destinationCollection->clearSlices();
 
-	// Construct alpha array (variables to fit) to pass to minimiser
-        Array<double> alpha;
-	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next)
-	{
-		// Grab variable pointer from FitVariable
-		EquationVariable* var = ri->item;
-		alpha.add(var->value());
-	}
-
 	// Fit all at once, or individual slices?
+	bool result;
 	if (ui.FitAtOnceCheck->isChecked())
 	{
 		currentFitData_ = NULL;
+		currentFittedData_ = NULL;
 
-		// Call the relevant minimiser
-		simplexMinimise(alpha);
+		// Call the minimiser
+		result = minimise();
+
+		// Create new slices in destination collection
+		for (Data2D* data = fittedData_.first(); data != NULL; data = data->next)
+		{
+			Slice* newSlice = destinationCollection->addSlice();
+			destinationCollection->setSliceZ(newSlice, data->z());
+			Data2D& newData = newSlice->data();
+			newData = (*data);
+		}
 	}
 	else
 	{
@@ -236,15 +251,13 @@ bool FitDialog::doFitting()
 		{
 			ui.OutputEdit->append("Fitting slice at z = " + QString::number(currentFitData_->z()));
 
-			// Call the relevant minimiser
-// 			simplexMinimise(alpha);
-			sdMinimise(alpha);
+			// Call the minimiser
+			result = minimise();
 
 			// Create new slice in destination collection
 			Slice* newSlice = destinationCollection->addSlice();
 			destinationCollection->setSliceZ(newSlice, currentFittedData_->z());
 			Data2D& newData = newSlice->data();
-			printf("Data of copying z = %f\n", currentFittedData_->z());
 			newData = (*currentFittedData_);
 			currentFittedData_ = currentFittedData_->next;
 		}
@@ -254,5 +267,38 @@ bool FitDialog::doFitting()
 	destinationCollection->calculateDataLimits();
 	destinationCollection->updateDataTransforms();
 
-	return true;
+	return result;
+}
+
+/*
+ * Minimisation
+ */
+
+// Minimise, calling relevant method
+bool FitDialog::minimise()
+{
+	// Construct alpha array (variables to fit) to pass to minimiser
+        Array<double> alpha;
+	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next)
+	{
+		// Grab variable pointer from FitVariable
+		EquationVariable* var = ri->item;
+		alpha.add(var->value());
+	}
+
+	// Call the minimiser
+	bool result;
+	switch (ui.MethodCombo->currentIndex())
+	{
+		// Steepest Descent
+		case (0):
+			result = sdMinimise(alpha);
+			break;
+		// Simplex
+		case (1):
+			result = simplexMinimise(alpha);
+			break;
+	}
+
+	return result;
 }

@@ -23,7 +23,7 @@
 #include "gui/uchroma.h"
 
 // Steepest Descent Minimise
-void FitDialog::sdMinimise(Array<double>& alpha)
+bool FitDialog::sdMinimise(Array<double>& alpha)
 {
 	// Create initial gradient
 	Array<double> gradient(alpha.nItems()), tempAlpha;
@@ -78,4 +78,6 @@ void FitDialog::sdMinimise(Array<double>& alpha)
 		
 		oldRMSE = currentRMSE;
 	}
+
+	return true;
 }

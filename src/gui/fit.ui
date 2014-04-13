@@ -36,13 +36,7 @@
       <attribute name="title">
        <string>Setup</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_9">
-       <property name="spacing">
-        <number>4</number>
-       </property>
-       <property name="margin">
-        <number>4</number>
-       </property>
+      <layout class="QVBoxLayout" name="verticalLayout_10">
        <item>
         <widget class="QGroupBox" name="EquationGroup">
          <property name="sizePolicy">
@@ -103,7 +97,7 @@
               <property name="maximumSize">
                <size>
                 <width>128</width>
-                <height>24</height>
+                <height>31</height>
                </size>
               </property>
               <property name="cursor">
@@ -153,46 +147,88 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="VariablesGroup">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>1</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <property name="spacing">
+          <number>4</number>
          </property>
-         <property name="title">
-          <string>Variables</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <property name="leftMargin">
-           <number>9</number>
-          </property>
-          <item>
-           <widget class="QTableWidget" name="VariablesTable">
-            <column>
-             <property name="text">
-              <string>Variable</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Value</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Minimum Value</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Maximum Value</string>
-             </property>
-            </column>
-           </widget>
-          </item>
-         </layout>
-        </widget>
+         <item>
+          <widget class="QGroupBox" name="VariablesGroup">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>1</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="title">
+            <string>Variables</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <property name="leftMargin">
+             <number>9</number>
+            </property>
+            <item>
+             <widget class="QTableWidget" name="VariablesTable">
+              <column>
+               <property name="text">
+                <string>Variable</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Value</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Minimum</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Maximum</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="MethodGroup">
+           <property name="title">
+            <string>Method</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <property name="spacing">
+             <number>4</number>
+            </property>
+            <property name="margin">
+             <number>4</number>
+            </property>
+            <item>
+             <widget class="QComboBox" name="MethodCombo">
+              <item>
+               <property name="text">
+                <string>Steepest Descent</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Simplex</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QStackedWidget" name="MethodStack">
+              <widget class="QWidget" name="page"/>
+              <widget class="QWidget" name="page_2"/>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -509,5 +545,22 @@
  <resources>
   <include location="icons.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>MethodCombo</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>MethodStack</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>546</x>
+     <y>223</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>568</x>
+     <y>268</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

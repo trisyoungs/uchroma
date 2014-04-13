@@ -61,7 +61,7 @@ View
   MatrixW 0.000000 0.000000 -17.589381 1.000000
 EndView
 Collection 'Cosine Test Data'
-  DataDirectory "/home/tris/src/uchroma-coll/test"
+  DataDirectory "./test"
   TransformX false x
   TransformY false y
   TransformZ false z

@@ -3,6 +3,7 @@ collection.cpp
 colourscale.cpp
 data2d.cpp
 dnchar.cpp
+equation.cpp
 lineparser.cpp
 messenger.cpp
 nxs.cpp
@@ -13,6 +14,7 @@ collection.h
 colourscale.h
 data2d.h
 dnchar.h
+equation.h
 lineparser.h
 messenger.h
 nxs.h

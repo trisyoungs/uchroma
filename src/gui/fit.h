@@ -27,6 +27,7 @@
 #include "gui/ui_fit.h"
 #include "base/dnchar.h"
 #include "base/slice.h"
+#include "base/equation.h"
 #include "parser/tree.h"
 #include "templates/array.h"
 #include "templates/list.h"
@@ -34,71 +35,6 @@
 // Forward Declarations
 class UChromaWindow;
 class Variable;
-
-/*
- * Equation Variable
- */
-class EquationVariable : public ListItem<EquationVariable>
-{
-	public:
-	// Constructor / Destructor
-	EquationVariable();
-	~EquationVariable();
-
-
-	/*
-	 * Variable Target
-	 */
-	private:
-	// Name of target variable
-	Dnchar name_;
-	// Target Variable pointer
-	Variable* variable_;
-	// Value
-	double value_;
-	// Whether minimum maximum limits are enabled
-	bool minimumLimitEnabled_, maximumLimitEnabled_;
-	// Values for minimum / maximum limits
-	double minimumLimit_, maximumLimit_;
-	// Whether the variable is to be fit
-	bool fit_;
-	// Whether the variable is used in the current equation
-	bool used_;
-
-	public:
-	// Set name
-	void setName(const char* name);
-	// Return name
-	const char* name();
-	// Set variable target
-	void setVariable(Variable* variable);
-	// Return variable target
-	Variable* variable();
-	// Set value
-	void setValue(double value);
-	// Return value
-	double value();
-	// Set minimum limit
-	void setMinimumLimit(bool enabled, double value);
-	// Return whether minimum limit is enabled
-	bool minimumLimitEnabled();
-	// Return minimum limit value
-	double minimumLimit();
-	// Set maximum limit
-	void setMaximumLimit(bool enabled, double value);
-	// Return whether maximum limit is enabled
-	bool maximumLimitEnabled();
-	// Return maximum limit value
-	double maximumLimit();
-	// Set whether this variable should be fit
-	void setFit(bool fit);
-	// Return whether this variable should be fit
-	bool fit();
-	// Set whether this variable is used in the current equation
-	void setUsed(bool used);
-	// Return whether this variable is used in the current equation
-	bool used();
-};
 
 /*
  * Fit Dialog
@@ -185,9 +121,11 @@ class FitDialog : public QDialog
 	 */
 	private:
 	// Simplex minimise
-	void simplexMinimise(Array<double>& alpha);
+	bool simplexMinimise(Array<double>& alpha);
 	// Steepest Descent minimise
-	void sdMinimise(Array<double>& alpha);
+	bool sdMinimise(Array<double>& alpha);
+	// Minimise, calling relevant method
+	bool minimise();
 
 
 	/*

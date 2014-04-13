@@ -24,8 +24,15 @@
 #include "templates/simplex.h"
 
 // Simplex Minimise
-void FitDialog::simplexMinimise(Array<double>& alpha)
+bool FitDialog::simplexMinimise(Array<double>& alpha)
 {
+	// Check number of variables to fit
+	if (alpha.nItems() < 2)
+	{
+		ui.OutputEdit->append("ERROR: Can't use Simplex minimiser for this few variables.");
+		return false;
+	}
+
 	// Setup the simplex minimiser 
 	ui.OutputEdit->append("Initialising Simplex minimiser");
         Simplex<FitDialog> simplex(this, &FitDialog::sosError);
