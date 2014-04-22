@@ -24,6 +24,7 @@
 
 #include "gui/ui_uchroma.h"
 #include "gui/saveimage.h"
+#include "gui/create.h"
 #include "gui/dataimport.h"
 #include "gui/fit.h"
 #include "gui/slicemonitor.h"
@@ -54,6 +55,8 @@ class UChromaWindow : public QMainWindow
 	SliceMonitorDialog sliceMonitorDialog_;
 	// Fit Window Dialog
 	FitDialog fitDialog_;
+	// Create Window Dialog
+	CreateDialog createDialog_;
 
 	public:
 	// Constructor / Destructor
@@ -106,6 +109,7 @@ class UChromaWindow : public QMainWindow
 	private slots:
 	void on_actionToolsSliceMonitor_triggered(bool checked);
 	void on_actionToolsFitWindow_triggered(bool checked);
+	void on_actionToolsCreateData_triggered(bool checked);
 
 
 	/*
@@ -121,7 +125,7 @@ class UChromaWindow : public QMainWindow
 	private slots:
 	void on_CollectionList_currentRowChanged(int index);
 	void on_CollectionList_itemClicked(QListWidgetItem* item);
-	void on_CollectionList_currentTextChanged(const QString& text);
+	void on_CollectionList_itemChanged(QListWidgetItem* item);
 	void on_CollectionAddButton_clicked(bool checked);
 	void on_CollectionRemoveButton_clicked(bool checked);
 
@@ -483,8 +487,6 @@ class UChromaWindow : public QMainWindow
 	Collection* currentCollection_;
 
 	private:
-	// Remove existing collection
-	void removeCollection(Collection* collection);
 	// Flag all surface data for regeneration
 	void regenerateAll();
 	// Recalculate tick deltas for specified axis
@@ -501,6 +503,8 @@ class UChromaWindow : public QMainWindow
 	public:
 	// Add new collection
 	Collection* addCollection(QString title = QString());
+	// Remove existing collection
+	void removeCollection(Collection* collection);
 	// Return first collection in list
 	Collection* collections();
 	// Return nth collection in list

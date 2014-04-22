@@ -67,8 +67,10 @@ class Collection : public ListItem<Collection>
 	void removeSlice(Slice* slice);
 	// Set z value of specified slice
 	void setSliceZ(Slice* target, double z);
+	// Set data for specified slice
+	void setSliceData(Slice* target, Data2D* newData);
 	// Return first slice in list
-	Slice* slices();
+	Slice* slices() const;
 	// Return last slice in list
 	Slice* lastSlice();
 	// Return nth slice in list

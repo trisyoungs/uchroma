@@ -167,10 +167,27 @@ void Collection::setSliceZ(Slice* target, double z)
 		if (++dummy == 10) break;
 		
 	} while (minBad || maxBad);
+
+	displayDataValid_ = false;
+}
+
+// Set data of specified slice
+void Collection::setSliceData(Slice* target, Data2D* newData)
+{
+	// Check that this Slice is owned by the collection
+	if (!slices_.contains(target))
+	{
+		msg.print("Internal Error : Tried to set the data of a slice using the wrong collection.\n");
+		return;
+	}
+
+	target->data() = (*newData);
+	
+	displayDataValid_ = false;
 }
 
 // Return first slice in list
-Slice* Collection::slices()
+Slice* Collection::slices() const
 {
 	return slices_.first();
 }

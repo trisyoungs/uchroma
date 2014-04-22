@@ -5295,6 +5295,7 @@
     </property>
     <addaction name="actionToolsSliceMonitor"/>
     <addaction name="actionToolsFitWindow"/>
+    <addaction name="actionToolsCreateData"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -5384,6 +5385,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionToolsCreateData">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Create Data</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a collection from a specified equation</string>
    </property>
   </action>
  </widget>

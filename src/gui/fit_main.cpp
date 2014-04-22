@@ -28,14 +28,13 @@ void FitDialog::resetEquation()
 {
 	equation_.clear();
 	xVariable_ = equation_.addGlobalVariable("x");
-// 	yVariable_ = equation_.addGlobalVariable("y");
 	zVariable_ = equation_.addGlobalVariable("z");
 	equation_.setGenerateMissingVariables(true);
 	equationValid_ = false;
 }
 
 // Update fit variables list
-void FitDialog::updateFitVariables()
+void FitDialog::updateVariables()
 {
 	// First, clear all 'used' flags
 	EquationVariable* eqVar;
@@ -48,14 +47,14 @@ void FitDialog::updateFitVariables()
 	fitVariables_.clear();
 
 	// Now, loop over current variables in the equation_
-	// Ignore 'x', 'y', and 'z' if they exist
+	// Ignore 'x' and 'z' if they exist
 	// If a variable already exists in equationVariables_, set it's 'used' status to true.
 	// If it doesn't, create it and set it's 'used' status to true
 	ScopeNode* rootNode = equation_.rootNode();
 	for (Variable* var = rootNode->variables.variables(); var != NULL; var = var->next)
 	{
-		// Is this variable one of 'x', 'y', or 'z'?
-		if (strcmp(var->name(),"x") == 0 || strcmp(var->name(),"y") == 0 || strcmp(var->name(),"z") == 0) continue;
+		// Is this variable one of 'x' or 'z'?
+		if ((strcmp(var->name(),"x") == 0) || (strcmp(var->name(),"z") == 0)) continue;
 
 		for (eqVar = equationVariables_.first(); eqVar != NULL; eqVar = eqVar->next) if (eqVar->name() == var->name()) break;
 		if (eqVar == NULL)
@@ -106,6 +105,43 @@ bool FitDialog::generateFittedData()
 	return true;
 }
 
+// Update destination with current fitted data
+void FitDialog::updateFittedData()
+{
+	// Check destination collection
+	if (destinationCollection_ == NULL)
+	{
+		msg.print("Internal Error: No destination collection set in FitDialog::updateFittedData().\n");
+		return;
+	}
+
+	if (currentFittedData_ == NULL)
+	{
+		// Clear existing slices
+		destinationCollection_->clearSlices();
+
+		// Copy all slice data over
+		for (Data2D* fittedData = fittedData_.first(); fittedData != NULL; fittedData = fittedData->next)
+		{
+			Slice* newSlice = destinationCollection_->addSlice();
+			destinationCollection_->setSliceZ(newSlice, fittedData->z());
+			destinationCollection_->setSliceData(newSlice, fittedData);
+		}
+	}
+	else
+	{
+		// Update single slice
+		if (destinationSlice_ == NULL)
+		{
+			msg.print("Internal Error: No destination slice set in FitDialog::updateFittedData().\n");
+			return;
+		}
+
+		// Overwrite existing slice data
+		destinationCollection_->setSliceData(destinationSlice_, currentFittedData_);
+	}
+}
+
 // Generate SOS error for current targets
 double FitDialog::sosError(Array<double>& alpha)
 {
@@ -145,7 +181,21 @@ double FitDialog::sosError(Array<double>& alpha)
 			sos += yDiff * yDiff;
 		}
 	}
-	return sos;
+
+	// Calculate penalty from variables outside of their allowable ranges
+	double penalty = 1.0;
+	n = 0;
+	EquationVariable* fitVar;
+	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next, ++n)
+	{
+		// Grab variable from reflist item
+		fitVar = ri->item;
+
+		if (fitVar->minimumLimitEnabled() && (alpha[n] < fitVar->minimumLimit())) penalty += pow(fitVar->minimumLimit() - alpha[n], 2.0) * 1000.0;
+		if (fitVar->maximumLimitEnabled() && (alpha[n] > fitVar->maximumLimit())) penalty += pow(alpha[n] - fitVar->maximumLimit(), 2.0) * 1000.0;
+	}
+
+	return sos * penalty;
 }
 
 // Generate RMS error for current targets
@@ -171,7 +221,7 @@ bool FitDialog::doFitting()
 	// Check number of variables to fit
 	if (fitVariables_.nItems() == 0)
 	{
-		ui.OutputEdit->append("ERROR: No variables to fit!");
+		printMessage("ERROR: No variables to fit!");
 		return false;
 	}
 
@@ -184,7 +234,7 @@ bool FitDialog::doFitting()
 	{
 		// Source data is normal XY slices from the current collection
 		double xMin = ui.SourceXYXMinSpin->value(), xMax = ui.SourceXYXMaxSpin->value();
-		ui.OutputEdit->append("Setting up XY slice data over " + QString::number(xMin) + " < x < " + QString::number(xMax));
+		printMessage("Setting up XY slice data over %e < x < %e", xMin, xMax);
 
 		for (int n=ui.SourceXYSliceFromSpin->value()-1; n<ui.SourceXYSliceToSpin->value(); ++n)
 		{
@@ -205,67 +255,63 @@ bool FitDialog::doFitting()
 			(*newFitData) = (*newData);
 		}
 	}
-	else if (ui.SourceYZSlicesRadio->isChecked())
+	else if (ui.SourceZYSlicesRadio->isChecked())
 	{
 		// TODO
 	}
 
 	// Set up destination collection
-	Collection* destinationCollection;
-	if (ui.DestinationNewCollectionRadio->isChecked()) destinationCollection = uChroma_->addCollection("Fit Results");
+	if (ui.DestinationNewCollectionRadio->isChecked()) destinationCollection_ = uChroma_->addCollection("Fit Results");
 	else
 	{
 		QVariant data = ui.DestinationCollectionCombo->itemData(ui.DestinationCollectionCombo->currentIndex());
-		destinationCollection = uChroma_->collection(data.toInt());
-		if (destinationCollection == NULL)
+		destinationCollection_ = uChroma_->collection(data.toInt());
+		if (destinationCollection_ == NULL)
 		{
-			ui.OutputEdit->append("ERROR: Unable to set destination collection for fitting output.");
+			printMessage("ERROR: Unable to set destination collection for fitting output.");
 			return false;
 		}
 	}
-	destinationCollection->clearSlices();
+	destinationCollection_->clearSlices();
+	destinationSlice_ = NULL;
 
 	// Fit all at once, or individual slices?
 	bool result;
-	if (ui.FitAtOnceCheck->isChecked())
+	if (ui.OptionsGlobalFitCheck->isChecked())
 	{
+		printMessage("Performing global fit over all source slices");
+
 		currentFitData_ = NULL;
 		currentFittedData_ = NULL;
 
 		// Call the minimiser
 		result = minimise();
 
-		// Create new slices in destination collection
-		for (Data2D* data = fittedData_.first(); data != NULL; data = data->next)
-		{
-			Slice* newSlice = destinationCollection->addSlice();
-			destinationCollection->setSliceZ(newSlice, data->z());
-			Data2D& newData = newSlice->data();
-			newData = (*data);
-		}
+		// Copy final fitted data over to destination collection
+		updateFittedData();
 	}
 	else
 	{
 		currentFittedData_ = fittedData_.first();
-		for (currentFitData_ = fitData_.first(); currentFitData_ != NULL; currentFitData_ = currentFitData_->next)
+		for (currentFitData_ = fitData_.first(); currentFitData_ != NULL; currentFitData_ = currentFitData_->next, currentFittedData_ = currentFittedData_->next)
 		{
-			ui.OutputEdit->append("Fitting slice at z = " + QString::number(currentFitData_->z()));
+			printMessage("Fitting slice at z = %e", currentFitData_->z());
+
+			// Create new slice target in destination collection
+			destinationSlice_ = destinationCollection_->addSlice();
+			destinationCollection_->setSliceZ(destinationSlice_, currentFittedData_->z());
 
 			// Call the minimiser
 			result = minimise();
 
-			// Create new slice in destination collection
-			Slice* newSlice = destinationCollection->addSlice();
-			destinationCollection->setSliceZ(newSlice, currentFittedData_->z());
-			Data2D& newData = newSlice->data();
-			newData = (*currentFittedData_);
-			currentFittedData_ = currentFittedData_->next;
+			// Copy final fitted data over to destination collection
+			updateFittedData();
 		}
 	}
 
 	// Update collection limits etc.
-	destinationCollection->calculateDataLimits();
-	destinationCollection->updateDataTransforms();
+	destinationCollection_->calculateDataLimits();
+	destinationCollection_->updateDataTransforms();
 
 	return result;
 }
@@ -278,7 +324,7 @@ bool FitDialog::doFitting()
 bool FitDialog::minimise()
 {
 	// Construct alpha array (variables to fit) to pass to minimiser
-        Array<double> alpha;
+	Array<double> alpha;
 	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next)
 	{
 		// Grab variable pointer from FitVariable
@@ -292,7 +338,7 @@ bool FitDialog::minimise()
 	{
 		// Steepest Descent
 		case (0):
-			result = sdMinimise(alpha);
+			result = sdMinimise(alpha, ui.MethodSDToleranceSpin->value(), ui.MethodSDMaxStepsSpin->value());
 			break;
 		// Simplex
 		case (1):
@@ -300,5 +346,16 @@ bool FitDialog::minimise()
 			break;
 	}
 
+	// Print results...
+	printMessage("Final, fitted parameters are:");
+	int n = 0;
+	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next, ++n)
+	{
+		// Grab variable pointer from FitVariable
+		EquationVariable* var = ri->item;
+
+		printMessage("\t%s\t=\t%e", qPrintable(var->name()), alpha[n]);
+	}
+	
 	return result;
 }

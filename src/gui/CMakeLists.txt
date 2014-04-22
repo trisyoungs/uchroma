@@ -25,6 +25,7 @@ data.cpp
 io.cpp
 keywords.cpp
 slices.cpp
+create_funcs.cpp
 dataimport_funcs.cpp
 dataimport_seqxy.cpp
 saveimage_funcs.cpp
@@ -61,6 +62,7 @@ viewer_vertexchunk.h
 
 SET(pro_MOC_HDRS
   uchroma.h
+  create.h
   dataimport.h
   fit.h
   graphwidget.h
@@ -75,6 +77,7 @@ SET(pro_MOC_HDRS
 QT4_WRAP_CPP(pro_MOC_SRCS ${pro_MOC_HDRS} OPTIONS -f)
 
 SET(pro_UIS
+  create.ui
   dataimport.ui
   fit.ui
   graphwidget.ui

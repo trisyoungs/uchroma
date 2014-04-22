@@ -24,7 +24,7 @@
 #include "version.h"
 
 // Constructor
-UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveImageDialog_(this), dataImportDialog_(this), fitDialog_(this), sliceMonitorDialog_(this)
+UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveImageDialog_(this), createDialog_(this), dataImportDialog_(this), fitDialog_(this), sliceMonitorDialog_(this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -51,6 +51,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveIma
 	ui.MainView->setUChroma(this);
 	GraphWidget::setUChroma(this);
 	FitDialog::setUChroma(this);
+	CreateDialog::setUChroma(this);
 
 	// Add display styles to StyleCombo on Collection->Style tab
 	for (int n=0; n<Collection::nDisplayStyles; ++n) ui.StyleCombo->addItem( Collection::displayStyle((Collection::DisplayStyle) n));

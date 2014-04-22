@@ -21,7 +21,7 @@
 
 #include "gui/fit.h"
 #include "gui/uchroma.h"
-// #include "parser/scopenode.h"
+#include "templates/variantpointer.h"
 
 // Static singletons
 UChromaWindow* FitDialog::uChroma_ = NULL;
@@ -31,11 +31,14 @@ FitDialog::FitDialog(QWidget* parent) : QDialog(parent)
 {
 	ui.setupUi(this);
 
+	// Set default values in some widgets
+	ui.MethodSDToleranceSpin->setValue(1.0e-2);
+
 	refreshing_ = false;
 	resetEquation();
-	ui.EquationEdit->setText("cos(2.0*Pi*x)");
-	equationValid_ = equation_.setCommands("cos(2.0*Pi*x)");
-	updateFitVariables();
+	ui.EquationEdit->setText("cos(x)*A");
+	equationValid_ = equation_.setCommands("cos(x)*A");
+	updateVariables();
 }
 
 // Destructor
@@ -47,10 +50,38 @@ FitDialog::~FitDialog()
  * Link to UChroma
  */
 
+
 // Set UChromaWindow pointer
 void FitDialog::setUChroma(UChromaWindow* ptr)
 {
 	uChroma_ = ptr;
+}
+
+/*
+ * Window Functions
+ */
+
+// Send message to message box
+void FitDialog::printMessage(const char* fmtString, ...) const
+{
+	va_list arguments;
+	static char msgs[8096];
+	msgs[0] = '\0';
+	// Parse the argument list (...) and internally write the output string into msgs[]
+	va_start(arguments, fmtString);
+	vsprintf(msgs, fmtString, arguments);
+	ui.OutputEdit->append(msgs);
+	va_end(arguments);
+}
+
+// Refresh main view (if options permit) after fit params have changed
+void FitDialog::updateMainView()
+{
+	if (ui.OptionsVisualCheck->isChecked())
+	{
+		updateFittedData();
+		uChroma_->updateDisplay();
+	}
 }
 
 // Update data in window
@@ -61,8 +92,8 @@ void FitDialog::updateAll()
 }
 
 /*
-// Widgets / Slots / Reimplementations
-*/
+ * Widgets / Slots / Reimplementations
+ */
 
 void FitDialog::on_CloseButton_clicked(bool checked)
 {
@@ -91,7 +122,7 @@ void FitDialog::on_EquationEdit_textChanged(QString text)
 	}
 
 	// Update list of variables
-	updateFitVariables();
+	updateVariables();
 	updateVariableTable();
 }
 
@@ -220,14 +251,17 @@ void FitDialog::updateSourceGroup(bool refreshList)
 {
 	refreshing_ = true;
 
-	// Get currently selected collection (by index)
+	// Update collection list
 	if (refreshList)
 	{
-		int currentIndex = ui.SourceCollectionCombo->currentIndex();
+		Collection* currentCollection = VariantPointer<Collection>(ui.SourceCollectionCombo->itemData(ui.SourceCollectionCombo->currentIndex()));
 		ui.SourceCollectionCombo->clear();
-		for (Collection* c = uChroma_->collections(); c != NULL; c = c->next) ui.SourceCollectionCombo->addItem(c->title());
-		if ((currentIndex != -1) && (currentIndex < ui.SourceCollectionCombo->count())) ui.SourceCollectionCombo->setCurrentIndex(currentIndex);
-		else ui.SourceCollectionCombo->setCurrentIndex(0);
+		int index = 0;
+		for (Collection* c = uChroma_->collections(); c != NULL; c = c->next, ++index)
+		{
+			ui.SourceCollectionCombo->addItem(c->title());
+			if (c == currentCollection) ui.SourceCollectionCombo->setCurrentIndex(index);
+		}
 	}
 
 	// Grab current collection
@@ -258,6 +292,8 @@ void FitDialog::updateSourceGroup(bool refreshList)
 	ui.SourceXYFromZLabel->setText("Z = " + (slice ? QString::number(slice->data().z()) : "???"));
 	slice = collection->slice(ui.SourceXYSliceToSpin->value()-1);
 	ui.SourceXYToZLabel->setText("Z = " + (slice ? QString::number(slice->data().z()) : "???"));
+
+	refreshing_ = false;
 }
 
 void FitDialog::on_SourceCollectionCombo_currentIndexChanged(int index)
@@ -285,9 +321,10 @@ void FitDialog::on_SourceXYSliceToSpin_valueChanged(int value)
 // Update destination data group
 void FitDialog::updateDestinationGroup()
 {
+	refreshing_ = true;
+
 	// Get currently selected collection (by user data value)
-	QVariant data = ui.DestinationCollectionCombo->itemData(ui.DestinationCollectionCombo->currentIndex());
-	int currentIndex = data.toInt();
+	Collection* selectedCollection = VariantPointer<Collection>(ui.DestinationCollectionCombo->itemData(ui.DestinationCollectionCombo->currentIndex()));
 
 	// Grab current collection
 	Collection* collection = uChroma_->collection(ui.SourceCollectionCombo->currentIndex());
@@ -297,7 +334,9 @@ void FitDialog::updateDestinationGroup()
 	int index = 0;
 	for (Collection* c = uChroma_->collections(); c != NULL; c = c->next, ++index) if (c != collection)
 	{
-		ui.DestinationCollectionCombo->addItem(c->title(), QVariant(index));
-		if (currentIndex == index) ui.DestinationCollectionCombo->setCurrentIndex(currentIndex);
+		ui.DestinationCollectionCombo->addItem(c->title(), VariantPointer<Collection>(c));
+		if (selectedCollection == c) ui.DestinationCollectionCombo->setCurrentIndex(index);
 	}
+
+	refreshing_ = false;
 }

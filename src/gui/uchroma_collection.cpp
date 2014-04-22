@@ -21,6 +21,7 @@
 
 #include "gui/uchroma.h"
 #include "templates/reflist.h"
+#include "templates/variantpointer.h"
 
 void UChromaWindow::on_CollectionList_currentRowChanged(int index)
 {
@@ -36,18 +37,26 @@ void UChromaWindow::on_CollectionList_currentRowChanged(int index)
 
 void UChromaWindow::on_CollectionList_itemClicked(QListWidgetItem* item)
 {
-	// Set the checkstate of the collection
-	QVariant data = item->data(Qt::UserRole);
-	Collection* collection = collections_[data.toInt()];
+	// Get collection from item
+	Collection* collection = VariantPointer<Collection>(item->data(Qt::UserRole));
 	if (!collection) return;
+
+	// Set the checkstate of the collection
 	collection->setVisible(item->checkState() == Qt::Checked);
 	updateDisplay();
 }
 
-void UChromaWindow::on_CollectionList_currentTextChanged(const QString& text)
+void UChromaWindow::on_CollectionList_itemChanged(QListWidgetItem* item)
 {
-	// TODO
-	printf("lkjlkjsaldj\n");
+	// Check refreshing status
+	if (refreshing_) return;
+
+	// Get collection from item
+	Collection* collection = VariantPointer<Collection>(item->data(Qt::UserRole));
+	if (!collection) return;
+
+	// Set title of collection
+	collection->setTitle(item->text());
 }
 
 void UChromaWindow::on_CollectionAddButton_clicked(bool checked)
@@ -72,12 +81,11 @@ void UChromaWindow::updateCollectionTab()
 
 	// Repopulate list
 	ui.CollectionList->clear();
-	int index = 0;
 	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
 	{
 		QListWidgetItem* item = new QListWidgetItem(ui.CollectionList, 0);
 		item->setText(collection->title());
-		item->setData(Qt::UserRole, QVariant(index++));
+		item->setData(Qt::UserRole, VariantPointer<Collection>(collection));
 		item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
 		item->setCheckState(collection->visible() ? Qt::Checked : Qt::Unchecked);
 

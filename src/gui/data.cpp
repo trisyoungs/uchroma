@@ -21,23 +21,6 @@
 
 #include "gui/uchroma.h"
 
-// Remove existing collection
-void UChromaWindow::removeCollection(Collection* collection)
-{
-	if (!collection) return;
-
-	// Remove link to rendering primitive
-	ui.MainView->removeSurfacePrimitive(&currentCollection_->displayPrimitive());
-
-	// Set new currentCollection_
-	if (collection->next) currentCollection_ = collection->next;
-	else currentCollection_ = collection->prev;
-	if (currentCollection_ == NULL) currentCollection_ = addCollection();
-
-	// Finally, remove old collection
-	collections_.remove(collection);
-}
-
 // Flag all surface and axis data for regeneration
 void UChromaWindow::regenerateAll()
 {
@@ -183,6 +166,23 @@ Collection* UChromaWindow::addCollection(QString title)
 	else currentCollection_->setTitle(title);
 
 	return currentCollection_;
+}
+
+// Remove existing collection
+void UChromaWindow::removeCollection(Collection* collection)
+{
+	if (!collection) return;
+
+	// Remove link to rendering primitive
+	ui.MainView->removeSurfacePrimitive(&currentCollection_->displayPrimitive());
+
+	// Set new currentCollection_
+	if (collection->next) currentCollection_ = collection->next;
+	else currentCollection_ = collection->prev;
+	if (currentCollection_ == NULL) currentCollection_ = addCollection();
+
+	// Finally, remove old collection
+	collections_.remove(collection);
 }
 
 // Return nth collection in list

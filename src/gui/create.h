@@ -1,6 +1,6 @@
 /*
-	*** Fit Widget
-	*** src/gui/fit.h
+	*** Create Widget
+	*** src/gui/create.h
 	Copyright T. Youngs 2012-2013.
 
 	This file is part of uChroma.
@@ -19,12 +19,12 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_FIT_H
-#define UCHROMA_FIT_H
+#ifndef UCHROMA_CREATE_H
+#define UCHROMA_CREATE_H
 
 #include <QtGui/QWidget>
 #include <QtCore/QObject>
-#include "gui/ui_fit.h"
+#include "gui/ui_create.h"
 #include "base/dnchar.h"
 #include "base/slice.h"
 #include "base/equation.h"
@@ -39,19 +39,19 @@ class Slice;
 class Variable;
 
 /*
- * Fit Dialog
+ * Create Dialog
  */
-class FitDialog : public QDialog
+class CreateDialog : public QDialog
 {
 	Q_OBJECT
 
 	public:
 	// Constructor
-	FitDialog(QWidget *parent);
+	CreateDialog(QWidget *parent);
 	// Destructor
-	~FitDialog();
+	~CreateDialog();
 	// Main form declaration
-	Ui::FitDialog ui;
+	Ui::CreateDialog ui;
 
 
 	/*
@@ -72,10 +72,8 @@ class FitDialog : public QDialog
 	private:
 	// Whether the window is refreshing / updating its controls
 	bool refreshing_;
-
+	
 	private:
-	// Send message to message box
-	void printMessage(const char* fmtString, ...) const;
 	// Refresh main view (if options permit) after fit params have changed
 	void updateMainView();
 
@@ -85,10 +83,10 @@ class FitDialog : public QDialog
 
 
 	/*
-	 * Main Fitting Data
+	 * Creation Data
 	 */
 	private:
-	// Local list of variables use in equations, including limits
+	// Local list of variables use in equations
 	List<EquationVariable> equationVariables_;
 	// Number of variables which are used in the current equation
 	int nVariablesUsed_;
@@ -98,48 +96,20 @@ class FitDialog : public QDialog
 	bool equationValid_;
 	// Standard x and z variables
 	Variable* xVariable_, *zVariable_;
-	// Data to fit
-	List<Data2D> fitData_;
-	// Current fitted datapoints
-	List<Data2D> fittedData_;
-	// Current Data2D to fit, or NULL for all Data2D simultaneously
-	Data2D* currentFitData_;
-	// Current fitted Data2D, or NULL if fitting all simultaneously
-	Data2D* currentFittedData_;
-	// List of variables targetted in fit process
-	RefList<EquationVariable,bool> fitVariables_;
-	// Destination collection for fitted data
-	Collection* destinationCollection_;
-	// Current destination slice for fitted data (if any)
-	Slice* destinationSlice_;
+	// List of variables targetted in create process
+	RefList<EquationVariable,bool> usedVariables_;
+	// Newly created collection (if any)
+	Collection* newCollection_;
 
 	private:
 	// Reset equation
 	void resetEquation();
 	// Update variables list
 	void updateVariables();
-	// Generate fitted data for current targets
-	bool generateFittedData();
-	// Update destination with current fitted data
-	void updateFittedData();
-	// Calculate SOS error for current targets
-	double sosError(Array<double>& alpha);
-	// Calculate RMS error for current targets
-	double rmsError(Array<double>& alpha);
-	// Perform fitting with current settings
-	bool doFitting();
-
-
-	/*
-	 * Minimisation Functions
-	 */
-	private:
-	// Simplex minimise
-	bool simplexMinimise(Array<double>& alpha);
-	// Steepest Descent minimise
-	bool sdMinimise(Array<double>& alpha, double tolerance, int maxSteps);
-	// Minimise, calling relevant method
-	bool minimise();
+	// Update created data
+	void updateCreatedData();
+	// Create collection
+	bool createCollection();
 
 
 	/*
@@ -154,7 +124,23 @@ class FitDialog : public QDialog
 	public slots:
 	void on_EquationEdit_textChanged(QString text);
 	void on_SelectEquationButton_clicked(bool checked);
-	void on_FitButton_clicked(bool checked);
+	void on_CreateButton_clicked(bool checked);
+
+	/*
+	 * Grid Group
+	 */
+	private:
+	// Update grid data group
+	void updateGridGroup(bool refreshList = true);
+
+	public slots:
+	void on_GridSpecifyXMinSpin_valueChanged(double value);
+	void on_GridSpecifyXMaxSpin_valueChanged(double value);
+	void on_GridSpecifyXDeltaSpin_valueChanged(double value);
+	void on_GridSpecifyZMinSpin_valueChanged(double value);
+	void on_GridSpecifyZMaxSpin_valueChanged(double value);
+	void on_GridSpecifyZDeltaSpin_valueChanged(double value);
+	void on_GridTakeFromCollectionCombo_currentIndexChanged(int index);
 
 	/*
 	 * Variables Group
@@ -167,24 +153,15 @@ class FitDialog : public QDialog
 	void on_VariablesTable_cellChanged(int row, int column);
 
 	/*
-	 * Source Group
-	 */
-	private:
-	// Update source data group
-	void updateSourceGroup(bool refreshList = true);
-
-	public slots:
-	void on_SourceCollectionCombo_currentIndexChanged(int index);
-	void on_SourceXYSliceFromSpin_valueChanged(int value);
-	void on_SourceXYSliceToSpin_valueChanged(int value);
-
-	/*
 	 * Destination Group
 	 */
 	private:
 	// Update destination data group
 	void updateDestinationGroup();
 
+	public slots:
+	void on_DestinationNewCollectionRadio_clicked(bool checked);
+	void on_DestinationExistingCollectionRadio_clicked(bool checked);
 };
 
 #endif

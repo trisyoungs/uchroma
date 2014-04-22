@@ -23,31 +23,34 @@
 #include "gui/uchroma.h"
 
 // Steepest Descent Minimise
-bool FitDialog::sdMinimise(Array<double>& alpha)
+bool FitDialog::sdMinimise(Array<double>& alpha, double tolerance, int maxSteps)
 {
+	// Control variables
+	double gradientDelta = 0.01;
+
 	// Create initial gradient
 	Array<double> gradient(alpha.nItems()), tempAlpha;
 	for (int n=0; n<alpha.nItems(); ++n)
 	{
 		tempAlpha = alpha;
-		tempAlpha[n] = 1.01 * alpha[n];
+		tempAlpha[n] = (1.0+gradientDelta) * alpha[n];
 		gradient[n] = rmsError(tempAlpha);
-		tempAlpha[n] = 0.99 * alpha[n];
+		tempAlpha[n] = (1.0-gradientDelta) * alpha[n];
 		gradient[n] -= rmsError(tempAlpha);
 	}
-	gradient /= 0.02;
+	gradient /= (2.0*gradientDelta);
 
 	// Set initial stepsize
 	double lambda = 1.0;
 
 	// Get initial cost
 	double oldRMSE = rmsError(alpha);
-	ui.OutputEdit->append("Initial RMSE = " + QString::number(oldRMSE, 'e'));
+	printMessage("Initial RMSE = %e", oldRMSE);
 
 	// Do some iterations
 	int n;
-	double currentRMSE;
-	for (int step=0; step<100; ++step)
+	double currentRMSE, deltaRMSE;
+	for (int step=1; step<=maxSteps; ++step)
 	{
 		// Test stepsize - if it does not decrease the RMSE, decrease it until it does
 		do
@@ -57,25 +60,32 @@ bool FitDialog::sdMinimise(Array<double>& alpha)
 			currentRMSE = rmsError(tempAlpha);
 
 			// Current RMSE higher than old RMSE?
-			if (currentRMSE > oldRMSE) lambda *= 0.5;
-		} while (currentRMSE > oldRMSE);
+			deltaRMSE = currentRMSE - oldRMSE;
+			if (deltaRMSE > 0.0) lambda *= 0.5;
+		} while (deltaRMSE > 0.0);
 		alpha = tempAlpha;
-		
-		// Get new cost
-		printf("Cost = %f (a=%f)\n", currentRMSE, alpha[0]);
+
+		// Update
+		updateMainView();
+
+		// Check on convergence tolerance
+		if (fabs(deltaRMSE) < tolerance)
+		{
+			printMessage("SD converged (tolerance = %e, delta(RMSE) = %e)", tolerance, deltaRMSE);
+			break;
+		}
 
 		// Generate new gradient
 		for (n=0; n<alpha.nItems(); ++n)
 		{
 			tempAlpha = alpha;
-			tempAlpha[n] = 1.01 * alpha[n];
+			tempAlpha[n] = (1.0+gradientDelta) * alpha[n];
 			gradient[n] = rmsError(tempAlpha);
-			tempAlpha[n] = 0.99 * alpha[n];
+			tempAlpha[n] = (1.0-gradientDelta) * alpha[n];
 			gradient[n] -= rmsError(tempAlpha);
 		}
-		gradient /= 0.02;
-		printf("Lamba = %f\n", lambda);
-		
+		gradient /= (2.0*gradientDelta);
+
 		oldRMSE = currentRMSE;
 	}
 

@@ -207,6 +207,17 @@ void UChromaWindow::on_actionToolsFitWindow_triggered(bool checked)
 	else fitDialog_.hide();
 }
 
+void UChromaWindow::on_actionToolsCreateData_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked)
+	{
+		createDialog_.updateAll();
+		createDialog_.show();
+	}
+	else createDialog_.hide();
+}
+
 /*
  * Settings Menu
  */
