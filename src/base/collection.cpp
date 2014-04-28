@@ -73,6 +73,48 @@ Collection::~Collection()
 {
 }
 
+// Copy constructor
+Collection::Collection(const Collection& source)
+{
+	(*this) = source;
+}
+
+// Assignment operator
+void Collection::operator=(const Collection& source)
+{
+	// Basic Data
+	title_ = source.title_;
+	slices_ = source.slices_;
+	dataFileDirectory_ = source.dataFileDirectory_;
+
+	// Transforms
+	dataMin_ = source.dataMin_;
+	dataMax_ = source.dataMax_;
+	transformMin_ = source.transformMin_;
+	transformMax_ = source.transformMax_;
+	transformMinPositive_ = source.transformMinPositive_;
+	transformMaxPositive_ = source.transformMaxPositive_;
+	transforms_[0] = source.transforms_[0];
+	transforms_[1] = source.transforms_[1];
+	transforms_[2] = source.transforms_[2];
+	interpolate_ = source.interpolate_;
+	interpolateConstrained_ = source.interpolateConstrained_;
+	interpolationStep_ = source.interpolationStep_;
+
+	// Colours
+	colourSource_ = source.colourSource_;
+	colourSinglePoint_ = source.colourSinglePoint_;
+	colourRGBGradientAPoint_ = source.colourRGBGradientAPoint_;
+	colourRGBGradientBPoint_ = source.colourRGBGradientBPoint_;
+	colourHSVGradientAPoint_ = source.colourHSVGradientAPoint_;
+	colourHSVGradientBPoint_ = source.colourHSVGradientBPoint_;
+	colourScale_ = source.colourScale_;
+	customColourScale_ = source.customColourScale_;
+	alphaControl_ = source.alphaControl_;
+	fixedAlpha_ = source.fixedAlpha_;
+	colourScaleValid_ = source.colourScaleValid_;
+}
+
 /*
  * Data
  */

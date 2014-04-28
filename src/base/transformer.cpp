@@ -37,6 +37,20 @@ Transformer::~Transformer()
 {
 }
 
+// Copy constructor
+Transformer::Transformer(const Transformer& source)
+{
+	(*this) = source;
+}
+
+// Assignment operator
+void Transformer::operator=(const Transformer& source)
+{
+	// Set equation from old tree
+	setEquation(source.text_);
+	enabled_ = source.enabled_;
+}
+
 // Set whether transform is enabled
 void Transformer::setEnabled(bool b)
 {

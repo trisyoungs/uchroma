@@ -37,6 +37,10 @@ class Collection : public ListItem<Collection>
 	Collection();
 	// Destructor
 	~Collection();
+	// Copy constructor
+	Collection(const Collection& source);
+	// Assignment operator
+	void operator=(const Collection& source);
 
 
 	/*

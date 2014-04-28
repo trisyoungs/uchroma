@@ -60,6 +60,10 @@ template <class T> class List
 	List<T>();
 	// Destructor
 	~List();
+	// Copy Constructor
+	List<T>(const List<T>& source);
+	// Assignment operator
+	void operator=(const List<T>& source);
 
 
 	/*!
@@ -174,6 +178,25 @@ template <class T> List<T>::List()
 template <class T> List<T>::~List()
 {
 	clear();
+}
+
+// Copy Constructor
+template <class T> List<T>::List(const List<T>& source)
+{
+	(*this) = source;
+}
+
+// Assignment operator
+template <class T> void List<T>::operator=(const List<T>& source)
+{
+	clear();
+
+	// Loop over items in other list, copying each to a new list item here
+	for (T* sourceItem = source.first(); sourceItem != NULL; sourceItem = sourceItem->next)
+	{
+		T* newItem = new T;
+		(*newItem) = (*sourceItem);
+	}
 }
 
 /*!
