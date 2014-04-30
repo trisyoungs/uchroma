@@ -82,12 +82,17 @@ void CreateDialog::updateMainView()
 }
 
 // Update data in window
-void CreateDialog::updateAll()
+void CreateDialog::updateAndShow()
 {
+	// Create a new collection for use by the window
+	newCollection_ = uChroma_->addCollection("New Creation");
+	updateCreatedData();
+
 	updateGridGroup();
-	updateDestinationGroup();
 	updateVariableTable();
 	updateMainView();
+
+	show();
 }
 
 /*
@@ -143,36 +148,32 @@ void CreateDialog::updateVariables()
 }
 
 // Update created data
-void CreateDialog::updateCreatedData()
+void CreateDialog::updateCreatedData(bool force)
 {
-	// First, check destination collection, and make sure it is valid
-	Collection* destinationCollection = NULL;
-	if (ui.DestinationNewCollectionRadio->isChecked())
-	{
-		if (newCollection_ == NULL) newCollection_ = uChroma_->addCollection("New Collection");
-		destinationCollection = newCollection_;
-	}
-	else
-	{
-		destinationCollection = VariantPointer<Collection>(ui.DestinationCollectionCombo->itemData(ui.DestinationCollectionCombo->currentIndex()));
-	}
-	if (destinationCollection == NULL)
+	// Unless 'force == true', obey the current status of the Visual checkbox
+	if ((!force) && (!ui.OptionsVisualCheck->isChecked())) return;
+
+	// First, check destination collection
+	if (newCollection_ == NULL)
 	{
 		msg.print("Internal Error: No valid destination collection pointer in CreateDialog::updateCreatedData().\n");
 		return;
 	}
 
+	// Set initial equation variables...
+	for (RefListItem<EquationVariable,bool>* ri = usedVariables_.first(); ri != NULL; ri = ri->next) ri->item->pokeValueToVariable();
+
 	// Generate new data...
 	if (ui.GridSpecifyRadio->isChecked())
 	{
 		// A grid has been specified by hand, so can clear all old data and recreate it
-		destinationCollection->clearSlices();
+		newCollection_->clearSlices();
 		double z = ui.GridSpecifyZMinSpin->value();
 		while (z <= ui.GridSpecifyZMaxSpin->value())
 		{
 			// Create new slice at this z
-			Slice* newSlice = destinationCollection->addSlice();
-			destinationCollection->setSliceZ(newSlice, z);
+			Slice* newSlice = newCollection_->addSlice();
+			newCollection_->setSliceZ(newSlice, z);
 			Data2D& newData = newSlice->data();
 
 			double x = ui.GridSpecifyXMinSpin->value();
@@ -192,12 +193,13 @@ void CreateDialog::updateCreatedData()
 	else
 	{
 	}
-}
 
-// Create collection
-bool CreateDialog::createCollection()
-{
-	
+	// Recalculate new data ranges
+	newCollection_->calculateDataLimits();
+
+	// Update main window
+	uChroma_->updateAllTabs();
+	uChroma_->updateDisplay();
 }
 
 /*
@@ -210,7 +212,25 @@ void CreateDialog::on_CloseButton_clicked(bool checked)
 	if (newCollection_ != NULL) uChroma_->removeCollection(newCollection_);
 	newCollection_ = NULL;
 
+	uChroma_->updateAllTabs();
+
 	hide();
+}
+
+void CreateDialog::on_CreateButton_clicked(bool checked)
+{
+	// Make sure the data is up to date
+	updateCreatedData(true);
+
+	uChroma_->setAsModified();
+
+	// Set the title of the current collection to the current equation text
+	newCollection_->setTitle(ui.EquationEdit->text());
+
+	// Create another new collection for the next creation...
+	newCollection_ = uChroma_->addCollection("New Creation");
+
+	uChroma_->updateAllTabs();
 }
 
 /*
@@ -237,16 +257,13 @@ void CreateDialog::on_EquationEdit_textChanged(QString text)
 	// Update list of variables
 	updateVariables();
 	updateVariableTable();
+
+	// Update data
+	updateCreatedData();
 }
 
 void CreateDialog::on_SelectEquationButton_clicked(bool checked)
 {
-}
-
-void CreateDialog::on_CreateButton_clicked(bool checked)
-{
-	if (createCollection()) uChroma_->setAsModified();
-	uChroma_->updateAllTabs();
 }
 
 /*
@@ -406,36 +423,4 @@ void CreateDialog::on_VariablesTable_cellChanged(int row, int column)
 			eqVariable->setValue(item->text().toDouble());
 			break;
 	}
-}
-
-/*
- * Destination Group
- */
-
-// Update destination data group
-void CreateDialog::updateDestinationGroup()
-{
-	refreshing_ = true;
-
-	// Get currently selected collection (by user data value)
-	Collection* selectedCollection = VariantPointer<Collection>(ui.DestinationCollectionCombo->itemData(ui.DestinationCollectionCombo->currentIndex()));
-
-	ui.DestinationCollectionCombo->clear();
-	int index = 0;
-	for (Collection* c = uChroma_->collections(); c != NULL; c = c->next, ++index)
-	{
-		ui.DestinationCollectionCombo->addItem(c->title(), VariantPointer<Collection>(c));
-		if (selectedCollection == c) ui.DestinationCollectionCombo->setCurrentIndex(index);
-	}
-
-	refreshing_ = false;
-}
-
-void CreateDialog::on_DestinationNewCollectionRadio_clicked(bool checked)
-{
-	
-}
-
-void CreateDialog::on_DestinationExistingCollectionRadio_clicked(bool checked)
-{
 }

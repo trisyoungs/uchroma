@@ -57,7 +57,7 @@ class Data2D : public ListItem<Data2D>
 	private:
 	// Resize arrays
 	void resize(int size);
-	
+
 	public:
 	// Reset arrays to zero
 	void reset();

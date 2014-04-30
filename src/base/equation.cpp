@@ -20,6 +20,8 @@
 */
 
 #include "base/equation.h"
+#include "base/messenger.h"
+#include <parser/variable.h>
 
 /*
  * Equation Variable
@@ -77,6 +79,13 @@ void EquationVariable::setValue(double value)
 double EquationVariable::value()
 {
 	return value_;
+}
+
+// Poke value to variable target
+void EquationVariable::pokeValueToVariable()
+{
+	if (variable_ == NULL ) msg.print("Internal Error: Tried to poke a value into a variable which didn't exist.\n");
+	else variable_->set(value_);
 }
 
 // Set minimum limit

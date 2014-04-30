@@ -210,11 +210,7 @@ void UChromaWindow::on_actionToolsFitWindow_triggered(bool checked)
 void UChromaWindow::on_actionToolsCreateData_triggered(bool checked)
 {
 	if (refreshing_) return;
-	if (checked)
-	{
-		createDialog_.updateAll();
-		createDialog_.show();
-	}
+	if (checked) createDialog_.updateAndShow();
 	else createDialog_.hide();
 }
 

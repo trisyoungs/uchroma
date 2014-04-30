@@ -78,8 +78,8 @@ class CreateDialog : public QDialog
 	void updateMainView();
 
 	public:
-	// Update data in window
-	void updateAll();
+	// Update data and show window
+	void updateAndShow();
 
 
 	/*
@@ -107,9 +107,7 @@ class CreateDialog : public QDialog
 	// Update variables list
 	void updateVariables();
 	// Update created data
-	void updateCreatedData();
-	// Create collection
-	bool createCollection();
+	void updateCreatedData(bool force = false);
 
 
 	/*
@@ -151,17 +149,6 @@ class CreateDialog : public QDialog
 
 	public slots:
 	void on_VariablesTable_cellChanged(int row, int column);
-
-	/*
-	 * Destination Group
-	 */
-	private:
-	// Update destination data group
-	void updateDestinationGroup();
-
-	public slots:
-	void on_DestinationNewCollectionRadio_clicked(bool checked);
-	void on_DestinationExistingCollectionRadio_clicked(bool checked);
 };
 
 #endif

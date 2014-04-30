@@ -69,6 +69,8 @@ class EquationVariable : public ListItem<EquationVariable>
 	void setValue(double value);
 	// Return value
 	double value();
+	// Poke value to variable target
+	void pokeValueToVariable();
 	// Set minimum limit
 	void setMinimumLimit(bool enabled, double value);
 	// Return whether minimum limit is enabled
