@@ -133,7 +133,7 @@ void FitDialog::on_SelectEquationButton_clicked(bool checked)
 void FitDialog::on_FitButton_clicked(bool checked)
 {
 	if (doFitting()) uChroma_->setAsModified();
-	uChroma_->updateAllTabs();
+	uChroma_->updateSubWindows();
 }
 
 /*

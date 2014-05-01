@@ -20,6 +20,7 @@
 */
 
 #include "gui/uchroma.h"
+#include "gui/axes.h"
 #include "templates/reflist.h"
 
 // Select source directory
@@ -45,9 +46,9 @@ void UChromaWindow::on_SourceDirSelectButton_clicked(bool checked)
 	}
 	progress.setValue(currentCollection_->nSlices());
 	
-	currentCollection_->calculateDataLimits();
-	currentCollection_->updateDataTransforms();
-// 	showAllData();
+	// Need to update axis limits
+	updateAxisLimits();
+	axesWindow_.updateControls();
 
 	setAsModified();
 }
@@ -93,9 +94,8 @@ void UChromaWindow::on_AddFilesButton_clicked(bool checked)
 	// Was any data loaded?
 	if (count == 0) return;
 
-	// Update data limits and transforms
-	currentCollection_->calculateDataLimits();
-	currentCollection_->updateDataTransforms();
+	// Update axis limits
+	updateAxisLimits();
 	setAsModified();
 
 	// Query whether limits should be updated to encompass all data
@@ -104,7 +104,7 @@ void UChromaWindow::on_AddFilesButton_clicked(bool checked)
 
 	// Update collection tabs, axes tabs and main display
 	updateCollectionTab();
-	updateAxesTab();
+	axesWindow_.updateControls();
 	updateDisplay();
 }
 
@@ -118,12 +118,12 @@ void UChromaWindow::on_RemoveFilesButton_clicked(bool checked)
 	// Delete slices....
 	for (RefListItem<Slice,int>* ri = slicesToRemove.first(); ri != NULL; ri = ri->next) currentCollection_->removeSlice(ri->item);
 
-	// Update data limits and transforms
-	currentCollection_->calculateDataLimits();
-	currentCollection_->updateDataTransforms();
+	// Update axis limits
+	updateAxisLimits();
 	setAsModified();
 
 	// Update relevant tabs and main display
+	axesWindow_.updateControls();
 	updateCollectionDataTab();
 	updateCollectionTransformTab();
 	updateDisplay();
@@ -153,8 +153,9 @@ void UChromaWindow::on_SourceFilesTable_cellChanged(int row, int column)
 		// Set new value of z (its position in the list will be adjusted if necessary)
 		currentCollection_->setSliceZ(slice, item->text().toDouble());
 
-		currentCollection_->calculateDataLimits();
-		currentCollection_->updateDataTransforms();
+		// Update axis limits
+		updateAxisLimits();
+		axesWindow_.updateControls();
 
 		// Update related tabs and display
 		updateCollectionDataTab();

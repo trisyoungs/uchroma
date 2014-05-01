@@ -53,6 +53,8 @@ class Collection : public ListItem<Collection>
 	List<Slice> slices_;
 	// Root directory for datafiles
 	QDir dataFileDirectory_;
+	// Extreme values of raw data
+	Vec3<double> dataMin_, dataMax_;
 
 	public:
 	// Set title
@@ -91,14 +93,16 @@ class Collection : public ListItem<Collection>
 	bool loadSliceData(Slice* slice);
 	// Reload data for all slices
 	int loadAllSlices();
+	// Return data minima, calculating if necessary
+	Vec3<double> dataMin();
+	// Return data maxima, calculating if necessary
+	Vec3<double> dataMax();
 
 
 	/*
 	 * Transform
 	 */
 	private:
-	// Extreme values of raw data
-	Vec3<double> dataMin_, dataMax_;
 	// Extreme values of transformed data 
 	Vec3<double> transformMin_, transformMax_;
 	// Extreme positive values of transformed data
@@ -111,13 +115,9 @@ class Collection : public ListItem<Collection>
 	Vec3<double> interpolationStep_;
 
 	public:
-	// Return data minima
-	Vec3<double> dataMin();
-	// Return data maxima
-	Vec3<double> dataMax();
-	// Return transformed data minima
+	// Return transformed data minima, calculating if necessary
 	Vec3<double> transformMin();
-	// Return transformed data maxima
+	// Return transformed data maxima, calculating if necessary
 	Vec3<double> transformMax();
 	// Return transformed positive data minima
 	Vec3<double> transformMinPositive();
@@ -133,10 +133,6 @@ class Collection : public ListItem<Collection>
 	void setTransformEnabled(int axis, bool enabled);
 	// Return whether specified transform is enabled
 	bool transformEnabled(int axis);
-	// Recalculate data limits
-	void calculateDataLimits();
-	// Update data transforms and calculate transform limits
-	void updateDataTransforms();
 	// Set whether interpolation is enabled
 	void setInterpolate(int axis, bool enabled);
 	// Return whether interpolation is enabled
@@ -149,6 +145,22 @@ class Collection : public ListItem<Collection>
 	void setInterpolationStep(int axis, double step);
 	// Return interpolation step size
 	double interpolationStep(int axis);
+
+
+	/*
+	 * Update
+	 */
+	private:
+	// Flag indicating if slice data has been changed in any way
+	bool dataChanged_;
+
+	private:
+	// Update data limits and transform data
+	void updateLimitsAndTransforms();
+
+	public:
+	// Flag that slice data has been changed
+	void setDataChanged();
 
 
 	/*

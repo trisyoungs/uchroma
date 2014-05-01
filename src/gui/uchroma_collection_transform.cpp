@@ -29,12 +29,12 @@ bool UChromaWindow::transformEnabledChanged(int axis, bool enabled)
 	if (refreshing_ || (!currentCollection_)) return false;
 
 	currentCollection_->setTransformEnabled(axis, enabled);
-	currentCollection_->updateDataTransforms();
+	updateAxisLimits();
 
 	// Update related tabs and main display
 	setAsModified();
 	updateCollectionTransformTab();
-	updateAxesTab();
+	axesWindow_.updateControls();
 	updateDisplay();
 
 	return true;
@@ -46,12 +46,12 @@ bool UChromaWindow::transformEquationChanged(int axis, QString equation)
 	if (refreshing_ || (!currentCollection_)) return false;
 
 	currentCollection_->setTransformEquation(axis, equation);
-	currentCollection_->updateDataTransforms();
+	updateAxisLimits();
 
 	// Update related tabs and main display
 	setAsModified();
 	updateCollectionTransformTab();
-	updateAxesTab();
+	axesWindow_.updateControls();
 	updateDisplay();
 
 	return true;

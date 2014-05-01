@@ -309,10 +309,6 @@ bool FitDialog::doFitting()
 		}
 	}
 
-	// Update collection limits etc.
-	destinationCollection_->calculateDataLimits();
-	destinationCollection_->updateDataTransforms();
-
 	return result;
 }
 

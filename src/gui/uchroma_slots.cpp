@@ -117,9 +117,10 @@ void UChromaWindow::on_actionFileImportData_triggered(bool checked)
 	// Loop over list of imported slices and copy them to our local list
 	for (Slice* slice = dataImportDialog_.importedSlices(); slice != NULL; slice = slice->next) currentCollection_->addSlice(slice);
 
-	// Update data limits and file list
-	currentCollection_->calculateDataLimits();
+	// Update axis limits
+	updateAxisLimits();
 
+	axesWindow_.updateControls();
 	updateCollectionDataTab();
 	updateCollectionTransformTab();
 	setAsModified();
@@ -212,6 +213,13 @@ void UChromaWindow::on_actionToolsCreateData_triggered(bool checked)
 	if (refreshing_) return;
 	if (checked) createDialog_.updateAndShow();
 	else createDialog_.hide();
+}
+
+void UChromaWindow::on_actionToolsAxesWindow_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) axesWindow_.updateAndShow();
+	else axesWindow_.hide();
 }
 
 /*

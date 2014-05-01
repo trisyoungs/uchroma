@@ -169,7 +169,7 @@ void Viewer::paintGL()
 	glMatrixMode(GL_MODELVIEW);
 
 	// Set up our transformation matrix
-	Vec3<double> centreTranslation = -uChroma_->axesCentre();
+	Vec3<double> centreTranslation = -uChroma_->axesCoordCentre();
 	Matrix A;
 	A.setIdentity();
 	A.setTranslation(centreTranslation);
@@ -517,6 +517,7 @@ Vec3<double> Viewer::modelToWorld(Vec3<double> &modelr)
 	Vec3<double> worldr;
 	Matrix vmat;
 	Vec4<double> pos, temp;
+
 	// Projection formula is : worldr = P x M x modelr
 	pos.set(modelr, 1.0);
 	// Get the world coordinates of the atom - Multiply by modelview matrix 'view'
@@ -540,7 +541,7 @@ Vec4<double> Viewer::modelToScreen(Vec3<double> &modelr, double screenradius)
 	pos.set(modelr, 1.0);
 	// Get the world coordinates of the point - Multiply by modelview matrix 'view'
 	vmat = viewMatrix_;
-	vmat.applyTranslation(-uChroma_->axesCentre());
+	vmat.applyTranslation(-uChroma_->axesCoordCentre());
 	worldr = vmat * pos;
 
 	screenr = projectionMatrix_ * worldr;

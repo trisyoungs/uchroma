@@ -12,7 +12,6 @@ ${CMAKE_BINARY_DIR}/src/
 # Source files (not Qt UI files or custom .h [uih])
 SET(qtproject_SRCS
 uchroma_funcs.cpp
-uchroma_axes.cpp
 uchroma_collection.cpp
 uchroma_collection_data.cpp
 uchroma_collection_style.cpp
@@ -20,11 +19,11 @@ uchroma_collection_transform.cpp
 uchroma_slices.cpp
 uchroma_slots.cpp
 uchroma_surface.cpp
-axes.cpp
 data.cpp
 io.cpp
 keywords.cpp
 slices.cpp
+axes_funcs.cpp
 create_funcs.cpp
 dataimport_funcs.cpp
 dataimport_seqxy.cpp
@@ -56,6 +55,7 @@ viewer_textprimitive.h
 viewer_trianglechopper.h
 viewer_user.cpp
 viewer_user_line.cpp
+viewer_user_axes.cpp
 viewer_user_surface.cpp
 viewer_vertexchunk.h
 )
@@ -77,6 +77,7 @@ SET(pro_MOC_HDRS
 QT4_WRAP_CPP(pro_MOC_SRCS ${pro_MOC_HDRS} OPTIONS -f)
 
 SET(pro_UIS
+  axes.ui
   create.ui
   dataimport.ui
   fit.ui

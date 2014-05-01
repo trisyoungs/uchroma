@@ -24,7 +24,7 @@
 #include "version.h"
 
 // Constructor
-UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveImageDialog_(this), createDialog_(this), dataImportDialog_(this), fitDialog_(this), sliceMonitorDialog_(this)
+UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWindow_(*this), saveImageDialog_(this), createDialog_(this), dataImportDialog_(this), fitDialog_(this), sliceMonitorDialog_(this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -47,11 +47,12 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), saveIma
 	// Load settings...
 	loadSettings();
 
-	// Set UChroma pointers in widgets where necessary
+	// Set UChroma pointers in widgets/dialogs where necessary
 	ui.MainView->setUChroma(this);
 	GraphWidget::setUChroma(this);
 	FitDialog::setUChroma(this);
 	CreateDialog::setUChroma(this);
+	axesWindow_.show();
 
 	// Add display styles to StyleCombo on Collection->Style tab
 	for (int n=0; n<Collection::nDisplayStyles; ++n) ui.StyleCombo->addItem( Collection::displayStyle((Collection::DisplayStyle) n));
@@ -93,11 +94,14 @@ void UChromaWindow::saveSettings()
  * Update
  */
 
-// Update all tabs
-void UChromaWindow::updateAllTabs()
+// Update all subwindows
+void UChromaWindow::updateSubWindows()
 {
+	// Make sure limits are up to date
+	updateAxisLimits();
+
 	updateCollectionTab();
-	updateAxesTab();
+	axesWindow_.updateControls();
 }
 
 // Update title bar
@@ -111,10 +115,10 @@ void UChromaWindow::updateTitleBar()
 void UChromaWindow::updateAfterLoad()
 {
 	// Update data and transform limits
-	for (Collection* c = collections_.first(); c != NULL; c = c->next) c->calculateDataLimits();
+// 	for (Collection* c = collections_.first(); c != NULL; c = c->next) c->calculateDataLimits(); // TODO Do we need this
 
 	// Update GUI
-	updateAllTabs();
+	updateSubWindows();
 	updateTitleBar();
 
 	// Setup font
@@ -137,40 +141,104 @@ void UChromaWindow::updateDisplay()
  * Axes
  */
 
-// Return minimum limit for specified axis
+// Update axis limits, clamping if necessary
+void UChromaWindow::updateAxisLimits()
+{
+	// Loop over axes
+	for (int axis = 0; axis < 3; ++axis)
+	{
+		// Set allowable range to avoid negative numbers if axis is now logarithmic
+		if (axisLogarithmic_[axis])
+		{
+			axisLimitMin_[axis] = transformedDataPositiveMinima()[axis];
+			axisLimitMax_[axis] = transformedDataPositiveMaxima()[axis];
+		}
+		else
+		{
+			axisLimitMin_[axis] = transformedDataMinima()[axis];
+			axisLimitMax_[axis] = transformedDataMaxima()[axis];
+		}
+
+		// Clamp current axis values if necessary
+		if (axisMin_[axis] < axisLimitMin_[axis]) setAxisToLimit(axis, true);
+		if (axisMax_[axis] > axisLimitMax_[axis]) setAxisToLimit(axis, false);
+
+		// Clamp axis position point values if necessary
+		for (int axis=0; axis < 3; ++axis)
+		{
+			if (axisPosition_[axis][(axis+1)%3] < axisLimitMin_[(axis+1)%3])
+			{
+				axisPosition_[axis].set((axis+1)%3, axisLimitMin_[(axis+1)%3]);
+				regenerateAxes_ = true;
+			}
+			if (axisPosition_[axis][(axis+2)%3] < axisLimitMin_[(axis+2)%3])
+			{
+				axisPosition_[axis].set((axis+2)%3, axisLimitMin_[(axis+2)%3]);
+				regenerateAxes_ = true;
+			}
+		}
+	}
+}
+
+// Set minimum value for specified axis
+void UChromaWindow::setAxisMin(int axis, double value)
+{
+	axisMin_[axis] = value;
+
+	// Set modification flag, and indicate that all display primitives must be updated
+	setAsModified();
+	setRegeneratePrimitives();
+}
+
+// Return minimum value for specified axis
 double UChromaWindow::axisMin(int axis)
 {
 	return axisMin_[axis];
 }
 
-// Return maximum limit for specified axis
+// Set maximum value for specified axis
+void UChromaWindow::setAxisMax(int axis, double value)
+{
+	axisMax_[axis] = value;
+
+	// Set modification flag, and indicate that all display primitives must be updated
+	setAsModified();
+	setRegeneratePrimitives();
+}
+
+// Return maximum value for specified axis
 double UChromaWindow::axisMax(int axis)
 {
 	return axisMax_[axis];
 }
 
-// Return whether axis is logarithmic
-bool UChromaWindow::axisLogarithmic(int axis)
+// Set axis to extreme limit
+void UChromaWindow::setAxisToLimit(int axis, bool minLim)
 {
-	return axisLogarithmic_[axis];
+	if (minLim) axisMin_[axis] = axisLimitMin_[axis];
+	else axisMax_[axis] = axisLimitMax_[axis];
+
+	// Set modification flag, and indicate that all display primitives must be updated
+	setAsModified();
+	setRegeneratePrimitives();
 }
 
-// Return whether axis is inverted
-bool UChromaWindow::axisInverted(int axis)
+// Return axis minimum limit for specified axis
+double UChromaWindow::axisLimitMin(int axis)
 {
-	return axisInverted_[axis];
+	return axisLimitMin_[axis];
 }
 
-// Return stretch factor for axis
-double UChromaWindow::axisStretch(int axis)
+// Return axis maximum limit for specified axis
+double UChromaWindow::axisLimitMax(int axis)
 {
-	return axisStretch_[axis];
+	return axisLimitMax_[axis];
 }
 
-// Return whether specified axis is visible
-bool UChromaWindow::axisVisible(int axis)
+// Return coordinate at centre of current axes
+Vec3<double> UChromaWindow::axesCoordCentre()
 {
-	return axisVisible_[axis];
+	return axesCentre_;
 }
 
 // Return coordinate at minimum of specified axis
@@ -183,6 +251,245 @@ Vec3<double> UChromaWindow::axisCoordMin(int axis)
 Vec3<double> UChromaWindow::axisCoordMax(int axis)
 {
 	return axisCoordMax_[axis];
+}
+
+// Set whether axis is inverted
+void UChromaWindow::setAxisInverted(int axis, bool b)
+{
+	axisInverted_[axis] = b;
+
+	// Set modification flag, and indicate that all display primitives must be updated
+	setAsModified();
+	setRegeneratePrimitives();
+}
+
+// Return whether axis is inverted
+bool UChromaWindow::axisInverted(int axis)
+{
+	return axisInverted_[axis];
+}
+
+// Set whether axis is logarithmic
+void UChromaWindow::setAxisLogarithmic(int axis, bool b)
+{
+	axisLogarithmic_[axis] = b;
+
+	// Update and clamp axis values according to data
+	updateAxisLimits();
+
+	// Set modification flag, and indicate that all display primitives must be updated
+	setAsModified();
+	setRegeneratePrimitives();
+}
+
+// Return whether axis is logarithmic
+bool UChromaWindow::axisLogarithmic(int axis)
+{
+	return axisLogarithmic_[axis];
+}
+
+// Set whether axis is visible
+void UChromaWindow::setAxisVisible(int axis, bool b)
+{
+	axisVisible_[axis] = b;
+
+	// Set modification flag, and indicate that axes display primitives must be updated
+	setAsModified();
+	regenerateAxes_ = true;
+}
+
+// Return whether specified axis is visible
+bool UChromaWindow::axisVisible(int axis)
+{
+	return axisVisible_[axis];
+}
+
+// Set stretch factor for axis
+void UChromaWindow::setAxisStretch(int axis, double value)
+{
+	axisStretch_[axis] = value;
+
+	// Set modification flag, and indicate that all display primitives must be updated
+	setAsModified();
+	setRegeneratePrimitives();
+}
+
+// Return stretch factor for axis
+double UChromaWindow::axisStretch(int axis)
+{
+	return axisStretch_[axis];
+}
+
+// Set axis position (in real surface-space coordinates)
+void UChromaWindow::setAxisPosition(int axis, int dir, double value)
+{
+	// Clamp range to limits
+	if ((value >= axisLimitMin_[dir]) && (value <= axisLimitMax_[dir])) axisPosition_[axis].set(dir, value);
+
+	// Set modification flag, and indicate that axes display primitives must be updated
+	setAsModified();
+	regenerateAxes_ = true;
+}
+
+// Set axis position to axis limit (in real surface-space coordinates)
+void UChromaWindow::setAxisPositionToLimit(int axis, int dir, bool minLim)
+{
+	axisPosition_[axis].set(dir, minLim ? axisLimitMin_[dir] : axisLimitMax_[dir]);
+
+	// Set modification flag, and indicate that axes display primitives must be updated
+	setAsModified();
+	regenerateAxes_ = true;
+}
+
+// Return axis position (in real surface-space coordinates)
+Vec3<double> UChromaWindow::axisPosition(int axis)
+{
+	return axisPosition_[axis];
+}
+
+// Set axis tick direction
+void UChromaWindow::setAxisTickDirection(int axis, int dir, double value)
+{
+	axisTickDirection_[axis].set(dir, value);
+
+	// Set modification flag, and indicate that axes display primitives must be updated
+	setAsModified();
+	regenerateAxes_ = true;
+}
+
+// Return axis tick direction
+Vec3<double> UChromaWindow::axisTickDirection(int axis)
+{
+	return axisTickDirection_[axis];
+}
+
+// Set position of first tick delta on axes
+void UChromaWindow::setAxisFirstTick(int axis, double value)
+{
+	axisFirstTick_[axis] = value;
+
+	// Set modification flag, and indicate that axes display primitives must be updated
+	setAsModified();
+	regenerateAxes_ = true;
+
+}
+
+// Return position of first tick delta on axes
+double UChromaWindow::axisFirstTick(int axis)
+{
+	return axisFirstTick_[axis];
+}
+
+// Set tick delta for axes
+void UChromaWindow::setAxisTickDelta(int axis, double value)
+{
+	axisTickDelta_[axis] = value;
+
+	// Set modification flag, and indicate that axes display primitives must be updated
+	setAsModified();
+	regenerateAxes_ = true;
+}
+
+// Return tick delta for axes
+double UChromaWindow::axisTickDelta(int axis)
+{
+	return axisTickDelta_[axis];
+}
+
+// Set whether to calculate ticks automatically
+void UChromaWindow::setAxisAutoTicks(int axis, bool b)
+{
+	axisAutoTicks_[axis] = b;
+
+	// Set modification flag, and indicate that axes display primitives must be updated
+	setAsModified();
+	regenerateAxes_ = true;
+}
+
+// Return whether to calculate ticks automatically
+bool UChromaWindow::axisAutoTicks(int axis)
+{
+	return axisAutoTicks_[axis];
+}
+
+// Set number of minor ticks in major tick intervals
+void UChromaWindow::setAxisMinorTicks(int axis, int value)
+{
+	axisMinorTicks_[axis] = value;
+
+	// Set modification flag, and indicate that axes primitives must be updated
+	setAsModified();
+	regenerateAxes_ = true;
+}
+
+// Return number of minor ticks in major tick intervals
+int UChromaWindow::axisMinorTicks(int axis)
+{
+	return axisMinorTicks_[axis];
+}
+
+// Set orientation of labels for specified axis
+void UChromaWindow::setAxisLabelOrientation(int axis, int component, double value)
+{
+	axisLabelOrientation_[axis].set(component, value);
+
+	// Set modification flag, and indicate that axes primitives must be updated
+	setAsModified();
+	regenerateAxes_ = true;
+}
+
+// Return orientation of labels for specified axis
+Vec3<double> UChromaWindow::axisLabelOrientation(int axis)
+{
+	return axisLabelOrientation_[axis];
+}
+
+// Set title for specified axis
+void UChromaWindow::setAxisTitle(int axis, QString title)
+{
+	axisTitle_[axis] = title;
+
+	// Set modification flag, and indicate that axes primitives must be updated
+	setAsModified();
+	regenerateAxes_ = true;
+}
+
+// Return title for specified axis
+QString UChromaWindow::axisTitle(int axis)
+{
+	return axisTitle_[axis];
+}
+
+// Set orientation of titles for specified axis
+void UChromaWindow::setAxisTitleOrientation(int axis, int component, double value)
+{
+	axisTitleOrientation_[axis].set(component, value);
+
+	// Set modification flag, and indicate that axes primitives must be updated
+	setAsModified();
+	regenerateAxes_ = true;
+}
+
+// Return orientation of titles for specified axis
+Vec4<double> UChromaWindow::axisTitleOrientation(int axis)
+{
+	return axisTitleOrientation_[axis];
+}
+
+// Set axis title text anchor position for specified axis
+void UChromaWindow::setAxisTitleAnchor(int axis, TextPrimitive::HorizontalAnchor anchor)
+{
+	axisTitleAnchor_[axis] = anchor;
+
+	// Set modification flag, and indicate that axes primitives must be updated
+	setAsModified();
+	regenerateAxes_ = true;
+}
+
+// Return axis title text anchor position for specified axis
+TextPrimitive::HorizontalAnchor UChromaWindow::axisTitleAnchor(int axis)
+{
+	return axisTitleAnchor_[axis];
 }
 
 // Return whether axis text labels face the viewer automatically
@@ -209,3 +516,99 @@ double UChromaWindow::titleScale()
 	return titleScale_;
 }
 
+
+/*
+ * Extras Tab TODO MOVE THIS
+ */
+
+void UChromaWindow::on_ViewBoundingBoxNoneRadio_clicked(bool checked)
+{
+	if (refreshing_) return;
+	boundingBox_ = UChromaWindow::NoBox;
+	regenerateAxes_ = true;
+	updateDisplay();
+}
+
+void UChromaWindow::on_ViewBoundingBoxPlaneRadio_clicked(bool checked)
+{
+	if (refreshing_) return;
+	boundingBox_ = UChromaWindow::PlaneBox;
+	regenerateAxes_ = true;
+	updateDisplay();
+}
+
+void UChromaWindow::on_ViewBoundingBoxCubeRadio_clicked(bool checked)
+{
+	if (refreshing_) return;
+	boundingBox_ = UChromaWindow::CubeBox;
+	regenerateAxes_ = true;
+	updateDisplay();
+}
+
+void UChromaWindow::on_ViewBoundingBoxPlaneYSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	boundingBoxPlaneY_ = value;
+	regenerateAxes_ = true;
+	updateDisplay();
+}
+
+void UChromaWindow::on_ViewBoundingBoxPlaneYSetMinimumButton_clicked(bool checked)
+{
+	ui.ViewBoundingBoxPlaneYSpin->setValue(axisMin_.y);
+}
+
+void UChromaWindow::on_ViewBoundingBoxPlaneYSetZeroButton_clicked(bool checked)
+{
+	ui.ViewBoundingBoxPlaneYSpin->setValue(0.0);
+}
+
+void UChromaWindow::on_ViewBoundingBoxPlaneYSetMaximumButton_clicked(bool checked)
+{
+	ui.ViewBoundingBoxPlaneYSpin->setValue(axisMax_.y);
+}
+
+// -- General Options
+void UChromaWindow::on_ViewLabelsFaceViewerCheck_clicked(bool checked)
+{
+	if (refreshing_) return;
+	labelFaceViewer_ = checked;
+	setAsModified();
+	regenerateAxes_ = true;
+	updateDisplay();
+}
+
+void UChromaWindow::on_ViewLabelScaleSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	labelScale_ = value;
+	setAsModified();
+	regenerateAxes_ = true;
+	updateDisplay();
+}
+
+void UChromaWindow::on_ViewTitleScaleSpin_valueChanged(double value)
+{
+	if (refreshing_) return;
+	titleScale_ = value;
+	setAsModified();
+	regenerateAxes_ = true;
+	updateDisplay();
+}
+
+// Update extras tab
+void UChromaWindow::updateExtrasTab()
+{
+	// Extras
+	ui.ViewLabelScaleSpin->setValue(labelScale_);
+	ui.ViewTitleScaleSpin->setValue(titleScale_);
+	
+	if (boundingBox_ == UChromaWindow::NoBox) ui.ViewBoundingBoxNoneRadio->setChecked(true);
+	else if (boundingBox_ == UChromaWindow::PlaneBox) ui.ViewBoundingBoxPlaneRadio->setChecked(true);
+	else if (boundingBox_ == UChromaWindow::CubeBox) ui.ViewBoundingBoxCubeRadio->setChecked(true);
+	ui.ViewBoundingBoxPlaneYSpin->setValue(boundingBoxPlaneY_);
+
+	// General Options
+	ui.ViewLabelsFaceViewerCheck->setChecked(labelFaceViewer_);
+	
+}

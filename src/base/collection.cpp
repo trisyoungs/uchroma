@@ -28,10 +28,11 @@ Collection::Collection() : ListItem<Collection>()
 	slices_.clear();
 	dataFileDirectory_ = getenv("PWD");
 	title_ = "Empty Collection";
-
-	// Transform
+	dataChanged_ = true;
 	dataMin_.zero();
 	dataMax_.set(10.0, 10.0, 10.0);
+
+	// Transform
 	transformMin_.zero();
 	transformMax_.set(10.0, 10.0, 10.0);
 	transformMinPositive_.set(0.1, 0.1, 0.1);
@@ -86,10 +87,11 @@ void Collection::operator=(const Collection& source)
 	title_ = source.title_;
 	slices_ = source.slices_;
 	dataFileDirectory_ = source.dataFileDirectory_;
-
-	// Transforms
 	dataMin_ = source.dataMin_;
 	dataMax_ = source.dataMax_;
+	dataChanged_ = source.dataChanged_;
+
+	// Transforms
 	transformMin_ = source.transformMin_;
 	transformMax_ = source.transformMax_;
 	transformMinPositive_ = source.transformMinPositive_;
@@ -137,6 +139,7 @@ Slice* Collection::addSlice()
 	// Create new slice
 	Slice* slice = slices_.add();
 
+	dataChanged_ = true;
 	displayDataValid_ = false;
 	return slice;
 }
@@ -210,6 +213,7 @@ void Collection::setSliceZ(Slice* target, double z)
 		
 	} while (minBad || maxBad);
 
+	dataChanged_ = true;
 	displayDataValid_ = false;
 }
 
@@ -224,7 +228,8 @@ void Collection::setSliceData(Slice* target, Data2D* newData)
 	}
 
 	target->data() = (*newData);
-	
+
+	dataChanged_ = true;
 	displayDataValid_ = false;
 }
 
@@ -290,43 +295,61 @@ int Collection::loadAllSlices()
 	return nFailed;
 }
 
+// Return data minima, calculating if necessary
+Vec3<double> Collection::dataMin()
+{
+	// Make sure limits and transform are up to date
+	updateLimitsAndTransforms();
+
+	return dataMin_;
+}
+
+// Return data maxima, calculating if necessary
+Vec3<double> Collection::dataMax()
+{
+	// Make sure limits and transform are up to date
+	updateLimitsAndTransforms();
+
+	return dataMax_;
+}
+
 /*
  * Transforms
  */
 
-// Return data minima
-Vec3<double> Collection::dataMin()
-{
-	return dataMin_;
-}
-
-// Return data maxima
-Vec3<double> Collection::dataMax()
-{
-	return dataMax_;
-}
-
-// Return transformed data minima
+// Return transformed data minima, calculating if necessary
 Vec3<double> Collection::transformMin()
 {
+	// Make sure limits and transform are up to date
+	updateLimitsAndTransforms();
+
 	return transformMin_;
 }
 
-// Return transformed data maxima
+// Return transformed data maxima, calculating if necessary
 Vec3<double> Collection::transformMax()
 {
+	// Make sure limits and transform are up to date
+	updateLimitsAndTransforms();
+
 	return transformMax_;
 }
 
-// Return transformed positive data minima
+// Return transformed positive data minima, calculating if necessary
 Vec3<double> Collection::transformMinPositive()
 {
+	// Make sure limits and transform are up to date
+	updateLimitsAndTransforms();
+
 	return transformMinPositive_;
 }
 
-// Return transformed positive data maxima
+// Return transformed positive data maxima, calculating if necessary
 Vec3<double> Collection::transformMaxPositive()
 {
+	// Make sure limits and transform are up to date
+	updateLimitsAndTransforms();
+
 	return transformMaxPositive_;
 }
 
@@ -334,6 +357,14 @@ Vec3<double> Collection::transformMaxPositive()
 void Collection::setTransformEquation(int axis, QString transformEquation)
 {
 	transforms_[axis].setEquation(transformEquation);
+
+	// Make sure limits and transform are up to date
+	if (transforms_[axis].enabled())
+	{
+		dataChanged_ = true;
+		updateLimitsAndTransforms();
+	}
+
 	displayDataValid_ = false;
 }
 
@@ -353,6 +384,14 @@ bool Collection::transformEquationValid(int axis)
 void Collection::setTransformEnabled(int axis, bool enabled)
 {
 	transforms_[axis].setEnabled(enabled);
+
+	// Make sure limits and transform are up to date
+	if (transforms_[axis].enabled())
+	{
+		dataChanged_ = true;
+		updateLimitsAndTransforms();
+	}
+
 	displayDataValid_ = false;
 }
 
@@ -362,9 +401,50 @@ bool Collection::transformEnabled(int axis)
 	return transforms_[axis].enabled();
 }
 
-// Recalculate data limits
-void Collection::calculateDataLimits()
+// Set whether interpolation is enabled
+void Collection::setInterpolate(int axis, bool enabled)
 {
+	interpolate_[axis] = enabled;
+}
+
+// Return whether interpolation is enabled
+bool Collection::interpolate(int axis)
+{
+	return interpolate_[axis];
+}
+
+// Set whether interpolation is constrained
+void Collection::setInterpolateConstrained(int axis, bool enabled)
+{
+	interpolateConstrained_[axis] = enabled;
+}
+
+// Return whether interpolation is constrained
+bool Collection::interpolateConstrained(int axis)
+{
+	return interpolateConstrained_[axis];
+}
+
+// Set interpolation step size
+void Collection::setInterpolationStep(int axis, double step)
+{
+	interpolationStep_[axis] = step;
+}
+
+// Return interpolation step size
+double Collection::interpolationStep(int axis)
+{
+	return interpolationStep_[axis];
+}
+
+/*
+ * Update
+ */
+
+// Update data limits and transform data
+void Collection::updateLimitsAndTransforms()
+{
+	if (!dataChanged_) return;
 	dataMin_ = 0.0;
 	dataMax_ = 0.0;
 	if (slices_.nItems() > 0)
@@ -389,12 +469,7 @@ void Collection::calculateDataLimits()
 			else if (slice->data().z() > dataMax_.z) dataMax_.z = slice->data().z();
 		}
 	}
-	updateDataTransforms();
-}
 
-// Update data transforms and calculate transform limits
-void Collection::updateDataTransforms()
-{
 	// Loop over slices_ list, updating transforms as we go
 	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) slice->transform(transforms_[0], transforms_[1], transforms_[2]);
 
@@ -456,42 +531,15 @@ void Collection::updateDataTransforms()
 	if (transformMaxPositive_.x < 0.0) transformMaxPositive_.x = 1.0;
 	if (transformMaxPositive_.y < 0.0) transformMaxPositive_.y = 1.0;
 	if (transformMaxPositive_.z < 0.0) transformMaxPositive_.z = 1.0;
+
+	// Reset flag
+	dataChanged_ = false;
 }
 
-// Set whether interpolation is enabled
-void Collection::setInterpolate(int axis, bool enabled)
+// Flag that slice data has been changed
+void Collection::setDataChanged()
 {
-	interpolate_[axis] = enabled;
-}
-
-// Return whether interpolation is enabled
-bool Collection::interpolate(int axis)
-{
-	return interpolate_[axis];
-}
-
-// Set whether interpolation is constrained
-void Collection::setInterpolateConstrained(int axis, bool enabled)
-{
-	interpolateConstrained_[axis] = enabled;
-}
-
-// Return whether interpolation is constrained
-bool Collection::interpolateConstrained(int axis)
-{
-	return interpolateConstrained_[axis];
-}
-
-// Set interpolation step size
-void Collection::setInterpolationStep(int axis, double step)
-{
-	interpolationStep_[axis] = step;
-}
-
-// Return interpolation step size
-double Collection::interpolationStep(int axis)
-{
-	return interpolationStep_[axis];
+	dataChanged_ = true;
 }
 
 /*

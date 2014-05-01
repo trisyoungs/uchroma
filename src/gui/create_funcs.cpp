@@ -194,11 +194,8 @@ void CreateDialog::updateCreatedData(bool force)
 	{
 	}
 
-	// Recalculate new data ranges
-	newCollection_->calculateDataLimits();
-
 	// Update main window
-	uChroma_->updateAllTabs();
+	uChroma_->updateSubWindows();
 	uChroma_->updateDisplay();
 }
 
@@ -212,7 +209,7 @@ void CreateDialog::on_CloseButton_clicked(bool checked)
 	if (newCollection_ != NULL) uChroma_->removeCollection(newCollection_);
 	newCollection_ = NULL;
 
-	uChroma_->updateAllTabs();
+	uChroma_->updateSubWindows();
 
 	hide();
 }
@@ -230,7 +227,7 @@ void CreateDialog::on_CreateButton_clicked(bool checked)
 	// Create another new collection for the next creation...
 	newCollection_ = uChroma_->addCollection("New Creation");
 
-	uChroma_->updateAllTabs();
+	uChroma_->updateSubWindows();
 }
 
 /*

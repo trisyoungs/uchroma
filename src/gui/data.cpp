@@ -21,8 +21,8 @@
 
 #include "gui/uchroma.h"
 
-// Flag all surface and axis data for regeneration
-void UChromaWindow::regenerateAll()
+// Flag all primitive data for regeneration
+void UChromaWindow::setRegeneratePrimitives()
 {
 	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next) collection->setDisplayDataInvalid();
 	regenerateAxes_ = true;
@@ -274,5 +274,5 @@ void UChromaWindow::showAllData()
 	axisMax_ = axisLimitMax_;
 
 	// Flag that all surfaces and axes should be regenerated (data and primitive)
-	regenerateAll();
+	setRegeneratePrimitives();
 }

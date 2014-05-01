@@ -211,9 +211,3 @@
 
 	regenerateAxes_ = false;
 }
-
-// Return central coordinate of surface
-Vec3<double> UChromaWindow::axesCentre()
-{
-	return axesCentre_;
-}
