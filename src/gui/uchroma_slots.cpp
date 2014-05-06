@@ -30,6 +30,14 @@ void UChromaWindow::closeEvent(QCloseEvent *event)
 	else event->setAccepted(false);
 }
 
+// Return centre coordinate of main window
+QPoint UChromaWindow::centrePos()
+{
+	QPoint centre = pos();
+	centre += QPoint(width()/2, height()/2);
+	return centre;
+}
+
 /*
 // File Menu
 */
@@ -52,7 +60,8 @@ void UChromaWindow::on_actionFileNew_triggered(bool checked)
 	clearData();
 	currentCollection_ = addCollection();
 
-	updateAfterLoad();
+	// Update the GUI
+	updateGUI();
 }
 
 void UChromaWindow::on_actionFileLoad_triggered(bool checked)
@@ -76,7 +85,9 @@ void UChromaWindow::on_actionFileLoad_triggered(bool checked)
 	// Clear existing data and load input file
 	clearData();
 	loadInputFile(fileName);
-	updateAfterLoad();
+
+	// Update the GUI
+	updateGUI();
 }
 
 void UChromaWindow::on_actionFileSave_triggered(bool checked)
@@ -90,6 +101,8 @@ void UChromaWindow::on_actionFileSave_triggered(bool checked)
 	}
 
 	if (saveInputFile(inputFile_)) modified_ = false;
+
+	// Update title bar
 	updateTitleBar();
 }
 
@@ -101,6 +114,8 @@ void UChromaWindow::on_actionFileSaveAs_triggered(bool checked)
 	
 	inputFile_ = fileName;
 	if (saveInputFile(inputFile_)) modified_ = false;
+
+	// Update title bar
 	updateTitleBar();
 }
 
@@ -117,12 +132,8 @@ void UChromaWindow::on_actionFileImportData_triggered(bool checked)
 	// Loop over list of imported slices and copy them to our local list
 	for (Slice* slice = dataImportDialog_.importedSlices(); slice != NULL; slice = slice->next) currentCollection_->addSlice(slice);
 
-	// Update axis limits
-	updateAxisLimits();
-
-	axesWindow_.updateControls();
-	updateCollectionDataTab();
-	updateCollectionTransformTab();
+	// Update subwindows
+	updateSubWindows();
 	setAsModified();
 	
 	// Need to update display
@@ -186,16 +197,6 @@ void UChromaWindow::on_actionViewReset_triggered(bool checked)
 /*
  * Tools Menu
  */
-void UChromaWindow::on_actionToolsSliceMonitor_triggered(bool checked)
-{
-	if (refreshing_) return;
-	if (checked)
-	{
-		updateSliceMonitor();
-		sliceMonitorDialog_.show();
-	}
-	else sliceMonitorDialog_.hide();
-}
 
 void UChromaWindow::on_actionToolsFitWindow_triggered(bool checked)
 {
@@ -215,11 +216,63 @@ void UChromaWindow::on_actionToolsCreateData_triggered(bool checked)
 	else createDialog_.hide();
 }
 
-void UChromaWindow::on_actionToolsAxesWindow_triggered(bool checked)
+/*
+ * Windows Menu
+ */
+
+void UChromaWindow::on_actionWindowsCollections_triggered(bool checked)
+{
+	if (refreshing_) return;
+	ui.CollectionsGroup->setVisible(checked);
+}
+
+void UChromaWindow::on_actionWindowsData_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) dataWindow_.updateAndShow();
+	else dataWindow_.hide();
+}
+
+void UChromaWindow::on_actionWindowsStyle_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) styleWindow_.updateAndShow();
+	else styleWindow_.hide();
+}
+
+void UChromaWindow::on_actionWindowsTransform_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) transformWindow_.updateAndShow();
+	else transformWindow_.hide();
+}
+
+void UChromaWindow::on_actionWindowsView_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) viewWindow_.updateAndShow();
+	else viewWindow_.hide();
+}
+
+void UChromaWindow::on_actionWindowsAxes_triggered(bool checked)
 {
 	if (refreshing_) return;
 	if (checked) axesWindow_.updateAndShow();
 	else axesWindow_.hide();
+}
+
+void UChromaWindow::on_actionWindowsSlices_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) slicesWindow_.updateAndShow();
+	else slicesWindow_.hide();
+}
+
+void UChromaWindow::on_actionWindowsSliceMonitor_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) sliceMonitorWindow_.updateAndShow();
+	else sliceMonitorWindow_.hide();
 }
 
 /*

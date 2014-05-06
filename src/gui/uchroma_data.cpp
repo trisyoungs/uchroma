@@ -197,6 +197,12 @@ Collection* UChromaWindow::collections()
 	return collections_.first();
 }
 
+// Return currently-selected Collection
+Collection* UChromaWindow::currentCollection()
+{
+	return currentCollection_;
+}
+
 // Clear current data
 void UChromaWindow::clearData()
 {
@@ -249,10 +255,6 @@ void UChromaWindow::clearData()
 	axisCoordMax_[0].zero();
 	axisCoordMax_[1].zero();
 	axisCoordMax_[2].zero();
-	labelFaceViewer_ = false;
-	labelCorrectOrientation_ = true;
-	labelScale_ = 0.25;
-	titleScale_ = 0.3;
 	regenerateAxes_ = true;
 
 	// Slices
@@ -262,8 +264,12 @@ void UChromaWindow::clearData()
 	extractedSliceGroups_.add();
 
 	// View
+	labelScale_ = 0.1;
+	titleScale_ = 0.12;
 	boundingBox_ = UChromaWindow::NoBox;
 	boundingBoxPlaneY_ = 0.0;
+	labelFaceViewer_ = false;
+	labelCorrectOrientation_ = true;
 	ui.actionViewPerspective->setChecked(false);
 }
 

@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* Update main window */
-	mainWindow.updateAfterLoad();
+	mainWindow.updateGUI();
 
 	/* Show the main window */
 	mainWindow.show();

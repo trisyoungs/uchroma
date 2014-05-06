@@ -1,5 +1,5 @@
 /*
-	*** SliceMonitor Functions
+	*** Slice Monitor Functions
 	*** src/slicemonitor_funcs.cpp
 	Copyright T. Youngs 2012-2013
 
@@ -22,34 +22,66 @@
 #include "gui/slicemonitor.h"
 #include "uchroma.h"
 
-// Static singletons
-UChromaWindow* SliceMonitorDialog::uChroma_ = NULL;
-
 /*!
  * \brief Constructor
  */
-SliceMonitorDialog::SliceMonitorDialog(QWidget* parent) : QDialog(parent)
+SliceMonitorWindow::SliceMonitorWindow(UChromaWindow& parent) : QWidget(&parent), uChroma_(parent)
 {
 	ui.setupUi(this);
+
+	QWidget::setWindowFlags(Qt::Tool);
+
+	refreshing_ = false;
 }
 
 /*!
  * \brief Destructor
  */
-SliceMonitorDialog::~SliceMonitorDialog()
+SliceMonitorWindow::~SliceMonitorWindow()
 {
 }
 
+// Window close event
+void SliceMonitorWindow::closeEvent(QCloseEvent* event)
+{
+	emit(windowClosed(false));
+}
+
 /*
- * Link to UChroma
+ * Slots
  */
 
-// Set UChromaWindow pointer
-void SliceMonitorDialog::setUChroma(UChromaWindow* ptr)
+/*
+ * Update
+ */
+
+// Update controls and show window
+void SliceMonitorWindow::updateAndShow()
 {
-	uChroma_ = ptr;
+	updateControls();
+	show();
+	move(uChroma_.centrePos() - QPoint(width()/2, height()/2));
 }
 
-/*
-// Widgets / Slots / Reimplementations
-*/
+// Update controls
+void SliceMonitorWindow::updateControls()
+{
+	// If the window isn't visible, do nothing...
+	if (!isVisible()) return;
+
+	if (uChroma_.sliceAxis() == -1)
+	{
+		ui.SurfaceSliceNoneRadio->setChecked(true);
+		ui.SliceSelectorLabel->setText("");
+		ui.SliceSelectorLabel->setEnabled(false);
+	}
+	else
+	{
+		if (uChroma_.sliceAxis()== 0) ui.SurfaceSliceXRadio->setChecked(true);
+		else if (uChroma_.sliceAxis() == 1) ui.SurfaceSliceYRadio->setChecked(true);
+		else if (uChroma_.sliceAxis() == 2) ui.SurfaceSliceZRadio->setChecked(true);
+		Dnchar s(-1, "%c = %f", char(88+uChroma_.sliceAxis()), uChroma_.sliceValue());
+		ui.SliceSelectorLabel->setText(s.get());
+		ui.SliceSelectorLabel->setEnabled(true);
+	}
+}

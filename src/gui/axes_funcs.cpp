@@ -1,6 +1,6 @@
 /*
 	*** Main Window - Axes Functions 
-	*** src/gui/uchroma_axes.cpp
+	*** src/gui/axes_funcs.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -34,6 +34,8 @@ AxesWindow::AxesWindow(UChromaWindow& parent) : QWidget(&parent), uChroma_(paren
 	ui.setupUi(this);
 
 	QWidget::setWindowFlags(Qt::Tool);
+
+	refreshing_ = false;
 }
 
 // Destructor
@@ -42,9 +44,9 @@ AxesWindow::~AxesWindow()
 }
 
 // Window close event
-void AxesWindow::closeEvent(QCloseEvent *event)
+void AxesWindow::closeEvent(QCloseEvent* event)
 {
-	// TODO
+	emit(windowClosed(false));
 }
 
 /*
@@ -850,11 +852,15 @@ void AxesWindow::updateAndShow()
 {
 	updateControls();
 	show();
+	move(uChroma_.centrePos() - QPoint(width()/2, height()/2));
 }
 
 // Update controls
 void AxesWindow::updateControls()
 {
+	// If the window isn't visible, do nothing...
+	if (!isVisible()) return;
+
 	refreshing_ = true;
 
 	// Invert / Visible / Logarithmic
@@ -867,9 +873,12 @@ void AxesWindow::updateControls()
 	ui.AxisXLogarithmicCheck->setChecked(uChroma_.axisLogarithmic(0));
 	ui.AxisYLogarithmicCheck->setChecked(uChroma_.axisLogarithmic(1));
 	ui.AxisZLogarithmicCheck->setChecked(uChroma_.axisLogarithmic(2));
-	ui.AxisXTicksStartDeltaAutoWidget->setDisabled(uChroma_.axisLogarithmic(0));
-	ui.AxisYTicksStartDeltaAutoWidget->setDisabled(uChroma_.axisLogarithmic(1));
-	ui.AxisZTicksStartDeltaAutoWidget->setDisabled(uChroma_.axisLogarithmic(2));
+	ui.AxisXTicksDeltaSpin->setDisabled(uChroma_.axisLogarithmic(0));
+	ui.AxisYTicksDeltaSpin->setDisabled(uChroma_.axisLogarithmic(1));
+	ui.AxisZTicksDeltaSpin->setDisabled(uChroma_.axisLogarithmic(2));
+	ui.AxisXAutoTicksCheck->setDisabled(uChroma_.axisLogarithmic(0));
+	ui.AxisYAutoTicksCheck->setDisabled(uChroma_.axisLogarithmic(1));
+	ui.AxisZAutoTicksCheck->setDisabled(uChroma_.axisLogarithmic(2));
 
 	// Axis titles
 	ui.AxisXTitleEdit->setText(uChroma_.axisTitle(0));

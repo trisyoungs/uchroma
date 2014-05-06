@@ -13,18 +13,15 @@ ${CMAKE_BINARY_DIR}/src/
 SET(qtproject_SRCS
 uchroma_funcs.cpp
 uchroma_collection.cpp
-uchroma_collection_data.cpp
-uchroma_collection_style.cpp
-uchroma_collection_transform.cpp
 uchroma_slices.cpp
 uchroma_slots.cpp
 uchroma_surface.cpp
-data.cpp
 io.cpp
 keywords.cpp
 slices.cpp
 axes_funcs.cpp
 create_funcs.cpp
+data_funcs.cpp
 dataimport_funcs.cpp
 dataimport_seqxy.cpp
 saveimage_funcs.cpp
@@ -39,7 +36,12 @@ plotwidget_data.cpp
 plotwidget_funcs.cpp
 plotwidget_paintevent.cpp
 slicemonitor_funcs.cpp
+style_funcs.cpp
+slices_funcs.cpp
 texponentialspin_funcs.cpp
+transform_funcs.cpp 
+uchroma_data.cpp
+view_funcs.cpp
 viewer_funcs.cpp
 viewer_input.cpp
 viewer_prefs.cpp
@@ -61,6 +63,7 @@ viewer_vertexchunk.h
 )
 
 SET(pro_MOC_HDRS
+  axes.h
   uchroma.h
   create.h
   dataimport.h
@@ -68,6 +71,10 @@ SET(pro_MOC_HDRS
   graphwidget.h
   saveimage.h
   slicemonitor.h
+  slices.h
+  style.h
+  transform.h
+  view.h
   colourbutton.uih
   gradientbar.uih
   plotwidget.uih
@@ -79,11 +86,16 @@ QT4_WRAP_CPP(pro_MOC_SRCS ${pro_MOC_HDRS} OPTIONS -f)
 SET(pro_UIS
   axes.ui
   create.ui
+  data.ui
   dataimport.ui
   fit.ui
   graphwidget.ui
   saveimage.ui
   slicemonitor.ui
+  slices.ui
+  style.ui
+  transform.ui
+  view.ui
   uchroma.ui
 )
 QT4_WRAP_UI(pro_UIS_H ${pro_UIS})

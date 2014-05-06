@@ -1,7 +1,7 @@
 /*
-	*** Slice Monitor Window
-	*** src/slicemonitor.h
-	Copyright T. Youngs 2012-2013.
+	*** uChroma View Window
+	*** src/gui/view.h
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -19,33 +19,33 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_SLICEMONITOR_H
-#define UCHROMA_SLICEMONITOR_H
+#ifndef UCHROMA_VIEWWINDOW_H
+#define UCHROMA_VIEWWINDOW_H
 
-#include <QtGui/QWidget>
-#include <QtCore/QObject>
-#include "gui/ui_slicemonitor.h"
+#include "gui/ui_view.h"
 
 // Forward Declarations
 class UChromaWindow;
 
-/*
- * Slice Monitor
- */
-class SliceMonitorWindow : public QWidget
+class ViewWindow : public QWidget
 {
+	// All Qt declarations must include this macro
 	Q_OBJECT
 
+
+	/*
+	// Window Functions
+	*/
 	private:
 	// Whether the window is refreshing / updating its controls
 	bool refreshing_;
 
 	public:
 	// Constructor / Destructor
-	SliceMonitorWindow(UChromaWindow& parent);
-	~SliceMonitorWindow();
+	ViewWindow(UChromaWindow& parent);
+	~ViewWindow();
 	// Main form declaration
-	Ui::SliceMonitorWindow ui;
+	Ui::ViewWindow ui;
 	// UChromaWindow reference
 	UChromaWindow& uChroma_;
 
@@ -57,10 +57,29 @@ class SliceMonitorWindow : public QWidget
 	// Window closed signal
 	void windowClosed(bool);
 
+
+	/*
+	 * Convenience Functions
+	 */
+	private:
+
+
 	/*
 	 * Slots
 	 */
-	public slots:
+	private slots:
+	// -- Bounding Box
+	void on_ViewBoundingBoxNoneRadio_clicked(bool checked);
+	void on_ViewBoundingBoxPlaneRadio_clicked(bool checked);
+	void on_ViewBoundingBoxCubeRadio_clicked(bool checked);
+	void on_ViewBoundingBoxPlaneYSpin_valueChanged(double value);
+	void on_ViewBoundingBoxPlaneYSetMinimumButton_clicked(bool checked);
+	void on_ViewBoundingBoxPlaneYSetZeroButton_clicked(bool checked);
+	void on_ViewBoundingBoxPlaneYSetMaximumButton_clicked(bool checked);
+	// -- Label Facing
+	void on_ViewLabelsFaceViewerCheck_clicked(bool checked);
+	void on_ViewLabelScaleSpin_valueChanged(double value);
+	void on_ViewTitleScaleSpin_valueChanged(double value);
 
 
 	/*

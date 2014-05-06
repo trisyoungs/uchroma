@@ -1,7 +1,7 @@
 /*
-	*** Slice Monitor Window
-	*** src/slicemonitor.h
-	Copyright T. Youngs 2012-2013.
+	*** uChroma Slices Window
+	*** src/gui/slices.h
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -19,54 +19,67 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_SLICEMONITOR_H
-#define UCHROMA_SLICEMONITOR_H
+#ifndef UCHROMA_SLICESWINDOW_H
+#define UCHROMA_SLICESWINDOW_H
 
-#include <QtGui/QWidget>
-#include <QtCore/QObject>
-#include "gui/ui_slicemonitor.h"
+#include "gui/ui_slices.h"
 
 // Forward Declarations
 class UChromaWindow;
 
-/*
- * Slice Monitor
- */
-class SliceMonitorWindow : public QWidget
+class SlicesWindow : public QWidget
 {
+	// All Qt declarations must include this macro
 	Q_OBJECT
 
+
+	/*
+	// Window Functions
+	*/
 	private:
 	// Whether the window is refreshing / updating its controls
 	bool refreshing_;
 
 	public:
 	// Constructor / Destructor
-	SliceMonitorWindow(UChromaWindow& parent);
-	~SliceMonitorWindow();
+	SlicesWindow(UChromaWindow& parent);
+	~SlicesWindow();
 	// Main form declaration
-	Ui::SliceMonitorWindow ui;
+	Ui::SlicesWindow ui;
 	// UChromaWindow reference
 	UChromaWindow& uChroma_;
 
 	protected:
 	// Window close event
-	void closeEvent(QCloseEvent *event);
+	void closeEvent(QCloseEvent* event);
 
 	signals:
 	// Window closed signal
 	void windowClosed(bool);
 
+
+	/*
+	 * Convenience Functions
+	 */
+	private:
+
+
 	/*
 	 * Slots
 	 */
-	public slots:
+	private slots:
+	// Slices list
+	void on_SlicesClearButton_clicked(bool checked);
+	void on_SlicesSaveButton_clicked(bool checked);
+	void on_SlicesList_currentRowChanged(int index);
 
 
 	/*
 	 * Update Functions
 	 */
 	public:
+	// Add slice data to graph
+	void addSlice(ExtractedSlice* slice);
 	// Update controls and show window
 	void updateAndShow();
 	// Update controls

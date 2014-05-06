@@ -53,7 +53,11 @@ class AxesWindow : public QWidget
 
 	protected:
 	// Window close event
-	void closeEvent(QCloseEvent *event);
+	void closeEvent(QCloseEvent* event);
+
+	signals:
+	// Window closed signal
+	void windowClosed(bool);
 
 
 	/*

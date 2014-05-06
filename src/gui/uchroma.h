@@ -24,11 +24,16 @@
 
 #include "gui/ui_uchroma.h"
 #include "gui/axes.h"
+#include "gui/data.h"
+#include "gui/slices.h"
+#include "gui/slicemonitor.h"
+#include "gui/style.h"
+#include "gui/transform.h"
+#include "gui/view.h"
 #include "gui/saveimage.h"
 #include "gui/create.h"
 #include "gui/dataimport.h"
 #include "gui/fit.h"
-#include "gui/slicemonitor.h"
 #include "base/collection.h"
 #include "base/transformer.h"
 #include "base/lineparser.h"
@@ -50,12 +55,22 @@ class UChromaWindow : public QMainWindow
 	bool refreshing_;
 	// Axes Window
 	AxesWindow axesWindow_;
+	// Data Window
+	DataWindow dataWindow_;
+	// Slice Monitor Window
+	SliceMonitorWindow sliceMonitorWindow_;
+	// Slices Window
+	SlicesWindow slicesWindow_;
+	// Style Window
+	StyleWindow styleWindow_;
+	// Transform Window
+	TransformWindow transformWindow_;
+	// View Window
+	ViewWindow viewWindow_;
 	// Save Image Dialog
 	SaveImageDialog saveImageDialog_;
 	// Data Import Dialog
 	DataImportDialog dataImportDialog_;
-	// Slice Monitor Dialog
-	SliceMonitorDialog sliceMonitorDialog_;
 	// Fit Window Dialog
 	FitDialog fitDialog_;
 	// Create Window Dialog
@@ -67,8 +82,8 @@ class UChromaWindow : public QMainWindow
 	~UChromaWindow();
 	// Main form declaration
 	Ui::UChromaWindow ui;
-	// Finalise widgets (things that we couldn't do in Qt Designer)
-	void finaliseUi();
+	// Return centre coordinate of main window
+	QPoint centrePos();
 
 	protected:
 	// Window close event
@@ -99,32 +114,44 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	// View Menu
-	*/
+	 * View Menu
+	 */
 	private slots:
 	void on_actionViewPerspective_triggered(bool checked);
 	void on_actionViewReset_triggered(bool checked);
 
 
 	/*
-	// Tools Menu
-	*/
+	 * Tools Menu
+	 */
 	private slots:
-	void on_actionToolsSliceMonitor_triggered(bool checked);
 	void on_actionToolsFitWindow_triggered(bool checked);
 	void on_actionToolsCreateData_triggered(bool checked);
-	void on_actionToolsAxesWindow_triggered(bool checked);
 
 
 	/*
-	// Settings Menu
-	*/
+	 * Windows Menu
+	 */
+	private slots:
+	void on_actionWindowsCollections_triggered(bool checked);
+	void on_actionWindowsData_triggered(bool checked);
+	void on_actionWindowsStyle_triggered(bool checked);
+	void on_actionWindowsTransform_triggered(bool checked);
+	void on_actionWindowsView_triggered(bool checked);
+	void on_actionWindowsAxes_triggered(bool checked);
+	void on_actionWindowsSlices_triggered(bool checked);
+	void on_actionWindowsSliceMonitor_triggered(bool checked);
+
+
+	/*
+	 * Settings Menu
+	 */
 	private slots:
 	void on_actionSettingsChooseFont_triggered(bool checked);
 
 
 	/*
-	 * Left Tabs -- Collections
+	 * Collections
 	 */
 	private slots:
 	void on_CollectionList_currentRowChanged(int index);
@@ -132,106 +159,6 @@ class UChromaWindow : public QMainWindow
 	void on_CollectionList_itemChanged(QListWidgetItem* item);
 	void on_CollectionAddButton_clicked(bool checked);
 	void on_CollectionRemoveButton_clicked(bool checked);
-
-	public:
-	// Update collection tab
-	void updateCollectionTab();
-
-
-	/*
-	 * Left Tabs -- Collection -- Source Data
-	 */
-	private slots:
-	void on_SourceDirSelectButton_clicked(bool checked);
-	void on_AddFilesButton_clicked(bool checked);
-	void on_RemoveFilesButton_clicked(bool checked);
-	void on_SourceFilesTable_itemSelectionChanged();
-	void on_SourceFilesTable_cellChanged(int row, int column);
-	void on_GetZFromTimeStampButton_clicked(bool checked);
-	void on_ReloadFilesButton_clicked(bool checked);
-
-	public:
-	// Update source data tab
-	void updateCollectionDataTab();
-
-
-	/*
-	 * Left Tabs -- Collection -- Transform
-	 */
-	private:
-	// Change functions
-	bool transformEnabledChanged(int axis, bool enabled);
-	bool transformEquationChanged(int axis, QString equation);
-	bool transformInterpolateChanged(int axis, bool checked);
-	bool transformInterpolateStepChanged(int axis, double step);
-	bool transformInterpolateConstrainChanged(int axis, bool checked);
-	private slots:
-	void on_TransformXCheck_clicked(bool checked);
-	void on_TransformYCheck_clicked(bool checked);
-	void on_TransformZCheck_clicked(bool checked);
-	void on_TransformXEquationEdit_textEdited(QString text);
-	void on_TransformYEquationEdit_textEdited(QString text);
-	void on_TransformZEquationEdit_textEdited(QString text);
-	void on_TransformXInterpolateCheck_clicked(bool checked);
-	void on_TransformXInterpolateStepSpin_valueChanged(double value);
-	void on_TransformXInterpolateConstrainCheck_clicked(bool checked);
-	void on_TransformZInterpolateCheck_clicked(bool checked);
-	void on_TransformZInterpolateStepSpin_valueChanged(double value);
-	void on_TransformZInterpolateConstrainCheck_clicked(bool checked);
-
-	public:
-	// Update Transform tab
-	void updateCollectionTransformTab();
-
-
-	/*
-	 * Left Tabs -- Collection -- Style
-	 */
-	private:
-	// Update Gradient Bar
-	void updateGradientBar();
-
-	private slots:
-	// -- Style
-	void on_StyleCombo_currentIndexChanged(int index);
-	// -- Single Colour
-	void on_ColourSingleColourRadio_clicked(bool checked);
-	void on_ColourSingleColourButton_clicked(bool checked);
-	// -- RGB Gradient
-	void on_ColourRGBGradientRadio_clicked(bool checked);
-	void on_ColourRGBGradientAButton_clicked(bool checked);
-	void on_ColourRGBGradientASpin_valueChanged(double value);
-	void on_ColourRGBGradientASetMinimumButton_clicked(bool checked);
-	void on_ColourRGBGradientASetMaximumButton_clicked(bool checked);
-	void on_ColourRGBGradientBButton_clicked(bool checked);
-	void on_ColourRGBGradientBSpin_valueChanged(double value);
-	void on_ColourRGBGradientBSetMinimumButton_clicked(bool checked);
-	void on_ColourRGBGradientBSetMaximumButton_clicked(bool checked);
-	// -- HSV Gradient
-	void on_ColourHSVGradientRadio_clicked(bool checked);
-	void on_ColourHSVGradientAButton_clicked(bool checked);
-	void on_ColourHSVGradientASpin_valueChanged(double value);
-	void on_ColourHSVGradientASetMinimumButton_clicked(bool checked);
-	void on_ColourHSVGradientASetMaximumButton_clicked(bool checked);
-	void on_ColourHSVGradientBButton_clicked(bool checked);
-	void on_ColourHSVGradientBSpin_valueChanged(double value);
-	void on_ColourHSVGradientBSetMinimumButton_clicked(bool checked);
-	void on_ColourHSVGradientBSetMaximumButton_clicked(bool checked);
-	// -- Custom Gradient
-	void on_ColourCustomGradientRadio_clicked(bool checked);
-	void on_ColourCustomGradientTable_itemSelectionChanged();
-	void on_ColourCustomGradientTable_cellDoubleClicked(int row, int column);
-	void on_ColourCustomGradientTable_cellChanged(int row, int column);
-	void on_ColourCustomGradientAddButton_clicked(bool checked);
-	void on_ColourCustomGradientRemoveButton_clicked(bool checked);
-	// -- Alpha Control
-	void on_ColourAlphaOwnAlphaRadio_clicked(bool checked);
-	void on_ColourAlphaFixedAlphaRadio_clicked(bool checked);
-	void on_ColourAlphaFixedAlphaSpin_valueChanged(int value);
-
-	public:
-	// Update
-	void updateCollectionColourTab();
 
 
 	/*
@@ -244,36 +171,19 @@ class UChromaWindow : public QMainWindow
 	void on_SurfaceSliceZRadio_clicked(bool checked);
 
 	public:
-	// Update Surface tab (except main view)
-	void updateSurfaceTab();
-
-
-	/*
-	 * Right Tabs -- Slices
-	 */
-	private slots:
-	void on_SlicesClearButton_clicked(bool checked);
-	void on_SlicesSaveButton_clicked(bool checked);
-	void on_SlicesList_currentRowChanged(int index);
-
-	public:
-	// Update the Slices tab
-	void updateSlicesTab();
-	// Update the slice monitor widget
-	void updateSliceMonitor();
 
 
 	/*
 	 * Update
 	 */
 	public:
+	// Update all aspects of GUI
+	void updateGUI(bool refreshCollectionList = false);
 	// Update all subwindows
 	void updateSubWindows();
 	// Update title bar
 	void updateTitleBar();
-	// Update GUI after loading data
-	void updateAfterLoad();
-	// Update display data
+	// Update display data (used for surfaces) in all collections
 	void updateDisplayData();
 	// Update main display
 	void updateDisplay();
@@ -353,6 +263,8 @@ class UChromaWindow : public QMainWindow
 	Collection* collections();
 	// Return nth collection in list
 	Collection* collection(int index);
+	// Return currently-selected Collection
+	Collection* currentCollection();
 	// Clear current data
 	void clearData();
 	// Set display limits to show all available data
@@ -399,14 +311,6 @@ class UChromaWindow : public QMainWindow
 	Vec4<double> axisTitleOrientation_[3];
 	// Axis title text anchor positions
 	TextPrimitive::HorizontalAnchor axisTitleAnchor_[3];
-	// Whether axis text labels face the viewer automatically
-	bool labelFaceViewer_;
-	// Whether axis text labels are corrected for left-right / up readability
-	bool labelCorrectOrientation_;
-	// Font scaling for axis value labels
-	double labelScale_;
-	// Font scaling for titles
-	double titleScale_;
 	// Whether axes need to be regenerated
 	bool regenerateAxes_;
 
@@ -493,14 +397,14 @@ class UChromaWindow : public QMainWindow
 	void setAxisTitleAnchor(int axis, TextPrimitive::HorizontalAnchor anchor);
 	// Return axis title text anchor position for specified axis
 	TextPrimitive::HorizontalAnchor axisTitleAnchor(int axis);
+	// Set whether axis text labels face the viewer automatically
+	void setLabelFaceViewer(bool b);
 	// Return whether axis text labels face the viewer automatically
 	bool labelFaceViewer();
+	// Set whether axis text labels are corrected for left-right / up readability
+	void setLabelCorrectOrientation(bool b);
 	// Return whether axis text labels are corrected for left-right / up readability
 	bool labelCorrectOrientation();
-	// Return font scaling for axis value labels
-	double labelScale();
-	// Return font scaling for titles
-	double titleScale();
 	// Update axes primitives if necessary
 	void updateAxesPrimitives();
 
@@ -523,6 +427,8 @@ class UChromaWindow : public QMainWindow
 	ExtractedSliceGroup* addOrRetrieveGroup(QString name);
 
 	public:
+	// Return first extracted slice group
+	ExtractedSliceGroup* extractedSliceGroups();
 	// Set slice axis
 	void setSliceAxis(int axis);
 	// Return current axis target for slice selection
@@ -538,43 +444,53 @@ class UChromaWindow : public QMainWindow
 	// Return current slice data
 	ExtractedSlice* currentSlice();
 
-	public slots:
-	// Add current slice data to extracted slices list
-	void addSurfaceSlice();
-
 	signals:
 	// Slice data has changed
 	void sliceDataChanged();
 
+	public slots:
+	// Add current slice data to extracted slices list
+	void addSurfaceSlice();
+
 
 	/*
-	 * Extras TODO Functions need a home!
+	 * View
 	 */
 	public:
 	// Available Bounding Boxes
 	enum BoundingBox { NoBox, PlaneBox, CubeBox, nBoundingBoxes };
 
 	private:
+	// Font scaling for axis value labels
+	double labelScale_;
+	// Font scaling for titles
+	double titleScale_;
 	// Current bounding box type
 	BoundingBox boundingBox_;
 	// Y-intercept of XZ plane
 	double boundingBoxPlaneY_;
-	
-	public slots:
-	// -- Extras Tab
-	void on_ViewBoundingBoxNoneRadio_clicked(bool checked);
-	void on_ViewBoundingBoxPlaneRadio_clicked(bool checked);
-	void on_ViewBoundingBoxCubeRadio_clicked(bool checked);
-	void on_ViewBoundingBoxPlaneYSpin_valueChanged(double value);
-	void on_ViewBoundingBoxPlaneYSetMinimumButton_clicked(bool checked);
-	void on_ViewBoundingBoxPlaneYSetZeroButton_clicked(bool checked);
-	void on_ViewBoundingBoxPlaneYSetMaximumButton_clicked(bool checked);
-	// -- General Options Group
-	void on_ViewLabelsFaceViewerCheck_clicked(bool checked);
-	void on_ViewLabelScaleSpin_valueChanged(double value);
-	void on_ViewTitleScaleSpin_valueChanged(double value);
-	// Update extras tab
-	void updateExtrasTab();
+	// Whether axis text labels face the viewer automatically
+	bool labelFaceViewer_;
+	// Whether axis text labels are corrected for left-right / up readability
+	bool labelCorrectOrientation_;
+
+	public:
+	// Set font scaling for axis value labels
+	void setLabelScale(double value);
+	// Return font scaling for axis value labels
+	double labelScale();
+	// Return font scaling for titles
+	void setTitleScale(double value);
+	// Return font scaling for titles
+	double titleScale();
+	// Set current bounding box type
+	void setBoundingBox(UChromaWindow::BoundingBox type);
+	// Return current bounding box type
+	UChromaWindow::BoundingBox boundingBox();
+	// Set y intercept for plane bounding box
+	void setBoundingBoxPlaneY(double value);
+	// Return y intercept for plane bounding box
+	double boundingBoxPlaneY();
 };
 
 #endif

@@ -1,7 +1,7 @@
 /*
-	*** Slice Monitor Window
-	*** src/slicemonitor.h
-	Copyright T. Youngs 2012-2013.
+	*** uChroma Data Window
+	*** src/gui/data.h
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -19,48 +19,61 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_SLICEMONITOR_H
-#define UCHROMA_SLICEMONITOR_H
+#ifndef UCHROMA_DATAWINDOW_H
+#define UCHROMA_DATAWINDOW_H
 
-#include <QtGui/QWidget>
-#include <QtCore/QObject>
-#include "gui/ui_slicemonitor.h"
+#include "gui/ui_data.h"
 
 // Forward Declarations
 class UChromaWindow;
 
-/*
- * Slice Monitor
- */
-class SliceMonitorWindow : public QWidget
+class DataWindow : public QWidget
 {
+	// All Qt declarations must include this macro
 	Q_OBJECT
 
+
+	/*
+	// Window Functions
+	*/
 	private:
 	// Whether the window is refreshing / updating its controls
 	bool refreshing_;
 
 	public:
 	// Constructor / Destructor
-	SliceMonitorWindow(UChromaWindow& parent);
-	~SliceMonitorWindow();
+	DataWindow(UChromaWindow& parent);
+	~DataWindow();
 	// Main form declaration
-	Ui::SliceMonitorWindow ui;
+	Ui::DataWindow ui;
 	// UChromaWindow reference
 	UChromaWindow& uChroma_;
 
 	protected:
 	// Window close event
-	void closeEvent(QCloseEvent *event);
+	void closeEvent(QCloseEvent* event);
 
 	signals:
 	// Window closed signal
 	void windowClosed(bool);
 
 	/*
+	 * Convenience Functions
+	 */
+	private:
+
+
+	/*
 	 * Slots
 	 */
-	public slots:
+	private slots:
+	void on_SourceDirSelectButton_clicked(bool checked);
+	void on_AddFilesButton_clicked(bool checked);
+	void on_RemoveFilesButton_clicked(bool checked);
+	void on_SourceFilesTable_itemSelectionChanged();
+	void on_SourceFilesTable_cellChanged(int row, int column);
+	void on_GetZFromTimeStampButton_clicked(bool checked);
+	void on_ReloadFilesButton_clicked(bool checked);
 
 
 	/*

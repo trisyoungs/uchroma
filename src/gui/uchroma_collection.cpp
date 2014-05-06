@@ -30,9 +30,7 @@ void UChromaWindow::on_CollectionList_currentRowChanged(int index)
 
 	currentCollection_ = collections_[index];
 
-	updateCollectionDataTab();
-	updateCollectionTransformTab();
-	updateCollectionColourTab();
+	updateGUI();
 }
 
 void UChromaWindow::on_CollectionList_itemClicked(QListWidgetItem* item)
@@ -62,40 +60,14 @@ void UChromaWindow::on_CollectionList_itemChanged(QListWidgetItem* item)
 void UChromaWindow::on_CollectionAddButton_clicked(bool checked)
 {
 	addCollection();
-	updateCollectionTab();
-	updateDisplay();
+
+	updateGUI(true);
 }
 
 void UChromaWindow::on_CollectionRemoveButton_clicked(bool checked)
 {
 	if (!currentCollection_) return;
 	removeCollection(currentCollection_);
-	updateCollectionTab();
-	updateDisplay();
-}
 
-// Update Transform tab
-void UChromaWindow::updateCollectionTab()
-{
-	refreshing_ = true;
-
-	// Repopulate list
-	ui.CollectionList->clear();
-	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
-	{
-		QListWidgetItem* item = new QListWidgetItem(ui.CollectionList, 0);
-		item->setText(collection->title());
-		item->setData(Qt::UserRole, VariantPointer<Collection>(collection));
-		item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-		item->setCheckState(collection->visible() ? Qt::Checked : Qt::Unchecked);
-
-		// If this is the current collection, select it
-		if (collection == currentCollection_) item->setSelected(true);
-	}
-	
-	updateCollectionDataTab();
-	updateCollectionTransformTab();
-	updateCollectionColourTab();
-
-	refreshing_ = false;
+	updateGUI(true);
 }

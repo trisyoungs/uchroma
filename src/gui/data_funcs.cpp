@@ -1,6 +1,6 @@
 /*
-	*** Main Window - Collection Data Functions 
-	*** src/gui/uchroma_collection_data.cpp
+	*** uChroma Data Window
+	*** src/gui/data_funcs.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,47 +19,80 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/uchroma.h"
-#include "gui/axes.h"
+#include "gui/data.h"
+#include "uchroma.h"
 #include "templates/reflist.h"
 
+/*
+ * Window Functions
+ */
+
+// Constructor
+DataWindow::DataWindow(UChromaWindow& parent) : QWidget(&parent), uChroma_(parent)
+{
+	ui.setupUi(this);
+
+	QWidget::setWindowFlags(Qt::Tool);
+
+	refreshing_ = false;
+}
+
+// Destructor
+DataWindow::~DataWindow()
+{
+}
+
+// Window close event
+void DataWindow::closeEvent(QCloseEvent* event)
+{
+	emit(windowClosed(false));
+}
+
+/*
+ * Convenience Functions
+ */
+
+/*
+ * Slots
+ */
+
 // Select source directory
-void UChromaWindow::on_SourceDirSelectButton_clicked(bool checked)
+void DataWindow::on_SourceDirSelectButton_clicked(bool checked)
 {
 	// Check for valid collection
-	if (!currentCollection_) return;
+	Collection* currentCollection = uChroma_.currentCollection();
+	if (!currentCollection) return;
 
-	QString dir = QFileDialog::getExistingDirectory(this, "Select Data Directory", currentCollection_->dataFileDirectory().path());
+	QString dir = QFileDialog::getExistingDirectory(this, "Select Data Directory", currentCollection->dataFileDirectory().path());
 	if (dir.isEmpty()) return;
 	ui.SourceDirEdit->setText(dir);
-	currentCollection_->setDataFileDirectory(dir);
+	currentCollection->setDataFileDirectory(dir);
 	
 	// Reload all data and update surface
-	QProgressDialog progress("Loading data...", "Abort", 0, currentCollection_->nSlices(), this);
+	QProgressDialog progress("Loading data...", "Abort", 0, currentCollection->nSlices(), this);
 	progress.setWindowModality(Qt::WindowModal);
 	int n=0;
-	for (Slice* slice = currentCollection_->slices(); slice != NULL; slice = slice->next)
+	for (Slice* slice = currentCollection->slices(); slice != NULL; slice = slice->next)
 	{
-		currentCollection_->loadSliceData(slice);
+		currentCollection->loadSliceData(slice);
 		progress.setValue(n++);
 		if (progress.wasCanceled()) break;
 	}
-	progress.setValue(currentCollection_->nSlices());
-	
-	// Need to update axis limits
-	updateAxisLimits();
-	axesWindow_.updateControls();
+	progress.setValue(currentCollection->nSlices());
 
-	setAsModified();
+	// Need to update GUI
+	uChroma_.setAsModified();
+	uChroma_.updateGUI();
 }
 
 // Add files button clicked
-void UChromaWindow::on_AddFilesButton_clicked(bool checked)
+void DataWindow::on_AddFilesButton_clicked(bool checked)
 {
 	// Check for valid collection
-	if (!currentCollection_) return;
+	Collection* currentCollection = uChroma_.currentCollection();
+	if (!currentCollection) return;
 
-	QStringList files = QFileDialog::getOpenFileNames(this, "Select datafiles", currentCollection_->dataFileDirectory().path(), "MINT files (*.mint01);;MDCS files (*.mdcs01);;Text files (*.txt);;All files (*)");
+	QStringList files = QFileDialog::getOpenFileNames(this, "Select datafiles", currentCollection->dataFileDirectory().path(), "MINT files (*.mint01);;MDCS files (*.mdcs01);;Text files (*.txt);;All files (*)");
 
 	QProgressDialog progress("Loading data...", "Abort Loading", 0, files.count(), this);
 	progress.setWindowModality(Qt::WindowModal);
@@ -67,11 +100,11 @@ void UChromaWindow::on_AddFilesButton_clicked(bool checked)
 	
 	// Determine automatic Z placement for slice
 	double z = 0.0, delta = 1.0;
-	if (currentCollection_->nSlices() == 1) z = currentCollection_->lastSlice()->data().z() + 1.0;
-	else if (currentCollection_->nSlices() > 1)
+	if (currentCollection->nSlices() == 1) z = currentCollection->lastSlice()->data().z() + 1.0;
+	else if (currentCollection->nSlices() > 1)
 	{
-		delta = currentCollection_->lastSlice()->data().z() - currentCollection_->lastSlice()->prev->data().z();
-		z = currentCollection_->lastSlice()->prev->data().z() + delta;
+		delta = currentCollection->lastSlice()->data().z() - currentCollection->lastSlice()->prev->data().z();
+		z = currentCollection->lastSlice()->prev->data().z() + delta;
 	}
 
 	foreach (QString fileName, files)
@@ -79,13 +112,13 @@ void UChromaWindow::on_AddFilesButton_clicked(bool checked)
 		progress.setValue(count);
 		if (progress.wasCanceled()) break;
 
-		Slice *slice = currentCollection_->addSlice(z);
+		Slice *slice = currentCollection->addSlice(z);
 		slice->setTitle(fileName);
 		slice->setDataSource(Slice::FileSource);
-		slice->setSourceFileName(currentCollection_->dataFileDirectory().relativeFilePath(fileName));
-		currentCollection_->setSliceZ(slice, z);
+		slice->setSourceFileName(currentCollection->dataFileDirectory().relativeFilePath(fileName));
+		currentCollection->setSliceZ(slice, z);
 
-		if (slice && currentCollection_->loadSliceData(slice)) ++count;
+		if (slice && currentCollection->loadSliceData(slice)) ++count;
 		
 		z += delta;
 	}
@@ -94,84 +127,74 @@ void UChromaWindow::on_AddFilesButton_clicked(bool checked)
 	// Was any data loaded?
 	if (count == 0) return;
 
-	// Update axis limits
-	updateAxisLimits();
-	setAsModified();
-
 	// Query whether limits should be updated to encompass all data
 	QMessageBox::Button button = QMessageBox::question(this, "New Data Loaded", "New data has been loaded - set current data limts to encompass all data?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-	if (button == QMessageBox::Yes) showAllData();
+	if (button == QMessageBox::Yes) uChroma_.showAllData();
 
-	// Update collection tabs, axes tabs and main display
-	updateCollectionTab();
-	axesWindow_.updateControls();
-	updateDisplay();
+	// Need to update GUI
+	uChroma_.setAsModified();
+	uChroma_.updateGUI();
 }
 
 // Remove files button clicked
-void UChromaWindow::on_RemoveFilesButton_clicked(bool checked)
+void DataWindow::on_RemoveFilesButton_clicked(bool checked)
 {
+	// Check for valid collection
+	Collection* currentCollection = uChroma_.currentCollection();
+	if (!currentCollection) return;
+
 	// From the selected items, construct a row of Slices to remove
 	RefList<Slice,int> slicesToRemove;
-	foreach(QTableWidgetItem* item, ui.SourceFilesTable->selectedItems()) slicesToRemove.addUnique(currentCollection_->slice(item->row()));
+	foreach(QTableWidgetItem* item, ui.SourceFilesTable->selectedItems()) slicesToRemove.addUnique(currentCollection->slice(item->row()));
 
 	// Delete slices....
-	for (RefListItem<Slice,int>* ri = slicesToRemove.first(); ri != NULL; ri = ri->next) currentCollection_->removeSlice(ri->item);
+	for (RefListItem<Slice,int>* ri = slicesToRemove.first(); ri != NULL; ri = ri->next) currentCollection->removeSlice(ri->item);
 
-	// Update axis limits
-	updateAxisLimits();
-	setAsModified();
-
-	// Update relevant tabs and main display
-	axesWindow_.updateControls();
-	updateCollectionDataTab();
-	updateCollectionTransformTab();
-	updateDisplay();
+	// Need to update GUI
+	uChroma_.setAsModified();
+	uChroma_.updateGUI();
 }
 
 // Source data item selection changed
-void UChromaWindow::on_SourceFilesTable_itemSelectionChanged()
+void DataWindow::on_SourceFilesTable_itemSelectionChanged()
 {
 	ui.RemoveFilesButton->setEnabled(ui.SourceFilesTable->selectedItems().count() != 0);
 }
 
-void UChromaWindow::on_SourceFilesTable_cellChanged(int row, int column)
+void DataWindow::on_SourceFilesTable_cellChanged(int row, int column)
 {
 	// Check for window refreshing or invalid Collection
-	if (refreshing_ || (!currentCollection_)) return;
+	Collection* currentCollection = uChroma_.currentCollection();
+	if (refreshing_ || (!currentCollection)) return;
 
 	// Z changed
 	if (column == 1)
 	{
 		// Get slice and widget item
-		Slice* slice = currentCollection_->slice(row);
+		Slice* slice = currentCollection->slice(row);
 		if (slice == NULL) return;
 
 		QTableWidgetItem* item = ui.SourceFilesTable->item(row, column);
 		if (item == NULL) return;
 
 		// Set new value of z (its position in the list will be adjusted if necessary)
-		currentCollection_->setSliceZ(slice, item->text().toDouble());
+		currentCollection->setSliceZ(slice, item->text().toDouble());
 
-		// Update axis limits
-		updateAxisLimits();
-		axesWindow_.updateControls();
-
-		// Update related tabs and display
-		updateCollectionDataTab();
-		updateCollectionTransformTab();
-		updateDisplay();
+		// Need to update now
+		uChroma_.setAsModified();
+		uChroma_.updateGUI();
 	}
 }
 
 // Retrieve relative Z values from timestamps
-void UChromaWindow::on_GetZFromTimeStampButton_clicked(bool checked)
+void DataWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 {
 	// Check for window refreshing or invalid Collection
-	if (refreshing_ || (!currentCollection_)) return;
+	Collection* currentCollection = uChroma_.currentCollection();
+	if (refreshing_ || (!currentCollection)) return;
 
 	// Check for no slices
-	if (currentCollection_->nSlices() == 0) return;
+	if (currentCollection->nSlices() == 0) return;
 
 // 	QString dir = QInputDialog::getText(this, "Choose File Location", "Select the location of the files that will be interrogated:", QLineEdit::Normal, 
 	bool ok;
@@ -186,7 +209,7 @@ void UChromaWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 	QString s;
 	double earliest = 0.0;
 	QDateTime referenceTime(QDate(1970,1,1));
-	for (Slice* slice = currentCollection_->slices(); slice != NULL; slice = slice->next)
+	for (Slice* slice = currentCollection->slices(); slice != NULL; slice = slice->next)
 	{
 		// Construct filename to search for
 		QFileInfo baseInfo(slice->sourceFileName());
@@ -203,31 +226,32 @@ void UChromaWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 	}
 	
 	// Set correct offset
-	for (Slice* slice = currentCollection_->slices(); slice != NULL; slice = slice->next) slice->data().setZ(slice->data().z() - earliest);
-	currentCollection_->setDisplayDataInvalid();
+	for (Slice* slice = currentCollection->slices(); slice != NULL; slice = slice->next) slice->data().setZ(slice->data().z() - earliest);
+	currentCollection->setDisplayDataInvalid();
 
-	setAsModified();
-	updateCollectionDataTab();
-	updateDisplay();
+	// Need to update now
+	uChroma_.setAsModified();
+	uChroma_.updateGUI();
 }
 
-void UChromaWindow::on_ReloadFilesButton_clicked(bool checked)
+void DataWindow::on_ReloadFilesButton_clicked(bool checked)
 {
 	// Check for invalid Collection
-	if (!currentCollection_) return;
+	Collection* currentCollection = uChroma_.currentCollection();
+	if (!currentCollection) return;
 	
 	// Reload all data and update surface
-	QProgressDialog progress("Reloading data...", "Abort", 0, currentCollection_->nSlices(), this);
+	QProgressDialog progress("Reloading data...", "Abort", 0, currentCollection->nSlices(), this);
 	progress.setWindowModality(Qt::WindowModal);
 	int n=0;
 	int nFailed = 0;
-	for (Slice* slice = currentCollection_->slices(); slice != NULL; slice = slice->next)
+	for (Slice* slice = currentCollection->slices(); slice != NULL; slice = slice->next)
 	{
-		if (!currentCollection_->loadSliceData(slice)) ++nFailed;
+		if (!currentCollection->loadSliceData(slice)) ++nFailed;
 		progress.setValue(n++);
 		if (progress.wasCanceled()) break;
 	}
-	progress.setValue(currentCollection_->nSlices());
+	progress.setValue(currentCollection->nSlices());
 
 	// Any failed to load?
 	if (nFailed > 0)
@@ -235,33 +259,51 @@ void UChromaWindow::on_ReloadFilesButton_clicked(bool checked)
 		QMessageBox::StandardButton button = QMessageBox::warning(this, "Failed to Load Data", QString("Failed to reload data for ") + QString::number(nFailed) + " defined slices.\nWould you like to remove empty slices from the list?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 		if (button == QMessageBox::Yes)
 		{
-			Slice* slice = currentCollection_->slices(), *nextSlice;
+			Slice* slice = currentCollection->slices(), *nextSlice;
 			while (slice != NULL)
 			{
 				nextSlice = slice->next;
-				if (slice->data().nPoints() == 0) currentCollection_->removeSlice(slice);
+				if (slice->data().nPoints() == 0) currentCollection->removeSlice(slice);
 				slice = nextSlice;
 			}
 		}
 	}
 
-	setAsModified();
-	updateAfterLoad();
+	// Need to update GUI
+	uChroma_.setAsModified();
+	uChroma_.updateGUI();
 }
 
-// Update source data
-void UChromaWindow::updateCollectionDataTab()
+/*
+ * Update
+ */
+
+// Update controls and show window
+void DataWindow::updateAndShow()
 {
+	updateControls();
+	show();
+	move(uChroma_.centrePos() - QPoint(width()/2, height()/2));
+}
+
+// Update controls
+void DataWindow::updateControls()
+{
+	// If the window isn't visible, do nothing...
+	if (!isVisible()) return;
+
 	// Check for invalid Collection
-	if (!currentCollection_) return;
+	Collection* currentCollection = uChroma_.currentCollection();
+	if (!currentCollection) return;
 
 	refreshing_ = true;
-	ui.SourceDirEdit->setText(currentCollection_->dataFileDirectory().absolutePath());
+
+	ui.SourceDirEdit->setText(currentCollection->dataFileDirectory().absolutePath());
 
 	ui.SourceFilesTable->clearContents();
-	ui.SourceFilesTable->setRowCount(currentCollection_->nSlices());
+	ui.SourceFilesTable->setRowCount(currentCollection->nSlices());
 	int count = 0;
-	for (Slice* slice = currentCollection_->slices(); slice != NULL; slice = slice->next)
+	for (Slice* slice = currentCollection->slices(); slice != NULL; slice = slice->next)
 	{
 		QTableWidgetItem* item = new QTableWidgetItem(slice->sourceFileName());
 		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
@@ -271,6 +313,6 @@ void UChromaWindow::updateCollectionDataTab()
 		++count;
 	}
 	ui.SourceFilesTable->resizeColumnsToContents();
-	
+
 	refreshing_ = false;
 }

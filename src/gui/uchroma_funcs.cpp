@@ -21,10 +21,11 @@
 
 #include "gui/uchroma.h"
 #include "templates/reflist.h"
+#include "templates/variantpointer.h"
 #include "version.h"
 
 // Constructor
-UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWindow_(*this), saveImageDialog_(this), createDialog_(this), dataImportDialog_(this), fitDialog_(this), sliceMonitorDialog_(this)
+UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWindow_(*this), dataWindow_(*this), slicesWindow_(*this), sliceMonitorWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this), saveImageDialog_(this), createDialog_(this), dataImportDialog_(this), fitDialog_(this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -52,19 +53,22 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	GraphWidget::setUChroma(this);
 	FitDialog::setUChroma(this);
 	CreateDialog::setUChroma(this);
-	axesWindow_.show();
-
-	// Add display styles to StyleCombo on Collection->Style tab
-	for (int n=0; n<Collection::nDisplayStyles; ++n) ui.StyleCombo->addItem( Collection::displayStyle((Collection::DisplayStyle) n));
 
 	// Load font for viewer
 	ui.MainView->setupFont(viewerFont_);
 
-	// Connect signals / slots between Viewer and main UI
+	// Connect signals / slots between the Viewer and uChroma
 	connect(ui.MainView, SIGNAL(sliceAxisClicked()), this, SLOT(addSurfaceSlice()));
 
 	// Connect signals / slots between SliceMonitor and main UI
-	connect(this, SIGNAL(sliceDataChanged()), sliceMonitorDialog_.ui.MonitorGraph, SLOT(staticDataChanged()));
+	connect(this, SIGNAL(sliceDataChanged()), sliceMonitorWindow_.ui.MonitorGraph, SLOT(staticDataChanged()));
+
+	// Connect sub-window closed signal to toggle buttons / menu items in uChroma's main window
+	connect(&axesWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsAxes, SLOT(setChecked(bool)));
+	connect(&dataWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsData, SLOT(setChecked(bool)));
+	connect(&styleWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsStyle, SLOT(setChecked(bool)));
+	connect(&transformWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsTransform, SLOT(setChecked(bool)));
+	connect(&viewWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsView, SLOT(setChecked(bool)));
 }
 
 // Destructor
@@ -94,14 +98,54 @@ void UChromaWindow::saveSettings()
  * Update
  */
 
+// Update all aspects of GUI
+void UChromaWindow::updateGUI(bool refreshCollectionList)
+{
+	refreshing_ = true;
+
+	// Repopulate list
+	ui.CollectionList->clear();
+	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
+	{
+		QListWidgetItem* item = new QListWidgetItem(ui.CollectionList, 0);
+		item->setText(collection->title());
+		item->setData(Qt::UserRole, VariantPointer<Collection>(collection));
+		item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+		item->setCheckState(collection->visible() ? Qt::Checked : Qt::Unchecked);
+
+		// If this is the current collection, select it
+		if (collection == currentCollection_) item->setSelected(true);
+	}
+	
+	updateSubWindows();
+	updateTitleBar();
+	updateDisplay();
+
+	refreshing_ = false;
+}
+
 // Update all subwindows
 void UChromaWindow::updateSubWindows()
 {
 	// Make sure limits are up to date
 	updateAxisLimits();
 
-	updateCollectionTab();
 	axesWindow_.updateControls();
+	dataWindow_.updateControls();
+	slicesWindow_.updateControls();
+	sliceMonitorWindow_.updateControls();
+	styleWindow_.updateControls();
+	transformWindow_.updateControls();
+	viewWindow_.updateControls();
+
+	// Set titles of each subwindow to reflect current collection
+	if (currentCollection_  != NULL)
+	{
+		dataWindow_.setWindowTitle("Data (" + currentCollection_->title() + ")");
+		styleWindow_.setWindowTitle("Data (" + currentCollection_->title() + ")");
+		transformWindow_.setWindowTitle("Data (" + currentCollection_->title() + ")");
+		viewWindow_.setWindowTitle("Data (" + currentCollection_->title() + ")");
+	}
 }
 
 // Update title bar
@@ -109,20 +153,6 @@ void UChromaWindow::updateTitleBar()
 {
 	if (modified_) setWindowTitle("uChroma v" + QString(UCHROMAREVISION) + " - " + inputFile_ + " (modified) ");
 	else setWindowTitle("uChroma v" + QString(UCHROMAREVISION) + " - " + inputFile_);
-}
-
-// Update GUI after loading data
-void UChromaWindow::updateAfterLoad()
-{
-	// Update data and transform limits
-// 	for (Collection* c = collections_.first(); c != NULL; c = c->next) c->calculateDataLimits(); // TODO Do we need this
-
-	// Update GUI
-	updateSubWindows();
-	updateTitleBar();
-
-	// Setup font
-	ui.MainView->setupFont(viewerFont_);
 }
 
 // Update display data
@@ -492,16 +522,16 @@ TextPrimitive::HorizontalAnchor UChromaWindow::axisTitleAnchor(int axis)
 	return axisTitleAnchor_[axis];
 }
 
-// Return whether axis text labels face the viewer automatically
-bool UChromaWindow::labelFaceViewer()
-{
-	return labelFaceViewer_;
-}
+/*
+ * View
+ */
 
-// Return whether axis text labels are corrected for left-right / up readability
-bool UChromaWindow::labelCorrectOrientation()
+// Set font scaling for axis value labels
+void UChromaWindow::setLabelScale(double value)
 {
-	return labelCorrectOrientation_;
+	labelScale_ = value;
+
+	regenerateAxes_ = true;
 }
 
 // Return font scaling for axis value labels
@@ -511,104 +541,69 @@ double UChromaWindow::labelScale()
 }
 
 // Return font scaling for titles
+void UChromaWindow::setTitleScale(double value)
+{
+	titleScale_ = value;
+
+	regenerateAxes_ = true;
+}
+
+// Return font scaling for titles
 double UChromaWindow::titleScale()
 {
 	return titleScale_;
 }
 
-
-/*
- * Extras Tab TODO MOVE THIS
- */
-
-void UChromaWindow::on_ViewBoundingBoxNoneRadio_clicked(bool checked)
+// Set current bounding box type
+void UChromaWindow::setBoundingBox(UChromaWindow::BoundingBox type)
 {
-	if (refreshing_) return;
-	boundingBox_ = UChromaWindow::NoBox;
+	boundingBox_ = type;
+
+	// Bounding boxes are generated as part of the axes primitives, so need to regenerate them
 	regenerateAxes_ = true;
-	updateDisplay();
 }
 
-void UChromaWindow::on_ViewBoundingBoxPlaneRadio_clicked(bool checked)
+// Return current bounding box type
+UChromaWindow::BoundingBox UChromaWindow::boundingBox()
 {
-	if (refreshing_) return;
-	boundingBox_ = UChromaWindow::PlaneBox;
-	regenerateAxes_ = true;
-	updateDisplay();
+	return boundingBox_;
 }
 
-void UChromaWindow::on_ViewBoundingBoxCubeRadio_clicked(bool checked)
+// Set y intercept for plane bounding box
+void UChromaWindow::setBoundingBoxPlaneY(double value)
 {
-	if (refreshing_) return;
-	boundingBox_ = UChromaWindow::CubeBox;
-	regenerateAxes_ = true;
-	updateDisplay();
-}
-
-void UChromaWindow::on_ViewBoundingBoxPlaneYSpin_valueChanged(double value)
-{
-	if (refreshing_) return;
 	boundingBoxPlaneY_ = value;
+
+	// Bounding boxes are generated as part of the axes primitives, so need to regenerate them
 	regenerateAxes_ = true;
-	updateDisplay();
 }
 
-void UChromaWindow::on_ViewBoundingBoxPlaneYSetMinimumButton_clicked(bool checked)
+// Return y intercept for plane bounding box
+double UChromaWindow::boundingBoxPlaneY()
 {
-	ui.ViewBoundingBoxPlaneYSpin->setValue(axisMin_.y);
+	return boundingBoxPlaneY_;
 }
 
-void UChromaWindow::on_ViewBoundingBoxPlaneYSetZeroButton_clicked(bool checked)
+// Set whether axis text labels face the viewer automatically
+void UChromaWindow::setLabelFaceViewer(bool b)
 {
-	ui.ViewBoundingBoxPlaneYSpin->setValue(0.0);
+	labelFaceViewer_ = b;
 }
 
-void UChromaWindow::on_ViewBoundingBoxPlaneYSetMaximumButton_clicked(bool checked)
+// Return whether axis text labels face the viewer automatically
+bool UChromaWindow::labelFaceViewer()
 {
-	ui.ViewBoundingBoxPlaneYSpin->setValue(axisMax_.y);
+	return labelFaceViewer_;
 }
 
-// -- General Options
-void UChromaWindow::on_ViewLabelsFaceViewerCheck_clicked(bool checked)
+// Set whether axis text labels are corrected for left-right / up readability
+void UChromaWindow::setLabelCorrectOrientation(bool b)
 {
-	if (refreshing_) return;
-	labelFaceViewer_ = checked;
-	setAsModified();
-	regenerateAxes_ = true;
-	updateDisplay();
+	labelCorrectOrientation_ = b;
 }
 
-void UChromaWindow::on_ViewLabelScaleSpin_valueChanged(double value)
+// Return whether axis text labels are corrected for left-right / up readability
+bool UChromaWindow::labelCorrectOrientation()
 {
-	if (refreshing_) return;
-	labelScale_ = value;
-	setAsModified();
-	regenerateAxes_ = true;
-	updateDisplay();
-}
-
-void UChromaWindow::on_ViewTitleScaleSpin_valueChanged(double value)
-{
-	if (refreshing_) return;
-	titleScale_ = value;
-	setAsModified();
-	regenerateAxes_ = true;
-	updateDisplay();
-}
-
-// Update extras tab
-void UChromaWindow::updateExtrasTab()
-{
-	// Extras
-	ui.ViewLabelScaleSpin->setValue(labelScale_);
-	ui.ViewTitleScaleSpin->setValue(titleScale_);
-	
-	if (boundingBox_ == UChromaWindow::NoBox) ui.ViewBoundingBoxNoneRadio->setChecked(true);
-	else if (boundingBox_ == UChromaWindow::PlaneBox) ui.ViewBoundingBoxPlaneRadio->setChecked(true);
-	else if (boundingBox_ == UChromaWindow::CubeBox) ui.ViewBoundingBoxCubeRadio->setChecked(true);
-	ui.ViewBoundingBoxPlaneYSpin->setValue(boundingBoxPlaneY_);
-
-	// General Options
-	ui.ViewLabelsFaceViewerCheck->setChecked(labelFaceViewer_);
-	
+	return labelCorrectOrientation_;
 }

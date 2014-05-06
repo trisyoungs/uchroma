@@ -97,6 +97,8 @@ void FitDialog::updateAll()
 
 void FitDialog::on_CloseButton_clicked(bool checked)
 {
+	uChroma_->updateGUI(true);
+
 	hide();
 }
 
@@ -133,7 +135,7 @@ void FitDialog::on_SelectEquationButton_clicked(bool checked)
 void FitDialog::on_FitButton_clicked(bool checked)
 {
 	if (doFitting()) uChroma_->setAsModified();
-	uChroma_->updateSubWindows();
+	uChroma_->updateGUI(true);
 }
 
 /*
