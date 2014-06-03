@@ -211,4 +211,41 @@ class ExtractedSliceGroup : public ListItem<ExtractedSliceGroup>
 	QTreeWidgetItem* treeItem();
 };
 
+// Display Slice
+class DisplaySlice : public ListItem<DisplaySlice>
+{
+	public:
+	// Constructor / Destructor
+	DisplaySlice();
+	~DisplaySlice();
+
+
+	/*
+	 * Data
+	 */
+	private:
+	// Y values of slice data
+	Array<double> y_;
+	// Flags indicating that y values exist at each point
+	Array<bool> yExists_;
+	// Z value of slice
+	double z_;
+
+	public:
+	// Add y value and associated flag
+	void add(double y);
+	// Add dummy y value and associated flag
+	void addDummy();
+	// Return y array
+	const Array<double>& y() const;
+	// Return flags array
+	const Array<bool>& yExists() const;
+	// Set specific y value
+	void setY(int index, double yNew);
+	// Set z value of slice
+	void setZ(double z);
+	// Return z value of slice
+	double z() const;
+};
+
 #endif

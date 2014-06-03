@@ -356,3 +356,62 @@ QTreeWidgetItem* ExtractedSliceGroup::treeItem()
 {
 	return treeItem_;
 }
+
+/*
+ * Display Slice
+ */
+
+// Constructor
+DisplaySlice::DisplaySlice()
+{
+}
+
+// Destructor
+DisplaySlice::~DisplaySlice()
+{
+}
+
+// Add y value and associated flag
+void DisplaySlice::add(double y)
+{
+	y_.add(y);
+	yExists_.add(true);
+}
+
+// Add dummy y value and associated flag
+void DisplaySlice::addDummy()
+{
+	y_.add(0.0);
+	yExists_.add(false);
+}
+
+// Return y array
+const Array< double >& DisplaySlice::y() const
+{
+	return y_;
+}
+
+// Return flags array
+const Array< bool >& DisplaySlice::yExists() const
+{
+	return yExists_;
+}
+
+// Set specific y value
+void DisplaySlice::setY(int index, double yNew)
+{
+	y_[index] = yNew;
+	yExists_[index] = true;
+}
+
+// Set z value of slice
+void DisplaySlice::setZ(double z)
+{
+	z_ = z;
+}
+
+// Return z value of slice
+double DisplaySlice::z() const
+{
+	return z_;
+}

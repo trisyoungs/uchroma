@@ -276,6 +276,8 @@ void UChromaWindow::clearData()
 // Set display limits to show all available data
 void UChromaWindow::showAllData()
 {
+	updateAxisLimits();
+
 	axisMin_ = axisLimitMin_;
 	axisMax_ = axisLimitMax_;
 

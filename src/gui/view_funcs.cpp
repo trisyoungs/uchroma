@@ -155,10 +155,10 @@ void ViewWindow::updateAndShow()
 }
 
 // Update controls
-void ViewWindow::updateControls()
+void ViewWindow::updateControls(bool force)
 {
 	// If the window isn't visible, do nothing...
-	if (!isVisible()) return;
+	if ((!isVisible()) && (!force) ) return;
 
 	refreshing_ = true;
 

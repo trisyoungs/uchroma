@@ -48,13 +48,12 @@ StyleWindow::~StyleWindow()
 // Window close event
 void StyleWindow::closeEvent(QCloseEvent *event)
 {
-	// TODO
+	emit(windowClosed(false));
 }
 
 /*
  * Convenience Functions
  */
-
 
 /*
  * Slots
@@ -514,16 +513,16 @@ void StyleWindow::updateGradientBar()
 // Update controls and show window
 void StyleWindow::updateAndShow()
 {
-	updateControls();
+	updateControls(true);
 	show();
 	move(uChroma_.centrePos() - QPoint(width()/2, height()/2));
 }
 
 // Update controls
-void StyleWindow::updateControls()
+void StyleWindow::updateControls(bool force)
 {
 	// If the window isn't visible, do nothing...
-	if (!isVisible()) return;
+	if ((!isVisible()) && (!force) ) return;
 
 	// Check for invalid Collection
 	Collection* currentCollection = uChroma_.currentCollection();

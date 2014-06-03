@@ -94,7 +94,7 @@ class TransformWindow : public QWidget
 	// Update controls and show window
 	void updateAndShow();
 	// Update controls
-	void updateControls();
+	void updateControls(bool force = false);
 };
 
 #endif

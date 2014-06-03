@@ -23,7 +23,7 @@
 #include "gui/uchroma.h"
 
 // Construct line representation of data
-void Viewer::constructLineSurface(Primitive& primitive, List<Data2D>& displayData, ColourScale colourScale)
+void Viewer::constructLineSurface(Primitive& primitive, const Array< double >& abscissa, List< DisplaySlice >& displayData, ColourScale colourScale)
 {
 	// Set primitive options
 	primitive.setType(GL_LINES);
@@ -36,34 +36,27 @@ void Viewer::constructLineSurface(Primitive& primitive, List<Data2D>& displayDat
 	double yAxisScale = uChroma_->axisStretch(1);
 	Vec3<double> nrm(0.0, 1.0, 0.0);
 
-	// We need to skip over slices with zero points, so construct a reflist here of those which contain usable data
-	RefList<Data2D,int> slices;
-	for (Data2D* slice = displayData.first(); slice != NULL; slice = slice->next) if (slice->nPoints() > 1) slices.add(slice);
-
-	// If there are not enough slices with a valid number of points, get out now
-	if (slices.nItems() < 1) return;
-
 	// Create lines for slices
-	for (RefListItem<Data2D,int>* ri = slices.first(); ri != NULL; ri = ri->next)
+	for (DisplaySlice* slice = displayData.first(); slice != NULL; slice = slice->next)
 	{
-		// Grab slice pointers
-		Data2D* data = ri->item;
-
-		// Grab z values
-		zA = (GLfloat) data->z();
+		// Grab y and z values
+		const Array<double>& yA = slice->y();
+		const Array<bool>& yAExists = slice->yExists();
+		zA = (GLfloat) slice->z();
 
 		// Get nPoints, and initial coordinates
-		nPoints = data->nPoints();
-		Array<double>& xA = data->arrayX();
-		Array<double>& yA = data->arrayY();
-		for (n=1; n<nPoints-1; ++n)
+		nPoints = abscissa.nItems();
+		for (n=1; n<nPoints; ++n)
 		{
-			// Add vertex for this point
-			colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, yA[n-1]) : yA[n-1]) / yAxisScale, colourA);
-			primitive.defineVertex(xA[n-1], yA[n-1], zA, nrm, colourA, false);
+			// If no valid points exists, plot no vertex
+			if (!yAExists.value(n-1)) continue;
+			if (!yAExists.value(n)) continue;
 
-			colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, yA[n]) : yA[n]) / yAxisScale, colourA);
-			primitive.defineVertex(xA[n], yA[n], zA, nrm, colourA, false);
+			// Add vertices for these points
+			colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, yA.value(n-1)) : yA.value(n-1)) / yAxisScale, colourA);
+			primitive.defineVertex(abscissa.value(n-1), yA.value(n-1), zA, nrm, colourA, false);
+			colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, yA.value(n)) : yA.value(n)) / yAxisScale, colourA);
+			primitive.defineVertex(abscissa.value(n), yA.value(n), zA, nrm, colourA, false);
 		}
 	}
 }

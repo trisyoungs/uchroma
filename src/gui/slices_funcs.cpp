@@ -90,10 +90,10 @@ void SlicesWindow::updateAndShow()
 }
 
 // Update controls
-void SlicesWindow::updateControls()
+void SlicesWindow::updateControls(bool force)
 {
 	// If the window isn't visible, do nothing...
-	if (!isVisible()) return;
+	if ((!isVisible()) && (!force) ) return;
 
 	refreshing_ = true;
 

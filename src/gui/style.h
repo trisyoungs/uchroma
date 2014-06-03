@@ -53,6 +53,10 @@ class StyleWindow : public QWidget
 	// Window close event
 	void closeEvent(QCloseEvent *event);
 
+	signals:
+	// Window closed signal
+	void windowClosed(bool);
+
 
 	/*
 	 * Convenience Functions
@@ -113,7 +117,7 @@ class StyleWindow : public QWidget
 	// Update controls and show window
 	void updateAndShow();
 	// Update controls
-	void updateControls();
+	void updateControls(bool force = false);
 };
 
 #endif

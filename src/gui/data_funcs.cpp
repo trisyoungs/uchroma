@@ -287,10 +287,10 @@ void DataWindow::updateAndShow()
 }
 
 // Update controls
-void DataWindow::updateControls()
+void DataWindow::updateControls(bool force)
 {
 	// If the window isn't visible, do nothing...
-	if (!isVisible()) return;
+	if ((!isVisible()) && (!force) ) return;
 
 	// Check for invalid Collection
 	Collection* currentCollection = uChroma_.currentCollection();

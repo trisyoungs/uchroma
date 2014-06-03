@@ -223,7 +223,7 @@ void UChromaWindow::on_actionToolsCreateData_triggered(bool checked)
 void UChromaWindow::on_actionWindowsCollections_triggered(bool checked)
 {
 	if (refreshing_) return;
-	ui.CollectionsGroup->setVisible(checked);
+	ui.LeftWidgetsWidget->setVisible(checked);
 }
 
 void UChromaWindow::on_actionWindowsData_triggered(bool checked)

@@ -850,16 +850,16 @@ void AxesWindow::on_AxisZTitleDistanceSpin_valueChanged(double value)
 // Update controls and show window
 void AxesWindow::updateAndShow()
 {
-	updateControls();
+	updateControls(true);
 	show();
 	move(uChroma_.centrePos() - QPoint(width()/2, height()/2));
 }
 
 // Update controls
-void AxesWindow::updateControls()
+void AxesWindow::updateControls(bool force)
 {
 	// If the window isn't visible, do nothing...
-	if (!isVisible()) return;
+	if ((!isVisible()) && (!force) ) return;
 
 	refreshing_ = true;
 

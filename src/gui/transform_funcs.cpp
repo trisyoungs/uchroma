@@ -208,10 +208,10 @@ void TransformWindow::updateAndShow()
 }
 
 // Update controls
-void TransformWindow::updateControls()
+void TransformWindow::updateControls(bool force)
 {
 	// If the window isn't visible, do nothing...
-	if (!isVisible()) return;
+	if ((!isVisible()) && (!force) ) return;
 
 	// Check for invalid Collection
 	Collection* currentCollection = uChroma_.currentCollection();

@@ -767,9 +767,7 @@
           <zorder>AxisXTicksStartSpin</zorder>
           <zorder>label_6</zorder>
           <zorder>AxisXAutoTicksCheck</zorder>
-          <zorder>AxisXTicksStartDeltaAutoWidget</zorder>
           <zorder>AxisXTicksWidget</zorder>
-          <zorder>verticalSpacer</zorder>
          </widget>
          <widget class="QWidget" name="XAxisStyleTab">
           <attribute name="title">
@@ -1137,7 +1135,6 @@
       <zorder>XAxisLimitsGroup</zorder>
       <zorder>XAxisCrossGroup</zorder>
       <zorder>XAxisTabs</zorder>
-      <zorder>AxisXTicksStartDeltaAutoWidget</zorder>
       <zorder>AxisXAutoTicksCheck</zorder>
      </widget>
      <widget class="QWidget" name="YAxisTab">

@@ -23,16 +23,15 @@
 #include "gui/uchroma.h"
 
 // Construct normal / colour data for slice specified
-void Viewer::constructSurfaceStrip(Data2D* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, const ColourScale& colourScale, Data2D* previousSlice, Data2D* nextSlice)
+void Viewer::constructSurfaceStrip(const Array<double>& abscissa, DisplaySlice* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, const ColourScale& colourScale, DisplaySlice* previousSlice, DisplaySlice* nextSlice)
 {
 	normals.clear();
 	colours.clear();
 	if ((previousSlice == NULL) && (nextSlice == NULL)) return;
 	
 	// Grab references to target arrays
-	Array<double>& xTarget = targetSlice->arrayX();
-	Array<double>& yTarget = targetSlice->arrayY();
-	int nPoints = xTarget.nItems();
+	const Array<double>& yTarget = targetSlice->y();
+	int nPoints = abscissa.nItems();
 	if (nPoints < 2) return;
 
 	// Get colour data
@@ -40,7 +39,7 @@ void Viewer::constructSurfaceStrip(Data2D* targetSlice, double yAxisScale, Array
 	QColor colour;
 	for (n=0; n<nPoints; ++n)
 	{
-		colour = colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, yTarget[n]): yTarget[n]) / yAxisScale);
+		colour = colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, yTarget.value(n)): yTarget.value(n)) / yAxisScale);
 		colours.add(Vec4<GLfloat>(colour.redF(), colour.greenF(), colour.blueF(), colour.alphaF()));
 	}
 
@@ -50,15 +49,13 @@ void Viewer::constructSurfaceStrip(Data2D* targetSlice, double yAxisScale, Array
 	if (previousSlice && nextSlice)
 	{
 		// Grab other array references
-		Array<double>& xPrev = previousSlice->arrayX();
-		Array<double>& xNext = nextSlice->arrayX();
-		Array<double>& yPrev = previousSlice->arrayY();
-		Array<double>& yNext = nextSlice->arrayY();
+		const Array<double>& yPrev = previousSlice->y();
+		const Array<double>& yNext = nextSlice->y();
 		dz = previousSlice->z() - nextSlice->z();
 
 		// -- First point
-		v1.set(xTarget[1] - xTarget[0], yTarget[1] - yTarget[0], 0);
-		v2.set(0.0, yNext[0] - yPrev[0], dz);
+		v1.set(abscissa.value(1) - abscissa.value(0), yTarget.value(1) - yTarget.value(0), 0);
+		v2.set(0.0, yNext.value(0) - yPrev.value(0), dz);
 		normals.add(v1 * v2);
 // 		v3 = v1 * v2;
 // 		v3.normalise();
@@ -67,8 +64,8 @@ void Viewer::constructSurfaceStrip(Data2D* targetSlice, double yAxisScale, Array
 		// -- Points 1 to N-2
 		for (n=1; n<nPoints-1; ++n)
 		{
-			v1.set(xTarget[n+1] - xTarget[n-1], yTarget[n+1] - yTarget[n-1], 0.0);
-			v2.set(0.0, yNext[n] - yPrev[n], dz);
+			v1.set(abscissa.value(n+1) - abscissa.value(n-1), yTarget.value(n+1) - yTarget.value(n-1), 0.0);
+			v2.set(0.0, yNext.value(n) - yPrev.value(n), dz);
 			normals.add(v1 * v2);
 // 			v3 = v1 * v2;
 // 			v3.normalise();
@@ -76,8 +73,8 @@ void Viewer::constructSurfaceStrip(Data2D* targetSlice, double yAxisScale, Array
 // 			printf("Norm %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		}
 		// -- Last point
-		v1.set(xTarget[nPoints-1] - xTarget[nPoints-2], yTarget[nPoints-1] - yTarget[nPoints-2], 0.0);
-		v2.set(0.0, yPrev[nPoints-1] - yNext[nPoints-1], dz);
+		v1.set(abscissa.value(nPoints-1) - abscissa.value(nPoints-2), yTarget.value(nPoints-1) - yTarget.value(nPoints-2), 0.0);
+		v2.set(0.0, yPrev.value(nPoints-1) - yNext.value(nPoints-1), dz);
 		normals.add(v1 * v2);
 // 		v3 = v1 * v2;
 // 		v3.normalise();
@@ -87,12 +84,12 @@ void Viewer::constructSurfaceStrip(Data2D* targetSlice, double yAxisScale, Array
 	else if (previousSlice)
 	{
 		// Grab other array reference
-		Array<double>& yPrev = previousSlice->arrayY();
+		const Array<double>& yPrev = previousSlice->y();
 		dz = previousSlice->z() - targetSlice->z();
 
 		// -- First point
-		v1.set(xTarget[1] - xTarget[0], yTarget[1] - yTarget[0], 0.0);
-		v2.set(0.0, yTarget[0] - yPrev[0], dz);
+		v1.set(abscissa.value(1) - abscissa.value(0), yTarget.value(1) - yTarget.value(0), 0.0);
+		v2.set(0.0, yTarget.value(0) - yPrev.value(0), dz);
 		normals.add(v1 * v2);
 // 		v3 = v1 * v2;
 // 		v3.normalise();
@@ -101,8 +98,8 @@ void Viewer::constructSurfaceStrip(Data2D* targetSlice, double yAxisScale, Array
 		// -- Points 1 to N-2
 		for (n=1; n<nPoints-1; ++n)
 		{
-			v1.set(xTarget[n+1] - xTarget[n-1], yTarget[n+1] - yTarget[n-1], 0.0);
-			v2.set(0.0, yTarget[n] - yPrev[n], dz);
+			v1.set(abscissa.value(n+1) - abscissa.value(n-1), yTarget.value(n+1) - yTarget.value(n-1), 0.0);
+			v2.set(0.0, yTarget.value(n) - yPrev.value(n), dz);
 			normals.add(v1 * v2);
 // 			v3 = v1 * v2;
 // 			v3.normalise();
@@ -110,8 +107,8 @@ void Viewer::constructSurfaceStrip(Data2D* targetSlice, double yAxisScale, Array
 // 			printf("Last %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		}
 		// -- Last point
-		v1.set(xTarget[nPoints-1] - xTarget[nPoints-2], yTarget[nPoints-1] - yTarget[nPoints-2], 0.0);
-		v2.set(0.0, yTarget[nPoints-1] - yPrev[nPoints-1], dz);
+		v1.set(abscissa.value(nPoints-1) - abscissa.value(nPoints-2), yTarget.value(nPoints-1) - yTarget.value(nPoints-2), 0.0);
+		v2.set(0.0, yTarget.value(nPoints-1) - yPrev.value(nPoints-1), dz);
 		normals.add(v1 * v2);
 // 		v3 = v1 * v2;
 // 		v3.normalise();
@@ -121,12 +118,12 @@ void Viewer::constructSurfaceStrip(Data2D* targetSlice, double yAxisScale, Array
 	else
 	{
 		// Grab other array reference
-		Array<double>& yNext = nextSlice->arrayY();
+		const Array<double>& yNext = nextSlice->y();
 		dz = targetSlice->z() - nextSlice->z();
 
 		// -- First point
-		v1.set(xTarget[1] - xTarget[0], yTarget[1] - yTarget[0], 0.0);
-		v2.set(0.0, yNext[0] - yTarget[0], dz);
+		v1.set(abscissa.value(1) - abscissa.value(0), yTarget.value(1) - yTarget.value(0), 0.0);
+		v2.set(0.0, yNext.value(0) - yTarget.value(0), dz);
 		normals.add(v1 * v2);
 // 		v3 = v1 * v2;
 // 		v3.normalise();
@@ -135,8 +132,8 @@ void Viewer::constructSurfaceStrip(Data2D* targetSlice, double yAxisScale, Array
 		// -- Points 1 to N-2
 		for (n=1; n<nPoints-1; ++n)
 		{
-			v1.set(xTarget[n+1] - xTarget[n-1], yTarget[n+1] - yTarget[n-1], 0.0);
-			v2.set(0.0, yNext[n] - yTarget[n], dz);
+			v1.set(abscissa.value(n+1) - abscissa.value(n-1), yTarget.value(n+1) - yTarget.value(n-1), 0.0);
+			v2.set(0.0, yNext.value(n) - yTarget.value(n), dz);
 			normals.add(v1 * v2);
 // 			v3 = v1 * v2;
 // 			v3.normalise();
@@ -144,8 +141,8 @@ void Viewer::constructSurfaceStrip(Data2D* targetSlice, double yAxisScale, Array
 // 			printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f)\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		}
 		// -- Last point
-		v1.set(xTarget[nPoints-1] - xTarget[nPoints-2], yTarget[nPoints-1] - yTarget[nPoints-2], 0.0);
-		v2.set(0.0, yNext[nPoints-1] - yTarget[nPoints-1], dz);
+		v1.set(abscissa.value(nPoints-1) - abscissa.value(nPoints-2), yTarget.value(nPoints-1) - yTarget.value(nPoints-2), 0.0);
+		v2.set(0.0, yNext.value(nPoints-1) - yTarget.value(nPoints-1), dz);
 		normals.add(v1 * v2);
 // 		v3 = v1 * v2;
 // 		v3.normalise();
@@ -158,7 +155,7 @@ void Viewer::constructSurfaceStrip(Data2D* targetSlice, double yAxisScale, Array
 }
 
 // Construct full surface representation of data
-void Viewer::constructFullSurface(Primitive& primitive, List<Data2D>& displayData, ColourScale colourScale)
+void Viewer::constructFullSurface(Primitive& primitive, const Array<double>& abscissa, List<DisplaySlice>& displayData, ColourScale colourScale)
 {
 	// Set primitive options
 	primitive.setType(GL_TRIANGLES);
@@ -176,53 +173,44 @@ void Viewer::constructFullSurface(Primitive& primitive, List<Data2D>& displayDat
 	double yAxisScale = uChroma_->axisStretch(1);
 	Vec3<double> nrm(0.0, 1.0, 0.0);
 
-	// We need to skip over slices with zero points, so construct a reflist here of those which contain usable data
-	RefList<Data2D,int> slices;
-	for (Data2D* slice = displayData.first(); slice != NULL; slice = slice->next) if (slice->nPoints() > 1) slices.add(slice);
-
-	// If there are not enough slices with a valid number of points
-	if (slices.nItems() < 2) return;
+	// Return now if there are not enough slices to work with
+	if (displayData.nItems() < 2) return;
 
 	// Construct first slice data and set initial min/max values
-	RefListItem<Data2D,int>* ri = slices.first();
-	constructSurfaceStrip(ri->item, yAxisScale, normA, colourA, colourScale, NULL, ri->next ? ri->next->item : NULL);
-	if (slices.nItems() < 2) return;
-	int nPoints = slices.first()->item->nPoints();
+	DisplaySlice* sliceA = displayData.first();
+	constructSurfaceStrip(abscissa, sliceA, yAxisScale, normA, colourA, colourScale, NULL, sliceA->next);
+	int nPoints = abscissa.nItems();
 	
 	// Create triangles
-	for (RefListItem<Data2D,int>* rj = ri->next; rj != NULL; rj = rj->next)
+	for (DisplaySlice* sliceB = sliceA->next; sliceB != NULL; sliceB = sliceB->next)
 	{
 		// Grab slice pointers
-		Data2D* sliceA = ri->item;
-		Data2D* sliceB = rj->item;
-		Data2D* sliceC = (rj->next == NULL ? NULL : rj->next->item);
+		DisplaySlice* sliceC = (sliceB->next == NULL ? NULL : sliceB->next);
 
 		// Construct data for current slice
-		constructSurfaceStrip(sliceB, yAxisScale, normB, colourB, colourScale, sliceA, sliceC);
+		constructSurfaceStrip(abscissa, sliceB, yAxisScale, normB, colourB, colourScale, sliceA, sliceC);
 
 		// Grab z values
 		zA = (GLfloat) sliceA->z();
 		zB = (GLfloat) sliceB->z();
 	
 		// Get nPoints, and initial coordinates
-		Array<double>& xA = sliceA->arrayX();
-		Array<double>& yA = sliceA->arrayY();
-		Array<double>& xB = sliceB->arrayX();
-		Array<double>& yB = sliceB->arrayY();
+		const Array<double>& yA = sliceA->y();
+		const Array<double>& yB = sliceB->y();
 		for (int n=0; n<nPoints-1; ++n)
 		{
 			// Add triangles for this quadrant
-			primitive.defineVertex(xA[n], yA[n], zA, normA[n], colourA[n], true);
-			primitive.defineVertex(xA[n+1], yA[n+1], zA, normA[n+1], colourA[n+1], true);
-			primitive.defineVertex(xB[n+1], yB[n+1], zB, normB[n+1], colourB[n+1], true);
-			primitive.defineVertex(xA[n], yA[n], zA, normA[n], colourA[n], true);
-			primitive.defineVertex(xB[n], yB[n], zB, normB[n], colourB[n], true);
-			primitive.defineVertex(xB[n+1], yB[n+1], zB, normB[n+1], colourB[n+1], true);
+			primitive.defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n], true);
+			primitive.defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n+1], true);
+			primitive.defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1], true);
+			primitive.defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n], true);
+			primitive.defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n], true);
+			primitive.defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1], true);
 		}
 
 		// Copy arrays ready for next pass
 		normA = normB;
 		colourA = colourB;
-		ri = rj;
+		sliceA = sliceB;
 	}
 }

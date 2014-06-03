@@ -38,6 +38,7 @@
 class ColourScale;
 class UChromaWindow;
 class Collection;
+class DisplaySlice;
 
 // Base rendering widget
 class Viewer : public QGLWidget
@@ -235,11 +236,11 @@ class Viewer : public QGLWidget
 	// Setup basic GL properties
 	void setupGL();
 	// Construct line surface representation of data
-	void constructLineSurface(Primitive& primitive, List< Data2D >& displayData, ColourScale colourScale);
+	void constructLineSurface(Primitive& primitive, const Array<double>& abscissa, List< DisplaySlice >& displayData, ColourScale colourScale);
 	// Construct normal / colour surface data for slice specified
-	void constructSurfaceStrip(Data2D* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, const ColourScale& colourScale, Data2D* previousSlice, Data2D* nextSlice);
+	void constructSurfaceStrip(const Array<double>& abscissa, DisplaySlice* targetSlice, double yAxisScale, Array< Vec3< double > >& normals, Array< Vec4< GLfloat > >& colours, const ColourScale& colourScale, DisplaySlice* previousSlice, DisplaySlice* nextSlice);
 	// Construct full surface representation of data
-	void constructFullSurface(Primitive& primitive, List< Data2D >& displayData, ColourScale colourScale);
+	void constructFullSurface(Primitive& primitive, const Array<double>& abscissa, List<DisplaySlice>& displayData, ColourScale colourScale);
 	// Create/update surface primitive for specified collection
 	void updateSurfacePrimitive(Collection* collection, bool forceUpdate = false);
 

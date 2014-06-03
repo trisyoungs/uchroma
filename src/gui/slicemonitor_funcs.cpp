@@ -64,10 +64,10 @@ void SliceMonitorWindow::updateAndShow()
 }
 
 // Update controls
-void SliceMonitorWindow::updateControls()
+void SliceMonitorWindow::updateControls(bool force)
 {
 	// If the window isn't visible, do nothing...
-	if (!isVisible()) return;
+	if ((!isVisible()) && (!force) ) return;
 
 	if (uChroma_.sliceAxis() == -1)
 	{

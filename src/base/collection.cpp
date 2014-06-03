@@ -20,6 +20,7 @@
 */
 
 #include "base/collection.h"
+#include <limits>
 
 // Constructor
 Collection::Collection() : ListItem<Collection>()
@@ -215,6 +216,7 @@ void Collection::setSliceZ(Slice* target, double z)
 
 	dataChanged_ = true;
 	displayDataValid_ = false;
+	displayPrimitiveValid_ = false;
 }
 
 // Set data of specified slice
@@ -231,6 +233,7 @@ void Collection::setSliceData(Slice* target, Data2D* newData)
 
 	dataChanged_ = true;
 	displayDataValid_ = false;
+	displayPrimitiveValid_ = false;
 }
 
 // Return first slice in list
@@ -264,6 +267,8 @@ void Collection::clearSlices()
 {
 	slices_.clear();
 	displayData_.clear();
+
+	dataChanged_ = true;
 	displayDataValid_ = false;
 	displayPrimitiveValid_ = false;
 }
@@ -764,8 +769,14 @@ bool Collection::visible()
 	return visible_;
 }
 
+// Return transformed display abscissa for data
+const Array<double>& Collection::displayAbscissa() const
+{
+	return displayAbscissa_;
+}
+
 // Return transformed data to display
-List<Data2D>& Collection::displayData()
+List<DisplaySlice>& Collection::displayData()
 {
 	return displayData_;
 }
@@ -814,7 +825,11 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 	// Is surface reconstruction necessary?
 	if (displayDataValid_) return;
 
-	// Clear existing display slices
+	// Make sure transforms are up to date
+	updateLimitsAndTransforms();
+
+	// Clear old displayData_ and create temporary Data2D list for display data construction
+	List<Data2D> transformedData;
 	displayData_.clear();
 	double x, y;
 
@@ -822,6 +837,9 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 	Slice* slice = axisInverted.z ? slices_.last() : slices_.first();
 	while (slice)
 	{
+		// Check for slice with no points...
+		if (slice->data().nPoints() == 0) continue;
+
 		// Z
 		double z = slice->transformedData().z();
 		// -- Is the transformed Z value within range?
@@ -834,11 +852,12 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 		else if (axisInverted.z) z = (axisMax.z - z) + axisMin.z;
 		else if (axisLogarithmic.z) z = log10(z);
 
-		// Add new item to surfaceData_ array
-		Data2D* surfaceSlice = displayData_.add();
-		surfaceSlice->setZ(z * axisStretch.z);
+		// Add new item to transformedData and displayData_ arrays
+		Data2D* surfaceSlice = transformedData.add();
+		DisplaySlice* displaySlice = displayData_.add();
+		displaySlice->setZ(z * axisStretch.z);
 
-		// Copy / interpolate arrays
+		// Copy / interpolate raw data arrays
 		Array<double> array[2];
 		if (interpolate_.x)
 		{
@@ -857,7 +876,7 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 			array[1] = slice->transformedData().arrayY();
 		}
 
-		// Add data to surfaceSlice, obeying defined x-limits
+		// Now add data to surfaceSlice, obeying defined x-limits
 		if (axisInverted.x) for (int n=array[0].nItems()-1; n >= 0; --n)
 		{
 			x = array[0].value(n);
@@ -890,6 +909,92 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 
 		// Move to next Z slice
 		slice = axisInverted.z ? slice->prev : slice->next;
+	}
+
+	// Construct common x scale for data, and create y value data
+	// We have already pruned out those slices with no data points, so no checks for this are necessary
+	int n, nFinished = 0, nTransformedSlices = transformedData.nItems();
+	Data2D** data = transformedData.array();
+	double lowest;
+
+	// -- Set up initial array indices and nFinished count
+	Array<int> i(nTransformedSlices);
+	for (n=0; n<nTransformedSlices; ++n)
+	{
+		if (data[n]->nPoints() == 0)
+		{
+			i[n] = -1;
+			++nFinished;
+		}
+		else i[n] = 0;
+	}
+	DisplaySlice** slices = displayData_.array();
+	displayAbscissa_.clear();
+	// -- Loop over all datasets simultaneously, seeking next lowest point in their x data
+	int test = 0;
+	while (nFinished != nTransformedSlices)
+	{
+		// Find lowest point of current x values
+		lowest = std::numeric_limits<double>::max();
+		for (n = 0; n< nTransformedSlices; ++n)
+		{
+			// If we have exhausted this slice's data, move on
+			if (i[n] == -1) continue;
+			if (data[n]->x(i[n]) <= lowest) lowest = data[n]->x(i[n]);
+		}
+
+		// Now have lowest x value, so add new x point to abscissa...
+		displayAbscissa_.add(lowest);
+
+		// ...and add y values/flags from slice data to new displayData_
+		for (n = 0; n< nTransformedSlices; ++n)
+		{
+			// If we have exhausted this slice's data, add a dummy value.
+			// Otherwise, check how close the X-value is to 'lowest'
+			if (i[n] == -1) slices[n]->addDummy();
+			else if (fabs(data[n]->x(i[n]) - lowest) < 1.0e-5)
+			{
+				slices[n]->add(data[n]->y(i[n]));
+				++i[n];
+				if (i[n] == data[n]->nPoints())
+				{
+					i[n] = -1;
+					++nFinished;
+				}
+			}
+			else slices[n]->addDummy();
+		}
+	}
+
+	// Finally, interpolate values over dummy points (where the dummy points are surrounded by actual values)
+	int lastReal, m, o;
+	double yWidth, xWidth, position;
+	for (n = 0; n < nTransformedSlices; ++n)
+	{
+		lastReal = -1;
+		const Array<bool>& yExists = slices[n]->yExists();
+		const Array<double>& y = slices[n]->y();
+		for (m = 0; m < displayAbscissa_.nItems(); ++m)
+		{
+			// If this point is a real value, interpolate up to here from the last real point (if one exists and it is more than one element away)
+			if (yExists.value(m))
+			{
+				if (lastReal == -1) lastReal = m;
+				else if ((m - lastReal) == 1) lastReal = m;
+				else
+				{
+					// Interpolate from 'lastReal' index up to here
+					xWidth = displayAbscissa_[m] - displayAbscissa_[lastReal]; 
+					yWidth = y.value(m) - y.value(lastReal);
+					for (o = lastReal+1; o<=m; ++o)
+					{
+						position = (displayAbscissa_[o] - displayAbscissa_[lastReal]) / xWidth;
+						slices[n]->setY(o, y.value(lastReal) + yWidth*position);
+					}
+				}
+				lastReal = m;
+			}
+		}
 	}
 
 	// Data has been updated - surface primitive will need to be reconstructed

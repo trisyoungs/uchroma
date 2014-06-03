@@ -120,12 +120,12 @@ void Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate)
 	switch (collection->displayStyle())
 	{
 		case (Collection::LineStyle):
-			constructLineSurface(primitive, collection->displayData(), collection->colourScale());
+			constructLineSurface(primitive, collection->displayAbscissa(), collection->displayData(), collection->colourScale());
 			break;
 		case (Collection::GridStyle):
 			break;
 		case (Collection::SurfaceStyle):
-			constructFullSurface(primitive, collection->displayData(), collection->colourScale());
+			constructFullSurface(primitive, collection->displayAbscissa(), collection->displayData(), collection->colourScale());
 			break;
 	}
 

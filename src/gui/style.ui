@@ -730,12 +730,7 @@
     </layout>
    </item>
   </layout>
-  <zorder>layoutWidget</zorder>
-  <zorder>layoutWidget_2</zorder>
   <zorder>AlphaGroup</zorder>
-  <zorder></zorder>
-  <zorder>AlphaGroup</zorder>
-  <zorder></zorder>
  </widget>
  <customwidgets>
   <customwidget>

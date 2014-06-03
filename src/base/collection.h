@@ -254,7 +254,9 @@ class Collection : public ListItem<Collection>
 	// Whether data is visible
 	bool visible_;
 	// Transformed data to display
-	List<Data2D> displayData_;
+	List<DisplaySlice> displayData_;
+	// Abscissa values for display data
+	Array<double> displayAbscissa_;
 	// Display style of data
 	DisplayStyle displayStyle_;
 	// Flag indicating whether display data is valid (and doesn't need to be regenerated)
@@ -269,8 +271,10 @@ class Collection : public ListItem<Collection>
 	bool setVisible(bool visible);
 	// Return hether data is visible
 	bool visible();
+	// Return transformed display abscissa for data
+	const Array<double>& displayAbscissa() const;
 	// Return transformed data to display
-	List<Data2D>& displayData();
+	List<DisplaySlice>& displayData();
 	// Set display style of data
 	void setDisplayStyle(DisplayStyle style);
 	// Return display style of data
