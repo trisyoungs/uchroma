@@ -3,7 +3,7 @@ project(uChroma)
 set(DESCRIPTION "uChroma")
 set(AUTHOR "Tristan Youngs")
 set(VERSION_MAJOR "0")
-set(VERSION_MINOR "68")
+set(VERSION_MINOR "69")
 
 set(CMAKE_BUILD_TYPE "Release")
 
