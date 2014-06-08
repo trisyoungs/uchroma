@@ -1,5 +1,13 @@
 <RCC>
   <qresource prefix="/uchroma">
+    <file>icons/windows_axes.svg</file>
+    <file>icons/windows_collections.svg</file>
+    <file>icons/windows_style.svg</file>
+    <file>icons/file_save.svg</file>
+    <file>icons/file_close.svg</file>
+    <file>icons/file_saveas.svg</file>
+    <file>icons/file_new.svg</file>
+    <file>icons/file_open.svg</file>
     <file>icons/tocentre.svg</file>
     <file>icons/uchroma.png</file>
     <file>icons/tozero.svg</file>

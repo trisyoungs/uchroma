@@ -323,6 +323,12 @@
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
+   <property name="iconSize">
+    <size>
+     <width>20</width>
+     <height>20</height>
+    </size>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -383,6 +389,10 @@
    </property>
   </action>
   <action name="actionFileLoad">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/file_open.svg</normaloff>:/uchroma/icons/file_open.svg</iconset>
+   </property>
    <property name="text">
     <string>&amp;Load</string>
    </property>
@@ -391,6 +401,10 @@
    </property>
   </action>
   <action name="actionFileSave">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/file_save.svg</normaloff>:/uchroma/icons/file_save.svg</iconset>
+   </property>
    <property name="text">
     <string>&amp;Save</string>
    </property>
@@ -407,6 +421,10 @@
    </property>
   </action>
   <action name="actionFileSaveAs">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/file_saveas.svg</normaloff>:/uchroma/icons/file_saveas.svg</iconset>
+   </property>
    <property name="text">
     <string>Save &amp;As</string>
    </property>
@@ -430,6 +448,10 @@
    </property>
   </action>
   <action name="actionFileNew">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/file_new.svg</normaloff>:/uchroma/icons/file_new.svg</iconset>
+   </property>
    <property name="text">
     <string>&amp;New</string>
    </property>
@@ -476,6 +498,10 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/windows_axes.svg</normaloff>:/uchroma/icons/windows_axes.svg</iconset>
+   </property>
    <property name="text">
     <string>&amp;Axes</string>
    </property>
@@ -489,6 +515,10 @@
   <action name="actionWindowsStyle">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/windows_style.svg</normaloff>:/uchroma/icons/windows_style.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Style</string>
@@ -532,6 +562,10 @@
    </property>
    <property name="checked">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/windows_collections.svg</normaloff>:/uchroma/icons/windows_collections.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Collections</string>
