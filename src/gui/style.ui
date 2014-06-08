@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>374</width>
-    <height>676</height>
+    <width>381</width>
+    <height>714</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="icons.qrc">
-    <normaloff>:/uchroma/icons/uchroma.png</normaloff>:/uchroma/icons/uchroma.png</iconset>
+    <normaloff>:/uchroma/icons/windows_style.svg</normaloff>:/uchroma/icons/windows_style.svg</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
@@ -730,7 +730,6 @@
     </layout>
    </item>
   </layout>
-  <zorder>AlphaGroup</zorder>
  </widget>
  <customwidgets>
   <customwidget>

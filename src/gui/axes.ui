@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>357</width>
-    <height>396</height>
+    <width>373</width>
+    <height>425</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="icons.qrc">
-    <normaloff>:/uchroma/icons/uchroma.png</normaloff>:/uchroma/icons/uchroma.png</iconset>
+    <normaloff>:/uchroma/icons/windows_axes.svg</normaloff>:/uchroma/icons/windows_axes.svg</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -764,10 +764,6 @@
             </spacer>
            </item>
           </layout>
-          <zorder>AxisXTicksStartSpin</zorder>
-          <zorder>label_6</zorder>
-          <zorder>AxisXAutoTicksCheck</zorder>
-          <zorder>AxisXTicksWidget</zorder>
          </widget>
          <widget class="QWidget" name="XAxisStyleTab">
           <attribute name="title">
@@ -1132,10 +1128,6 @@
         </widget>
        </item>
       </layout>
-      <zorder>XAxisLimitsGroup</zorder>
-      <zorder>XAxisCrossGroup</zorder>
-      <zorder>XAxisTabs</zorder>
-      <zorder>AxisXAutoTicksCheck</zorder>
      </widget>
      <widget class="QWidget" name="YAxisTab">
       <attribute name="title">
@@ -2197,10 +2189,6 @@
         </widget>
        </item>
       </layout>
-      <zorder>YAxisTabs</zorder>
-      <zorder>AxisYTicksStartSpin</zorder>
-      <zorder>label_10</zorder>
-      <zorder>AxisYAutoTicksCheck</zorder>
      </widget>
      <widget class="QWidget" name="ZAxisTab">
       <attribute name="title">

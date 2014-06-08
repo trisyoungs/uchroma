@@ -258,7 +258,7 @@
      <x>0</x>
      <y>0</y>
      <width>1092</width>
-     <height>23</height>
+     <height>31</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -505,6 +505,9 @@
    <property name="text">
     <string>&amp;Axes</string>
    </property>
+   <property name="toolTip">
+    <string>Adjust axis limits and axis style</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
    </property>
@@ -523,21 +526,38 @@
    <property name="text">
     <string>&amp;Style</string>
    </property>
+   <property name="toolTip">
+    <string>Set colour and visual style of current collection</string>
+   </property>
   </action>
   <action name="actionWindowsTransform">
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/windows_transform.svg</normaloff>:/uchroma/icons/windows_transform.svg</iconset>
+   </property>
    <property name="text">
     <string>&amp;Transform</string>
+   </property>
+   <property name="toolTip">
+    <string>Set x, y, and z data transforms for current collection</string>
    </property>
   </action>
   <action name="actionWindowsData">
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/windows_data.svg</normaloff>:/uchroma/icons/windows_data.svg</iconset>
+   </property>
    <property name="text">
     <string>&amp;Data</string>
+   </property>
+   <property name="toolTip">
+    <string>Add/remove data slices in current collection</string>
    </property>
   </action>
   <action name="actionWindowsView">
@@ -569,6 +589,9 @@
    </property>
    <property name="text">
     <string>&amp;Collections</string>
+   </property>
+   <property name="toolTip">
+    <string>Show list of all data collections</string>
    </property>
   </action>
  </widget>

@@ -15,7 +15,7 @@
    height="100"
    id="svg2"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="file_save.svg">
+   sodipodi:docname="file_saveas.svg">
   <metadata
      id="metadata3127">
     <rdf:RDF>
@@ -24,7 +24,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -37,15 +37,15 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1920"
-     inkscape:window-height="1140"
+     inkscape:window-width="1600"
+     inkscape:window-height="844"
      id="namedview3125"
      showgrid="false"
-     inkscape:zoom="2.36"
-     inkscape:cx="27.69277"
-     inkscape:cy="31.582531"
-     inkscape:window-x="1920"
-     inkscape:window-y="25"
+     inkscape:zoom="4"
+     inkscape:cx="90.929756"
+     inkscape:cy="31.281806"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
   <defs
@@ -93,44 +93,14 @@
     <linearGradient
        id="linearGradient5375">
       <stop
-         style="stop-color:#b3b2b0;stop-opacity:1;"
+         style="stop-color:#787878;stop-opacity:1;"
          offset="0"
          id="stop5377" />
       <stop
-         style="stop-color:#8f8f8f;stop-opacity:0.70588237;"
+         style="stop-color:#646464;stop-opacity:0.70588237;"
          offset="1"
          id="stop5379" />
     </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient5375"
-       id="linearGradient5969"
-       x1="-0.91818857"
-       y1="47.270142"
-       x2="95.407005"
-       y2="47.270142"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.95446209,0,0,0.954463,5.1187512,5.5425141)" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient5375"
-       id="linearGradient5977"
-       x1="24.537582"
-       y1="18.243332"
-       x2="74.977882"
-       y2="18.243332"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.95446209,0,0,0.954463,5.1187512,5.5425141)" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient5375"
-       id="linearGradient5985"
-       x1="12.53134"
-       y1="69.191803"
-       x2="82.233597"
-       y2="69.191803"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.95446209,0,0,0.954463,5.1187512,5.5425141)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient5375"
@@ -141,16 +111,58 @@
        y2="87.699066"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(0.95446209,0,0,0.954463,5.1187512,5.5425141)" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5375"
+       id="radialGradient3814"
+       cx="52.610619"
+       cy="22.955099"
+       fx="52.610619"
+       fy="22.955099"
+       r="24.16275"
+       gradientTransform="matrix(1,0,0,0.76064609,0,5.4943926)"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5375"
+       id="radialGradient3816"
+       cx="50.21175"
+       cy="50.660114"
+       fx="50.21175"
+       fy="50.660114"
+       r="46.060452"
+       gradientTransform="translate(0,-4.5589257e-5)"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5375"
+       id="radialGradient3818"
+       cx="50.343517"
+       cy="71.583527"
+       fx="50.343517"
+       fy="71.583527"
+       r="33.355156"
+       gradientTransform="matrix(1,0,0,0.75451271,0,17.572846)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3921"
+       id="linearGradient3822"
+       x1="4.1512995"
+       y1="50.660114"
+       x2="96.272202"
+       y2="50.660114"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <path
      d="m 6.1512993,6.5996214 76.5409107,0 11.57999,11.0151206 0,77.105863 -88.1209007,0 0,-88.1209836 0,0 z"
      id="rect5048"
-     style="fill:url(#linearGradient2191);fill-opacity:1;fill-rule:evenodd;stroke:url(#linearGradient5969);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+     style="fill:url(#linearGradient3822);fill-opacity:1;fill-rule:evenodd;stroke:url(#radialGradient3816);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
      inkscape:connector-curvature="0" />
   <path
      d="m 30.447868,6.5757967 0,32.7586043 44.325502,0 0,-32.7586043 -44.325502,0 0,0 z m 28.356237,5.9992713 10.401603,0 0,21.191666 -10.401603,0 0,-21.191666 0,0 z"
      id="rect5051"
-     style="fill:url(#linearGradient2188);fill-opacity:1;fill-rule:evenodd;stroke:url(#linearGradient5977);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+     style="fill:url(#linearGradient2188);fill-opacity:1;fill-rule:evenodd;stroke:url(#radialGradient3814);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
      inkscape:connector-curvature="0" />
   <rect
      width="62.710312"
@@ -158,7 +170,7 @@
      x="18.988363"
      y="48.416637"
      id="rect5080"
-     style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:url(#linearGradient5985);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+     style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:url(#radialGradient3818);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
   <rect
      width="5.6790729"
      height="5.0214405"
