@@ -10,6 +10,11 @@
     <height>894</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>uChroma</string>
   </property>
@@ -221,30 +226,6 @@
            </layout>
           </widget>
          </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_11">
-           <item>
-            <widget class="QLabel" name="NTrianglesLabel">
-             <property name="text">
-              <string>NTriangles: 0</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
         </layout>
        </item>
       </layout>
@@ -258,7 +239,7 @@
      <x>0</x>
      <y>0</y>
      <width>1092</width>
-     <height>31</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -301,7 +282,7 @@
     <property name="title">
      <string>&amp;Windows</string>
     </property>
-    <addaction name="actionWindowCollections"/>
+    <addaction name="actionWindowsCollections"/>
     <addaction name="separator"/>
     <addaction name="actionWindowsData"/>
     <addaction name="actionWindowsStyle"/>
@@ -341,8 +322,16 @@
    <addaction name="actionFileSaveAs"/>
   </widget>
   <widget class="QToolBar" name="WindowsToolBar">
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
    <property name="windowTitle">
     <string>toolBar</string>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextBesideIcon</enum>
    </property>
    <attribute name="toolBarArea">
     <enum>LeftToolBarArea</enum>
@@ -350,7 +339,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionWindowCollections"/>
+   <addaction name="actionWindowsCollections"/>
    <addaction name="separator"/>
    <addaction name="actionWindowsData"/>
    <addaction name="actionWindowsStyle"/>
@@ -564,6 +553,10 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/windows_view.svg</normaloff>:/uchroma/icons/windows_view.svg</iconset>
+   </property>
    <property name="text">
     <string>&amp;View</string>
    </property>
@@ -576,7 +569,7 @@
     <string>S&amp;lices</string>
    </property>
   </action>
-  <action name="actionWindowCollections">
+  <action name="actionWindowsCollections">
    <property name="checkable">
     <bool>true</bool>
    </property>

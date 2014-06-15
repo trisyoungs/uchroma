@@ -160,6 +160,9 @@ class UChromaWindow : public QMainWindow
 	void on_CollectionAddButton_clicked(bool checked);
 	void on_CollectionRemoveButton_clicked(bool checked);
 
+	public:
+	void refreshCollections(bool updateToolTipsOnly = false);
+
 
 	/*
 	 * Right Tabs -- Surface
@@ -170,15 +173,13 @@ class UChromaWindow : public QMainWindow
 	void on_SurfaceSliceYRadio_clicked(bool checked);
 	void on_SurfaceSliceZRadio_clicked(bool checked);
 
-	public:
-
 
 	/*
 	 * Update
 	 */
 	public:
 	// Update all aspects of GUI
-	void updateGUI(bool refreshCollectionList = false);
+	void updateGUI();
 	// Update all subwindows
 	void updateSubWindows();
 	// Update title bar

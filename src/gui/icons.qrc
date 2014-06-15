@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/uchroma">
+    <file>icons/windows_view.svg</file>
     <file>icons/windows_data.svg</file>
     <file>icons/windows_transform.svg</file>
     <file>icons/windows_axes.svg</file>

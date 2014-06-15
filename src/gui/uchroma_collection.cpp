@@ -61,7 +61,7 @@ void UChromaWindow::on_CollectionAddButton_clicked(bool checked)
 {
 	addCollection();
 
-	updateGUI(true);
+	updateGUI();
 }
 
 void UChromaWindow::on_CollectionRemoveButton_clicked(bool checked)
@@ -69,5 +69,22 @@ void UChromaWindow::on_CollectionRemoveButton_clicked(bool checked)
 	if (!currentCollection_) return;
 	removeCollection(currentCollection_);
 
-	updateGUI(true);
+	updateGUI();
+}
+
+void UChromaWindow::refreshCollections(bool updateToolTipsOnly)
+{
+	ui.CollectionList->clear();
+	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
+	{
+		QListWidgetItem* item = new QListWidgetItem(ui.CollectionList, 0);
+		item->setText(collection->title());
+		item->setData(Qt::UserRole, VariantPointer<Collection>(collection));
+		item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+		item->setCheckState(collection->visible() ? Qt::Checked : Qt::Unchecked);
+		item->setToolTip("Helloaslkdaskjdlksj");
+
+		// If this is the current collection, select it
+		if (collection == currentCollection_) item->setSelected(true);
+	}
 }
