@@ -104,7 +104,6 @@ class UChromaWindow : public QMainWindow
 	void on_actionFileLoad_triggered(bool checked);
 	void on_actionFileSave_triggered(bool checked);
 	void on_actionFileSaveAs_triggered(bool checked);
-	void on_actionFileImportData_triggered(bool checked);
 	void on_actionFileSaveImage_triggered(bool checked);
 	void on_actionFileQuit_triggered(bool checked);
 
@@ -122,11 +121,28 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
+	 * Collections Menu
+	 */
+	private slots:
+	void on_actionCollectionsNew_triggered(bool checked);
+	void on_actionCollectionsCreate_triggered(bool checked);
+	void on_actionCollectionsFocusNext_triggered(bool checked);
+	void on_actionCollectionsFocusPrevious_triggered(bool checked);
+
+
+	/*
+	 * Data Menu
+	 */
+	private slots:
+	void on_actionDataLoadXY_triggered(bool checked);
+	void on_actionDataImport_triggered(bool checked);
+
+
+	/*
 	 * Tools Menu
 	 */
 	private slots:
 	void on_actionToolsFitWindow_triggered(bool checked);
-	void on_actionToolsCreateData_triggered(bool checked);
 
 
 	/*
@@ -161,7 +177,7 @@ class UChromaWindow : public QMainWindow
 	void on_CollectionRemoveButton_clicked(bool checked);
 
 	public:
-	void refreshCollections(bool updateToolTipsOnly = false);
+	void refreshCollections();
 
 
 	/*
@@ -182,6 +198,8 @@ class UChromaWindow : public QMainWindow
 	void updateGUI();
 	// Update all subwindows
 	void updateSubWindows();
+	// Update collection info bar
+	void updateCollectionInfoBar();
 	// Update title bar
 	void updateTitleBar();
 	// Update display data (used for surfaces) in all collections
@@ -218,8 +236,8 @@ class UChromaWindow : public QMainWindow
 	bool loadInputFile(QString fileName);
 	// Save current input to file specified
 	bool saveInputFile(QString fileName);
-	// Flag data as modified and update titlebar
-	void setAsModified();
+	// Flag data as (not) modified and update titlebar
+	void setAsModified(bool isModified = true);
 
 
 	/*
@@ -264,6 +282,10 @@ class UChromaWindow : public QMainWindow
 	Collection* collections();
 	// Return nth collection in list
 	Collection* collection(int index);
+	// Move collection focus to next in list
+	void focusNextCollection();
+	// Move collection focus to previous in list
+	void focusPreviousCollection();
 	// Return currently-selected Collection
 	Collection* currentCollection();
 	// Clear current data

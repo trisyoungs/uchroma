@@ -92,7 +92,7 @@ void DataWindow::on_AddFilesButton_clicked(bool checked)
 	Collection* currentCollection = uChroma_.currentCollection();
 	if (!currentCollection) return;
 
-	QStringList files = QFileDialog::getOpenFileNames(this, "Select datafiles", currentCollection->dataFileDirectory().path(), "MINT files (*.mint01);;MDCS files (*.mdcs01);;Text files (*.txt);;All files (*)");
+	QStringList files = QFileDialog::getOpenFileNames(this, QString("Select XY datafiles (importing into '")+currentCollection->title()+"')", currentCollection->dataFileDirectory().path(), "MINT files (*.mint01);;MDCS files (*.mdcs01);;Text files (*.txt);;All files (*)");
 
 	QProgressDialog progress("Loading data...", "Abort Loading", 0, files.count(), this);
 	progress.setWindowModality(Qt::WindowModal);

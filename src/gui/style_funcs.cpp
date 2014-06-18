@@ -32,6 +32,8 @@ StyleWindow::StyleWindow(UChromaWindow& parent) : QWidget(&parent), uChroma_(par
 {
 	ui.setupUi(this);
 
+	refreshing_ = true;
+
 	// Add display styles to StyleCombo on Collection->Style tab
 	for (int n=0; n<Collection::nDisplayStyles; ++n) ui.StyleCombo->addItem( Collection::displayStyle((Collection::DisplayStyle) n));
 
@@ -72,6 +74,7 @@ void StyleWindow::on_StyleCombo_currentIndexChanged(int index)
 	// Update display
 	uChroma_.setAsModified();
 	uChroma_.updateDisplay();
+	uChroma_.updateCollectionInfoBar();
 }
 
 // Single Colour

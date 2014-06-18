@@ -236,7 +236,7 @@ void Viewer::paintGL()
 // 	triangleChopper_.sendToGL();
 // 	glPopClientAttrib();
 
-	// Loop over surface primitives
+	// Loop over collections
 	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next)
 	{
 		// If this collection is not visible, move on...
@@ -253,7 +253,9 @@ void Viewer::paintGL()
 			glLineWidth(lineWidth_);
 			glDisable(GL_LIGHTING);
 		}
-		collection->displayPrimitive().sendToGL();
+
+		// Send Primitives to display
+		collection->displayPrimitives().sendToGL();
 	}
 	
 	glDisable(GL_MULTISAMPLE);

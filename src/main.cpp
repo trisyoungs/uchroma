@@ -57,6 +57,9 @@ int main(int argc, char *argv[])
 	/* Show the main window */
 	mainWindow.show();
 
+	/* Set status to not modified, if we did not load a file */
+	if (argc != 2) mainWindow.setAsModified(false);
+
 	/* Enter Qt's main events loop */
 	return app.exec();
 }

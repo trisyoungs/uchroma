@@ -26,6 +26,7 @@
 #include "glext.h"
 #endif
 #include "gui/viewer_primitive.h"
+#include <string.h>
 
 // Declare static VBO functions (Windows only)
 #ifdef _WIN32
@@ -35,7 +36,6 @@ PFNGLBUFFERDATAPROC Primitive::glBufferData = NULL;
 PFNGLBUFFERSUBDATAPROC Primitive::glBufferSubData = NULL;
 PFNGLDELETEBUFFERSPROC Primitive::glDeleteBuffers = NULL;
 #endif
-
 
 /*
 // Primitive Instance
@@ -47,15 +47,26 @@ PrimitiveInstance::PrimitiveInstance() : ListItem<PrimitiveInstance>()
 	// Private variables
 	context_ = NULL;
 	type_ = PrimitiveInstance::ListInstance;
-	id_ = 0;
+	listObject_ = 0;
+	vboVertexObject_ = 0;
+	vboIndexObject_ = 0;
 }
 
-// Set data
-void PrimitiveInstance::set(const QGLContext *context, PrimitiveInstance::InstanceType type, GLuint id)
+// Set display list data
+void PrimitiveInstance::setDisplayList(const QGLContext *context, GLuint listObject)
 {
 	context_ = context;
-	type_ = type;
-	id_ = id;
+	type_ = PrimitiveInstance::ListInstance;
+	listObject_ = listObject;
+}
+
+// Set vbo object data
+void PrimitiveInstance::setVBO(const QGLContext *context, GLuint vertexObject, GLuint indexObject)
+{
+	context_ = context;
+	type_ = PrimitiveInstance::VBOInstance;
+	vboVertexObject_ = vertexObject;
+	vboIndexObject_ = indexObject;
 }
 
 // Return context to which primitive instance is associated
@@ -70,10 +81,22 @@ PrimitiveInstance::InstanceType PrimitiveInstance::type()
 	return type_;
 }
 
-// Return OpenGL ID of instance
-int PrimitiveInstance::id()
+// Return display list object for instance
+GLuint PrimitiveInstance::listObject()
 {
-	return id_;
+	return listObject_;
+}
+
+// Return VBO ID of vertex array for instance
+GLuint PrimitiveInstance::vboVertexObject()
+{
+	return vboVertexObject_;
+}
+
+// Return VBO ID of index array for instance
+GLuint PrimitiveInstance::vboIndexObject()
+{
+	return vboIndexObject_;
 }
 
 /*
@@ -84,10 +107,13 @@ int PrimitiveInstance::id()
 Primitive::Primitive() : ListItem<Primitive>()
 {
 	currentVertexChunk_ = NULL;
+	currentIndexChunk_ = NULL;
 	colouredVertexData_ = false;
 	type_ = GL_TRIANGLES;
 	nDefinedVertices_ = 0;
+	nDefinedIndices_ = 0;
 	useInstances_ = true;
+	useIndices_ = false;
 	name_ = "<UnnamedPrimitive>";
 }
 
@@ -108,6 +134,8 @@ void Primitive::clear()
 {
 	vertexChunks_.clear();
 	currentVertexChunk_ = NULL;
+	indexChunks_.clear();
+	currentIndexChunk_ = NULL;
 	nDefinedVertices_ = 0;
 }
 
@@ -116,6 +144,8 @@ void Primitive::forgetAll()
 {
 	for (VertexChunk *v = vertexChunks_.first(); v != NULL; v = v->next) v->forgetAll();
 	currentVertexChunk_ = vertexChunks_.first();
+	for (IndexChunk *i = indexChunks_.first(); i != NULL; i = i->next) i->forgetAll();
+	currentIndexChunk_ = indexChunks_.first();
 	nDefinedVertices_ = 0;
 }
 
@@ -123,6 +153,12 @@ void Primitive::forgetAll()
 int Primitive::nDefinedVertices()
 {
 	return nDefinedVertices_;
+}
+
+// Return number of indices currently defined in primitive
+int Primitive::nDefinedIndices()
+{
+	return nDefinedIndices_;
 }
 
 // Set GL drawing primitive type
@@ -233,18 +269,27 @@ void Primitive::setNoInstances()
 	useInstances_ = false;
 }
 
+// Set whether indexed vertex drawing is to be used
+void Primitive::setUseIndices(bool b)
+{
+	useIndices_ = b;
+}
+
 // Push instance of primitive
 void Primitive::pushInstance(const QGLContext *context)
 {
 	// Does this primitive use instances?
 	if (!useInstances_) return;
 
+	// Clear the error flag
+	glGetError();
+
 	// Vertex buffer object or plain old display list?
 	if (Primitive::defaultInstanceType_ == PrimitiveInstance::VBOInstance)
 	{
 		// Prepare local array of data to pass to VBO
 		int offset;
-		GLuint idVBO;
+		GLuint vertexVBO, indexVBO;
 		if (nDefinedVertices_ < 0)
 		{
 			printf("Error: No data in Primitive with which to create VBO.\n");
@@ -255,14 +300,22 @@ void Primitive::pushInstance(const QGLContext *context)
 		// Determine total size of array (in bytes) for VBO
 		int vboSize = nDefinedVertices_ * (colouredVertexData_ ? 10 : 6) * sizeof(GLfloat);
 		
-		// Generate VBO
-		glGenBuffers(1, &idVBO);
+		// Generate vertex array object
+		glGenBuffers(1, &vertexVBO);
 
 		// Bind VBO
-		glBindBuffer(GL_ARRAY_BUFFER, idVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
 		
 		// Initialise VBO data, but don't copy anything here
 		glBufferData(GL_ARRAY_BUFFER, vboSize, NULL, GL_STATIC_DRAW);
+		if (glGetError() != GL_NO_ERROR)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			printf("Error occurred while generating vertex buffer object for Primitive.\n");
+			glDeleteBuffers(1, &vertexVBO);
+			vertexVBO = 0;
+			return;
+		}
 
 	// 	GLfloat *bufdat = (GLfloat*) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
 	// // 	for (int n=0; n<30; ++n) printf("Buffer data %i is %f\n", n, bufdat[n]);
@@ -274,14 +327,44 @@ void Primitive::pushInstance(const QGLContext *context)
 		for (VertexChunk *chunk = vertexChunks_.first(); chunk != NULL; chunk = chunk->next)
 		{
 			chunksize = chunk->nDefinedVertices()*(colouredVertexData_ ? 10 : 6)*sizeof(GLfloat);
-			glBufferSubData(GL_ARRAY_BUFFER_ARB, offset, chunksize, chunk->vertexData());
+			glBufferSubData(GL_ARRAY_BUFFER, offset, chunksize, chunk->vertexData());
 			offset += chunksize;
 		}
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		
+
+		// Generate index array ovject (if using indices)
+		if (useIndices_)
+		{
+			// Generate vertex array object
+			glGenBuffers(1, &indexVBO);
+
+			// Bind VBO
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBO);
+			
+			// Initialise VBO data, but don't copy anything here
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, nDefinedIndices_*sizeof(GLuint), NULL, GL_STATIC_DRAW);
+			if (glGetError() != GL_NO_ERROR)
+			{
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+				printf("Error occurred while generating index buffer object for Primitive.\n");
+				glDeleteBuffers(1, &indexVBO);
+				indexVBO = 0;
+				return;
+			}
+
+			// Loop over stored IndexChunks and copy data to VBO
+			offset = 0;
+			for (IndexChunk *ichunk = indexChunks_.first(); ichunk != NULL; ichunk = ichunk->next)
+			{
+				chunksize = ichunk->nDefinedIndices()*sizeof(GLuint);
+				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, chunksize, ichunk->indexData());
+				offset += chunksize;
+			}
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		}
 		// Store data
 		PrimitiveInstance *pi = instances_.add();
-		pi->set(context, PrimitiveInstance::VBOInstance, idVBO);
+		pi->setVBO(context, vertexVBO, useIndices_ ? indexVBO : 0);
 	}
 	else
 	{
@@ -293,7 +376,7 @@ void Primitive::pushInstance(const QGLContext *context)
 
 		// Store data
 		PrimitiveInstance *pi = instances_.add();
-		pi->set(context, PrimitiveInstance::ListInstance, listId);
+		pi->setDisplayList(context, listId);
 	}
 }
 
@@ -310,10 +393,15 @@ void Primitive::popInstance(const QGLContext *context)
 			// Vertex buffer object or plain old display list?
 			if (pi->type() == PrimitiveInstance::VBOInstance)
 			{
-				GLuint bufid  = pi->id();
-				glDeleteBuffers(1, &bufid);
+				GLuint bufid  = pi->vboVertexObject();
+				if (bufid != 0) glDeleteBuffers(1, &bufid);
+				if (useIndices_)
+				{
+					bufid = pi->vboIndexObject();
+					if (bufid != 0) glDeleteBuffers(1, &bufid);
+				}
 			}
-			else glDeleteLists(pi->id(),1);
+			else glDeleteLists(pi->listObject(),1);
 		}
 	}
 	instances_.removeLast();
@@ -336,21 +424,25 @@ void Primitive::sendToGL()
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glEnableClientState(GL_NORMAL_ARRAY);
 			glEnableClientState(GL_COLOR_ARRAY);
-			glDisableClientState(GL_INDEX_ARRAY);
+			if (useIndices_) glEnableClientState(GL_INDEX_ARRAY);
+			else glDisableClientState(GL_INDEX_ARRAY);
 
-			// Bind VBO
-			glBindBuffer(GL_ARRAY_BUFFER, pi->id());
+			// Bind VBO and index buffer (if using it)
+			glBindBuffer(GL_ARRAY_BUFFER, pi->vboVertexObject());
+			if (useIndices_) glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pi->vboIndexObject());
 
 			glInterleavedArrays(colouredVertexData_ ? GL_C4F_N3F_V3F : GL_N3F_V3F, 0, NULL);
-			glDrawArrays(type_, 0, nDefinedVertices_);
+			if (useIndices_) glDrawElements(type_, nDefinedIndices_, GL_UNSIGNED_INT, 0);
+			else glDrawArrays(type_, 0, nDefinedVertices_);
 
 			// Revert to normal operation - pass 0 as VBO index
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glDisableClientState(GL_VERTEX_ARRAY);
 			glDisableClientState(GL_NORMAL_ARRAY);
 			glDisableClientState(GL_COLOR_ARRAY);
+			if (useIndices_) glDisableClientState(GL_INDEX_ARRAY);
 		}
-		else glCallList(pi->id());
+		else glCallList(pi->listObject());
 	}
 	else for (VertexChunk *chunk = vertexChunks_.first(); chunk != NULL; chunk = chunk->next) chunk->sendToGL();
 }

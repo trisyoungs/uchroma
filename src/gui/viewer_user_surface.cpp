@@ -155,12 +155,18 @@ void Viewer::constructSurfaceStrip(const Array<double>& abscissa, DisplaySlice* 
 }
 
 // Construct full surface representation of data
-void Viewer::constructFullSurface(Primitive& primitive, const Array<double>& abscissa, List<DisplaySlice>& displayData, ColourScale colourScale)
+void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplaySlice>& displayData, ColourScale colourScale)
 {
-	// Set primitive options
-	primitive.setType(GL_TRIANGLES);
-
 	GLfloat zA, zB;
+
+	// Forget all data in current primitives
+	primitives.forgetAll();
+
+	// Resize primitive list so it's large enough for our needs
+	primitives.resize(displayData.nItems()-1, false);
+
+	// Set primitive type to triangles
+	primitives.setType(GL_TRIANGLES);
 
 	// Sanity check - are there enough slices to proceed?
 	if (displayData.nItems() < 2) return;
@@ -180,8 +186,13 @@ void Viewer::constructFullSurface(Primitive& primitive, const Array<double>& abs
 	DisplaySlice* sliceA = displayData.first();
 	constructSurfaceStrip(abscissa, sliceA, yAxisScale, normA, colourA, colourScale, NULL, sliceA->next);
 	int nPoints = abscissa.nItems();
-	
+
+	printf("NVertices at start of constructFullSurface = %i\n", primitives.nDefinedVertices());
+
 	// Create triangles
+	int balls = 1;
+	int nBit, nPlusOneBit, totalBit;
+	Primitive* currentPrimitive = primitives[0];
 	for (DisplaySlice* sliceB = sliceA->next; sliceB != NULL; sliceB = sliceB->next)
 	{
 		// Grab slice pointers
@@ -194,23 +205,85 @@ void Viewer::constructFullSurface(Primitive& primitive, const Array<double>& abs
 		zA = (GLfloat) sliceA->z();
 		zB = (GLfloat) sliceB->z();
 	
-		// Get nPoints, and initial coordinates
+		// Get nPoints and array references
 		const Array<double>& yA = sliceA->y();
 		const Array<double>& yB = sliceB->y();
+		const Array<bool>& yExistsA = sliceA->yExists();
+		const Array<bool>& yExistsB = sliceB->yExists();
+
+		// Construct initial bit. Use to quickly determine which triangles to draw, given possible lack of datapoints in slices
+		//
+		//			n	n+1	n	n+1
+		//	Slice A		4-------1	4-------1	0 = Both	5 = None
+		//			| ....TR|	|TL.... |	1 = BL		6 = None
+		//			|   ....|	|....   |	2 = TL		7 = None
+		//			|BL   ..|	|..   BR|	3 = None	8 = TR
+		//	Slice B		8-------2	8-------2	4 = BR		9+= None
+		
+		nBit = 0;
+		if (!yExistsA.value(0)) nBit += 4;
+		if (!yExistsB.value(0)) nBit += 8;
 		for (int n=0; n<nPoints-1; ++n)
 		{
+			// Construct bit for n+1
+			nPlusOneBit = 0;
+			if (!yExistsA.value(n+1)) nPlusOneBit += 1;
+			if (!yExistsB.value(n+1)) nPlusOneBit += 2;
+			totalBit = nBit + nPlusOneBit;
+
 			// Add triangles for this quadrant
-			primitive.defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n], true);
-			primitive.defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n+1], true);
-			primitive.defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1], true);
-			primitive.defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n], true);
-			primitive.defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n], true);
-			primitive.defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1], true);
+			if (totalBit == 0)
+			{
+				// Draw both 
+				currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n], true);
+				currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n+1], true);
+				currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1], true);
+				currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n], true);
+				currentPrimitive->defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n], true);
+				currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1], true);
+			}
+			else if (totalBit == 1)
+			{
+				// Bottom left corner only
+				currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n], true);
+				currentPrimitive->defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n], true);
+				currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1], true);
+			}
+			else if (totalBit == 2)
+			{
+				// Top left corner only
+				currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n], true);
+				currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n], true);
+				currentPrimitive->defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n], true);
+			}
+			else if (totalBit == 4)
+			{
+				// Bottom right corner only
+				currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n], true);
+				currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1], true);
+				currentPrimitive->defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n], true);
+			}
+			else if (totalBit == 8)
+			{
+				// Top right corner only
+				currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n], true);
+				currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n], true);
+				currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1], true);
+			}
+
+			// Store new nBit for next index
+			nBit = nPlusOneBit*4;
 		}
 
 		// Copy arrays ready for next pass
 		normA = normB;
 		colourA = colourB;
 		sliceA = sliceB;
+
+		// Increment primitive pointer
+		currentPrimitive = currentPrimitive->next;
 	}
+
+	printf("NVertices at end of constructFullSurface = %i\n", primitives.nDefinedVertices());
+
 }

@@ -65,9 +65,8 @@ Collection::Collection() : ListItem<Collection>()
 	visible_ = true;
 	displayData_.clear();
 	displayStyle_ = Collection::LineStyle;
-	displayPrimitive_.setColourData(true);
 	displayDataValid_ = false;
-	displayPrimitiveValid_ = false;
+	displayPrimitivesValid_ = false;
 }
 
 // Destructor
@@ -216,7 +215,7 @@ void Collection::setSliceZ(Slice* target, double z)
 
 	dataChanged_ = true;
 	displayDataValid_ = false;
-	displayPrimitiveValid_ = false;
+	displayPrimitivesValid_ = false;
 }
 
 // Set data of specified slice
@@ -233,7 +232,7 @@ void Collection::setSliceData(Slice* target, Data2D* newData)
 
 	dataChanged_ = true;
 	displayDataValid_ = false;
-	displayPrimitiveValid_ = false;
+	displayPrimitivesValid_ = false;
 }
 
 // Return first slice in list
@@ -270,7 +269,7 @@ void Collection::clearSlices()
 
 	dataChanged_ = true;
 	displayDataValid_ = false;
-	displayPrimitiveValid_ = false;
+	displayPrimitivesValid_ = false;
 }
 
 // Set root directory for datafiles
@@ -289,6 +288,7 @@ QDir Collection::dataFileDirectory()
 bool Collection::loadSliceData(Slice* slice)
 {
 	if (!slice) return false;
+	dataChanged_ = true;
 	return slice->loadData(dataFileDirectory_);
 }
 
@@ -316,6 +316,16 @@ Vec3<double> Collection::dataMax()
 	updateLimitsAndTransforms();
 
 	return dataMax_;
+}
+
+// Return formatted summary information on this Collection
+QString Collection::summaryInfo()
+{
+	QString summary;
+	summary += "<b>" + title_ + "</b>, ";
+	if ((displayStyle_ == Collection::LineStyle) || (displayStyle_ == Collection::LineStyle)) summary += "line surface with " + QString::number(displayPrimitives_.nDefinedVertices()) + " points";
+	else if (displayStyle_ == Collection::SurfaceStyle) summary += "full surface with " + QString::number(displayPrimitives_.nDefinedIndices()/3) + " triangles";
+	return summary;
 }
 
 /*
@@ -576,7 +586,7 @@ void Collection::updateColourScale()
 	colourScaleValid_ = true;
 
 	// Primitive will now need to be regenerated...
-	displayPrimitiveValid_ = false;
+	displayPrimitivesValid_ = false;
 }
 
 // Set colourscale source to use
@@ -786,7 +796,7 @@ void Collection::setDisplayStyle(DisplayStyle style)
 {
 	displayStyle_ = style;
 
-	displayPrimitiveValid_ = false;
+	displayPrimitivesValid_ = false;
 }
 
 // Return display style of data
@@ -804,19 +814,19 @@ void Collection::setDisplayDataInvalid()
 // Flag that the primitive has been updated
 void Collection::setDisplayPrimitiveValid()
 {
-	displayPrimitiveValid_ = true;
+	displayPrimitivesValid_ = true;
 }
 
-// Return whether surface primitive is valid
-bool Collection::displayPrimitiveValid()
+// Return whether surface primitives are valid
+bool Collection::displayPrimitivesValid()
 {
-	return displayPrimitiveValid_;
+	return displayPrimitivesValid_;
 }
 
-// Return surface primitive
-Primitive& Collection::displayPrimitive()
+// Return surface primitives list
+PrimitiveList& Collection::displayPrimitives()
 {
-	return displayPrimitive_;
+	return displayPrimitives_;
 }
 
 // Update surface data if necessary
@@ -994,10 +1004,10 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 				}
 				lastReal = m;
 			}
-		}
+		}	
 	}
 
 	// Data has been updated - surface primitive will need to be reconstructed
-	displayPrimitiveValid_ = false;
+	displayPrimitivesValid_ = false;
 	displayDataValid_ = true;
 }

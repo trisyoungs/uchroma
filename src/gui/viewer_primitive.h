@@ -28,6 +28,7 @@
 #include "glext.h"
 #endif
 #include "templates/list.h"
+#include "gui/viewer_indexchunk.h"
 #include "gui/viewer_vertexchunk.h"
 #include "math/matrix.h"
 #include "base/dnchar.h"
@@ -49,18 +50,28 @@ class PrimitiveInstance : public ListItem<PrimitiveInstance>
 	const QGLContext *context_;
 	// Type of instance
 	InstanceType type_;
-	// OpenGL ID of instance
-	GLuint id_;
+	// List ID of instance (if using display lists)
+	GLuint listObject_;
+	// VBO ID of vertex array (if using VBOs)
+	GLuint vboVertexObject_;
+	// VBO ID of index array (if using indexed VBOs)
+	GLuint vboIndexObject_;
 	
 	public:
-	// Set data
-	void set(const QGLContext *context, PrimitiveInstance::InstanceType type, GLuint id);
+	// Set display list data
+	void setDisplayList(const QGLContext *context, GLuint listObject);
+	// Set vbo object data
+	void setVBO(const QGLContext *context, GLuint vertexObject, GLuint indexObject);
 	// Return context to which primitive instance is associated
 	const QGLContext *context();
 	// Return type of instance
 	InstanceType type();
-	// Return OpenGL ID of instance
-	int id();
+	// Return display list object for instance
+	GLuint listObject();
+	// Return VBO ID of vertex array for instance
+	GLuint vboVertexObject();
+	// Return VBO ID of index array for instance
+	GLuint vboIndexObject();
 };
 
 // Rendering Primitive
@@ -92,6 +103,12 @@ class Primitive : public ListItem<Primitive>
 	bool colouredVertexData_;
 	// Number of vertices that have been defined
 	int nDefinedVertices_;
+	// Index array, referring to vertexChunk list
+	List<IndexChunk> indexChunks_;
+	// Current index chunk
+	IndexChunk* currentIndexChunk_;
+	// Number of defined indices
+	int nDefinedIndices_;
 	// GL object drawing method
 	GLenum type_;
 	// Default (i.e. global) instance type to use
@@ -100,6 +117,8 @@ class Primitive : public ListItem<Primitive>
 	List<PrimitiveInstance> instances_;
 	// Flag stating whether or not instances should be used for this primitive
 	bool useInstances_;
+	// Flag stating whether indexed vertex drawing is to be used
+	bool useIndices_;
 	// Name of primitive (for easier bug-tracking)
 	Dnchar name_;
 
@@ -110,6 +129,8 @@ class Primitive : public ListItem<Primitive>
 	void forgetAll();
 	// Return number of vertices currently defined in primitive
 	int nDefinedVertices();
+	// Return number of indices currently defined in primitive
+	int nDefinedIndices();
 	// Set GL drawing primitive type
 	void setType(GLenum type);
 	// Return vertex array
@@ -120,6 +141,8 @@ class Primitive : public ListItem<Primitive>
 	bool colouredVertexData();
 	// Flag that this primitive should not use instances (rendering will use vertex arrays)
 	void setNoInstances();
+	// Set whether indexed vertex drawing is to be used
+	void setUseIndices(bool b);
 	// Push instance layer from current vertex chunk list
 	void pushInstance(const QGLContext *context);
 	// Pop topmost instance layer
@@ -166,6 +189,13 @@ class Primitive : public ListItem<Primitive>
 	void plotCube(double size, int nsubs, double ox, double oy, double oz);
 	// Plot solid orthorhomboid of specified size at specified origin, and with sides subdivided into triangles ( ntriangles = 2*nsubs )
 	void plotOrthorhomboid(double sizex, double sizey, double sizez, int nsubs, double ox, double oy, double oz);
+
+	/*
+	 * Index Generation
+	 */
+	public:
+	// Define next index triple
+	void defineIndices(GLuint a, GLuint b, GLuint c);
 
 
 	/*

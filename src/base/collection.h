@@ -25,7 +25,7 @@
 #include "base/slice.h"
 #include "base/transformer.h"
 #include "base/colourscale.h"
-#include "gui/viewer_primitive.h"
+#include "gui/viewer_primitivelist.h"
 
 // Forward Declarations
 /* None */
@@ -97,6 +97,8 @@ class Collection : public ListItem<Collection>
 	Vec3<double> dataMin();
 	// Return data maxima, calculating if necessary
 	Vec3<double> dataMax();
+	// Return formatted summary information on this Collection
+	QString summaryInfo();
 
 
 	/*
@@ -259,12 +261,12 @@ class Collection : public ListItem<Collection>
 	Array<double> displayAbscissa_;
 	// Display style of data
 	DisplayStyle displayStyle_;
-	// Flag indicating whether display data is valid (and doesn't need to be regenerated)
+	// Flag indicating whether display data is valid (and don't need to be regenerated)
 	bool displayDataValid_;
-	// GL primitive containing display data
-	Primitive displayPrimitive_;
-	// Flag indicating whether display primitive is valid (and doesn't need to be regenerated)
-	bool displayPrimitiveValid_;
+	// PrimitiveList containing GL display data
+	PrimitiveList displayPrimitives_;
+	// Flag indicating whether display primitives are valid (and don't need to be regenerated)
+	bool displayPrimitivesValid_;
 
 	public:
 	// Set whether data is visible
@@ -283,10 +285,10 @@ class Collection : public ListItem<Collection>
 	void setDisplayDataInvalid();
 	// Flag that the primitive has been updated
 	void setDisplayPrimitiveValid();
-	// Return whether primitive is valid
-	bool displayPrimitiveValid();
-	// Return display primitive
-	Primitive& displayPrimitive();
+	// Return whether primitives are valid
+	bool displayPrimitivesValid();
+	// Return list of display primitives
+	PrimitiveList& displayPrimitives();
 	// Update display data and surface if necessary
 	void updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, Vec3<bool> axisInverted, Vec3<bool> axisLogarithmic, Vec3<double> axisStretch);
 };

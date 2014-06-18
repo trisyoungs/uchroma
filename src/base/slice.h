@@ -59,8 +59,6 @@ class Slice : public ListItem<Slice>
 	DataSource dataSource_;
 	// Source file, if one is specified (not including path)
 	QString sourceFileName_;
-// 	// Whether a file has been associated to this slice
-// 	bool fileAssociated_;
 	// Title
 	QString title_;
 	// Data

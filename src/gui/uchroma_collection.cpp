@@ -72,7 +72,7 @@ void UChromaWindow::on_CollectionRemoveButton_clicked(bool checked)
 	updateGUI();
 }
 
-void UChromaWindow::refreshCollections(bool updateToolTipsOnly)
+void UChromaWindow::refreshCollections()
 {
 	ui.CollectionList->clear();
 	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
@@ -82,7 +82,6 @@ void UChromaWindow::refreshCollections(bool updateToolTipsOnly)
 		item->setData(Qt::UserRole, VariantPointer<Collection>(collection));
 		item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
 		item->setCheckState(collection->visible() ? Qt::Checked : Qt::Unchecked);
-		item->setToolTip("Helloaslkdaskjdlksj");
 
 		// If this is the current collection, select it
 		if (collection == currentCollection_) item->setSelected(true);

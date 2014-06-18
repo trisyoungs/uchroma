@@ -109,41 +109,38 @@ void Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate)
 {
 	// Check for valid collection, and whether primitive needs updating
 	if (!collection) return;
-	if (collection->displayPrimitiveValid() && collection->colourScaleValid() && (!forceUpdate)) return;
+	if (collection->displayPrimitivesValid() && collection->colourScaleValid() && (!forceUpdate)) return;
 
-	// Pop old primitive instance and adjust primitive settings
-	Primitive& primitive = collection->displayPrimitive();
-	primitive.popInstance(context());
-	primitive.forgetAll();
+	// Pop old primitive instances and adjust primitive settings
+	collection->displayPrimitives().popInstance(context());
+	collection->displayPrimitives().forgetAll();
 	
 	// Recreate primitive depending on current style
 	switch (collection->displayStyle())
 	{
 		case (Collection::LineStyle):
-			constructLineSurface(primitive, collection->displayAbscissa(), collection->displayData(), collection->colourScale());
+			constructLineSurface(collection->displayPrimitives(), collection->displayAbscissa(), collection->displayData(), collection->colourScale());
 			break;
 		case (Collection::GridStyle):
 			break;
 		case (Collection::SurfaceStyle):
-			constructFullSurface(primitive, collection->displayAbscissa(), collection->displayData(), collection->colourScale());
+			constructFullSurface(collection->displayPrimitives(), collection->displayAbscissa(), collection->displayData(), collection->colourScale());
 			break;
 	}
 
 	// Push a new instance to create the new display list / vertex array
-	primitive.pushInstance(context());
+	collection->displayPrimitives().pushInstance(context());
 	collection->setDisplayPrimitiveValid();
-
-	msg.print("Surface contains %i vertices.\n", primitive.nDefinedVertices());
 }
 
 // Add supplied surface primitive to list
-void Viewer::addSurfacePrimitive(Primitive* primitive)
+void Viewer::addCollectionPrimitive(Primitive* primitive)
 {
 	primitiveList_.add(primitive);
 }
 
 // Remove surface primitive from primitive list
-void Viewer::removeSurfacePrimitive(Primitive* primitive)
+void Viewer::removeCollectionPrimitive(Primitive* primitive)
 {
 	primitiveList_.remove(primitive);
 }

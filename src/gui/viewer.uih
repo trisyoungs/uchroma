@@ -27,6 +27,7 @@
 #include <FTGL/ftgl.h>
 #include "gui/viewer_primitive.h"
 #include "gui/viewer_primitiveinfo.h"
+#include "gui/viewer_primitivelist.h"
 #include "gui/viewer_textprimitive.h"
 #include "gui/viewer_trianglechopper.h"
 #include "base/colourscale.h"
@@ -236,19 +237,19 @@ class Viewer : public QGLWidget
 	// Setup basic GL properties
 	void setupGL();
 	// Construct line surface representation of data
-	void constructLineSurface(Primitive& primitive, const Array<double>& abscissa, List< DisplaySlice >& displayData, ColourScale colourScale);
+	void constructLineSurface(PrimitiveList& primitives, const Array<double>& abscissa, List< DisplaySlice >& displayData, ColourScale colourScale);
 	// Construct normal / colour surface data for slice specified
 	void constructSurfaceStrip(const Array<double>& abscissa, DisplaySlice* targetSlice, double yAxisScale, Array< Vec3< double > >& normals, Array< Vec4< GLfloat > >& colours, const ColourScale& colourScale, DisplaySlice* previousSlice, DisplaySlice* nextSlice);
 	// Construct full surface representation of data
-	void constructFullSurface(Primitive& primitive, const Array<double>& abscissa, List<DisplaySlice>& displayData, ColourScale colourScale);
+	void constructFullSurface(PrimitiveList& primitives, const Array< double >& abscissa, List< DisplaySlice >& displayData, ColourScale colourScale);
 	// Create/update surface primitive for specified collection
 	void updateSurfacePrimitive(Collection* collection, bool forceUpdate = false);
 
 	public:
-	// Add supplied surface primitive to list
-	void addSurfacePrimitive(Primitive* primitive);
-	// Remove surface primitive from primitive list
-	void removeSurfacePrimitive(Primitive* primitive);
+	// Add supplied collection primitive to list
+	void addCollectionPrimitive(Primitive* primitive);
+	// Remove collection primitive from primitive list
+	void removeCollectionPrimitive(Primitive* primitive);
 	// Clear specified axis primitives
 	void clearAxisPrimitives(int axis);
 	// Add line to axis primitive

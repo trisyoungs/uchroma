@@ -1,5 +1,11 @@
 <RCC>
   <qresource prefix="/uchroma">
+    <file>icons/collections_create.svg</file>
+    <file>icons/collections_new.svg</file>
+    <file>icons/collections_next.svg</file>
+    <file>icons/collections_prev.svg</file>
+    <file>icons/view_reset.svg</file>
+    <file>icons/view_perspective.svg</file>
     <file>icons/windows_view.svg</file>
     <file>icons/windows_data.svg</file>
     <file>icons/windows_transform.svg</file>

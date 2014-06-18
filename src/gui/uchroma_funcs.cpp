@@ -108,6 +108,7 @@ void UChromaWindow::updateGUI()
 	updateSubWindows();
 	updateTitleBar();
 	updateDisplay();
+	updateCollectionInfoBar();
 
 	refreshing_ = false;
 }
@@ -130,10 +131,17 @@ void UChromaWindow::updateSubWindows()
 	if (currentCollection_  != NULL)
 	{
 		dataWindow_.setWindowTitle("Data (" + currentCollection_->title() + ")");
-		styleWindow_.setWindowTitle("Data (" + currentCollection_->title() + ")");
-		transformWindow_.setWindowTitle("Data (" + currentCollection_->title() + ")");
-		viewWindow_.setWindowTitle("Data (" + currentCollection_->title() + ")");
+		styleWindow_.setWindowTitle("Style (" + currentCollection_->title() + ")");
+		transformWindow_.setWindowTitle("Transform (" + currentCollection_->title() + ")");
+		viewWindow_.setWindowTitle("View (" + currentCollection_->title() + ")");
 	}
+}
+
+// Update collection info bar
+void UChromaWindow::updateCollectionInfoBar()
+{
+	if (currentCollection_) ui.CollectionInfoLabel->setText(currentCollection_->summaryInfo());
+	else ui.CollectionInfoLabel->setText("No current Collection");
 }
 
 // Update title bar

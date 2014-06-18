@@ -627,8 +627,8 @@ bool UChromaWindow::saveInputFile(QString fileName)
 }
 
 // Flag data as modified, and update titlebar
-void UChromaWindow::setAsModified()
+void UChromaWindow::setAsModified(bool isModified)
 {
-	modified_ = true;
+	modified_ = isModified;
 	updateTitleBar();
 }

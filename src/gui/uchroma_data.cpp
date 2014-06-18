@@ -157,13 +157,17 @@ Collection* UChromaWindow::addCollection(QString title)
 {
 	static int collectionCount = 1;
 
-	// -- Add an empty collection
+	// Add an empty collection
 	currentCollection_ = collections_.add();
-	ui.MainView->addSurfacePrimitive(&currentCollection_->displayPrimitive());
+
+	// Set link to MainView's primitive reflist
+	currentCollection_->displayPrimitives().setViewer(ui.MainView);
 
 	// Set the title
 	if (title.isEmpty()) currentCollection_->setTitle("Empty Collection " + QString::number(collectionCount++));
 	else currentCollection_->setTitle(title);
+
+	setAsModified();
 
 	return currentCollection_;
 }
@@ -173,16 +177,33 @@ void UChromaWindow::removeCollection(Collection* collection)
 {
 	if (!collection) return;
 
-	// Remove link to rendering primitive
-	ui.MainView->removeSurfacePrimitive(&currentCollection_->displayPrimitive());
-
 	// Set new currentCollection_
 	if (collection->next) currentCollection_ = collection->next;
 	else currentCollection_ = collection->prev;
 	if (currentCollection_ == NULL) currentCollection_ = addCollection();
 
+	setAsModified();
+
 	// Finally, remove old collection
 	collections_.remove(collection);
+}
+
+// Move collection focus to next in list
+void UChromaWindow::focusNextCollection()
+{
+	currentCollection_ = currentCollection_->next;
+	if (currentCollection_ == NULL) currentCollection_ = collections_.first();
+
+	updateGUI();
+}
+
+// Move collection focus to previous in list
+void UChromaWindow::focusPreviousCollection()
+{
+	currentCollection_ = currentCollection_->prev;
+	if (currentCollection_ == NULL) currentCollection_ = collections_.last();
+
+	updateGUI();
 }
 
 // Return nth collection in list
@@ -206,8 +227,7 @@ Collection* UChromaWindow::currentCollection()
 // Clear current data
 void UChromaWindow::clearData()
 {
-	// Collections - remove links to Primitives first
-	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next) ui.MainView->removeSurfacePrimitive(&collection->displayPrimitive());
+	// Collections
 	collections_.clear();
 
 	// Data

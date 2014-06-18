@@ -119,26 +119,6 @@ void UChromaWindow::on_actionFileSaveAs_triggered(bool checked)
 	updateTitleBar();
 }
 
-void UChromaWindow::on_actionFileImportData_triggered(bool checked)
-{
-	// Check for valid current collection
-	if (!currentCollection_) return;
-
-	// Raise the Data Import dialog
-	bool fitData = currentCollection_->nSlices() == 0;
-	bool result = dataImportDialog_.import();
-	if (!result) return;
-
-	// Loop over list of imported slices and copy them to our local list
-	for (Slice* slice = dataImportDialog_.importedSlices(); slice != NULL; slice = slice->next) currentCollection_->addSlice(slice);
-
-	// Update subwindows
-	updateSubWindows();
-	setAsModified();
-	
-	// Need to update display
-	updateDisplay();
-}
 
 void UChromaWindow::on_actionFileSaveImage_triggered(bool checked)
 {
@@ -195,6 +175,67 @@ void UChromaWindow::on_actionViewReset_triggered(bool checked)
 }
 
 /*
+ * Collections
+ */
+
+void UChromaWindow::on_actionCollectionsNew_triggered(bool checked)
+{
+	addCollection();
+
+	updateGUI();
+}
+
+void UChromaWindow::on_actionCollectionsCreate_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) createDialog_.updateAndShow();
+	else createDialog_.hide();
+}
+
+void UChromaWindow::on_actionCollectionsFocusNext_triggered(bool checked)
+{
+	focusNextCollection();
+}
+
+void UChromaWindow::on_actionCollectionsFocusPrevious_triggered(bool checked)
+{
+	focusPreviousCollection();
+}
+
+/*
+ * Data Menu
+ */
+
+void UChromaWindow::on_actionDataLoadXY_triggered(bool checked)
+{
+	// Check for valid current collection
+	if (!currentCollection_) return;
+
+	dataWindow_.ui.AddFilesButton->click();
+}
+
+void UChromaWindow::on_actionDataImport_triggered(bool checked)
+{
+	// Check for valid current collection
+	if (!currentCollection_) return;
+
+	// Raise the Data Import dialog
+	bool fitData = currentCollection_->nSlices() == 0;
+	bool result = dataImportDialog_.import();
+	if (!result) return;
+
+	// Loop over list of imported slices and copy them to our local list
+	for (Slice* slice = dataImportDialog_.importedSlices(); slice != NULL; slice = slice->next) currentCollection_->addSlice(slice);
+
+	// Update subwindows
+	updateSubWindows();
+	setAsModified();
+	
+	// Need to update display
+	updateDisplay();
+}
+
+/*
  * Tools Menu
  */
 
@@ -207,13 +248,6 @@ void UChromaWindow::on_actionToolsFitWindow_triggered(bool checked)
 		fitDialog_.show();
 	}
 	else fitDialog_.hide();
-}
-
-void UChromaWindow::on_actionToolsCreateData_triggered(bool checked)
-{
-	if (refreshing_) return;
-	if (checked) createDialog_.updateAndShow();
-	else createDialog_.hide();
 }
 
 /*
