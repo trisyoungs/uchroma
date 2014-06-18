@@ -42,7 +42,7 @@ PrimitiveList::~PrimitiveList()
 // Clear all existing primitives
 void PrimitiveList::clear()
 {
-	for (Primitive* prim = primitives_.first(); prim != NULL; prim = prim->next) prim->clear();
+// 	for (Primitive* prim = primitives_.first(); prim != NULL; prim = prim->next) prim->clear();
 }
 
 // Forget all data, leaving arrays intact
@@ -52,13 +52,12 @@ void PrimitiveList::forgetAll()
 }
 
 // Resize list so it is large enough to accomodate specified number of Primitives
-void PrimitiveList::resize(int newSize, bool allowShrink)
+void PrimitiveList::reinitialise(int newSize, bool allowShrink, int maxVertices, int maxIndices, GLenum type, bool colourData)
 {
 	// Add enough primitives to match the new size
 	while (primitives_.nItems() < newSize)
 	{
 		Primitive* newPrim = primitives_.add();
-		newPrim->setColourData(true);
 		viewer_->addCollectionPrimitive(newPrim);
 	}
 
@@ -71,6 +70,12 @@ void PrimitiveList::resize(int newSize, bool allowShrink)
 			viewer_->removeCollectionPrimitive(primitives_.last());
 			primitives_.removeLast();
 		}
+	}
+
+	// Loop over all current primitives and set information
+	for (Primitive* prim = primitives_.first(); prim != NULL; prim = prim->next)
+	{
+		prim->initialise(maxVertices, maxIndices, type, colourData);
 	}
 }
 
@@ -94,19 +99,6 @@ int PrimitiveList::nDefinedIndices()
 void PrimitiveList::setViewer(Viewer* viewer)
 {
 	viewer_ = viewer;
-}
-
-// Flag that primitive should contain colour data information for each vertex
-void PrimitiveList::setColourData(bool b)
-{
-	for (Primitive* prim = primitives_.first(); prim != NULL; prim = prim->next) prim->setColourData(b);
-}
-
-
-// Set GL drawing primitive type
-void PrimitiveList::setType(GLenum type)
-{
-	for (Primitive* prim = primitives_.first(); prim != NULL; prim = prim->next) prim->setType(type);
 }
 
 // Push instance layer

@@ -106,12 +106,8 @@ GLuint PrimitiveInstance::vboIndexObject()
 // Constructor
 Primitive::Primitive() : ListItem<Primitive>()
 {
-	currentVertexChunk_ = NULL;
-	currentIndexChunk_ = NULL;
 	colouredVertexData_ = false;
 	type_ = GL_TRIANGLES;
-	nDefinedVertices_ = 0;
-	nDefinedIndices_ = 0;
 	useInstances_ = true;
 	useIndices_ = false;
 	name_ = "<UnnamedPrimitive>";
@@ -120,52 +116,32 @@ Primitive::Primitive() : ListItem<Primitive>()
 // Destructor
 Primitive::~Primitive()
 {
-	clear();
 }
 
-// Flag that primitive should contain colour data information for each vertex
-void Primitive::setColourData(bool b)
+// Initialise primitive
+void Primitive::initialise(int maxVertices, int maxIndices, GLenum type, bool colourData)
 {
-	colouredVertexData_ = b;
-}
-
-// Clear existing data
-void Primitive::clear()
-{
-	vertexChunks_.clear();
-	currentVertexChunk_ = NULL;
-	indexChunks_.clear();
-	currentIndexChunk_ = NULL;
-	nDefinedVertices_ = 0;
+	type_ = type;
+	colouredVertexData_ = colourData;
+	vertexChunk_.initialise(maxVertices, maxIndices, type, colouredVertexData_);
 }
 
 // Forget all data, leaving arrays intact
 void Primitive::forgetAll()
 {
-	for (VertexChunk *v = vertexChunks_.first(); v != NULL; v = v->next) v->forgetAll();
-	currentVertexChunk_ = vertexChunks_.first();
-	for (IndexChunk *i = indexChunks_.first(); i != NULL; i = i->next) i->forgetAll();
-	currentIndexChunk_ = indexChunks_.first();
-	nDefinedVertices_ = 0;
+	vertexChunk_.forgetAll();
 }
 
 // Return number of vertices currently defined in primitive
 int Primitive::nDefinedVertices()
 {
-	return nDefinedVertices_;
+	return vertexChunk_.nDefinedVertices();
 }
 
 // Return number of indices currently defined in primitive
 int Primitive::nDefinedIndices()
 {
-	return nDefinedIndices_;
-}
-
-// Set GL drawing primitive type
-void Primitive::setType(GLenum type)
-{
-	type_ = type;
-	clear();
+	return vertexChunk_.nDefinedIndices();
 }
 
 // Set name of primitive
@@ -180,81 +156,10 @@ const char *Primitive::name()
 	return name_.get();
 }
 
-/*
-// Primitive Generation
-*/
-
-// Create wireframe cube centred at zero
-void Primitive::createWireCube(double size)
-{
-	// Clear existing data first (if it exists)
-	type_ = GL_LINES;
-	forgetAll();
-	
-	size = 0.5*size;
-	int i, j;
-	GLfloat r[3];
-	// Set initial corner
-	r[0] = -size;
-	r[1] = -size;
-	r[2] = -size;
-	for (i=0; i<4; ++i)
-	{
-		// Swap signs to generate new corner if necessary
-		if (i>0)
-		{
-			r[1] = -r[1];
-			if (i == 2) r[2] = -r[2];
-			else r[0] = -r[0];
-		}
-		// Generate lines
-		for (j=0; j<3; ++j)
-		{
-			defineVertex(r[0], r[1], r[2], 1.0, 0.0, 0.0, true);
-			defineVertex(j == 0 ? -r[0] : r[0], j == 1 ? -r[1] : r[1], j == 2 ? -r[2] : r[2], 1.0, 0.0, 0.0, true);
-		}
-	}
-}
-
-// Create wireframe, crossed cube centred at zero
-void Primitive::createCrossedCube(double size)
-{
-	// Create wire cube to start with
-	createWireCube(size);
-	// Add crosses to faces
-	int i, j, sign;
-	GLfloat r[3];
-	for (i=0; i<3; ++i)
-	{
-		for (sign = 1; sign > -2; sign -=2)
-		{
-			// Determine single coordinate on positive face from which to determine all others
-			for (j = 0; j<3; ++j) r[j] = (j == i ? 0.55*size*sign : 0.4*size);
-			defineVertex(r[0], r[1], r[2], 1.0, 0.0, 0.0, true);
-			r[(i+1)%3] = -r[(i+1)%3];
-			r[(i+2)%3] = -r[(i+2)%3];
-			defineVertex(r[0], r[1], r[2], 1.0, 0.0, 0.0, true);
-			r[(i+1)%3] = -r[(i+1)%3];
-			defineVertex(r[0], r[1], r[2], 1.0, 0.0, 0.0, true);
-			r[(i+1)%3] = -r[(i+1)%3];
-			r[(i+2)%3] = -r[(i+2)%3];
-			defineVertex(r[0], r[1], r[2], 1.0, 0.0, 0.0, true);
-		}
-	}
-}
-
-// Create solid cube of specified size, centred at zero, and with sides subdivided into triangles ( ntriangles = 2*nsubs )
-void Primitive::createCube(double size, int nsubs, double ox, double oy, double oz)
-{
-	// Clear existing data first (if it exists)
-	forgetAll();
-	plotCube(size, nsubs, ox, oy, oz);
-}
-
 // Return first chunk vertex array
-VertexChunk *Primitive::vertexChunks()
+const VertexChunk& Primitive::vertexChunk()
 {
-	return vertexChunks_.first();;
+	return vertexChunk_;
 }
 
 // Return whether vertex data contains colour information
@@ -290,7 +195,7 @@ void Primitive::pushInstance(const QGLContext *context)
 		// Prepare local array of data to pass to VBO
 		int offset;
 		GLuint vertexVBO, indexVBO;
-		if (nDefinedVertices_ < 0)
+		if (vertexChunk_.nDefinedVertices() <= 0)
 		{
 			printf("Error: No data in Primitive with which to create VBO.\n");
 			msg.exit("Primitive::pushInstance");
@@ -298,7 +203,7 @@ void Primitive::pushInstance(const QGLContext *context)
 		}
 		
 		// Determine total size of array (in bytes) for VBO
-		int vboSize = nDefinedVertices_ * (colouredVertexData_ ? 10 : 6) * sizeof(GLfloat);
+		int vboSize = vertexChunk_.nDefinedVertices() * (colouredVertexData_ ? 10 : 6) * sizeof(GLfloat);
 		
 		// Generate vertex array object
 		glGenBuffers(1, &vertexVBO);
@@ -306,8 +211,8 @@ void Primitive::pushInstance(const QGLContext *context)
 		// Bind VBO
 		glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
 		
-		// Initialise VBO data, but don't copy anything here
-		glBufferData(GL_ARRAY_BUFFER, vboSize, NULL, GL_STATIC_DRAW);
+		// Initialise vertex array data
+		glBufferData(GL_ARRAY_BUFFER, vboSize, vertexChunk_.vertexData(), GL_STATIC_DRAW);
 		if (glGetError() != GL_NO_ERROR)
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -316,33 +221,19 @@ void Primitive::pushInstance(const QGLContext *context)
 			vertexVBO = 0;
 			return;
 		}
-
-	// 	GLfloat *bufdat = (GLfloat*) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
-	// // 	for (int n=0; n<30; ++n) printf("Buffer data %i is %f\n", n, bufdat[n]);
-	// 	glUnmapBuffer(GL_ARRAY_BUFFER);
-		
-		// Loop over stored VertexChunks and copy data to VBO
-		offset = 0;
-		int chunksize;
-		for (VertexChunk *chunk = vertexChunks_.first(); chunk != NULL; chunk = chunk->next)
-		{
-			chunksize = chunk->nDefinedVertices()*(colouredVertexData_ ? 10 : 6)*sizeof(GLfloat);
-			glBufferSubData(GL_ARRAY_BUFFER, offset, chunksize, chunk->vertexData());
-			offset += chunksize;
-		}
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		// Generate index array ovject (if using indices)
 		if (useIndices_)
 		{
-			// Generate vertex array object
+			// Generate index array object
 			glGenBuffers(1, &indexVBO);
 
 			// Bind VBO
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBO);
 			
-			// Initialise VBO data, but don't copy anything here
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, nDefinedIndices_*sizeof(GLuint), NULL, GL_STATIC_DRAW);
+			// Initialise index array data
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexChunk_.nDefinedIndices()*sizeof(GLuint), vertexChunk_.indexData(), GL_STATIC_DRAW);
 			if (glGetError() != GL_NO_ERROR)
 			{
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -350,15 +241,6 @@ void Primitive::pushInstance(const QGLContext *context)
 				glDeleteBuffers(1, &indexVBO);
 				indexVBO = 0;
 				return;
-			}
-
-			// Loop over stored IndexChunks and copy data to VBO
-			offset = 0;
-			for (IndexChunk *ichunk = indexChunks_.first(); ichunk != NULL; ichunk = ichunk->next)
-			{
-				chunksize = ichunk->nDefinedIndices()*sizeof(GLuint);
-				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, chunksize, ichunk->indexData());
-				offset += chunksize;
 			}
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
@@ -371,7 +253,7 @@ void Primitive::pushInstance(const QGLContext *context)
 		// Generate display list
 		int listId = glGenLists(1);
 		glNewList(listId, GL_COMPILE);
-		for (VertexChunk *chunk = vertexChunks_.first(); chunk != NULL; chunk = chunk->next) chunk->sendToGL();
+		vertexChunk_.sendToGL();
 		glEndList();
 
 		// Store data
@@ -411,7 +293,7 @@ void Primitive::popInstance(const QGLContext *context)
 void Primitive::sendToGL()
 {
 	// If no vertices are defined, nothing to do...
-	if (nDefinedVertices_ == 0) return;
+	if (vertexChunk_.nDefinedVertices() == 0) return;
 
 	// Check if using instances...
 	if (useInstances_)
@@ -432,8 +314,8 @@ void Primitive::sendToGL()
 			if (useIndices_) glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pi->vboIndexObject());
 
 			glInterleavedArrays(colouredVertexData_ ? GL_C4F_N3F_V3F : GL_N3F_V3F, 0, NULL);
-			if (useIndices_) glDrawElements(type_, nDefinedIndices_, GL_UNSIGNED_INT, 0);
-			else glDrawArrays(type_, 0, nDefinedVertices_);
+			if (useIndices_) glDrawElements(type_, vertexChunk_.nDefinedIndices(), GL_UNSIGNED_INT, 0);
+			else glDrawArrays(type_, 0, vertexChunk_.nDefinedVertices());
 
 			// Revert to normal operation - pass 0 as VBO index
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -444,6 +326,6 @@ void Primitive::sendToGL()
 		}
 		else glCallList(pi->listObject());
 	}
-	else for (VertexChunk *chunk = vertexChunks_.first(); chunk != NULL; chunk = chunk->next) chunk->sendToGL();
+	else vertexChunk_.sendToGL();
 }
 

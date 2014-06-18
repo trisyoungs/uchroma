@@ -23,16 +23,14 @@
 #include "gui/uchroma.h"
 
 // Construct line representation of data
-void Viewer::constructLineSurface(PrimitiveList& primitives, const Array< double >& abscissa, List< DisplaySlice >& displayData, ColourScale colourScale)
+void Viewer::constructLineSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplaySlice>& displayData, ColourScale colourScale)
 {
 	// Forget all data in current primitives
 	primitives.forgetAll();
 
 	// Resize primitive list so it's large enough for our needs
-	primitives.resize(1, true);
-
-	// Set primitive type to triangles
-	primitives.setType(GL_LINES);
+	primitives.reinitialise(displayData.nItems(), true, abscissa.nItems()*2, 0, GL_LINES, true);
+// 	primitives.reinitialise(displayData.nItems(), true, abscissa.nItems(), (abscissa.nItems()-1)*2, GL_LINES, true);
 
 	// Temporary variables
 	GLfloat zA;
@@ -61,9 +59,10 @@ void Viewer::constructLineSurface(PrimitiveList& primitives, const Array< double
 
 			// Add vertices for these points
 			colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, yA.value(n-1)) : yA.value(n-1)) / yAxisScale, colourA);
-			currentPrimitive->defineVertex(abscissa.value(n-1), yA.value(n-1), zA, nrm, colourA, false);
+			currentPrimitive->defineVertex(abscissa.value(n-1), yA.value(n-1), zA, nrm, colourA);
 			colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, yA.value(n)) : yA.value(n)) / yAxisScale, colourA);
-			currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, nrm, colourA, false);
+			currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, nrm, colourA);
 		}
+		currentPrimitive = currentPrimitive->next;
 	}
 }

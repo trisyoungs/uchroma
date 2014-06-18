@@ -54,16 +54,12 @@ class PrimitiveList
 	void clear();
 	// Forget all data, leaving arrays intact
 	void forgetAll();
-	// Resize list so it is large enough to accomodate specified number of Primitives
-	void resize(int newSize, bool allowShrink);
+	// Reinitialise list so it is large enough to accomodate specified number of Primitives
+	void reinitialise(int newSize, bool allowShrink, int maxVertices, int maxIndices, GLenum type, bool colourData);
 	// Return total number of defined vertices
 	int nDefinedVertices();
 	// Return total number of defined indices
 	int nDefinedIndices();
-	// Set GL drawing primitive type
-	void setType(GLenum type);
-	// Flag whether primitive should contain colour data information for each vertex
-	void setColourData(bool b);
 	// Push instance layer
 	void pushInstance(const QGLContext *context);
 	// Pop topmost instance layer

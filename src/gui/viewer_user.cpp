@@ -28,12 +28,12 @@ void Viewer::createPrimitives()
 	// Setup primitives
 	slicePrimitive_.setNoInstances();
 	slicePrimitiveBox_.setNoInstances();
-	slicePrimitiveBox_.setType(GL_LINES);
+	slicePrimitiveBox_.initialise(4, 8, GL_LINES, false);
 	boundingBoxPrimitive_.setNoInstances();
-	boundingBoxPrimitive_.setType(GL_LINES);
+	boundingBoxPrimitive_.initialise(4, 8, GL_LINES, false);
 	for (int n=0; n<3; ++n)
 	{
-		axisPrimitives_[n].setType(GL_LINES);
+		axisPrimitives_[n].initialise(1020, 0, GL_LINES, false);
 		axisPrimitives_[n].setNoInstances();
 	}
 }
@@ -155,7 +155,8 @@ void Viewer::clearAxisPrimitives(int axis)
 // Add line to axis primitive
 void Viewer::addAxisLine(int axis, Vec3<double> v1, Vec3<double> v2)
 {
-	axisPrimitives_[axis].plotLine(v1, v2);
+	axisPrimitives_[axis].defineVertex(v1.x, v1.y, v1.z, 1.0, 0.0, 0.0);
+	axisPrimitives_[axis].defineVertex(v2.x, v2.y, v2.z, 1.0, 0.0, 0.0);
 }
 
 // Add entry to axis text primitive
@@ -219,13 +220,18 @@ void Viewer::setSlicePrimitive(int axis)
 	deltaB = (axisMaxB - axisMinB) / nPoints;
 
 	// Create 'bounding box' for slice primitive
-	slicePrimitiveBox_.plotLine(axisMinA, axisMaxA);
-	slicePrimitiveBox_.plotLine(axisMaxA, axisMaxA + axisMaxB - axisMinB);
-	slicePrimitiveBox_.plotLine(axisMaxA + axisMaxB - axisMinB, axisMinA + axisMaxB - axisMinB);
-	slicePrimitiveBox_.plotLine(axisMinA + axisMaxB - axisMinB, axisMinA);
+	Vec3<double> normal(0.0, 0.0, 1.0);
+	slicePrimitiveBox_.defineVertex(axisMinA, normal);
+	slicePrimitiveBox_.defineVertex(axisMaxA, normal);
+	slicePrimitiveBox_.defineVertex(axisMaxA, normal);
+	slicePrimitiveBox_.defineVertex(axisMaxA + axisMaxB - axisMinB, normal);
+	slicePrimitiveBox_.defineVertex(axisMaxA + axisMaxB - axisMinB, normal);
+	slicePrimitiveBox_.defineVertex(axisMinA + axisMaxB - axisMinB, normal);
+	slicePrimitiveBox_.defineVertex(axisMinA + axisMaxB - axisMinB, normal);
+	slicePrimitiveBox_.defineVertex(axisMinA, normal);
 
 	// Set normal
-	Vec3<double> normal(0.0, 0.0, 0.0);
+	normal.zero();
 	normal[axis] = 1.0;
 
 	// Construct plane
@@ -234,12 +240,12 @@ void Viewer::setSlicePrimitive(int axis)
 		pos = axisMinA + deltaA*n;
 		for (int m=0; m<nPoints; ++m)
 		{
-			slicePrimitive_.defineVertex(pos, normal, true);
-			slicePrimitive_.defineVertex(pos + deltaA, normal, true);
-			slicePrimitive_.defineVertex(pos + deltaA + deltaB, normal, true);
-			slicePrimitive_.defineVertex(pos + deltaA + deltaB, normal, true);
-			slicePrimitive_.defineVertex(pos + deltaB, normal, true);
-			slicePrimitive_.defineVertex(pos, normal, true);
+			slicePrimitive_.defineVertex(pos, normal);
+			slicePrimitive_.defineVertex(pos + deltaA, normal);
+			slicePrimitive_.defineVertex(pos + deltaA + deltaB, normal);
+			slicePrimitive_.defineVertex(pos + deltaA + deltaB, normal);
+			slicePrimitive_.defineVertex(pos + deltaB, normal);
+			slicePrimitive_.defineVertex(pos, normal);
 			pos += deltaB;
 		}
 	}

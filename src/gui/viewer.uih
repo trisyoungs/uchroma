@@ -29,7 +29,6 @@
 #include "gui/viewer_primitiveinfo.h"
 #include "gui/viewer_primitivelist.h"
 #include "gui/viewer_textprimitive.h"
-#include "gui/viewer_trianglechopper.h"
 #include "base/colourscale.h"
 #include "base/data2d.h"
 #include "templates/list.h"
@@ -179,8 +178,6 @@ class Viewer : public QGLWidget
 	List<PrimitiveInfo> linePrimitives_;
 	// List of general text primitives
 	TextPrimitiveList textPrimitives_;
-	// Transparency chopper
-	TriangleChopper triangleChopper_;
 
 
 	/*

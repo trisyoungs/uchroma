@@ -70,7 +70,6 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	slicePrimitivePosition_ = 0.0;
 
 	// Engine Setup
-	triangleChopper_.initialise(0.0, 1000, 0.2);
 	createPrimitives();
 	viewMatrix_[14] = -5.0;
 	font_ = NULL;

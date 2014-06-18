@@ -163,10 +163,9 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 	primitives.forgetAll();
 
 	// Resize primitive list so it's large enough for our needs
-	primitives.resize(displayData.nItems()-1, false);
-
-	// Set primitive type to triangles
-	primitives.setType(GL_TRIANGLES);
+	int maxVertices = (abscissa.nItems()+1)*2;
+	int maxIndices = (abscissa.nItems()-1)*6;
+	primitives.reinitialise(displayData.nItems()-1, false, maxVertices, maxIndices, GL_TRIANGLES, true);
 
 	// Sanity check - are there enough slices to proceed?
 	if (displayData.nItems() < 2) return;
@@ -192,6 +191,7 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 	// Create triangles
 	int balls = 1;
 	int nBit, nPlusOneBit, totalBit;
+	GLuint vertexAn = -1, vertexBn = -1, vertexAnPlusOne = -1, vertexBnPlusOne = -1;
 	Primitive* currentPrimitive = primitives[0];
 	for (DisplaySlice* sliceB = sliceA->next; sliceB != NULL; sliceB = sliceB->next)
 	{
@@ -211,7 +211,7 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 		const Array<bool>& yExistsA = sliceA->yExists();
 		const Array<bool>& yExistsB = sliceB->yExists();
 
-		// Construct initial bit. Use to quickly determine which triangles to draw, given possible lack of datapoints in slices
+		// Use a simple bit to quickly determine which triangles to draw, given possible lack of datapoints in slices
 		//
 		//			n	n+1	n	n+1
 		//	Slice A		4-------1	4-------1	0 = Both	5 = None
@@ -219,10 +219,22 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 		//			|   ....|	|....   |	2 = TL		7 = None
 		//			|BL   ..|	|..   BR|	3 = None	8 = TR
 		//	Slice B		8-------2	8-------2	4 = BR		9+= None
-		
+
+		// Set initial bit, and generate initial vertices
 		nBit = 0;
-		if (!yExistsA.value(0)) nBit += 4;
-		if (!yExistsB.value(0)) nBit += 8;
+		if (!yExistsA.value(0)) 
+		{
+			nBit += 4;
+			vertexAn = -1;
+		}
+		else vertexAn = currentPrimitive->defineVertex(abscissa.value(0), yA.value(0), zA, normA[0], colourA[0]);
+		if (!yExistsB.value(0))
+		{
+			nBit += 8;
+			vertexBn = -1;
+		}
+		else vertexBn = currentPrimitive->defineVertex(abscissa.value(0), yB.value(0), zB, normB[0], colourB[0]);
+
 		for (int n=0; n<nPoints-1; ++n)
 		{
 			// Construct bit for n+1
@@ -231,48 +243,50 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 			if (!yExistsB.value(n+1)) nPlusOneBit += 2;
 			totalBit = nBit + nPlusOneBit;
 
+			// Reset indices for current (n+1) column
+			vertexAnPlusOne = -1;
+			vertexBnPlusOne = -1;
+
 			// Add triangles for this quadrant
 			if (totalBit == 0)
 			{
-				// Draw both 
-				currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n], true);
-				currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n+1], true);
-				currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1], true);
-				currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n], true);
-				currentPrimitive->defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n], true);
-				currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1], true);
+				// Draw both
+				vertexAnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n+1]);
+				vertexBnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1]);
+				currentPrimitive->defineIndices(vertexAn, vertexAnPlusOne, vertexBnPlusOne);
+				currentPrimitive->defineIndices(vertexAn, vertexBn, vertexBnPlusOne);
 			}
 			else if (totalBit == 1)
 			{
 				// Bottom left corner only
-				currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n], true);
-				currentPrimitive->defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n], true);
-				currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1], true);
+				vertexBnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1]);
+				currentPrimitive->defineIndices(vertexAn, vertexBnPlusOne, vertexBn);
 			}
 			else if (totalBit == 2)
 			{
 				// Top left corner only
-				currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n], true);
-				currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n], true);
-				currentPrimitive->defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n], true);
+				vertexAnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n]);
+				currentPrimitive->defineIndices(vertexAn, vertexAnPlusOne, vertexBn);
 			}
 			else if (totalBit == 4)
 			{
 				// Bottom right corner only
-				currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n], true);
-				currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1], true);
-				currentPrimitive->defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n], true);
+				vertexAnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n+1]);
+				vertexBnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1]);
+				currentPrimitive->defineIndices(vertexAnPlusOne, vertexBnPlusOne, vertexBn);
 			}
 			else if (totalBit == 8)
 			{
 				// Top right corner only
-				currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n], true);
-				currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n], true);
-				currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1], true);
+				vertexAnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n+1]);
+				vertexBnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1]);
+				currentPrimitive->defineIndices(vertexAn, vertexAnPlusOne, vertexBnPlusOne);
 			}
 
 			// Store new nBit for next index
 			nBit = nPlusOneBit*4;
+			vertexAn = vertexAnPlusOne;
+			vertexBn = vertexBnPlusOne;
 		}
 
 		// Copy arrays ready for next pass

@@ -322,9 +322,14 @@ Vec3<double> Collection::dataMax()
 QString Collection::summaryInfo()
 {
 	QString summary;
-	summary += "<b>" + title_ + "</b>, ";
-	if ((displayStyle_ == Collection::LineStyle) || (displayStyle_ == Collection::LineStyle)) summary += "line surface with " + QString::number(displayPrimitives_.nDefinedVertices()) + " points";
-	else if (displayStyle_ == Collection::SurfaceStyle) summary += "full surface with " + QString::number(displayPrimitives_.nDefinedIndices()/3) + " triangles";
+	if ((displayStyle_ == Collection::LineStyle) || (displayStyle_ == Collection::LineStyle))
+	{
+		summary.sprintf("<b>%s</b>, line surface, %iv, %ii, %il", qPrintable(title_), displayPrimitives_.nDefinedVertices(), displayPrimitives_.nDefinedIndices(), displayPrimitives_.nDefinedIndices()/2);
+	}
+	else
+	{
+		summary.sprintf("<b>%s</b>, full surface, %iv, %ii, %it", qPrintable(title_), displayPrimitives_.nDefinedVertices(), displayPrimitives_.nDefinedIndices(), displayPrimitives_.nDefinedIndices()/3);
+	}
 	return summary;
 }
 

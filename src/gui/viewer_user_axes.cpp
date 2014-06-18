@@ -1,6 +1,6 @@
 /*
 	*** Axes Functions
-	*** src/gui/axes.cpp
+	*** src/gui/viewer_user_axes.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.

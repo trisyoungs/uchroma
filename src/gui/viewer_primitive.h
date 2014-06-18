@@ -28,7 +28,6 @@
 #include "glext.h"
 #endif
 #include "templates/list.h"
-#include "gui/viewer_indexchunk.h"
 #include "gui/viewer_vertexchunk.h"
 #include "math/matrix.h"
 #include "base/dnchar.h"
@@ -95,20 +94,10 @@ class Primitive : public ListItem<Primitive>
 	// Data
 	*/
 	private:
-	// List of vertices in primitive
-	List<VertexChunk> vertexChunks_;
-	// Current vertex chunk
-	VertexChunk* currentVertexChunk_;
+	// Vertex chunk for this primitive
+	VertexChunk vertexChunk_;
 	// Whether vertexData_ array also contains colour information
 	bool colouredVertexData_;
-	// Number of vertices that have been defined
-	int nDefinedVertices_;
-	// Index array, referring to vertexChunk list
-	List<IndexChunk> indexChunks_;
-	// Current index chunk
-	IndexChunk* currentIndexChunk_;
-	// Number of defined indices
-	int nDefinedIndices_;
 	// GL object drawing method
 	GLenum type_;
 	// Default (i.e. global) instance type to use
@@ -123,20 +112,16 @@ class Primitive : public ListItem<Primitive>
 	Dnchar name_;
 
 	public:
-	// Clear existing data (including deleting arrays)
-	void clear();
+	// Initialise primitive storage
+	void initialise(int maxVertices, int maxIndices, GLenum type, bool colourData);
 	// Forget all data, leaving arrays intact
 	void forgetAll();
 	// Return number of vertices currently defined in primitive
 	int nDefinedVertices();
 	// Return number of indices currently defined in primitive
 	int nDefinedIndices();
-	// Set GL drawing primitive type
-	void setType(GLenum type);
-	// Return vertex array
-	VertexChunk *vertexChunks();
-	// Flag whether primitive should contain colour data information for each vertex
-	void setColourData(bool b);
+	// Return vertex chunk
+	const VertexChunk& vertexChunk();
 	// Return whether vertex data contains colour information
 	bool colouredVertexData();
 	// Flag that this primitive should not use instances (rendering will use vertex arrays)
@@ -156,58 +141,21 @@ class Primitive : public ListItem<Primitive>
 	
 	
 	/*
-	// Vertex Generation
+	// Vertex / Index Generation
 	*/
 	public:
 	// Define next vertex and normal
-	void defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz, bool calcCentroid);
+	GLuint defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz);
 	// Define next vertex and normal (as Vec3<double>)
-	void defineVertex(Vec3<double> vertex, Vec3<double> normal, bool calcCentroid);
+	GLuint defineVertex(Vec3<double> vertex, Vec3<double> normal);
 	// Define next vertex, normal, and colour
-	void defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat r, GLfloat g, GLfloat b, GLfloat a, bool calcCentroid);
+	GLuint defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat r, GLfloat g, GLfloat b, GLfloat a);
 	// Define next vertex, normal, and colour
-	void defineVertex(GLfloat x, GLfloat y, GLfloat z, Vec3<double>& normal, Vec4<GLfloat>& colour, bool calcCentroid);
+	GLuint defineVertex(GLfloat x, GLfloat y, GLfloat z, Vec3<double>& normal, Vec4<GLfloat>& colour);
 	// Define next vertex, normal, and colour (as Vec3<double>s and array)
-	void defineVertex(Vec3<double> &v, Vec3<double> &u, Vec4<GLfloat> &colour, bool calcCentroid);
-	// Define triangle fromn supplied array data, unique colour per vertex
-	void defineTriangle(GLfloat *vertices, GLfloat *normals, GLfloat *colour);
-	// Define triangle with single colour per vertex
-	void defineTriangleSingleColour(GLfloat *vertices, GLfloat *normals, GLfloat *colour);
-	// Plot simple line between specified coordinates
-	void plotLine(Vec3<double> p1, Vec3<double> p2);
-	// Plot vertices of sphere with specified radius and quality
-	void plotSphere(double radius, int nstacks, int nslices);
-	// Plot cylinder vertices from origin {ox,oy,oz}, following vector {vx,vy,vz}, for 'length', with radii and quality specified
-	void plotCylinder(GLfloat ox, GLfloat oy, GLfloat oz, GLfloat vx, GLfloat vy, GLfloat vz, double startradius, double endradius, int nstacks, int nslices, bool capStart = false, bool capEnd = false);
-	// Plot tube ring of specified radius and tube width
-	void plotRing(double radius, double width, int nstacks, int nslices, int nsegments, bool segmented = false);
-	// Plot circle of specified radius
-	void plotCircle(double radius, int nstacks, int nsegments, bool segmented = false);
-	// Create vertices of cross with specified width
-	void plotCross(double halfWidth, Matrix &transform, GLfloat colour[4]);
-	// Plot solid cube of specified size at specified origin, and with sides subdivided into triangles ( ntriangles = 2*nsubs )
-	void plotCube(double size, int nsubs, double ox, double oy, double oz);
-	// Plot solid orthorhomboid of specified size at specified origin, and with sides subdivided into triangles ( ntriangles = 2*nsubs )
-	void plotOrthorhomboid(double sizex, double sizey, double sizez, int nsubs, double ox, double oy, double oz);
-
-	/*
-	 * Index Generation
-	 */
-	public:
+	GLuint defineVertex(Vec3<double> &v, Vec3<double> &u, Vec4<GLfloat> &colour);
 	// Define next index triple
 	void defineIndices(GLuint a, GLuint b, GLuint c);
-
-
-	/*
-	// Primitive Generation
-	*/
-	public:
-	// Create wireframe cube centred at zero
-	void createWireCube(double size);
-	// Create wireframe, crossed, cube centred at zero
-	void createCrossedCube(double size);
-	// Create solid cube of specified size at specified origin, and with sides subdivided into triangles ( ntriangles = 2*nsubs )
-	void createCube(double size, int nsubs, double ox, double oy, double oz);
 };
 
 #endif
