@@ -40,6 +40,7 @@ VertexChunk::VertexChunk()
 	nDefinedIndices_ = 0;
 	maxVertices_ = 0;
 	maxIndices_ = 0;
+	useIndices_ = false;
 	maxTypes_ = 0;
 	nDefinedTypes_ = 0;
 	calcCentroids_ = false;
@@ -100,9 +101,10 @@ void VertexChunk::initialise(int newMaxVertices, int newMaxIndices, GLenum type,
 		maxIndices_ = newMaxIndices;
 		indexData_ = new GLuint[maxIndices_];
 	}
+	useIndices_ = (newMaxIndices > 0);
 
 	// (Re)create centroids_ array if it doesn't currently exist or is too small
-	if (maxIndices_ == 0)
+	if (newMaxIndices == 0)
 	{
 		calcCentroids_ = true;
 		if ((!centroids_) || ((maxVertices_/verticesPerType_) > maxTypes_))
@@ -123,7 +125,7 @@ void VertexChunk::initialise(int newMaxVertices, int newMaxIndices, GLenum type,
 // Define next vertex and normal
 GLuint VertexChunk::defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz)
 {
-	if ((maxVertices_-nDefinedVertices_) < 3)
+	if (nDefinedVertices_ >= maxVertices_)
 	{
 		printf("Internal Error: Vertex limit for VertexChunk reached.\n");
 		return -1;
@@ -158,7 +160,7 @@ GLuint VertexChunk::defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GL
 // Define next vertex and normal with specific colour (as array)
 GLuint VertexChunk::defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat* colour)
 {
-	if ((maxVertices_-nDefinedVertices_) < 3)
+	if (nDefinedVertices_ >= maxVertices_)
 	{
 		printf("Internal Error: Vertex limit for VertexChunk reached.\n");
 		return -1;
@@ -201,7 +203,7 @@ GLuint VertexChunk::defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GL
 // Define next vertex and normal with specific colour
 GLuint VertexChunk::defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat r, GLfloat g, GLfloat b, GLfloat a)
 {
-	if ((maxVertices_-nDefinedVertices_) < 3)
+	if (nDefinedVertices_ >= maxVertices_)
 	{
 		printf("Internal Error: Vertex limit for VertexChunk reached.\n");
 		return -1;
@@ -240,6 +242,20 @@ GLuint VertexChunk::defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GL
 
 	// Return index of vertex
 	return (nDefinedVertices_-1);
+}
+
+// Define index doublet
+bool VertexChunk::defineIndices(GLuint a, GLuint b)
+{
+	if ((maxIndices_-nDefinedIndices_) < 2)
+	{
+		printf("Internal Error: Index limit for IndexChunk reached.\n");
+		return false;
+	}
+	// Store indices
+	indexData_[nDefinedIndices_++] = a;
+	indexData_[nDefinedIndices_++] = b;
+	return true;
 }
 
 // Define next triplet of indices
@@ -320,6 +336,6 @@ void VertexChunk::sendToGL()
 	glInterleavedArrays(dataPerVertex_ == 10 ? GL_C4F_N3F_V3F : GL_N3F_V3F, 0, vertexData_);
 
 	// Check if we are using indices
-	if (maxIndices_ > 0) glDrawElements(type_, nDefinedIndices_, GL_UNSIGNED_INT, indexData_);
+	if (useIndices_) glDrawElements(type_, nDefinedIndices_, GL_UNSIGNED_INT, indexData_);
 	else glDrawArrays(type_, 0, nDefinedVertices_);
 }

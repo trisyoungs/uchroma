@@ -22,8 +22,6 @@
 #include "version.h"
 #include "gui/uchroma.h"
 
-#include "parser/tree.h"
-
 int main(int argc, char *argv[])
 {
 	// Uncomment here for extra debug output

@@ -19,22 +19,32 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define GL_GLEXT_PROTOTYPES
 #ifdef _WIN32
 #include <windows.h>
 #include <GL/gl.h>
 #include "glext.h"
+#else
+#include <GL/glx.h>
 #endif
 #include "gui/viewer_primitive.h"
 #include <string.h>
 
-// Declare static VBO functions (Windows only)
+/*
+ * OpenGL Extension Function Initialisation
+ */
+
 #ifdef _WIN32
-PFNGLGENBUFFERSPROC Primitive::glGenBuffers = NULL;
-PFNGLBINDBUFFERPROC Primitive::glBindBuffer = NULL;
-PFNGLBUFFERDATAPROC Primitive::glBufferData = NULL;
-PFNGLBUFFERSUBDATAPROC Primitive::glBufferSubData = NULL;
-PFNGLDELETEBUFFERSPROC Primitive::glDeleteBuffers = NULL;
+PFNGLGENBUFFERSPROC Primitive::glGenBuffers = (PFNGLGENBUFFERSPROC) wglGetProcAddress("glGenBuffers");
+PFNGLBINDBUFFERPROC Primitive::glBindBuffer = (PFNGLBINDBUFFERPROC) wglGetProcAddress("glBindBuffer");
+PFNGLBUFFERDATAPROC Primitive::glBufferData = (PFNGLBUFFERDATAPROC) wglGetProcAddress("glBufferData");
+PFNGLBUFFERSUBDATAPROC Primitive::glBufferSubData = (PFNGLBUFFERSUBDATAPROC) wglGetProcAddress("glBufferSubData");
+PFNGLDELETEBUFFERSPROC Primitive::glDeleteBuffers = (PFNGLDELETEBUFFERSPROC) wglGetProcAddress("glDeleteBuffers");
+#else
+PFNGLGENBUFFERSPROC Primitive::glGenBuffers = (PFNGLGENBUFFERSPROC) glXGetProcAddress((const GLubyte*) "glGenBuffers");
+PFNGLBINDBUFFERPROC Primitive::glBindBuffer = (PFNGLBINDBUFFERPROC) glXGetProcAddress((const GLubyte*) "glBindBuffer");
+PFNGLBUFFERDATAPROC Primitive::glBufferData = (PFNGLBUFFERDATAPROC) glXGetProcAddress((const GLubyte*) "glBufferData");
+PFNGLBUFFERSUBDATAPROC Primitive::glBufferSubData = (PFNGLBUFFERSUBDATAPROC) glXGetProcAddress((const GLubyte*) "glBufferSubData");
+PFNGLDELETEBUFFERSPROC Primitive::glDeleteBuffers = (PFNGLDELETEBUFFERSPROC) glXGetProcAddress((const GLubyte*) "glDeleteBuffers");
 #endif
 
 /*

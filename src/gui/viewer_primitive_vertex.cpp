@@ -54,8 +54,14 @@ GLuint Primitive::defineVertex(Vec3<double>& v, Vec3<double>& u, Vec4<GLfloat>& 
 	return vertexChunk_.defineVertex(v.x,v.y,v.z,u.x,u.y,u.z,colour.x,colour.y,colour.z,colour.w);
 }
 
-// Define next index triple
-void Primitive::defineIndices(GLuint a, GLuint b, GLuint c)
+// Define next index double
+bool Primitive::defineIndices(GLuint a, GLuint b)
 {
-	vertexChunk_.defineIndices(a, b, c);
+	return vertexChunk_.defineIndices(a, b);
+}
+
+// Define next index triple
+bool Primitive::defineIndices(GLuint a, GLuint b, GLuint c)
+{
+	return vertexChunk_.defineIndices(a, b, c);
 }

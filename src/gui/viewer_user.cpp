@@ -105,11 +105,11 @@ void Viewer::setupGL()
 }
 
 // Create/update surface primitive
-void Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate)
+bool Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate)
 {
 	// Check for valid collection, and whether primitive needs updating
-	if (!collection) return;
-	if (collection->displayPrimitivesValid() && collection->colourScaleValid() && (!forceUpdate)) return;
+	if (!collection) return false;
+	if (collection->displayPrimitivesValid() && collection->colourScaleValid() && (!forceUpdate)) return false;
 
 	// Pop old primitive instances and adjust primitive settings
 	collection->displayPrimitives().popInstance(context());
@@ -131,6 +131,8 @@ void Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate)
 	// Push a new instance to create the new display list / vertex array
 	collection->displayPrimitives().pushInstance(context());
 	collection->setDisplayPrimitiveValid();
+
+	return true;
 }
 
 // Add supplied surface primitive to list

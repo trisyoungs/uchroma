@@ -29,12 +29,11 @@ void Viewer::constructLineSurface(PrimitiveList& primitives, const Array<double>
 	primitives.forgetAll();
 
 	// Resize primitive list so it's large enough for our needs
-	primitives.reinitialise(displayData.nItems(), true, abscissa.nItems()*2, 0, GL_LINES, true);
-// 	primitives.reinitialise(displayData.nItems(), true, abscissa.nItems(), (abscissa.nItems()-1)*2, GL_LINES, true);
+	primitives.reinitialise(displayData.nItems(), true, abscissa.nItems(), (abscissa.nItems()-1)*2, GL_LINES, true);
 
 	// Temporary variables
-	GLfloat zA;
-	Vec4<GLfloat> colourA(0,0,0,1);
+	GLfloat z;
+	Vec4<GLfloat> colour(0,0,0,1);
 	int n, nPoints;
 	double yAxisScale = uChroma_->axisStretch(1);
 	Vec3<double> nrm(0.0, 1.0, 0.0);
@@ -42,26 +41,37 @@ void Viewer::constructLineSurface(PrimitiveList& primitives, const Array<double>
 	Primitive* currentPrimitive = primitives[0];
 
 	// Create lines for slices
+	GLuint vertexA, vertexB;
 	for (DisplaySlice* slice = displayData.first(); slice != NULL; slice = slice->next)
 	{
 		// Grab y and z values
-		const Array<double>& yA = slice->y();
-		const Array<bool>& yAExists = slice->yExists();
-		zA = (GLfloat) slice->z();
+		const Array<double>& y = slice->y();
+		const Array<bool>& yExists = slice->yExists();
+		z = (GLfloat) slice->z();
 
-		// Get nPoints, and initial coordinates
+		// Get nPoints, and initial vertex
 		nPoints = abscissa.nItems();
+		if (yExists.value(0))
+		{
+			colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, y.value(0)) : y.value(0)) / yAxisScale, colour);
+			vertexA = currentPrimitive->defineVertex(abscissa.value(0), y.value(0), z, nrm, colour);
+		}
+		else vertexA = -1;
+
 		for (n=1; n<nPoints; ++n)
 		{
-			// If no valid points exists, plot no vertex
-			if (!yAExists.value(n-1)) continue;
-			if (!yAExists.value(n)) continue;
+			// Define vertex index for this point (if one exists)
+			if (yExists.value(n))
+			{
+				colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, y.value(n)) : y.value(n)) / yAxisScale, colour);
+				vertexB = currentPrimitive->defineVertex(abscissa.value(n), y.value(n), z, nrm, colour);
+			}
+			else vertexB = -1;
 
-			// Add vertices for these points
-			colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, yA.value(n-1)) : yA.value(n-1)) / yAxisScale, colourA);
-			currentPrimitive->defineVertex(abscissa.value(n-1), yA.value(n-1), zA, nrm, colourA);
-			colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, yA.value(n)) : yA.value(n)) / yAxisScale, colourA);
-			currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, nrm, colourA);
+			// If both vertices are valid, plot a line
+			if ((vertexA != -1) && (vertexB != -1)) currentPrimitive->defineIndices(vertexA, vertexB);
+
+			vertexA = vertexB;
 		}
 		currentPrimitive = currentPrimitive->next;
 	}

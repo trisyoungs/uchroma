@@ -61,6 +61,8 @@ class VertexChunk
 	int maxVertices_;
 	// Maximum number of indices
 	int maxIndices_;
+	// Whether indices are to be used when rendering
+	bool useIndices_;
 	// Maximum number of types (for non-indexed data)
 	int maxTypes_;
 	// Primitive type (GL)
@@ -85,7 +87,9 @@ class VertexChunk
 	GLuint defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat *colour);
 	// Define next vertex, normal, and colour
 	GLuint defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat r, GLfloat g, GLfloat b, GLfloat a);
-	// Define indices
+	// Define index doublet
+	bool defineIndices(GLuint a, GLuint b);
+	// Define index triplet
 	bool defineIndices(GLuint a, GLuint b, GLuint c);
 	// Return whether current array is full
 	bool full();

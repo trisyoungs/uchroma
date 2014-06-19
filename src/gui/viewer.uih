@@ -52,6 +52,17 @@ class Viewer : public QGLWidget
 
 
 	/*
+	 * OpenGL Function Declarations
+	 */
+	public:
+	static PFNGLBEGINQUERYPROC glBeginQuery;
+	static PFNGLENDQUERYPROC glEndQuery;
+	static PFNGLGENQUERIESPROC glGenQueries;
+	static PFNGLGETQUERYOBJECTIVPROC glGetQueryObjectiv;
+	static PFNGLGETQUERYOBJECTUI64VPROC glGetQueryObjectui64v;
+
+
+	/*
 	 * Link to UChroma
 	 */
 	private:
@@ -90,7 +101,8 @@ class Viewer : public QGLWidget
 	FTFont* font_;
 	// Basic font height (from baseline to top of normal height letter)
 	double fontBaseHeight_;
-
+	// String containing time taken to do last render
+	QString renderTime_;
 
 	protected:
 	// Initialise context widget (when created by Qt)
@@ -240,7 +252,7 @@ class Viewer : public QGLWidget
 	// Construct full surface representation of data
 	void constructFullSurface(PrimitiveList& primitives, const Array< double >& abscissa, List< DisplaySlice >& displayData, ColourScale colourScale);
 	// Create/update surface primitive for specified collection
-	void updateSurfacePrimitive(Collection* collection, bool forceUpdate = false);
+	bool updateSurfacePrimitive(Collection* collection, bool forceUpdate = false);
 
 	public:
 	// Add supplied collection primitive to list
@@ -263,7 +275,12 @@ class Viewer : public QGLWidget
 	void setYClip(double yMin, double yMax);
 	
 	signals:
+	// Slice axis was clicked on
 	void sliceAxisClicked();
+	// Return string containing time taken to do last render
+	QString renderComplete(QString timeTaken);
+	// Data for one or more surface primitives was updated
+	void surfacePrimitivesUpdated();
 
 
 	/*

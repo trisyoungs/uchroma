@@ -251,6 +251,8 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 			if (totalBit == 0)
 			{
 				// Draw both
+				if (vertexAn == -1) vertexAn = currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n]);
+				if (vertexBn == -1) vertexBn = currentPrimitive->defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n]);
 				vertexAnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n+1]);
 				vertexBnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1]);
 				currentPrimitive->defineIndices(vertexAn, vertexAnPlusOne, vertexBnPlusOne);
@@ -259,18 +261,23 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 			else if (totalBit == 1)
 			{
 				// Bottom left corner only
+				if (vertexAn == -1) vertexAn = currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n]);
+				if (vertexBn == -1) vertexBn = currentPrimitive->defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n]);
 				vertexBnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1]);
 				currentPrimitive->defineIndices(vertexAn, vertexBnPlusOne, vertexBn);
 			}
 			else if (totalBit == 2)
 			{
 				// Top left corner only
+				if (vertexAn == -1) vertexAn = currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n]);
+				if (vertexBn == -1) vertexBn = currentPrimitive->defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n]);
 				vertexAnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n]);
 				currentPrimitive->defineIndices(vertexAn, vertexAnPlusOne, vertexBn);
 			}
 			else if (totalBit == 4)
 			{
 				// Bottom right corner only
+				if (vertexBn == -1) vertexBn = currentPrimitive->defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n]);
 				vertexAnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n+1]);
 				vertexBnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1]);
 				currentPrimitive->defineIndices(vertexAnPlusOne, vertexBnPlusOne, vertexBn);
@@ -278,6 +285,7 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 			else if (totalBit == 8)
 			{
 				// Top right corner only
+				if (vertexAn == -1) vertexAn = currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n]);
 				vertexAnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n+1]);
 				vertexBnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1]);
 				currentPrimitive->defineIndices(vertexAn, vertexAnPlusOne, vertexBnPlusOne);

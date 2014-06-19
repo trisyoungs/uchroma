@@ -104,8 +104,8 @@ void Messenger::print(const char *fmt, ...) const
 void Messenger::print(Messenger::OutputType ot, const char *fmt, ...) const
 {
 	// Print to the text view in the main window if it has been initialised.
-	// If program is in quiet mode, don't print anything except Messenger::Always calls
-	if (quiet_ && (ot != Messenger::Always)) return;
+	// If program is in quiet mode, don't print anything except Messenger::Force calls
+	if (quiet_ && (ot != Messenger::Force)) return;
 	va_list arguments;
 	static char msgs[8096];
 	msgs[0] = '\0';
@@ -113,7 +113,7 @@ void Messenger::print(Messenger::OutputType ot, const char *fmt, ...) const
 	va_start(arguments,fmt);
 	vsprintf(msgs,fmt,arguments);
 	// Print message to stdout, but only if specified output type is active
-	if (ot == Messenger::Always) printf("%s",msgs);
+	if (ot == Messenger::Force) printf("%s",msgs);
 	else if (isOutputActive(ot) && (!quiet_)) printf("%s",msgs);
 	va_end(arguments);
 }

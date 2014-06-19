@@ -191,9 +191,21 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
+	 * StatusBar Widgets
+	 */
+	private:
+	// Label for rendering time information
+	QLabel* renderTimeLabel_;
+
+	public slots:
+	// Update text of renderTimeLabel_ in statusbar
+	void updateRenderTimeLabel(QString text);
+
+
+	/*
 	 * Update
 	 */
-	public:
+	public slots:
 	// Update all aspects of GUI
 	void updateGUI();
 	// Update all subwindows

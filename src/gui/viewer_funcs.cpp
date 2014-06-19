@@ -22,6 +22,26 @@
 #include "gui/viewer.uih"
 #include "gui/uchroma.h"
 #include "base/messenger.h"
+#include <GL/glext.h>
+#include <GL/glx.h>
+
+/*
+ * OpenGL Function Declarations
+ */
+
+#ifdef _WIN32
+PFNGLBEGINQUERYPROC Viewer::glBeginQuery = (PFNGLBEGINQUERYPROC) wglGetProcAddress("glBeginQuery");
+PFNGLENDQUERYPROC Viewer::glEndQuery = (PFNGLENDQUERYPROC) wglGetProcAddress("glEndQuery");
+PFNGLGENQUERIESPROC Viewer::glGenQueries = (PFNGLGENQUERIESPROC) wglGetProcAddress("glGenQueries");
+PFNGLGETQUERYOBJECTIVPROC Viewer::glGetQueryObjectiv = (PFNGLGETQUERYOBJECTIVPROC) wglGetProcAddress("glGetQueryObjectiv");
+PFNGLGETQUERYOBJECTUI64VPROC Viewer::glGetQueryObjectui64v = (PFNGLGETQUERYOBJECTUI64VPROC) wglGetProcAddress("glGetQueryObjectui64v");
+#else
+PFNGLBEGINQUERYPROC Viewer::glBeginQuery = (PFNGLBEGINQUERYPROC) glXGetProcAddress((const GLubyte*) "glBeginQuery");
+PFNGLENDQUERYPROC Viewer::glEndQuery = (PFNGLENDQUERYPROC) glXGetProcAddress((const GLubyte*) "glEndQuery");
+PFNGLGENQUERIESPROC Viewer::glGenQueries = (PFNGLGENQUERIESPROC) glXGetProcAddress((const GLubyte*) "glGenQueries");
+PFNGLGETQUERYOBJECTIVPROC Viewer::glGetQueryObjectiv = (PFNGLGETQUERYOBJECTIVPROC) glXGetProcAddress((const GLubyte*) "glGetQueryObjectiv");
+PFNGLGETQUERYOBJECTUI64VPROC Viewer::glGetQueryObjectui64v = (PFNGLGETQUERYOBJECTUI64VPROC) glXGetProcAddress((const GLubyte*) "glGetQueryObjectui64v");
+#endif
 
 /*
  * Image Formats
@@ -113,7 +133,14 @@ void Viewer::initializeGL()
 	// Initialize GL
 	msg.enter("Viewer::initializeGL");
 	valid_ = true;
-	
+
+	// Query OpenGL Extensions and set features
+	const GLubyte* glexts = NULL;
+	glexts = glGetString(GL_EXTENSIONS);
+	printf("%s\n", glexts);
+	if (strstr((const char*)glexts, "GL_ARB_timer_query") != NULL) printf("Feature found.\n");
+	else printf("Feature not found.\n");
+
 	// Create an instance for each defined user primitive - we do this in every call to initialiseGL so
 	// that, when saving a bitmap using QGLWidget::renderPixmap(), we automatically create new display list
 	// objects, rather than having to worry about context sharing etc. Slow, but safer and more compatible.
@@ -143,7 +170,12 @@ void Viewer::paintGL()
 	// Update / recreate axes, display data and surface primitives if necessary
 	uChroma_->updateAxesPrimitives();
 	uChroma_->updateDisplayData();
-	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) updateSurfacePrimitive(collection);
+	int nUpdated = 0;
+	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next)
+	{
+		if (updateSurfacePrimitive(collection)) ++nUpdated;
+	}
+	if (nUpdated > 0) emit(surfacePrimitivesUpdated());
 
 	// Setup basic GL stuff
 	setupGL();
@@ -234,7 +266,12 @@ void Viewer::paintGL()
 // 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 // 	triangleChopper_.sendToGL();
 // 	glPopClientAttrib();
-
+       
+	// Create a query object to get timing information
+	GLuint query;
+	glGenQueries(1, &query);
+	glBeginQuery(GL_TIME_ELAPSED, query);
+	
 	// Loop over collections
 	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next)
 	{
@@ -287,7 +324,22 @@ void Viewer::paintGL()
 // 		glLoadMatrixd(A.matrix());
 // 		prim->sendToGL();
 // 	}
+
 	
+	// End timer query
+	glEndQuery(GL_TIME_ELAPSED);
+
+	// Wait for all results to become available
+	GLint available = 0;
+	GLuint64 timeElapsed = 0;
+	while (!available) { glGetQueryObjectiv(query, GL_QUERY_RESULT_AVAILABLE, &available); }
+
+	// Time taken is in ns, so convert to ms and write to a string
+	glGetQueryObjectui64v(query, GL_QUERY_RESULT, &timeElapsed);
+	double ms = timeElapsed / 1.0e6;
+	renderTime_.sprintf("%0.2f ms", ms);
+	emit(renderComplete(renderTime_));
+
 	// Set the rendering flag to false
 	drawing_ = false;
 

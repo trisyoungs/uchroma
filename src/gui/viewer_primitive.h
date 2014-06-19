@@ -80,14 +80,15 @@ class Primitive : public ListItem<Primitive>
 	// Constructor / Destructor
 	Primitive();
 	~Primitive();
-	// VBO function pointers (Windows only)
-	#ifdef _WIN32
+
+	/*
+	 * OpenGL Function Pointers (VBO)
+	 */
 	static PFNGLGENBUFFERSPROC glGenBuffers;
 	static PFNGLBINDBUFFERPROC glBindBuffer;
 	static PFNGLBUFFERDATAPROC glBufferData;
 	static PFNGLBUFFERSUBDATAPROC glBufferSubData;
 	static PFNGLDELETEBUFFERSPROC glDeleteBuffers;
-	#endif
 
 
 	/*
@@ -101,7 +102,7 @@ class Primitive : public ListItem<Primitive>
 	// GL object drawing method
 	GLenum type_;
 	// Default (i.e. global) instance type to use
-	static const PrimitiveInstance::InstanceType defaultInstanceType_ = PrimitiveInstance::ListInstance;
+	static const PrimitiveInstance::InstanceType defaultInstanceType_ = PrimitiveInstance::VBOInstance;
 	// Stack of OpenGL VBO or display list IDs and the contexts in which they were created
 	List<PrimitiveInstance> instances_;
 	// Flag stating whether or not instances should be used for this primitive
@@ -154,8 +155,10 @@ class Primitive : public ListItem<Primitive>
 	GLuint defineVertex(GLfloat x, GLfloat y, GLfloat z, Vec3<double>& normal, Vec4<GLfloat>& colour);
 	// Define next vertex, normal, and colour (as Vec3<double>s and array)
 	GLuint defineVertex(Vec3<double> &v, Vec3<double> &u, Vec4<GLfloat> &colour);
+	// Define next index double
+		bool defineIndices(GLuint a, GLuint b);
 	// Define next index triple
-	void defineIndices(GLuint a, GLuint b, GLuint c);
+		bool defineIndices(GLuint a, GLuint b, GLuint c);
 };
 
 #endif

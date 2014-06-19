@@ -54,11 +54,17 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	FitDialog::setUChroma(this);
 	CreateDialog::setUChroma(this);
 
+	// Create statusbar widgets
+	renderTimeLabel_ = new QLabel;
+	ui.StatusBar->addPermanentWidget(renderTimeLabel_);
+
 	// Load font for viewer
 	ui.MainView->setupFont(viewerFont_);
 
 	// Connect signals / slots between the Viewer and uChroma
 	connect(ui.MainView, SIGNAL(sliceAxisClicked()), this, SLOT(addSurfaceSlice()));
+	connect(ui.MainView, SIGNAL(renderComplete(QString)), this, SLOT(updateRenderTimeLabel(QString)));
+	connect(ui.MainView, SIGNAL(surfacePrimitivesUpdated()), this, SLOT(updateCollectionInfoBar()));
 
 	// Connect signals / slots between SliceMonitor and main UI
 	connect(this, SIGNAL(sliceDataChanged()), sliceMonitorWindow_.ui.MonitorGraph, SLOT(staticDataChanged()));
@@ -68,7 +74,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	connect(&dataWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsData, SLOT(setChecked(bool)));
 	connect(&styleWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsStyle, SLOT(setChecked(bool)));
 	connect(&transformWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsTransform, SLOT(setChecked(bool)));
-	connect(&viewWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsView, SLOT(setChecked(bool)));
+	connect(&viewWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsView, SLOT(setChecked(bool)));	
 }
 
 // Destructor
@@ -92,6 +98,16 @@ void UChromaWindow::saveSettings()
 
 	// Viewer font
 	settings.setValue("ViewerFont", viewerFont_);
+}
+
+/*
+ * StatusBar Widgets
+ */
+
+// Update text of renderTimeLabel_ in statusbar
+void UChromaWindow::updateRenderTimeLabel(QString text)
+{
+	renderTimeLabel_->setText(text);
 }
 
 /*
