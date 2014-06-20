@@ -79,6 +79,8 @@ class Viewer : public QGLWidget
 	// (in viewer_funcs.cpp)
 	*/
 	private:
+	// Flags indicating presence of various GL_EXTENSIONS
+	bool vboExtension_, timerExtension_;
 	// Width, height, and aspect ratio of the canvas
 	GLsizei contextWidth_, contextHeight_;
 	// Flag to indicate whether we may draw to the canvas

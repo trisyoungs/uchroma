@@ -178,15 +178,10 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 	double yAxisScale = uChroma_->axisStretch(1);
 	Vec3<double> nrm(0.0, 1.0, 0.0);
 
-	// Return now if there are not enough slices to work with
-	if (displayData.nItems() < 2) return;
-
 	// Construct first slice data and set initial min/max values
 	DisplaySlice* sliceA = displayData.first();
 	constructSurfaceStrip(abscissa, sliceA, yAxisScale, normA, colourA, colourScale, NULL, sliceA->next);
 	int nPoints = abscissa.nItems();
-
-	printf("NVertices at start of constructFullSurface = %i\n", primitives.nDefinedVertices());
 
 	// Create triangles
 	int balls = 1;
@@ -305,7 +300,4 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 		// Increment primitive pointer
 		currentPrimitive = currentPrimitive->next;
 	}
-
-	printf("NVertices at end of constructFullSurface = %i\n", primitives.nDefinedVertices());
-
 }

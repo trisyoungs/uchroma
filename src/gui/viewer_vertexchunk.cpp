@@ -40,7 +40,7 @@ VertexChunk::VertexChunk()
 	nDefinedIndices_ = 0;
 	maxVertices_ = 0;
 	maxIndices_ = 0;
-	useIndices_ = false;
+	hasIndices_ = false;
 	maxTypes_ = 0;
 	nDefinedTypes_ = 0;
 	calcCentroids_ = false;
@@ -101,7 +101,7 @@ void VertexChunk::initialise(int newMaxVertices, int newMaxIndices, GLenum type,
 		maxIndices_ = newMaxIndices;
 		indexData_ = new GLuint[maxIndices_];
 	}
-	useIndices_ = (newMaxIndices > 0);
+	hasIndices_ = (newMaxIndices > 0);
 
 	// (Re)create centroids_ array if it doesn't currently exist or is too small
 	if (newMaxIndices == 0)
@@ -274,9 +274,15 @@ bool VertexChunk::defineIndices(GLuint a, GLuint b, GLuint c)
 }
 
 // Return whether current array is full
-bool VertexChunk::full()
+bool VertexChunk::full() const
 {
 	return (nDefinedVertices_ == maxVertices_);
+}
+
+// Return whether indices are being used
+bool VertexChunk::hasIndices() const
+{
+	return hasIndices_;
 }
 
 // Forget all vertex data currently stored in array (but retain array)
@@ -291,19 +297,19 @@ void VertexChunk::forgetAll()
 }
 
 // Return number of vertices defined
-int VertexChunk::nDefinedVertices()
+int VertexChunk::nDefinedVertices() const
 {
 	return nDefinedVertices_;
 }
 
 // Return number of indices defined
-int VertexChunk::nDefinedIndices()
+int VertexChunk::nDefinedIndices() const
 {
 	return nDefinedIndices_;
 }
 
 // Return number of defined primitive (GL) types
-int VertexChunk::nDefinedTypes()
+int VertexChunk::nDefinedTypes() const
 {
 	return nDefinedTypes_;
 }
@@ -327,7 +333,7 @@ const GLuint *VertexChunk::indexData()
 }
 
 // Send to GL
-void VertexChunk::sendToGL()
+void VertexChunk::sendToGL() const
 {
 	// Check vertex count
 	if (nDefinedVertices_ == 0) return;
@@ -336,6 +342,6 @@ void VertexChunk::sendToGL()
 	glInterleavedArrays(dataPerVertex_ == 10 ? GL_C4F_N3F_V3F : GL_N3F_V3F, 0, vertexData_);
 
 	// Check if we are using indices
-	if (useIndices_) glDrawElements(type_, nDefinedIndices_, GL_UNSIGNED_INT, indexData_);
+	if (hasIndices_) glDrawElements(type_, nDefinedIndices_, GL_UNSIGNED_INT, indexData_);
 	else glDrawArrays(type_, 0, nDefinedVertices_);
 }

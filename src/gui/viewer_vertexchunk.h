@@ -61,8 +61,8 @@ class VertexChunk
 	int maxVertices_;
 	// Maximum number of indices
 	int maxIndices_;
-	// Whether indices are to be used when rendering
-	bool useIndices_;
+	// Whether indices are being used when rendering
+	bool hasIndices_;
 	// Maximum number of types (for non-indexed data)
 	int maxTypes_;
 	// Primitive type (GL)
@@ -92,13 +92,15 @@ class VertexChunk
 	// Define index triplet
 	bool defineIndices(GLuint a, GLuint b, GLuint c);
 	// Return whether current array is full
-	bool full();
+	bool full() const;
+	// Return whether indices are being used
+	bool hasIndices() const;
 	// Return number of vertices defined
-	int nDefinedVertices();
+	int nDefinedVertices() const;
 	// Return number of indices defined
-	int nDefinedIndices();
+	int nDefinedIndices() const;
 	// Return number of defined primitive (GL) types
-	int nDefinedTypes();
+	int nDefinedTypes() const;
 	// Return vertex array
 	const GLfloat* vertexData();
 	// Return index array
@@ -106,7 +108,7 @@ class VertexChunk
 	// Return centroid array
 	const GLfloat* centroids();
 	// Send to GL
-	void sendToGL();
+	void sendToGL() const;
 };
 
 #endif

@@ -29,6 +29,9 @@
 #include "gui/viewer_primitive.h"
 #include <string.h>
 
+// Static members
+PrimitiveInstance::InstanceType Primitive::globalInstanceType_ = PrimitiveInstance::VBOInstance;
+
 /*
  * OpenGL Extension Function Initialisation
  */
@@ -119,13 +122,24 @@ Primitive::Primitive() : ListItem<Primitive>()
 	colouredVertexData_ = false;
 	type_ = GL_TRIANGLES;
 	useInstances_ = true;
-	useIndices_ = false;
 	name_ = "<UnnamedPrimitive>";
 }
 
 // Destructor
 Primitive::~Primitive()
 {
+}
+
+// Return global instance type to use
+PrimitiveInstance::InstanceType Primitive::globalInstanceType()
+{
+	return globalInstanceType_;
+}
+
+// Set global instance type to use
+void Primitive::setGlobalInstanceType(PrimitiveInstance::InstanceType instanceType)
+{
+	Primitive::globalInstanceType_ = instanceType;
 }
 
 // Initialise primitive
@@ -143,13 +157,13 @@ void Primitive::forgetAll()
 }
 
 // Return number of vertices currently defined in primitive
-int Primitive::nDefinedVertices()
+int Primitive::nDefinedVertices() const
 {
 	return vertexChunk_.nDefinedVertices();
 }
 
 // Return number of indices currently defined in primitive
-int Primitive::nDefinedIndices()
+int Primitive::nDefinedIndices() const
 {
 	return vertexChunk_.nDefinedIndices();
 }
@@ -161,7 +175,7 @@ void Primitive::setName(const char *s)
 }
 
 // Return name of primitive
-const char *Primitive::name()
+const char *Primitive::name() const
 {
 	return name_.get();
 }
@@ -173,7 +187,7 @@ const VertexChunk& Primitive::vertexChunk()
 }
 
 // Return whether vertex data contains colour information
-bool Primitive::colouredVertexData()
+bool Primitive::colouredVertexData() const
 {
 	return colouredVertexData_;
 }
@@ -184,11 +198,7 @@ void Primitive::setNoInstances()
 	useInstances_ = false;
 }
 
-// Set whether indexed vertex drawing is to be used
-void Primitive::setUseIndices(bool b)
-{
-	useIndices_ = b;
-}
+
 
 // Push instance of primitive
 void Primitive::pushInstance(const QGLContext *context)
@@ -200,7 +210,7 @@ void Primitive::pushInstance(const QGLContext *context)
 	glGetError();
 
 	// Vertex buffer object or plain old display list?
-	if (Primitive::defaultInstanceType_ == PrimitiveInstance::VBOInstance)
+	if (Primitive::globalInstanceType_ == PrimitiveInstance::VBOInstance)
 	{
 		// Prepare local array of data to pass to VBO
 		int offset;
@@ -211,7 +221,7 @@ void Primitive::pushInstance(const QGLContext *context)
 			msg.exit("Primitive::pushInstance");
 			return;
 		}
-		
+
 		// Determine total size of array (in bytes) for VBO
 		int vboSize = vertexChunk_.nDefinedVertices() * (colouredVertexData_ ? 10 : 6) * sizeof(GLfloat);
 		
@@ -233,8 +243,8 @@ void Primitive::pushInstance(const QGLContext *context)
 		}
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		// Generate index array ovject (if using indices)
-		if (useIndices_)
+		// Generate index array object (if using indices)
+		if (vertexChunk_.hasIndices())
 		{
 			// Generate index array object
 			glGenBuffers(1, &indexVBO);
@@ -254,9 +264,10 @@ void Primitive::pushInstance(const QGLContext *context)
 			}
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
-		// Store data
+
+		// Store instance data
 		PrimitiveInstance *pi = instances_.add();
-		pi->setVBO(context, vertexVBO, useIndices_ ? indexVBO : 0);
+		pi->setVBO(context, vertexVBO, vertexChunk_.hasIndices() ? indexVBO : 0);
 	}
 	else
 	{
@@ -287,7 +298,7 @@ void Primitive::popInstance(const QGLContext *context)
 			{
 				GLuint bufid  = pi->vboVertexObject();
 				if (bufid != 0) glDeleteBuffers(1, &bufid);
-				if (useIndices_)
+				if (vertexChunk_.hasIndices())
 				{
 					bufid = pi->vboIndexObject();
 					if (bufid != 0) glDeleteBuffers(1, &bufid);
@@ -300,7 +311,7 @@ void Primitive::popInstance(const QGLContext *context)
 }
 
 // Send to OpenGL (i.e. render)
-void Primitive::sendToGL()
+void Primitive::sendToGL() const
 {
 	// If no vertices are defined, nothing to do...
 	if (vertexChunk_.nDefinedVertices() == 0) return;
@@ -316,15 +327,15 @@ void Primitive::sendToGL()
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glEnableClientState(GL_NORMAL_ARRAY);
 			glEnableClientState(GL_COLOR_ARRAY);
-			if (useIndices_) glEnableClientState(GL_INDEX_ARRAY);
+			if (vertexChunk_.hasIndices()) glEnableClientState(GL_INDEX_ARRAY);
 			else glDisableClientState(GL_INDEX_ARRAY);
 
 			// Bind VBO and index buffer (if using it)
 			glBindBuffer(GL_ARRAY_BUFFER, pi->vboVertexObject());
-			if (useIndices_) glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pi->vboIndexObject());
+			if (vertexChunk_.hasIndices()) glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pi->vboIndexObject());
 
 			glInterleavedArrays(colouredVertexData_ ? GL_C4F_N3F_V3F : GL_N3F_V3F, 0, NULL);
-			if (useIndices_) glDrawElements(type_, vertexChunk_.nDefinedIndices(), GL_UNSIGNED_INT, 0);
+			if (vertexChunk_.hasIndices()) glDrawElements(type_, vertexChunk_.nDefinedIndices(), GL_UNSIGNED_INT, 0);
 			else glDrawArrays(type_, 0, vertexChunk_.nDefinedVertices());
 
 			// Revert to normal operation - pass 0 as VBO index
@@ -332,7 +343,7 @@ void Primitive::sendToGL()
 			glDisableClientState(GL_VERTEX_ARRAY);
 			glDisableClientState(GL_NORMAL_ARRAY);
 			glDisableClientState(GL_COLOR_ARRAY);
-			if (useIndices_) glDisableClientState(GL_INDEX_ARRAY);
+			if (vertexChunk_.hasIndices()) glDisableClientState(GL_INDEX_ARRAY);
 		}
 		else glCallList(pi->listObject());
 	}

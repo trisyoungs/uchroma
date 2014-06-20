@@ -137,9 +137,13 @@ void Viewer::initializeGL()
 	// Query OpenGL Extensions and set features
 	const GLubyte* glexts = NULL;
 	glexts = glGetString(GL_EXTENSIONS);
-	printf("%s\n", glexts);
-	if (strstr((const char*)glexts, "GL_ARB_timer_query") != NULL) printf("Feature found.\n");
-	else printf("Feature not found.\n");
+	vboExtension_ = (strstr((const char*)glexts, "GL_ARB_vertex_buffer_object") != NULL);
+	timerExtension_ = (strstr((const char*)glexts, "GL_ARB_timer_query") != NULL);
+	if (!vboExtension_)
+	{
+		printf("VBO Extension is not available, so reverting to display list instances.\n");
+		Primitive::setGlobalInstanceType(PrimitiveInstance::ListInstance);
+	}
 
 	// Create an instance for each defined user primitive - we do this in every call to initialiseGL so
 	// that, when saving a bitmap using QGLWidget::renderPixmap(), we automatically create new display list
@@ -259,19 +263,14 @@ void Viewer::paintGL()
 	glEnable(GL_CLIP_PLANE1);
 	glPopMatrix();
 
-// 	triangleChopper_.emptyTriangles();
-// 	triangleChopper_.storeTriangles(&surface_, A);
-// 	glLoadIdentity();
-// 	glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
-// 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-// 	triangleChopper_.sendToGL();
-// 	glPopClientAttrib();
-       
 	// Create a query object to get timing information
-	GLuint query;
-	glGenQueries(1, &query);
-	glBeginQuery(GL_TIME_ELAPSED, query);
-	
+	GLuint timeQuery = 0;
+	if (timerExtension_)
+	{
+		glGenQueries(1, &timeQuery);
+		glBeginQuery(GL_TIME_ELAPSED, timeQuery);
+	}
+
 	// Loop over collections
 	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next)
 	{
@@ -298,47 +297,23 @@ void Viewer::paintGL()
 	glDisable(GL_CLIP_PLANE0);
 	glDisable(GL_CLIP_PLANE1);
 
-	// Send all other listed primitives to the display
-// 	sortAndSendGL();
-// 		// Transform and render each transparent primitive in each list, unless correctTransparency_ is off.
-// 	if (correctTransparency_)
-// 	{
-// 		triangleChopper_.emptyTriangles();
-// 		for (PrimitiveInfo *pi = transparentPrimitives_.first(); pi != NULL; pi = pi->next)
-// 		{
-// 			triangleChopper_.storeTriangles(pi, viewMatrix_);
-// 		}
-// 		glLoadIdentity();
-// 		glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
-// 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-// 		triangleChopper_.sendToGL();
-// 		glPopClientAttrib();
-// 	}
-// 	else for (PrimitiveInfo *pi = transparentPrimitives_.first(); pi != NULL; pi = pi->next)
-// 	{
-// 		// Grab primitive pointer
-// 		prim = pi->primitive();
-// 		if (prim == NULL) continue;
-// 		if (!prim->colouredVertexData()) glColor4fv(pi->colour());
-// 		A = viewMatrix_ * pi->localTransform();
-// 		glLoadMatrixd(A.matrix());
-// 		prim->sendToGL();
-// 	}
-
-	
 	// End timer query
-	glEndQuery(GL_TIME_ELAPSED);
+	if (timerExtension_)
+	{
+		glEndQuery(GL_TIME_ELAPSED);
 
-	// Wait for all results to become available
-	GLint available = 0;
-	GLuint64 timeElapsed = 0;
-	while (!available) { glGetQueryObjectiv(query, GL_QUERY_RESULT_AVAILABLE, &available); }
+		// Wait for all results to become available
+		GLint available = 0;
+		GLuint64 timeElapsed = 0;
+		while (!available) { glGetQueryObjectiv(timeQuery, GL_QUERY_RESULT_AVAILABLE, &available); }
 
-	// Time taken is in ns, so convert to ms and write to a string
-	glGetQueryObjectui64v(query, GL_QUERY_RESULT, &timeElapsed);
-	double ms = timeElapsed / 1.0e6;
-	renderTime_.sprintf("%0.2f ms", ms);
-	emit(renderComplete(renderTime_));
+		// Time taken is in ns, so convert to ms and write to a string
+		glGetQueryObjectui64v(timeQuery, GL_QUERY_RESULT, &timeElapsed);
+		double ms = timeElapsed / 1.0e6;
+		renderTime_.sprintf("%0.2f ms", ms);
+		emit(renderComplete(renderTime_));
+	}
+	else renderTime_ = "";
 
 	// Set the rendering flag to false
 	drawing_ = false;

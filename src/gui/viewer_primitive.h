@@ -101,34 +101,34 @@ class Primitive : public ListItem<Primitive>
 	bool colouredVertexData_;
 	// GL object drawing method
 	GLenum type_;
-	// Default (i.e. global) instance type to use
-	static const PrimitiveInstance::InstanceType defaultInstanceType_ = PrimitiveInstance::VBOInstance;
+	// Global instance type to use
+	static PrimitiveInstance::InstanceType globalInstanceType_;
 	// Stack of OpenGL VBO or display list IDs and the contexts in which they were created
 	List<PrimitiveInstance> instances_;
 	// Flag stating whether or not instances should be used for this primitive
 	bool useInstances_;
-	// Flag stating whether indexed vertex drawing is to be used
-	bool useIndices_;
 	// Name of primitive (for easier bug-tracking)
 	Dnchar name_;
 
 	public:
+	// Return global instance type to use
+	static PrimitiveInstance::InstanceType globalInstanceType();
+	// Set global instance type to use
+	static void setGlobalInstanceType(PrimitiveInstance::InstanceType instanceType);
 	// Initialise primitive storage
 	void initialise(int maxVertices, int maxIndices, GLenum type, bool colourData);
 	// Forget all data, leaving arrays intact
 	void forgetAll();
 	// Return number of vertices currently defined in primitive
-	int nDefinedVertices();
+	int nDefinedVertices() const;
 	// Return number of indices currently defined in primitive
-	int nDefinedIndices();
+	int nDefinedIndices() const;
 	// Return vertex chunk
 	const VertexChunk& vertexChunk();
 	// Return whether vertex data contains colour information
-	bool colouredVertexData();
+	bool colouredVertexData() const;
 	// Flag that this primitive should not use instances (rendering will use vertex arrays)
 	void setNoInstances();
-	// Set whether indexed vertex drawing is to be used
-	void setUseIndices(bool b);
 	// Push instance layer from current vertex chunk list
 	void pushInstance(const QGLContext *context);
 	// Pop topmost instance layer
@@ -136,11 +136,11 @@ class Primitive : public ListItem<Primitive>
 	// Set name of primitive
 	void setName(const char *s);
 	// Return name of primitive
-	const char *name();
+	const char *name() const;
 	// Send to OpenGL (i.e. render)
-	void sendToGL();
-	
-	
+	void sendToGL() const;
+
+
 	/*
 	// Vertex / Index Generation
 	*/
