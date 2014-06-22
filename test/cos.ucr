@@ -55,13 +55,13 @@ View
   LabelFaceViewer false
   LabelScale 0.140000
   TitleScale 0.200000
-  MatrixX 0.965949 -0.031995 0.256747 0.000000
-  MatrixY 0.004981 0.994440 0.105183 0.000000
-  MatrixZ -0.258685 -0.100323 0.960738 0.000000
-  MatrixW 0.000000 0.000000 -17.589381 1.000000
+  MatrixX 0.929927 -0.367698 -0.005801 0.000000
+  MatrixY 0.367453 0.929703 -0.025083 0.000000
+  MatrixZ 0.014616 0.021193 0.999669 0.000000
+  MatrixW 0.000000 0.000000 -12.749315 1.000000
 EndView
 Collection 'Cosine Test Data'
-  DataDirectory "./test"
+  DataDirectory "/home/tris/src/uchroma/test"
   TransformX false x
   TransformY false y
   TransformZ false z
@@ -75,7 +75,9 @@ Collection 'Cosine Test Data'
   ColourLinearHSVA 0.009155 0 255 255 255
   ColourLinearHSVB -1.200000 255 215 255 5
   ColourAlphaControl 0
-  ColourAlphaFixed 46
+  ColourAlphaFixed 46.000000
+  Style Grid
+  Visible true
   Slice 'cos01'
   Source  File  'cos01.txt'
     Z  0.000000

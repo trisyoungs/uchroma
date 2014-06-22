@@ -196,7 +196,7 @@ class Collection : public ListItem<Collection>
 	// Current alpha control
 	AlphaControl alphaControl_;
 	// Fixed alpha value (for FixedAlpha option)
-	int fixedAlpha_;
+	double fixedAlpha_;
 	// Flag indicating that colourscale is valid (and doesn't need to be regenerated)
 	bool colourScaleValid_;
 
@@ -213,7 +213,7 @@ class Collection : public ListItem<Collection>
 	const ColourScalePoint* colourScalePoint(ColourSource source, int index = -1);
 	// Return colour of point specified
 	QColor colourScalePointColour(ColourSource source, int index = -1);
-	// Return value of point specified
+	// Retu5rn value of point specified
 	double colourScalePointValue(ColourSource source, int index = -1);
 	// Add empty point to end of custom colourscale
 	void addCustomColourScalePoint();

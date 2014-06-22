@@ -56,6 +56,8 @@ class PrimitiveList
 	void forgetAll();
 	// Reinitialise list so it is large enough to accomodate specified number of Primitives
 	void reinitialise(int newSize, bool allowShrink, int maxVertices, int maxIndices, GLenum type, bool colourData);
+	// Add a new primitive to the end of the list
+	Primitive* addPrimitive(int maxVertices, int maxIndices, GLenum type, bool colourData);
 	// Return total number of defined vertices
 	int nDefinedVertices();
 	// Return total number of defined indices

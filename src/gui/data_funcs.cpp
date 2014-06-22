@@ -281,7 +281,7 @@ void DataWindow::on_ReloadFilesButton_clicked(bool checked)
 // Update controls and show window
 void DataWindow::updateAndShow()
 {
-	updateControls();
+	updateControls(true);
 	show();
 	move(uChroma_.centrePos() - QPoint(width()/2, height()/2));
 }

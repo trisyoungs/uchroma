@@ -163,10 +163,10 @@ class ColourScale
 	void removePoint(ColourScalePoint* point);
 	// Get colour associated with value supplied
 	QColor colour(double value) const;
-	// Get colour associated with value supplied (as GLfloat[4])
+	// Get colour associated with value supplied (as Vec4<GLfloat>)
 	void colour(double value, Vec4<GLfloat>& target) const;
 	// Set all alpha values to that specified
-	void setAllAlpha(int alpha);
+	void setAllAlpha(double alpha);
 };
 
 #endif

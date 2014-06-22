@@ -439,13 +439,16 @@ void ColourScale::clear()
 }
 
 // Set all alpha values to that specified
-void ColourScale::setAllAlpha(int alpha)
+void ColourScale::setAllAlpha(double alpha)
 {
 	QColor color;
 	for (ColourScalePoint *csp = points_.first(); csp != NULL; csp = csp->next)
 	{
 		color = csp->colour();
-		color.setAlpha(alpha);
+		int alphai = alpha*255;
+		if (alphai < 0) alphai = 0;
+		else if (alphai > 255) alphai = 255;
+		color.setAlpha(alphai);
 		csp->setColour(color);
 	}
 	calculateDeltas();

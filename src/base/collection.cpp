@@ -58,7 +58,7 @@ Collection::Collection() : ListItem<Collection>()
 	customColourScale_.clear();
 	colourSource_ = SingleColourSource;
 	alphaControl_ = Collection::OwnAlpha;
-	fixedAlpha_ = 128;
+	fixedAlpha_ = 0.5;
 	colourScaleValid_ = false;
 
 	// Display

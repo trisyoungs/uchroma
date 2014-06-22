@@ -122,6 +122,7 @@ bool Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate)
 			constructLineSurface(collection->displayPrimitives(), collection->displayAbscissa(), collection->displayData(), collection->colourScale());
 			break;
 		case (Collection::GridStyle):
+			constructGridSurface(collection->displayPrimitives(), collection->displayAbscissa(), collection->displayData(), collection->colourScale());
 			break;
 		case (Collection::SurfaceStyle):
 			constructFullSurface(collection->displayPrimitives(), collection->displayAbscissa(), collection->displayData(), collection->colourScale());

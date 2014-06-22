@@ -248,11 +248,15 @@ class Viewer : public QGLWidget
 	// Setup basic GL properties
 	void setupGL();
 	// Construct line surface representation of data
-	void constructLineSurface(PrimitiveList& primitives, const Array<double>& abscissa, List< DisplaySlice >& displayData, ColourScale colourScale);
+	void constructLineSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplaySlice>& displayData, ColourScale colourScale);
+	// Construct line surface representation of data
+	void constructGridSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplaySlice>& displayData, ColourScale colourScale);
+	// Construct gridded surface representation of data
+	Vec3<double> constructVertexNormals(const Array<double>& abscissa, int index, DisplaySlice* targetSlice, DisplaySlice* previousSlice, DisplaySlice* nextSlice, int nPoints);
 	// Construct normal / colour surface data for slice specified
 	void constructSurfaceStrip(const Array<double>& abscissa, DisplaySlice* targetSlice, double yAxisScale, Array< Vec3< double > >& normals, Array< Vec4< GLfloat > >& colours, const ColourScale& colourScale, DisplaySlice* previousSlice, DisplaySlice* nextSlice);
 	// Construct full surface representation of data
-	void constructFullSurface(PrimitiveList& primitives, const Array< double >& abscissa, List< DisplaySlice >& displayData, ColourScale colourScale);
+	void constructFullSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplaySlice>& displayData, ColourScale colourScale);
 	// Create/update surface primitive for specified collection
 	bool updateSurfacePrimitive(Collection* collection, bool forceUpdate = false);
 

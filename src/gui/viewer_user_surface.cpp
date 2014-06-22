@@ -1,5 +1,5 @@
 /*
-	*** Scene Rendering Functions (User) - Surface Generation
+	*** Scene Rendering Functions (User) - Full Surface Generation
 	*** src/gui/viewer_user_surface.cpp
 	Copyright T. Youngs 2013-2014
 

@@ -79,6 +79,16 @@ void PrimitiveList::reinitialise(int newSize, bool allowShrink, int maxVertices,
 	}
 }
 
+// Add a new primitive to the end of the list
+Primitive* PrimitiveList::addPrimitive(int maxVertices, int maxIndices, GLenum type, bool colourData)
+{
+	Primitive* newPrim = primitives_.add();
+	viewer_->addCollectionPrimitive(newPrim);
+	newPrim->initialise(maxVertices, maxIndices, type, colourData);
+
+	return newPrim;
+}
+
 // Return total number of defined vertices
 int PrimitiveList::nDefinedVertices()
 {

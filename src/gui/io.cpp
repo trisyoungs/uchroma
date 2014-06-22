@@ -600,7 +600,7 @@ bool UChromaWindow::saveInputFile(QString fileName)
 		}
 		// -- Alpha control
 		parser.writeLineF("  %s %i\n", Keywords::collectionKeyword(Keywords::ColourAlphaControlKeyword), collection->alphaControl());
-		parser.writeLineF("  %s %i\n", Keywords::collectionKeyword(Keywords::ColourAlphaFixedKeyword), collection->fixedAlpha());
+		parser.writeLineF("  %s %f\n", Keywords::collectionKeyword(Keywords::ColourAlphaFixedKeyword), collection->fixedAlpha());
 
 		// Display
 		parser.writeLineF("  %s %s\n", Keywords::collectionKeyword(Keywords::StyleKeyword), Collection::displayStyle(collection->displayStyle()));
