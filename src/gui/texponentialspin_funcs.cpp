@@ -85,6 +85,9 @@ void TExponentialSpin::setValue(double value)
 
 	// Update text
 	updateText();
+
+	// Emit signal
+	emit(valueChanged(value_.value()));
 }
 
 // Set minimum limit

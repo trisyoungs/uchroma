@@ -97,7 +97,7 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	// File Menu
+	// File Actions
 	*/
 	private slots:
 	void on_actionFileNew_triggered(bool checked);
@@ -113,7 +113,7 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * View Menu
+	 * View Actions
 	 */
 	private slots:
 	void on_actionViewPerspective_triggered(bool checked);
@@ -121,7 +121,7 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * Collections Menu
+	 * Collections Actions
 	 */
 	private slots:
 	void on_actionCollectionsNew_triggered(bool checked);
@@ -131,7 +131,7 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * Data Menu
+	 * Data Actions
 	 */
 	private slots:
 	void on_actionDataLoadXY_triggered(bool checked);
@@ -139,14 +139,21 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * Tools Menu
+	 * Tools Actions
 	 */
 	private slots:
 	void on_actionToolsFitWindow_triggered(bool checked);
 
 
 	/*
-	 * Windows Menu
+	 * Axes Actions
+	 */
+	private slots:
+	void on_actionAxesShowAll_triggered(bool checked);
+
+
+	/*
+	 * Windows Actions
 	 */
 	private slots:
 	void on_actionWindowsCollections_triggered(bool checked);

@@ -333,6 +333,7 @@
     <addaction name="actionDataLoadXY"/>
     <addaction name="separator"/>
     <addaction name="actionDataImport"/>
+    <addaction name="actionDataReload"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -420,7 +421,7 @@
    <addaction name="actionCollectionsFocusNext"/>
    <addaction name="actionCollectionsFocusPrevious"/>
   </widget>
-  <widget class="QToolBar" name="toolBar_3">
+  <widget class="QToolBar" name="AxesToolbar">
    <property name="windowTitle">
     <string>toolBar_3</string>
    </property>
@@ -430,6 +431,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionAxesShowAll"/>
   </widget>
   <action name="actionFileQuit">
    <property name="text">
@@ -553,7 +555,7 @@
   </action>
   <action name="actionCollectionsCreate">
    <property name="checkable">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>&amp;Create...</string>
@@ -564,6 +566,9 @@
   </action>
   <action name="actionWindowsAxes">
    <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
     <bool>true</bool>
    </property>
    <property name="icon">
@@ -713,6 +718,20 @@
   <action name="actionDataLoadXY">
    <property name="text">
     <string>&amp;Load XY Datasets</string>
+   </property>
+  </action>
+  <action name="actionAxesShowAll">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/axes_showall.svg</normaloff>:/uchroma/icons/axes_showall.svg</iconset>
+   </property>
+   <property name="text">
+    <string>AxesShowAll</string>
+   </property>
+  </action>
+  <action name="actionDataReload">
+   <property name="text">
+    <string>Reload</string>
    </property>
   </action>
  </widget>

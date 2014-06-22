@@ -103,7 +103,7 @@ class StyleWindow : public QWidget
 	// -- Alpha Control
 	void on_ColourAlphaOwnAlphaRadio_clicked(bool checked);
 	void on_ColourAlphaFixedAlphaRadio_clicked(bool checked);
-	void on_ColourAlphaFixedAlphaSpin_valueChanged(int value);
+	void on_ColourAlphaFixedAlphaSpin_valueChanged(double value);
 
 
 	/*

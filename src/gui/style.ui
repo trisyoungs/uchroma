@@ -666,6 +666,12 @@
           <string>Alpha Values</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
+          <property name="spacing">
+           <number>4</number>
+          </property>
+          <property name="margin">
+           <number>4</number>
+          </property>
           <item>
            <widget class="QRadioButton" name="ColourAlphaOwnAlphaRadio">
             <property name="text">
@@ -705,18 +711,21 @@
              </spacer>
             </item>
             <item>
-             <widget class="QSpinBox" name="ColourAlphaFixedAlphaSpin">
+             <widget class="QDoubleSpinBox" name="ColourAlphaFixedAlphaSpin">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="decimals">
+               <number>3</number>
+              </property>
               <property name="maximum">
-               <number>255</number>
+               <double>1.000000000000000</double>
               </property>
               <property name="singleStep">
-               <number>5</number>
+               <double>0.100000000000000</double>
               </property>
              </widget>
             </item>

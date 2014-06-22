@@ -39,7 +39,7 @@ QPoint UChromaWindow::centrePos()
 }
 
 /*
-// File Menu
+// File Actions
 */
 
 void UChromaWindow::on_actionFileNew_triggered(bool checked)
@@ -157,7 +157,7 @@ bool UChromaWindow::checkBeforeClose()
 }
 
 /*
- * View Menu
+ * View Actions
  */
 
 void UChromaWindow::on_actionViewPerspective_triggered(bool checked)
@@ -188,8 +188,7 @@ void UChromaWindow::on_actionCollectionsNew_triggered(bool checked)
 void UChromaWindow::on_actionCollectionsCreate_triggered(bool checked)
 {
 	if (refreshing_) return;
-	if (checked) createDialog_.updateAndShow();
-	else createDialog_.hide();
+	createDialog_.updateAndShow();
 }
 
 void UChromaWindow::on_actionCollectionsFocusNext_triggered(bool checked)
@@ -203,7 +202,7 @@ void UChromaWindow::on_actionCollectionsFocusPrevious_triggered(bool checked)
 }
 
 /*
- * Data Menu
+ * Data Actions
  */
 
 void UChromaWindow::on_actionDataLoadXY_triggered(bool checked)
@@ -236,7 +235,7 @@ void UChromaWindow::on_actionDataImport_triggered(bool checked)
 }
 
 /*
- * Tools Menu
+ * Tools Actions
  */
 
 void UChromaWindow::on_actionToolsFitWindow_triggered(bool checked)
@@ -250,8 +249,20 @@ void UChromaWindow::on_actionToolsFitWindow_triggered(bool checked)
 	else fitDialog_.hide();
 }
 
+
 /*
- * Windows Menu
+ * Axes Actions
+ */
+
+void UChromaWindow::on_actionAxesShowAll_triggered(bool checked)
+{
+	showAllData();
+
+	updateGUI();
+}
+
+/*
+ * Windows Actions
  */
 
 void UChromaWindow::on_actionWindowsCollections_triggered(bool checked)
@@ -310,7 +321,7 @@ void UChromaWindow::on_actionWindowsSliceMonitor_triggered(bool checked)
 }
 
 /*
- * Settings Menu
+ * Settings Actions
  */
 
 void UChromaWindow::on_actionSettingsChooseFont_triggered(bool checked)

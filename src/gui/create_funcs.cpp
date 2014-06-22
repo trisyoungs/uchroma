@@ -1,7 +1,7 @@
 /*
 	*** Create Widget Functions
 	*** src/gui/create_funcs.cpp
-	Copyright T. Youngs 2012-2013
+	Copyright T. Youngs 2012-2014
 
 	This file is part of uChroma.
 
@@ -195,8 +195,7 @@ void CreateDialog::updateCreatedData(bool force)
 	}
 
 	// Update main window
-	uChroma_->updateSubWindows();
-	uChroma_->updateDisplay();
+	uChroma_->updateGUI();
 }
 
 /*
@@ -227,7 +226,7 @@ void CreateDialog::on_CreateButton_clicked(bool checked)
 	// Create another new collection for the next creation...
 	newCollection_ = uChroma_->addCollection("New Creation");
 
-	uChroma_->updateSubWindows();
+	uChroma_->updateGUI();
 }
 
 /*

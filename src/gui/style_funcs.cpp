@@ -37,6 +37,13 @@ StyleWindow::StyleWindow(UChromaWindow& parent) : QWidget(&parent), uChroma_(par
 	// Add display styles to StyleCombo on Collection->Style tab
 	for (int n=0; n<Collection::nDisplayStyles; ++n) ui.StyleCombo->addItem( Collection::displayStyle((Collection::DisplayStyle) n));
 
+	// Create a buttongroup for the main style RadioButtons
+	QButtonGroup* butGroup = new QButtonGroup(this);
+	butGroup->addButton(ui.ColourSingleColourRadio);
+	butGroup->addButton(ui.ColourRGBGradientRadio);
+	butGroup->addButton(ui.ColourHSVGradientRadio);
+	butGroup->addButton(ui.ColourCustomGradientRadio);
+
 	QWidget::setWindowFlags(Qt::Tool);
 
 	refreshing_ = false;
@@ -486,7 +493,7 @@ void StyleWindow::on_ColourAlphaFixedAlphaRadio_clicked(bool checked)
 	uChroma_.updateDisplay();
 }
 
-void StyleWindow::on_ColourAlphaFixedAlphaSpin_valueChanged(int value)
+void StyleWindow::on_ColourAlphaFixedAlphaSpin_valueChanged(double value)
 {
 	// Check for window refreshing or invalid Collection
 	Collection* currentCollection = uChroma_.currentCollection();
