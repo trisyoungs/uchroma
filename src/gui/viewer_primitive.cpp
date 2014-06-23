@@ -209,15 +209,19 @@ void Primitive::pushInstance(const QGLContext *context)
 	// Clear the error flag
 	glGetError();
 
+	// Create new instance
+	PrimitiveInstance *pi = instances_.add();
+
 	// Vertex buffer object or plain old display list?
 	if (Primitive::globalInstanceType_ == PrimitiveInstance::VBOInstance)
 	{
 		// Prepare local array of data to pass to VBO
 		int offset;
-		GLuint vertexVBO, indexVBO;
+		GLuint vertexVBO = 0, indexVBO = 0;
 		if (vertexChunk_.nDefinedVertices() <= 0)
 		{
-			printf("Error: No data in Primitive with which to create VBO.\n");
+			// Store instance data
+			pi->setVBO(context, 0, 0);
 			msg.exit("Primitive::pushInstance");
 			return;
 		}
@@ -266,7 +270,6 @@ void Primitive::pushInstance(const QGLContext *context)
 		}
 
 		// Store instance data
-		PrimitiveInstance *pi = instances_.add();
 		pi->setVBO(context, vertexVBO, vertexChunk_.hasIndices() ? indexVBO : 0);
 	}
 	else
@@ -278,7 +281,6 @@ void Primitive::pushInstance(const QGLContext *context)
 		glEndList();
 
 		// Store data
-		PrimitiveInstance *pi = instances_.add();
 		pi->setDisplayList(context, listId);
 	}
 }
