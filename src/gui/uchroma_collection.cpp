@@ -74,18 +74,40 @@ void UChromaWindow::on_CollectionRemoveButton_clicked(bool checked)
 	updateGUI();
 }
 
-void UChromaWindow::refreshCollections()
+void UChromaWindow::updateCollections(bool repopulateList)
 {
-	ui.CollectionTree->clear();
-	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
+	if (repopulateList)
 	{
-		QTreeWidgetItem* item = new QTreeWidgetItem(ui.CollectionTree, 0);
-		item->setText(0, collection->title());
-		item->setData(0, Qt::UserRole, VariantPointer<Collection>(collection));
-		item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-		item->setCheckState(0, collection->visible() ? Qt::Checked : Qt::Unchecked);
+		ui.CollectionTree->clear();
+		for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
+		{
+			QTreeWidgetItem* item = new QTreeWidgetItem(ui.CollectionTree, 0);
+			item->setText(0, collection->title());
+			item->setData(0, Qt::UserRole, VariantPointer<Collection>(collection));
+			item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+			item->setCheckState(0, collection->visible() ? Qt::Checked : Qt::Unchecked);
 
-		// If this is the current collection, select it
-		if (collection == currentCollection_) item->setSelected(true);
+			// If this is the current collection, select it
+			if (collection == currentCollection_) item->setSelected(true);
+		}
+	}
+
+	// Update collection info
+	if (currentCollection_)
+	{
+		ui.CollectionNSlicesLabel->setText(QString::number(currentCollection_->nSlices()));
+		ui.CollectionNPointsLabel->setText(QString::number(currentCollection_->nDataPoints()));
+		ui.CollectionNVerticesLabel->setText(QString::number(currentCollection_->displayPrimitives().nDefinedVertices()));
+		ui.CollectionNIndicesLabel->setText(QString::number(currentCollection_->displayPrimitives().nDefinedIndices()));
+		int nPrimitives = currentCollection_->displayPrimitives().nDefinedIndices() / (currentCollection_->displayStyle() == Collection::SurfaceStyle ? 3 : 2);
+		ui.CollectionNPrimitivesLabel->setText(QString::number(nPrimitives));
+	}
+	else
+	{
+		ui.CollectionNSlicesLabel->setText("0");
+		ui.CollectionNPointsLabel->setText("0");
+		ui.CollectionNVerticesLabel->setText("0");
+		ui.CollectionNIndicesLabel->setText("0");
+		ui.CollectionNPrimitivesLabel->setText("0");
 	}
 }

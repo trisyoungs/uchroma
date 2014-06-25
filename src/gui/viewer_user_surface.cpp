@@ -234,8 +234,8 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 		{
 			// Construct bit for n+1
 			nPlusOneBit = 0;
-			if (!yTypeA.value(n+1)) nPlusOneBit += 1;
-			if (!yTypeB.value(n+1)) nPlusOneBit += 2;
+			if (yTypeA.value(n+1) == DisplaySlice::NoPoint) nPlusOneBit += 1;
+			if (yTypeB.value(n+1) == DisplaySlice::NoPoint) nPlusOneBit += 2;
 			totalBit = nBit + nPlusOneBit;
 
 			// Reset indices for current (n+1) column

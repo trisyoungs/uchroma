@@ -215,6 +215,7 @@ void Viewer::paintGL()
 	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_BLEND);
 	glColor4fv(colourBlack);
+
 	// -- Render axis text
 	if (font_)
 	{
@@ -244,12 +245,9 @@ void Viewer::paintGL()
 		// Note - we do not need to check for inverted or logarithmic axes here, since the transformation matrix A takes care of that
 		v[sliceAxis] = uChroma_->sliceCoordinate() * uChroma_->axisStretch(sliceAxis);
 		glTranslated(v.x, v.y, v.z);
-		glColor4d(0.0, 0.0, 0.0, 0.5);
-		printf("111\n");
+		glColor4d(1.0, 0.0, 0.0, 0.5);
 		slicePrimitive_.sendToGL();
-		printf("222\n");
-// 		slicePrimitiveBox_.sendToGL();
-		printf("333\n");
+		slicePrimitiveBox_.sendToGL();
 	}
 
 	// Render main surface

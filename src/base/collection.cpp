@@ -275,6 +275,14 @@ void Collection::clearSlices()
 	displayPrimitivesValid_ = false;
 }
 
+// Return total number of points across all slices
+int Collection::nDataPoints()
+{
+	int nPoints = 0;
+	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) nPoints += slice->data().nPoints();
+	return nPoints;
+}
+
 // Set root directory for datafiles
 void Collection::setDataFileDirectory(QDir directory)
 {

@@ -119,12 +119,11 @@ void UChromaWindow::updateGUI()
 {
 	refreshing_ = true;
 
-	refreshCollections();
+	updateCollections(true);
 	
 	updateSubWindows();
 	updateTitleBar();
 	updateDisplay();
-	updateCollectionInfoBar();
 
 	refreshing_ = false;
 }
@@ -151,13 +150,6 @@ void UChromaWindow::updateSubWindows()
 		transformWindow_.setWindowTitle("Transform (" + currentCollection_->title() + ")");
 		viewWindow_.setWindowTitle("View (" + currentCollection_->title() + ")");
 	}
-}
-
-// Update collection info bar
-void UChromaWindow::updateCollectionInfoBar()
-{
-	if (currentCollection_) ui.CollectionInfoLabel->setText(currentCollection_->summaryInfo());
-	else ui.CollectionInfoLabel->setText("No current Collection");
 }
 
 // Update title bar

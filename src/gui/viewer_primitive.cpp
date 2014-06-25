@@ -342,6 +342,7 @@ void Primitive::sendToGL() const
 
 			// Revert to normal operation - pass 0 as VBO index
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			if (vertexChunk_.hasIndices()) glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glDisableClientState(GL_VERTEX_ARRAY);
 			glDisableClientState(GL_NORMAL_ARRAY);
 			glDisableClientState(GL_COLOR_ARRAY);
@@ -351,4 +352,3 @@ void Primitive::sendToGL() const
 	}
 	else vertexChunk_.sendToGL();
 }
-

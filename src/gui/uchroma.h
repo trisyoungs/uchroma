@@ -184,7 +184,7 @@ class UChromaWindow : public QMainWindow
 	void on_CollectionRemoveButton_clicked(bool checked);
 
 	public:
-	void refreshCollections();
+	void updateCollections(bool repopulateList = false);
 
 
 	/*
@@ -217,8 +217,6 @@ class UChromaWindow : public QMainWindow
 	void updateGUI();
 	// Update all subwindows
 	void updateSubWindows();
-	// Update collection info bar
-	void updateCollectionInfoBar();
 	// Update title bar
 	void updateTitleBar();
 	// Update display data (used for surfaces) in all collections

@@ -204,7 +204,6 @@ void Viewer::setSlicePrimitive(int axis)
 {
 	const int nPoints = 32;
 	
-	printf("Here in setSlicePrimitive.\n");
 	slicePrimitive_.initialise(nPoints*nPoints*4, nPoints*nPoints*6, GL_TRIANGLES, false);
 	slicePrimitive_.forgetAll();
 	slicePrimitiveBox_.initialise(4, 8, GL_LINES, false);

@@ -85,6 +85,8 @@ class Collection : public ListItem<Collection>
 	int nEmptySlices();
 	// Clear slice data from collection
 	void clearSlices();
+	// Return total number of points across all slices
+	int nDataPoints();
 	// Set root directory for datafiles
 	void setDataFileDirectory(QDir directory);
 	// Return root directory for datafiles
