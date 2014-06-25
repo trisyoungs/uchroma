@@ -30,6 +30,7 @@ fit_funcs.cpp
 fit_main.cpp
 fit_sd.cpp
 fit_simplex.cpp
+fit_target.cpp
 gradientbar_funcs.cpp
 graphwidget_funcs.cpp
 plotwidget_data.cpp

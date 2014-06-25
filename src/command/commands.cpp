@@ -1,7 +1,7 @@
 /*
 	*** Command Function Definitions
 	*** src/command/commands.cpp
-	Copyright T. Youngs 2010-2011
+	Copyright T. Youngs 2010-2014
 
 	This file is part of uChroma.
 
@@ -182,7 +182,7 @@ CommandData Command::data[Command::nCommands] = {
 		"Return square root of number" },
 	{ "tan",		"N",		VTypes::DoubleData,
 		"double degrees",
-		"Return tangent of specified angle (supplied in degrees)" }
+		"Return tangent of specified angle (supplied in degrees)" },
 };
 
 // Return enumerated command from string

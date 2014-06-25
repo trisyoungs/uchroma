@@ -216,6 +216,8 @@ class DisplaySlice : public ListItem<DisplaySlice>
 	// Constructor / Destructor
 	DisplaySlice();
 	~DisplaySlice();
+	// Data poin type enum
+	enum DataPointType { RealPoint, InterpolatedPoint, NoPoint };
 
 
 	/*
@@ -224,22 +226,22 @@ class DisplaySlice : public ListItem<DisplaySlice>
 	private:
 	// Y values of slice data
 	Array<double> y_;
-	// Flags indicating that y values exist at each point
-	Array<bool> yExists_;
+	// Type of y value at each point
+	Array<DataPointType> yType_;
 	// Z value of slice
 	double z_;
 
 	public:
 	// Add y value and associated flag
-	void add(double y);
+	void add(double y, DisplaySlice::DataPointType type);
 	// Add dummy y value and associated flag
 	void addDummy();
 	// Return y array
 	const Array<double>& y() const;
-	// Return flags array
-	const Array<bool>& yExists() const;
+	// Return type array
+	const Array<DisplaySlice::DataPointType>& yType() const;
 	// Set specific y value
-	void setY(int index, double yNew);
+	void setY(int index, double yNew, DisplaySlice::DataPointType type);
 	// Set z value of slice
 	void setZ(double z);
 	// Return z value of slice

@@ -245,8 +245,11 @@ void Viewer::paintGL()
 		v[sliceAxis] = uChroma_->sliceCoordinate() * uChroma_->axisStretch(sliceAxis);
 		glTranslated(v.x, v.y, v.z);
 		glColor4d(0.0, 0.0, 0.0, 0.5);
+		printf("111\n");
 		slicePrimitive_.sendToGL();
-		slicePrimitiveBox_.sendToGL();
+		printf("222\n");
+// 		slicePrimitiveBox_.sendToGL();
+		printf("333\n");
 	}
 
 	// Render main surface

@@ -133,14 +133,14 @@ void Viewer::constructGridSurface(PrimitiveList& primitives, const Array<double>
 
 		// Grab arrays from first slice
 		const Array<double>& y = slices[0]->y();
-		const Array<bool>& yExists = slices[0]->yExists();
+		const Array<DisplaySlice::DataPointType>& yType = slices[0]->yType();
 		z = slices[0]->z();
 		
 		// Generate lines / vertices for first row
 		for (n=0; n<nLimit; ++n)
 		{
 			i = offset+n;
-			if (yExists.value(i))
+			if (yType.value(i) != DisplaySlice::NoPoint)
 			{
 				// A value exists here, so define a vertex
 				colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, y.value(i)) : y.value(i)) / yAxisScale, colour);
@@ -157,14 +157,14 @@ void Viewer::constructGridSurface(PrimitiveList& primitives, const Array<double>
 		{
 			// Grab arrays
 			const Array<double>& y = slices[slice]->y();
-			const Array<bool>& yExists = slices[slice]->yExists();
+			const Array<DisplaySlice::DataPointType>& yType = slices[slice]->yType();
 			z = slices[slice]->z();
 
 			// Generate vertices for this row
 			for (n=0; n<nLimit; ++n)
 			{
 				i = offset+n;
-				if (yExists.value(offset+n))
+				if (yType.value(offset+n) != DisplaySlice::NoPoint)
 				{
 					// A value exists here, so define a vertex
 					colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, y.value(i)) : y.value(i)) / yAxisScale, colour);

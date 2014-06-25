@@ -97,8 +97,8 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	// File Actions
-	*/
+	 * File Actions
+	 */
 	private slots:
 	void on_actionFileNew_triggered(bool checked);
 	void on_actionFileLoad_triggered(bool checked);
@@ -177,9 +177,9 @@ class UChromaWindow : public QMainWindow
 	 * Collections
 	 */
 	private slots:
-	void on_CollectionList_currentRowChanged(int index);
-	void on_CollectionList_itemClicked(QListWidgetItem* item);
-	void on_CollectionList_itemChanged(QListWidgetItem* item);
+	void on_CollectionTree_itemClicked(QTreeWidgetItem* item, int column);
+	void on_CollectionTree_itemDoubleClicked(QTreeWidgetItem* item, int column);
+	void on_CollectionTree_itemChanged(QTreeWidgetItem* item, int column);
 	void on_CollectionAddButton_clicked(bool checked);
 	void on_CollectionRemoveButton_clicked(bool checked);
 
@@ -188,7 +188,7 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * Right Tabs -- Surface
+	 * TODO Right Tabs -- Surface
 	 */
 	private slots:
 	void on_SurfaceSliceNoneRadio_clicked(bool checked);

@@ -39,6 +39,69 @@ class Slice;
 class Variable;
 
 /*
+ * Fit Target
+ */
+class FitTarget : public ListItem<FitTarget>
+{
+	public:
+	// Constructor / Destructor
+	FitTarget();
+	~FitTarget();
+
+
+	/* 
+	 * Target Data
+	 */
+	private:
+	// Source Collection
+	Collection* collection_;
+	// Indices of first and last DisplaySlice to use in fitting
+	int displaySliceStart_, displaySliceEnd_;
+	// Number of sequential DisplaySlices to use in fitting
+	int nSlices_;
+	// First and last abscissa indices to use in fitting
+	int abscissaStart_, abscissaEnd_;
+	// Number of sequential abscissa values to use in fitting
+	int nPoints_;
+
+	public:
+	// Set target information
+	void set(Collection* collection, int firstSlice, int lastSlice, int abscissaFirst, int abscissaLast);
+	// Return index of first DisplaySice to be fit
+	int displaySliceStart();
+	// Return index of last DisplaySice to be fit
+	int displaySliceEnd();
+	// Return number of sequential DisplaySlices to use in fitting
+	int nSlices();
+	// Return first abscissa index to use in fitting
+	int abscissaStart();
+	// Return last abscissa index to use in fitting
+	int abscissaEnd();
+	// Return number of sequential abscissa values to use in fitting
+	int nPoints();
+	// Return z value of first slice used in fitting
+	double zStart();
+	// Return z value of last slice used in fitting
+	double zEnd();
+
+
+	/*
+	 * Fitting
+	 */
+	private:
+	// Fitted/calculated values for target
+	List<Data2D> calculatedY_;
+
+	public:
+	// Calculate 'fitted' values from specified equation
+	bool calculateY(Tree& equation, Variable* xVariable, Variable* zVariable, Variable* referenceYVariable, int referenceYIndex);
+	// Return sos error between calculated and original y values
+	double sosError();
+	// Copy calculated Y data to specified Collection
+	void copyCalculatedY(Collection* target);
+};
+
+/*
  * Fit Dialog
  */
 class FitDialog : public QDialog
@@ -98,28 +161,22 @@ class FitDialog : public QDialog
 	bool equationValid_;
 	// Standard x and z variables
 	Variable* xVariable_, *zVariable_;
-	// Data to fit
-	List<Data2D> fitData_;
-	// Current fitted datapoints
-	List<Data2D> fittedData_;
-	// Current Data2D to fit, or NULL for all Data2D simultaneously
-	Data2D* currentFitData_;
-	// Current fitted Data2D, or NULL if fitting all simultaneously
-	Data2D* currentFittedData_;
+	// Slice reference variables
+	Variable* referenceYVariable_;
+	// Data targets to fit
+	List<FitTarget> fitTargets_;
+	// Current target for fitting
+	FitTarget* currentFitTarget_;
 	// List of variables targetted in fit process
 	RefList<EquationVariable,bool> fitVariables_;
 	// Destination collection for fitted data
 	Collection* destinationCollection_;
-	// Current destination slice for fitted data (if any)
-	Slice* destinationSlice_;
 
 	private:
 	// Reset equation
 	void resetEquation();
 	// Update variables list
 	void updateVariables();
-	// Generate fitted data for current targets
-	bool generateFittedData();
 	// Update destination with current fitted data
 	void updateFittedData();
 	// Calculate SOS error for current targets

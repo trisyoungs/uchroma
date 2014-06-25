@@ -29,6 +29,7 @@ void FitDialog::resetEquation()
 	equation_.clear();
 	xVariable_ = equation_.addGlobalVariable("x");
 	zVariable_ = equation_.addGlobalVariable("z");
+	referenceYVariable_ = equation_.addGlobalVariable("refy");
 	equation_.setGenerateMissingVariables(true);
 	equationValid_ = false;
 }
@@ -71,40 +72,6 @@ void FitDialog::updateVariables()
 	}
 }
 
-// Generate fitted data for current targets
-bool FitDialog::generateFittedData()
-{
-	// Generate fitted data using current equation / variables
-	// We will use the values of x / y stored in currentFittedData_, rather than the original fitData_.
-	if (currentFittedData_ == NULL)
-	{
-		// Generate fitted data over all available fitData_
-		for (Data2D* fittedData = fittedData_.first(); fittedData != NULL; fittedData = fittedData->next)
-		{
-			zVariable_->set(fittedData->z());
-			Array<double>& x = fittedData->arrayX();
-			Array<double>& y = fittedData->arrayY();
-			for (int n = 0; n<x.nItems(); ++n)
-			{
-				xVariable_->set(x[n]);
-				y[n] = equation_.execute();
-			}
-		}
-	}
-	else
-	{
-		zVariable_->set(currentFittedData_->z());
-		Array<double>& x = currentFittedData_->arrayX();
-		Array<double>& y = currentFittedData_->arrayY();
-		for (int n = 0; n<x.nItems(); ++n)
-		{
-			xVariable_->set(x[n]);
-			y[n] = equation_.execute();
-		}
-	}
-	return true;
-}
-
 // Update destination with current fitted data
 void FitDialog::updateFittedData()
 {
@@ -115,31 +82,11 @@ void FitDialog::updateFittedData()
 		return;
 	}
 
-	if (currentFittedData_ == NULL)
-	{
-		// Clear existing slices
-		destinationCollection_->clearSlices();
+	// Clear existing slices
+	destinationCollection_->clearSlices();
 
-		// Copy all slice data over
-		for (Data2D* fittedData = fittedData_.first(); fittedData != NULL; fittedData = fittedData->next)
-		{
-			Slice* newSlice = destinationCollection_->addSlice();
-			destinationCollection_->setSliceZ(newSlice, fittedData->z());
-			destinationCollection_->setSliceData(newSlice, fittedData);
-		}
-	}
-	else
-	{
-		// Update single slice
-		if (destinationSlice_ == NULL)
-		{
-			msg.print("Internal Error: No destination slice set in FitDialog::updateFittedData().\n");
-			return;
-		}
-
-		// Overwrite existing slice data
-		destinationCollection_->setSliceData(destinationSlice_, currentFittedData_);
-	}
+	// Copy all slice data over
+	for (FitTarget* fitTarget = fitTargets_.first(); fitTarget != NULL; fitTarget = fitTarget->next) fitTarget->copyCalculatedY(destinationCollection_);
 }
 
 // Generate SOS error for current targets
@@ -150,37 +97,10 @@ double FitDialog::sosError(Array<double>& alpha)
 	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next) ri->item->variable()->set(alpha[n++]);
 	
 	// Generate new data from current variable values
-	generateFittedData();
+	currentFitTarget_->calculateY(equation_, xVariable_, zVariable_, referenceYVariable_, ui.SourceReferenceYCombo->currentIndex());
 
-	double yDiff, sos = 0.0;
-	if (currentFittedData_ == NULL)
-	{
-		// Sum error over all fit data
-		Data2D* fittedData = fittedData_.first();
-		for (Data2D* fitData = fitData_.first(); fitData != NULL; fitData = fitData->next)
-		{
-			Array<double>& yOrig = fitData->arrayY();
-			Array<double>& yNew = fittedData->arrayY();
-			for (n = 0; n<yOrig.nItems(); ++n)
-			{
-				yDiff = yOrig[n] - yNew[n];
-				sos += yDiff * yDiff;
-			}
-
-			fittedData = fittedData->next;
-		}
-	}
-	else
-	{
-		// Sum error over current fit data
-		Array<double>& yOrig = currentFitData_->arrayY();
-		Array<double>& yNew = currentFittedData_->arrayY();
-		for (n = 0; n<yOrig.nItems(); ++n)
-		{
-			yDiff = yOrig[n] - yNew[n];
-			sos += yDiff * yDiff;
-		}
-	}
+	// Get sos error from current fit target
+	double sos = currentFitTarget_->sosError();
 
 	// Calculate penalty from variables outside of their allowable ranges
 	double penalty = 1.0;
@@ -205,12 +125,7 @@ double FitDialog::rmsError(Array<double>& alpha)
 	double rms = sosError(alpha);
 
 	// Normalise  to number of data points, and take sqrt
-	int nPoints = 0;
-	if (currentFittedData_ == NULL)
-	{
-		for (Data2D* data = fittedData_.first(); data != NULL; data = data->next) nPoints += data->nPoints();
-	}
-	else nPoints = currentFittedData_->nPoints();
+	int nPoints = currentFitTarget_->nSlices() * currentFitTarget_->nPoints();
 
 	return sqrt(rms/nPoints);
 }
@@ -226,8 +141,8 @@ bool FitDialog::doFitting()
 	}
 
 	// Grab source collection, and construct a list of data to fit, obeying all defined data limits
-	fitData_.clear();
-	fittedData_.clear();
+	fitTargets_.clear();
+	currentFitTarget_ = NULL;
 	Collection* collection = uChroma_->collection(ui.SourceCollectionCombo->currentIndex());
 	if (!collection) return false;
 	if (ui.SourceXYSlicesRadio->isChecked())
@@ -236,24 +151,23 @@ bool FitDialog::doFitting()
 		double xMin = ui.SourceXYXMinSpin->value(), xMax = ui.SourceXYXMaxSpin->value();
 		printMessage("Setting up XY slice data over %e < x < %e", xMin, xMax);
 
-		for (int n=ui.SourceXYSliceFromSpin->value()-1; n<ui.SourceXYSliceToSpin->value(); ++n)
+		int firstSlice, lastSlice, firstPoint, lastPoint;
+
+		// Determine abscissa limits - always the same, whether we are fitting one slice at a time, or all slices at once (global)
+		const Array<double>& abscissa = collection->displayAbscissa();
+		for (firstPoint = 0; firstPoint < abscissa.nItems(); ++firstPoint) if (abscissa.value(firstPoint) >= xMin) break;
+		for (lastPoint = abscissa.nItems()-1; lastPoint >= 0; --lastPoint) if (abscissa.value(lastPoint) <= xMax) break;
+
+		// Determine slice range
+		firstSlice = ui.SourceXYSliceFromSpin->value() - 1;
+		lastSlice = ui.SourceXYSliceToSpin->value() - 1;
+
+		if (ui.OptionsGlobalFitCheck->isChecked())
 		{
-			Data2D& oldData = collection->slice(n)->data();
-			Data2D* newData = fitData_.add();
-			newData->setZ(oldData.z());
-
-			// Copy x-range specified
-			for (int m=0; m<oldData.nPoints(); ++m)
-			{
-				if (oldData.x(m) < xMin) continue;
-				if (oldData.x(m) > xMax) break;
-				newData->addPoint(oldData.x(m), oldData.y(m));
-			}
-
-			// Copy the new data to fittedData_, our temporary fitting array
-			Data2D* newFitData = fittedData_.add();
-			(*newFitData) = (*newData);
+			FitTarget* target = fitTargets_.add();
+			target->set(collection, firstSlice, lastSlice, firstPoint, lastPoint);
 		}
+		else for (int n=firstSlice; n<=lastSlice; ++n) fitTargets_.add()->set(collection, n, n, firstPoint, lastPoint);
 	}
 	else if (ui.SourceZYSlicesRadio->isChecked())
 	{
@@ -273,40 +187,18 @@ bool FitDialog::doFitting()
 		}
 	}
 	destinationCollection_->clearSlices();
-	destinationSlice_ = NULL;
 
-	// Fit all at once, or individual slices?
+	// Loop over defined FitTargets (global fit has already been accounted for)
 	bool result;
-	if (ui.OptionsGlobalFitCheck->isChecked())
+	for (currentFitTarget_ = fitTargets_.first(); currentFitTarget_ != NULL; currentFitTarget_ = currentFitTarget_->next)
 	{
-		printMessage("Performing global fit over all source slices");
-
-		currentFitData_ = NULL;
-		currentFittedData_ = NULL;
+		printMessage("Fitting %i slice(s) at %e < z < %e", currentFitTarget_->nSlices(), currentFitTarget_->zStart(), currentFitTarget_->zEnd());
 
 		// Call the minimiser
 		result = minimise();
 
 		// Copy final fitted data over to destination collection
 		updateFittedData();
-	}
-	else
-	{
-		currentFittedData_ = fittedData_.first();
-		for (currentFitData_ = fitData_.first(); currentFitData_ != NULL; currentFitData_ = currentFitData_->next, currentFittedData_ = currentFittedData_->next)
-		{
-			printMessage("Fitting slice at z = %e", currentFitData_->z());
-
-			// Create new slice target in destination collection
-			destinationSlice_ = destinationCollection_->addSlice();
-			destinationCollection_->setSliceZ(destinationSlice_, currentFittedData_->z());
-
-			// Call the minimiser
-			result = minimise();
-
-			// Copy final fitted data over to destination collection
-			updateFittedData();
-		}
 	}
 
 	return result;

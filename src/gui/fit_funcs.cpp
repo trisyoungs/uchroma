@@ -33,6 +33,7 @@ FitDialog::FitDialog(QWidget* parent) : QDialog(parent)
 
 	// Set default values in some widgets
 	ui.MethodSDToleranceSpin->setValue(1.0e-2);
+	ui.OptionsLimitStrengthSpin->setValue(10000.0);
 
 	refreshing_ = false;
 	resetEquation();
@@ -130,6 +131,7 @@ void FitDialog::on_EquationEdit_textChanged(QString text)
 
 void FitDialog::on_SelectEquationButton_clicked(bool checked)
 {
+	// TODO
 }
 
 void FitDialog::on_FitButton_clicked(bool checked)
@@ -273,6 +275,10 @@ void FitDialog::updateSourceGroup(bool refreshList)
 		refreshing_ = false;
 		return;
 	}
+
+	// Populate reference Y combo
+	ui.SourceReferenceYCombo->clear();
+	for (Slice* slice = collection->slices(); slice != NULL; slice = slice->next) ui.SourceReferenceYCombo->addItem(slice->title() + " (Z = " + QString::number(slice->data().z()) + ")");
 
 	// Update spin boxes with limits
 	ui.SourceXYSliceFromSpin->setRange(1, ui.SourceXYSliceToSpin->value());

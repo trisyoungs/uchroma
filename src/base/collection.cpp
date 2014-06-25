@@ -61,6 +61,9 @@ Collection::Collection() : ListItem<Collection>()
 	fixedAlpha_ = 0.5;
 	colourScaleValid_ = false;
 
+	// Associated data
+	parent_ = NULL;
+
 	// Display
 	visible_ = true;
 	displayData_.clear();
@@ -455,6 +458,40 @@ void Collection::setInterpolationStep(int axis, double step)
 double Collection::interpolationStep(int axis)
 {
 	return interpolationStep_[axis];
+}
+
+/*
+ * Associated Data
+ */
+
+// Set parent Collection
+void Collection::setParent(Collection* parent)
+{
+	parent_ = parent;
+}
+
+// Add fit to Collection
+Collection* Collection::addFit()
+{
+	return fits_.add();
+}
+
+// Return fits in Collection
+Collection* Collection::fits()
+{
+	return fits_.first();
+}
+
+// Add extracted slice to Collection
+Collection* Collection::addExtractedSlice()
+{
+	return extractedSlices_.add();
+}
+
+// Return extracted slices in Collection
+Collection* Collection::extractedSlices()
+{
+	return extractedSlices_.first();
 }
 
 /*
@@ -969,7 +1006,7 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 			if (i[n] == -1) slices[n]->addDummy();
 			else if (fabs(data[n]->x(i[n]) - lowest) < 1.0e-5)
 			{
-				slices[n]->add(data[n]->y(i[n]));
+				slices[n]->add(data[n]->y(i[n]), DisplaySlice::RealPoint);
 				++i[n];
 				if (i[n] == data[n]->nPoints())
 				{
@@ -987,12 +1024,12 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 	for (n = 0; n < nTransformedSlices; ++n)
 	{
 		lastReal = -1;
-		const Array<bool>& yExists = slices[n]->yExists();
+		const Array<DisplaySlice::DataPointType>& yType = slices[n]->yType();
 		const Array<double>& y = slices[n]->y();
 		for (m = 0; m < displayAbscissa_.nItems(); ++m)
 		{
 			// If this point is a real value, interpolate up to here from the last real point (if one exists and it is more than one element away)
-			if (yExists.value(m))
+			if (yType.value(m) == DisplaySlice::RealPoint)
 			{
 				if (lastReal == -1) lastReal = m;
 				else if ((m - lastReal) == 1) lastReal = m;
@@ -1004,7 +1041,7 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 					for (o = lastReal+1; o<=m; ++o)
 					{
 						position = (displayAbscissa_[o] - displayAbscissa_[lastReal]) / xWidth;
-						slices[n]->setY(o, y.value(lastReal) + yWidth*position);
+						slices[n]->setY(o, y.value(lastReal) + yWidth*position, DisplaySlice::InterpolatedPoint);
 					}
 				}
 				lastReal = m;

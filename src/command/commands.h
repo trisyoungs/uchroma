@@ -1,7 +1,7 @@
 /*
 	*** Command Functions
 	*** src/parser/commands.h
-	Copyright T. Youngs 2010-2011
+	Copyright T. Youngs 2010-2014
 
 	This file is part of uChroma.
 
@@ -172,6 +172,8 @@ class Command
 	static bool function_Sin(CommandNode *c, ReturnValue &rv);
 	static bool function_Sqrt(CommandNode *c, ReturnValue &rv);
 	static bool function_Tan(CommandNode *c, ReturnValue &rv);
+	// Collection / Slice Commands
+	static bool function_SliceY(CommandNode *c, ReturnValue &rv);
 	// Variable Operators
 	static bool function_OperatorAdd(CommandNode *c, ReturnValue &rv);
 	static bool function_OperatorAnd(CommandNode *c, ReturnValue &rv);

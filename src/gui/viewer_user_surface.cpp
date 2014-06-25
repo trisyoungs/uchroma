@@ -203,8 +203,8 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 		// Get nPoints and array references
 		const Array<double>& yA = sliceA->y();
 		const Array<double>& yB = sliceB->y();
-		const Array<bool>& yExistsA = sliceA->yExists();
-		const Array<bool>& yExistsB = sliceB->yExists();
+		const Array<DisplaySlice::DataPointType>& yTypeA = sliceA->yType();
+		const Array<DisplaySlice::DataPointType>& yTypeB = sliceB->yType();
 
 		// Use a simple bit to quickly determine which triangles to draw, given possible lack of datapoints in slices
 		//
@@ -217,13 +217,13 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 
 		// Set initial bit, and generate initial vertices
 		nBit = 0;
-		if (!yExistsA.value(0)) 
+		if (yTypeA.value(0) == DisplaySlice::NoPoint)
 		{
 			nBit += 4;
 			vertexAn = -1;
 		}
 		else vertexAn = currentPrimitive->defineVertex(abscissa.value(0), yA.value(0), zA, normA[0], colourA[0]);
-		if (!yExistsB.value(0))
+		if (yTypeB.value(0) == DisplaySlice::NoPoint)
 		{
 			nBit += 8;
 			vertexBn = -1;
@@ -234,8 +234,8 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 		{
 			// Construct bit for n+1
 			nPlusOneBit = 0;
-			if (!yExistsA.value(n+1)) nPlusOneBit += 1;
-			if (!yExistsB.value(n+1)) nPlusOneBit += 2;
+			if (!yTypeA.value(n+1)) nPlusOneBit += 1;
+			if (!yTypeB.value(n+1)) nPlusOneBit += 2;
 			totalBit = nBit + nPlusOneBit;
 
 			// Reset indices for current (n+1) column

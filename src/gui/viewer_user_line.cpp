@@ -46,12 +46,12 @@ void Viewer::constructLineSurface(PrimitiveList& primitives, const Array<double>
 	{
 		// Grab y and z values
 		const Array<double>& y = slice->y();
-		const Array<bool>& yExists = slice->yExists();
+		const Array<DisplaySlice::DataPointType>& yType = slice->yType();
 		z = (GLfloat) slice->z();
 
 		// Get nPoints, and initial vertex
 		nPoints = abscissa.nItems();
-		if (yExists.value(0))
+		if (yType.value(0) != DisplaySlice::NoPoint)
 		{
 			colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, y.value(0)) : y.value(0)) / yAxisScale, colour);
 			vertexA = currentPrimitive->defineVertex(abscissa.value(0), y.value(0), z, nrm, colour);
@@ -61,7 +61,7 @@ void Viewer::constructLineSurface(PrimitiveList& primitives, const Array<double>
 		for (n=1; n<nPoints; ++n)
 		{
 			// Define vertex index for this point (if one exists)
-			if (yExists.value(n))
+			if (yType.value(n) != DisplaySlice::NoPoint)
 			{
 				colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, y.value(n)) : y.value(n)) / yAxisScale, colour);
 				vertexB = currentPrimitive->defineVertex(abscissa.value(n), y.value(n), z, nrm, colour);

@@ -28,9 +28,7 @@ void Viewer::createPrimitives()
 	// Setup primitives
 	slicePrimitive_.setNoInstances();
 	slicePrimitiveBox_.setNoInstances();
-	slicePrimitiveBox_.initialise(4, 8, GL_LINES, false);
 	boundingBoxPrimitive_.setNoInstances();
-	boundingBoxPrimitive_.initialise(4, 8, GL_LINES, false);
 	for (int n=0; n<3; ++n)
 	{
 		axisPrimitives_[n].initialise(1020, 0, GL_LINES, false);
@@ -204,7 +202,12 @@ void Viewer::setYClip(double yMin, double yMax)
 // Setup slice primitive
 void Viewer::setSlicePrimitive(int axis)
 {
+	const int nPoints = 32;
+	
+	printf("Here in setSlicePrimitive.\n");
+	slicePrimitive_.initialise(nPoints*nPoints*4, nPoints*nPoints*6, GL_TRIANGLES, false);
 	slicePrimitive_.forgetAll();
+	slicePrimitiveBox_.initialise(4, 8, GL_LINES, false);
 	slicePrimitiveBox_.forgetAll();
 	if (axis == -1) return;
 
@@ -216,39 +219,40 @@ void Viewer::setSlicePrimitive(int axis)
 	axisMinB[axis] = 0.0;
 	axisMaxB[axis] = 0.0;
 
+	// Create 'bounding box' for slice primitive
+	Vec3<double> normal(0.0, 0.0, 1.0);
+	
+	slicePrimitiveBox_.defineVertex(axisMinA, normal);
+	slicePrimitiveBox_.defineVertex(axisMaxA, normal);
+	slicePrimitiveBox_.defineVertex(axisMaxA + axisMaxB - axisMinB, normal);
+	slicePrimitiveBox_.defineVertex(axisMinA + axisMaxB - axisMinB, normal);
+	slicePrimitiveBox_.defineIndices(0,1);
+	slicePrimitiveBox_.defineIndices(1,2);
+	slicePrimitiveBox_.defineIndices(2,3);
+	slicePrimitiveBox_.defineIndices(3,0);
+
 	// Work out deltas for each direction
-	const int nPoints = 50;
 	Vec3<double> deltaA, deltaB, pos;
 	deltaA = (axisMaxA - axisMinA) / nPoints;
 	deltaB = (axisMaxB - axisMinB) / nPoints;
-
-	// Create 'bounding box' for slice primitive
-	Vec3<double> normal(0.0, 0.0, 1.0);
-	slicePrimitiveBox_.defineVertex(axisMinA, normal);
-	slicePrimitiveBox_.defineVertex(axisMaxA, normal);
-	slicePrimitiveBox_.defineVertex(axisMaxA, normal);
-	slicePrimitiveBox_.defineVertex(axisMaxA + axisMaxB - axisMinB, normal);
-	slicePrimitiveBox_.defineVertex(axisMaxA + axisMaxB - axisMinB, normal);
-	slicePrimitiveBox_.defineVertex(axisMinA + axisMaxB - axisMinB, normal);
-	slicePrimitiveBox_.defineVertex(axisMinA + axisMaxB - axisMinB, normal);
-	slicePrimitiveBox_.defineVertex(axisMinA, normal);
 
 	// Set normal
 	normal.zero();
 	normal[axis] = 1.0;
 
 	// Construct plane
+	GLuint a, b, c, d;
 	for (int n=0; n<nPoints; ++n)
 	{
 		pos = axisMinA + deltaA*n;
 		for (int m=0; m<nPoints; ++m)
 		{
-			slicePrimitive_.defineVertex(pos, normal);
-			slicePrimitive_.defineVertex(pos + deltaA, normal);
-			slicePrimitive_.defineVertex(pos + deltaA + deltaB, normal);
-			slicePrimitive_.defineVertex(pos + deltaA + deltaB, normal);
-			slicePrimitive_.defineVertex(pos + deltaB, normal);
-			slicePrimitive_.defineVertex(pos, normal);
+			a = slicePrimitive_.defineVertex(pos, normal);
+			b = slicePrimitive_.defineVertex(pos + deltaA, normal);
+			c = slicePrimitive_.defineVertex(pos + deltaA + deltaB, normal);
+			d = slicePrimitive_.defineVertex(pos + deltaB, normal);
+			slicePrimitive_.defineIndices(a, b, c);
+			slicePrimitive_.defineIndices(c, d, a);
 			pos += deltaB;
 		}
 	}

@@ -372,17 +372,17 @@ DisplaySlice::~DisplaySlice()
 }
 
 // Add y value and associated flag
-void DisplaySlice::add(double y)
+void DisplaySlice::add(double y, DisplaySlice::DataPointType type)
 {
 	y_.add(y);
-	yExists_.add(true);
+	yType_.add(type);
 }
 
 // Add dummy y value and associated flag
 void DisplaySlice::addDummy()
 {
 	y_.add(0.0);
-	yExists_.add(false);
+	yType_.add(DisplaySlice::NoPoint);
 }
 
 // Return y array
@@ -392,16 +392,16 @@ const Array< double >& DisplaySlice::y() const
 }
 
 // Return flags array
-const Array< bool >& DisplaySlice::yExists() const
+const Array<DisplaySlice::DataPointType>& DisplaySlice::yType() const
 {
-	return yExists_;
+	return yType_;
 }
 
 // Set specific y value
-void DisplaySlice::setY(int index, double yNew)
+void DisplaySlice::setY(int index, double yNew, DisplaySlice::DataPointType type)
 {
 	y_[index] = yNew;
-	yExists_[index] = true;
+	yType_[index] = type;
 }
 
 // Set z value of slice

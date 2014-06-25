@@ -135,7 +135,7 @@ template <class A> class Array : public ListItem< Array<A> >
 		nItems_ = 0;
 	}
 	// Create empty array of specified size
-	void createEmpty(int size, double value = 0.0)
+	void createEmpty(int size, A value = A())
 	{
 		// First, resize array...
 		resize(size);

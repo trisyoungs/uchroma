@@ -79,7 +79,7 @@
               <number>4</number>
              </property>
              <item>
-              <widget class="QListWidget" name="CollectionList">
+              <widget class="QTreeWidget" name="CollectionTree">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
                  <horstretch>0</horstretch>
@@ -92,6 +92,14 @@
                <property name="showDropIndicator" stdset="0">
                 <bool>false</bool>
                </property>
+               <attribute name="headerVisible">
+                <bool>false</bool>
+               </attribute>
+               <column>
+                <property name="text">
+                 <string notr="true">1</string>
+                </property>
+               </column>
               </widget>
              </item>
              <item>

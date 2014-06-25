@@ -1,7 +1,7 @@
 /*
 	*** Flow Commands
 	*** src/command/flow.cpp
-	Copyright T. Youngs 2010-2011
+	Copyright T. Youngs 2010-2014
 
 	This file is part of uChroma.
 

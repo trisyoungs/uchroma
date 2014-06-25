@@ -150,6 +150,30 @@ class Collection : public ListItem<Collection>
 
 
 	/*
+	 * Associated Data
+	 */
+	private:
+	// Parent Collection
+	Collection* parent_;
+	// List of fits made to parent
+	List<Collection> fits_;
+	// List of slices extracted from parent
+	List<Collection> extractedSlices_;
+
+	public:
+	// Set parent Collection
+	void setParent(Collection* parent);
+	// Add fit to Collection
+	Collection* addFit();
+	// Return fits in Collection
+	Collection* fits();
+	// Add extracted slice to Collection
+	Collection* addExtractedSlice();
+	// Return extracted slices in Collection
+	Collection* extractedSlices();
+
+
+	/*
 	 * Update
 	 */
 	private:

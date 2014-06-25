@@ -1,7 +1,7 @@
 /*
 	*** Math Commands
 	*** src/command/math.cpp
-	Copyright T. Youngs 2010-2011
+	Copyright T. Youngs 2010-2014
 
 	This file is part of uChroma.
 
