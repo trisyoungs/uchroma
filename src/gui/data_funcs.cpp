@@ -69,16 +69,16 @@ void DataWindow::on_SourceDirSelectButton_clicked(bool checked)
 	currentCollection->setDataFileDirectory(dir);
 	
 	// Reload all data and update surface
-	QProgressDialog progress("Loading data...", "Abort", 0, currentCollection->nSlices(), this);
+	QProgressDialog progress("Loading data...", "Abort", 0, currentCollection->nDataSets(), this);
 	progress.setWindowModality(Qt::WindowModal);
 	int n=0;
-	for (Slice* slice = currentCollection->slices(); slice != NULL; slice = slice->next)
+	for (DataSet* dataSet = currentCollection->dataSets(); dataSet != NULL; dataSet = dataSet->next)
 	{
-		currentCollection->loadSliceData(slice);
+		currentCollection->loadDataSet(dataSet);
 		progress.setValue(n++);
 		if (progress.wasCanceled()) break;
 	}
-	progress.setValue(currentCollection->nSlices());
+	progress.setValue(currentCollection->nDataSets());
 
 	// Need to update GUI
 	uChroma_.setAsModified();
@@ -92,19 +92,19 @@ void DataWindow::on_AddFilesButton_clicked(bool checked)
 	Collection* currentCollection = uChroma_.currentCollection();
 	if (!currentCollection) return;
 
-	QStringList files = QFileDialog::getOpenFileNames(this, QString("Select XY datafiles (importing into '")+currentCollection->title()+"')", currentCollection->dataFileDirectory().path(), "MINT files (*.mint01);;MDCS files (*.mdcs01);;Text files (*.txt);;All files (*)");
+	QStringList files = QFileDialog::getOpenFileNames(this, QString("Select XY datafiles (importing into '")+currentCollection->title()+"')", currentCollection->dataFileDirectory().path(), "Text files (*.txt);;MINT files (*.mint01);;MDCS files (*.mdcs01);;All files (*)");
 
 	QProgressDialog progress("Loading data...", "Abort Loading", 0, files.count(), this);
 	progress.setWindowModality(Qt::WindowModal);
 	int count = 0;
 	
-	// Determine automatic Z placement for slice
+	// Determine automatic Z placement for dataset
 	double z = 0.0, delta = 1.0;
-	if (currentCollection->nSlices() == 1) z = currentCollection->lastSlice()->data().z() + 1.0;
-	else if (currentCollection->nSlices() > 1)
+	if (currentCollection->nDataSets() == 1) z = currentCollection->lastDataSet()->data().z() + 1.0;
+	else if (currentCollection->nDataSets() > 1)
 	{
-		delta = currentCollection->lastSlice()->data().z() - currentCollection->lastSlice()->prev->data().z();
-		z = currentCollection->lastSlice()->prev->data().z() + delta;
+		delta = currentCollection->lastDataSet()->data().z() - currentCollection->lastDataSet()->prev->data().z();
+		z = currentCollection->lastDataSet()->prev->data().z() + delta;
 	}
 
 	foreach (QString fileName, files)
@@ -112,13 +112,13 @@ void DataWindow::on_AddFilesButton_clicked(bool checked)
 		progress.setValue(count);
 		if (progress.wasCanceled()) break;
 
-		Slice *slice = currentCollection->addSlice(z);
-		slice->setTitle(fileName);
-		slice->setDataSource(Slice::FileSource);
-		slice->setSourceFileName(currentCollection->dataFileDirectory().relativeFilePath(fileName));
-		currentCollection->setSliceZ(slice, z);
+		DataSet* dataSet = currentCollection->addDataSet(z);
+		dataSet->setTitle(fileName);
+		dataSet->setDataSource(DataSet::FileSource);
+		dataSet->setSourceFileName(currentCollection->dataFileDirectory().relativeFilePath(fileName));
+		currentCollection->setDataSetZ(dataSet, z);
 
-		if (slice && currentCollection->loadSliceData(slice)) ++count;
+		if (dataSet && currentCollection->loadDataSet(dataSet)) ++count;
 		
 		z += delta;
 	}
@@ -143,12 +143,12 @@ void DataWindow::on_RemoveFilesButton_clicked(bool checked)
 	Collection* currentCollection = uChroma_.currentCollection();
 	if (!currentCollection) return;
 
-	// From the selected items, construct a row of Slices to remove
-	RefList<Slice,int> slicesToRemove;
-	foreach(QTableWidgetItem* item, ui.SourceFilesTable->selectedItems()) slicesToRemove.addUnique(currentCollection->slice(item->row()));
+	// From the selected items, construct a list of dataset to remove
+	RefList<DataSet,int> slicesToRemove;
+	foreach(QTableWidgetItem* item, ui.SourceFilesTable->selectedItems()) slicesToRemove.addUnique(currentCollection->dataSet(item->row()));
 
-	// Delete slices....
-	for (RefListItem<Slice,int>* ri = slicesToRemove.first(); ri != NULL; ri = ri->next) currentCollection->removeSlice(ri->item);
+	// Delete datasets....
+	for (RefListItem<DataSet,int>* ri = slicesToRemove.first(); ri != NULL; ri = ri->next) currentCollection->removeDataSet(ri->item);
 
 	// Need to update GUI
 	uChroma_.setAsModified();
@@ -171,14 +171,14 @@ void DataWindow::on_SourceFilesTable_cellChanged(int row, int column)
 	if (column == 1)
 	{
 		// Get slice and widget item
-		Slice* slice = currentCollection->slice(row);
-		if (slice == NULL) return;
+		DataSet* dataSet = currentCollection->dataSet(row);
+		if (dataSet == NULL) return;
 
 		QTableWidgetItem* item = ui.SourceFilesTable->item(row, column);
 		if (item == NULL) return;
 
 		// Set new value of z (its position in the list will be adjusted if necessary)
-		currentCollection->setSliceZ(slice, item->text().toDouble());
+		currentCollection->setDataSetZ(dataSet, item->text().toDouble());
 
 		// Need to update now
 		uChroma_.setAsModified();
@@ -194,7 +194,7 @@ void DataWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 	if (refreshing_ || (!currentCollection)) return;
 
 	// Check for no slices
-	if (currentCollection->nSlices() == 0) return;
+	if (currentCollection->nDataSets() == 0) return;
 
 // 	QString dir = QInputDialog::getText(this, "Choose File Location", "Select the location of the files that will be interrogated:", QLineEdit::Normal, 
 	bool ok;
@@ -209,10 +209,10 @@ void DataWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 	QString s;
 	double earliest = 0.0;
 	QDateTime referenceTime(QDate(1970,1,1));
-	for (Slice* slice = currentCollection->slices(); slice != NULL; slice = slice->next)
+	for (DataSet* dataSet = currentCollection->dataSets(); dataSet != NULL; dataSet = dataSet->next)
 	{
 		// Construct filename to search for
-		QFileInfo baseInfo(slice->sourceFileName());
+		QFileInfo baseInfo(dataSet->sourceFileName());
 		s = dir.absoluteFilePath(baseInfo.baseName()) + "." + extension;
 		QFileInfo fileInfo(s);
 		if (!fileInfo.exists())
@@ -220,13 +220,13 @@ void DataWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 			QMessageBox::warning(this, "Failed to Open File", "The file '" + s + "' could not be found.");
 			break;
 		}
-		slice->data().setZ(referenceTime.secsTo(fileInfo.lastModified()));
+		dataSet->data().setZ(referenceTime.secsTo(fileInfo.lastModified()));
 		
-		if ((earliest == 0) || (slice->data().z() < earliest)) earliest = slice->data().z();
+		if ((earliest == 0) || (dataSet->data().z() < earliest)) earliest = dataSet->data().z();
 	}
 	
 	// Set correct offset
-	for (Slice* slice = currentCollection->slices(); slice != NULL; slice = slice->next) slice->data().setZ(slice->data().z() - earliest);
+	for (DataSet* dataSet = currentCollection->dataSets(); dataSet != NULL; dataSet = dataSet->next) dataSet->data().setZ(dataSet->data().z() - earliest);
 	currentCollection->setDisplayDataInvalid();
 
 	// Need to update now
@@ -240,18 +240,18 @@ void DataWindow::on_ReloadFilesButton_clicked(bool checked)
 	Collection* currentCollection = uChroma_.currentCollection();
 	if (!currentCollection) return;
 	
-	// Reload all data and update surface
-	QProgressDialog progress("Reloading data...", "Abort", 0, currentCollection->nSlices(), this);
+	// Reload all data
+	QProgressDialog progress("Reloading data...", "Abort", 0, currentCollection->nDataSets(), this);
 	progress.setWindowModality(Qt::WindowModal);
 	int n=0;
 	int nFailed = 0;
-	for (Slice* slice = currentCollection->slices(); slice != NULL; slice = slice->next)
+	for (DataSet* dataSet = currentCollection->dataSets(); dataSet != NULL; dataSet = dataSet->next)
 	{
-		if (!currentCollection->loadSliceData(slice)) ++nFailed;
+		if (!currentCollection->loadDataSet(dataSet)) ++nFailed;
 		progress.setValue(n++);
 		if (progress.wasCanceled()) break;
 	}
-	progress.setValue(currentCollection->nSlices());
+	progress.setValue(currentCollection->nDataSets());
 
 	// Any failed to load?
 	if (nFailed > 0)
@@ -259,12 +259,12 @@ void DataWindow::on_ReloadFilesButton_clicked(bool checked)
 		QMessageBox::StandardButton button = QMessageBox::warning(this, "Failed to Load Data", QString("Failed to reload data for ") + QString::number(nFailed) + " defined slices.\nWould you like to remove empty slices from the list?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 		if (button == QMessageBox::Yes)
 		{
-			Slice* slice = currentCollection->slices(), *nextSlice;
-			while (slice != NULL)
+			DataSet* dataSet = currentCollection->dataSets(), *nextDataSet;
+			while (dataSet != NULL)
 			{
-				nextSlice = slice->next;
-				if (slice->data().nPoints() == 0) currentCollection->removeSlice(slice);
-				slice = nextSlice;
+				nextDataSet = dataSet->next;
+				if (dataSet->data().nPoints() == 0) currentCollection->removeDataSet(dataSet);
+				dataSet = nextDataSet;
 			}
 		}
 	}
@@ -301,14 +301,14 @@ void DataWindow::updateControls(bool force)
 	ui.SourceDirEdit->setText(currentCollection->dataFileDirectory().absolutePath());
 
 	ui.SourceFilesTable->clearContents();
-	ui.SourceFilesTable->setRowCount(currentCollection->nSlices());
+	ui.SourceFilesTable->setRowCount(currentCollection->nDataSets());
 	int count = 0;
-	for (Slice* slice = currentCollection->slices(); slice != NULL; slice = slice->next)
+	for (DataSet* dataSet = currentCollection->dataSets(); dataSet != NULL; dataSet = dataSet->next)
 	{
-		QTableWidgetItem* item = new QTableWidgetItem(slice->sourceFileName());
+		QTableWidgetItem* item = new QTableWidgetItem(dataSet->sourceFileName());
 		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 		ui.SourceFilesTable->setItem(count, 0, item);
-		item = new QTableWidgetItem(QString::number(slice->data().z()));
+		item = new QTableWidgetItem(QString::number(dataSet->data().z()));
 		ui.SourceFilesTable->setItem(count, 1, item);
 		++count;
 	}

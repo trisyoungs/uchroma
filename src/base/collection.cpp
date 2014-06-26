@@ -26,7 +26,7 @@
 Collection::Collection() : ListItem<Collection>()
 {
 	// Set variable defaults
-	slices_.clear();
+	dataSets_.clear();
 	dataFileDirectory_ = getenv("PWD");
 	title_ = "Empty Collection";
 	dataChanged_ = true;
@@ -88,7 +88,7 @@ void Collection::operator=(const Collection& source)
 {
 	// Basic Data
 	title_ = source.title_;
-	slices_ = source.slices_;
+	dataSets_ = source.dataSets_;
 	dataFileDirectory_ = source.dataFileDirectory_;
 	dataMin_ = source.dataMin_;
 	dataMax_ = source.dataMax_;
@@ -136,70 +136,70 @@ QString Collection::title()
 	return title_;
 }
 
-// Add slice
-Slice* Collection::addSlice()
+// Add dataset
+DataSet* Collection::addDataSet()
 {
-	// Create new slice
-	Slice* slice = slices_.add();
+	// Create new dataset
+	DataSet* dataSet = dataSets_.add();
 
 	dataChanged_ = true;
 	displayDataValid_ = false;
-	return slice;
+	return dataSet;
 }
 
-// Add slice at specified z
-Slice* Collection::addSlice(double z)
+// Add dataset at specified z
+DataSet* Collection::addDataSet(double z)
 {
-	Slice* slice = slices_.add();
-	setSliceZ(slice, z);
-	return slice;
+	DataSet* dataSet = dataSets_.add();
+	setDataSetZ(dataSet, z);
+	return dataSet;
 }
 
-// Add slice, copying from supplied data
-void Collection::addSlice(Slice* source)
+// Add dataset, copying from supplied data
+void Collection::addDataSet(DataSet* source)
 {
-	// Create new slice
-	Slice* slice = slices_.add();
-	(*slice) = (*source);
+	// Create new dataset
+	DataSet* dataSet = dataSets_.add();
+	(*dataSet) = (*source);
 
 	displayDataValid_ = false;
 }
 
-// Return number of slices
-int Collection::nSlices()
+// Return number of datasets
+int Collection::nDataSets()
 {
-	return slices_.nItems();
+	return dataSets_.nItems();
 }
 
-// Remove slice
-void Collection::removeSlice(Slice* slice)
+// Remove dataset
+void Collection::removeDataSet(DataSet* dataSet)
 {
-	slices_.remove(slice);
+	dataSets_.remove(dataSet);
 	displayDataValid_ = false;
 }
 
-// Set z value of specified slice
-void Collection::setSliceZ(Slice* target, double z)
+// Set z value of specified dataset
+void Collection::setDataSetZ(DataSet* target, double z)
 {
 	bool minBad = true, maxBad = true;
 	int dummy = 0;
 
-	// Check that this Slice is owned by the collection
-	if (!slices_.contains(target))
+	// Check that this DataSet is owned by the collection
+	if (!dataSets_.contains(target))
 	{
-		msg.print("Internal Error : Tried to set the Z value of a slice using the wrong collection.\n");
+		msg.print("Internal Error : Tried to set the Z value of a dataset using the wrong collection.\n");
 		return;
 	}
 	target->data().setZ(z);
 
-	// Adjust position of the slice in the list if necessary
+	// Adjust position of the dataset in the list if necessary
 	do
 	{
 		// Shift item if necessary
 		if (target->prev && (target->prev->data().z() > target->data().z()))
 		{
 			// Shift specified target up the list
-			slices_.shiftUp(target);
+			dataSets_.shiftUp(target);
 			displayDataValid_ = false;
 			minBad = (target->prev ? (target->prev->data().z() > target->data().z()) : false);
 		}
@@ -207,7 +207,7 @@ void Collection::setSliceZ(Slice* target, double z)
 		if (target->next && (target->next->data().z() < target->data().z()))
 		{
 			// Move specified target down the list
-			slices_.shiftDown(target);
+			dataSets_.shiftDown(target);
 			displayDataValid_ = false;
 			maxBad = (target->next ? (target->next->data().z() < target->data().z()) : false);
 		}
@@ -221,13 +221,13 @@ void Collection::setSliceZ(Slice* target, double z)
 	displayPrimitivesValid_ = false;
 }
 
-// Set data of specified slice
-void Collection::setSliceData(Slice* target, Data2D* newData)
+// Set data of specified dataset
+void Collection::setDataSetData(DataSet* target, Data2D* newData)
 {
-	// Check that this Slice is owned by the collection
-	if (!slices_.contains(target))
+	// Check that this DataSet is owned by the collection
+	if (!dataSets_.contains(target))
 	{
-		msg.print("Internal Error : Tried to set the data of a slice using the wrong collection.\n");
+		msg.print("Internal Error : Tried to set the data of a dataset using the wrong collection.\n");
 		return;
 	}
 
@@ -238,36 +238,36 @@ void Collection::setSliceData(Slice* target, Data2D* newData)
 	displayPrimitivesValid_ = false;
 }
 
-// Return first slice in list
-Slice* Collection::slices() const
+// Return first dataset in list
+DataSet* Collection::dataSets() const
 {
-	return slices_.first();
+	return dataSets_.first();
 }
 
-// Return last slice in list
-Slice* Collection::lastSlice()
+// Return last dataset in list
+DataSet* Collection::lastDataSet()
 {
-	return slices_.last();
+	return dataSets_.last();
 }
 
-// Return nth slice in list
-Slice* Collection::slice(int index)
+// Return nth dataset in list
+DataSet* Collection::dataSet(int index)
 {
-	return slices_[index];
+	return dataSets_[index];
 }
 
 // Return number of slices with no data present
-int Collection::nEmptySlices()
+int Collection::nEmptyDataSets()
 {
 	int count = 0;
-	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) if (slice->data().nPoints() < 2) ++count;
+	for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next) if (dataSet->data().nPoints() < 2) ++count;
 	return count;
 }
 
-// Clear slice data from collection
-void Collection::clearSlices()
+// Clear dataset data from collection
+void Collection::clearDataSets()
 {
-	slices_.clear();
+	dataSets_.clear();
 	displayData_.clear();
 
 	dataChanged_ = true;
@@ -275,11 +275,11 @@ void Collection::clearSlices()
 	displayPrimitivesValid_ = false;
 }
 
-// Return total number of points across all slices
+// Return total number of points across all datasets
 int Collection::nDataPoints()
 {
 	int nPoints = 0;
-	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) nPoints += slice->data().nPoints();
+	for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next) nPoints += dataSet->data().nPoints();
 	return nPoints;
 }
 
@@ -295,19 +295,19 @@ QDir Collection::dataFileDirectory()
 	return dataFileDirectory_;
 }
 
-// Load data for specified slice index
-bool Collection::loadSliceData(Slice* slice)
+// Load data for specified dataset index
+bool Collection::loadDataSet(DataSet* dataSet)
 {
-	if (!slice) return false;
+	if (!dataSet) return false;
 	dataChanged_ = true;
-	return slice->loadData(dataFileDirectory_);
+	return dataSet->loadData(dataFileDirectory_);
 }
 
 // Reload data for all slices
-int Collection::loadAllSlices()
+int Collection::loadAllDataSets()
 {
 	int nFailed = 0;
-	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) if (!slice->loadData(dataFileDirectory_)) ++nFailed;
+	for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next) if (!dataSet->loadData(dataFileDirectory_)) ++nFailed;
 	return nFailed;
 }
 
@@ -327,21 +327,6 @@ Vec3<double> Collection::dataMax()
 	updateLimitsAndTransforms();
 
 	return dataMax_;
-}
-
-// Return formatted summary information on this Collection
-QString Collection::summaryInfo()
-{
-	QString summary;
-	if ((displayStyle_ == Collection::LineStyle) || (displayStyle_ == Collection::LineStyle))
-	{
-		summary.sprintf("<b>%s</b>, line surface, %iv, %ii, %il", qPrintable(title_), displayPrimitives_.nDefinedVertices(), displayPrimitives_.nDefinedIndices(), displayPrimitives_.nDefinedIndices()/2);
-	}
-	else
-	{
-		summary.sprintf("<b>%s</b>, full surface, %iv, %ii, %it", qPrintable(title_), displayPrimitives_.nDefinedVertices(), displayPrimitives_.nDefinedIndices(), displayPrimitives_.nDefinedIndices()/3);
-	}
-	return summary;
 }
 
 /*
@@ -493,13 +478,13 @@ Collection* Collection::fits()
 // Add extracted slice to Collection
 Collection* Collection::addExtractedSlice()
 {
-	return extractedSlices_.add();
+	return extractedDataSets_.add();
 }
 
 // Return extracted slices in Collection
 Collection* Collection::extractedSlices()
 {
-	return extractedSlices_.first();
+	return extractedDataSets_.first();
 }
 
 /*
@@ -512,62 +497,62 @@ void Collection::updateLimitsAndTransforms()
 	if (!dataChanged_) return;
 	dataMin_ = 0.0;
 	dataMax_ = 0.0;
-	if (slices_.nItems() > 0)
+	if (dataSets_.nItems() > 0)
 	{
-		// Grab first slice and set initial values
-		Slice* slice = slices_.first();
-		dataMin_.set(slice->data().xMin(), slice->data().yMin(), slice->data().z());
-		dataMax_.set(slice->data().xMax(), slice->data().yMax(), slice->data().z());
+		// Grab first dataset and set initial values
+		DataSet* dataSet = dataSets_.first();
+		dataMin_.set(dataSet->data().xMin(), dataSet->data().yMin(), dataSet->data().z());
+		dataMax_.set(dataSet->data().xMax(), dataSet->data().yMax(), dataSet->data().z());
 		double mmin, mmax;
-		for (slice = slice->next; slice != NULL; slice = slice->next)
+		for (dataSet = dataSet->next; dataSet != NULL; dataSet = dataSet->next)
 		{
-// 			printf("Z = %f\n", slice->data().z());
-			mmin = slice->data().xMin();
-			mmax = slice->data().xMax();
+// 			printf("Z = %f\n", dataSet->data().z());
+			mmin = dataSet->data().xMin();
+			mmax = dataSet->data().xMax();
 			if (mmin < dataMin_.x) dataMin_.x = mmin;
 			if (mmax > dataMax_.x) dataMax_.x = mmax;
-			mmin = slice->data().yMin();
-			mmax = slice->data().yMax();
+			mmin = dataSet->data().yMin();
+			mmax = dataSet->data().yMax();
 			if (mmin < dataMin_.y) dataMin_.y = mmin;
 			if (mmax > dataMax_.y) dataMax_.y = mmax;
-			if (slice->data().z() < dataMin_.z) dataMin_.z = slice->data().z();
-			else if (slice->data().z() > dataMax_.z) dataMax_.z = slice->data().z();
+			if (dataSet->data().z() < dataMin_.z) dataMin_.z = dataSet->data().z();
+			else if (dataSet->data().z() > dataMax_.z) dataMax_.z = dataSet->data().z();
 		}
 	}
 
-	// Loop over slices_ list, updating transforms as we go
-	for (Slice* slice = slices_.first(); slice != NULL; slice = slice->next) slice->transform(transforms_[0], transforms_[1], transforms_[2]);
+	// Loop over dataSets_ list, updating transforms as we go
+	for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next) dataSet->transform(transforms_[0], transforms_[1], transforms_[2]);
 
 	transformMin_ = 0.0;
 	transformMax_ = 0.0;
 	transformMinPositive_ = 0.1;
 	transformMaxPositive_ = -1.0;
-	if (slices_.nItems() == 0) return;
+	if (dataSets_.nItems() == 0) return;
 	
-	// Grab first slice and set initial values
-	Slice* slice = slices_.first();
-	transformMin_.set(slice->transformedData().xMin(), slice->transformedData().yMin(), slice->transformedData().z());
-	transformMax_.set(slice->transformedData().xMax(), slice->transformedData().yMax(), slice->transformedData().z());
+	// Grab first dataset and set initial values
+	DataSet* dataSet = dataSets_.first();
+	transformMin_.set(dataSet->transformedData().xMin(), dataSet->transformedData().yMin(), dataSet->transformedData().z());
+	transformMax_.set(dataSet->transformedData().xMax(), dataSet->transformedData().yMax(), dataSet->transformedData().z());
 	double mmin, mmax;
-	for (slice = slice->next; slice != NULL; slice = slice->next)
+	for (dataSet = dataSet->next; dataSet != NULL; dataSet = dataSet->next)
 	{
-		mmin = slice->transformedData().xMin();
-		mmax = slice->transformedData().xMax();
+		mmin = dataSet->transformedData().xMin();
+		mmax = dataSet->transformedData().xMax();
 		if (mmin < transformMin_.x) transformMin_.x = mmin;
 		if (mmax > transformMax_.x) transformMax_.x = mmax;
-		mmin = slice->transformedData().yMin();
-		mmax = slice->transformedData().yMax();
+		mmin = dataSet->transformedData().yMin();
+		mmax = dataSet->transformedData().yMax();
 		if (mmin < transformMin_.y) transformMin_.y = mmin;
 		if (mmax > transformMax_.y) transformMax_.y = mmax;
-		if (slice->transformedData().z() < transformMin_.z) transformMin_.z = slice->transformedData().z();
-		else if (slice->transformedData().z() > transformMax_.z) transformMax_.z = slice->transformedData().z();
+		if (dataSet->transformedData().z() < transformMin_.z) transformMin_.z = dataSet->transformedData().z();
+		else if (dataSet->transformedData().z() > transformMax_.z) transformMax_.z = dataSet->transformedData().z();
 	}
 
 	// Now determine minimum positive limits
-	for (slice = slices_.first(); slice != NULL; slice = slice->next)
+	for (dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next)
 	{
 		// Loop over XY points in data, searching for first positive, non-zero value
-		Data2D& data = slice->transformedData();
+		Data2D& data = dataSet->transformedData();
 		for (int n=0; n<data.nPoints(); ++n)
 		{
 			// X
@@ -601,7 +586,7 @@ void Collection::updateLimitsAndTransforms()
 	dataChanged_ = false;
 }
 
-// Flag that slice data has been changed
+// Flag that one or more datasets have changed
 void Collection::setDataChanged()
 {
 	dataChanged_ = true;
@@ -836,7 +821,7 @@ const Array<double>& Collection::displayAbscissa() const
 }
 
 // Return transformed data to display
-List<DisplaySlice>& Collection::displayData()
+List<DisplayDataSet>& Collection::displayData()
 {
 	return displayData_;
 }
@@ -894,7 +879,7 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 	double x, y;
 
 	// Loop over slices, apply any transforms (X or Y) and check limits
-	Slice* slice = axisInverted.z ? slices_.last() : slices_.first();
+	DataSet* slice = axisInverted.z ? dataSets_.last() : dataSets_.first();
 	while (slice)
 	{
 		// Check for slice with no points...
@@ -913,9 +898,9 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 		else if (axisLogarithmic.z) z = log10(z);
 
 		// Add new item to transformedData and displayData_ arrays
-		Data2D* surfaceSlice = transformedData.add();
-		DisplaySlice* displaySlice = displayData_.add();
-		displaySlice->setZ(z * axisStretch.z);
+		Data2D* surfaceDataSet = transformedData.add();
+		DisplayDataSet* displayDataSet = displayData_.add();
+		displayDataSet->setZ(z * axisStretch.z);
 
 		// Copy / interpolate raw data arrays
 		Array<double> array[2];
@@ -936,7 +921,7 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 			array[1] = slice->transformedData().arrayY();
 		}
 
-		// Now add data to surfaceSlice, obeying defined x-limits
+		// Now add data to surfaceDataSet, obeying defined x-limits
 		if (axisInverted.x) for (int n=array[0].nItems()-1; n >= 0; --n)
 		{
 			x = array[0].value(n);
@@ -948,7 +933,7 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 			if (axisLogarithmic.y) y = (axisInverted.y ? log10(axisMax.y / y) : log10(y));
 			else if (axisInverted.y) y = (axisMax.y - y) + axisMin.y;
 			y *= axisStretch.y;
-			surfaceSlice->addPoint(x, y);
+			surfaceDataSet->addPoint(x, y);
 		}
 		else for (int n=0; n<array[0].nItems(); ++n)
 		{
@@ -964,7 +949,7 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 			}
 			else if (axisInverted.y) y = (axisMax.y - y) + axisMin.y;
 			y *= axisStretch.y;
-			surfaceSlice->addPoint(x, y);
+			surfaceDataSet->addPoint(x, y);
 		}
 
 		// Move to next Z slice
@@ -973,13 +958,13 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 
 	// Construct common x scale for data, and create y value data
 	// We have already pruned out those slices with no data points, so no checks for this are necessary
-	int n, nFinished = 0, nTransformedSlices = transformedData.nItems();
+	int n, nFinished = 0, nTransformedDataSets = transformedData.nItems();
 	Data2D** data = transformedData.array();
 	double lowest;
 
 	// -- Set up initial array indices and nFinished count
-	Array<int> i(nTransformedSlices);
-	for (n=0; n<nTransformedSlices; ++n)
+	Array<int> i(nTransformedDataSets);
+	for (n=0; n<nTransformedDataSets; ++n)
 	{
 		if (data[n]->nPoints() == 0)
 		{
@@ -988,15 +973,15 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 		}
 		else i[n] = 0;
 	}
-	DisplaySlice** slices = displayData_.array();
+	DisplayDataSet** slices = displayData_.array();
 	displayAbscissa_.clear();
 	// -- Loop over all datasets simultaneously, seeking next lowest point in their x data
 	int test = 0;
-	while (nFinished != nTransformedSlices)
+	while (nFinished != nTransformedDataSets)
 	{
 		// Find lowest point of current x values
 		lowest = std::numeric_limits<double>::max();
-		for (n = 0; n< nTransformedSlices; ++n)
+		for (n = 0; n< nTransformedDataSets; ++n)
 		{
 			// If we have exhausted this slice's data, move on
 			if (i[n] == -1) continue;
@@ -1007,14 +992,14 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 		displayAbscissa_.add(lowest);
 
 		// ...and add y values/flags from slice data to new displayData_
-		for (n = 0; n< nTransformedSlices; ++n)
+		for (n = 0; n< nTransformedDataSets; ++n)
 		{
 			// If we have exhausted this slice's data, add a dummy value.
 			// Otherwise, check how close the X-value is to 'lowest'
 			if (i[n] == -1) slices[n]->addDummy();
 			else if (fabs(data[n]->x(i[n]) - lowest) < 1.0e-5)
 			{
-				slices[n]->add(data[n]->y(i[n]), DisplaySlice::RealPoint);
+				slices[n]->add(data[n]->y(i[n]), DisplayDataSet::RealPoint);
 				++i[n];
 				if (i[n] == data[n]->nPoints())
 				{
@@ -1029,15 +1014,15 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 	// Finally, interpolate values over dummy points (where the dummy points are surrounded by actual values)
 	int lastReal, m, o;
 	double yWidth, xWidth, position;
-	for (n = 0; n < nTransformedSlices; ++n)
+	for (n = 0; n < nTransformedDataSets; ++n)
 	{
 		lastReal = -1;
-		const Array<DisplaySlice::DataPointType>& yType = slices[n]->yType();
+		const Array<DisplayDataSet::DataPointType>& yType = slices[n]->yType();
 		const Array<double>& y = slices[n]->y();
 		for (m = 0; m < displayAbscissa_.nItems(); ++m)
 		{
 			// If this point is a real value, interpolate up to here from the last real point (if one exists and it is more than one element away)
-			if (yType.value(m) == DisplaySlice::RealPoint)
+			if (yType.value(m) == DisplayDataSet::RealPoint)
 			{
 				if (lastReal == -1) lastReal = m;
 				else if ((m - lastReal) == 1) lastReal = m;
@@ -1049,7 +1034,7 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 					for (o = lastReal+1; o<=m; ++o)
 					{
 						position = (displayAbscissa_[o] - displayAbscissa_[lastReal]) / xWidth;
-						slices[n]->setY(o, y.value(lastReal) + yWidth*position, DisplaySlice::InterpolatedPoint);
+						slices[n]->setY(o, y.value(lastReal) + yWidth*position, DisplayDataSet::InterpolatedPoint);
 					}
 				}
 				lastReal = m;

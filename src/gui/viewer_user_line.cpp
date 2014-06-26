@@ -23,7 +23,7 @@
 #include "gui/uchroma.h"
 
 // Construct line representation of data
-void Viewer::constructLineSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplaySlice>& displayData, ColourScale colourScale)
+void Viewer::constructLineSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale)
 {
 	// Forget all data in current primitives
 	primitives.forgetAll();
@@ -42,16 +42,16 @@ void Viewer::constructLineSurface(PrimitiveList& primitives, const Array<double>
 
 	// Create lines for slices
 	GLuint vertexA, vertexB;
-	for (DisplaySlice* slice = displayData.first(); slice != NULL; slice = slice->next)
+	for (DisplayDataSet* dataSet = displayData.first(); dataSet != NULL; dataSet = dataSet->next)
 	{
 		// Grab y and z values
-		const Array<double>& y = slice->y();
-		const Array<DisplaySlice::DataPointType>& yType = slice->yType();
-		z = (GLfloat) slice->z();
+		const Array<double>& y = dataSet->y();
+		const Array<DisplayDataSet::DataPointType>& yType = dataSet->yType();
+		z = (GLfloat) dataSet->z();
 
 		// Get nPoints, and initial vertex
 		nPoints = abscissa.nItems();
-		if (yType.value(0) != DisplaySlice::NoPoint)
+		if (yType.value(0) != DisplayDataSet::NoPoint)
 		{
 			colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, y.value(0)) : y.value(0)) / yAxisScale, colour);
 			vertexA = currentPrimitive->defineVertex(abscissa.value(0), y.value(0), z, nrm, colour);
@@ -61,7 +61,7 @@ void Viewer::constructLineSurface(PrimitiveList& primitives, const Array<double>
 		for (n=1; n<nPoints; ++n)
 		{
 			// Define vertex index for this point (if one exists)
-			if (yType.value(n) != DisplaySlice::NoPoint)
+			if (yType.value(n) != DisplayDataSet::NoPoint)
 			{
 				colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, y.value(n)) : y.value(n)) / yAxisScale, colour);
 				vertexB = currentPrimitive->defineVertex(abscissa.value(n), y.value(n), z, nrm, colour);

@@ -35,7 +35,7 @@
 // Forward Declarations
 class UChromaWindow;
 class Collection;
-class Slice;
+class DataSet;
 class Variable;
 
 /*

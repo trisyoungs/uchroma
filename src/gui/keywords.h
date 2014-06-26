@@ -101,11 +101,11 @@ class Keywords
 		ColourSingleKeyword,
 		ColourSourceKeyword,
 		DataDirectoryKeyword,
+		DataSetDefinitionKeyword,
 		EndCollectionKeyword,
 		InterpolateKeyword,
 		InterpolateConstrainKeyword,
 		InterpolateStepKeyword,
-		SliceDefinitionKeyword,
 		StyleKeyword,
 		TransformXKeyword,
 		TransformYKeyword,
@@ -119,6 +119,27 @@ class Keywords
 	static const char* collectionKeyword(CollectionKeyword kwd);
 	// Return minimum number of expected arguments
 	static int collectionKeywordNArguments(CollectionKeyword kwd);
+
+
+	/*
+	 * DataSet Block Keywords
+	 */
+	public:
+	// DataSet Block Keyword Enum
+	enum DataSetKeyword
+	{
+		DataKeyword,
+		EndDataSetKeyword,
+		SourceKeyword,
+		ZKeyword,
+		nDataSetKeywords
+	};
+	// Convert text string to DataSetKeyword
+	static DataSetKeyword dataSetKeyword(const char* s);
+	// Convert DataSetKeyword to text string
+	static const char* dataSetKeyword(DataSetKeyword kwd);
+	// Return minimum number of expected arguments
+	static int dataSetKeywordNArguments(DataSetKeyword kwd);
 
 
 	/*
@@ -138,27 +159,6 @@ class Keywords
 	static const char* settingsKeyword(SettingsKeyword kwd);
 	// Return minimum number of expected arguments
 	static int settingsKeywordNArguments(SettingsKeyword kwd);
-
-
-	/*
-	 * Slice Block Keywords
-	 */
-	public:
-	// Slice Block Keyword Enum
-	enum SliceKeyword
-	{
-		DataKeyword,
-		EndSliceKeyword,
-		SourceKeyword,
-		ZKeyword,
-		nSliceKeywords
-	};
-	// Convert text string to SliceKeyword
-	static SliceKeyword sliceKeyword(const char* s);
-	// Convert SliceKeyword to text string
-	static const char* sliceKeyword(SliceKeyword kwd);
-	// Return minimum number of expected arguments
-	static int sliceKeywordNArguments(SliceKeyword kwd);
 
 
 	/*

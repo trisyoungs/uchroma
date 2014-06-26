@@ -83,7 +83,7 @@ void FitDialog::updateFittedData()
 	}
 
 	// Clear existing slices
-	destinationCollection_->clearSlices();
+	destinationCollection_->clearDataSets();
 
 	// Copy all slice data over
 	for (FitTarget* fitTarget = fitTargets_.first(); fitTarget != NULL; fitTarget = fitTarget->next) fitTarget->copyCalculatedY(destinationCollection_);
@@ -125,7 +125,7 @@ double FitDialog::rmsError(Array<double>& alpha)
 	double rms = sosError(alpha);
 
 	// Normalise  to number of data points, and take sqrt
-	int nPoints = currentFitTarget_->nSlices() * currentFitTarget_->nPoints();
+	int nPoints = currentFitTarget_->nDataSets() * currentFitTarget_->nPoints();
 
 	return sqrt(rms/nPoints);
 }
@@ -186,13 +186,13 @@ bool FitDialog::doFitting()
 			return false;
 		}
 	}
-	destinationCollection_->clearSlices();
+	destinationCollection_->clearDataSets();
 
 	// Loop over defined FitTargets (global fit has already been accounted for)
 	bool result;
 	for (currentFitTarget_ = fitTargets_.first(); currentFitTarget_ != NULL; currentFitTarget_ = currentFitTarget_->next)
 	{
-		printMessage("Fitting %i slice(s) at %e < z < %e", currentFitTarget_->nSlices(), currentFitTarget_->zStart(), currentFitTarget_->zEnd());
+		printMessage("Fitting %i dataset(s) at %e < z < %e", currentFitTarget_->nDataSets(), currentFitTarget_->zStart(), currentFitTarget_->zEnd());
 
 		// Call the minimiser
 		result = minimise();

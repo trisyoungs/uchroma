@@ -23,15 +23,15 @@
 #include "gui/uchroma.h"
 
 // Construct normal / colour data for vertex specified
-Vec3<double> Viewer::constructVertexNormals(const Array<double>& abscissa, int index, DisplaySlice* targetSlice, DisplaySlice* previousSlice, DisplaySlice* nextSlice, int nPoints)
+Vec3<double> Viewer::constructVertexNormals(const Array<double>& abscissa, int index, DisplayDataSet* targetDataSet, DisplayDataSet* previousDataSet, DisplayDataSet* nextDataSet, int nPoints)
 {
 	Vec3<double> normals;
 
 	// Grab references to first target array
-	const Array<double>& yTarget = targetSlice->y();
+	const Array<double>& yTarget = targetDataSet->y();
 
 	// Check whether previous / next slice information is available
-	if ((previousSlice == NULL) && (nextSlice == NULL))
+	if ((previousDataSet == NULL) && (nextDataSet == NULL))
 	{
 		// Neither previous nor next slices exist - the normal will depend only on the previous and/or next points
 
@@ -49,7 +49,7 @@ Vec3<double> Viewer::constructVertexNormals(const Array<double>& abscissa, int i
 			// Point somewhere in middle of array, so have previous and next points
 		}
 	}
-	else if (previousSlice == NULL)
+	else if (previousDataSet == NULL)
 	{
 		// No previous slice available, so normals depend on this and next slice only
 
@@ -67,7 +67,7 @@ Vec3<double> Viewer::constructVertexNormals(const Array<double>& abscissa, int i
 			// Point somewhere in middle of array, so have previous and next points
 		}
 	}
-	else if (nextSlice == NULL)
+	else if (nextDataSet == NULL)
 	{
 		// No next slice available, so normals depend on this and previous slice only
 
@@ -93,7 +93,7 @@ Vec3<double> Viewer::constructVertexNormals(const Array<double>& abscissa, int i
 }
 
 // Construct grid surface representation of data
-void Viewer::constructGridSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplaySlice>& displayData, ColourScale colourScale)
+void Viewer::constructGridSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale)
 {
 	// Forget all data in current primitives
 	primitives.forgetAll();
@@ -120,7 +120,7 @@ void Viewer::constructGridSurface(PrimitiveList& primitives, const Array<double>
 	double yAxisScale = uChroma_->axisStretch(1);
 	Vec3<double> nrm(0.0, 1.0, 0.0);
 
-	DisplaySlice** slices = displayData.array(), slice;
+	DisplayDataSet** slices = displayData.array(), slice;
 	Primitive* currentPrimitive = primitives[0];
 	GLuint verticesA[cacheSize], verticesB[cacheSize];
 	double z;
@@ -133,14 +133,14 @@ void Viewer::constructGridSurface(PrimitiveList& primitives, const Array<double>
 
 		// Grab arrays from first slice
 		const Array<double>& y = slices[0]->y();
-		const Array<DisplaySlice::DataPointType>& yType = slices[0]->yType();
+		const Array<DisplayDataSet::DataPointType>& yType = slices[0]->yType();
 		z = slices[0]->z();
 		
 		// Generate lines / vertices for first row
 		for (n=0; n<nLimit; ++n)
 		{
 			i = offset+n;
-			if (yType.value(i) != DisplaySlice::NoPoint)
+			if (yType.value(i) != DisplayDataSet::NoPoint)
 			{
 				// A value exists here, so define a vertex
 				colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, y.value(i)) : y.value(i)) / yAxisScale, colour);
@@ -157,14 +157,14 @@ void Viewer::constructGridSurface(PrimitiveList& primitives, const Array<double>
 		{
 			// Grab arrays
 			const Array<double>& y = slices[slice]->y();
-			const Array<DisplaySlice::DataPointType>& yType = slices[slice]->yType();
+			const Array<DisplayDataSet::DataPointType>& yType = slices[slice]->yType();
 			z = slices[slice]->z();
 
 			// Generate vertices for this row
 			for (n=0; n<nLimit; ++n)
 			{
 				i = offset+n;
-				if (yType.value(offset+n) != DisplaySlice::NoPoint)
+				if (yType.value(offset+n) != DisplayDataSet::NoPoint)
 				{
 					// A value exists here, so define a vertex
 					colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, y.value(i)) : y.value(i)) / yAxisScale, colour);

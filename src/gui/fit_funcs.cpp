@@ -278,11 +278,11 @@ void FitDialog::updateSourceGroup(bool refreshList)
 
 	// Populate reference Y combo
 	ui.SourceReferenceYCombo->clear();
-	for (Slice* slice = collection->slices(); slice != NULL; slice = slice->next) ui.SourceReferenceYCombo->addItem(slice->title() + " (Z = " + QString::number(slice->data().z()) + ")");
+	for (DataSet* dataSet = collection->dataSets(); dataSet != NULL; dataSet = dataSet->next) ui.SourceReferenceYCombo->addItem(dataSet->title() + " (Z = " + QString::number(dataSet->data().z()) + ")");
 
 	// Update spin boxes with limits
 	ui.SourceXYSliceFromSpin->setRange(1, ui.SourceXYSliceToSpin->value());
-	ui.SourceXYSliceToSpin->setRange(ui.SourceXYSliceFromSpin->value(), collection->nSlices());
+	ui.SourceXYSliceToSpin->setRange(ui.SourceXYSliceFromSpin->value(), collection->nDataSets());
 	ui.SourceXYXMinSpin->setRange(true, collection->transformMin().x, true, collection->transformMax().x);
 	ui.SourceXYXMaxSpin->setRange(true, collection->transformMin().x, true, collection->transformMax().x);
 
@@ -290,16 +290,16 @@ void FitDialog::updateSourceGroup(bool refreshList)
 	if (refreshList)
 	{
 		ui.SourceXYSliceFromSpin->setValue(1);
-		ui.SourceXYSliceToSpin->setValue(collection->nSlices());
+		ui.SourceXYSliceToSpin->setValue(collection->nDataSets());
 		ui.SourceXYXMinSpin->setValue(collection->transformMin().x);
 		ui.SourceXYXMaxSpin->setValue(collection->transformMax().x);
 	}
 
 	// Update info labels
-	Slice* slice = collection->slice(ui.SourceXYSliceFromSpin->value()-1);
-	ui.SourceXYFromZLabel->setText("Z = " + (slice ? QString::number(slice->data().z()) : "???"));
-	slice = collection->slice(ui.SourceXYSliceToSpin->value()-1);
-	ui.SourceXYToZLabel->setText("Z = " + (slice ? QString::number(slice->data().z()) : "???"));
+	DataSet* dataSet = collection->dataSet(ui.SourceXYSliceFromSpin->value()-1);
+	ui.SourceXYFromZLabel->setText("Z = " + (dataSet ? QString::number(dataSet->data().z()) : "???"));
+	dataSet = collection->dataSet(ui.SourceXYSliceToSpin->value()-1);
+	ui.SourceXYToZLabel->setText("Z = " + (dataSet ? QString::number(dataSet->data().z()) : "???"));
 
 	refreshing_ = false;
 }

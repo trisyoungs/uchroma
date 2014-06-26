@@ -22,7 +22,8 @@
 #ifndef UCHROMA_COLLECTION_H
 #define UCHROMA_COLLECTION_H
 
-#include "base/slice.h"
+#include "base/dataset.h"
+#include "base/displaydataset.h"
 #include "base/transformer.h"
 #include "base/colourscale.h"
 #include "gui/viewer_primitivelist.h"
@@ -49,8 +50,8 @@ class Collection : public ListItem<Collection>
 	private:
 	// Title
 	QString title_;
-	// List of slices
-	List<Slice> slices_;
+	// List of datasets
+	List<DataSet> dataSets_;
 	// Root directory for datafiles
 	QDir dataFileDirectory_;
 	// Extreme values of raw data
@@ -61,46 +62,44 @@ class Collection : public ListItem<Collection>
 	void setTitle(QString title);
 	// Return title
 	QString title();
-	// Add slice
-	Slice* addSlice();
+	// Add dataset
+	DataSet* addDataSet();
 	// Add slice at specified z
-	Slice* addSlice(double z);
+	DataSet* addDataSet(double z);
 	// Add slice, copying from supplied data
-	void addSlice(Slice* source);
-	// Return number of slices
-	int nSlices();
-	// Remove slice
-	void removeSlice(Slice* slice);
+	void addDataSet(DataSet* source);
+	// Return number of datasets
+	int nDataSets();
+	// Remove dataset
+	void removeDataSet(DataSet* dataSet);
 	// Set z value of specified slice
-	void setSliceZ(Slice* target, double z);
+	void setDataSetZ(DataSet* target, double z);
 	// Set data for specified slice
-	void setSliceData(Slice* target, Data2D* newData);
+	void setDataSetData(DataSet* target, Data2D* newData);
 	// Return first slice in list
-	Slice* slices() const;
+	DataSet* dataSets() const;
 	// Return last slice in list
-	Slice* lastSlice();
+	DataSet* lastDataSet();
 	// Return nth slice in list
-	Slice* slice(int index);
-	// Return number of slices with no data present
-	int nEmptySlices();
+	DataSet* dataSet(int index);
+	// Return number of dataset with no data present
+	int nEmptyDataSets();
 	// Clear slice data from collection
-	void clearSlices();
-	// Return total number of points across all slices
+	void clearDataSets();
+	// Return total number of points across all dataset
 	int nDataPoints();
 	// Set root directory for datafiles
 	void setDataFileDirectory(QDir directory);
 	// Return root directory for datafiles
 	QDir dataFileDirectory();
-	// Load data for specified slice
-	bool loadSliceData(Slice* slice);
-	// Reload data for all slices
-	int loadAllSlices();
+	// Load specified dataset
+	bool loadDataSet(DataSet* dataSet);
+	// Reload data for all dataset
+	int loadAllDataSets();
 	// Return data minima, calculating if necessary
 	Vec3<double> dataMin();
 	// Return data maxima, calculating if necessary
 	Vec3<double> dataMax();
-	// Return formatted summary information on this Collection
-	QString summaryInfo();
 
 
 	/*
@@ -160,7 +159,7 @@ class Collection : public ListItem<Collection>
 	// List of fits made to parent
 	List<Collection> fits_;
 	// List of slices extracted from parent
-	List<Collection> extractedSlices_;
+	List<Collection> extractedDataSets_;
 
 	public:
 	// Set parent Collection
@@ -282,7 +281,7 @@ class Collection : public ListItem<Collection>
 	// Whether data is visible
 	bool visible_;
 	// Transformed data to display
-	List<DisplaySlice> displayData_;
+	List<DisplayDataSet> displayData_;
 	// Abscissa values for display data
 	Array<double> displayAbscissa_;
 	// Display style of data
@@ -302,7 +301,7 @@ class Collection : public ListItem<Collection>
 	// Return transformed display abscissa for data
 	const Array<double>& displayAbscissa() const;
 	// Return transformed data to display
-	List<DisplaySlice>& displayData();
+	List<DisplayDataSet>& displayData();
 	// Set display style of data
 	void setDisplayStyle(DisplayStyle style);
 	// Return display style of data

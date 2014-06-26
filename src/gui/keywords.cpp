@@ -109,10 +109,10 @@ int Keywords::axisKeywordNArguments(Keywords::AxisKeyword kwd)
 */
 
 // Collection Block Keywords
-const char* CollectionBlockKeywords[] = { "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearRGBA", "ColourLinearRGBB", "ColourLinearHSVA", "ColourLinearHSVB", "ColourSingle", "ColourSource", "DataDirectory", "EndCollection", "Interpolate", "InterpolateConstrain", "InterpolateStep", "Slice", "Style", "TransformX", "TransformY", "TransformZ", "Visible" };
+const char* CollectionBlockKeywords[] = { "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearRGBA", "ColourLinearRGBB", "ColourLinearHSVA", "ColourLinearHSVB", "ColourSingle", "ColourSource", "DataDirectory", "DataSet", "EndCollection", "Interpolate", "InterpolateConstrain", "InterpolateStep", "Style", "TransformX", "TransformY", "TransformZ", "Visible" };
 
 // Collection Block NArguments
-int CollectionKeywordNArguments[] = { 1, 1, 5, 5, 5, 5, 5, 4, 1, 1, 0, 2, 2, 2, 1, 1, 2, 2, 2, 1 };
+int CollectionKeywordNArguments[] = { 1, 1, 5, 5, 5, 5, 5, 4, 1, 1, 1, 0, 2, 2, 2, 1, 2, 2, 2, 1 };
 
 /*!
  * \brief Convert text string to CollectionKeyword
@@ -175,38 +175,38 @@ int Keywords::settingsKeywordNArguments(Keywords::SettingsKeyword kwd)
 }
 
 /*
-// Slice Keywords
+// DataSet Keywords
 */
 
-// Slice Block Keywords
-const char* SliceBlockKeywords[] = { "Data", "EndSlice", "Source", "Z" };
+// DataSet Block Keywords
+const char* DataSetBlockKeywords[] = { "Data", "EndDataSet", "Source", "Z" };
 
-// Slice Block NArguments
-int SliceKeywordNArguments[] = { 0, 0, 1, 1 };
+// DataSet Block NArguments
+int DataSetKeywordNArguments[] = { 0, 0, 1, 1 };
 
 /*!
- * \brief Convert text string to SliceKeyword
+ * \brief Convert text string to DataSetKeyword
  */
-Keywords::SliceKeyword Keywords::sliceKeyword(const char* s)
+Keywords::DataSetKeyword Keywords::dataSetKeyword(const char* s)
 {
-	for (int n=0; n<nSliceKeywords; ++n) if (strcmp(s,SliceBlockKeywords[n]) == 0) return (Keywords::SliceKeyword) n;
-	return nSliceKeywords;
+	for (int n=0; n<nDataSetKeywords; ++n) if (strcmp(s,DataSetBlockKeywords[n]) == 0) return (Keywords::DataSetKeyword) n;
+	return nDataSetKeywords;
 }
 
 /*!
- * \brief Convert SliceKeyword to text string
+ * \brief Convert DataSetKeyword to text string
  */
-const char* Keywords::sliceKeyword(Keywords::SliceKeyword kwd)
+const char* Keywords::dataSetKeyword(Keywords::DataSetKeyword kwd)
 {
-	return SliceBlockKeywords[kwd];
+	return DataSetBlockKeywords[kwd];
 }
 
 /*!
  * \brief Return minimum number of expected arguments
  */
-int Keywords::sliceKeywordNArguments(Keywords::SliceKeyword kwd)
+int Keywords::dataSetKeywordNArguments(Keywords::DataSetKeyword kwd)
 {
-	return SliceKeywordNArguments[kwd];
+	return DataSetKeywordNArguments[kwd];
 }
 
 /*

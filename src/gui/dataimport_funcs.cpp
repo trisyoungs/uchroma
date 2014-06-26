@@ -54,15 +54,15 @@ void DataImportDialog::closeEvent(QCloseEvent *event)
 // Run the import, showing the dialog
 bool DataImportDialog::import()
 {
-	importedSlices_.clear();
+	importedDataSets_.clear();
 	int result = exec();
 }
 
 
 // Return first imported slice
-Slice* DataImportDialog::importedSlices()
+DataSet* DataImportDialog::importedSlices()
 {
-	return importedSlices_.first();
+	return importedDataSets_.first();
 }
 
 /*

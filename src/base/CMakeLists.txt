@@ -2,6 +2,8 @@ add_library(base
 collection.cpp
 colourscale.cpp
 data2d.cpp
+dataset.cpp
+displaydataset.cpp
 dnchar.cpp
 equation.cpp
 lineparser.cpp
@@ -13,6 +15,8 @@ transformer.cpp
 collection.h
 colourscale.h
 data2d.h
+dataset.h
+displaydataset.h
 dnchar.h
 equation.h
 lineparser.h

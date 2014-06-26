@@ -167,14 +167,14 @@ void CreateDialog::updateCreatedData(bool force)
 	if (ui.GridSpecifyRadio->isChecked())
 	{
 		// A grid has been specified by hand, so can clear all old data and recreate it
-		newCollection_->clearSlices();
+		newCollection_->clearDataSets();
 		double z = ui.GridSpecifyZMinSpin->value();
 		while (z <= ui.GridSpecifyZMaxSpin->value())
 		{
-			// Create new slice at this z
-			Slice* newSlice = newCollection_->addSlice();
-			newCollection_->setSliceZ(newSlice, z);
-			Data2D& newData = newSlice->data();
+			// Create new dataset at this z
+			DataSet* newDataSet = newCollection_->addDataSet();
+			newCollection_->setDataSetZ(newDataSet, z);
+			Data2D& newData = newDataSet->data();
 
 			double x = ui.GridSpecifyXMinSpin->value();
 			while (x <= ui.GridSpecifyXMaxSpin->value())

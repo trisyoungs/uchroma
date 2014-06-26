@@ -23,7 +23,7 @@
 #define UCHROMA_DATAIMPORT_H
 
 #include "gui/ui_dataimport.h"
-#include "base/slice.h"
+#include "base/dataset.h"
 
 // Forward Declarations
 /* None */
@@ -61,8 +61,8 @@ class DataImportDialog : public QDialog
 	private:
 	// Current directory for file selector
 	QDir currentDirectory_;
-	// List of imported data slices
-	List<Slice> importedSlices_;
+	// List of imported datasets
+	List<DataSet> importedDataSets_;
 
 	private:
 	// Import sequential XY data
@@ -72,7 +72,7 @@ class DataImportDialog : public QDialog
 	// Run the import, showing the dialog
 	bool import();
 	// Return first imported slice
-	Slice* importedSlices();
+	DataSet* importedSlices();
 
 
 	/*

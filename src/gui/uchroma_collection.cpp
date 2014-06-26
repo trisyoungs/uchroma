@@ -102,7 +102,7 @@ void UChromaWindow::updateCollectionInfo()
 	// Update collection stats underneath main Collection list
 	if (currentCollection_)
 	{
-		ui.CollectionNSlicesLabel->setText(QString::number(currentCollection_->nSlices()));
+		ui.CollectionNSlicesLabel->setText(QString::number(currentCollection_->nDataSets()));
 		ui.CollectionNPointsLabel->setText(QString::number(currentCollection_->nDataPoints()));
 		ui.CollectionNVerticesLabel->setText(QString::number(currentCollection_->displayPrimitives().nDefinedVertices()));
 		ui.CollectionNIndicesLabel->setText(QString::number(currentCollection_->displayPrimitives().nDefinedIndices()));

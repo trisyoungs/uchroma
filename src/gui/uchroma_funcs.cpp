@@ -60,7 +60,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	// Connect signals / slots between the Viewer and uChroma
 	connect(ui.MainView, SIGNAL(sliceAxisClicked()), this, SLOT(addSurfaceSlice()));
 	connect(ui.MainView, SIGNAL(renderComplete(QString)), this, SLOT(updateRenderTimeLabel(QString)));
-	connect(ui.MainView, SIGNAL(surfacePrimitivesUpdated(bool)), this, SLOT(updateCollections(bool)));
+	connect(ui.MainView, SIGNAL(surfacePrimitivesUpdated()), this, SLOT(updateCollectionInfo()));
 
 	// Connect signals / slots between SliceMonitor and main UI
 	connect(this, SIGNAL(sliceDataChanged()), sliceMonitorWindow_.ui.MonitorGraph, SLOT(staticDataChanged()));

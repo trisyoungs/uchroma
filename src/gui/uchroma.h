@@ -242,10 +242,10 @@ class UChromaWindow : public QMainWindow
 	bool readAxisBlock(LineParser& parser, int axis);
 	// Read CollectionBlock keywords
 	bool readCollectionBlock(LineParser& parser, Collection* collection);
+	// Read DataSetBlock keywords
+	bool readDataSetBlock(LineParser& parser, DataSet* dataS, Collection* collection);
 	// Read SettingsBlock keywords
 	bool readSettingsBlock(LineParser& parser);
-	// Read SliceBlock keywords
-	bool readSliceBlock(LineParser& parser, Slice* slice, Collection* collection);
 	// Read AxisBlock keywords
 	bool readViewBlock(LineParser& parser);
 

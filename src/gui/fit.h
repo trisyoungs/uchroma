@@ -35,7 +35,7 @@
 // Forward Declarations
 class UChromaWindow;
 class Collection;
-class Slice;
+class DataSet;
 class Variable;
 
 /*
@@ -55,10 +55,10 @@ class FitTarget : public ListItem<FitTarget>
 	private:
 	// Source Collection
 	Collection* collection_;
-	// Indices of first and last DisplaySlice to use in fitting
-	int displaySliceStart_, displaySliceEnd_;
-	// Number of sequential DisplaySlices to use in fitting
-	int nSlices_;
+	// Indices of first and last DisplayDataSet to use in fitting
+	int displayDataSetStart_, displayDataSetEnd_;
+	// Number of sequential DisplayDataSet to use in fitting
+	int nDataSets_;
 	// First and last abscissa indices to use in fitting
 	int abscissaStart_, abscissaEnd_;
 	// Number of sequential abscissa values to use in fitting
@@ -66,22 +66,22 @@ class FitTarget : public ListItem<FitTarget>
 
 	public:
 	// Set target information
-	void set(Collection* collection, int firstSlice, int lastSlice, int abscissaFirst, int abscissaLast);
-	// Return index of first DisplaySice to be fit
-	int displaySliceStart();
-	// Return index of last DisplaySice to be fit
-	int displaySliceEnd();
-	// Return number of sequential DisplaySlices to use in fitting
-	int nSlices();
+	void set(Collection* collection, int firstDataSet, int lastDataSet, int abscissaFirst, int abscissaLast);
+	// Return index of first DisplayDataSet to be fit
+	int displayDataSetStart();
+	// Return index of last DisplayDataSet to be fit
+	int displayDataSetEnd();
+	// Return number of sequential DisplayDataSets to use in fitting
+	int nDataSets();
 	// Return first abscissa index to use in fitting
 	int abscissaStart();
 	// Return last abscissa index to use in fitting
 	int abscissaEnd();
 	// Return number of sequential abscissa values to use in fitting
 	int nPoints();
-	// Return z value of first slice used in fitting
+	// Return z value of first dataset used in fitting
 	double zStart();
-	// Return z value of last slice used in fitting
+	// Return z value of last dataset used in fitting
 	double zEnd();
 
 

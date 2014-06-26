@@ -38,7 +38,7 @@
 class ColourScale;
 class UChromaWindow;
 class Collection;
-class DisplaySlice;
+class DisplayDataSet;
 
 // Base rendering widget
 class Viewer : public QGLWidget
@@ -248,15 +248,15 @@ class Viewer : public QGLWidget
 	// Setup basic GL properties
 	void setupGL();
 	// Construct line surface representation of data
-	void constructLineSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplaySlice>& displayData, ColourScale colourScale);
+	void constructLineSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
 	// Construct line surface representation of data
-	void constructGridSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplaySlice>& displayData, ColourScale colourScale);
+	void constructGridSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
 	// Construct gridded surface representation of data
-	Vec3<double> constructVertexNormals(const Array<double>& abscissa, int index, DisplaySlice* targetSlice, DisplaySlice* previousSlice, DisplaySlice* nextSlice, int nPoints);
-	// Construct normal / colour surface data for slice specified
-	void constructSurfaceStrip(const Array<double>& abscissa, DisplaySlice* targetSlice, double yAxisScale, Array< Vec3< double > >& normals, Array< Vec4< GLfloat > >& colours, const ColourScale& colourScale, DisplaySlice* previousSlice, DisplaySlice* nextSlice);
+	Vec3<double> constructVertexNormals(const Array<double>& abscissa, int index, DisplayDataSet* targetDataSet, DisplayDataSet* previousDataSet, DisplayDataSet* nextDataSet, int nPoints);
+	// Construct normal / colour surface data for dataset specified
+	void constructSurfaceStrip(const Array<double>& abscissa, DisplayDataSet* targetDataSet, double yAxisScale, Array< Vec3< double > >& normals, Array< Vec4< GLfloat > >& colours, const ColourScale& colourScale, DisplayDataSet* previousDataSet, DisplayDataSet* nextDataSet);
 	// Construct full surface representation of data
-	void constructFullSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplaySlice>& displayData, ColourScale colourScale);
+	void constructFullSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
 	// Create/update surface primitive for specified collection
 	bool updateSurfacePrimitive(Collection* collection, bool forceUpdate = false);
 
@@ -286,7 +286,7 @@ class Viewer : public QGLWidget
 	// Return string containing time taken to do last render
 	QString renderComplete(QString timeTaken);
 	// Data for one or more surface primitives was updated
-	void surfacePrimitivesUpdated(bool);
+	void surfacePrimitivesUpdated();
 
 
 	/*

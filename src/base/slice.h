@@ -32,63 +32,6 @@
 class ExtractedSliceGroup;
 class QTreeWidgetItem;
 
-// Slice
-class Slice : public ListItem<Slice>
-{
-	public:
-	// Constructor / Destructor
-	Slice();
-	~Slice();
-	// Copy constructor
-	Slice(const Slice& source);
-	// Assignment operator
-	void operator=(const Slice& source);
-	// Data Sources
-	enum DataSource { FileSource, InternalSource, nDataSources };
-	// Convert text string to DataSource
-	static DataSource dataSource(const char* s);
-	// Convert DataSource to text string
-	static const char* dataSource(DataSource kwd);
-
-
-	/*
-	// Data
-	*/
-	private:
-	// Source of data
-	DataSource dataSource_;
-	// Source file, if one is specified (not including path)
-	QString sourceFileName_;
-	// Title
-	QString title_;
-	// Data
-	Data2D data_;
-	// Transformed data
-	Data2D transformedData_;
-
-	public:
-	// Set source of data
-	void setDataSource(Slice::DataSource source);
-	// Return source of data
-	Slice::DataSource dataSource();
-	// Set source filename
-	void setSourceFileName(QString fileName);
-	// Return source filename
-	QString sourceFileName();
-	// Set title
-	void setTitle(QString title);
-	// Return title
-	QString title();
-	// Load data from file
-	bool loadData(QDir sourceDir);
-	// Return data
-	Data2D& data();
-	// Transform original data with supplied transformers
-	void transform(Transformer& xTransformer, Transformer& yTransformer, Transformer& zTransformer);
-	// Return transformed data
-	Data2D& transformedData();
-};
-
 // Extracted Slice
 class ExtractedSlice : public ListItem<ExtractedSlice>
 {
@@ -207,45 +150,6 @@ class ExtractedSliceGroup : public ListItem<ExtractedSliceGroup>
 	void setTreeItem(QTreeWidgetItem* item);
 	// Return tree node associated to the group
 	QTreeWidgetItem* treeItem();
-};
-
-// Display Slice
-class DisplaySlice : public ListItem<DisplaySlice>
-{
-	public:
-	// Constructor / Destructor
-	DisplaySlice();
-	~DisplaySlice();
-	// Data poin type enum
-	enum DataPointType { RealPoint, InterpolatedPoint, NoPoint };
-
-
-	/*
-	 * Data
-	 */
-	private:
-	// Y values of slice data
-	Array<double> y_;
-	// Type of y value at each point
-	Array<DataPointType> yType_;
-	// Z value of slice
-	double z_;
-
-	public:
-	// Add y value and associated flag
-	void add(double y, DisplaySlice::DataPointType type);
-	// Add dummy y value and associated flag
-	void addDummy();
-	// Return y array
-	const Array<double>& y() const;
-	// Return type array
-	const Array<DisplaySlice::DataPointType>& yType() const;
-	// Set specific y value
-	void setY(int index, double yNew, DisplaySlice::DataPointType type);
-	// Set z value of slice
-	void setZ(double z);
-	// Return z value of slice
-	double z() const;
 };
 
 #endif

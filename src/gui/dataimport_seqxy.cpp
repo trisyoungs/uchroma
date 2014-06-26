@@ -26,7 +26,7 @@
 bool DataImportDialog::importSequentialXY()
 {
 	// Clear any old imported slices
-	importedSlices_.clear();
+	importedDataSets_.clear();
 
 	// Grab some values from the UI
 	Vec3<int> columns(ui.SeqXYColumnXSpin->value()-1, ui.SeqXYColumnYSpin->value()-1,  ui.SeqXYColumnZSpin->value()-1);
@@ -43,8 +43,8 @@ bool DataImportDialog::importSequentialXY()
 		return false;
 	}
 
-	// Set up initial slice
-	Slice* slice = importedSlices_.add();
+	// Set up initial dataSet
+	DataSet* dataSet = importedDataSets_.add();
 
 	// Skip lines at start
 	if (nStartSkip > 0) parser.skipLines(nStartSkip);
@@ -73,7 +73,7 @@ bool DataImportDialog::importSequentialXY()
 			// If it is non-zero, create a new Slice for the next round...
 			if (count.x != 0)
 			{
-				slice = importedSlices_.add();
+				dataSet = importedDataSets_.add();
 				++count.z;
 			}
 			count.x = 0;
@@ -84,10 +84,10 @@ bool DataImportDialog::importSequentialXY()
 		if (maxColumn >= parser.nArgs()) msg.print("Not enough columns in file.\n");
 
 		// Add datapoint
-		slice->data().addPoint(columns.x == -1 ? count.x : parser.argd(columns.x), parser.argd(columns.y));
+		dataSet->data().addPoint(columns.x == -1 ? count.x : parser.argd(columns.x), parser.argd(columns.y));
 
 		// Set z value for slice
-		slice->data().setZ(columns.z == -1 ? count.z : parser.argd(columns.z));
+		dataSet->data().setZ(columns.z == -1 ? count.z : parser.argd(columns.z));
 
 		// Increase x count
 		++count.x;

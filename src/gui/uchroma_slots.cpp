@@ -219,12 +219,12 @@ void UChromaWindow::on_actionDataImport_triggered(bool checked)
 	if (!currentCollection_) return;
 
 	// Raise the Data Import dialog
-	bool fitData = currentCollection_->nSlices() == 0;
+	bool fitData = currentCollection_->nDataSets() == 0;
 	bool result = dataImportDialog_.import();
 	if (!result) return;
 
 	// Loop over list of imported slices and copy them to our local list
-	for (Slice* slice = dataImportDialog_.importedSlices(); slice != NULL; slice = slice->next) currentCollection_->addSlice(slice);
+	for (DataSet* dataSet = dataImportDialog_.importedSlices(); dataSet != NULL; dataSet = dataSet->next) currentCollection_->addDataSet(dataSet);
 
 	// Update subwindows
 	updateSubWindows();
@@ -248,7 +248,6 @@ void UChromaWindow::on_actionToolsFitWindow_triggered(bool checked)
 	}
 	else fitDialog_.hide();
 }
-
 
 /*
  * Axes Actions

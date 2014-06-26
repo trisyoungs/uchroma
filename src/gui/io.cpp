@@ -126,7 +126,7 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, int axis)
 // Read CollectionBlock keywords
 bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collection)
 {
-	Slice* slice;
+	DataSet* dataSet;
 	int xyz;
 	Collection::DisplayStyle ds;
 	while (!parser.eofOrBlank())
@@ -176,7 +176,7 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				if ((parser.argi(1) < 0) || (parser.argi(1) >= Collection::nColourSources)) msg.print("Value is out of range for %s keyword.\n", Keywords::collectionKeyword(collectionKwd));
 				else collection->setColourSource((Collection::ColourSource) parser.argi(1));
 				break;
-				// Slice directory
+			// Dataset directory
 			case (Keywords::DataDirectoryKeyword):
 				collection->setDataFileDirectory(QDir(parser.argc(1)));
 				if (!collection->dataFileDirectory().isReadable())
@@ -188,6 +188,13 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 						if (!dir.isEmpty()) collection->setDataFileDirectory(dir);
 					}
 				}
+				break;
+			// DataSet
+			case (Keywords::DataSetDefinitionKeyword):
+				// Create new dataset
+				dataSet = collection->addDataSet();
+				dataSet->setTitle(parser.argc(1));
+				if (!readDataSetBlock(parser, dataSet, collection)) return false;
 				break;
 			// End input block
 			case (Keywords::EndCollectionKeyword):
@@ -207,13 +214,6 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 			case (Keywords::InterpolateStepKeyword):
 				collection->setInterpolationStep(0, parser.argd(1));
 				collection->setInterpolationStep(2, parser.argd(2));
-				break;
-			// Slice
-			case (Keywords::SliceDefinitionKeyword):
-				// Create new slice
-				slice = collection->addSlice();
-				slice->setTitle(parser.argc(1));
-				if (!readSliceBlock(parser, slice, collection)) return false;
 				break;
 			// Display style
 			case (Keywords::StyleKeyword):
@@ -240,6 +240,77 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 		}
 	}
 	msg.print("Error : Unterminated 'Collection' block.\n");
+	return false;
+}
+
+// Read DataSetBlock keywords
+bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Collection* collection)
+{
+	int nPoints;
+	bool foundEnd;
+	DataSet::DataSource source;
+	while (!parser.eofOrBlank())
+	{
+		// Get line from file
+		parser.getArgsDelim(LineParser::UseQuotes + LineParser::SkipBlanks);
+
+		// Get keyword and check number of arguments provided
+		Keywords::DataSetKeyword dataSetKwd = Keywords::dataSetKeyword(parser.argc(0));
+		if ((dataSetKwd != Keywords::nDataSetKeywords) && (Keywords::dataSetKeywordNArguments(dataSetKwd) > (parser.nArgs()-1)))
+		{
+			msg.print("Error : DataSet keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::dataSetKeyword(dataSetKwd), Keywords::dataSetKeywordNArguments(dataSetKwd), parser.nArgs()-1);
+			return false;
+		}
+		switch (dataSetKwd)
+		{
+			case (Keywords::DataKeyword):
+				dataSet->data().reset();
+				foundEnd = false;
+				do
+				{
+					parser.getArgsDelim(LineParser::Defaults);
+					// Check for 'EndData'
+					if (strcmp(parser.argc(0),"EndData") == 0) foundEnd = true;
+					else dataSet->data().addPoint(parser.argd(0), parser.argd(1));
+				} while ((!foundEnd) && (!parser.eofOrBlank()));
+				if (!foundEnd)
+				{
+					msg.print("Error : Unterminated 'Data' block in dataSet '%s'.\n", qPrintable(dataSet->title()));
+					return false;
+				}
+				break;
+			case (Keywords::EndDataSetKeyword):
+				return true;
+				break;
+			case (Keywords::SourceKeyword):
+				source = DataSet::dataSource(parser.argc(1));
+				if (source == DataSet::nDataSources)
+				{
+					msg.print("Error :Datasource for dataSet not recognised (%s)\n", parser.argc(1));
+					return false;
+				}
+				dataSet->setDataSource(source);
+				// Depending on the source, we might expect other data here...
+				if (source == DataSet::FileSource)
+				{
+					if (parser.hasArg(2)) dataSet->setSourceFileName(parser.argc(2));
+					else
+					{
+						msg.print("Error :Expected data file name after 'Source File' declaration in dataSet '%s'.\n", qPrintable(dataSet->title()));
+						return false;
+					}
+				}
+				break;
+			case (Keywords::ZKeyword):
+				collection->setDataSetZ(dataSet, parser.argd(1));
+				break;
+			// Unrecognised Keyword
+			default:
+				msg.print("Error : Unrecognised DataSet keyword: %s\n", parser.argc(0));
+				return false;
+		}
+	}
+	msg.print("Error : Unterminated 'DataSet' block.\n");
 	return false;
 }
 
@@ -280,78 +351,6 @@ bool UChromaWindow::readSettingsBlock(LineParser& parser)
 	}
 	msg.print("Error : Unterminated 'Settings' block.\n");
 	return false;
-}
-
-// Read SliceBlock keywords
-bool UChromaWindow::readSliceBlock(LineParser& parser, Slice* slice, Collection* collection)
-{
-	int nPoints;
-	bool foundEnd;
-	Slice::DataSource source;
-	while (!parser.eofOrBlank())
-	{
-		// Get line from file
-		parser.getArgsDelim(LineParser::UseQuotes + LineParser::SkipBlanks);
-
-		// Get keyword and check number of arguments provided
-		Keywords::SliceKeyword sliceKwd = Keywords::sliceKeyword(parser.argc(0));
-		if ((sliceKwd != Keywords::nSliceKeywords) && (Keywords::sliceKeywordNArguments(sliceKwd) > (parser.nArgs()-1)))
-		{
-			msg.print("Error : Slice keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::sliceKeyword(sliceKwd), Keywords::sliceKeywordNArguments(sliceKwd), parser.nArgs()-1);
-			return false;
-		}
-		switch (sliceKwd)
-		{
-			case (Keywords::DataKeyword):
-				slice->data().reset();
-				foundEnd = false;
-				do
-				{
-					parser.getArgsDelim(LineParser::Defaults);
-					// Check for 'EndData'
-					if (strcmp(parser.argc(0),"EndData") == 0) foundEnd = true;
-					else slice->data().addPoint(parser.argd(0), parser.argd(1));
-				} while ((!foundEnd) && (!parser.eofOrBlank()));
-				if (!foundEnd)
-				{
-					msg.print("Error : Unterminated 'Data' block in slice '%s'.\n", qPrintable(slice->title()));
-					return false;
-				}
-				break;
-			case (Keywords::EndSliceKeyword):
-				return true;
-				break;
-			case (Keywords::SourceKeyword):
-				source = Slice::dataSource(parser.argc(1));
-				if (source == Slice::nDataSources)
-				{
-					msg.print("Error :Datasource for slice not recognised (%s)\n", parser.argc(1));
-					return false;
-				}
-				slice->setDataSource(source);
-				// Depending on the source, we might expect other data here...
-				if (source == Slice::FileSource)
-				{
-					if (parser.hasArg(2)) slice->setSourceFileName(parser.argc(2));
-					else
-					{
-						msg.print("Error :Expected data file name after 'Source File' declaration in slice '%s'.\n", qPrintable(slice->title()));
-						return false;
-					}
-				}
-				break;
-			case (Keywords::ZKeyword):
-				collection->setSliceZ(slice, parser.argd(1));
-				break;
-			// Unrecognised Keyword
-			default:
-				msg.print("Error : Unrecognised slice keyword: %s\n", parser.argc(0));
-				return false;
-		}
-	}
-	msg.print("Error : Unterminated 'Slice' block.\n");
-	return false;
-
 }
 
 // Read AxisBlock keywords
@@ -466,13 +465,13 @@ bool UChromaWindow::loadInputFile(QString fileName)
 				
 				success = readCollectionBlock(parser, currentCollection_);
 				// Check for empty slices
-				nEmpty = currentCollection_->nEmptySlices();
+				nEmpty = currentCollection_->nEmptyDataSets();
 				if (nEmpty != 0)
 				{
 					QMessageBox::StandardButton button = QMessageBox::warning(this, "Empty Data", QString("There are ") + QString::number(nEmpty) + " defined slices which contain no data in collection '" + currentCollection_->title() + "'.\nWould you like to reload these now from their source files?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 					if (button == QMessageBox::Yes)
 					{
-						nEmpty = currentCollection_->loadAllSlices();
+						nEmpty = currentCollection_->loadAllDataSets();
 						
 						if (nEmpty > 0)
 						{
@@ -607,14 +606,14 @@ bool UChromaWindow::saveInputFile(QString fileName)
 		parser.writeLineF("  %s %s\n", Keywords::collectionKeyword(Keywords::VisibleCollectionKeyword), stringBool(collection->visible()));
 
 		// Loop over slices
-		for (Slice* slice = collection->slices(); slice != NULL; slice = slice->next)
+		for (DataSet* dataSet = collection->dataSets(); dataSet != NULL; dataSet = dataSet->next)
 		{
-			parser.writeLineF("  Slice '%s'\n", qPrintable(slice->title()));
-			if (slice->dataSource() == Slice::FileSource) parser.writeLineF("  %s  %s  '%s'\n", Keywords::sliceKeyword(Keywords::SourceKeyword), Slice::dataSource(slice->dataSource()), qPrintable(slice->sourceFileName()));
-			else parser.writeLineF("  %s  %s\n", Keywords::sliceKeyword(Keywords::SourceKeyword), Slice::dataSource(slice->dataSource()));
-			parser.writeLineF("    %s  %f\n", Keywords::sliceKeyword(Keywords::ZKeyword), slice->data().z());
+			parser.writeLineF("  Slice '%s'\n", qPrintable(dataSet->title()));
+			if (dataSet->dataSource() == DataSet::FileSource) parser.writeLineF("  %s  %s  '%s'\n", Keywords::dataSetKeyword(Keywords::SourceKeyword), DataSet::dataSource(dataSet->dataSource()), qPrintable(dataSet->sourceFileName()));
+			else parser.writeLineF("  %s  %s\n", Keywords::dataSetKeyword(Keywords::SourceKeyword), DataSet::dataSource(dataSet->dataSource()));
+			parser.writeLineF("    %s  %f\n", Keywords::dataSetKeyword(Keywords::ZKeyword), dataSet->data().z());
 			parser.writeLineF("    Data\n");
-			for (int n=0; n<slice->data().nPoints(); ++n) parser.writeLineF("      %f  %f\n", slice->data().x(n), slice->data().y(n));
+			for (int n=0; n< dataSet->data().nPoints(); ++n) parser.writeLineF("      %f  %f\n", dataSet->data().x(n), dataSet->data().y(n));
 			parser.writeLineF("    EndData\n");
 			parser.writeLineF("  EndSlice\n");
 		}

@@ -23,7 +23,7 @@
 #include "gui/uchroma.h"
 
 // Construct normal / colour data for slice specified
-void Viewer::constructSurfaceStrip(const Array<double>& abscissa, DisplaySlice* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, const ColourScale& colourScale, DisplaySlice* previousSlice, DisplaySlice* nextSlice)
+void Viewer::constructSurfaceStrip(const Array<double>& abscissa, DisplayDataSet* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, const ColourScale& colourScale, DisplayDataSet* previousSlice, DisplayDataSet* nextSlice)
 {
 	normals.clear();
 	colours.clear();
@@ -155,7 +155,7 @@ void Viewer::constructSurfaceStrip(const Array<double>& abscissa, DisplaySlice* 
 }
 
 // Construct full surface representation of data
-void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplaySlice>& displayData, ColourScale colourScale)
+void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale)
 {
 	GLfloat zA, zB;
 
@@ -179,8 +179,8 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 	Vec3<double> nrm(0.0, 1.0, 0.0);
 
 	// Construct first slice data and set initial min/max values
-	DisplaySlice* sliceA = displayData.first();
-	constructSurfaceStrip(abscissa, sliceA, yAxisScale, normA, colourA, colourScale, NULL, sliceA->next);
+	DisplayDataSet* dataSetA = displayData.first();
+	constructSurfaceStrip(abscissa, dataSetA, yAxisScale, normA, colourA, colourScale, NULL, dataSetA->next);
 	int nPoints = abscissa.nItems();
 
 	// Create triangles
@@ -188,23 +188,23 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 	int nBit, nPlusOneBit, totalBit;
 	GLuint vertexAn = -1, vertexBn = -1, vertexAnPlusOne = -1, vertexBnPlusOne = -1;
 	Primitive* currentPrimitive = primitives[0];
-	for (DisplaySlice* sliceB = sliceA->next; sliceB != NULL; sliceB = sliceB->next)
+	for (DisplayDataSet* dataSetB = dataSetA->next; dataSetB != NULL; dataSetB = dataSetB->next)
 	{
 		// Grab slice pointers
-		DisplaySlice* sliceC = (sliceB->next == NULL ? NULL : sliceB->next);
+		DisplayDataSet* dataSetC = (dataSetB->next == NULL ? NULL : dataSetB->next);
 
 		// Construct data for current slice
-		constructSurfaceStrip(abscissa, sliceB, yAxisScale, normB, colourB, colourScale, sliceA, sliceC);
+		constructSurfaceStrip(abscissa, dataSetB, yAxisScale, normB, colourB, colourScale, dataSetA, dataSetC);
 
 		// Grab z values
-		zA = (GLfloat) sliceA->z();
-		zB = (GLfloat) sliceB->z();
+		zA = (GLfloat) dataSetA->z();
+		zB = (GLfloat) dataSetB->z();
 	
 		// Get nPoints and array references
-		const Array<double>& yA = sliceA->y();
-		const Array<double>& yB = sliceB->y();
-		const Array<DisplaySlice::DataPointType>& yTypeA = sliceA->yType();
-		const Array<DisplaySlice::DataPointType>& yTypeB = sliceB->yType();
+		const Array<double>& yA = dataSetA->y();
+		const Array<double>& yB = dataSetB->y();
+		const Array<DisplayDataSet::DataPointType>& yTypeA = dataSetA->yType();
+		const Array<DisplayDataSet::DataPointType>& yTypeB = dataSetB->yType();
 
 		// Use a simple bit to quickly determine which triangles to draw, given possible lack of datapoints in slices
 		//
@@ -217,13 +217,13 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 
 		// Set initial bit, and generate initial vertices
 		nBit = 0;
-		if (yTypeA.value(0) == DisplaySlice::NoPoint)
+		if (yTypeA.value(0) == DisplayDataSet::NoPoint)
 		{
 			nBit += 4;
 			vertexAn = -1;
 		}
 		else vertexAn = currentPrimitive->defineVertex(abscissa.value(0), yA.value(0), zA, normA[0], colourA[0]);
-		if (yTypeB.value(0) == DisplaySlice::NoPoint)
+		if (yTypeB.value(0) == DisplayDataSet::NoPoint)
 		{
 			nBit += 8;
 			vertexBn = -1;
@@ -234,8 +234,8 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 		{
 			// Construct bit for n+1
 			nPlusOneBit = 0;
-			if (yTypeA.value(n+1) == DisplaySlice::NoPoint) nPlusOneBit += 1;
-			if (yTypeB.value(n+1) == DisplaySlice::NoPoint) nPlusOneBit += 2;
+			if (yTypeA.value(n+1) == DisplayDataSet::NoPoint) nPlusOneBit += 1;
+			if (yTypeB.value(n+1) == DisplayDataSet::NoPoint) nPlusOneBit += 2;
 			totalBit = nBit + nPlusOneBit;
 
 			// Reset indices for current (n+1) column
@@ -295,7 +295,7 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 		// Copy arrays ready for next pass
 		normA = normB;
 		colourA = colourB;
-		sliceA = sliceB;
+		dataSetA = dataSetB;
 
 		// Increment primitive pointer
 		currentPrimitive = currentPrimitive->next;

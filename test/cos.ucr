@@ -78,7 +78,7 @@ Collection 'Cosine Test Data'
   ColourAlphaFixed 46.000000
   Style Surface
   Visible true
-  Slice 'cos01'
+  DataSet 'cos01'
   Source  File  'cos01.txt'
     Z  0.000000
     Data
@@ -583,8 +583,8 @@ Collection 'Cosine Test Data'
       9.959900  -1.032200
       10.000000  -1.006900
     EndData
-  EndSlice
-  Slice 'cos02'
+  EndDataSet
+  DataSet 'cos02'
   Source  File  'cos02.txt'
     Z  1.000000
     Data
@@ -1089,8 +1089,8 @@ Collection 'Cosine Test Data'
       9.959900  -0.860200
       10.000000  -0.839070
     EndData
-  EndSlice
-  Slice 'cos03'
+  EndDataSet
+  DataSet 'cos03'
   Source  File  'cos03.txt'
     Z  2.000000
     Data
@@ -1595,8 +1595,8 @@ Collection 'Cosine Test Data'
       9.959900  -0.860200
       10.000000  -0.839070
     EndData
-  EndSlice
-  Slice 'cos04'
+  EndDataSet
+  DataSet 'cos04'
   Source  File  'cos04.txt'
     Z  3.000000
     Data
@@ -2101,8 +2101,8 @@ Collection 'Cosine Test Data'
       9.959900  -0.860200
       10.000000  -0.839070
     EndData
-  EndSlice
-  Slice 'cos05'
+  EndDataSet
+  DataSet 'cos05'
   Source  File  'cos05.txt'
     Z  4.000000
     Data
@@ -2607,8 +2607,8 @@ Collection 'Cosine Test Data'
       9.959900  -0.860200
       10.000000  -0.839070
     EndData
-  EndSlice
-  Slice 'cos06'
+  EndDataSet
+  DataSet 'cos06'
   Source  File  'cos06.txt'
     Z  5.000000
     Data
@@ -3113,8 +3113,8 @@ Collection 'Cosine Test Data'
       9.959900  -0.860200
       10.000000  -0.839070
     EndData
-  EndSlice
-  Slice 'cos07'
+  EndDataSet
+  DataSet 'cos07'
   Source  File  'cos07.txt'
     Z  6.000000
     Data
@@ -3619,8 +3619,8 @@ Collection 'Cosine Test Data'
       9.959900  -0.860200
       10.000000  -0.839070
     EndData
-  EndSlice
-  Slice 'cos08'
+  EndDataSet
+  DataSet 'cos08'
   Source  File  'cos08.txt'
     Z  7.000000
     Data
@@ -4125,8 +4125,8 @@ Collection 'Cosine Test Data'
       9.959900  -0.860200
       10.000000  -0.839070
     EndData
-  EndSlice
-  Slice 'cos09'
+  EndDataSet
+  DataSet 'cos09'
   Source  File  'cos09.txt'
     Z  8.000000
     Data
@@ -4631,8 +4631,8 @@ Collection 'Cosine Test Data'
       9.959900  -0.860200
       10.000000  -0.839070
     EndData
-  EndSlice
-  Slice 'cos10'
+  EndDataSet
+  DataSet 'cos10'
   Source  File  'cos10.txt'
     Z  9.000000
     Data
@@ -5137,5 +5137,5 @@ Collection 'Cosine Test Data'
       9.959900  -0.430100
       10.000000  -0.419540
     EndData
-  EndSlice
+  EndDataSet
 EndCollection
