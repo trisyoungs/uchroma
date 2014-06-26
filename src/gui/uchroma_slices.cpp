@@ -123,6 +123,7 @@ bool UChromaWindow::updateSliceValue(int mouseX, int mouseY)
 		}
 
 		emit(sliceDataChanged());
+		updateCoordinateInfo();
 		sliceMonitorWindow_.updateControls();
 		return true;
 	}

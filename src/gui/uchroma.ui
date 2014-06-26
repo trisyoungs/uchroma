@@ -401,7 +401,7 @@
           <item>
            <layout class="QHBoxLayout" name="InfoLayout">
             <item>
-             <widget class="QFrame" name="CurrentCollectionFrame">
+             <widget class="QFrame" name="InfoCurrentCollectionFrame">
               <property name="frameShape">
                <enum>QFrame::StyledPanel</enum>
               </property>
@@ -416,7 +416,13 @@
                 <number>4</number>
                </property>
                <item>
-                <widget class="QLabel" name="CurrentCollectionLabel">
+                <widget class="QLabel" name="InfoCurrentCollectionLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
                   <string>CurrentCollection</string>
                  </property>
@@ -426,7 +432,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QFrame" name="CoordinateFrame">
+             <widget class="QFrame" name="InfoCoordinateFrame">
               <property name="frameShape">
                <enum>QFrame::StyledPanel</enum>
               </property>
@@ -441,9 +447,37 @@
                 <number>4</number>
                </property>
                <item>
-                <widget class="QLabel" name="CoordinateLabel">
+                <widget class="QLabel" name="InfoCoordinateLabel">
                  <property name="text">
-                  <string>{0,0,0}</string>
+                  <string>{1.04e+10,1.04e+10,1.04e+10}</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QFrame" name="InfoRenderingTimeFrame">
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Sunken</enum>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <item>
+                <widget class="QLabel" name="InfoRenderingTimeLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>00.00 ms</string>
                  </property>
                 </widget>
                </item>
@@ -512,7 +546,7 @@
      <x>0</x>
      <y>0</y>
      <width>1092</width>
-     <height>29</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

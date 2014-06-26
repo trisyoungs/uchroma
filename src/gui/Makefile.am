@@ -24,7 +24,7 @@ clean-local:
 libgui_a_SOURCES = icons.qrc graphwidget.ui texponentialspin.uih
 libgui_a_SOURCES += texponentialspin.uih texponentialspin_funcs.cpp
 libgui_a_SOURCES += axes.ui create.ui data.ui dataimport.ui fit.ui saveimage.ui slicemonitor.ui slices.ui style.ui transform.ui view.ui
-libgui_a_SOURCES += uchroma.ui uchroma_data.cpp uchroma_funcs.cpp uchroma_collection.cpp uchroma_slices.cpp uchroma_slots.cpp uchroma_surface.cpp
+libgui_a_SOURCES += uchroma.ui uchroma_collection.cpp uchroma_data.cpp uchroma_funcs.cpp uchroma_info.cpp uchroma_slices.cpp uchroma_slots.cpp uchroma_surface.cpp
 libgui_a_SOURCES += io.cpp keywords.cpp
 libgui_a_SOURCES += plotwidget.uih plotwidget_data.cpp plotwidget_funcs.cpp plotwidget_paintevent.cpp
 libgui_a_SOURCES += axes_funcs.cpp create_funcs.cpp data_funcs.cpp dataimport_funcs.cpp dataimport_seqxy.cpp fit_funcs.cpp fit_main.cpp fit_sd.cpp fit_simplex.cpp fit_target.cpp graphwidget_funcs.cpp saveimage_funcs.cpp slicemonitor_funcs.cpp slices_funcs.cpp style_funcs.cpp transform_funcs.cpp view_funcs.cpp

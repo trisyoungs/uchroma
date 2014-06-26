@@ -54,17 +54,13 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	FitDialog::setUChroma(this);
 	CreateDialog::setUChroma(this);
 
-	// Create statusbar widgets
-	renderTimeLabel_ = new QLabel;
-	ui.StatusBar->addPermanentWidget(renderTimeLabel_);
-
 	// Load font for viewer
 	ui.MainView->setupFont(viewerFont_);
 
 	// Connect signals / slots between the Viewer and uChroma
 	connect(ui.MainView, SIGNAL(sliceAxisClicked()), this, SLOT(addSurfaceSlice()));
 	connect(ui.MainView, SIGNAL(renderComplete(QString)), this, SLOT(updateRenderTimeLabel(QString)));
-	connect(ui.MainView, SIGNAL(surfacePrimitivesUpdated()), this, SLOT(updateCollectionInfoBar()));
+	connect(ui.MainView, SIGNAL(surfacePrimitivesUpdated(bool)), this, SLOT(updateCollections(bool)));
 
 	// Connect signals / slots between SliceMonitor and main UI
 	connect(this, SIGNAL(sliceDataChanged()), sliceMonitorWindow_.ui.MonitorGraph, SLOT(staticDataChanged()));
@@ -101,16 +97,6 @@ void UChromaWindow::saveSettings()
 }
 
 /*
- * StatusBar Widgets
- */
-
-// Update text of renderTimeLabel_ in statusbar
-void UChromaWindow::updateRenderTimeLabel(QString text)
-{
-	renderTimeLabel_->setText(text);
-}
-
-/*
  * Update
  */
 
@@ -119,7 +105,7 @@ void UChromaWindow::updateGUI()
 {
 	refreshing_ = true;
 
-	updateCollections(true);
+	refreshCollections();
 	
 	updateSubWindows();
 	updateTitleBar();

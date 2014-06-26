@@ -183,8 +183,11 @@ class UChromaWindow : public QMainWindow
 	void on_CollectionAddButton_clicked(bool checked);
 	void on_CollectionRemoveButton_clicked(bool checked);
 
-	public:
-	void updateCollections(bool repopulateList = false);
+	public slots:
+	// Refresh collection list
+	void refreshCollections();
+	// Update displayed info for current collection
+	void updateCollectionInfo();
 
 
 	/*
@@ -198,13 +201,11 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * StatusBar Widgets
+	 * InfoBar
 	 */
-	private:
-	// Label for rendering time information
-	QLabel* renderTimeLabel_;
-
 	public slots:
+	// Update coordinate info
+	void updateCoordinateInfo();
 	// Update text of renderTimeLabel_ in statusbar
 	void updateRenderTimeLabel(QString text);
 

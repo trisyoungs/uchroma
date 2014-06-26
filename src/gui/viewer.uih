@@ -286,7 +286,7 @@ class Viewer : public QGLWidget
 	// Return string containing time taken to do last render
 	QString renderComplete(QString timeTaken);
 	// Data for one or more surface primitives was updated
-	void surfacePrimitivesUpdated();
+	void surfacePrimitivesUpdated(bool);
 
 
 	/*

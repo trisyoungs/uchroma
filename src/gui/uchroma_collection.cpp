@@ -74,25 +74,32 @@ void UChromaWindow::on_CollectionRemoveButton_clicked(bool checked)
 	updateGUI();
 }
 
-void UChromaWindow::updateCollections(bool repopulateList)
+// Refresh collection list
+void UChromaWindow::refreshCollections()
 {
-	if (repopulateList)
+	// Clear and repopulate list
+	ui.CollectionTree->clear();
+	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
 	{
-		ui.CollectionTree->clear();
-		for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
-		{
-			QTreeWidgetItem* item = new QTreeWidgetItem(ui.CollectionTree, 0);
-			item->setText(0, collection->title());
-			item->setData(0, Qt::UserRole, VariantPointer<Collection>(collection));
-			item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-			item->setCheckState(0, collection->visible() ? Qt::Checked : Qt::Unchecked);
+		QTreeWidgetItem* item = new QTreeWidgetItem(ui.CollectionTree, 0);
+		item->setText(0, collection->title());
+		item->setData(0, Qt::UserRole, VariantPointer<Collection>(collection));
+		item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+		item->setCheckState(0, collection->visible() ? Qt::Checked : Qt::Unchecked);
 
-			// If this is the current collection, select it
-			if (collection == currentCollection_) item->setSelected(true);
-		}
+		// If this is the current collection, select it
+		if (collection == currentCollection_) item->setSelected(true);
 	}
 
-	// Update collection info
+	// Update associated info
+	updateCollectionInfo();
+}
+
+	
+// Update displayed info for current collection
+void UChromaWindow::updateCollectionInfo()
+{
+	// Update collection stats underneath main Collection list
 	if (currentCollection_)
 	{
 		ui.CollectionNSlicesLabel->setText(QString::number(currentCollection_->nSlices()));
@@ -110,4 +117,8 @@ void UChromaWindow::updateCollections(bool repopulateList)
 		ui.CollectionNIndicesLabel->setText("0");
 		ui.CollectionNPrimitivesLabel->setText("0");
 	}
+
+	// Update collection info label
+	if (currentCollection_) ui.InfoCurrentCollectionLabel->setText(currentCollection_->title());
+	ui.InfoCurrentCollectionLabel->setText("<No Current Collection>");
 }

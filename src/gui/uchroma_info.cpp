@@ -1,6 +1,6 @@
 /*
-	*** uChroma version information
-	*** src/version.h
+	*** Main Window - Info Bar 
+	*** src/gui/uchroma_info.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,11 +19,17 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_VERSION_H
-#define UCHROMA_VERSION_H
+#include "gui/uchroma.h"
+#include "templates/reflist.h"
+#include "templates/variantpointer.h"
 
-#define UCHROMAREVISION "82"
-#define UCHROMADATE "Thu 26 Jun 2014 - 09:01"
-#define UCHROMAURL "http://www.projectaten.net/uchroma"
+// Update coordinate info
+void UChromaWindow::updateCoordinateInfo()
+{
+}
 
-#endif
+// Update text of renderTimeLabel_ in statusbar
+void UChromaWindow::updateRenderTimeLabel(QString text)
+{
+	ui.InfoRenderingTimeLabel->setText(text);
+}

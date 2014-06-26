@@ -179,7 +179,7 @@ void Viewer::paintGL()
 	{
 		if (updateSurfacePrimitive(collection)) ++nUpdated;
 	}
-	if (nUpdated > 0) emit(surfacePrimitivesUpdated());
+	if (nUpdated > 0) emit(surfacePrimitivesUpdated(false));
 
 	// Setup basic GL stuff
 	setupGL();
