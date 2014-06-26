@@ -120,5 +120,5 @@ void UChromaWindow::updateCollectionInfo()
 
 	// Update collection info label
 	if (currentCollection_) ui.InfoCurrentCollectionLabel->setText(currentCollection_->title());
-	ui.InfoCurrentCollectionLabel->setText("<No Current Collection>");
+	else ui.InfoCurrentCollectionLabel->setText("<No Current Collection>");
 }

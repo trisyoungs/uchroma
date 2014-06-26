@@ -63,8 +63,6 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
 	msg.enter("Viewer::mouseReleaseEvent");
 	buttonState_ = event->buttons();
 	Qt::KeyboardModifiers km = event->modifiers();
-	
-
 
 	postRedisplay();
 	
