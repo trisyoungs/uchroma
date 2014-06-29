@@ -118,6 +118,7 @@ class UChromaWindow : public QMainWindow
 	private slots:
 	void on_actionViewPerspective_triggered(bool checked);
 	void on_actionViewReset_triggered(bool checked);
+	void on_actionViewGraphMode_triggered(bool checked);
 
 
 	/*
@@ -148,8 +149,15 @@ class UChromaWindow : public QMainWindow
 	/*
 	 * Axes Actions
 	 */
+	private:
+	// Change interaction axis target
+	void interactionActionTriggered(int axis);
+
 	private slots:
 	void on_actionAxesShowAll_triggered(bool checked);
+	void on_actionAxesInteractX_triggered(bool checked);
+	void on_actionAxesInteractY_triggered(bool checked);
+	void on_actionAxesInteractZ_triggered(bool checked);
 
 
 	/*
@@ -188,16 +196,6 @@ class UChromaWindow : public QMainWindow
 	void refreshCollections();
 	// Update displayed info for current collection
 	void updateCollectionInfo();
-
-
-	/*
-	 * TODO Right Tabs -- Surface
-	 */
-	private slots:
-	void on_SurfaceSliceNoneRadio_clicked(bool checked);
-	void on_SurfaceSliceXRadio_clicked(bool checked);
-	void on_SurfaceSliceYRadio_clicked(bool checked);
-	void on_SurfaceSliceZRadio_clicked(bool checked);
 
 
 	/*
@@ -451,37 +449,79 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
+	 * Selection / Interaction
+	 */
+	public:
+	// Interaction Modes
+	enum InteractionMode
+	{
+		NoInteraction,
+		ZoomInteraction
+	};
+
+	private:
+	// Current interaction mode
+	InteractionMode interactionMode_;
+	// Whether the user is currently interacting with the display
+	bool interacting_;
+	// Current axis target for interaction
+	int interactionAxis_;
+	// Starting (clicked) value when interacting
+	double clickedInteractionValue_;
+	// Current interaction position on axis
+	double currentInteractionValue_;
+
+	private:
+	// Calculate selection axis coordinate from supplied screen coordinates
+	double screenToAxis(int axis, int mouseX, int mouseY);
+	// Return axis bin value of closest point to supplied value
+	int closestBin(int axis, double value);
+
+	public:
+	// Set interaction mode
+	void setInteractionMode(InteractionMode mode);
+	// Return interaction mode
+	InteractionMode interactionMode();
+	// Return whether the user is currently interacting with the display
+	bool interacting();
+	// Set interaction axis
+	void setInteractionAxis(int axis);
+	// Return current axis target for interaction
+	int interactionAxis();
+	// Start interaction at the specified screen coordinates
+	void startInteraction(int mouseX, int mouseY, Qt::KeyboardModifiers modifiers);
+	// Update current interaction value
+	void updateInteractionPosition(int mouseX, int mouseY);
+	// End interaction at the specified screen coordinates
+	void endInteraction(int mouseX, int mouseY);
+	// Return clicked interaction value on axis
+	double clickedInteractionValue();
+	// Return current interaction value on axis
+	double currentInteractionValue();
+	// Return clicked interaction coordinate on axis
+	double clickedInteractionCoordinate();
+	// Return current interaction coordinate on axis
+	double currentInteractionCoordinate();
+
+
+	/*
 	 * Slices
 	 */
 	private:
 	// List of user-defined groups containing extracted slices
 	List<ExtractedSliceGroup> extractedSliceGroups_;
-	// Current axis target for slice selection in Viewer
-	int sliceAxis_;
-	// Current value along axis in slice selection
-	double sliceValue_;
 	// Current slice data
 	ExtractedSlice currentSlice_;
 
 	private:
 	// Add / retrieve group
 	ExtractedSliceGroup* addOrRetrieveGroup(QString name);
+	// Extract slice based on specified axis and bin
+	void extractSlice(int axis, int bin);
 
 	public:
 	// Return first extracted slice group
 	ExtractedSliceGroup* extractedSliceGroups();
-	// Set slice axis
-	void setSliceAxis(int axis);
-	// Return current axis target for slice selection
-	int sliceAxis();
-	// Update slice axis position from specified screen coordinates
-	bool updateSliceValue(int mouseX, int mouseY);
-	// Return current slice value along axis
-	double sliceValue();
-	// Return current slice coordinate along axis
-	double sliceCoordinate();
-	// Return axis bin value of closest point to supplied value
-	int closestBin(int axis, double value);
 	// Return current slice data
 	ExtractedSlice* currentSlice();
 
@@ -514,6 +554,8 @@ class UChromaWindow : public QMainWindow
 	bool labelFaceViewer_;
 	// Whether axis text labels are corrected for left-right / up readability
 	bool labelCorrectOrientation_;
+	// Whether graph (2D) mode is enabled
+	bool graphMode_;
 
 	public:
 	// Set font scaling for axis value labels

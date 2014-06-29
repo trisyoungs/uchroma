@@ -1,6 +1,6 @@
 /*
-	*** Slice Acquisition / Fitting
-	*** src/gui/slices.cpp
+	*** Slice Acquisition
+	*** src/gui/uchroma_slices.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -39,6 +39,39 @@ ExtractedSliceGroup* UChromaWindow::addOrRetrieveGroup(QString name)
 	return group;
 }
 
+// Extract slice based on specified axis and bin
+void UChromaWindow::extractSlice(int axis, int bin)
+{
+	if (bin != -1)
+	{
+		currentSlice_.data().clear();
+		return;
+	}
+
+	if (interactionAxis_ == 0)
+	{
+		// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated - TODO)
+		currentSlice_.data().clear();
+		for (DataSet* dataSet = currentCollection_->dataSets(); dataSet != NULL; dataSet = dataSet->next) currentSlice_.data().addPoint(dataSet->transformedData().z(), dataSet->transformedData().y(bin));
+		currentSlice_.setTitle("X = " + QString::number(currentCollection_->dataSets()->transformedData().x(bin)));
+	}
+	else if (interactionAxis_ == 1)
+	{
+		currentSlice_.data().clear();
+		// TODO - Generate contour map?
+	}
+	else if (interactionAxis_ == 2)
+	{
+		// Slice through Z - i.e. original slice data
+		currentSlice_.data().clear();
+		currentSlice_.data() = currentCollection_->dataSet(bin)->data();
+		currentSlice_.setTitle("Z = " + QString::number(currentCollection_->dataSet(bin)->transformedData().z()));
+	}
+
+	emit(sliceDataChanged());
+	sliceMonitorWindow_.updateControls();
+}
+
 /*
  * Public Functions
  */
@@ -47,152 +80,6 @@ ExtractedSliceGroup* UChromaWindow::addOrRetrieveGroup(QString name)
 ExtractedSliceGroup* UChromaWindow::extractedSliceGroups()
 {
 	return extractedSliceGroups_.first();
-}
-
-// Set slice axis
-void UChromaWindow::setSliceAxis(int axis)
-{
-	sliceAxis_ = axis;
-}
-
-// Return current axis target for slice selection
-int UChromaWindow::sliceAxis()
-{
-	return sliceAxis_;
-}
-
-// Calculate axis slice value at supplied mouse position
-bool UChromaWindow::updateSliceValue(int mouseX, int mouseY)
-{
-	if (sliceAxis_ != -1)
-	{
-// 		printf("Test: min=%f, max=%f\n", axisMin_[0], axisMax_[0]);
-// 		rMouseLast_.print();
-// 		axisCoordMin_[0].print();
-		// Project axis coordinates to get a screen-based yardstick
-		Vec4<double> axmin = ui.MainView->modelToScreen(axisCoordMin_[sliceAxis_]);
-		Vec4<double> axmax = ui.MainView->modelToScreen(axisCoordMax_[sliceAxis_]);
-// 		axmin.print();
-// 		axmax.print();
-
-		// Calculate vectors between axis minimum and mouse position (AM) and axis maximum (AB)
-		Vec3<double> ab(axmax.x - axmin.x, axmax.y - axmin.y, 0.0);
-		Vec3<double> am(mouseX - axmin.x, mouseY - axmin.y, 0.0);
-		Vec3<double> amNorm = am, abNorm = ab;
-		double ratio = am.magnitude() / ab.magnitude();
-		abNorm.normalise();
-		amNorm.normalise();
-		double angle = acos(abNorm.dp(amNorm)) ;
-// 		printf("Angle = %f, %f\n", angle, angle * DEGRAD);
-
-		// Calculate slice axis value - no need to account for inverted axes here, since this is accounted for in the vectors axmin and axmax
-		if (axisLogarithmic_[sliceAxis_]) sliceValue_ = pow(10, abNorm.dp(amNorm)*ratio * (log10(axisMax_[sliceAxis_]) - log10(axisMin_[sliceAxis_])) + log10(axisMin_[sliceAxis_]));
-		else sliceValue_ = abNorm.dp(amNorm)*ratio * (axisMax_[sliceAxis_] - axisMin_[sliceAxis_]) + axisMin_[sliceAxis_];
-// 		printf("slicevalue = %f (%f)\n", sliceValue_, abNorm.dp(amNorm)*ratio);
-
-		// Clamp value to data range
-		if (sliceValue_ < axisMin_[sliceAxis_]) sliceValue_ = axisMin_[sliceAxis_];
-		else if (sliceValue_ > axisMax_[sliceAxis_]) sliceValue_ = axisMax_[sliceAxis_];
-// 		printf("ACMAG = %f, X = %f\n", ratio, sliceValue_);
-
-		// Extract slice from data
-		int bin = closestBin(sliceAxis_, sliceValue_);
-		currentSlice_.data().clear();
-
-		// Grab slice data
-		if (bin != -1)
-		{
-			if (sliceAxis_ == 0)
-			{
-				// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated - TODO)
-				currentSlice_.data().clear();
-				for (DataSet* dataSet = currentCollection_->dataSets(); dataSet != NULL; dataSet = dataSet->next) currentSlice_.data().addPoint(dataSet->transformedData().z(), dataSet->transformedData().y(bin));
-				currentSlice_.setTitle("X = " + QString::number(currentCollection_->dataSets()->transformedData().x(bin)));
-			}
-			else if (sliceAxis_ == 1)
-			{
-				return false;
-			}
-			else if (sliceAxis_ == 2)
-			{
-				// Slice through Z - i.e. original slice data
-				currentSlice_.data().clear();
-				currentSlice_.data() = currentCollection_->dataSet(bin)->data();
-				currentSlice_.setTitle("Z = " + QString::number(currentCollection_->dataSet(bin)->transformedData().z()));
-			}
-		}
-
-		emit(sliceDataChanged());
-		updateCoordinateInfo();
-		sliceMonitorWindow_.updateControls();
-		return true;
-	}
-
-	sliceMonitorWindow_.updateControls();
-
-	return false;
-}
-
-// Return current axis value for slice selection
-double UChromaWindow::sliceValue()
-{
-	return sliceValue_;
-}
-
-// Return current slice coordinate along axis
-double UChromaWindow::sliceCoordinate()
-{
-	if (sliceAxis_ == -1) return 0.0;
-
-	if (axisLogarithmic_[sliceAxis_]) return (axisInverted_[sliceAxis_] ? log10(axisMax_[sliceAxis_]/sliceValue_) : log10(sliceValue_));
-	else return (axisInverted_[sliceAxis_] ? axisMax_[sliceAxis_] - sliceValue_ : sliceValue_);
-}
-
-// Return axis bin value of closest point to supplied value
-int UChromaWindow::closestBin(int axis, double value)
-{
-	if (!currentCollection_) return -1;
-	if (currentCollection_->nDataSets() == 0) return -1;
-
-	if (axis == 0)
-	{
-		// Check X array of first slice
-		Array<double>& x = currentCollection_->dataSets()->transformedData().arrayX();
-		int midIndex, loIndex = 0, hiIndex = x.nItems() - 1;
-		if (value < x.value(0)) return 0;
-		if (value > x.value(hiIndex)) return hiIndex;
-		// Binary... chop!
-		while ((hiIndex - loIndex) > 1)
-		{
-			midIndex = (hiIndex + loIndex) / 2;
-			if (x.value(midIndex) <= value) loIndex = midIndex;
-			else hiIndex = midIndex;
-		}
-		if (fabs(x.value(loIndex) - value) < fabs(x.value(hiIndex) - value)) return loIndex;
-		else return hiIndex;
-	}
-	else if (axis == 1)
-	{
-		// ???
-	}
-	else if (axis == 2)
-	{
-		// Check z-values
-		int closest = 0, n = 0;
-		double delta, closestDelta = fabs(currentCollection_->dataSets()->transformedData().z() - value);
-		for (DataSet* dataSet = currentCollection_->dataSets()->next; dataSet != NULL; dataSet = dataSet->next)
-		{
-			delta = fabs(dataSet->transformedData().z() - value);
-			++n;
-			if (delta < closestDelta)
-			{
-				closest = n;
-				closestDelta = delta;
-			}
-		}
-		return closest;
-	}
-	else return -1;
 }
 
 // Return current slice data

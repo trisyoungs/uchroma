@@ -15,9 +15,9 @@ uchroma_collection.cpp
 uchroma_data.cpp
 uchroma_funcs.cpp
 uchroma_info.cpp
+uchroma_interaction.cpp
 uchroma_slices.cpp
 uchroma_slots.cpp
-uchroma_surface.cpp
 io.cpp
 keywords.cpp
 slices.cpp

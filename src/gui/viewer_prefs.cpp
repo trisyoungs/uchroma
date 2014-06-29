@@ -55,7 +55,7 @@ bool Viewer::hasPerspective()
 void Viewer::setHasPerspective(bool b)
 {
 	hasPerspective_ = b;
-	setProjectionMatrix();
+	projectionMatrix_ = calculateProjectionMatrix(hasPerspective_, perspectiveFieldOfView_, viewMatrix_[14]);
 }
 
 // Set line width to use

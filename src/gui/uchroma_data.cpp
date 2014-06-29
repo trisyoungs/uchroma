@@ -277,9 +277,13 @@ void UChromaWindow::clearData()
 	axisCoordMax_[2].zero();
 	regenerateAxes_ = true;
 
+	// Interaction
+	interactionMode_ = UChromaWindow::NoInteraction;
+	interactionAxis_ = -1;
+	clickedInteractionValue_ = 0.0;
+	currentInteractionValue_ = 0.0;
+
 	// Slices
-	sliceAxis_ = -1;
-	sliceValue_ = 0.0;
 	extractedSliceGroups_.clear();
 	extractedSliceGroups_.add();
 
@@ -290,6 +294,7 @@ void UChromaWindow::clearData()
 	boundingBoxPlaneY_ = 0.0;
 	labelFaceViewer_ = false;
 	labelCorrectOrientation_ = true;
+	graphMode_ = false;
 	ui.actionViewPerspective->setChecked(false);
 }
 

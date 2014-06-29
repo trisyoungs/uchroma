@@ -41,7 +41,9 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	viewerFont_ = QDir::current().absoluteFilePath("wright.ttf");
 #endif
 	clearData();
-	sliceAxis_ = -1;
+	interactionAxis_ = -1;
+	interactionMode_ = UChromaWindow::NoInteraction;
+	interacting_ = false;
 	refreshing_ = false;
 	addCollection();
 
@@ -58,7 +60,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	ui.MainView->setupFont(viewerFont_);
 
 	// Connect signals / slots between the Viewer and uChroma
-	connect(ui.MainView, SIGNAL(sliceAxisClicked()), this, SLOT(addSurfaceSlice()));
+// 	connect(ui.MainView, SIGNAL(/*/*/*/*/*/*/*/*sliceAxisClicked*/*/*/*/*/*/*/*/()), this, SLOT(addSurfaceSlice()));  TODO
 	connect(ui.MainView, SIGNAL(renderComplete(QString)), this, SLOT(updateRenderTimeLabel(QString)));
 	connect(ui.MainView, SIGNAL(surfacePrimitivesUpdated()), this, SLOT(updateCollectionInfo()));
 
@@ -70,7 +72,14 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	connect(&dataWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsData, SLOT(setChecked(bool)));
 	connect(&styleWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsStyle, SLOT(setChecked(bool)));
 	connect(&transformWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsTransform, SLOT(setChecked(bool)));
-	connect(&viewWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsView, SLOT(setChecked(bool)));	
+	connect(&viewWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsView, SLOT(setChecked(bool)));
+
+	// Create an action group for the axis interact buttons
+	QActionGroup* actionGroup = new QActionGroup(this);
+	actionGroup->addAction(ui.actionAxesInteractNone);
+	actionGroup->addAction(ui.actionAxesInteractX);
+	actionGroup->addAction(ui.actionAxesInteractY);
+	actionGroup->addAction(ui.actionAxesInteractZ);
 }
 
 // Destructor

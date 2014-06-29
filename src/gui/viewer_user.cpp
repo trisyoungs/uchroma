@@ -26,8 +26,8 @@
 void Viewer::createPrimitives()
 {
 	// Setup primitives
-	slicePrimitive_.setNoInstances();
-	slicePrimitiveBox_.setNoInstances();
+	interactionPrimitive_.setNoInstances();
+	interactionBoxPrimitive_.setNoInstances();
 	boundingBoxPrimitive_.setNoInstances();
 	for (int n=0; n<3; ++n)
 	{
@@ -204,10 +204,10 @@ void Viewer::setSlicePrimitive(int axis)
 {
 	const int nPoints = 32;
 	
-	slicePrimitive_.initialise(nPoints*nPoints*4, nPoints*nPoints*6, GL_TRIANGLES, false);
-	slicePrimitive_.forgetAll();
-	slicePrimitiveBox_.initialise(4, 8, GL_LINES, false);
-	slicePrimitiveBox_.forgetAll();
+	interactionPrimitive_.initialise(nPoints*nPoints*4, nPoints*nPoints*6, GL_TRIANGLES, false);
+	interactionPrimitive_.forgetAll();
+	interactionBoxPrimitive_.initialise(4, 8, GL_LINES, false);
+	interactionBoxPrimitive_.forgetAll();
 	if (axis == -1) return;
 
 	// Grab axes, and knock out values in the supplied vectors which correspond to the activated axis
@@ -221,14 +221,14 @@ void Viewer::setSlicePrimitive(int axis)
 	// Create 'bounding box' for slice primitive
 	Vec3<double> normal(0.0, 0.0, 1.0);
 	
-	slicePrimitiveBox_.defineVertex(axisMinA, normal);
-	slicePrimitiveBox_.defineVertex(axisMaxA, normal);
-	slicePrimitiveBox_.defineVertex(axisMaxA + axisMaxB - axisMinB, normal);
-	slicePrimitiveBox_.defineVertex(axisMinA + axisMaxB - axisMinB, normal);
-	slicePrimitiveBox_.defineIndices(0,1);
-	slicePrimitiveBox_.defineIndices(1,2);
-	slicePrimitiveBox_.defineIndices(2,3);
-	slicePrimitiveBox_.defineIndices(3,0);
+	interactionBoxPrimitive_.defineVertex(axisMinA, normal);
+	interactionBoxPrimitive_.defineVertex(axisMaxA, normal);
+	interactionBoxPrimitive_.defineVertex(axisMaxA + axisMaxB - axisMinB, normal);
+	interactionBoxPrimitive_.defineVertex(axisMinA + axisMaxB - axisMinB, normal);
+	interactionBoxPrimitive_.defineIndices(0,1);
+	interactionBoxPrimitive_.defineIndices(1,2);
+	interactionBoxPrimitive_.defineIndices(2,3);
+	interactionBoxPrimitive_.defineIndices(3,0);
 
 	// Work out deltas for each direction
 	Vec3<double> deltaA, deltaB, pos;
@@ -246,12 +246,12 @@ void Viewer::setSlicePrimitive(int axis)
 		pos = axisMinA + deltaA*n;
 		for (int m=0; m<nPoints; ++m)
 		{
-			a = slicePrimitive_.defineVertex(pos, normal);
-			b = slicePrimitive_.defineVertex(pos + deltaA, normal);
-			c = slicePrimitive_.defineVertex(pos + deltaA + deltaB, normal);
-			d = slicePrimitive_.defineVertex(pos + deltaB, normal);
-			slicePrimitive_.defineIndices(a, b, c);
-			slicePrimitive_.defineIndices(c, d, a);
+			a = interactionPrimitive_.defineVertex(pos, normal);
+			b = interactionPrimitive_.defineVertex(pos + deltaA, normal);
+			c = interactionPrimitive_.defineVertex(pos + deltaA + deltaB, normal);
+			d = interactionPrimitive_.defineVertex(pos + deltaB, normal);
+			interactionPrimitive_.defineIndices(a, b, c);
+			interactionPrimitive_.defineIndices(c, d, a);
 			pos += deltaB;
 		}
 	}

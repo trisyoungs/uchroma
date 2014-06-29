@@ -1,5 +1,8 @@
 <RCC>
   <qresource prefix="/uchroma">
+    <file>icons/axes_interactx.svg</file>
+    <file>icons/axes_interacty.svg</file>
+    <file>icons/axes_interactz.svg</file>
     <file>icons/axes_showall.svg</file>
     <file>icons/collections_create.svg</file>
     <file>icons/collections_new.svg</file>

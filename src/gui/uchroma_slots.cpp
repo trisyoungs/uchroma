@@ -169,9 +169,19 @@ void UChromaWindow::on_actionViewPerspective_triggered(bool checked)
 void UChromaWindow::on_actionViewReset_triggered(bool checked)
 {
 	Matrix A;
-	A[14] = -5.0;
+	A.setIdentity();
+
+	double zoom = ui.MainView->calculateRequiredZoom((axisMax_.x - axisMin_.x)*0.5, (axisMax_.y - axisMin_.y)*0.5, 0.9);
+	A[14] = zoom;
+
 	ui.MainView->setViewMatrix(A);
 	ui.MainView->update();
+}
+
+void UChromaWindow::on_actionViewGraphMode_triggered(bool checked)
+{
+	graphMode_ = checked;
+	updateDisplay();
 }
 
 /*
@@ -253,11 +263,52 @@ void UChromaWindow::on_actionToolsFitWindow_triggered(bool checked)
  * Axes Actions
  */
 
+// Change interaction axis target
+void UChromaWindow::interactionActionTriggered(int axis)
+{
+	// Toggle interaction axis
+	if (interactionAxis_ == axis)
+	{
+		ui.actionAxesInteractNone->setChecked(true);
+		setInteractionAxis(-1);
+		setInteractionMode(UChromaWindow::ZoomInteraction);
+	}
+	else
+	{
+		setInteractionAxis(axis);
+		updateInteractionPosition(ui.MainView->rMouseLast().x, ui.MainView->contextHeight() - ui.MainView->rMouseLast().y);
+	}
+
+	// Update GUI
+	updateDisplay();
+}
+
 void UChromaWindow::on_actionAxesShowAll_triggered(bool checked)
 {
 	showAllData();
 
 	updateGUI();
+}
+
+void UChromaWindow::on_actionAxesInteractX_triggered(bool checked)
+{
+	if (refreshing_) return;
+
+	interactionActionTriggered(0);
+}
+
+void UChromaWindow::on_actionAxesInteractY_triggered(bool checked)
+{
+	if (refreshing_) return;
+
+	interactionActionTriggered(1);
+}
+
+void UChromaWindow::on_actionAxesInteractZ_triggered(bool checked)
+{
+	if (refreshing_) return;
+
+	interactionActionTriggered(2);
 }
 
 /*

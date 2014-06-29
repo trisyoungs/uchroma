@@ -55,10 +55,10 @@ View
   LabelFaceViewer false
   LabelScale 0.140000
   TitleScale 0.200000
-  MatrixX 0.566542 -0.128487 -0.813954 0.000000
-  MatrixY 0.380931 0.916726 0.120432 0.000000
-  MatrixZ 0.730699 -0.378291 0.568309 0.000000
-  MatrixW 0.000000 0.000000 -9.241089 1.000000
+  MatrixX 0.954575 -0.293897 0.049113 0.000000
+  MatrixY 0.295680 0.954680 -0.034043 0.000000
+  MatrixZ -0.036882 0.047018 0.998213 0.000000
+  MatrixW 0.000000 0.000000 -11.565304 1.000000
 EndView
 Collection 'Cosine Test Data'
   DataDirectory "/home/tris/src/uchroma/test"

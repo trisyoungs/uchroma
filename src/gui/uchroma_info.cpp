@@ -26,10 +26,10 @@
 // Update coordinate info
 void UChromaWindow::updateCoordinateInfo()
 {
-	if (sliceAxis_ == -1) ui.InfoCoordinateLabel->setText("{--,--,--}");
-	else if (sliceAxis_ == 0) ui.InfoCoordinateLabel->setText("{"+QString::number(sliceValue_)+",--,--}");
-	else if (sliceAxis_ == 1) ui.InfoCoordinateLabel->setText("{--,"+QString::number(sliceValue_)+",--}");
-	else if (sliceAxis_ == 2) ui.InfoCoordinateLabel->setText("{--,--,"+QString::number(sliceValue_)+"}");
+	if (interactionAxis_ == -1) ui.InfoCoordinateLabel->setText("{--,--,--}");
+	else if (interactionAxis_ == 0) ui.InfoCoordinateLabel->setText("{"+QString::number(currentInteractionValue_)+",--,--}");
+	else if (interactionAxis_ == 1) ui.InfoCoordinateLabel->setText("{--,"+QString::number(currentInteractionValue_)+",--}");
+	else if (interactionAxis_ == 2) ui.InfoCoordinateLabel->setText("{--,--,"+QString::number(currentInteractionValue_)+"}");
 }
 
 // Update text of renderTimeLabel_ in statusbar

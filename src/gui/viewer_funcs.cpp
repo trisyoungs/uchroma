@@ -87,6 +87,7 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	drawing_ = false;
 	renderingOffscreen_ = false;
 	hasPerspective_ = false;
+	perspectiveFieldOfView_ = 20.0;
 	slicePrimitivePosition_ = 0.0;
 
 	// Engine Setup
@@ -154,6 +155,15 @@ void Viewer::initializeGL()
 	// Recreate surface primitives (so that images are saved correctly)
 	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) updateSurfacePrimitive(collection, true);
 
+	// Set viewport matrix
+	viewportMatrix_[0] = 0;
+	viewportMatrix_[1] = 0;
+	viewportMatrix_[2] = contextWidth_;
+	viewportMatrix_[3] = contextHeight_;
+
+	// Recalculate projection matrix
+	projectionMatrix_ = calculateProjectionMatrix(hasPerspective_, perspectiveFieldOfView_, viewMatrix_[14]);
+
 	msg.exit("Viewer::initializeGL");
 }
 
@@ -197,10 +207,11 @@ void Viewer::paintGL()
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_TEXTURE_2D);
 
-	// Prepare for model rendering
+	// Set projection matrix
 	glMatrixMode(GL_PROJECTION);
-	setProjectionMatrix();
 	glLoadMatrixd(projectionMatrix_.matrix());
+
+	// Set modelview matrix as target for the remainder of the routine
 	glMatrixMode(GL_MODELVIEW);
 
 	// Set up our transformation matrix
@@ -236,18 +247,30 @@ void Viewer::paintGL()
 	// Render bounding box
 	boundingBoxPrimitive_.sendToGL();
 
-	// Render current slice (if any)
+	// Render current selection marker
 	glLoadMatrixd(A.matrix());
-	int sliceAxis = uChroma_->sliceAxis();
+	int sliceAxis = uChroma_->interactionAxis();
 	if (sliceAxis != -1)
 	{
-		Vec3<double> v;
 		// Note - we do not need to check for inverted or logarithmic axes here, since the transformation matrix A takes care of that
-		v[sliceAxis] = uChroma_->sliceCoordinate() * uChroma_->axisStretch(sliceAxis);
+		Vec3<double> v;
+
+		// Draw starting interaction point (if we are interacting)
+		if (uChroma_->interacting())
+		{
+			v[sliceAxis] = uChroma_->clickedInteractionCoordinate() * uChroma_->axisStretch(sliceAxis);
+			glTranslated(v.x, v.y, v.z);
+			glColor4d(0.0, 0.0, 1.0, 0.5);
+			interactionPrimitive_.sendToGL();
+			interactionBoxPrimitive_.sendToGL();
+		}
+
+		// Draw current selection position
+		v[sliceAxis] = uChroma_->currentInteractionCoordinate() * uChroma_->axisStretch(sliceAxis) - v[sliceAxis];
 		glTranslated(v.x, v.y, v.z);
 		glColor4d(1.0, 0.0, 0.0, 0.5);
-		slicePrimitive_.sendToGL();
-		slicePrimitiveBox_.sendToGL();
+		interactionPrimitive_.sendToGL();
+		interactionBoxPrimitive_.sendToGL();
 	}
 
 	// Render main surface
@@ -335,7 +358,15 @@ void Viewer::resizeGL(int newwidth, int newheight)
 	// Store the new width and height of the widget
 	contextWidth_ = (GLsizei) newwidth;
 	contextHeight_ = (GLsizei) newheight;
-	setProjectionMatrix();
+
+	// Set viewport matrix
+	viewportMatrix_[0] = 0;
+	viewportMatrix_[1] = 0;
+	viewportMatrix_[2] = contextWidth_;
+	viewportMatrix_[3] = contextHeight_;
+
+	// Recalculate projection matrix
+	projectionMatrix_ = calculateProjectionMatrix(hasPerspective_, perspectiveFieldOfView_, viewMatrix_[14]);
 }
 
 /*
@@ -442,30 +473,24 @@ void Viewer::postRedisplay()
 	update();
 }
 
-// Setup projection matrix
-void Viewer::setProjectionMatrix(double perspectiveFov)
+// Return calculated projection matrix
+Matrix Viewer::calculateProjectionMatrix(bool perspective, double fov, double viewZOffset)
 {
-	// Create projection matrix for model
+	Matrix result;
 	GLdouble top, bottom, right, left, aspect = (GLdouble) contextWidth_ / (GLdouble) contextHeight_;
 	GLdouble nearClip = 0.5, farClip = 2000.0;
 
-	// Set viewport matrix here
-	viewportMatrix_[0] = 0;
-	viewportMatrix_[1] = 0;
-	viewportMatrix_[2] = contextWidth_;
-	viewportMatrix_[3] = contextHeight_;
-
-	if (hasPerspective_)
+	if (perspective)
 	{
 		// Use reversed top and bottom values so we get y-axis (0,1,0) pointing up
-		top = tan(perspectiveFov / DEGRAD) * 0.5;
+		top = tan(fov / DEGRAD) * 0.5;
 		bottom = -top;
 		left = -aspect*top;
 		right = aspect*top;
-		projectionMatrix_.setColumn(0, (nearClip*2.0) / (right-left), 0.0, 0.0, 0.0);
-		projectionMatrix_.setColumn(1, 0.0, (nearClip*2.0) / (top-bottom), 0.0, 0.0);
-		projectionMatrix_.setColumn(2, (right+left)/(right-left), (top+bottom)/(top-bottom), -(farClip+nearClip)/(farClip-nearClip), -1.0);
-		projectionMatrix_.setColumn(3, 0.0, 0.0, -(2.0*nearClip*farClip) / (farClip-nearClip), 0.0);
+		result.setColumn(0, (nearClip*2.0) / (right-left), 0.0, 0.0, 0.0);
+		result.setColumn(1, 0.0, (nearClip*2.0) / (top-bottom), 0.0, 0.0);
+		result.setColumn(2, (right+left)/(right-left), (top+bottom)/(top-bottom), -(farClip+nearClip)/(farClip-nearClip), -1.0);
+		result.setColumn(3, 0.0, 0.0, -(2.0*nearClip*farClip) / (farClip-nearClip), 0.0);
 		// Equivalent to the following code:
 		// glMatrixMode(GL_PROJECTION);
 		// glLoadIdentity();
@@ -476,15 +501,15 @@ void Viewer::setProjectionMatrix(double perspectiveFov)
 	}
 	else
 	{
-		top = -tan(perspectiveFov / DEGRAD) * viewMatrix_[14];
+		top = -tan(fov / DEGRAD) * viewZOffset;
 		bottom = -top;
 		left = -aspect*top;
 		right = aspect*top;
 
-		projectionMatrix_.setColumn(0, 2.0 / (right-left), 0.0, 0.0, (right+left)/(right-left));
-		projectionMatrix_.setColumn(1, 0.0, 2.0 / (top-bottom), 0.0, (top+bottom)/(top-bottom));
-		projectionMatrix_.setColumn(2, 0.0, 0.0, -1.0/farClip, 0.0);
-		projectionMatrix_.setColumn(3, 0.0, 0.0, 0.0, 1.0);
+		result.setColumn(0, 2.0 / (right-left), 0.0, 0.0, (right+left)/(right-left));
+		result.setColumn(1, 0.0, 2.0 / (top-bottom), 0.0, (top+bottom)/(top-bottom));
+		result.setColumn(2, 0.0, 0.0, -1.0/farClip, 0.0);
+		result.setColumn(3, 0.0, 0.0, 0.0, 1.0);
 		// Equivalent to the following code:
 		// glMatrixMode(GL_PROJECTION);
 		// glLoadIdentity();
@@ -493,13 +518,23 @@ void Viewer::setProjectionMatrix(double perspectiveFov)
 		// glOrtho(aspect*top, aspect*bottom, top, bottom, -prefs.clipFar(), prefs.clipFar());
 		// glGetDoublev(GL_PROJECTION_MATRIX, modelProjectionMatrix_.matrix());
 	}
+
+	return result;
 }
                 
 // Update transformation (view) matrix
 void Viewer::setViewMatrix(Matrix &mat)
 {
+	// Projection matrix needs to be updated if the zoom value has changed and we are *not* using perspective
+	if ((!hasPerspective_) && (fabs(mat[14] - viewMatrix_[14]) > 0.01))
+	{
+		// Recalculate projection matrix
+		projectionMatrix_ = calculateProjectionMatrix(hasPerspective_, perspectiveFieldOfView_, mat[14]);
+	}
+
 	viewMatrix_ = mat;
 }
+
 // Return transformation (view) matrix
 Matrix Viewer::viewMatrix()
 {
@@ -572,6 +607,7 @@ Vec4<double> Viewer::modelToScreen(Vec3<double> &modelr, double screenradius)
 	vmat = viewMatrix_;
 	vmat.applyTranslation(-uChroma_->axesCoordCentre());
 	worldr = vmat * pos;
+	worldr.print();
 
 	screenr = projectionMatrix_ * worldr;
 	screenr.x /= screenr.w;
@@ -589,6 +625,60 @@ Vec4<double> Viewer::modelToScreen(Vec3<double> &modelr, double screenradius)
 	}
 	msg.exit("Viewer::modelToScreen");
 	return screenr;
+}
+
+// Return zoom level, assuming orthogonally-aligned view matrix, to display coordinates supplied
+double Viewer::calculateRequiredZoom(double xExtent, double yExtent, double fraction)
+{
+	// The supplied x and y extents should indicate the number of units in those directions
+	// from the origin that are to be displaye on-screen. The 'fraction' indicates how much of the
+	// available range on-screen to use, allowing a margin to be added. A value of '1.0' would
+	// put the extent with the highest units on the very edge of the display.
+
+	Vec4<double> rScreen, rProjected;
+	Vec4<double> worldr;
+	Vec4<double> pos;
+
+	// Calculate target screen coordinate
+	int targetX = (1.0 + fraction) * contextWidth_ * 0.5;
+	int targetY = (1.0 + fraction) * contextHeight_ * 0.5;
+	int screenX = targetX, screenY = targetY;
+
+	double zoom = 0.0;
+	
+	do
+	{
+		// Increase zoom distance
+		zoom -= max( max(screenX / targetX, screenY / targetY), 1);
+
+		// Get the world coordinates of the point - viewmatrix is assumed to be the identity matrix, plus the zoom factor in array index [14]
+		worldr.x = xExtent;
+		worldr.y = yExtent;
+		worldr.z = 0.0;
+
+		// Get projection matrix for this zoom level (orthogonal projection only)
+		Matrix projectionMatrix = calculateProjectionMatrix(hasPerspective_, perspectiveFieldOfView_, zoom);
+
+// 		rProjected = projectionMatrix * worldr;
+
+		// Multiply by view matrix to get screen coordinates
+// 		rScreen.x = viewportMatrix_[0] + viewportMatrix_[2]*((rProjected.x / rProjected.w)+1)*0.5;
+// 		rScreen.y = viewportMatrix_[1] + viewportMatrix_[3]*((rProjected.y / rProjected.w)+1)*0.5;
+
+		// Calculate screen X coordinate
+		screenX = viewportMatrix_[0] + viewportMatrix_[2]*((
+			(worldr.x * projectionMatrix[0] + worldr.z * projectionMatrix[8])
+			/ 
+			(worldr.x * projectionMatrix[3] + worldr.z * projectionMatrix[11] + projectionMatrix[15])
+			)+1)*0.5;
+		screenY = viewportMatrix_[1] + viewportMatrix_[3]*((
+			(worldr.y * projectionMatrix[5] + worldr.z * projectionMatrix[8])
+			/ 
+			(worldr.y * projectionMatrix[7] + worldr.z * projectionMatrix[11] + projectionMatrix[15])
+			)+1)*0.5;
+		printf("One-shot screenx = %i (%i) : screeny = %i (%i)\n", screenX, targetX, screenY, targetY);
+	} while ((screenX > targetX) || (screenY > targetY));
+	return zoom;
 }
 
 // Convert screen coordinates into model space coordinates

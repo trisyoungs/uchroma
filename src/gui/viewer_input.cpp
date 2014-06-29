@@ -38,17 +38,9 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 	// Store event information
 	rMouseDown_.set(event->x(), event->y(), 0.0);
 
-	if (buttonState_&Qt::LeftButton)
-	{
-		if (uChroma_->sliceAxis() != -1)
-		{
-// 			calculateMouseAxisValues();
-			emit(sliceAxisClicked());
-		}
-	}
-
-	// Do something with the button press event (e.g. context menu function)?
-	if (buttonState_&Qt::RightButton)
+	// Do something with the button press event (e.g. context menu function, or interaction start)
+	if (buttonState_&Qt::LeftButton) uChroma_->startInteraction(event->x(), contextHeight_-event->y(), km);
+	else if (buttonState_&Qt::RightButton)
 	{
 
 	}
@@ -63,6 +55,9 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
 	msg.enter("Viewer::mouseReleaseEvent");
 	buttonState_ = event->buttons();
 	Qt::KeyboardModifiers km = event->modifiers();
+
+	// Notify uChroma that the mouse button has been released
+	uChroma_->endInteraction(event->x(), contextHeight_-event->y());
 
 	postRedisplay();
 	
@@ -107,8 +102,12 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 		refresh = true;
 	}
 	
-	// Recalculate slice value
-	if (uChroma_->updateSliceValue(event->x(), contextHeight_-event->y())) refresh = true;
+	// Update interaction position
+	if (uChroma_->interactionAxis() != -1)
+	{
+		uChroma_->updateInteractionPosition(event->x(), contextHeight_-event->y());
+		refresh = true;
+	}
 
 	rMouseLast_.set(event->x(), event->y(), 0.0);
 	setFocus();
@@ -129,6 +128,9 @@ void Viewer::wheelEvent(QWheelEvent *event)
 	// Never let camera z go below -1.0...
 	if (viewMatrix_[14] > -1.0) viewMatrix_[14] = -1.0;
 	postRedisplay();
+
+	// Recalculate projection matrix
+	projectionMatrix_ = calculateProjectionMatrix(hasPerspective_, perspectiveFieldOfView_, viewMatrix_[14]);
 
 	msg.exit("Viewer::wheelEvent");
 }
@@ -161,7 +163,8 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 	switch (event->key())
 	{
 		case (Qt::Key_Escape):
-			uChroma_->setSliceAxis(-1);
+			uChroma_->endInteraction(-1, -1);
+			uChroma_->setInteractionAxis(-1);
 			setSlicePrimitive(-1);
 			refresh = true;
 			ignore = false;
@@ -201,10 +204,11 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 		case (Qt::Key_X):
 		case (Qt::Key_Y):
 		case (Qt::Key_Z):
-			uChroma_->setSliceAxis(uChroma_->sliceAxis() == (event->key() - Qt::Key_X) ? -1 : (event->key() - Qt::Key_X));
-			setSlicePrimitive(uChroma_->sliceAxis());
-			uChroma_->updateSliceValue(rMouseLast_.x, contextHeight_ - rMouseLast_.y);
-			refresh = true;
+			printf("Key XYZ\n");
+// 			uChroma_->setSliceAxis(uChroma_->sliceAxis() == (event->key() - Qt::Key_X) ? -1 : (event->key() - Qt::Key_X));
+// 			setSlicePrimitive(uChroma_->sliceAxis());
+// 			uChroma_->updateSliceValue(rMouseLast_.x, contextHeight_ - rMouseLast_.y);
+// 			refresh = true;
 			ignore = false;
 			break;
 		default:

@@ -95,7 +95,6 @@ void UChromaWindow::refreshCollections()
 	updateCollectionInfo();
 }
 
-	
 // Update displayed info for current collection
 void UChromaWindow::updateCollectionInfo()
 {

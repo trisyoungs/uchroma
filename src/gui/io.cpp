@@ -516,7 +516,7 @@ bool UChromaWindow::saveInputFile(QString fileName)
 	// Write axis definitions
 	for (int axis=0; axis < 3; ++axis)
 	{
-		parser.writeLineF("Axis %i\n", axis);
+		parser.writeLineF("%s %i\n", Keywords::inputBlock(Keywords::AxisBlock), axis);
 		parser.writeLineF("  %s %s\n", Keywords::axisKeyword(Keywords::AutoTicksKeyword), stringBool(axisAutoTicks_[axis]));
 		parser.writeLineF("  %s %f\n", Keywords::axisKeyword(Keywords::FirstTickKeyword), axisFirstTick_[axis]);
 		parser.writeLineF("  %s %f\n", Keywords::axisKeyword(Keywords::TickDeltaKeyword), axisTickDelta_[axis]);
@@ -531,17 +531,17 @@ bool UChromaWindow::saveInputFile(QString fileName)
 		parser.writeLineF("  %s %s\n", Keywords::axisKeyword(Keywords::LogarithmicKeyword), stringBool(axisLogarithmic_[axis]));
 		parser.writeLineF("  %s %s\n", Keywords::axisKeyword(Keywords::VisibleAxisKeyword), stringBool(axisVisible_[axis]));
 		parser.writeLineF("  %s %f\n", Keywords::axisKeyword(Keywords::StretchKeyword), axisStretch_[axis]);
-		parser.writeLineF("EndAxis\n");
+		parser.writeLineF("%s\n", Keywords::axisKeyword(Keywords::EndAxisKeyword));
 	}
 
 	// Write Settings Data
-	parser.writeLineF("Settings\n");
+	parser.writeLineF("%s\n", Keywords::inputBlock(Keywords::SettingsBlock));
 	parser.writeLineF("  %s \"%s\" %i %i %s %i\n", Keywords::settingsKeyword(Keywords::ImageExportKeyword), qPrintable(imageExportFile_), imageExportWidth_, imageExportHeight_, Viewer::imageFormatExtension(imageExportFormat_), imageExportMaintainAspect_);
-	parser.writeLineF("EndSettings\n");
+	parser.writeLineF("%s\n", Keywords::settingsKeyword(Keywords::EndSettingsKeyword));
 
 	// Write View Data
 	Matrix mat = ui.MainView->viewMatrix();
-	parser.writeLineF("View\n");
+	parser.writeLineF("%s\n", Keywords::inputBlock(Keywords::ViewBlock));
 	parser.writeLineF("  %s %i\n", Keywords::viewKeyword(Keywords::BoundingBoxKeyword), boundingBox_);
 	parser.writeLineF("  %s %f\n", Keywords::viewKeyword(Keywords::BoundingBoxPlaneYKeyword), boundingBoxPlaneY_);
 	parser.writeLineF("  %s %s\n", Keywords::viewKeyword(Keywords::LabelFaceViewerKeyword), stringBool(labelFaceViewer_));
@@ -552,12 +552,12 @@ bool UChromaWindow::saveInputFile(QString fileName)
 	parser.writeLineF("  %s %f %f %f %f\n", Keywords::viewKeyword(Keywords::MatrixZKeyword), mat[8], mat[9], mat[10], mat[11]);
 	parser.writeLineF("  %s %f %f %f %f\n", Keywords::viewKeyword(Keywords::MatrixWKeyword), mat[12], mat[13], mat[14], mat[15]);
 	if (ui.actionViewPerspective->isChecked()) parser.writeLineF("  %s\n", Keywords::viewKeyword(Keywords::PerspectiveKeyword));
-	parser.writeLineF("EndView\n");
+	parser.writeLineF("%s\n", Keywords::viewKeyword(Keywords::EndViewKeyword));
 
 	// Write Collection Data
 	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
 	{
-		parser.writeLineF("Collection '%s'\n", qPrintable(collection->title()));
+		parser.writeLineF("%s '%s'\n", Keywords::inputBlock(Keywords::CollectionBlock), qPrintable(collection->title()));
 		parser.writeLineF("  %s \"%s\"\n", Keywords::collectionKeyword(Keywords::DataDirectoryKeyword), qPrintable(collection->dataFileDirectory().absolutePath()));
 
 		// -- Transforms
@@ -608,17 +608,17 @@ bool UChromaWindow::saveInputFile(QString fileName)
 		// Loop over slices
 		for (DataSet* dataSet = collection->dataSets(); dataSet != NULL; dataSet = dataSet->next)
 		{
-			parser.writeLineF("  Slice '%s'\n", qPrintable(dataSet->title()));
-			if (dataSet->dataSource() == DataSet::FileSource) parser.writeLineF("  %s  %s  '%s'\n", Keywords::dataSetKeyword(Keywords::SourceKeyword), DataSet::dataSource(dataSet->dataSource()), qPrintable(dataSet->sourceFileName()));
-			else parser.writeLineF("  %s  %s\n", Keywords::dataSetKeyword(Keywords::SourceKeyword), DataSet::dataSource(dataSet->dataSource()));
+			parser.writeLineF("  %s '%s'\n", Keywords::collectionKeyword(Keywords::DataSetDefinitionKeyword), qPrintable(dataSet->title()));
+			if (dataSet->dataSource() == DataSet::FileSource) parser.writeLineF("    %s  %s  '%s'\n", Keywords::dataSetKeyword(Keywords::SourceKeyword), DataSet::dataSource(dataSet->dataSource()), qPrintable(dataSet->sourceFileName()));
+			else parser.writeLineF("    %s  %s\n", Keywords::dataSetKeyword(Keywords::SourceKeyword), DataSet::dataSource(dataSet->dataSource()));
 			parser.writeLineF("    %s  %f\n", Keywords::dataSetKeyword(Keywords::ZKeyword), dataSet->data().z());
-			parser.writeLineF("    Data\n");
+			parser.writeLineF("    %s\n", Keywords::dataSetKeyword(Keywords::DataKeyword));
 			for (int n=0; n< dataSet->data().nPoints(); ++n) parser.writeLineF("      %f  %f\n", dataSet->data().x(n), dataSet->data().y(n));
-			parser.writeLineF("    EndData\n");
-			parser.writeLineF("  EndSlice\n");
+			parser.writeLineF("    End%s\n", Keywords::dataSetKeyword(Keywords::DataKeyword));
+			parser.writeLineF("  %s\n", Keywords::dataSetKeyword(Keywords::EndDataSetKeyword));
 		}
 
-		parser.writeLineF("EndCollection\n");
+		parser.writeLineF("%s\n", Keywords::collectionKeyword(Keywords::EndCollectionKeyword));
 	}
 
 	parser.closeFiles();

@@ -68,20 +68,4 @@ void SliceMonitorWindow::updateControls(bool force)
 {
 	// If the window isn't visible, do nothing...
 	if ((!isVisible()) && (!force) ) return;
-
-	if (uChroma_.sliceAxis() == -1)
-	{
-		ui.SurfaceSliceNoneRadio->setChecked(true);
-		ui.SliceSelectorLabel->setText("");
-		ui.SliceSelectorLabel->setEnabled(false);
-	}
-	else
-	{
-		if (uChroma_.sliceAxis()== 0) ui.SurfaceSliceXRadio->setChecked(true);
-		else if (uChroma_.sliceAxis() == 1) ui.SurfaceSliceYRadio->setChecked(true);
-		else if (uChroma_.sliceAxis() == 2) ui.SurfaceSliceZRadio->setChecked(true);
-		Dnchar s(-1, "%c = %f", char(88+uChroma_.sliceAxis()), uChroma_.sliceValue());
-		ui.SliceSelectorLabel->setText(s.get());
-		ui.SliceSelectorLabel->setEnabled(true);
-	}
 }
