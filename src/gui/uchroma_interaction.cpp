@@ -188,7 +188,6 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 			fitDialog_.show();
 			break;
 		case (UChromaWindow::ZoomInteraction):
-			printf("Zooming %i axis to %f/%f\n", interactionAxis_, clickedInteractionValue_, currentInteractionValue_);
 			setAxisMin(interactionAxis_, min(clickedInteractionValue_, currentInteractionValue_));
 			setAxisMax(interactionAxis_, max(clickedInteractionValue_, currentInteractionValue_));
 			updateAxesPrimitives();

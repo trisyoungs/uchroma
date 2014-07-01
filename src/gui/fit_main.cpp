@@ -21,7 +21,8 @@
 
 #include "gui/fit.h"
 #include "gui/uchroma.h"
-#include <parser/scopenode.h>
+#include "parser/scopenode.h"
+#include "templates/variantpointer.h"
 
 // Reset equation
 void FitDialog::resetEquation()
@@ -185,11 +186,14 @@ bool FitDialog::doFitting()
 	}
 
 	// Set up destination collection
-	if (ui.DestinationNewCollectionRadio->isChecked()) destinationCollection_ = uChroma_->addCollection("Fit Results");
+	if (ui.DestinationNewCollectionRadio->isChecked())
+	{
+		destinationCollection_ = collection->addFit(ui.EquationEdit->text());
+	}
 	else
 	{
-		QVariant data = ui.DestinationCollectionCombo->itemData(ui.DestinationCollectionCombo->currentIndex());
-		destinationCollection_ = uChroma_->collection(data.toInt());
+		// Get selected destination collection
+		Collection* destinationCollection_ = VariantPointer<Collection>(ui.DestinationCollectionCombo->itemData(ui.DestinationCollectionCombo->currentIndex()));
 		if (destinationCollection_ == NULL)
 		{
 			printMessage("ERROR: Unable to set destination collection for fitting output.");

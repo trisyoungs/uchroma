@@ -108,6 +108,7 @@ class Keywords
 		InterpolateKeyword,
 		InterpolateConstrainKeyword,
 		InterpolateStepKeyword,
+		ParentKeyword,
 		StyleKeyword,
 		TransformXKeyword,
 		TransformYKeyword,

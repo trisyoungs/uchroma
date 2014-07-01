@@ -63,6 +63,7 @@ Collection::Collection() : ListItem<Collection>()
 
 	// Associated data
 	parent_ = NULL;
+	type_ = Collection::MasterCollection;
 
 	// Display
 	visible_ = true;
@@ -463,10 +464,30 @@ void Collection::setParent(Collection* parent)
 	parent_ = parent;
 }
 
-// Add fit to Collection
-Collection* Collection::addFit()
+// Parent Collection
+Collection* Collection::parent()
 {
-	return fits_.add();
+	return parent_;
+}
+
+// Return type of this collection
+Collection::CollectionType Collection::type()
+{
+	return type_;
+}
+
+// Add fit to Collection
+Collection* Collection::addFit(QString title)
+{
+	Collection* newFit = fits_.add();
+	newFit->setTitle(title);
+	newFit->type_ = Collection::FitCollection;
+	newFit->setParent(this);
+
+	// Set link to MainView's primitive reflist (copy pointer set in parent collection)
+	newFit->displayPrimitives_.setViewer(displayPrimitives_.viewer());
+
+	return newFit;
 }
 
 // Return fits in Collection

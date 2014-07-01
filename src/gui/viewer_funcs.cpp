@@ -153,7 +153,17 @@ void Viewer::initializeGL()
 	for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->pushInstance(context());
 
 	// Recreate surface primitives (so that images are saved correctly)
-	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) updateSurfacePrimitive(collection, true);
+	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next)
+	{
+		// Main collection primitive
+		updateSurfacePrimitive(collection, true);
+
+		// Fit collections
+		for (Collection* fit = collection->fits(); fit != NULL; fit = fit->next) updateSurfacePrimitive(fit, true);
+
+		// Extracted data
+		for (Collection* extract = collection->fits(); extract != NULL; extract = extract->next) updateSurfacePrimitive(extract, true);
+	}
 
 	// Set viewport matrix
 	viewportMatrix_[0] = 0;
@@ -187,7 +197,15 @@ void Viewer::paintGL()
 	int nUpdated = 0;
 	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next)
 	{
+		// Main data
 		if (updateSurfacePrimitive(collection)) ++nUpdated;
+
+		// Fit collections
+		for (Collection* fit = collection->fits(); fit != NULL; fit = fit->next) if (updateSurfacePrimitive(fit, true)) ++nUpdated;
+
+		// Extracted data
+		for (Collection* extract = collection->fits(); extract != NULL; extract = extract->next) if (updateSurfacePrimitive(extract, true)) ++nUpdated;
+
 	}
 	if (nUpdated > 0) emit(surfacePrimitivesUpdated());
 
@@ -266,7 +284,7 @@ void Viewer::paintGL()
 		}
 
 		// Draw current selection position
-		v[sliceAxis] = uChroma_->currentInteractionCoordinate() * uChroma_->axisStretch(sliceAxis) - v[sliceAxis];
+		v[sliceAxis] = 	uChroma_->currentInteractionCoordinate() * uChroma_->axisStretch(sliceAxis) - v[sliceAxis];
 		glTranslated(v.x, v.y, v.z);
 		glColor4d(1.0, 0.0, 0.0, 0.5);
 		interactionPrimitive_.sendToGL();

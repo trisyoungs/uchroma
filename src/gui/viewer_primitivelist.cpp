@@ -111,6 +111,12 @@ void PrimitiveList::setViewer(Viewer* viewer)
 	viewer_ = viewer;
 }
 
+// Return viewer in which these primitives are to be displayed
+Viewer* PrimitiveList::viewer()
+{
+	return viewer_;
+}
+
 // Push instance layer
 void PrimitiveList::pushInstance(const QGLContext *context)
 {

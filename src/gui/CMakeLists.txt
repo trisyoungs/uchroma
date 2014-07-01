@@ -18,7 +18,8 @@ uchroma_info.cpp
 uchroma_interaction.cpp
 uchroma_slices.cpp
 uchroma_slots.cpp
-io.cpp
+io_load.cpp
+io_save.cpp
 keywords.cpp
 slices.cpp
 axes_funcs.cpp

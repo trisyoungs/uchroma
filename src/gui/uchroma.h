@@ -186,6 +186,7 @@ class UChromaWindow : public QMainWindow
 	 * Collections
 	 */
 	private slots:
+	void on_CollectionTree_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
 	void on_CollectionTree_itemClicked(QTreeWidgetItem* item, int column);
 	void on_CollectionTree_itemDoubleClicked(QTreeWidgetItem* item, int column);
 	void on_CollectionTree_itemChanged(QTreeWidgetItem* item, int column);
@@ -242,11 +243,21 @@ class UChromaWindow : public QMainWindow
 	// Read CollectionBlock keywords
 	bool readCollectionBlock(LineParser& parser, Collection* collection);
 	// Read DataSetBlock keywords
-	bool readDataSetBlock(LineParser& parser, DataSet* dataS, Collection* collection);
+	bool readDataSetBlock(LineParser& parser, DataSet* dataSet, Collection* collection);
 	// Read SettingsBlock keywords
 	bool readSettingsBlock(LineParser& parser);
-	// Read AxisBlock keywords
+	// Read ViewBlock keywords
 	bool readViewBlock(LineParser& parser);
+	// Write AxisBlock keywords
+	bool writeAxisBlock(LineParser& parser, int axis);
+	// Write CollectionBlock keywords
+	bool writeCollectionBlock(LineParser& parser, Collection* collection);
+	// Write DataSetBlock keywords
+	bool writeDataSetBlock(LineParser& parser, DataSet* dataSet);
+	// Write SettingsBlock keywords
+	bool writeSettingsBlock(LineParser& parser);
+	// Write ViewBlock keywords
+	bool writeViewBlock(LineParser& parser);
 
 	public:
 	// Load input from file specified

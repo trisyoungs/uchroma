@@ -32,7 +32,7 @@ FitDialog::FitDialog(QWidget* parent) : QDialog(parent)
 	ui.setupUi(this);
 
 	// Set default values in some widgets
-	ui.MethodSDToleranceSpin->setValue(1.0e-2);
+	ui.MethodSDToleranceSpin->setValue(1.0e-4);
 	ui.OptionsLimitStrengthSpin->setValue(10000.0);
 
 	refreshing_ = false;
@@ -261,7 +261,7 @@ void FitDialog::updateSourceList()
 	int index = 0;
 	for (Collection* c = uChroma_->collections(); c != NULL; c = c->next, ++index)
 	{
-		ui.SourceCollectionCombo->addItem(c->title());
+		ui.SourceCollectionCombo->addItem(c->title(), VariantPointer<Collection>(c));
 		if (c == currentCollection) ui.SourceCollectionCombo->setCurrentIndex(index);
 	}
 
@@ -345,19 +345,14 @@ void FitDialog::updateDestinationGroup()
 {
 	refreshing_ = true;
 
-	// Get currently selected collection (by user data value)
-	Collection* selectedCollection = VariantPointer<Collection>(ui.DestinationCollectionCombo->itemData(ui.DestinationCollectionCombo->currentIndex()));
-
 	// Grab current collection
 	Collection* collection = uChroma_->collection(ui.SourceCollectionCombo->currentIndex());
 	if (!collection) return;
 
 	ui.DestinationCollectionCombo->clear();
-	int index = 0;
-	for (Collection* c = uChroma_->collections(); c != NULL; c = c->next, ++index) if (c != collection)
+	for (Collection* c = collection->fits(); c != NULL; c = c->next)
 	{
 		ui.DestinationCollectionCombo->addItem(c->title(), VariantPointer<Collection>(c));
-		if (selectedCollection == c) ui.DestinationCollectionCombo->setCurrentIndex(index);
 	}
 
 	refreshing_ = false;

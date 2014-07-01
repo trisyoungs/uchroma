@@ -23,18 +23,33 @@
 #include "templates/reflist.h"
 #include "templates/variantpointer.h"
 
+void UChromaWindow::on_CollectionTree_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous)
+{
+	// Get collection from item
+	Collection* collection = VariantPointer<Collection>(current->data(0, Qt::UserRole));
+	if (!collection) return;
+
+	// Set new current collection
+	currentCollection_ = collection;
+
+	// Update other parts of the GUI
+	updateSubWindows();
+	updateCollectionInfo();
+	updateDisplay();
+}
+
 void UChromaWindow::on_CollectionTree_itemClicked(QTreeWidgetItem* item, int column)
 {
 	// Get collection from item
 	Collection* collection = VariantPointer<Collection>(item->data(0, Qt::UserRole));
 	if (!collection) return;
 
-	// Set new current collection
-	currentCollection_ = collection;
-
 	// Set the checkstate of the collection
 	collection->setVisible(item->checkState(0) == Qt::Checked);
-	updateGUI();
+
+	// Update other parts of the GUI
+	updateSubWindows();
+	updateDisplay();
 }
 
 void UChromaWindow::on_CollectionTree_itemDoubleClicked(QTreeWidgetItem* item, int column)
@@ -86,9 +101,20 @@ void UChromaWindow::refreshCollections()
 		item->setData(0, Qt::UserRole, VariantPointer<Collection>(collection));
 		item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
 		item->setCheckState(0, collection->visible() ? Qt::Checked : Qt::Unchecked);
+		item->setExpanded(true);
 
 		// If this is the current collection, select it
 		if (collection == currentCollection_) item->setSelected(true);
+
+		// Add a child item to contain fit data
+		QTreeWidgetItem* fitItem = new QTreeWidgetItem(item, 0);
+		for (Collection* fit = collection->fits(); fit != NULL; fit = fit->next)
+		{
+			fitItem->setText(0, fit->title());
+			fitItem->setData(0, Qt::UserRole, VariantPointer<Collection>(fit));
+			fitItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+			fitItem->setCheckState(0, collection->visible() ? Qt::Checked : Qt::Unchecked);
+		}
 	}
 
 	// Update associated info
