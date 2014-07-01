@@ -35,6 +35,20 @@ AxesWindow::AxesWindow(UChromaWindow& parent) : QWidget(&parent), uChroma_(paren
 
 	QWidget::setWindowFlags(Qt::Tool);
 
+	// Set limits / deltas for fractional axis position
+	ui.AxisXPositionYFractionalSpin->setRange(true, 0.0, true, 1.0);
+	ui.AxisXPositionZFractionalSpin->setRange(true, 0.0, true, 1.0);
+	ui.AxisYPositionXFractionalSpin->setRange(true, 0.0, true, 1.0);
+	ui.AxisYPositionZFractionalSpin->setRange(true, 0.0, true, 1.0);
+	ui.AxisZPositionYFractionalSpin->setRange(true, 0.0, true, 1.0);
+	ui.AxisZPositionYFractionalSpin->setRange(true, 0.0, true, 1.0);
+	ui.AxisXPositionYFractionalSpin->setSingleStep(0.1);
+	ui.AxisXPositionZFractionalSpin->setSingleStep(0.1);
+	ui.AxisYPositionXFractionalSpin->setSingleStep(0.1);
+	ui.AxisYPositionZFractionalSpin->setSingleStep(0.1);
+	ui.AxisZPositionYFractionalSpin->setSingleStep(0.1);
+	ui.AxisZPositionYFractionalSpin->setSingleStep(0.1);
+
 	refreshing_ = false;
 }
 
@@ -123,10 +137,47 @@ bool AxesWindow::axisLimitSetExtreme(int axis, bool minLim)
 	return true;
 }
 
-bool AxesWindow::axisCrossChanged(int axis, int dir, double value)
+bool AxesWindow::axisPositionIsFractionalChanged(int axis, bool fractional)
 {
+	// Disable / enable relevant widgets, and set button graphics to reflect choice
+	if (axis == 0)
+	{
+		ui.AxisXPositionYRealSpin->setDisabled(fractional);
+		ui.AxisXPositionYFractionalSpin->setEnabled(fractional);
+		ui.AxisXPositionZRealSpin->setDisabled(fractional);
+		ui.AxisXPositionZFractionalSpin->setEnabled(fractional);
+		ui.AxisXPositionYSetZeroButton->setIcon(fractional ? QIcon(":/uchroma/icons/tocentre.svg") : QIcon(":/uchroma/icons/tozero.svg"));
+		ui.AxisXPositionZSetZeroButton->setIcon(fractional ? QIcon(":/uchroma/icons/tocentre.svg") : QIcon(":/uchroma/icons/tozero.svg"));
+		ui.AxisXPositionYSetZeroButton->setToolTip(fractional ? "Set to midpoint" : "Set to zero");
+		ui.AxisXPositionZSetZeroButton->setToolTip(fractional ? "Set to midpoint" : "Set to zero");
+	}
+	else if (axis == 1)
+	{
+		ui.AxisYPositionXRealSpin->setDisabled(fractional);
+		ui.AxisYPositionXFractionalSpin->setEnabled(fractional);
+		ui.AxisYPositionZRealSpin->setDisabled(fractional);
+		ui.AxisYPositionZFractionalSpin->setEnabled(fractional);
+		ui.AxisYPositionXSetZeroButton->setIcon(fractional ? QIcon(":/uchroma/icons/tocentre.svg") : QIcon(":/uchroma/icons/tozero.svg"));
+		ui.AxisYPositionZSetZeroButton->setIcon(fractional ? QIcon(":/uchroma/icons/tocentre.svg") : QIcon(":/uchroma/icons/tozero.svg"));
+		ui.AxisYPositionXSetZeroButton->setToolTip(fractional ? "Set to midpoint" : "Set to zero");
+		ui.AxisYPositionZSetZeroButton->setToolTip(fractional ? "Set to midpoint" : "Set to zero");
+	}
+	else if (axis == 2)
+	{
+		ui.AxisZPositionXRealSpin->setDisabled(fractional);
+		ui.AxisZPositionXFractionalSpin->setEnabled(fractional);
+		ui.AxisZPositionYRealSpin->setDisabled(fractional);
+		ui.AxisZPositionYFractionalSpin->setEnabled(fractional);
+		ui.AxisZPositionXSetZeroButton->setIcon(fractional ? QIcon(":/uchroma/icons/tocentre.svg") : QIcon(":/uchroma/icons/tozero.svg"));
+		ui.AxisZPositionYSetZeroButton->setIcon(fractional ? QIcon(":/uchroma/icons/tocentre.svg") : QIcon(":/uchroma/icons/tozero.svg"));
+		ui.AxisZPositionXSetZeroButton->setToolTip(fractional ? "Set to midpoint" : "Set to zero");
+		ui.AxisZPositionYSetZeroButton->setToolTip(fractional ? "Set to midpoint" : "Set to zero");
+	}
+
+	// Don't do anything else if we are currently refreshing
 	if (refreshing_) return false;
-	uChroma_.setAxisPosition(axis, dir, value);
+
+	uChroma_.setAxisPositionIsFractional(axis, fractional);
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -134,13 +185,36 @@ bool AxesWindow::axisCrossChanged(int axis, int dir, double value)
 	return true;
 }
 
-bool AxesWindow::axisCrossSet(int axis, int dir, int type)
+bool AxesWindow::axisPositionChanged(bool real, int axis, int dir, double value)
 {
 	if (refreshing_) return false;
-	if (type == -1) uChroma_.setAxisPositionToLimit(axis, dir, true);
-	else if (type == 0) uChroma_.setAxisPosition(axis, dir, 0.0);
-	else if (type == 1) uChroma_.setAxisPositionToLimit(axis, dir, false);
-	else return false;
+
+	if (real) uChroma_.setAxisPositionReal(axis, dir, value);
+	else uChroma_.setAxisPositionFractional(axis, dir, value);
+
+	// Update relevant parts of gui
+	uChroma_.updateDisplay();
+
+	return true;
+}
+
+bool AxesWindow::axisPositionSet(bool real, int axis, int dir, int type)
+{
+	if (refreshing_) return false;
+	if (real)
+	{
+		if (type == -1) uChroma_.setAxisPositionRealToLimit(axis, dir, true);
+		else if (type == 0) uChroma_.setAxisPositionReal(axis, dir, 0.0);
+		else if (type == 1) uChroma_.setAxisPositionRealToLimit(axis, dir, false);
+		else return false;
+	}
+	else
+	{
+		if (type == -1) uChroma_.setAxisPositionFractional(axis, dir, 0.0);
+		else if (type == 0) uChroma_.setAxisPositionFractional(axis, dir, 0.5);
+		else if (type == 1) uChroma_.setAxisPositionFractional(axis, dir, 1.0);
+		else return false;
+	}
 
 	// Update relevant parts of gui
 	updateControls();
@@ -275,29 +349,9 @@ void AxesWindow::on_AxisXMinSpin_valueChanged(double value)
 	axisLimitChanged(0, true, value);
 }
 
-void AxesWindow::on_AxisYMinSpin_valueChanged(double value)
-{
-	axisLimitChanged(1, true, value);
-}
-
-void AxesWindow::on_AxisZMinSpin_valueChanged(double value)
-{
-	axisLimitChanged(2, true, value);
-}
-
 void AxesWindow::on_AxisXMinSetMinimumButton_clicked(bool checked)
 {
 	axisLimitSetExtreme(0, true);
-}
-
-void AxesWindow::on_AxisYMinSetMinimumButton_clicked(bool checked)
-{
-	axisLimitSetExtreme(1, true);
-}
-
-void AxesWindow::on_AxisZMinSetMinimumButton_clicked(bool checked)
-{
-	axisLimitSetExtreme(2, true);
 }
 
 void AxesWindow::on_AxisXMaxSpin_valueChanged(double value)
@@ -305,69 +359,69 @@ void AxesWindow::on_AxisXMaxSpin_valueChanged(double value)
 	axisLimitChanged(0, false, value);
 }
 
-void AxesWindow::on_AxisYMaxSpin_valueChanged(double value)
-{
-	axisLimitChanged(1, false, value);
-}
-
-void AxesWindow::on_AxisZMaxSpin_valueChanged(double value)
-{
-	axisLimitChanged(2, false, value);
-}
-
 void AxesWindow::on_AxisXMaxSetMaximumButton_clicked(bool checked)
 {
 	axisLimitSetExtreme(0, false);
 }
 
-void AxesWindow::on_AxisYMaxSetMaximumButton_clicked(bool checked)
+void AxesWindow::on_AxisXPositionRealRadio_clicked(bool checked)
 {
-	axisLimitSetExtreme(1, false);
+	axisPositionIsFractionalChanged(0, !checked);
 }
 
-void AxesWindow::on_AxisZMaxSetMaximumButton_clicked(bool checked)
+void AxesWindow::on_AxisXPositionFractionalRadio_clicked(bool checked)
 {
-	axisLimitSetExtreme(2, false);
+	axisPositionIsFractionalChanged(0, checked);
 }
 
-void AxesWindow::on_AxisXCrossAtYSpin_valueChanged(double value)
+void AxesWindow::on_AxisXPositionYRealSpin_valueChanged(double value)
 {
-	axisCrossChanged(0, 1, value);
+	axisPositionChanged(true, 0, 1, value);
 }
 
-void AxesWindow::on_AxisXCrossAtZSpin_valueChanged(double value)
+void AxesWindow::on_AxisXPositionYFractionalSpin_valueChanged(double value)
 {
-	axisCrossChanged(0, 2, value);
+	axisPositionChanged(false, 0, 1, value);
 }
 
-void AxesWindow::on_AxisXCrossAtYSetMinimumButton_clicked(bool checked)
+void AxesWindow::on_AxisXPositionZRealSpin_valueChanged(double value)
 {
-	axisCrossSet(0, 1, -1);
+	axisPositionChanged(true, 0, 2, value);
 }
 
-void AxesWindow::on_AxisXCrossAtYSetZeroButton_clicked(bool checked)
+void AxesWindow::on_AxisXPositionZFractionalSpin_valueChanged(double value)
 {
-	axisCrossSet(0, 1, 0);
+	axisPositionChanged(false, 0, 2, value);
 }
 
-void AxesWindow::on_AxisXCrossAtYSetMaximumButton_clicked(bool checked)
+void AxesWindow::on_AxisXPositionYSetMinimumButton_clicked(bool checked)
 {
-	axisCrossSet(0, 1, 1);
+	axisPositionSet(ui.AxisXPositionRealRadio->isChecked(), 0, 1, -1);
 }
 
-void AxesWindow::on_AxisXCrossAtZSetMinimumButton_clicked(bool checked)
+void AxesWindow::on_AxisXPositionYSetZeroButton_clicked(bool checked)
 {
-	axisCrossSet(0, 2, -1);
+	axisPositionSet(ui.AxisXPositionRealRadio->isChecked(), 0, 1, 0);
 }
 
-void AxesWindow::on_AxisXCrossAtZSetZeroButton_clicked(bool checked)
+void AxesWindow::on_AxisXPositionYSetMaximumButton_clicked(bool checked)
 {
-	axisCrossSet(0, 2, 0);
+	axisPositionSet(ui.AxisXPositionRealRadio->isChecked(), 0, 1, 1);
 }
 
-void AxesWindow::on_AxisXCrossAtZSetMaximumButton_clicked(bool checked)
+void AxesWindow::on_AxisXPositionZSetMinimumButton_clicked(bool checked)
 {
-	axisCrossSet(0, 2, 1);
+	axisPositionSet(ui.AxisXPositionRealRadio->isChecked(), 0, 2, -1);
+}
+
+void AxesWindow::on_AxisXPositionZSetZeroButton_clicked(bool checked)
+{
+	axisPositionSet(ui.AxisXPositionRealRadio->isChecked(), 0, 2, 0);
+}
+
+void AxesWindow::on_AxisXPositionZSetMaximumButton_clicked(bool checked)
+{
+	axisPositionSet(ui.AxisXPositionRealRadio->isChecked(), 0, 2, 1);
 }
 
 void AxesWindow::on_AxisXAutoTicksCheck_clicked(bool checked)
@@ -510,44 +564,84 @@ void AxesWindow::on_AxisYStretchSpin_valueChanged(double value)
 	axisStretchChanged(1, value);
 }
 
-void AxesWindow::on_AxisYCrossAtXSpin_valueChanged(double value)
+void AxesWindow::on_AxisYMinSpin_valueChanged(double value)
 {
-	axisCrossChanged(1, 0, value);
+	axisLimitChanged(1, true, value);
 }
 
-void AxesWindow::on_AxisYCrossAtZSpin_valueChanged(double value)
+void AxesWindow::on_AxisYMinSetMinimumButton_clicked(bool checked)
 {
-	axisCrossChanged(1, 2, value);
+	axisLimitSetExtreme(1, true);
 }
 
-void AxesWindow::on_AxisYCrossAtXSetMinimumButton_clicked(bool checked)
+void AxesWindow::on_AxisYMaxSpin_valueChanged(double value)
 {
-	axisCrossSet(1, 0, -1);
+	axisLimitChanged(1, false, value);
 }
 
-void AxesWindow::on_AxisYCrossAtXSetZeroButton_clicked(bool checked)
+void AxesWindow::on_AxisYMaxSetMaximumButton_clicked(bool checked)
 {
-	axisCrossSet(1, 0, 0);
+	axisLimitSetExtreme(1, false);
 }
 
-void AxesWindow::on_AxisYCrossAtXSetMaximumButton_clicked(bool checked)
+void AxesWindow::on_AxisYPositionRealRadio_clicked(bool checked)
 {
-	axisCrossSet(1, 0, 1);
+	axisPositionIsFractionalChanged(1, !checked);
 }
 
-void AxesWindow::on_AxisYCrossAtZSetMinimumButton_clicked(bool checked)
+void AxesWindow::on_AxisYPositionFractionalRadio_clicked(bool checked)
 {
-	axisCrossSet(1, 2, -1);
+	axisPositionIsFractionalChanged(1, checked);
 }
 
-void AxesWindow::on_AxisYCrossAtZSetZeroButton_clicked(bool checked)
+void AxesWindow::on_AxisYPositionXRealSpin_valueChanged(double value)
 {
-	axisCrossSet(1, 2, 0);
+	axisPositionChanged(true, 1, 0, value);
 }
 
-void AxesWindow::on_AxisYCrossAtZSetMaximumButton_clicked(bool checked)
+void AxesWindow::on_AxisYPositionXFractionalSpin_valueChanged(double value)
 {
-	axisCrossSet(1, 2, 1);
+	axisPositionChanged(false, 1, 0, value);
+}
+
+void AxesWindow::on_AxisYPositionZRealSpin_valueChanged(double value)
+{
+	axisPositionChanged(true, 1, 2, value);
+}
+
+void AxesWindow::on_AxisYPositionZFractionalSpin_valueChanged(double value)
+{
+	axisPositionChanged(false, 1, 2, value);
+}
+
+void AxesWindow::on_AxisYPositionXSetMinimumButton_clicked(bool checked)
+{
+	axisPositionSet(ui.AxisYPositionRealRadio->isChecked(), 1, 0, -1);
+}
+
+void AxesWindow::on_AxisYPositionXSetZeroButton_clicked(bool checked)
+{
+	axisPositionSet(ui.AxisYPositionRealRadio->isChecked(), 1, 0, 0);
+}
+
+void AxesWindow::on_AxisYPositionXSetMaximumButton_clicked(bool checked)
+{
+	axisPositionSet(ui.AxisYPositionRealRadio->isChecked(), 1, 0, 1);
+}
+
+void AxesWindow::on_AxisYPositionZSetMinimumButton_clicked(bool checked)
+{
+	axisPositionSet(ui.AxisYPositionRealRadio->isChecked(), 1, 2, -1);
+}
+
+void AxesWindow::on_AxisYPositionZSetZeroButton_clicked(bool checked)
+{
+	axisPositionSet(ui.AxisYPositionRealRadio->isChecked(), 1, 2, 0);
+}
+
+void AxesWindow::on_AxisYPositionZSetMaximumButton_clicked(bool checked)
+{
+	axisPositionSet(ui.AxisYPositionRealRadio->isChecked(), 1, 2, 1);
 }
 
 void AxesWindow::on_AxisYAutoTicksCheck_clicked(bool checked)
@@ -690,44 +784,84 @@ void AxesWindow::on_AxisZStretchSpin_valueChanged(double value)
 	axisStretchChanged(2, value);
 }
 
-void AxesWindow::on_AxisZCrossAtXSpin_valueChanged(double value)
+void AxesWindow::on_AxisZMinSpin_valueChanged(double value)
 {
-	axisCrossChanged(2, 0, value);
+	axisLimitChanged(2, true, value);
 }
 
-void AxesWindow::on_AxisZCrossAtYSpin_valueChanged(double value)
+void AxesWindow::on_AxisZMinSetMinimumButton_clicked(bool checked)
 {
-	axisCrossChanged(2, 1, value);
+	axisLimitSetExtreme(2, true);
 }
 
-void AxesWindow::on_AxisZCrossAtXSetMinimumButton_clicked(bool checked)
+void AxesWindow::on_AxisZMaxSpin_valueChanged(double value)
 {
-	axisCrossSet(2, 0, -1);
+	axisLimitChanged(2, false, value);
 }
 
-void AxesWindow::on_AxisZCrossAtXSetZeroButton_clicked(bool checked)
+void AxesWindow::on_AxisZMaxSetMaximumButton_clicked(bool checked)
 {
-	axisCrossSet(2, 0, 0);
+	axisLimitSetExtreme(2, false);
 }
 
-void AxesWindow::on_AxisZCrossAtXSetMaximumButton_clicked(bool checked)
+void AxesWindow::on_AxisZPositionRealRadio_clicked(bool checked)
 {
-	axisCrossSet(2, 0, 1);
+	axisPositionIsFractionalChanged(2, !checked);
 }
 
-void AxesWindow::on_AxisZCrossAtYSetMinimumButton_clicked(bool checked)
+void AxesWindow::on_AxisZPositionFractionalRadio_clicked(bool checked)
 {
-	axisCrossSet(2, 1, -1);
+	axisPositionIsFractionalChanged(2, checked);
 }
 
-void AxesWindow::on_AxisZCrossAtYSetZeroButton_clicked(bool checked)
+void AxesWindow::on_AxisZPositionXRealSpin_valueChanged(double value)
 {
-	axisCrossSet(2, 1, 0);
+	axisPositionChanged(true, 2, 0, value);
 }
 
-void AxesWindow::on_AxisZCrossAtYSetMaximumButton_clicked(bool checked)
+void AxesWindow::on_AxisZPositionXFractionalSpin_valueChanged(double value)
 {
-	axisCrossSet(2, 1, 1);
+	axisPositionChanged(false, 2, 0, value);
+}
+
+void AxesWindow::on_AxisZPositionYRealSpin_valueChanged(double value)
+{
+	axisPositionChanged(true, 2, 1, value);
+}
+
+void AxesWindow::on_AxisZPositionYFractionalSpin_valueChanged(double value)
+{
+	axisPositionChanged(false, 2, 1, value);
+}
+
+void AxesWindow::on_AxisZPositionXSetMinimumButton_clicked(bool checked)
+{
+	axisPositionSet(ui.AxisZPositionRealRadio->isChecked(), 2, 0, -1);
+}
+
+void AxesWindow::on_AxisZPositionXSetZeroButton_clicked(bool checked)
+{
+	axisPositionSet(ui.AxisZPositionRealRadio->isChecked(), 2, 0, 0);
+}
+
+void AxesWindow::on_AxisZPositionXSetMaximumButton_clicked(bool checked)
+{
+	axisPositionSet(ui.AxisZPositionRealRadio->isChecked(), 2, 0, 1);
+}
+
+void AxesWindow::on_AxisZPositionYSetMinimumButton_clicked(bool checked)
+{
+	axisPositionSet(ui.AxisZPositionRealRadio->isChecked(), 2, 1, -1);
+}
+
+void AxesWindow::on_AxisZPositionYSetZeroButton_clicked(bool checked)
+{
+	axisPositionSet(ui.AxisZPositionRealRadio->isChecked(), 2, 1, 0);
+}
+
+void AxesWindow::on_AxisZPositionYSetMaximumButton_clicked(bool checked)
+{
+	axisPositionSet(ui.AxisZPositionRealRadio->isChecked(), 2, 1, 1);
 }
 
 void AxesWindow::on_AxisZAutoTicksCheck_clicked(bool checked)
@@ -919,20 +1053,32 @@ void AxesWindow::updateControls(bool force)
 
 	// Axis positions
 	// -- X
-	ui.AxisXCrossAtYSpin->setRange(uChroma_.axisLogarithmic(1), uChroma_.axisLimitMin(1), false, 0.0);
-	ui.AxisXCrossAtYSpin->setValue(uChroma_.axisPosition(0).y);
-	ui.AxisXCrossAtZSpin->setRange(uChroma_.axisLogarithmic(2), uChroma_.axisLimitMin(2), false, 0.0);
-	ui.AxisXCrossAtZSpin->setValue(uChroma_.axisPosition(0).z);
+	ui.AxisXPositionFractionalRadio->setChecked(uChroma_.axisPositionIsFractional(0));
+	axisPositionIsFractionalChanged(0, uChroma_.axisPositionIsFractional(0));
+	ui.AxisXPositionYRealSpin->setRange(uChroma_.axisLogarithmic(1), uChroma_.axisLimitMin(1), false, 0.0);
+	ui.AxisXPositionYRealSpin->setValue(uChroma_.axisPositionReal(0).y);
+	ui.AxisXPositionZRealSpin->setRange(uChroma_.axisLogarithmic(2), uChroma_.axisLimitMin(2), false, 0.0);
+	ui.AxisXPositionZRealSpin->setValue(uChroma_.axisPositionReal(0).z);
+	ui.AxisXPositionYFractionalSpin->setValue(uChroma_.axisPositionFractional(0).y);
+	ui.AxisXPositionZFractionalSpin->setValue(uChroma_.axisPositionFractional(0).z);
 	// -- Y
-	ui.AxisYCrossAtXSpin->setValue(uChroma_.axisPosition(1).x);
-	ui.AxisYCrossAtXSpin->setRange(uChroma_.axisLogarithmic(0), uChroma_.axisLimitMin(0), false, 0.0);
-	ui.AxisYCrossAtZSpin->setValue(uChroma_.axisPosition(1).z);
-	ui.AxisYCrossAtZSpin->setRange(uChroma_.axisLogarithmic(2), uChroma_.axisLimitMin(2), false, 0.0);
+	ui.AxisYPositionFractionalRadio->setChecked(uChroma_.axisPositionIsFractional(1));
+	axisPositionIsFractionalChanged(1, uChroma_.axisPositionIsFractional(1));
+	ui.AxisYPositionXRealSpin->setRange(uChroma_.axisLogarithmic(0), uChroma_.axisLimitMin(0), false, 0.0);
+	ui.AxisYPositionXRealSpin->setValue(uChroma_.axisPositionReal(1).x);
+	ui.AxisYPositionZRealSpin->setRange(uChroma_.axisLogarithmic(2), uChroma_.axisLimitMin(2), false, 0.0);
+	ui.AxisYPositionZRealSpin->setValue(uChroma_.axisPositionReal(1).z);
+	ui.AxisYPositionXFractionalSpin->setValue(uChroma_.axisPositionFractional(1).x);
+	ui.AxisYPositionZFractionalSpin->setValue(uChroma_.axisPositionFractional(1).z);
 	// -- Z
-	ui.AxisZCrossAtXSpin->setValue(uChroma_.axisPosition(2).x);
-	ui.AxisZCrossAtXSpin->setRange(uChroma_.axisLogarithmic(0), uChroma_.axisLimitMin(0), false, 0.0);
-	ui.AxisZCrossAtYSpin->setValue(uChroma_.axisPosition(2).y);
-	ui.AxisZCrossAtYSpin->setRange(uChroma_.axisLogarithmic(1), uChroma_.axisLimitMin(1), false, 0.0);
+	ui.AxisZPositionFractionalRadio->setChecked(uChroma_.axisPositionIsFractional(2));
+	axisPositionIsFractionalChanged(2, uChroma_.axisPositionIsFractional(2));
+	ui.AxisZPositionXRealSpin->setRange(uChroma_.axisLogarithmic(0), uChroma_.axisLimitMin(0), false, 0.0);
+	ui.AxisZPositionXRealSpin->setValue(uChroma_.axisPositionReal(2).x);
+	ui.AxisZPositionYRealSpin->setRange(uChroma_.axisLogarithmic(1), uChroma_.axisLimitMin(1), false, 0.0);
+	ui.AxisZPositionYRealSpin->setValue(uChroma_.axisPositionReal(2).y);
+	ui.AxisZPositionXFractionalSpin->setValue(uChroma_.axisPositionFractional(2).x);
+	ui.AxisZPositionYFractionalSpin->setValue(uChroma_.axisPositionFractional(2).y);
 
 	// Axis Ticks
 	// -- X

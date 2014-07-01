@@ -162,13 +162,6 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 	
 	switch (event->key())
 	{
-		case (Qt::Key_Escape):
-			uChroma_->endInteraction(-1, -1);
-			uChroma_->setInteractionAxis(-1);
-			setSlicePrimitive(-1);
-			refresh = true;
-			ignore = false;
-			break;
 		case (Qt::Key_Left):
 			A.createRotationXY(0.0, km.testFlag(Qt::ShiftModifier) ? -1.0 : -10.0);
 			A.copyTranslationAndScaling(viewMatrix_);
@@ -199,16 +192,6 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 			viewMatrix_.removeTranslationAndScaling();
 			viewMatrix_ = A * viewMatrix_;
 			refresh = true;
-			ignore = false;
-			break;
-		case (Qt::Key_X):
-		case (Qt::Key_Y):
-		case (Qt::Key_Z):
-			printf("Key XYZ\n");
-// 			uChroma_->setSliceAxis(uChroma_->sliceAxis() == (event->key() - Qt::Key_X) ? -1 : (event->key() - Qt::Key_X));
-// 			setSlicePrimitive(uChroma_->sliceAxis());
-// 			uChroma_->updateSliceValue(rMouseLast_.x, contextHeight_ - rMouseLast_.y);
-// 			refresh = true;
 			ignore = false;
 			break;
 		default:

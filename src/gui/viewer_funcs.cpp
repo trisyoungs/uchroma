@@ -601,13 +601,14 @@ Vec4<double> Viewer::modelToScreen(Vec3<double> &modelr, double screenradius)
 	Vec4<double> worldr;
 	Matrix vmat;
 	Vec4<double> pos;
+
 	// Projection formula is : worldr = P x M x modelr
 	pos.set(modelr, 1.0);
+
 	// Get the world coordinates of the point - Multiply by modelview matrix 'view'
 	vmat = viewMatrix_;
 	vmat.applyTranslation(-uChroma_->axesCoordCentre());
 	worldr = vmat * pos;
-	worldr.print();
 
 	screenr = projectionMatrix_ * worldr;
 	screenr.x /= screenr.w;
@@ -615,6 +616,7 @@ Vec4<double> Viewer::modelToScreen(Vec3<double> &modelr, double screenradius)
 	screenr.x = viewportMatrix_[0] + viewportMatrix_[2]*(screenr.x+1)*0.5;
 	screenr.y = viewportMatrix_[1] + viewportMatrix_[3]*(screenr.y+1)*0.5;
 	screenr.z = screenr.z / screenr.w;
+
 	// Calculate 2D 'radius' around the point - Multiply world[x+delta] coordinates by P
 	if (screenradius > 0.0)
 	{
@@ -645,7 +647,7 @@ double Viewer::calculateRequiredZoom(double xExtent, double yExtent, double frac
 	int screenX = targetX, screenY = targetY;
 
 	double zoom = 0.0;
-	
+	int count = 0;
 	do
 	{
 		// Increase zoom distance
@@ -676,7 +678,10 @@ double Viewer::calculateRequiredZoom(double xExtent, double yExtent, double frac
 			/ 
 			(worldr.y * projectionMatrix[7] + worldr.z * projectionMatrix[11] + projectionMatrix[15])
 			)+1)*0.5;
-		printf("One-shot screenx = %i (%i) : screeny = %i (%i)\n", screenX, targetX, screenY, targetY);
+
+		// Limit the number of iterations so we can never get into an infinite loop
+		if (++count == 20) break;
+
 	} while ((screenX > targetX) || (screenY > targetY));
 	return zoom;
 }

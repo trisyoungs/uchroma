@@ -158,6 +158,7 @@ class UChromaWindow : public QMainWindow
 	void on_actionAxesInteractX_triggered(bool checked);
 	void on_actionAxesInteractY_triggered(bool checked);
 	void on_actionAxesInteractZ_triggered(bool checked);
+	void on_actionAxesInteractNone_triggered(bool checked);
 
 
 	/*
@@ -330,8 +331,12 @@ class UChromaWindow : public QMainWindow
 	Vec3<bool> axisVisible_;
 	// Stretch factors to apply to axes
 	Vec3<double> axisStretch_;
-	// Axis position (in real surface-space coordinates)
-	Vec3<double> axisPosition_[3];
+	// Whether axis position is fractional or absolute
+	Vec3<bool> axisPositionIsFractional_;
+	// Axis position in real or surface-space coordinates
+	Vec3<double> axisPositionReal_[3];
+	// Axis position in fractional axis coordinates
+	Vec3<double> axisPositionFractional_[3];
 	// Axis tick direction
 	Vec3<double> axisTickDirection_[3];
 	// Position of first tick delta on axes
@@ -394,12 +399,20 @@ class UChromaWindow : public QMainWindow
 	void setAxisStretch(int axis, double value);
 	// Return stretch factor for axis
 	double axisStretch(int axis);
+	// Set fractional position flag for axis
+	void setAxisPositionIsFractional(int axis, bool value);
+	// Return fractional position flag for axis
+	double axisPositionIsFractional(int axis);
 	// Set axis position (in real surface-space coordinates)
-	void setAxisPosition(int axis, int dir, double value);
+	void setAxisPositionReal(int axis, int dir, double value);
 	// Set axis position to axis limit (in real surface-space coordinates)
-	void setAxisPositionToLimit(int axis, int dir, bool minLim);
+	void setAxisPositionRealToLimit(int axis, int dir, bool minLim);
 	// Return axis position (in real surface-space coordinates)
-	Vec3<double> axisPosition(int axis);
+	Vec3<double> axisPositionReal(int axis);
+	// Set axis position (in fractional axis coordinates)
+	void setAxisPositionFractional(int axis, int dir, double value);
+	// Return axis position (in fractional axis coordinates)
+	Vec3<double> axisPositionFractional(int axis);
 	// Set axis tick direction
 	void setAxisTickDirection(int axis, int dir, double value);
 	// Return axis tick direction for specified axis

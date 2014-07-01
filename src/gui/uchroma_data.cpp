@@ -246,9 +246,13 @@ void UChromaWindow::clearData()
 	axisInverted_.set(false, false, false);
 	axisLogarithmic_.set(false, false, false);
 	axisVisible_.set(true, true, true);
-	axisPosition_[0].zero();
-	axisPosition_[1].zero();
-	axisPosition_[2].zero();
+	axisPositionIsFractional_.set(true, true, true);
+	axisPositionReal_[0].zero();
+	axisPositionReal_[1].zero();
+	axisPositionReal_[2].zero();
+	axisPositionFractional_[0].zero();
+	axisPositionFractional_[1].zero();
+	axisPositionFractional_[2].zero();
 	axisTickDirection_[0].set(0.0, -1.0, 0.0);
 	axisTickDirection_[1].set(-1.0, 0.0, 0.0);
 	axisTickDirection_[2].set(1.0, 0.0, 0.0);

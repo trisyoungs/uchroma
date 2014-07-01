@@ -60,7 +60,6 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	ui.MainView->setupFont(viewerFont_);
 
 	// Connect signals / slots between the Viewer and uChroma
-// 	connect(ui.MainView, SIGNAL(/*/*/*/*/*/*/*/*sliceAxisClicked*/*/*/*/*/*/*/*/()), this, SLOT(addSurfaceSlice()));  TODO
 	connect(ui.MainView, SIGNAL(renderComplete(QString)), this, SLOT(updateRenderTimeLabel(QString)));
 	connect(ui.MainView, SIGNAL(surfacePrimitivesUpdated()), this, SLOT(updateCollectionInfo()));
 
@@ -195,14 +194,14 @@ void UChromaWindow::updateAxisLimits()
 		// Clamp axis position point values if necessary
 		for (int axis=0; axis < 3; ++axis)
 		{
-			if (axisPosition_[axis][(axis+1)%3] < axisLimitMin_[(axis+1)%3])
+			if (axisPositionReal_[axis][(axis+1)%3] < axisLimitMin_[(axis+1)%3])
 			{
-				axisPosition_[axis].set((axis+1)%3, axisLimitMin_[(axis+1)%3]);
+				axisPositionReal_[axis].set((axis+1)%3, axisLimitMin_[(axis+1)%3]);
 				regenerateAxes_ = true;
 			}
-			if (axisPosition_[axis][(axis+2)%3] < axisLimitMin_[(axis+2)%3])
+			if (axisPositionReal_[axis][(axis+2)%3] < axisLimitMin_[(axis+2)%3])
 			{
-				axisPosition_[axis].set((axis+2)%3, axisLimitMin_[(axis+2)%3]);
+				axisPositionReal_[axis].set((axis+2)%3, axisLimitMin_[(axis+2)%3]);
 				regenerateAxes_ = true;
 			}
 		}
@@ -349,11 +348,29 @@ double UChromaWindow::axisStretch(int axis)
 	return axisStretch_[axis];
 }
 
+// Set fractional position flag for axis
+void UChromaWindow::setAxisPositionIsFractional(int axis, bool b)
+{
+	axisPositionIsFractional_[axis] = b;
+
+	// Set modification flag, and indicate that axes display primitives must be updated
+	setAsModified();
+	regenerateAxes_ = true;
+}
+
+// Return fractional position flag for axis
+double UChromaWindow::axisPositionIsFractional(int axis)
+{
+	return axisPositionIsFractional_[axis];
+}
+
 // Set axis position (in real surface-space coordinates)
-void UChromaWindow::setAxisPosition(int axis, int dir, double value)
+void UChromaWindow::setAxisPositionReal(int axis, int dir, double value)
 {
 	// Clamp range to limits
-	if ((value >= axisLimitMin_[dir]) && (value <= axisLimitMax_[dir])) axisPosition_[axis].set(dir, value);
+	if (value > axisLimitMax_[dir]) value = axisLimitMax_[dir];
+	else if (value < axisLimitMin_[dir]) value = axisLimitMin_[dir];
+	axisPositionReal_[axis].set(dir, value);
 
 	// Set modification flag, and indicate that axes display primitives must be updated
 	setAsModified();
@@ -361,9 +378,9 @@ void UChromaWindow::setAxisPosition(int axis, int dir, double value)
 }
 
 // Set axis position to axis limit (in real surface-space coordinates)
-void UChromaWindow::setAxisPositionToLimit(int axis, int dir, bool minLim)
+void UChromaWindow::setAxisPositionRealToLimit(int axis, int dir, bool minLim)
 {
-	axisPosition_[axis].set(dir, minLim ? axisLimitMin_[dir] : axisLimitMax_[dir]);
+	axisPositionReal_[axis].set(dir, minLim ? axisLimitMin_[dir] : axisLimitMax_[dir]);
 
 	// Set modification flag, and indicate that axes display primitives must be updated
 	setAsModified();
@@ -371,9 +388,28 @@ void UChromaWindow::setAxisPositionToLimit(int axis, int dir, bool minLim)
 }
 
 // Return axis position (in real surface-space coordinates)
-Vec3<double> UChromaWindow::axisPosition(int axis)
+Vec3<double> UChromaWindow::axisPositionReal(int axis)
 {
-	return axisPosition_[axis];
+	return axisPositionReal_[axis];
+}
+
+// Set axis position (in fractional axis coordinates)
+void UChromaWindow::setAxisPositionFractional(int axis, int dir, double value)
+{
+	// Clamp range to limits
+	if (value > 1.0) value = 1.0;
+	else if (value < 0.0) value = 0.0;
+	axisPositionFractional_[axis].set(dir, value);
+
+	// Set modification flag, and indicate that axes display primitives must be updated
+	setAsModified();
+	regenerateAxes_ = true;
+}
+
+// Return axis position (in fractional axis coordinates)
+Vec3<double> UChromaWindow::axisPositionFractional(int axis)
+{
+	return axisPositionFractional_[axis];
 }
 
 // Set axis tick direction

@@ -303,7 +303,7 @@
              <property name="title">
               <string>Cross At</string>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout_8">
+             <layout class="QHBoxLayout" name="horizontalLayout">
               <property name="spacing">
                <number>4</number>
               </property>
@@ -315,21 +315,60 @@
                 <property name="spacing">
                  <number>4</number>
                 </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_4">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
+                <item row="1" column="5">
+                 <widget class="QToolButton" name="AxisXPositionYSetMaximumButton">
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Set to maximum source data value</string>
                   </property>
                   <property name="text">
-                   <string>Y =</string>
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="icons.qrc">
+                    <normaloff>:/uchroma/icons/torightlimit.svg</normaloff>:/uchroma/icons/torightlimit.svg</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>16</width>
+                    <height>16</height>
+                   </size>
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="1">
-                 <widget class="TExponentialSpin" name="AxisXCrossAtYSpin" native="true">
+                <item row="1" column="4">
+                 <widget class="QToolButton" name="AxisXPositionYSetZeroButton">
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Set to zero</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="icons.qrc">
+                    <normaloff>:/uchroma/icons/tozero.svg</normaloff>:/uchroma/icons/tozero.svg</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>16</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="TExponentialSpin" name="AxisXPositionYRealSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -347,21 +386,8 @@
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_5">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Z =</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="TExponentialSpin" name="AxisXCrossAtZSpin" native="true">
+                <item row="2" column="1">
+                 <widget class="TExponentialSpin" name="AxisXPositionZRealSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -379,8 +405,8 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="5">
-                 <widget class="QToolButton" name="AxisXCrossAtYSetMaximumButton">
+                <item row="1" column="3">
+                 <widget class="QToolButton" name="AxisXPositionYSetMinimumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -388,14 +414,14 @@
                    </size>
                   </property>
                   <property name="toolTip">
-                   <string>Set to maximum source data value</string>
+                   <string>Set to minimum source data value</string>
                   </property>
                   <property name="text">
                    <string>...</string>
                   </property>
                   <property name="icon">
                    <iconset resource="icons.qrc">
-                    <normaloff>:/uchroma/icons/torightlimit.svg</normaloff>:/uchroma/icons/torightlimit.svg</iconset>
+                    <normaloff>:/uchroma/icons/toleftlimit.svg</normaloff>:/uchroma/icons/toleftlimit.svg</iconset>
                   </property>
                   <property name="iconSize">
                    <size>
@@ -405,8 +431,60 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="3">
-                 <widget class="QToolButton" name="AxisXCrossAtYSetZeroButton">
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_5">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Z =</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_4">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Y =</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="3">
+                 <widget class="QToolButton" name="AxisXPositionZSetMinimumButton">
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Set to minimum source data value</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="icons.qrc">
+                    <normaloff>:/uchroma/icons/toleftlimit.svg</normaloff>:/uchroma/icons/toleftlimit.svg</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>16</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="4">
+                 <widget class="QToolButton" name="AxisXPositionZSetZeroButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -431,8 +509,18 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="2">
-                 <widget class="QToolButton" name="AxisXCrossAtYSetMinimumButton">
+                <item row="0" column="1">
+                 <widget class="QRadioButton" name="AxisXPositionRealRadio">
+                  <property name="text">
+                   <string>Real</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="5">
+                 <widget class="QToolButton" name="AxisXPositionZSetMaximumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -440,14 +528,14 @@
                    </size>
                   </property>
                   <property name="toolTip">
-                   <string>Set to minimum source data value</string>
+                   <string>Set to maximum source data value</string>
                   </property>
                   <property name="text">
                    <string>...</string>
                   </property>
                   <property name="icon">
                    <iconset resource="icons.qrc">
-                    <normaloff>:/uchroma/icons/toleftlimit.svg</normaloff>:/uchroma/icons/toleftlimit.svg</iconset>
+                    <normaloff>:/uchroma/icons/torightlimit.svg</normaloff>:/uchroma/icons/torightlimit.svg</iconset>
                   </property>
                   <property name="iconSize">
                    <size>
@@ -458,80 +546,47 @@
                  </widget>
                 </item>
                 <item row="1" column="2">
-                 <widget class="QToolButton" name="AxisXCrossAtZSetMinimumButton">
-                  <property name="maximumSize">
+                 <widget class="TExponentialSpin" name="AxisXPositionYFractionalSpin" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
                    <size>
-                    <width>24</width>
-                    <height>24</height>
+                    <width>0</width>
+                    <height>31</height>
                    </size>
                   </property>
                   <property name="toolTip">
-                   <string>Set to minimum source data value</string>
-                  </property>
-                  <property name="text">
-                   <string>...</string>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="icons.qrc">
-                    <normaloff>:/uchroma/icons/toleftlimit.svg</normaloff>:/uchroma/icons/toleftlimit.svg</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>16</width>
-                    <height>16</height>
-                   </size>
+                   <string>Y axis fraction at which the X axis crosses</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="3">
-                 <widget class="QToolButton" name="AxisXCrossAtZSetZeroButton">
-                  <property name="maximumSize">
+                <item row="2" column="2">
+                 <widget class="TExponentialSpin" name="AxisXPositionZFractionalSpin" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
                    <size>
-                    <width>24</width>
-                    <height>24</height>
+                    <width>0</width>
+                    <height>31</height>
                    </size>
                   </property>
                   <property name="toolTip">
-                   <string>Set to zero</string>
-                  </property>
-                  <property name="text">
-                   <string>...</string>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="icons.qrc">
-                    <normaloff>:/uchroma/icons/tozero.svg</normaloff>:/uchroma/icons/tozero.svg</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>16</width>
-                    <height>16</height>
-                   </size>
+                   <string>Z axis fraction at which the X axis crosses</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="5">
-                 <widget class="QToolButton" name="AxisXCrossAtZSetMaximumButton">
-                  <property name="maximumSize">
-                   <size>
-                    <width>24</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="toolTip">
-                   <string>Set to maximum source data value</string>
-                  </property>
+                <item row="0" column="2">
+                 <widget class="QRadioButton" name="AxisXPositionFractionalRadio">
                   <property name="text">
-                   <string>...</string>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="icons.qrc">
-                    <normaloff>:/uchroma/icons/torightlimit.svg</normaloff>:/uchroma/icons/torightlimit.svg</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>16</width>
-                    <height>16</height>
-                   </size>
+                   <string>Fractional</string>
                   </property>
                  </widget>
                 </item>
@@ -1384,11 +1439,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="YAxisCrossGroup">
+            <widget class="QGroupBox" name="XAxisCrossGroup_2">
              <property name="title">
               <string>Cross At</string>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout_13">
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
               <property name="spacing">
                <number>4</number>
               </property>
@@ -1400,21 +1455,60 @@
                 <property name="spacing">
                  <number>4</number>
                 </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_8">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
+                <item row="1" column="5">
+                 <widget class="QToolButton" name="AxisYPositionXSetMaximumButton">
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Set to maximum source data value</string>
                   </property>
                   <property name="text">
-                   <string>X =</string>
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="icons.qrc">
+                    <normaloff>:/uchroma/icons/torightlimit.svg</normaloff>:/uchroma/icons/torightlimit.svg</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>16</width>
+                    <height>16</height>
+                   </size>
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="1">
-                 <widget class="TExponentialSpin" name="AxisYCrossAtXSpin" native="true">
+                <item row="1" column="4">
+                 <widget class="QToolButton" name="AxisYPositionXSetZeroButton">
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Set to zero</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="icons.qrc">
+                    <normaloff>:/uchroma/icons/tozero.svg</normaloff>:/uchroma/icons/tozero.svg</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>16</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="TExponentialSpin" name="AxisYPositionXRealSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1428,25 +1522,12 @@
                    </size>
                   </property>
                   <property name="toolTip">
-                   <string>Z axis value at which the X axis crosses</string>
+                   <string>X axis value at which the Y axis crosses</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_9">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Z =</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="TExponentialSpin" name="AxisYCrossAtZSpin" native="true">
+                <item row="2" column="1">
+                 <widget class="TExponentialSpin" name="AxisYPositionZRealSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1464,20 +1545,23 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="5">
-                 <widget class="QToolButton" name="AxisYCrossAtXSetMaximumButton">
+                <item row="1" column="3">
+                 <widget class="QToolButton" name="AxisYPositionXSetMinimumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
                     <height>24</height>
                    </size>
                   </property>
+                  <property name="toolTip">
+                   <string>Set to minimum source data value</string>
+                  </property>
                   <property name="text">
                    <string>...</string>
                   </property>
                   <property name="icon">
                    <iconset resource="icons.qrc">
-                    <normaloff>:/uchroma/icons/torightlimit.svg</normaloff>:/uchroma/icons/torightlimit.svg</iconset>
+                    <normaloff>:/uchroma/icons/toleftlimit.svg</normaloff>:/uchroma/icons/toleftlimit.svg</iconset>
                   </property>
                   <property name="iconSize">
                    <size>
@@ -1487,8 +1571,60 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="3">
-                 <widget class="QToolButton" name="AxisYCrossAtXSetZeroButton">
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_8">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Z =</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_9">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>X =</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="3">
+                 <widget class="QToolButton" name="AxisYPositionZSetMinimumButton">
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Set to minimum source data value</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="icons.qrc">
+                    <normaloff>:/uchroma/icons/toleftlimit.svg</normaloff>:/uchroma/icons/toleftlimit.svg</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>16</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="4">
+                 <widget class="QToolButton" name="AxisYPositionZSetZeroButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -1513,8 +1649,18 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="2">
-                 <widget class="QToolButton" name="AxisYCrossAtXSetMinimumButton">
+                <item row="0" column="1">
+                 <widget class="QRadioButton" name="AxisYPositionRealRadio">
+                  <property name="text">
+                   <string>Real</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="5">
+                 <widget class="QToolButton" name="AxisYPositionZSetMaximumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -1522,14 +1668,14 @@
                    </size>
                   </property>
                   <property name="toolTip">
-                   <string>Set to minimum source data value</string>
+                   <string>Set to maximum source data value</string>
                   </property>
                   <property name="text">
                    <string>...</string>
                   </property>
                   <property name="icon">
                    <iconset resource="icons.qrc">
-                    <normaloff>:/uchroma/icons/toleftlimit.svg</normaloff>:/uchroma/icons/toleftlimit.svg</iconset>
+                    <normaloff>:/uchroma/icons/torightlimit.svg</normaloff>:/uchroma/icons/torightlimit.svg</iconset>
                   </property>
                   <property name="iconSize">
                    <size>
@@ -1540,77 +1686,47 @@
                  </widget>
                 </item>
                 <item row="1" column="2">
-                 <widget class="QToolButton" name="AxisYCrossAtZSetMinimumButton">
-                  <property name="maximumSize">
+                 <widget class="TExponentialSpin" name="AxisYPositionXFractionalSpin" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
                    <size>
-                    <width>24</width>
-                    <height>24</height>
+                    <width>0</width>
+                    <height>31</height>
                    </size>
                   </property>
                   <property name="toolTip">
-                   <string>Set to minimum source data value</string>
-                  </property>
-                  <property name="text">
-                   <string>...</string>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="icons.qrc">
-                    <normaloff>:/uchroma/icons/toleftlimit.svg</normaloff>:/uchroma/icons/toleftlimit.svg</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>16</width>
-                    <height>16</height>
-                   </size>
+                   <string>X axis fraction at which the Y axis crosses</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="3">
-                 <widget class="QToolButton" name="AxisYCrossAtZSetZeroButton">
-                  <property name="maximumSize">
+                <item row="2" column="2">
+                 <widget class="TExponentialSpin" name="AxisYPositionZFractionalSpin" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
                    <size>
-                    <width>24</width>
-                    <height>24</height>
+                    <width>0</width>
+                    <height>31</height>
                    </size>
                   </property>
                   <property name="toolTip">
-                   <string>Set to zero</string>
-                  </property>
-                  <property name="text">
-                   <string>...</string>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="icons.qrc">
-                    <normaloff>:/uchroma/icons/tozero.svg</normaloff>:/uchroma/icons/tozero.svg</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>16</width>
-                    <height>16</height>
-                   </size>
+                   <string>Z axis fraction at which the Y axis crosses</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="5">
-                 <widget class="QToolButton" name="AxisYCrossAtZSetMaximumButton">
-                  <property name="maximumSize">
-                   <size>
-                    <width>24</width>
-                    <height>24</height>
-                   </size>
-                  </property>
+                <item row="0" column="2">
+                 <widget class="QRadioButton" name="AxisYPositionFractionalRadio">
                   <property name="text">
-                   <string>...</string>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="icons.qrc">
-                    <normaloff>:/uchroma/icons/torightlimit.svg</normaloff>:/uchroma/icons/torightlimit.svg</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>16</width>
-                    <height>16</height>
-                   </size>
+                   <string>Fractional</string>
                   </property>
                  </widget>
                 </item>
@@ -2445,11 +2561,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="ZAxisCrossGroup">
+            <widget class="QGroupBox" name="XAxisCrossGroup_3">
              <property name="title">
               <string>Cross At</string>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout_17">
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
               <property name="spacing">
                <number>4</number>
               </property>
@@ -2461,21 +2577,60 @@
                 <property name="spacing">
                  <number>4</number>
                 </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_12">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
+                <item row="1" column="5">
+                 <widget class="QToolButton" name="AxisZPositionXSetMaximumButton">
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Set to maximum source data value</string>
                   </property>
                   <property name="text">
-                   <string>X =</string>
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="icons.qrc">
+                    <normaloff>:/uchroma/icons/torightlimit.svg</normaloff>:/uchroma/icons/torightlimit.svg</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>16</width>
+                    <height>16</height>
+                   </size>
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="1">
-                 <widget class="TExponentialSpin" name="AxisZCrossAtXSpin" native="true">
+                <item row="1" column="4">
+                 <widget class="QToolButton" name="AxisZPositionXSetZeroButton">
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Set to zero</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="icons.qrc">
+                    <normaloff>:/uchroma/icons/tozero.svg</normaloff>:/uchroma/icons/tozero.svg</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>16</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="TExponentialSpin" name="AxisZPositionXRealSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -2493,21 +2648,8 @@
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_13">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Y =</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="TExponentialSpin" name="AxisZCrossAtYSpin" native="true">
+                <item row="2" column="1">
+                 <widget class="TExponentialSpin" name="AxisZPositionYRealSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -2525,8 +2667,8 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="2">
-                 <widget class="QToolButton" name="AxisZCrossAtXSetMinimumButton">
+                <item row="1" column="3">
+                 <widget class="QToolButton" name="AxisZPositionXSetMinimumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -2551,8 +2693,34 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="4">
-                 <widget class="QToolButton" name="AxisZCrossAtXSetMaximumButton">
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_12">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Y =</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_13">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>X =</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="3">
+                 <widget class="QToolButton" name="AxisZPositionYSetMinimumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -2560,14 +2728,14 @@
                    </size>
                   </property>
                   <property name="toolTip">
-                   <string>Set to maximum source data value</string>
+                   <string>Set to minimum source data value</string>
                   </property>
                   <property name="text">
                    <string>...</string>
                   </property>
                   <property name="icon">
                    <iconset resource="icons.qrc">
-                    <normaloff>:/uchroma/icons/torightlimit.svg</normaloff>:/uchroma/icons/torightlimit.svg</iconset>
+                    <normaloff>:/uchroma/icons/toleftlimit.svg</normaloff>:/uchroma/icons/toleftlimit.svg</iconset>
                   </property>
                   <property name="iconSize">
                    <size>
@@ -2577,8 +2745,8 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="3">
-                 <widget class="QToolButton" name="AxisZCrossAtXSetZeroButton">
+                <item row="2" column="4">
+                 <widget class="QToolButton" name="AxisZPositionYSetZeroButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -2594,6 +2762,42 @@
                   <property name="icon">
                    <iconset resource="icons.qrc">
                     <normaloff>:/uchroma/icons/tozero.svg</normaloff>:/uchroma/icons/tozero.svg</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>16</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QRadioButton" name="AxisZPositionRealRadio">
+                  <property name="text">
+                   <string>Real</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="5">
+                 <widget class="QToolButton" name="AxisZPositionYSetMaximumButton">
+                  <property name="maximumSize">
+                   <size>
+                    <width>24</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Set to maximum source data value</string>
+                  </property>
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="icons.qrc">
+                    <normaloff>:/uchroma/icons/torightlimit.svg</normaloff>:/uchroma/icons/torightlimit.svg</iconset>
                   </property>
                   <property name="iconSize">
                    <size>
@@ -2604,80 +2808,47 @@
                  </widget>
                 </item>
                 <item row="1" column="2">
-                 <widget class="QToolButton" name="AxisZCrossAtYSetMinimumButton">
-                  <property name="maximumSize">
+                 <widget class="TExponentialSpin" name="AxisZPositionXFractionalSpin" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
                    <size>
-                    <width>24</width>
-                    <height>24</height>
+                    <width>0</width>
+                    <height>31</height>
                    </size>
                   </property>
                   <property name="toolTip">
-                   <string>Set to minimum source data value</string>
-                  </property>
-                  <property name="text">
-                   <string>...</string>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="icons.qrc">
-                    <normaloff>:/uchroma/icons/toleftlimit.svg</normaloff>:/uchroma/icons/toleftlimit.svg</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>16</width>
-                    <height>16</height>
-                   </size>
+                   <string>X axis fraction at which the Z axis crosses</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="3">
-                 <widget class="QToolButton" name="AxisZCrossAtYSetZeroButton">
-                  <property name="maximumSize">
+                <item row="2" column="2">
+                 <widget class="TExponentialSpin" name="AxisZPositionYFractionalSpin" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
                    <size>
-                    <width>24</width>
-                    <height>24</height>
+                    <width>0</width>
+                    <height>31</height>
                    </size>
                   </property>
                   <property name="toolTip">
-                   <string>Set to zero</string>
-                  </property>
-                  <property name="text">
-                   <string>...</string>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="icons.qrc">
-                    <normaloff>:/uchroma/icons/tozero.svg</normaloff>:/uchroma/icons/tozero.svg</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>16</width>
-                    <height>16</height>
-                   </size>
+                   <string>Y axis fraction at which the Y axis crosses</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="4">
-                 <widget class="QToolButton" name="AxisZCrossAtYSetMaximumButton">
-                  <property name="maximumSize">
-                   <size>
-                    <width>24</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="toolTip">
-                   <string>Set to maximum source data value</string>
-                  </property>
+                <item row="0" column="2">
+                 <widget class="QRadioButton" name="AxisZPositionFractionalRadio">
                   <property name="text">
-                   <string>...</string>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="icons.qrc">
-                    <normaloff>:/uchroma/icons/torightlimit.svg</normaloff>:/uchroma/icons/torightlimit.svg</iconset>
-                  </property>
-                  <property name="iconSize">
-                   <size>
-                    <width>16</width>
-                    <height>16</height>
-                   </size>
+                   <string>Fractional</string>
                   </property>
                  </widget>
                 </item>

@@ -136,7 +136,7 @@ bool UChromaWindow::interacting()
 void UChromaWindow::setInteractionAxis(int axis)
 {
 	interactionAxis_ = axis;
-	ui.MainView->setSlicePrimitive(axis);
+	ui.MainView->setInteractionPrimitive(axis);
 }
 
 // Return current axis target for interaction
@@ -184,7 +184,21 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 	// If we are not interacting, exit now
 	if (!interacting_) return;
 
-	// TODO Finalise interaction type
+	// Finalise interaction type
+	switch (interactionMode_)
+	{
+		case (UChromaWindow::ZoomInteraction):
+			printf("Zooming %i axis to %f/%f\n", interactionAxis_, clickedInteractionValue_, currentInteractionValue_);
+			setAxisMin(interactionAxis_, min(clickedInteractionValue_, currentInteractionValue_));
+			setAxisMax(interactionAxis_, max(clickedInteractionValue_, currentInteractionValue_));
+			updateAxesPrimitives();
+			axesWindow_.updateControls();
+			updateDisplay();
+			break;
+		default:
+			printf("Internal Error: Don't know how to complete interaction mode %i\n", interactionMode_);
+			break;
+	}
 
 	interacting_ = false;
 }

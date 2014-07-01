@@ -1,10 +1,12 @@
 Axis 0
   AutoTicks true
   FirstTick -9.000000
+  FractionalPositioning true
   TickDelta 3.000000
   MinorTicks 9
   TitleAnchor 2
-  Position 0.000000 0.000000 0.000000
+  PositionFractional 0.000000 0.500000 0.000000
+  PositionReal 0.000000 0.000000 0.000000
   LabelOrientation 0.000000 0.000000 0.200000
   Title 'X'
   TitleOrientation 0.000000 0.000000 0.100000 1.000000
@@ -17,10 +19,12 @@ EndAxis
 Axis 1
   AutoTicks true
   FirstTick -0.900000
+  FractionalPositioning true
   TickDelta 0.300000
   MinorTicks 1
   TitleAnchor 1
-  Position 0.000000 0.000000 0.000000
+  PositionFractional 0.500000 0.000000 0.000000
+  PositionReal 0.000000 0.000000 0.000000
   LabelOrientation 0.000000 0.000000 0.200000
   Title 'Y Axis'
   TitleOrientation 0.000000 0.000000 0.300000 1.000000
@@ -33,10 +37,12 @@ EndAxis
 Axis 2
   AutoTicks true
   FirstTick 0.000000
+  FractionalPositioning true
   TickDelta 1.000000
   MinorTicks 9
   TitleAnchor 1
-  Position 0.000000 0.000000 0.000000
+  PositionFractional 0.500000 0.500000 0.000000
+  PositionReal 0.000000 0.000000 0.000000
   LabelOrientation 0.000000 177.000000 0.200000
   Title 'Z Axis'
   TitleOrientation 0.000000 0.000000 0.300000 0.500000
@@ -55,10 +61,10 @@ View
   LabelFaceViewer false
   LabelScale 0.140000
   TitleScale 0.200000
-  MatrixX 0.954575 -0.293897 0.049113 0.000000
-  MatrixY 0.295680 0.954680 -0.034043 0.000000
-  MatrixZ -0.036882 0.047018 0.998213 0.000000
-  MatrixW 0.000000 0.000000 -11.565304 1.000000
+  MatrixX 0.931507 -0.363621 0.008651 0.000000
+  MatrixY 0.328376 0.830518 -0.449899 0.000000
+  MatrixZ 0.156408 0.421925 0.893038 0.000000
+  MatrixW 0.000000 0.000000 -71.158858 1.000000
 EndView
 Collection 'Cosine Test Data'
   DataDirectory "/home/tris/src/uchroma/test"
@@ -79,7 +85,7 @@ Collection 'Cosine Test Data'
   Style Surface
   Visible true
   DataSet 'cos01'
-  Source  File  'cos01.txt'
+    Source  File  'cos01.txt'
     Z  0.000000
     Data
       -10.000000  -1.006900
@@ -585,7 +591,7 @@ Collection 'Cosine Test Data'
     EndData
   EndDataSet
   DataSet 'cos02'
-  Source  File  'cos02.txt'
+    Source  File  'cos02.txt'
     Z  1.000000
     Data
       -10.000000  -0.839070
@@ -1091,7 +1097,7 @@ Collection 'Cosine Test Data'
     EndData
   EndDataSet
   DataSet 'cos03'
-  Source  File  'cos03.txt'
+    Source  File  'cos03.txt'
     Z  2.000000
     Data
       -10.000000  -0.839070
@@ -1597,7 +1603,7 @@ Collection 'Cosine Test Data'
     EndData
   EndDataSet
   DataSet 'cos04'
-  Source  File  'cos04.txt'
+    Source  File  'cos04.txt'
     Z  3.000000
     Data
       -10.000000  -0.839070
@@ -2103,7 +2109,7 @@ Collection 'Cosine Test Data'
     EndData
   EndDataSet
   DataSet 'cos05'
-  Source  File  'cos05.txt'
+    Source  File  'cos05.txt'
     Z  4.000000
     Data
       -10.000000  -0.839070
@@ -2609,7 +2615,7 @@ Collection 'Cosine Test Data'
     EndData
   EndDataSet
   DataSet 'cos06'
-  Source  File  'cos06.txt'
+    Source  File  'cos06.txt'
     Z  5.000000
     Data
       -10.000000  -0.839070
@@ -3115,7 +3121,7 @@ Collection 'Cosine Test Data'
     EndData
   EndDataSet
   DataSet 'cos07'
-  Source  File  'cos07.txt'
+    Source  File  'cos07.txt'
     Z  6.000000
     Data
       -10.000000  -0.839070
@@ -3621,7 +3627,7 @@ Collection 'Cosine Test Data'
     EndData
   EndDataSet
   DataSet 'cos08'
-  Source  File  'cos08.txt'
+    Source  File  'cos08.txt'
     Z  7.000000
     Data
       -10.000000  -0.839070
@@ -4127,7 +4133,7 @@ Collection 'Cosine Test Data'
     EndData
   EndDataSet
   DataSet 'cos09'
-  Source  File  'cos09.txt'
+    Source  File  'cos09.txt'
     Z  8.000000
     Data
       -10.000000  -0.839070
@@ -4633,7 +4639,7 @@ Collection 'Cosine Test Data'
     EndData
   EndDataSet
   DataSet 'cos10'
-  Source  File  'cos10.txt'
+    Source  File  'cos10.txt'
     Z  9.000000
     Data
       -10.000000  -0.419540

@@ -199,10 +199,10 @@ void Viewer::setYClip(double yMin, double yMax)
 	clipPlaneYMax_ = yMax + clipPlaneDelta_;
 }
 
-// Setup slice primitive
-void Viewer::setSlicePrimitive(int axis)
+// Setup interaction primitive
+void Viewer::setInteractionPrimitive(int axis)
 {
-	const int nPoints = 32;
+	const int nPoints = 16;
 	
 	interactionPrimitive_.initialise(nPoints*nPoints*4, nPoints*nPoints*6, GL_TRIANGLES, false);
 	interactionPrimitive_.forgetAll();
@@ -211,8 +211,11 @@ void Viewer::setSlicePrimitive(int axis)
 	if (axis == -1) return;
 
 	// Grab axes, and knock out values in the supplied vectors which correspond to the activated axis
-	Vec3<double> axisMinA = uChroma_->axisCoordMin((axis+1)%3), axisMaxA = uChroma_->axisCoordMax((axis+1)%3);
-	Vec3<double> axisMinB = uChroma_->axisCoordMin((axis+2)%3), axisMaxB = uChroma_->axisCoordMax((axis+2)%3);
+	Vec3<double> axisMinA, axisMinB, axisMaxA, axisMaxB;
+	axisMinA[(axis+1)%3] = uChroma_->axisCoordMin((axis+1)%3)[(axis+1)%3];
+	axisMaxA[(axis+1)%3] = uChroma_->axisCoordMax((axis+1)%3)[(axis+1)%3];
+	axisMinB[(axis+2)%3] = uChroma_->axisCoordMin((axis+2)%3)[(axis+2)%3];
+	axisMaxB[(axis+2)%3] = uChroma_->axisCoordMax((axis+2)%3)[(axis+2)%3];
 	axisMinA[axis] = 0.0;
 	axisMaxA[axis] = 0.0;
 	axisMinB[axis] = 0.0;
@@ -221,10 +224,10 @@ void Viewer::setSlicePrimitive(int axis)
 	// Create 'bounding box' for slice primitive
 	Vec3<double> normal(0.0, 0.0, 1.0);
 	
-	interactionBoxPrimitive_.defineVertex(axisMinA, normal);
-	interactionBoxPrimitive_.defineVertex(axisMaxA, normal);
-	interactionBoxPrimitive_.defineVertex(axisMaxA + axisMaxB - axisMinB, normal);
-	interactionBoxPrimitive_.defineVertex(axisMinA + axisMaxB - axisMinB, normal);
+	interactionBoxPrimitive_.defineVertex(axisMinA + axisMinB, normal);
+	interactionBoxPrimitive_.defineVertex(axisMinA + axisMaxB, normal);
+	interactionBoxPrimitive_.defineVertex(axisMaxA + axisMaxB, normal);
+	interactionBoxPrimitive_.defineVertex(axisMaxA + axisMinB, normal);
 	interactionBoxPrimitive_.defineIndices(0,1);
 	interactionBoxPrimitive_.defineIndices(1,2);
 	interactionBoxPrimitive_.defineIndices(2,3);
@@ -243,7 +246,7 @@ void Viewer::setSlicePrimitive(int axis)
 	GLuint a, b, c, d;
 	for (int n=0; n<nPoints; ++n)
 	{
-		pos = axisMinA + deltaA*n;
+		pos = axisMinA + axisMinB + deltaA*n;
 		for (int m=0; m<nPoints; ++m)
 		{
 			a = interactionPrimitive_.defineVertex(pos, normal);

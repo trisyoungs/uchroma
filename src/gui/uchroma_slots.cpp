@@ -267,20 +267,22 @@ void UChromaWindow::on_actionToolsFitWindow_triggered(bool checked)
 void UChromaWindow::interactionActionTriggered(int axis)
 {
 	// Toggle interaction axis
-	if (interactionAxis_ == axis)
+	if ((interactionAxis_ == axis) || (axis == -1))
 	{
 		ui.actionAxesInteractNone->setChecked(true);
 		setInteractionAxis(-1);
-		setInteractionMode(UChromaWindow::ZoomInteraction);
+		setInteractionMode(UChromaWindow::NoInteraction);
 	}
 	else
 	{
 		setInteractionAxis(axis);
 		updateInteractionPosition(ui.MainView->rMouseLast().x, ui.MainView->contextHeight() - ui.MainView->rMouseLast().y);
+		setInteractionMode(UChromaWindow::ZoomInteraction);
 	}
 
 	// Update GUI
 	updateDisplay();
+	updateCoordinateInfo();
 }
 
 void UChromaWindow::on_actionAxesShowAll_triggered(bool checked)
@@ -305,6 +307,13 @@ void UChromaWindow::on_actionAxesInteractY_triggered(bool checked)
 }
 
 void UChromaWindow::on_actionAxesInteractZ_triggered(bool checked)
+{
+	if (refreshing_) return;
+
+	interactionActionTriggered(2);
+}
+
+void UChromaWindow::on_actionAxesInteractNone_triggered(bool checked)
 {
 	if (refreshing_) return;
 

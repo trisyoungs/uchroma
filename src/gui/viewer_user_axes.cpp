@@ -47,10 +47,13 @@
 	// Set basic extreme coordinates for axes - actual limits on axes will be set in following loop
 	for (int axis=0; axis < 3; ++axis)
 	{
+		double axisPosition;
 		for (int n=0; n<3; ++n)
 		{
-			if (axisLogarithmic_[n]) axisCoordMin_[axis].set(n, (axisInverted_[n] ? log10(axisMax_[n]/axisPosition_[axis][n]) : log10(axisPosition_[axis][n])) * axisStretch_[n]);
-			else axisCoordMin_[axis].set(n, (axisInverted_[n] ? axisMax_[n] - axisPosition_[axis][n] : axisPosition_[axis][n]) * axisStretch_[n]);
+			// Get axis position
+			axisPosition = (axisPositionIsFractional_[axis] ? axisPositionFractional_[axis][n]*(axisMax_[n]-axisMin_[n])+axisMin_[n] : axisPositionReal_[axis][n]);
+			if (axisLogarithmic_[n]) axisCoordMin_[axis].set(n, (axisInverted_[n] ? log10(axisMax_[n]/axisPosition) : log10(axisPosition)) * axisStretch_[n]);
+			else axisCoordMin_[axis].set(n, (axisInverted_[n] ? axisMax_[n] - axisPosition : axisPosition) * axisStretch_[n]);
 		}
 		axisCoordMax_[axis] = axisCoordMin_[axis];
 	}

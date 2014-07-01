@@ -64,6 +64,10 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, int axis)
 			case (Keywords::FirstTickKeyword):
 				axisFirstTick_[axis] = parser.argd(1);
 				break;
+			// Fractional positioning flag
+			case (Keywords::FractionalPositioningKeyword):
+				axisPositionIsFractional_[axis] = parser.argb(1);
+				break;
 			// Invert
 			case (Keywords::InvertKeyword):
 				axisInverted_[axis] = parser.argb(1);
@@ -85,9 +89,13 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, int axis)
 			case (Keywords::MinorTicksKeyword):
 				axisMinorTicks_[axis] = parser.argi(1);
 				break;
-			// Axis position
-			case (Keywords::PositionKeyword):
-				axisPosition_[axis].set(parser.argd(1), parser.argd(2), parser.argd(3));
+			// Axis position (in fractional axis coordinates)
+			case (Keywords::PositionFractionalKeyword):
+				axisPositionFractional_[axis].set(parser.argd(1), parser.argd(2), parser.argd(3));
+				break;
+			// Axis position (in real surface-space coordinates)
+			case (Keywords::PositionRealKeyword):
+				axisPositionReal_[axis].set(parser.argd(1), parser.argd(2), parser.argd(3));
 				break;
 			// Axis stretch factors
 			case (Keywords::StretchKeyword):
@@ -519,10 +527,12 @@ bool UChromaWindow::saveInputFile(QString fileName)
 		parser.writeLineF("%s %i\n", Keywords::inputBlock(Keywords::AxisBlock), axis);
 		parser.writeLineF("  %s %s\n", Keywords::axisKeyword(Keywords::AutoTicksKeyword), stringBool(axisAutoTicks_[axis]));
 		parser.writeLineF("  %s %f\n", Keywords::axisKeyword(Keywords::FirstTickKeyword), axisFirstTick_[axis]);
+		parser.writeLineF("  %s %s\n", Keywords::axisKeyword(Keywords::FractionalPositioningKeyword), stringBool(axisPositionIsFractional_[axis]));
 		parser.writeLineF("  %s %f\n", Keywords::axisKeyword(Keywords::TickDeltaKeyword), axisTickDelta_[axis]);
 		parser.writeLineF("  %s %i\n", Keywords::axisKeyword(Keywords::MinorTicksKeyword), axisMinorTicks_[axis]);
 		parser.writeLineF("  %s %i\n", Keywords::axisKeyword(Keywords::TitleAnchorKeyword), axisTitleAnchor_[axis]);
-		parser.writeLineF("  %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionKeyword), axisPosition_[axis].x, axisPosition_[axis].y, axisPosition_[axis].z);
+		parser.writeLineF("  %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionFractionalKeyword), axisPositionFractional_[axis].x, axisPositionFractional_[axis].y, axisPositionFractional_[axis].z);
+		parser.writeLineF("  %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionRealKeyword), axisPositionReal_[axis].x, axisPositionReal_[axis].y, axisPositionReal_[axis].z);
 		parser.writeLineF("  %s %f %f %f\n", Keywords::axisKeyword(Keywords::LabelOrientationKeyword), axisLabelOrientation_[axis].x, axisLabelOrientation_[axis].y, axisLabelOrientation_[axis].z);
 		parser.writeLineF("  %s '%s'\n", Keywords::axisKeyword(Keywords::TitleKeyword), qPrintable(axisTitle_[axis]));
 		parser.writeLineF("  %s %f %f %f %f\n", Keywords::axisKeyword(Keywords::TitleOrientationKeyword), axisTitleOrientation_[axis].x, axisTitleOrientation_[axis].y, axisTitleOrientation_[axis].z, axisTitleOrientation_[axis].w);

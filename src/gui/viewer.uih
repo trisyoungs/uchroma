@@ -277,8 +277,8 @@ class Viewer : public QGLWidget
 	void addAxisText(int axis, QString text, Vec3<double> origin, Matrix transform, TextPrimitive::HorizontalAnchor textAlignment = TextPrimitive::AnchorCentre);
 	// Calculate axis slice value at current mouse position
 	void calculateMouseAxisValue();
-	// Set slice primitive to specified axis
-	void setSlicePrimitive(int axis);
+	// Set interaction primitive to specified axis
+	void setInteractionPrimitive(int axis);
 	// Create bounding box
 	void createBoundingBox(int type, double planeY);
 	// Set Y clip plane limits
