@@ -56,7 +56,7 @@ void UChromaWindow::on_CollectionTree_itemChanged(QTreeWidgetItem* item, int col
 	if (!collection) return;
 
 	// Set title of collection
-	collection->setTitle(item->text(1));
+	collection->setTitle(item->text(0));
 }
 
 void UChromaWindow::on_CollectionAddButton_clicked(bool checked)

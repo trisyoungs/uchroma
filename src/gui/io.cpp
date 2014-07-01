@@ -226,7 +226,11 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 			// Display style
 			case (Keywords::StyleKeyword):
 				ds = Collection::displayStyle(parser.argc(1));
-				if (ds == Collection::nDisplayStyles) return false;
+				if (ds == Collection::nDisplayStyles)
+				{
+					msg.print("Unrecognised display style '%s'.\n", parser.argc(1));
+					return false;
+				}
 				collection->setDisplayStyle(ds);
 				break;
 			// Data Transform

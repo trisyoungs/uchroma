@@ -271,7 +271,7 @@ class Collection : public ListItem<Collection>
 	 */
 	public:
 	// Display types enum
-	enum DisplayStyle { LineStyle, GridStyle, SurfaceStyle, nDisplayStyles };
+	enum DisplayStyle { LineXYStyle, LineZYStyle, GridStyle, SurfaceStyle, nDisplayStyles };
 	// Convert text string to DisplayStyle
 	static DisplayStyle displayStyle(const char* s);
 	// Convert DisplayStyle to text string

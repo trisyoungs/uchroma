@@ -88,7 +88,7 @@ void FitDialog::updateMainView()
 // Update data in window
 void FitDialog::updateAll()
 {
-	updateSourceGroup();
+	updateSourceList();
 	updateDestinationGroup();
 }
 
@@ -250,23 +250,31 @@ void FitDialog::on_VariablesTable_cellChanged(int row, int column)
  * Source Group
  */
 
-// Update source data group
-void FitDialog::updateSourceGroup(bool refreshList)
+// Update source list
+void FitDialog::updateSourceList()
 {
 	refreshing_ = true;
 
 	// Update collection list
-	if (refreshList)
+	Collection* currentCollection = VariantPointer<Collection>(ui.SourceCollectionCombo->itemData(ui.SourceCollectionCombo->currentIndex()));
+	ui.SourceCollectionCombo->clear();
+	int index = 0;
+	for (Collection* c = uChroma_->collections(); c != NULL; c = c->next, ++index)
 	{
-		Collection* currentCollection = VariantPointer<Collection>(ui.SourceCollectionCombo->itemData(ui.SourceCollectionCombo->currentIndex()));
-		ui.SourceCollectionCombo->clear();
-		int index = 0;
-		for (Collection* c = uChroma_->collections(); c != NULL; c = c->next, ++index)
-		{
-			ui.SourceCollectionCombo->addItem(c->title());
-			if (c == currentCollection) ui.SourceCollectionCombo->setCurrentIndex(index);
-		}
+		ui.SourceCollectionCombo->addItem(c->title());
+		if (c == currentCollection) ui.SourceCollectionCombo->setCurrentIndex(index);
 	}
+
+	refreshing_ = false;
+
+	// Update source info...
+	updateSourceData(true);
+}
+
+// Update source data
+void FitDialog::updateSourceData(bool setInitialValues)
+{
+	refreshing_ = true;
 
 	// Grab current collection
 	Collection* collection = uChroma_->collection(ui.SourceCollectionCombo->currentIndex());
@@ -281,25 +289,25 @@ void FitDialog::updateSourceGroup(bool refreshList)
 	for (DataSet* dataSet = collection->dataSets(); dataSet != NULL; dataSet = dataSet->next) ui.SourceReferenceYCombo->addItem(dataSet->title() + " (Z = " + QString::number(dataSet->data().z()) + ")");
 
 	// Update spin boxes with limits
-	ui.SourceXYSliceFromSpin->setRange(1, ui.SourceXYSliceToSpin->value());
-	ui.SourceXYSliceToSpin->setRange(ui.SourceXYSliceFromSpin->value(), collection->nDataSets());
-	ui.SourceXYXMinSpin->setRange(true, collection->transformMin().x, true, collection->transformMax().x);
-	ui.SourceXYXMaxSpin->setRange(true, collection->transformMin().x, true, collection->transformMax().x);
+	ui.SourceDataSetFromSpin->setRange(1, ui.SourceDataSetToSpin->value());
+	ui.SourceDataSetToSpin->setRange(ui.SourceDataSetFromSpin->value(), collection->nDataSets());
+	ui.SourceXMinSpin->setRange(true, collection->transformMin().x, true, collection->transformMax().x);
+	ui.SourceXMaxSpin->setRange(true, collection->transformMin().x, true, collection->transformMax().x);
 
-	// Set initial values for x range if refreshing list
-	if (refreshList)
+	// Set initial values for x and z ranges if requested
+	if (setInitialValues)
 	{
-		ui.SourceXYSliceFromSpin->setValue(1);
-		ui.SourceXYSliceToSpin->setValue(collection->nDataSets());
-		ui.SourceXYXMinSpin->setValue(collection->transformMin().x);
-		ui.SourceXYXMaxSpin->setValue(collection->transformMax().x);
+		ui.SourceDataSetFromSpin->setValue(1);
+		ui.SourceDataSetToSpin->setValue(collection->nDataSets());
+		ui.SourceXMinSpin->setValue(collection->transformMin().x);
+		ui.SourceXMaxSpin->setValue(collection->transformMax().x);
 	}
 
 	// Update info labels
-	DataSet* dataSet = collection->dataSet(ui.SourceXYSliceFromSpin->value()-1);
-	ui.SourceXYFromZLabel->setText("Z = " + (dataSet ? QString::number(dataSet->data().z()) : "???"));
-	dataSet = collection->dataSet(ui.SourceXYSliceToSpin->value()-1);
-	ui.SourceXYToZLabel->setText("Z = " + (dataSet ? QString::number(dataSet->data().z()) : "???"));
+	DataSet* dataSet = collection->dataSet(ui.SourceDataSetFromSpin->value()-1);
+	ui.SourceFromZLabel->setText("Z = " + (dataSet ? QString::number(dataSet->data().z()) : "???"));
+	dataSet = collection->dataSet(ui.SourceDataSetToSpin->value()-1);
+	ui.SourceToZLabel->setText("Z = " + (dataSet ? QString::number(dataSet->data().z()) : "???"));
 
 	refreshing_ = false;
 }
@@ -307,19 +315,24 @@ void FitDialog::updateSourceGroup(bool refreshList)
 void FitDialog::on_SourceCollectionCombo_currentIndexChanged(int index)
 {
 	if (refreshing_) return;
-	updateSourceGroup();
+	updateSourceData(true);
 }
 
-void FitDialog::on_SourceXYSliceFromSpin_valueChanged(int value)
+void FitDialog::on_SourceDataSetFromSpin_valueChanged(int value)
 {
 	if (refreshing_) return;
-	updateSourceGroup(false);
+	updateSourceData(false);
 }
 
-void FitDialog::on_SourceXYSliceToSpin_valueChanged(int value)
+void FitDialog::on_SourceDataSetToSpin_valueChanged(int value)
 {
 	if (refreshing_) return;
-	updateSourceGroup(false);
+	updateSourceData(false);
+}
+
+void FitDialog::on_SourceXSelectButton_clicked(bool checked)
+{
+	// TODO
 }
 
 /*

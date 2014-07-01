@@ -251,8 +251,10 @@ class Viewer : public QGLWidget
 	void createPrimitives();
 	// Setup basic GL properties
 	void setupGL();
-	// Construct line surface representation of data
-	void constructLineSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
+	// Construct line surface representation of data in XY slices
+	void constructLineXYSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
+	// Construct line surface representation of data in ZY slices
+	void constructLineZYSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
 	// Construct line surface representation of data
 	void constructGridSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
 	// Construct gridded surface representation of data

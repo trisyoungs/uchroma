@@ -223,17 +223,22 @@ class FitDialog : public QDialog
 	public slots:
 	void on_VariablesTable_cellChanged(int row, int column);
 
+
 	/*
 	 * Source Group
 	 */
 	private:
-	// Update source data group
-	void updateSourceGroup(bool refreshList = true);
+	// Update source list
+	void updateSourceList();
+	// Update source data
+	void updateSourceData(bool setInitialValues = false);
 
 	public slots:
 	void on_SourceCollectionCombo_currentIndexChanged(int index);
-	void on_SourceXYSliceFromSpin_valueChanged(int value);
-	void on_SourceXYSliceToSpin_valueChanged(int value);
+	void on_SourceDataSetFromSpin_valueChanged(int value);
+	void on_SourceDataSetToSpin_valueChanged(int value);
+	void on_SourceXSelectButton_clicked(bool checked);
+
 
 	/*
 	 * Destination Group

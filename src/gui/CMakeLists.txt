@@ -61,7 +61,8 @@ viewer_textprimitive.h
 viewer_user.cpp
 viewer_user_axes.cpp
 viewer_user_grid.cpp
-viewer_user_line.cpp
+viewer_user_linexy.cpp
+viewer_user_linezy.cpp
 viewer_user_surface.cpp
 viewer_vertexchunk.h
 )

@@ -190,7 +190,7 @@ void StyleWindow::on_ColourRGBGradientBButton_clicked(bool checked)
 
 	if (ui.ColourRGBGradientBButton->selectColour())
 	{
-		currentCollection->setColourScalePoint(Collection::RGBGradientSource, ui.ColourRGBGradientBButton->colour(), ui.ColourRGBGradientASpin->value(), 1);
+		currentCollection->setColourScalePoint(Collection::RGBGradientSource, ui.ColourRGBGradientBButton->colour(), ui.ColourRGBGradientBSpin->value(), 1);
 
 		// Update gradient bar and display
 		updateGradientBar();
@@ -205,7 +205,7 @@ void StyleWindow::on_ColourRGBGradientBSpin_valueChanged(double value)
 	Collection* currentCollection = uChroma_.currentCollection();
 	if (refreshing_ || (!currentCollection)) return;
 
-	currentCollection->setColourScalePoint(Collection::RGBGradientSource, ui.ColourRGBGradientBButton->colour(), ui.ColourRGBGradientASpin->value(), 1);
+	currentCollection->setColourScalePoint(Collection::RGBGradientSource, ui.ColourRGBGradientBButton->colour(), ui.ColourRGBGradientBSpin->value(), 1);
 
 	// Update gradient bar and display
 	updateGradientBar();

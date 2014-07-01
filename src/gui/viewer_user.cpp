@@ -116,8 +116,11 @@ bool Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate)
 	// Recreate primitive depending on current style
 	switch (collection->displayStyle())
 	{
-		case (Collection::LineStyle):
-			constructLineSurface(collection->displayPrimitives(), collection->displayAbscissa(), collection->displayData(), collection->colourScale());
+		case (Collection::LineXYStyle):
+			constructLineXYSurface(collection->displayPrimitives(), collection->displayAbscissa(), collection->displayData(), collection->colourScale());
+			break;
+		case (Collection::LineZYStyle):
+			constructLineZYSurface(collection->displayPrimitives(), collection->displayAbscissa(), collection->displayData(), collection->colourScale());
 			break;
 		case (Collection::GridStyle):
 			constructGridSurface(collection->displayPrimitives(), collection->displayAbscissa(), collection->displayData(), collection->colourScale());

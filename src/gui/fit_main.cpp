@@ -54,8 +54,8 @@ void FitDialog::updateVariables()
 	ScopeNode* rootNode = equation_.rootNode();
 	for (Variable* var = rootNode->variables.variables(); var != NULL; var = var->next)
 	{
-		// Is this variable one of 'x' or 'z'?
-		if ((strcmp(var->name(),"x") == 0) || (strcmp(var->name(),"z") == 0)) continue;
+		// Is this variable one of 'x', 'z', or 'refy'?
+		if ((strcmp(var->name(),"x") == 0) || (strcmp(var->name(),"z") == 0) || (strcmp(var->name(),"refy") == 0)) continue;
 
 		for (eqVar = equationVariables_.first(); eqVar != NULL; eqVar = eqVar->next) if (eqVar->name() == var->name()) break;
 		if (eqVar == NULL)
@@ -145,22 +145,24 @@ bool FitDialog::doFitting()
 	currentFitTarget_ = NULL;
 	Collection* collection = uChroma_->collection(ui.SourceCollectionCombo->currentIndex());
 	if (!collection) return false;
+
+	// Determine X bin range
+	double xMin = ui.SourceXMinSpin->value(), xMax = ui.SourceXMaxSpin->value();
+	const Array<double>& abscissa = collection->displayAbscissa();
+	int firstPoint, lastPoint;
+	for (firstPoint = 0; firstPoint < abscissa.nItems(); ++firstPoint) if (abscissa.value(firstPoint) >= xMin) break;
+	for (lastPoint = abscissa.nItems()-1; lastPoint >= 0; --lastPoint) if (abscissa.value(lastPoint) <= xMax) break;
+
+	// Grab slice range
+	int firstSlice, lastSlice;
+	firstSlice = ui.SourceDataSetFromSpin->value() - 1;
+	lastSlice = ui.SourceDataSetToSpin->value() - 1;
+
+	// Construct source data
 	if (ui.SourceXYSlicesRadio->isChecked())
 	{
 		// Source data is normal XY slices from the current collection
-		double xMin = ui.SourceXYXMinSpin->value(), xMax = ui.SourceXYXMaxSpin->value();
 		printMessage("Setting up XY slice data over %e < x < %e", xMin, xMax);
-
-		int firstSlice, lastSlice, firstPoint, lastPoint;
-
-		// Determine abscissa limits - always the same, whether we are fitting one slice at a time, or all slices at once (global)
-		const Array<double>& abscissa = collection->displayAbscissa();
-		for (firstPoint = 0; firstPoint < abscissa.nItems(); ++firstPoint) if (abscissa.value(firstPoint) >= xMin) break;
-		for (lastPoint = abscissa.nItems()-1; lastPoint >= 0; --lastPoint) if (abscissa.value(lastPoint) <= xMax) break;
-
-		// Determine slice range
-		firstSlice = ui.SourceXYSliceFromSpin->value() - 1;
-		lastSlice = ui.SourceXYSliceToSpin->value() - 1;
 
 		if (ui.OptionsGlobalFitCheck->isChecked())
 		{
@@ -171,7 +173,15 @@ bool FitDialog::doFitting()
 	}
 	else if (ui.SourceZYSlicesRadio->isChecked())
 	{
-		// TODO
+		// Source data will be slices in the ZY plane
+		printMessage("Setting up ZY slice data over %e < x < %e", xMin, xMax);
+
+		if (ui.OptionsGlobalFitCheck->isChecked())
+		{
+			FitTarget* target = fitTargets_.add();
+			target->set(collection, firstSlice, lastSlice, firstPoint, lastPoint);
+		}
+		else for (int n=firstPoint; n<=lastPoint; ++n) fitTargets_.add()->set(collection, firstSlice, lastSlice, n, n);
 	}
 
 	// Set up destination collection

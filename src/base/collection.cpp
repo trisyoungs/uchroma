@@ -67,7 +67,7 @@ Collection::Collection() : ListItem<Collection>()
 	// Display
 	visible_ = true;
 	displayData_.clear();
-	displayStyle_ = Collection::LineStyle;
+	displayStyle_ = Collection::LineXYStyle;
 	displayDataValid_ = false;
 	displayPrimitivesValid_ = false;
 }
@@ -787,7 +787,7 @@ bool Collection::colourScaleValid()
  */
 
 // Suface Style Keywords
-const char* SurfaceStyleKeywords[] = { "Line", "Grid", "Surface" };
+const char* SurfaceStyleKeywords[] = { "LineXY", "LineZY", "Grid", "Surface" };
 
 // Convert text string to DisplayStyle
 Collection::DisplayStyle Collection::displayStyle(const char* s)
