@@ -114,10 +114,12 @@ int UChromaWindow::closestBin(int axis, double value)
  * Public Functions
  */
 
-// Set interaction mode
-void UChromaWindow::setInteractionMode(UChromaWindow::InteractionMode mode)
+// Set interaction mode and axis
+void UChromaWindow::setInteractionMode(UChromaWindow::InteractionMode mode, int axis)
 {
 	interactionMode_ = mode;
+	interactionAxis_ = axis;
+	ui.MainView->setInteractionPrimitive(axis);
 }
 
 // Return interaction mode
@@ -126,23 +128,16 @@ UChromaWindow::InteractionMode UChromaWindow::interactionMode()
 	return interactionMode_;
 }
 
-// Return whether the user is currently interacting with the display
-bool UChromaWindow::interacting()
-{
-	return interacting_;
-}
-
-// Set interaction axis
-void UChromaWindow::setInteractionAxis(int axis)
-{
-	interactionAxis_ = axis;
-	ui.MainView->setInteractionPrimitive(axis);
-}
-
 // Return current axis target for interaction
 int UChromaWindow::interactionAxis()
 {
 	return interactionAxis_;
+}
+
+// Return whether the user is currently interacting with the display
+bool UChromaWindow::interacting()
+{
+	return interacting_;
 }
 
 // Start interaction at the specified screen coordinates
@@ -187,6 +182,11 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 	// Finalise interaction type
 	switch (interactionMode_)
 	{
+		case (UChromaWindow::FitDialogSelectXInteraction):
+			fitDialog_.ui.SourceXMinSpin->setValue(min(clickedInteractionValue_, currentInteractionValue_));
+			fitDialog_.ui.SourceXMaxSpin->setValue(max(clickedInteractionValue_, currentInteractionValue_));
+			fitDialog_.show();
+			break;
 		case (UChromaWindow::ZoomInteraction):
 			printf("Zooming %i axis to %f/%f\n", interactionAxis_, clickedInteractionValue_, currentInteractionValue_);
 			setAxisMin(interactionAxis_, min(clickedInteractionValue_, currentInteractionValue_));

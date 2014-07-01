@@ -469,6 +469,7 @@ class UChromaWindow : public QMainWindow
 	enum InteractionMode
 	{
 		NoInteraction,
+		FitDialogSelectXInteraction,
 		ZoomInteraction
 	};
 
@@ -491,16 +492,14 @@ class UChromaWindow : public QMainWindow
 	int closestBin(int axis, double value);
 
 	public:
-	// Set interaction mode
-	void setInteractionMode(InteractionMode mode);
+	// Set interaction mode and target axis
+	void setInteractionMode(InteractionMode mode, int axis);
 	// Return interaction mode
 	InteractionMode interactionMode();
-	// Return whether the user is currently interacting with the display
-	bool interacting();
-	// Set interaction axis
-	void setInteractionAxis(int axis);
 	// Return current axis target for interaction
 	int interactionAxis();
+	// Return whether the user is currently interacting with the display
+	bool interacting();
 	// Start interaction at the specified screen coordinates
 	void startInteraction(int mouseX, int mouseY, Qt::KeyboardModifiers modifiers);
 	// Update current interaction value

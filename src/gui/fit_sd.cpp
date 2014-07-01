@@ -89,5 +89,8 @@ bool FitDialog::sdMinimise(Array<double>& alpha, double tolerance, int maxSteps)
 		oldRMSE = currentRMSE;
 	}
 
+	// Get final cost
+	printMessage("Final RMSE = %e", rmsError(alpha));
+	
 	return true;
 }

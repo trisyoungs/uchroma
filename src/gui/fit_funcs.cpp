@@ -332,7 +332,8 @@ void FitDialog::on_SourceDataSetToSpin_valueChanged(int value)
 
 void FitDialog::on_SourceXSelectButton_clicked(bool checked)
 {
-	// TODO
+	uChroma_->setInteractionMode(UChromaWindow::FitDialogSelectXInteraction, 0);
+	hide();
 }
 
 /*

@@ -270,14 +270,12 @@ void UChromaWindow::interactionActionTriggered(int axis)
 	if ((interactionAxis_ == axis) || (axis == -1))
 	{
 		ui.actionAxesInteractNone->setChecked(true);
-		setInteractionAxis(-1);
-		setInteractionMode(UChromaWindow::NoInteraction);
+		setInteractionMode(UChromaWindow::NoInteraction, -1);
 	}
 	else
 	{
-		setInteractionAxis(axis);
+		setInteractionMode(UChromaWindow::ZoomInteraction, axis);
 		updateInteractionPosition(ui.MainView->rMouseLast().x, ui.MainView->contextHeight() - ui.MainView->rMouseLast().y);
-		setInteractionMode(UChromaWindow::ZoomInteraction);
 	}
 
 	// Update GUI
