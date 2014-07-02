@@ -196,6 +196,14 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 			case (Keywords::EndCollectionKeyword):
 				return true;
 				break;
+			// Extracted data block
+			case (Keywords::ExtractedDataBlockKeyword):
+				if (!readCollectionBlock(parser, collection->addExtractedData(parser.argc(1)))) return false;
+				break;
+			// Fit data block
+			case (Keywords::FitBlockKeyword):
+				if (!readCollectionBlock(parser, collection->addFitData(parser.argc(1)))) return false;
+				break;
 			// Interpolate flags
 			case (Keywords::InterpolateKeyword):
 				collection->setInterpolate(0, parser.argb(1));
@@ -460,10 +468,12 @@ bool UChromaWindow::loadInputFile(QString fileName)
 				break;
 			// Collection Block
 			case (Keywords::CollectionBlock):
-				// Create new Collection and set its title
+				// Create new master Collection and set its title
 				currentCollection_ = addCollection(parser.argc(1));
-				
+
+				// Load the collection data
 				success = readCollectionBlock(parser, currentCollection_);
+
 				// Check for empty slices
 				nEmpty = currentCollection_->nEmptyDataSets();
 				if (nEmpty != 0)
@@ -480,6 +490,7 @@ bool UChromaWindow::loadInputFile(QString fileName)
 					}
 				}
 				break;
+				
 			// Settings
 			case (Keywords::SettingsBlock):
 				success = readSettingsBlock(parser);

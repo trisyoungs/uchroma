@@ -62,7 +62,7 @@ void FitTarget::set(Collection* collection, int firstDataSet, int lastDataSet, i
 	{
 		Data2D* data = calculatedY_.add();
 		for (int i=0; i<nPoints_; ++i) data->addPoint(abscissa.value(i+abscissaStart_), 0.0);
-		data->setZ(dataSets[n]->z());
+		data->setZ(dataSets[n+displayDataSetStart_]->z());
 	}
 }
 
@@ -225,24 +225,12 @@ double FitTarget::sosError()
 // Copy calculated Y data to specified Collection
 void FitTarget::copyCalculatedY(Collection* target)
 {
-	int sliceIndex;
-	DisplayDataSet* dataSet;
 	DataSet* newDataSet;
 	const Array<double>& x = collection_->displayAbscissa();
 	for (int n=0; n<nDataSets_; ++n)
 	{
-		// Get slice index, and grab slice pointer
-		sliceIndex = displayDataSetStart_ + n;
-		dataSet = collection_->displayData()[sliceIndex];
-		if (dataSet == NULL)
-		{
-			msg.print("FitTarget::copyCalculatedY() - No valid slice for n = %i (index = %i)\n", n, sliceIndex);
-			return;
-		}
-
-		// Grab z value
 		newDataSet = target->addDataSet();
 		target->setDataSetData(newDataSet, calculatedY_[n]);
-		target->setDataSetZ(newDataSet, dataSet->z());
+		target->setDataSetZ(newDataSet, calculatedY_[n]->z());
 	}
 }

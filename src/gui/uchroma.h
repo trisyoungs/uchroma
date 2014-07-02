@@ -185,6 +185,10 @@ class UChromaWindow : public QMainWindow
 	/*
 	 * Collections
 	 */
+	private:
+	// Add collection data to CollectionTree under specified item
+	void addCollectionsToTree(Collection* collection, QTreeWidgetItem* parent);
+
 	private slots:
 	void on_CollectionTree_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
 	void on_CollectionTree_itemClicked(QTreeWidgetItem* item, int column);
@@ -251,9 +255,9 @@ class UChromaWindow : public QMainWindow
 	// Write AxisBlock keywords
 	bool writeAxisBlock(LineParser& parser, int axis);
 	// Write CollectionBlock keywords
-	bool writeCollectionBlock(LineParser& parser, Collection* collection);
+	bool writeCollectionBlock(LineParser& parser, Collection* collection, Collection::CollectionType type = Collection::MasterCollection, int indentLevel = 0);
 	// Write DataSetBlock keywords
-	bool writeDataSetBlock(LineParser& parser, DataSet* dataSet);
+	bool writeDataSetBlock(LineParser& parser, DataSet* dataSet, int indentLevel = 0);
 	// Write SettingsBlock keywords
 	bool writeSettingsBlock(LineParser& parser);
 	// Write ViewBlock keywords
@@ -310,6 +314,8 @@ class UChromaWindow : public QMainWindow
 	Collection* collections();
 	// Return nth collection in list
 	Collection* collection(int index);
+	// Find named collection
+	Collection* findCollection(QString name);
 	// Move collection focus to next in list
 	void focusNextCollection();
 	// Move collection focus to previous in list

@@ -25,6 +25,9 @@
 
 void UChromaWindow::on_CollectionTree_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous)
 {
+	// Check current item
+	if (current == NULL) return;
+
 	// Get collection from item
 	Collection* collection = VariantPointer<Collection>(current->data(0, Qt::UserRole));
 	if (!collection) return;
@@ -89,33 +92,40 @@ void UChromaWindow::on_CollectionRemoveButton_clicked(bool checked)
 	updateGUI();
 }
 
+// Add collection data to CollectionTree under specified item
+void UChromaWindow::addCollectionsToTree(Collection* collection, QTreeWidgetItem* parent)
+{
+	// Add on collection item
+	QTreeWidgetItem* item;
+	if (parent) item = new QTreeWidgetItem(parent, 0);
+	else item = new QTreeWidgetItem(ui.CollectionTree, 0);
+
+	// Set item information
+	item->setText(0, collection->title());
+	item->setData(0, Qt::UserRole, VariantPointer<Collection>(collection));
+	item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+	item->setCheckState(0, collection->visible() ? Qt::Checked : Qt::Unchecked);
+	item->setExpanded(true);
+
+	// Set icon...
+	if (collection->type() == Collection::MasterCollection) item->setIcon(0, QIcon(":/uchroma/icons/window_collections.svg"));
+	else if (collection->type() == Collection::FitCollection) item->setIcon(0, QIcon(":/uchroma/icons/collection_fit.svg"));
+	else if (collection->type() == Collection::ExtractedCollection) item->setIcon(0, QIcon(":/uchroma/icons/collection_extracted.svg"));
+
+	// If this is the current collection, select it
+	if (collection == currentCollection_) item->setSelected(true);
+
+	// Add any additional data
+	for (Collection* fit = collection->fitData(); fit != NULL; fit = fit->next) addCollectionsToTree(fit, item);
+	for (Collection* extract = collection->extractedData(); extract != NULL; extract = extract->next) addCollectionsToTree(extract, item);
+}
+
 // Refresh collection list
 void UChromaWindow::refreshCollections()
 {
 	// Clear and repopulate list
 	ui.CollectionTree->clear();
-	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
-	{
-		QTreeWidgetItem* item = new QTreeWidgetItem(ui.CollectionTree, 0);
-		item->setText(0, collection->title());
-		item->setData(0, Qt::UserRole, VariantPointer<Collection>(collection));
-		item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-		item->setCheckState(0, collection->visible() ? Qt::Checked : Qt::Unchecked);
-		item->setExpanded(true);
-
-		// If this is the current collection, select it
-		if (collection == currentCollection_) item->setSelected(true);
-
-		// Add a child item to contain fit data
-		QTreeWidgetItem* fitItem = new QTreeWidgetItem(item, 0);
-		for (Collection* fit = collection->fits(); fit != NULL; fit = fit->next)
-		{
-			fitItem->setText(0, fit->title());
-			fitItem->setData(0, Qt::UserRole, VariantPointer<Collection>(fit));
-			fitItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-			fitItem->setCheckState(0, collection->visible() ? Qt::Checked : Qt::Unchecked);
-		}
-	}
+	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next) addCollectionsToTree(collection, NULL);
 
 	// Update associated info
 	updateCollectionInfo();

@@ -105,9 +105,18 @@ void Viewer::setupGL()
 // Create/update surface primitive
 bool Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate)
 {
-	// Check for valid collection, and whether primitive needs updating
+	// Check for valid collection
 	if (!collection) return false;
-	if (collection->displayPrimitivesValid() && collection->colourScaleValid() && (!forceUpdate)) return false;
+
+	// Update additional data first
+	int nUpdated = 0;
+	// -- Fit collections
+	for (Collection* fit = collection->fitData(); fit != NULL; fit = fit->next) if (updateSurfacePrimitive(fit, forceUpdate)) ++nUpdated;
+	// -- Extracted data
+	for (Collection* extract = collection->fitData(); extract != NULL; extract = extract->next) if (updateSurfacePrimitive(extract, forceUpdate)) ++nUpdated;
+
+	// Check whether the primitive for this collection needs updating
+	if (collection->displayPrimitivesValid() && collection->colourScaleValid() && (!forceUpdate)) return (nUpdated != 0);
 
 	// Pop old primitive instances and adjust primitive settings
 	collection->displayPrimitives().popInstance(context());

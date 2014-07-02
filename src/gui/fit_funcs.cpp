@@ -350,7 +350,7 @@ void FitDialog::updateDestinationGroup()
 	if (!collection) return;
 
 	ui.DestinationCollectionCombo->clear();
-	for (Collection* c = collection->fits(); c != NULL; c = c->next)
+	for (Collection* c = collection->fitData(); c != NULL; c = c->next)
 	{
 		ui.DestinationCollectionCombo->addItem(c->title(), VariantPointer<Collection>(c));
 	}

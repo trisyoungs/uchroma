@@ -168,25 +168,35 @@ class Collection : public ListItem<Collection>
 	// Type of this collection
 	CollectionType type_;
 	// List of fits made to parent
-	List<Collection> fits_;
+	List<Collection> fitData_;
 	// List of slices extracted from parent
-	List<Collection> extractedDataSets_;
+	List<Collection> extractedData_;
 
 	public:
+	// Find collection with name specified
+	Collection* findCollection(QString name);
+	// Return next logical collection in lists
+	Collection* nextCollection(bool descend);
+	// Return previous logical collection in lists
+	Collection* previousCollection(bool descend);
 	// Set parent Collection
 	void setParent(Collection* parent);
 	// Return parent Collection
 	Collection* parent();
 	// Return type of this collection
 	CollectionType type();
-	// Add fit to Collection
-	Collection* addFit(QString title = QString());
-	// Return fits in Collection
-	Collection* fits();
-	// Add extracted slice to Collection
-	Collection* addExtractedSlice();
-	// Return extracted slices in Collection
-	Collection* extractedSlices();
+	// Add fit data to Collection
+	Collection* addFitData(QString title = QString());
+	// Remove specified fitdata from list
+	void removeFitData(Collection* collection);
+	// Return fit data in Collection
+	Collection* fitData();
+	// Add extracted data to Collection
+	Collection* addExtractedData(QString title = QString());
+	// Return extracted data in Collection
+	Collection* extractedData();
+	// Remove specified extracted data from list
+	void removeExtractedData(Collection* collection);
 
 
 	/*
@@ -301,6 +311,8 @@ class Collection : public ListItem<Collection>
 	Array<double> displayAbscissa_;
 	// Display style of data
 	DisplayStyle displayStyle_;
+	// Line width (for line styles)
+	double displayLineWidth_;
 	// Flag indicating whether display data is valid (and don't need to be regenerated)
 	bool displayDataValid_;
 	// PrimitiveList containing GL display data
@@ -321,6 +333,10 @@ class Collection : public ListItem<Collection>
 	void setDisplayStyle(DisplayStyle style);
 	// Return display style of data
 	DisplayStyle displayStyle();
+	// Set line width (for line styles)
+	void setDisplayLineWidth(double width);
+	// Return Line width (for line styles)
+	double displayLineWidth();
 	// Manually set the flag to force regeneration of surface data
 	void setDisplayDataInvalid();
 	// Flag that the primitive has been updated
@@ -331,6 +347,8 @@ class Collection : public ListItem<Collection>
 	PrimitiveList& displayPrimitives();
 	// Update display data and surface if necessary
 	void updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, Vec3<bool> axisInverted, Vec3<bool> axisLogarithmic, Vec3<double> axisStretch);
+	// Send collection data to GL, including any associated fit and extracted data
+	void sendToGL();
 };
 
 #endif

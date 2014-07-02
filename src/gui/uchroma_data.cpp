@@ -177,21 +177,51 @@ void UChromaWindow::removeCollection(Collection* collection)
 {
 	if (!collection) return;
 
-	// Set new currentCollection_
-	if (collection->next) currentCollection_ = collection->next;
-	else currentCollection_ = collection->prev;
-	if (currentCollection_ == NULL) currentCollection_ = addCollection();
+	// Check parent in order to work out where to delete the collection from
+	if (collection->parent() == NULL)
+	{
+		// Set new currentCollection_
+		if (collection->next) currentCollection_ = collection->next;
+		else currentCollection_ = collection->prev;
+		if (currentCollection_ == NULL) currentCollection_ = addCollection();
+
+		// Remove master collection
+		collections_.remove(collection);
+	}
+	else
+	{
+		// Need to check whether this is a Fit or an ExtractedData
+		if (collection->type() == Collection::FitCollection)
+		{
+			// Set new currentCollection_
+			if (collection->next) currentCollection_ = collection->next;
+			else currentCollection_ = collection->prev;
+			if (currentCollection_ == NULL) currentCollection_ = collection->parent();
+
+			// Remove master collection
+			collection->parent()->removeFitData(collection);
+		}
+		else
+		{
+			// Set new currentCollection_
+			if (collection->next) currentCollection_ = collection->next;
+			else currentCollection_ = collection->prev;
+			if (currentCollection_ == NULL) currentCollection_ = collection->parent();
+
+			// Remove master collection
+			collection->parent()->removeExtractedData(collection);
+		}
+	}
 
 	setAsModified();
-
-	// Finally, remove old collection
-	collections_.remove(collection);
 }
 
 // Move collection focus to next in list
 void UChromaWindow::focusNextCollection()
 {
-	currentCollection_ = currentCollection_->next;
+	currentCollection_ = currentCollection_->nextCollection(true);
+
+	// Safety check...
 	if (currentCollection_ == NULL) currentCollection_ = collections_.first();
 
 	updateGUI();
@@ -200,7 +230,9 @@ void UChromaWindow::focusNextCollection()
 // Move collection focus to previous in list
 void UChromaWindow::focusPreviousCollection()
 {
-	currentCollection_ = currentCollection_->prev;
+	currentCollection_ = currentCollection_->previousCollection(true);
+
+	// Safety check...
 	if (currentCollection_ == NULL) currentCollection_ = collections_.last();
 
 	updateGUI();
@@ -210,6 +242,17 @@ void UChromaWindow::focusPreviousCollection()
 Collection* UChromaWindow::collection(int index)
 {
 	return collections_[index];
+}
+
+// Find named collection
+Collection* UChromaWindow::findCollection(QString name)
+{
+	// Loop over main collections
+	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
+	{
+		if (collection->findCollection(name)) return collection;
+	}
+	return NULL;
 }
 
 // Return first collection in list

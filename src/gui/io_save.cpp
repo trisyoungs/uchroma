@@ -56,81 +56,100 @@ bool UChromaWindow::writeAxisBlock(LineParser& parser, int axis)
 	parser.writeLineF("  %s %s\n", Keywords::axisKeyword(Keywords::VisibleAxisKeyword), stringBool(axisVisible_[axis]));
 	parser.writeLineF("  %s %f\n", Keywords::axisKeyword(Keywords::StretchKeyword), axisStretch_[axis]);
 	parser.writeLineF("%s\n", Keywords::axisKeyword(Keywords::EndAxisKeyword));
+
+	return true;
 }
 
 // Write CollectionBlock keywords
-bool UChromaWindow::writeCollectionBlock(LineParser& parser, Collection* collection)
+bool UChromaWindow::writeCollectionBlock(LineParser& parser, Collection* collection, Collection::CollectionType type, int indentLevel)
 {
-	parser.writeLineF("%s '%s'\n", Keywords::inputBlock(Keywords::CollectionBlock), qPrintable(collection->title()));
-	if (collection->type() != Collection::MasterCollection)
-	{
-		if (collection->parent() == NULL) printf("Internal Error: A sub-collection ('%s') has a NULL parent.\n", qPrintable(collection->title()));
-		else parser.writeLineF("  %s '%s'\n", Keywords::collectionKeyword(Keywords::ParentKeyword), qPrintable(collection->parent()->title()));
-	}
-	parser.writeLineF("  %s \"%s\"\n", Keywords::collectionKeyword(Keywords::DataDirectoryKeyword), qPrintable(collection->dataFileDirectory().absolutePath()));
+	// Construct indent string
+	char* indent = new char[indentLevel*2+1];
+	for (int n=0; n<indentLevel*2; ++n) indent[n] = ' ';
+	indent[indentLevel*2] = '\0';
+
+	if (type == Collection::MasterCollection) parser.writeLineF("%s%s '%s'\n", indent, Keywords::inputBlock(Keywords::CollectionBlock), qPrintable(collection->title()));
+	else if (type == Collection::FitCollection) parser.writeLineF("%s%s '%s'\n", indent, Keywords::collectionKeyword(Keywords::FitBlockKeyword), qPrintable(collection->title()));
+	else if (type == Collection::ExtractedCollection) parser.writeLineF("%s%s '%s'\n", indent, Keywords::collectionKeyword(Keywords::ExtractedDataBlockKeyword), qPrintable(collection->title()));
+	parser.writeLineF("%s  %s \"%s\"\n", indent, Keywords::collectionKeyword(Keywords::DataDirectoryKeyword), qPrintable(collection->dataFileDirectory().absolutePath()));
 
 	// -- Transforms
-	parser.writeLineF("  %s %s %s\n", Keywords::collectionKeyword(Keywords::TransformXKeyword), stringBool(collection->transformEnabled(0)), qPrintable(collection->transformEquation(0)));
-	parser.writeLineF("  %s %s %s\n", Keywords::collectionKeyword(Keywords::TransformYKeyword), stringBool(collection->transformEnabled(1)), qPrintable(collection->transformEquation(1)));
-	parser.writeLineF("  %s %s %s\n", Keywords::collectionKeyword(Keywords::TransformZKeyword), stringBool(collection->transformEnabled(2)), qPrintable(collection->transformEquation(2)));
+	parser.writeLineF("%s  %s %s %s\n", indent, Keywords::collectionKeyword(Keywords::TransformXKeyword), stringBool(collection->transformEnabled(0)), qPrintable(collection->transformEquation(0)));
+	parser.writeLineF("%s  %s %s %s\n", indent, Keywords::collectionKeyword(Keywords::TransformYKeyword), stringBool(collection->transformEnabled(1)), qPrintable(collection->transformEquation(1)));
+	parser.writeLineF("%s  %s %s %s\n", indent, Keywords::collectionKeyword(Keywords::TransformZKeyword), stringBool(collection->transformEnabled(2)), qPrintable(collection->transformEquation(2)));
 
 	// -- Interpolation
-	parser.writeLineF("  %s %s %s\n", Keywords::collectionKeyword(Keywords::InterpolateKeyword), stringBool(collection->interpolate(0)), stringBool(collection->interpolate(2)));
-	parser.writeLineF("  %s %s %s\n", Keywords::collectionKeyword(Keywords::InterpolateConstrainKeyword), stringBool(collection->interpolateConstrained(0)), stringBool(collection->interpolateConstrained(2)));
-	parser.writeLineF("  %s %f %f\n", Keywords::collectionKeyword(Keywords::InterpolateStepKeyword), collection->interpolationStep(0), collection->interpolationStep(2));
+	parser.writeLineF("%s  %s %s %s\n", indent, Keywords::collectionKeyword(Keywords::InterpolateKeyword), stringBool(collection->interpolate(0)), stringBool(collection->interpolate(2)));
+	parser.writeLineF("%s  %s %s %s\n", indent, Keywords::collectionKeyword(Keywords::InterpolateConstrainKeyword), stringBool(collection->interpolateConstrained(0)), stringBool(collection->interpolateConstrained(2)));
+	parser.writeLineF("%s  %s %f %f\n", indent, Keywords::collectionKeyword(Keywords::InterpolateStepKeyword), collection->interpolationStep(0), collection->interpolationStep(2));
 
 	// Colour Setup
-	parser.writeLineF("  %s %i\n", Keywords::collectionKeyword(Keywords::ColourSourceKeyword), collection->colourSource());
+	parser.writeLineF("%s  %s %i\n", indent, Keywords::collectionKeyword(Keywords::ColourSourceKeyword), collection->colourSource());
 	ColourScalePoint* csp;
 	QColor colour;
 	double value;
 	// -- Single Colour
 	colour = collection->colourScalePointColour(Collection::SingleColourSource);
-	parser.writeLineF("  %s %i %i %i %i\n", Keywords::collectionKeyword(Keywords::ColourSingleKeyword), colour.red(), colour.green(), colour.blue(), colour.alpha());
+	parser.writeLineF("%s  %s %i %i %i %i\n", indent, Keywords::collectionKeyword(Keywords::ColourSingleKeyword), colour.red(), colour.green(), colour.blue(), colour.alpha());
 	// -- RGB Gradient
 	colour = collection->colourScalePointColour(Collection::RGBGradientSource, 0);
 	value = collection->colourScalePointValue(Collection::RGBGradientSource, 0);
-	parser.writeLineF("  %s %f %i %i %i %i\n", Keywords::collectionKeyword(Keywords::ColourRGBGradientAKeyword), value, colour.red(), colour.green(), colour.blue(), colour.alpha());
+	parser.writeLineF("%s  %s %f %i %i %i %i\n", indent, Keywords::collectionKeyword(Keywords::ColourRGBGradientAKeyword), value, colour.red(), colour.green(), colour.blue(), colour.alpha());
 	colour = collection->colourScalePointColour(Collection::RGBGradientSource, 1);
 	value = collection->colourScalePointValue(Collection::RGBGradientSource, 1);
-	parser.writeLineF("  %s %f %i %i %i %i\n", Keywords::collectionKeyword(Keywords::ColourRGBGradientBKeyword), value, colour.red(), colour.green(), colour.blue(), colour.alpha());
+	parser.writeLineF("%s  %s %f %i %i %i %i\n", indent, Keywords::collectionKeyword(Keywords::ColourRGBGradientBKeyword), value, colour.red(), colour.green(), colour.blue(), colour.alpha());
 	// -- HSV Gradient
 	colour = collection->colourScalePointColour(Collection::HSVGradientSource, 0);
 	value = collection->colourScalePointValue(Collection::HSVGradientSource, 0);
-	parser.writeLineF("  %s %f %i %i %i %i\n", Keywords::collectionKeyword(Keywords::ColourHSVGradientAKeyword), value, colour.hue(), colour.saturation(), colour.value(), colour.alpha());
+	parser.writeLineF("%s  %s %f %i %i %i %i\n", indent, Keywords::collectionKeyword(Keywords::ColourHSVGradientAKeyword), value, colour.hue(), colour.saturation(), colour.value(), colour.alpha());
 	colour = collection->colourScalePointColour(Collection::HSVGradientSource, 1);
 	value = collection->colourScalePointValue(Collection::HSVGradientSource, 1);
-	parser.writeLineF("  %s %f %i %i %i %i\n", Keywords::collectionKeyword(Keywords::ColourHSVGradientBKeyword), value, colour.hue(), colour.saturation(), colour.value(), colour.alpha());
+	parser.writeLineF("%s  %s %f %i %i %i %i\n", indent, Keywords::collectionKeyword(Keywords::ColourHSVGradientBKeyword), value, colour.hue(), colour.saturation(), colour.value(), colour.alpha());
 	// -- Custom Gradient
 	for (csp = collection->customColourScalePoints(); csp != NULL; csp = csp->next)
 	{
-		parser.writeLineF("  %s %f %i %i %i %i\n", Keywords::collectionKeyword(Keywords::ColourCustomGradientKeyword), csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
+		parser.writeLineF("%s  %s %f %i %i %i %i\n", indent, Keywords::collectionKeyword(Keywords::ColourCustomGradientKeyword), csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
 	}
 	// -- Alpha control
-	parser.writeLineF("  %s %i\n", Keywords::collectionKeyword(Keywords::ColourAlphaControlKeyword), collection->alphaControl());
-	parser.writeLineF("  %s %f\n", Keywords::collectionKeyword(Keywords::ColourAlphaFixedKeyword), collection->fixedAlpha());
+	parser.writeLineF("%s  %s %i\n", indent, Keywords::collectionKeyword(Keywords::ColourAlphaControlKeyword), collection->alphaControl());
+	parser.writeLineF("%s  %s %f\n", indent, Keywords::collectionKeyword(Keywords::ColourAlphaFixedKeyword), collection->fixedAlpha());
 
 	// Display
-	parser.writeLineF("  %s %s\n", Keywords::collectionKeyword(Keywords::StyleKeyword), Collection::displayStyle(collection->displayStyle()));
-	parser.writeLineF("  %s %s\n", Keywords::collectionKeyword(Keywords::VisibleCollectionKeyword), stringBool(collection->visible()));
+	parser.writeLineF("%s  %s %s\n", indent, Keywords::collectionKeyword(Keywords::StyleKeyword), Collection::displayStyle(collection->displayStyle()));
+	parser.writeLineF("%s  %s %s\n", indent, Keywords::collectionKeyword(Keywords::VisibleCollectionKeyword), stringBool(collection->visible()));
 
 	// Loop over datasets
-	for (DataSet* dataSet = collection->dataSets(); dataSet != NULL; dataSet = dataSet->next) writeDataSetBlock(parser, dataSet);
+	for (DataSet* dataSet = collection->dataSets(); dataSet != NULL; dataSet = dataSet->next) writeDataSetBlock(parser, dataSet, indentLevel);
 
-	parser.writeLineF("%s\n", Keywords::collectionKeyword(Keywords::EndCollectionKeyword));
+	// Additional data
+	// -- Fits
+	for (Collection* fit = collection->fitData(); fit != NULL; fit = fit->next) writeCollectionBlock(parser, fit, Collection::FitCollection, indentLevel+1);
+	// -- Extracted Data
+	for (Collection* extract = collection->extractedData(); extract != NULL; extract = extract->next) writeCollectionBlock(parser, extract, Collection::ExtractedCollection, indentLevel+1);
+
+	parser.writeLineF("%s%s\n", indent, Keywords::collectionKeyword(Keywords::EndCollectionKeyword));
+
+	return true;
 }
 
 // Write DataSetBlock keywords
-bool UChromaWindow::writeDataSetBlock(LineParser& parser, DataSet* dataSet)
+bool UChromaWindow::writeDataSetBlock(LineParser& parser, DataSet* dataSet, int indentLevel)
 {
-	parser.writeLineF("  %s '%s'\n", Keywords::collectionKeyword(Keywords::DataSetDefinitionKeyword), qPrintable(dataSet->title()));
-	if (dataSet->dataSource() == DataSet::FileSource) parser.writeLineF("    %s  %s  '%s'\n", Keywords::dataSetKeyword(Keywords::SourceKeyword), DataSet::dataSource(dataSet->dataSource()), qPrintable(dataSet->sourceFileName()));
-	else parser.writeLineF("    %s  %s\n", Keywords::dataSetKeyword(Keywords::SourceKeyword), DataSet::dataSource(dataSet->dataSource()));
-	parser.writeLineF("    %s  %f\n", Keywords::dataSetKeyword(Keywords::ZKeyword), dataSet->data().z());
-	parser.writeLineF("    %s\n", Keywords::dataSetKeyword(Keywords::DataKeyword));
-	for (int n=0; n< dataSet->data().nPoints(); ++n) parser.writeLineF("      %f  %f\n", dataSet->data().x(n), dataSet->data().y(n));
-	parser.writeLineF("    End%s\n", Keywords::dataSetKeyword(Keywords::DataKeyword));
-	parser.writeLineF("  %s\n", Keywords::dataSetKeyword(Keywords::EndDataSetKeyword));
+	// Construct indent string
+	char* indent = new char[indentLevel*2+1];
+	for (int n=0; n<indentLevel*2; ++n) indent[n] = ' ';
+	indent[indentLevel*2] = '\0';
+
+	parser.writeLineF("%s  %s '%s'\n", indent, Keywords::collectionKeyword(Keywords::DataSetDefinitionKeyword), qPrintable(dataSet->title()));
+	if (dataSet->dataSource() == DataSet::FileSource) parser.writeLineF("%s    %s  %s  '%s'\n", indent, Keywords::dataSetKeyword(Keywords::SourceKeyword), DataSet::dataSource(dataSet->dataSource()), qPrintable(dataSet->sourceFileName()));
+	else parser.writeLineF("%s    %s  %s\n", indent, Keywords::dataSetKeyword(Keywords::SourceKeyword), DataSet::dataSource(dataSet->dataSource()));
+	parser.writeLineF("%s    %s  %f\n", indent, Keywords::dataSetKeyword(Keywords::ZKeyword), dataSet->data().z());
+	parser.writeLineF("%s    %s\n", indent, Keywords::dataSetKeyword(Keywords::DataKeyword));
+	for (int n=0; n< dataSet->data().nPoints(); ++n) parser.writeLineF("%s      %f  %f\n", indent, dataSet->data().x(n), dataSet->data().y(n));
+	parser.writeLineF("%s    End%s\n", indent, Keywords::dataSetKeyword(Keywords::DataKeyword));
+	parser.writeLineF("%s  %s\n", indent, Keywords::dataSetKeyword(Keywords::EndDataSetKeyword));
+
+	return true;
 }
 
 // Write SettingsBlock keywords
@@ -139,6 +158,8 @@ bool UChromaWindow::writeSettingsBlock(LineParser& parser)
 	parser.writeLineF("%s\n", Keywords::inputBlock(Keywords::SettingsBlock));
 	parser.writeLineF("  %s \"%s\" %i %i %s %i\n", Keywords::settingsKeyword(Keywords::ImageExportKeyword), qPrintable(imageExportFile_), imageExportWidth_, imageExportHeight_, Viewer::imageFormatExtension(imageExportFormat_), imageExportMaintainAspect_);
 	parser.writeLineF("%s\n", Keywords::settingsKeyword(Keywords::EndSettingsKeyword));
+
+	return true;
 }
 
 // Write ViewBlock keywords
@@ -157,6 +178,8 @@ bool UChromaWindow::writeViewBlock(LineParser& parser)
 	parser.writeLineF("  %s %f %f %f %f\n", Keywords::viewKeyword(Keywords::MatrixWKeyword), mat[12], mat[13], mat[14], mat[15]);
 	if (ui.actionViewPerspective->isChecked()) parser.writeLineF("  %s\n", Keywords::viewKeyword(Keywords::PerspectiveKeyword));
 	parser.writeLineF("%s\n", Keywords::viewKeyword(Keywords::EndViewKeyword));
+
+	return true;
 }
 
 // Save current data to file specified
@@ -180,18 +203,7 @@ bool UChromaWindow::saveInputFile(QString fileName)
 	writeViewBlock(parser);
 
 	// Write Collection Data
-	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
-	{
-		// Write main collection block
-		writeCollectionBlock(parser, collection);
-
-		// Loop over fit data
-		for (Collection* fit = collection->fits(); fit != NULL; fit = fit->next)
-		{
-			parser.writeLine("");
-			writeCollectionBlock(parser, fit);
-		}
-	}
+	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next) writeCollectionBlock(parser, collection);
 
 	parser.closeFiles();
 	return true;

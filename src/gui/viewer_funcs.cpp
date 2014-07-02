@@ -153,17 +153,7 @@ void Viewer::initializeGL()
 	for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->pushInstance(context());
 
 	// Recreate surface primitives (so that images are saved correctly)
-	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next)
-	{
-		// Main collection primitive
-		updateSurfacePrimitive(collection, true);
-
-		// Fit collections
-		for (Collection* fit = collection->fits(); fit != NULL; fit = fit->next) updateSurfacePrimitive(fit, true);
-
-		// Extracted data
-		for (Collection* extract = collection->fits(); extract != NULL; extract = extract->next) updateSurfacePrimitive(extract, true);
-	}
+	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) updateSurfacePrimitive(collection, true);
 
 	// Set viewport matrix
 	viewportMatrix_[0] = 0;
@@ -195,18 +185,7 @@ void Viewer::paintGL()
 	uChroma_->updateAxesPrimitives();
 	uChroma_->updateDisplayData();
 	int nUpdated = 0;
-	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next)
-	{
-		// Main data
-		if (updateSurfacePrimitive(collection)) ++nUpdated;
-
-		// Fit collections
-		for (Collection* fit = collection->fits(); fit != NULL; fit = fit->next) if (updateSurfacePrimitive(fit, true)) ++nUpdated;
-
-		// Extracted data
-		for (Collection* extract = collection->fits(); extract != NULL; extract = extract->next) if (updateSurfacePrimitive(extract, true)) ++nUpdated;
-
-	}
+	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) if (updateSurfacePrimitive(collection)) ++nUpdated;
 	if (nUpdated > 0) emit(surfacePrimitivesUpdated());
 
 	// Setup basic GL stuff
@@ -313,28 +292,9 @@ void Viewer::paintGL()
 		glBeginQuery(GL_TIME_ELAPSED, timeQuery);
 	}
 
-	// Loop over collections
-	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next)
-	{
-		// If this collection is not visible, move on...
-		if (!collection->visible()) continue;
+	// Loop over master collections - the Collection::sendToGL routine will take care of any additional data collections
+	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) collection->sendToGL();
 
-		if (collection->displayStyle() == Collection::SurfaceStyle)
-		{
-			glEnable(GL_LIGHTING);
-			glDisable(GL_LINE_SMOOTH);
-		}
-		else
-		{
-			glEnable(GL_LINE_SMOOTH);
-			glLineWidth(lineWidth_);
-			glDisable(GL_LIGHTING);
-		}
-
-		// Send Primitives to display
-		collection->displayPrimitives().sendToGL();
-	}
-	
 	glDisable(GL_MULTISAMPLE);
 	glDisable(GL_CLIP_PLANE0);
 	glDisable(GL_CLIP_PLANE1);

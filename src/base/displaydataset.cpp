@@ -47,7 +47,7 @@ void DisplayDataSet::addDummy()
 }
 
 // Return y array
-const Array< double >& DisplayDataSet::y() const
+const Array<double>& DisplayDataSet::y() const
 {
 	return y_;
 }

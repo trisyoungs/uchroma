@@ -163,7 +163,9 @@ void Collection::addDataSet(DataSet* source)
 	DataSet* dataSet = dataSets_.add();
 	(*dataSet) = (*source);
 
+	dataChanged_ = true;
 	displayDataValid_ = false;
+	displayPrimitivesValid_ = false;
 }
 
 // Return number of datasets
@@ -458,6 +460,76 @@ double Collection::interpolationStep(int axis)
  * Associated Data
  */
 
+// Find collection with name specified
+Collection* Collection::findCollection(QString name)
+{
+	// Does the name of this collection match?
+	if (title_ == name) return this;
+
+	// Check fit data
+	for (Collection* fit = fitData_.first(); fit != NULL; fit = fit->next)
+	{
+		Collection* result = fit->findCollection(name);
+		if (result) return result;
+	}
+
+	// Check extracted data
+	for (Collection* extract = extractedData_.first(); extract != NULL; extract = extract->next)
+	{
+		Collection* result = extract->findCollection(name);
+		if (result) return result;
+	}
+
+	// No match here, so return NULL
+	return NULL;
+}
+
+// Return next logical collection in lists
+Collection* Collection::nextCollection(bool descend)
+{
+	// If the current collection contains additional data, return that
+	if (descend && fitData_.first()) return fitData_.first();
+	else if (descend && extractedData_.first()) return extractedData_.first();
+
+	// If there is a next item in the current collection's list (whatever it is) move on to that
+	if (next) return next;
+
+	// No additional data, and we are at the end of the current list, so check parent
+	if (type_ == Collection::MasterCollection) return NULL;
+	else if (type_ == Collection::FitCollection)
+	{
+		// No more fitData - check extracted data in parent. If nothing there, then we must ascend to the next item in the parent's list
+		if (parent_->extractedData_.nItems() != 0) return parent_->extractedData();
+		else return parent_->nextCollection(false);
+	}
+	else if (type_ == Collection::ExtractedCollection) return parent_->nextCollection(false);
+
+	return NULL;
+}
+
+// Return previous logical collection in lists
+Collection* Collection::previousCollection(bool descend)
+{
+	// If the current collection contains additional data, return that
+	if (descend && extractedData_.last()) return extractedData_.last();
+	else if (descend && fitData_.last()) return fitData_.last();
+
+	// If there is a previous item in the current collection's list (whatever it is) move on to that
+	if (prev) return prev;
+
+	// No additional data, and we are at the beginning of the current list, so check parent
+	if (type_ == Collection::MasterCollection) return NULL;
+	else if (type_ == Collection::ExtractedCollection)
+	{
+		// No more extractedData - check fit data in parent. If nothing there, then we must ascend to the previous item in the parent's list
+		if (parent_->fitData_.nItems() != 0) return parent_->fitData();
+		else return parent_->previousCollection(true);
+	}
+	else if (type_ == Collection::FitCollection) return parent_->previousCollection(true);
+
+	return NULL;
+}
+
 // Set parent Collection
 void Collection::setParent(Collection* parent)
 {
@@ -476,10 +548,10 @@ Collection::CollectionType Collection::type()
 	return type_;
 }
 
-// Add fit to Collection
-Collection* Collection::addFit(QString title)
+// Add fit data to Collection
+Collection* Collection::addFitData(QString title)
 {
-	Collection* newFit = fits_.add();
+	Collection* newFit = fitData_.add();
 	newFit->setTitle(title);
 	newFit->type_ = Collection::FitCollection;
 	newFit->setParent(this);
@@ -490,22 +562,42 @@ Collection* Collection::addFit(QString title)
 	return newFit;
 }
 
-// Return fits in Collection
-Collection* Collection::fits()
+// Remove specified fit data from list
+void Collection::removeFitData(Collection* collection)
 {
-	return fits_.first();
+	fitData_.remove(collection);
 }
 
-// Add extracted slice to Collection
-Collection* Collection::addExtractedSlice()
+// Return fit data in Collection
+Collection* Collection::fitData()
 {
-	return extractedDataSets_.add();
+	return fitData_.first();
 }
 
-// Return extracted slices in Collection
-Collection* Collection::extractedSlices()
+// Add extracted data to Collection
+Collection* Collection::addExtractedData(QString title)
 {
-	return extractedDataSets_.first();
+	Collection* newExtract = extractedData_.add();
+	newExtract->setTitle(title);
+	newExtract->type_ = Collection::ExtractedCollection;
+	newExtract->setParent(this);
+
+	// Set link to MainView's primitive reflist (copy pointer set in parent collection)
+	newExtract->displayPrimitives_.setViewer(displayPrimitives_.viewer());
+
+	return newExtract;
+}
+
+// Remove specified extracted data from list
+void Collection::removeExtractedData(Collection* collection)
+{
+	extractedData_.remove(collection);
+}
+
+// Return extracted data in Collection
+Collection* Collection::extractedData()
+{
+	return extractedData_.first();
 }
 
 /*
@@ -861,9 +953,27 @@ Collection::DisplayStyle Collection::displayStyle()
 	return displayStyle_;
 }
 
+// Set line width (for line styles)
+void Collection::setDisplayLineWidth(double width)
+{
+	displayLineWidth_ = width;
+}
+
+// Return Line width (for line styles)
+double Collection::displayLineWidth()
+{
+	return displayLineWidth_;
+}
+
 // Manually set the flag to force regeneration of surface data
 void Collection::setDisplayDataInvalid()
 {
+	// Update subcollections first
+	// -- Fit data
+	for (Collection* fit = fitData_.first(); fit != NULL; fit = fit->next) fit->setDisplayDataInvalid();
+	// -- Extracted data
+	for (Collection* extract = extractedData_.first(); extract != NULL; extract = extract->next) extract->setDisplayDataInvalid();
+
 	displayDataValid_ = false;
 }
 
@@ -888,6 +998,12 @@ PrimitiveList& Collection::displayPrimitives()
 // Update surface data if necessary
 void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, Vec3<bool> axisInverted, Vec3<bool> axisLogarithmic, Vec3<double> axisStretch)
 {
+	// Update subcollections first
+	// -- Fit data
+	for (Collection* fit = fitData_.first(); fit != NULL; fit = fit->next) fit->updateDisplayData(axisMin, axisMax, axisInverted, axisLogarithmic, axisStretch);
+	// -- Extracted data
+	for (Collection* extract = extractedData_.first(); extract != NULL; extract = extract->next) extract->updateDisplayData(axisMin, axisMax, axisInverted, axisLogarithmic, axisStretch);
+
 	// Is surface reconstruction necessary?
 	if (displayDataValid_) return;
 
@@ -1066,4 +1182,32 @@ void Collection::updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, V
 	// Data has been updated - surface primitive will need to be reconstructed
 	displayPrimitivesValid_ = false;
 	displayDataValid_ = true;
+}
+
+// Send collection data to GL, including any associated fit and extracted data
+void Collection::sendToGL()
+{
+	// Associated data first
+	// -- Fit data
+	for (Collection* fit = fitData_.first(); fit != NULL; fit = fit->next) fit->sendToGL();
+	// -- Extracted data
+	for (Collection* extract = extractedData_.first(); extract != NULL; extract = extract->next) extract->sendToGL();
+
+	// If this collection is not visible return now
+	if (!visible_) return;
+
+	if (displayStyle_ == Collection::SurfaceStyle)
+	{
+		glEnable(GL_LIGHTING);
+		glDisable(GL_LINE_SMOOTH);
+	}
+	else
+	{
+		glEnable(GL_LINE_SMOOTH);
+		glLineWidth(displayLineWidth_);
+		glDisable(GL_LIGHTING);
+	}
+
+	// Send Primitives to display
+	displayPrimitives_.sendToGL();
 }

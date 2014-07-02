@@ -188,7 +188,7 @@ bool FitDialog::doFitting()
 	// Set up destination collection
 	if (ui.DestinationNewCollectionRadio->isChecked())
 	{
-		destinationCollection_ = collection->addFit(ui.EquationEdit->text());
+		destinationCollection_ = collection->addFitData(ui.EquationEdit->text());
 	}
 	else
 	{
