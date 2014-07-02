@@ -511,8 +511,9 @@ Collection* Collection::nextCollection(bool descend)
 Collection* Collection::previousCollection(bool descend)
 {
 	// If the current collection contains additional data, return that
-	if (descend && extractedData_.last()) return extractedData_.last();
-	else if (descend && fitData_.last()) return fitData_.last();
+	if (descend && extractedData_.last()) return extractedData_.last()->previousCollection(true);
+	else if (descend && fitData_.last()) return fitData_.last()->previousCollection(true);
+	else if (descend) return this;
 
 	// If there is a previous item in the current collection's list (whatever it is) move on to that
 	if (prev) return prev;
@@ -522,10 +523,10 @@ Collection* Collection::previousCollection(bool descend)
 	else if (type_ == Collection::ExtractedCollection)
 	{
 		// No more extractedData - check fit data in parent. If nothing there, then we must ascend to the previous item in the parent's list
-		if (parent_->fitData_.nItems() != 0) return parent_->fitData();
+		if (parent_->fitData_.nItems() != 0) return parent_->fitData_.last()->previousCollection(true);
 		else return parent_->previousCollection(true);
 	}
-	else if (type_ == Collection::FitCollection) return parent_->previousCollection(true);
+	else if (type_ == Collection::FitCollection) return parent_;
 
 	return NULL;
 }

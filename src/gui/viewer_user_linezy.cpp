@@ -47,10 +47,10 @@ void Viewer::constructLineZYSurface(PrimitiveList& primitives, const Array<doubl
 	{
 		// Get initial vertex
 		dataSet = displayData.first();
-		if (dataSet->yType().value(0) != DisplayDataSet::NoPoint)
+		if (dataSet->yType().value(n) != DisplayDataSet::NoPoint)
 		{
-			colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, dataSet->y().value(0)) : dataSet->y().value(0)) / yAxisScale, colour);
-			vertexA = currentPrimitive->defineVertex(abscissa.value(n), dataSet->y().value(0), dataSet->z(), nrm, colour);
+			colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, dataSet->y().value(n)) : dataSet->y().value(n)) / yAxisScale, colour);
+			vertexA = currentPrimitive->defineVertex(abscissa.value(n), dataSet->y().value(n), dataSet->z(), nrm, colour);
 		}
 		else vertexA = -1;
 

@@ -27,7 +27,7 @@
 #include "gui/ui_fit.h"
 #include "base/dnchar.h"
 #include "base/slice.h"
-#include "base/equation.h"
+#include "base/equationvariable.h"
 #include "parser/tree.h"
 #include "templates/array.h"
 #include "templates/list.h"
@@ -169,6 +169,8 @@ class FitDialog : public QDialog
 	FitTarget* currentFitTarget_;
 	// List of variables targetted in fit process
 	RefList<EquationVariable,bool> fitVariables_;
+	// Source collection for fitting
+	Collection* sourceCollection_;
 	// Destination collection for fitted data
 	Collection* destinationCollection_;
 
@@ -185,6 +187,10 @@ class FitDialog : public QDialog
 	double rmsError(Array<double>& alpha);
 	// Perform fitting with current settings
 	bool doFitting();
+
+	public:
+	// Set source collection
+	void setSourceCollection(Collection* collection);
 
 
 	/*
@@ -228,8 +234,6 @@ class FitDialog : public QDialog
 	 * Source Group
 	 */
 	private:
-	// Update source list
-	void updateSourceList();
 	// Update source data
 	void updateSourceData(bool setInitialValues = false);
 

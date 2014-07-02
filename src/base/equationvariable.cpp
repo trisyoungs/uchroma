@@ -1,6 +1,6 @@
 /*
-	*** Equation Functions
-	*** src/base/equation.cpp
+	*** EquationVariable
+	*** src/base/equationvariable.cpp
 	Copyright T. Youngs 2012-2014
 
 	This file is part of uChroma.
@@ -19,13 +19,9 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/equation.h"
+#include "base/equationvariable.h"
 #include "base/messenger.h"
 #include <parser/variable.h>
-
-/*
- * Equation Variable
- */
 
 // Constructor
 EquationVariable::EquationVariable() : ListItem<EquationVariable>()

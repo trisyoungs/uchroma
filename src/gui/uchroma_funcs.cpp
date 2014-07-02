@@ -66,6 +66,9 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	// Connect signals / slots between SliceMonitor and main UI
 	connect(this, SIGNAL(sliceDataChanged()), sliceMonitorWindow_.ui.MonitorGraph, SLOT(staticDataChanged()));
 
+	// Connect CollectionTree context menu signal
+	connect(ui.CollectionTree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(collectionTreeContextMenuRequested(QPoint)));
+
 	// Connect sub-window closed signal to toggle buttons / menu items in uChroma's main window
 	connect(&axesWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsAxes, SLOT(setChecked(bool)));
 	connect(&dataWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsData, SLOT(setChecked(bool)));
@@ -130,6 +133,7 @@ void UChromaWindow::updateSubWindows()
 
 	axesWindow_.updateControls();
 	dataWindow_.updateControls();
+	fitDialog_.setSourceCollection(currentCollection_);
 	slicesWindow_.updateControls();
 	sliceMonitorWindow_.updateControls();
 	styleWindow_.updateControls();

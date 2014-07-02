@@ -141,15 +141,20 @@ bool FitDialog::doFitting()
 		return false;
 	}
 
-	// Grab source collection, and construct a list of data to fit, obeying all defined data limits
+	// Check source collection
+	if (!sourceCollection_)
+	{
+		printMessage("Internal Error: No sourceCollection_ pointer set.\n");
+		return false;
+	}
+	
+	// Construct a list of data to fit, obeying all defined data limits
 	fitTargets_.clear();
 	currentFitTarget_ = NULL;
-	Collection* collection = uChroma_->collection(ui.SourceCollectionCombo->currentIndex());
-	if (!collection) return false;
 
 	// Determine X bin range
 	double xMin = ui.SourceXMinSpin->value(), xMax = ui.SourceXMaxSpin->value();
-	const Array<double>& abscissa = collection->displayAbscissa();
+	const Array<double>& abscissa = sourceCollection_->displayAbscissa();
 	int firstPoint, lastPoint;
 	for (firstPoint = 0; firstPoint < abscissa.nItems(); ++firstPoint) if (abscissa.value(firstPoint) >= xMin) break;
 	for (lastPoint = abscissa.nItems()-1; lastPoint >= 0; --lastPoint) if (abscissa.value(lastPoint) <= xMax) break;
@@ -168,9 +173,9 @@ bool FitDialog::doFitting()
 		if (ui.OptionsGlobalFitCheck->isChecked())
 		{
 			FitTarget* target = fitTargets_.add();
-			target->set(collection, firstSlice, lastSlice, firstPoint, lastPoint);
+			target->set(sourceCollection_, firstSlice, lastSlice, firstPoint, lastPoint);
 		}
-		else for (int n=firstSlice; n<=lastSlice; ++n) fitTargets_.add()->set(collection, n, n, firstPoint, lastPoint);
+		else for (int n=firstSlice; n<=lastSlice; ++n) fitTargets_.add()->set(sourceCollection_, n, n, firstPoint, lastPoint);
 	}
 	else if (ui.SourceZYSlicesRadio->isChecked())
 	{
@@ -180,15 +185,15 @@ bool FitDialog::doFitting()
 		if (ui.OptionsGlobalFitCheck->isChecked())
 		{
 			FitTarget* target = fitTargets_.add();
-			target->set(collection, firstSlice, lastSlice, firstPoint, lastPoint);
+			target->set(sourceCollection_, firstSlice, lastSlice, firstPoint, lastPoint);
 		}
-		else for (int n=firstPoint; n<=lastPoint; ++n) fitTargets_.add()->set(collection, firstSlice, lastSlice, n, n);
+		else for (int n=firstPoint; n<=lastPoint; ++n) fitTargets_.add()->set(sourceCollection_, firstSlice, lastSlice, n, n);
 	}
 
 	// Set up destination collection
 	if (ui.DestinationNewCollectionRadio->isChecked())
 	{
-		destinationCollection_ = collection->addFitData(ui.EquationEdit->text());
+		destinationCollection_ = sourceCollection_->addFitData(ui.EquationEdit->text());
 	}
 	else
 	{
@@ -216,6 +221,16 @@ bool FitDialog::doFitting()
 	}
 
 	return result;
+}
+
+// Set source collection
+void FitDialog::setSourceCollection(Collection* collection)
+{
+	if (sourceCollection_ == collection) return;
+
+	sourceCollection_ = collection;
+	
+	updateSourceData(true);
 }
 
 /*

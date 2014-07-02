@@ -19,8 +19,8 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_EQUATION_H
-#define UCHROMA_EQUATION_H
+#ifndef UCHROMA_EQUATIONVARIABLE_H
+#define UCHROMA_EQUATIONVARIABLE_H
 
 #include <QtCore/QString>
 #include "templates/list.h"
@@ -93,60 +93,4 @@ class EquationVariable : public ListItem<EquationVariable>
 	bool used();
 };
 
-// Equation
-class Equation : public ListItem<Equation>
-{
-	public:
-	// Constructor / Destructor
-	Equation();
-	~Equation();
-
-
-	/*
-	 * Equation Definition
-	 */
-	private:
-	// Name of equation
-	QString name_;
-	// Description of equation
-	QString description_;
-	// Source Filename
-	QString fileName_;
-	// Equation text
-	QString equationText_;
-	// List of variable used in eq, and starting values
-	List<EquationVariable> variables_;
-
-	public:
-	// Set name of equation
-	void setName(QString name);
-	// Return name of equation
-	QString name();
-	// Set description of equation
-	void setDescription(QString description);
-	// Return description of equation
-	QString description();
-	// Set filename of equation
-	void setFileName(QString fileName);
-	// Return filename of equation
-	QString fileName();
-	// Set equation text
-	void setEquationText(QString text);
-	// Return equation text
-	QString equationText();
-
-
-	/*
-	 * Load / Save
-	 */
-	public:
-	// Save contained data to file
-	bool save();
-	// Load data from file
-	bool load(QString fileName = QString());
-};
-
-
 #endif
-
-

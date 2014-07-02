@@ -5,7 +5,7 @@ data2d.cpp
 dataset.cpp
 displaydataset.cpp
 dnchar.cpp
-equation.cpp
+equationvariable.cpp
 lineparser.cpp
 messenger.cpp
 nxs.cpp
@@ -18,7 +18,7 @@ data2d.h
 dataset.h
 displaydataset.h
 dnchar.h
-equation.h
+equationvariable.h
 lineparser.h
 messenger.h
 nxs.h

@@ -27,7 +27,7 @@
 #include "gui/ui_create.h"
 #include "base/dnchar.h"
 #include "base/slice.h"
-#include "base/equation.h"
+#include "base/equationvariable.h"
 #include "parser/tree.h"
 #include "templates/array.h"
 #include "templates/list.h"

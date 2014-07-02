@@ -108,9 +108,9 @@ void UChromaWindow::addCollectionsToTree(Collection* collection, QTreeWidgetItem
 	item->setExpanded(true);
 
 	// Set icon...
-	if (collection->type() == Collection::MasterCollection) item->setIcon(0, QIcon(":/uchroma/icons/window_collections.svg"));
-	else if (collection->type() == Collection::FitCollection) item->setIcon(0, QIcon(":/uchroma/icons/collection_fit.svg"));
-	else if (collection->type() == Collection::ExtractedCollection) item->setIcon(0, QIcon(":/uchroma/icons/collection_extracted.svg"));
+	if (collection->type() == Collection::MasterCollection) item->setIcon(0, QIcon(":/uchroma/icons/windows_collections.svg"));
+	else if (collection->type() == Collection::FitCollection) item->setIcon(0, QIcon(":/uchroma/icons/up.svg"));
+	else if (collection->type() == Collection::ExtractedCollection) item->setIcon(0, QIcon(":/uchroma/icons/right.svg"));
 
 	// If this is the current collection, select it
 	if (collection == currentCollection_) item->setSelected(true);
@@ -118,6 +118,16 @@ void UChromaWindow::addCollectionsToTree(Collection* collection, QTreeWidgetItem
 	// Add any additional data
 	for (Collection* fit = collection->fitData(); fit != NULL; fit = fit->next) addCollectionsToTree(fit, item);
 	for (Collection* extract = collection->extractedData(); extract != NULL; extract = extract->next) addCollectionsToTree(extract, item);
+}
+
+/*
+ * Slots
+ */
+
+// Context menu requested for CollectionTree
+void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
+{
+	printf("ContextMenuRequested.\n");
 }
 
 // Refresh collection list

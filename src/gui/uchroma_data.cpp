@@ -230,10 +230,10 @@ void UChromaWindow::focusNextCollection()
 // Move collection focus to previous in list
 void UChromaWindow::focusPreviousCollection()
 {
-	currentCollection_ = currentCollection_->previousCollection(true);
+	currentCollection_ = currentCollection_->previousCollection(false);
 
 	// Safety check...
-	if (currentCollection_ == NULL) currentCollection_ = collections_.last();
+	if (currentCollection_ == NULL) currentCollection_ = collections_.last()->previousCollection(true);
 
 	updateGUI();
 }

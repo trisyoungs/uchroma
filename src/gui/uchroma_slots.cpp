@@ -39,8 +39,8 @@ QPoint UChromaWindow::centrePos()
 }
 
 /*
-// File Actions
-*/
+ * File Actions
+ */
 
 void UChromaWindow::on_actionFileNew_triggered(bool checked)
 {

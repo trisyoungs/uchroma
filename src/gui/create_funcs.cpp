@@ -22,7 +22,6 @@
 #include "gui/create.h"
 #include "gui/uchroma.h"
 #include "parser/scopenode.h"
-#include "templates/variantpointer.h"
 
 // Static singletons
 UChromaWindow* CreateDialog::uChroma_ = NULL;

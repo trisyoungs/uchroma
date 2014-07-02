@@ -198,6 +198,8 @@ class UChromaWindow : public QMainWindow
 	void on_CollectionRemoveButton_clicked(bool checked);
 
 	public slots:
+	// Context menu requested for CollectionTree
+	void collectionTreeContextMenuRequested(const QPoint& point);
 	// Refresh collection list
 	void refreshCollections();
 	// Update displayed info for current collection

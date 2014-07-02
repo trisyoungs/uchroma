@@ -21,6 +21,7 @@
 
 #include "gui/fit.h"
 #include "gui/uchroma.h"
+#include "gui/equationselect.h"
 #include "templates/variantpointer.h"
 
 // Static singletons
@@ -36,6 +37,7 @@ FitDialog::FitDialog(QWidget* parent) : QDialog(parent)
 	ui.OptionsLimitStrengthSpin->setValue(10000.0);
 
 	refreshing_ = false;
+	sourceCollection_ = NULL;
 	resetEquation();
 	ui.EquationEdit->setText("cos(x)*A");
 	equationValid_ = equation_.setCommands("cos(x)*A");
@@ -88,7 +90,7 @@ void FitDialog::updateMainView()
 // Update data in window
 void FitDialog::updateAll()
 {
-	updateSourceList();
+	updateSourceData();
 	updateDestinationGroup();
 }
 
@@ -131,7 +133,8 @@ void FitDialog::on_EquationEdit_textChanged(QString text)
 
 void FitDialog::on_SelectEquationButton_clicked(bool checked)
 {
-	// TODO
+	EquationSelectDialog selectDialog(this);
+	if (selectDialog.exec()) ui.EquationEdit->setText(selectDialog.selectedEquation().equationText);
 }
 
 void FitDialog::on_FitButton_clicked(bool checked)
@@ -250,63 +253,38 @@ void FitDialog::on_VariablesTable_cellChanged(int row, int column)
  * Source Group
  */
 
-// Update source list
-void FitDialog::updateSourceList()
-{
-	refreshing_ = true;
-
-	// Update collection list
-	Collection* currentCollection = VariantPointer<Collection>(ui.SourceCollectionCombo->itemData(ui.SourceCollectionCombo->currentIndex()));
-	ui.SourceCollectionCombo->clear();
-	int index = 0;
-	for (Collection* c = uChroma_->collections(); c != NULL; c = c->next, ++index)
-	{
-		ui.SourceCollectionCombo->addItem(c->title(), VariantPointer<Collection>(c));
-		if (c == currentCollection) ui.SourceCollectionCombo->setCurrentIndex(index);
-	}
-
-	refreshing_ = false;
-
-	// Update source info...
-	updateSourceData(true);
-}
-
 // Update source data
 void FitDialog::updateSourceData(bool setInitialValues)
 {
+	if (!sourceCollection_) return;
+
 	refreshing_ = true;
 
-	// Grab current collection
-	Collection* collection = uChroma_->collection(ui.SourceCollectionCombo->currentIndex());
-	if (!collection)
-	{
-		refreshing_ = false;
-		return;
-	}
-
+	// Set collection name
+	ui.SourceCollectionLabel->setText(sourceCollection_->title());
 	// Populate reference Y combo
 	ui.SourceReferenceYCombo->clear();
-	for (DataSet* dataSet = collection->dataSets(); dataSet != NULL; dataSet = dataSet->next) ui.SourceReferenceYCombo->addItem(dataSet->title() + " (Z = " + QString::number(dataSet->data().z()) + ")");
+	for (DataSet* dataSet = sourceCollection_->dataSets(); dataSet != NULL; dataSet = dataSet->next) ui.SourceReferenceYCombo->addItem(dataSet->title() + " (Z = " + QString::number(dataSet->data().z()) + ")");
 
 	// Update spin boxes with limits
 	ui.SourceDataSetFromSpin->setRange(1, ui.SourceDataSetToSpin->value());
-	ui.SourceDataSetToSpin->setRange(ui.SourceDataSetFromSpin->value(), collection->nDataSets());
-	ui.SourceXMinSpin->setRange(true, collection->transformMin().x, true, collection->transformMax().x);
-	ui.SourceXMaxSpin->setRange(true, collection->transformMin().x, true, collection->transformMax().x);
+	ui.SourceDataSetToSpin->setRange(ui.SourceDataSetFromSpin->value(), sourceCollection_->nDataSets());
+	ui.SourceXMinSpin->setRange(true, sourceCollection_->transformMin().x, true, sourceCollection_->transformMax().x);
+	ui.SourceXMaxSpin->setRange(true, sourceCollection_->transformMin().x, true, sourceCollection_->transformMax().x);
 
 	// Set initial values for x and z ranges if requested
 	if (setInitialValues)
 	{
 		ui.SourceDataSetFromSpin->setValue(1);
-		ui.SourceDataSetToSpin->setValue(collection->nDataSets());
-		ui.SourceXMinSpin->setValue(collection->transformMin().x);
-		ui.SourceXMaxSpin->setValue(collection->transformMax().x);
+		ui.SourceDataSetToSpin->setValue(sourceCollection_->nDataSets());
+		ui.SourceXMinSpin->setValue(sourceCollection_->transformMin().x);
+		ui.SourceXMaxSpin->setValue(sourceCollection_->transformMax().x);
 	}
 
 	// Update info labels
-	DataSet* dataSet = collection->dataSet(ui.SourceDataSetFromSpin->value()-1);
+	DataSet* dataSet = sourceCollection_->dataSet(ui.SourceDataSetFromSpin->value()-1);
 	ui.SourceFromZLabel->setText("Z = " + (dataSet ? QString::number(dataSet->data().z()) : "???"));
-	dataSet = collection->dataSet(ui.SourceDataSetToSpin->value()-1);
+	dataSet = sourceCollection_->dataSet(ui.SourceDataSetToSpin->value()-1);
 	ui.SourceToZLabel->setText("Z = " + (dataSet ? QString::number(dataSet->data().z()) : "???"));
 
 	refreshing_ = false;
@@ -343,14 +321,12 @@ void FitDialog::on_SourceXSelectButton_clicked(bool checked)
 // Update destination data group
 void FitDialog::updateDestinationGroup()
 {
+	if (!sourceCollection_) return;
+
 	refreshing_ = true;
 
-	// Grab current collection
-	Collection* collection = uChroma_->collection(ui.SourceCollectionCombo->currentIndex());
-	if (!collection) return;
-
 	ui.DestinationCollectionCombo->clear();
-	for (Collection* c = collection->fitData(); c != NULL; c = c->next)
+	for (Collection* c = sourceCollection_->fitData(); c != NULL; c = c->next)
 	{
 		ui.DestinationCollectionCombo->addItem(c->title(), VariantPointer<Collection>(c));
 	}

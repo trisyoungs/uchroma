@@ -29,6 +29,7 @@ dataimport_funcs.cpp
 dataimport_seqxy.cpp
 saveimage_funcs.cpp
 colourbutton_funcs.cpp
+equationselect_funcs.cpp
 fit_funcs.cpp
 fit_main.cpp
 fit_sd.cpp
@@ -94,6 +95,7 @@ SET(pro_UIS
   create.ui
   data.ui
   dataimport.ui
+  equationselect.ui
   fit.ui
   graphwidget.ui
   saveimage.ui
