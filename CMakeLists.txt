@@ -3,7 +3,7 @@ project(uChroma)
 set(DESCRIPTION "uChroma")
 set(AUTHOR "Tristan Youngs")
 set(VERSION_MAJOR "0")
-set(VERSION_MINOR "97")
+set(VERSION_MINOR "98")
 
 set(CMAKE_BUILD_TYPE "Release")
 
@@ -125,10 +125,10 @@ if(NOT ${PREFIX})
 endif(NOT ${PREFIX})
 
 if(UNIX AND NOT APPLE)
-  configure_file(${CMAKE_SOURCE_DIR}/desktop.cmake ${CMAKE_BINARY_DIR}/uChroma.desktop)
-  install(FILES ${CMAKE_BINARY_DIR}/uChroma.desktop 
+  configure_file(${CMAKE_SOURCE_DIR}/desktop.cmake ${CMAKE_BINARY_DIR}/extra/uChroma.desktop)
+  install(FILES ${CMAKE_BINARY_DIR}/extra/uChroma.desktop 
        DESTINATION "/usr/share/applications/")
-  install(FILES ${CMAKE_SOURCE_DIR}/extra/uChroma.png
+  install(FILES ${CMAKE_SOURCE_DIR}/extra/uchroma.png
         DESTINATION share/uchroma)
 endif(UNIX AND NOT APPLE)
 
