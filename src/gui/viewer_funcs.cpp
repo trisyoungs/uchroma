@@ -23,7 +23,9 @@
 #include "gui/uchroma.h"
 #include "base/messenger.h"
 #include <GL/glext.h>
+#ifndef _WIN32
 #include <GL/glx.h>
+#endif
 
 /*
  * OpenGL Function Declarations

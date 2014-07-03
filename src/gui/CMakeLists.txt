@@ -72,7 +72,9 @@ SET(pro_MOC_HDRS
   axes.h
   uchroma.h
   create.h
+  data.h
   dataimport.h
+  equationselect.h
   fit.h
   graphwidget.h
   saveimage.h

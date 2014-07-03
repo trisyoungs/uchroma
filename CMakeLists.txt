@@ -3,7 +3,7 @@ project(uChroma)
 set(DESCRIPTION "uChroma")
 set(AUTHOR "Tristan Youngs")
 set(VERSION_MAJOR "0")
-set(VERSION_MINOR "94")
+set(VERSION_MINOR "95")
 
 set(CMAKE_BUILD_TYPE "Release")
 
@@ -36,10 +36,13 @@ if(WIN32)
   set(FT2_LIBRARIES "C:/Program Files (x86)/GnuWin32/lib/libfreetype.dll.a")
   set(GLEXT_INCLUDES "C:/src/include")
 endif(WIN32)
+if(UNIX)
+  set(FT2_INCLUDES "/usr/include/freetype2")
+endif(UNIX)
 
 # Find required packages for this project
 find_package(Qt4 REQUIRED)
-IF(WIN32 OR APPLE)
+if(WIN32 OR APPLE)
  find_package(OPENGL REQUIRED)
 endif(WIN32 OR APPLE)
 
@@ -49,7 +52,6 @@ if(MINGW)
 else(MINGW)
 	  SET(HDF5_LIBS "C:/Program Files (x86)/HDF_Group/HDF5/1.8.10/lib/hdf5dll.lib" CACHE STRING "Link-time commands to use HDF5 (Windows only)")
 endif(MINGW)
-
 find_package(HDF5 REQUIRED)
 find_package(ZLIB REQUIRED)
 if(NOT UNIX)
@@ -104,7 +106,7 @@ link_directories (${LIBRARY_OUTPUT_PATH})
 IF(WIN32 OR APPLE)
 	target_link_libraries(${target_name} gui base math parser command ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${FTGL_LIBRARIES} ${OPENGL_LIBRARIES} ${FT2_LIBRARIES} ${HDF5_LIBS})
 ELSE(WIN32 OR APPLE)
-	target_link_libraries(${target_name} gui base math parser command ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${HDF5_LIBRARIES})
+	target_link_libraries(${target_name} gui base math parser command ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${HDF5_LIBRARIES} -lGL -lftgl)
 ENDIF(WIN32 OR APPLE)
 
 # -----------------------------------
