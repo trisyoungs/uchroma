@@ -25,7 +25,7 @@
 #include "version.h"
 
 // Constructor
-UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWindow_(*this), dataWindow_(*this), slicesWindow_(*this), sliceMonitorWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this), saveImageDialog_(this), createCollectionDialog_(this), dataImportDialog_(this), fitDialog_(this)
+UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWindow_(*this), dataWindow_(*this), fitWindow_(*this), slicesWindow_(*this), sliceMonitorWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this), saveImageDialog_(this), createCollectionDialog_(this), dataImportDialog_(this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -53,7 +53,6 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	// Set UChroma pointers in widgets/dialogs where necessary
 	ui.MainView->setUChroma(this);
 	GraphWidget::setUChroma(this);
-	FitDialog::setUChroma(this);
 	CreateCollectionDialog::setUChroma(this);
 
 	// Load font for viewer
@@ -72,6 +71,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	// Connect sub-window closed signal to toggle buttons / menu items in uChroma's main window
 	connect(&axesWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsAxes, SLOT(setChecked(bool)));
 	connect(&dataWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsData, SLOT(setChecked(bool)));
+	connect(&fitWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsFit, SLOT(setChecked(bool)));
 	connect(&styleWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsStyle, SLOT(setChecked(bool)));
 	connect(&transformWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsTransform, SLOT(setChecked(bool)));
 	connect(&viewWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsView, SLOT(setChecked(bool)));
@@ -133,7 +133,7 @@ void UChromaWindow::updateSubWindows()
 
 	axesWindow_.updateControls();
 	dataWindow_.updateControls();
-	fitDialog_.setSourceCollection(currentCollection_);
+	fitWindow_.updateControls();
 	slicesWindow_.updateControls();
 	sliceMonitorWindow_.updateControls();
 	styleWindow_.updateControls();

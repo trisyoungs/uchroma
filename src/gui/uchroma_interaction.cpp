@@ -183,9 +183,9 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 	switch (interactionMode_)
 	{
 		case (UChromaWindow::FitDialogSelectXInteraction):
-			fitDialog_.ui.SourceXMinSpin->setValue(min(clickedInteractionValue_, currentInteractionValue_));
-			fitDialog_.ui.SourceXMaxSpin->setValue(max(clickedInteractionValue_, currentInteractionValue_));
-			fitDialog_.show();
+			fitWindow_.ui.SourceXMinSpin->setValue(min(clickedInteractionValue_, currentInteractionValue_));
+			fitWindow_.ui.SourceXMaxSpin->setValue(max(clickedInteractionValue_, currentInteractionValue_));
+			fitWindow_.show();
 			break;
 		case (UChromaWindow::ZoomInteraction):
 			setAxisMin(interactionAxis_, min(clickedInteractionValue_, currentInteractionValue_));

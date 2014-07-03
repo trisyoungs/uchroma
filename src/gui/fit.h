@@ -102,31 +102,21 @@ class FitTarget : public ListItem<FitTarget>
 };
 
 /*
- * Fit Dialog
+ * Fit Window
  */
-class FitDialog : public QDialog
+class FitWindow : public QWidget
 {
 	Q_OBJECT
 
 	public:
 	// Constructor
-	FitDialog(QWidget *parent);
+	FitWindow(UChromaWindow& parent);
 	// Destructor
-	~FitDialog();
+	~FitWindow();
 	// Main form declaration
-	Ui::FitDialog ui;
-
-
-	/*
-	 * Link to UChroma
-	 */
-	private:
-	// UChromaWindow pointer
-	static UChromaWindow* uChroma_;
-	
-	public:
-	// Set UChromaWindow pointer
-	static void setUChroma(UChromaWindow* ptr);
+	Ui::FitWindow ui;
+	// UChromaWindow reference
+	UChromaWindow& uChroma_;
 
 
 	/*
@@ -142,9 +132,13 @@ class FitDialog : public QDialog
 	// Refresh main view (if options permit) after fit params have changed
 	void updateMainView();
 
-	public:
-	// Update data in window
-	void updateAll();
+	protected:
+	// Window close event
+	void closeEvent(QCloseEvent* event);
+
+	signals:
+	// Window closed signal
+	void windowClosed(bool);
 
 
 	/*
@@ -206,18 +200,13 @@ class FitDialog : public QDialog
 
 
 	/*
-	 * Slots / Reimplementations
-	 */
-	public slots:
-	void on_CloseButton_clicked(bool checked);
-
-	/*
 	 * Equation Group
 	 */
 	public slots:
 	void on_EquationEdit_textChanged(QString text);
 	void on_SelectEquationButton_clicked(bool checked);
 	void on_FitButton_clicked(bool checked);
+
 
 	/*
 	 * Variables Group
@@ -238,7 +227,6 @@ class FitDialog : public QDialog
 	void updateSourceData(bool setInitialValues = false);
 
 	public slots:
-	void on_SourceCollectionCombo_currentIndexChanged(int index);
 	void on_SourceDataSetFromSpin_valueChanged(int value);
 	void on_SourceDataSetToSpin_valueChanged(int value);
 	void on_SourceXSelectButton_clicked(bool checked);
@@ -251,6 +239,15 @@ class FitDialog : public QDialog
 	// Update destination data group
 	void updateDestinationGroup();
 
+
+	/*
+	 * Update Functions
+	 */
+	public:
+	// Update controls and show window
+	void updateAndShow();
+	// Update controls
+	void updateControls(bool force = false);
 };
 
 #endif

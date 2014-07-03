@@ -57,6 +57,8 @@ class UChromaWindow : public QMainWindow
 	AxesWindow axesWindow_;
 	// Data Window
 	DataWindow dataWindow_;
+	// Fit Window
+	FitWindow fitWindow_;
 	// Slice Monitor Window
 	SliceMonitorWindow sliceMonitorWindow_;
 	// Slices Window
@@ -71,8 +73,6 @@ class UChromaWindow : public QMainWindow
 	SaveImageDialog saveImageDialog_;
 	// Data Import Dialog
 	DataImportDialog dataImportDialog_;
-	// Fit Window Dialog
-	FitDialog fitDialog_;
 	// Create Window Dialog
 	CreateCollectionDialog createCollectionDialog_;
 
@@ -104,7 +104,7 @@ class UChromaWindow : public QMainWindow
 	void on_actionFileLoad_triggered(bool checked);
 	void on_actionFileSave_triggered(bool checked);
 	void on_actionFileSaveAs_triggered(bool checked);
-	void on_actionFileSaveImage_triggered(bool checked);
+	void on_actionFileExportImage_triggered(bool checked);
 	void on_actionFileQuit_triggered(bool checked);
 
 	private:
@@ -140,13 +140,6 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * Tools Actions
-	 */
-	private slots:
-	void on_actionToolsFitWindow_triggered(bool checked);
-
-
-	/*
 	 * Axes Actions
 	 */
 	private:
@@ -171,6 +164,7 @@ class UChromaWindow : public QMainWindow
 	void on_actionWindowsTransform_triggered(bool checked);
 	void on_actionWindowsView_triggered(bool checked);
 	void on_actionWindowsAxes_triggered(bool checked);
+	void on_actionWindowsFit_triggered(bool checked);
 	void on_actionWindowsSlices_triggered(bool checked);
 	void on_actionWindowsSliceMonitor_triggered(bool checked);
 

@@ -24,13 +24,12 @@
 #include "gui/equationselect.h"
 #include "templates/variantpointer.h"
 
-// Static singletons
-UChromaWindow* FitDialog::uChroma_ = NULL;
-
 // Constructor
-FitDialog::FitDialog(QWidget* parent) : QDialog(parent)
+FitWindow::FitWindow(UChromaWindow& parent) : QWidget(&parent), uChroma_(parent)
 {
 	ui.setupUi(this);
+
+	QWidget::setWindowFlags(Qt::Tool);
 
 	// Set default values in some widgets
 	ui.MethodSDToleranceSpin->setValue(1.0e-4);
@@ -45,19 +44,8 @@ FitDialog::FitDialog(QWidget* parent) : QDialog(parent)
 }
 
 // Destructor
-FitDialog::~FitDialog()
+FitWindow::~FitWindow()
 {
-}
-
-/*
- * Link to UChroma
- */
-
-
-// Set UChromaWindow pointer
-void FitDialog::setUChroma(UChromaWindow* ptr)
-{
-	uChroma_ = ptr;
 }
 
 /*
@@ -65,7 +53,7 @@ void FitDialog::setUChroma(UChromaWindow* ptr)
  */
 
 // Send message to message box
-void FitDialog::printMessage(const char* fmtString, ...) const
+void FitWindow::printMessage(const char* fmtString, ...) const
 {
 	va_list arguments;
 	static char msgs[8096];
@@ -78,38 +66,26 @@ void FitDialog::printMessage(const char* fmtString, ...) const
 }
 
 // Refresh main view (if options permit) after fit params have changed
-void FitDialog::updateMainView()
+void FitWindow::updateMainView()
 {
 	if (ui.OptionsVisualCheck->isChecked())
 	{
 		updateFittedData();
-		uChroma_->updateDisplay();
+		uChroma_.updateDisplay();
 	}
 }
 
-// Update data in window
-void FitDialog::updateAll()
+// Window close event
+void FitWindow::closeEvent(QCloseEvent* event)
 {
-	updateSourceData();
-	updateDestinationGroup();
-}
-
-/*
- * Widgets / Slots / Reimplementations
- */
-
-void FitDialog::on_CloseButton_clicked(bool checked)
-{
-	uChroma_->updateGUI();
-
-	hide();
+	emit(windowClosed(false));
 }
 
 /*
  * Equations Group
  */
 
-void FitDialog::on_EquationEdit_textChanged(QString text)
+void FitWindow::on_EquationEdit_textChanged(QString text)
 {
 	resetEquation();
 	equationValid_ = equation_.setCommands(text);
@@ -131,16 +107,16 @@ void FitDialog::on_EquationEdit_textChanged(QString text)
 	updateVariableTable();
 }
 
-void FitDialog::on_SelectEquationButton_clicked(bool checked)
+void FitWindow::on_SelectEquationButton_clicked(bool checked)
 {
 	EquationSelectDialog selectDialog(this);
 	if (selectDialog.exec()) ui.EquationEdit->setText(selectDialog.selectedEquation().equationText);
 }
 
-void FitDialog::on_FitButton_clicked(bool checked)
+void FitWindow::on_FitButton_clicked(bool checked)
 {
-	if (doFitting()) uChroma_->setAsModified();
-	uChroma_->updateGUI();
+	if (doFitting()) uChroma_.setAsModified();
+	uChroma_.updateGUI();
 }
 
 /*
@@ -148,7 +124,7 @@ void FitDialog::on_FitButton_clicked(bool checked)
  */
 
 // Update variable table
-void FitDialog::updateVariableTable()
+void FitWindow::updateVariableTable()
 {
 	refreshing_ = true;
 
@@ -214,7 +190,7 @@ void FitDialog::updateVariableTable()
 	refreshing_ = false;
 }
 
-void FitDialog::on_VariablesTable_cellChanged(int row, int column)
+void FitWindow::on_VariablesTable_cellChanged(int row, int column)
 {
 	if (refreshing_) return;
 
@@ -254,7 +230,7 @@ void FitDialog::on_VariablesTable_cellChanged(int row, int column)
  */
 
 // Update source data
-void FitDialog::updateSourceData(bool setInitialValues)
+void FitWindow::updateSourceData(bool setInitialValues)
 {
 	if (!sourceCollection_) return;
 
@@ -290,27 +266,21 @@ void FitDialog::updateSourceData(bool setInitialValues)
 	refreshing_ = false;
 }
 
-void FitDialog::on_SourceCollectionCombo_currentIndexChanged(int index)
-{
-	if (refreshing_) return;
-	updateSourceData(true);
-}
-
-void FitDialog::on_SourceDataSetFromSpin_valueChanged(int value)
+void FitWindow::on_SourceDataSetFromSpin_valueChanged(int value)
 {
 	if (refreshing_) return;
 	updateSourceData(false);
 }
 
-void FitDialog::on_SourceDataSetToSpin_valueChanged(int value)
+void FitWindow::on_SourceDataSetToSpin_valueChanged(int value)
 {
 	if (refreshing_) return;
 	updateSourceData(false);
 }
 
-void FitDialog::on_SourceXSelectButton_clicked(bool checked)
+void FitWindow::on_SourceXSelectButton_clicked(bool checked)
 {
-	uChroma_->setInteractionMode(UChromaWindow::FitDialogSelectXInteraction, 0);
+	uChroma_.setInteractionMode(UChromaWindow::FitDialogSelectXInteraction, 0);
 	hide();
 }
 
@@ -319,7 +289,7 @@ void FitDialog::on_SourceXSelectButton_clicked(bool checked)
  */
 
 // Update destination data group
-void FitDialog::updateDestinationGroup()
+void FitWindow::updateDestinationGroup()
 {
 	if (!sourceCollection_) return;
 
@@ -331,5 +301,35 @@ void FitDialog::updateDestinationGroup()
 		ui.DestinationCollectionCombo->addItem(c->title(), VariantPointer<Collection>(c));
 	}
 
+	refreshing_ = false;
+}
+
+/*
+ * Update Functions
+ */
+
+// Update controls and show window
+void FitWindow::updateAndShow()
+{
+	show();
+	updateControls();
+	move(uChroma_.centrePos() - QPoint(width()/2, height()/2));
+}
+
+// Update controls
+void FitWindow::updateControls(bool force)
+{
+	// If the window isn't visible, do nothing...
+	if ((!isVisible()) && (!force) ) return;
+
+	refreshing_ = true;
+
+	// Check currentCollection_ in uChroma_ - if it's the same as it was before, don't update any initial values
+	bool updateInitialValues = uChroma_.currentCollection() != sourceCollection_;
+	sourceCollection_ = uChroma_.currentCollection();
+	updateSourceData(updateInitialValues);
+
+	updateDestinationGroup();
+	
 	refreshing_ = false;
 }

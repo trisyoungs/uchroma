@@ -23,7 +23,7 @@
 #include "gui/uchroma.h"
 
 // Steepest Descent Minimise
-bool FitDialog::sdMinimise(Array<double>& alpha, double tolerance, int maxSteps)
+bool FitWindow::sdMinimise(Array<double>& alpha, double tolerance, int maxSteps)
 {
 	// Control variables
 	double gradientDelta = 0.01;

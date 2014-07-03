@@ -25,7 +25,7 @@
 #include "templates/variantpointer.h"
 
 // Reset equation
-void FitDialog::resetEquation()
+void FitWindow::resetEquation()
 {
 	equation_.clear();
 	xVariable_ = equation_.addGlobalVariable("x");
@@ -36,7 +36,7 @@ void FitDialog::resetEquation()
 }
 
 // Update fit variables list
-void FitDialog::updateVariables()
+void FitWindow::updateVariables()
 {
 	// First, clear all 'used' flags
 	EquationVariable* eqVar;
@@ -74,12 +74,12 @@ void FitDialog::updateVariables()
 }
 
 // Update destination with current fitted data
-void FitDialog::updateFittedData()
+void FitWindow::updateFittedData()
 {
 	// Check destination collection
 	if (destinationCollection_ == NULL)
 	{
-		msg.print("Internal Error: No destination collection set in FitDialog::updateFittedData().\n");
+		msg.print("Internal Error: No destination collection set in FitWindow::updateFittedData().\n");
 		return;
 	}
 
@@ -91,7 +91,7 @@ void FitDialog::updateFittedData()
 }
 
 // Generate SOS error for current targets
-double FitDialog::sosError(Array<double>& alpha)
+double FitWindow::sosError(Array<double>& alpha)
 {
 	// Poke current values back into the equation variables
 	int n = 0;
@@ -120,7 +120,7 @@ double FitDialog::sosError(Array<double>& alpha)
 }
 
 // Generate RMS error for current targets
-double FitDialog::rmsError(Array<double>& alpha)
+double FitWindow::rmsError(Array<double>& alpha)
 {
 	// Get sos error to start with
 	double rms = sosError(alpha);
@@ -132,7 +132,7 @@ double FitDialog::rmsError(Array<double>& alpha)
 }
 
 // Perform fitting with current settings
-bool FitDialog::doFitting()
+bool FitWindow::doFitting()
 {
 	// Check number of variables to fit
 	if (fitVariables_.nItems() == 0)
@@ -224,7 +224,7 @@ bool FitDialog::doFitting()
 }
 
 // Set source collection
-void FitDialog::setSourceCollection(Collection* collection)
+void FitWindow::setSourceCollection(Collection* collection)
 {
 	if (sourceCollection_ == collection) return;
 
@@ -238,7 +238,7 @@ void FitDialog::setSourceCollection(Collection* collection)
  */
 
 // Minimise, calling relevant method
-bool FitDialog::minimise()
+bool FitWindow::minimise()
 {
 	// Construct alpha array (variables to fit) to pass to minimiser
 	Array<double> alpha;

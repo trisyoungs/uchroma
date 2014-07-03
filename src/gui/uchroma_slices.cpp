@@ -42,12 +42,13 @@ ExtractedSliceGroup* UChromaWindow::addOrRetrieveGroup(QString name)
 // Extract slice based on specified axis and bin
 void UChromaWindow::extractSlice(int axis, int bin)
 {
-	if (bin != -1)
+	if (bin == -1)
 	{
 		currentSlice_.data().clear();
 		return;
 	}
 
+	// Construct slice based on current interaction axis
 	if (interactionAxis_ == 0)
 	{
 		// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated - TODO)

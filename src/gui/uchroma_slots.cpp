@@ -120,7 +120,7 @@ void UChromaWindow::on_actionFileSaveAs_triggered(bool checked)
 }
 
 
-void UChromaWindow::on_actionFileSaveImage_triggered(bool checked)
+void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 {
 	if (saveImageDialog_.getImageDetails(imageExportFile_, imageExportWidth_, imageExportHeight_, imageExportFormat_, imageExportMaintainAspect_, double(ui.MainView->width()) / double(ui.MainView->height())))
 	{
@@ -245,21 +245,6 @@ void UChromaWindow::on_actionDataImport_triggered(bool checked)
 }
 
 /*
- * Tools Actions
- */
-
-void UChromaWindow::on_actionToolsFitWindow_triggered(bool checked)
-{
-	if (refreshing_) return;
-	if (checked)
-	{
-		fitDialog_.updateAll();
-		fitDialog_.show();
-	}
-	else fitDialog_.hide();
-}
-
-/*
  * Axes Actions
  */
 
@@ -361,6 +346,13 @@ void UChromaWindow::on_actionWindowsAxes_triggered(bool checked)
 	if (refreshing_) return;
 	if (checked) axesWindow_.updateAndShow();
 	else axesWindow_.hide();
+}
+
+void UChromaWindow::on_actionWindowsFit_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) fitWindow_.updateAndShow();
+	else fitWindow_.hide();
 }
 
 void UChromaWindow::on_actionWindowsSlices_triggered(bool checked)

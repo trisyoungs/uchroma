@@ -24,7 +24,6 @@
 
 #include "gui/ui_axes.h"
 #include "gui/viewer_textprimitive.h"
-#include <QtGui/QDockWidget>
 
 // Forward Declarations
 class UChromaWindow;

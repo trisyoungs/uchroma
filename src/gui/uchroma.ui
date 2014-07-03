@@ -626,7 +626,6 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
-    <addaction name="actionViewGraphMode"/>
     <addaction name="actionViewPerspective"/>
     <addaction name="separator"/>
     <addaction name="actionViewReset"/>
@@ -636,12 +635,6 @@
      <string>&amp;Settings</string>
     </property>
     <addaction name="actionSettingsChooseFont"/>
-   </widget>
-   <widget class="QMenu" name="menuTools">
-    <property name="title">
-     <string>&amp;Tools</string>
-    </property>
-    <addaction name="actionToolsFitWindow"/>
    </widget>
    <widget class="QMenu" name="menuWindows">
     <property name="title">
@@ -655,8 +648,9 @@
     <addaction name="actionWindowsView"/>
     <addaction name="separator"/>
     <addaction name="actionWindowsAxes"/>
-    <addaction name="actionWindowsSliceMonitor"/>
+    <addaction name="actionWindowsFit"/>
     <addaction name="actionWindowSlices"/>
+    <addaction name="actionWindowsSliceMonitor"/>
    </widget>
    <widget class="QMenu" name="menuCollections">
     <property name="title">
@@ -681,7 +675,6 @@
    <addaction name="menuView"/>
    <addaction name="menuCollections"/>
    <addaction name="menuData"/>
-   <addaction name="menuTools"/>
    <addaction name="menuWindows"/>
    <addaction name="menuSettings"/>
   </widget>
@@ -739,6 +732,7 @@
    <addaction name="actionWindowsView"/>
    <addaction name="separator"/>
    <addaction name="actionWindowsAxes"/>
+   <addaction name="actionWindowsFit"/>
    <addaction name="actionWindowSlices"/>
    <addaction name="actionWindowsSliceMonitor"/>
   </widget>
@@ -760,7 +754,6 @@
    </attribute>
    <addaction name="actionViewReset"/>
    <addaction name="actionViewPerspective"/>
-   <addaction name="actionViewGraphMode"/>
   </widget>
   <widget class="QToolBar" name="AxesToolbar">
    <property name="windowTitle">
@@ -923,12 +916,12 @@
     <string>Ctrl+M</string>
    </property>
   </action>
-  <action name="actionToolsFitWindow">
+  <action name="actionWindowsFit">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>&amp;Fit Window</string>
+    <string>Fit</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
@@ -1123,17 +1116,6 @@
    </property>
    <property name="toolTip">
     <string>Reload datasets from their associated files</string>
-   </property>
-  </action>
-  <action name="actionViewGraphMode">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Graph Mode</string>
-   </property>
-   <property name="toolTip">
-    <string>Toggle between standard (3D) and graphing (2D) modes</string>
    </property>
   </action>
   <action name="actionAxesInteractX">
