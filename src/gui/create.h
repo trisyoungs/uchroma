@@ -39,19 +39,19 @@ class DataSet;
 class Variable;
 
 /*
- * Create Dialog
+ * Create Collection Dialog
  */
-class CreateDialog : public QDialog
+class CreateCollectionDialog : public QDialog
 {
 	Q_OBJECT
 
 	public:
 	// Constructor
-	CreateDialog(QWidget *parent);
+	CreateCollectionDialog(QWidget *parent);
 	// Destructor
-	~CreateDialog();
+	~CreateCollectionDialog();
 	// Main form declaration
-	Ui::CreateDialog ui;
+	Ui::CreateCollectionDialog ui;
 
 
 	/*

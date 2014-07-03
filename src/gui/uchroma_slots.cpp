@@ -198,7 +198,7 @@ void UChromaWindow::on_actionCollectionsNew_triggered(bool checked)
 void UChromaWindow::on_actionCollectionsCreate_triggered(bool checked)
 {
 	if (refreshing_) return;
-	createDialog_.updateAndShow();
+	createCollectionDialog_.updateAndShow();
 }
 
 void UChromaWindow::on_actionCollectionsFocusNext_triggered(bool checked)

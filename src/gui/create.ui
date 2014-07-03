@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CreateDialog</class>
- <widget class="QDialog" name="CreateDialog">
+ <class>CreateCollectionDialog</class>
+ <widget class="QDialog" name="CreateCollectionDialog">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>

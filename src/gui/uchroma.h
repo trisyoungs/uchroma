@@ -74,7 +74,7 @@ class UChromaWindow : public QMainWindow
 	// Fit Window Dialog
 	FitDialog fitDialog_;
 	// Create Window Dialog
-	CreateDialog createDialog_;
+	CreateCollectionDialog createCollectionDialog_;
 
 	public:
 	// Constructor / Destructor

@@ -24,10 +24,10 @@
 #include "parser/scopenode.h"
 
 // Static singletons
-UChromaWindow* CreateDialog::uChroma_ = NULL;
+UChromaWindow* CreateCollectionDialog::uChroma_ = NULL;
 
 // Constructor
-CreateDialog::CreateDialog(QWidget* parent) : QDialog(parent)
+CreateCollectionDialog::CreateCollectionDialog(QWidget* parent) : QDialog(parent)
 {
 	ui.setupUi(this);
 
@@ -50,7 +50,7 @@ CreateDialog::CreateDialog(QWidget* parent) : QDialog(parent)
 }
 
 // Destructor
-CreateDialog::~CreateDialog()
+CreateCollectionDialog::~CreateCollectionDialog()
 {
 }
 
@@ -60,7 +60,7 @@ CreateDialog::~CreateDialog()
 
 
 // Set UChromaWindow pointer
-void CreateDialog::setUChroma(UChromaWindow* ptr)
+void CreateCollectionDialog::setUChroma(UChromaWindow* ptr)
 {
 	uChroma_ = ptr;
 }
@@ -70,7 +70,7 @@ void CreateDialog::setUChroma(UChromaWindow* ptr)
  */
 
 // Refresh main view (if options permit) after fit params have changed
-void CreateDialog::updateMainView()
+void CreateCollectionDialog::updateMainView()
 {
 	if (ui.OptionsVisualCheck->isChecked())
 	{
@@ -81,7 +81,7 @@ void CreateDialog::updateMainView()
 }
 
 // Update data in window
-void CreateDialog::updateAndShow()
+void CreateCollectionDialog::updateAndShow()
 {
 	// Create a new collection for use by the window
 	newCollection_ = uChroma_->addCollection("New Creation");
@@ -99,7 +99,7 @@ void CreateDialog::updateAndShow()
  */
 
 // Reset equation
-void CreateDialog::resetEquation()
+void CreateCollectionDialog::resetEquation()
 {
 	equation_.clear();
 	xVariable_ = equation_.addGlobalVariable("x");
@@ -109,7 +109,7 @@ void CreateDialog::resetEquation()
 }
 
 // Update variables list
-void CreateDialog::updateVariables()
+void CreateCollectionDialog::updateVariables()
 {
 	// First, clear all 'used' flags
 	EquationVariable* eqVar;
@@ -147,7 +147,7 @@ void CreateDialog::updateVariables()
 }
 
 // Update created data
-void CreateDialog::updateCreatedData(bool force)
+void CreateCollectionDialog::updateCreatedData(bool force)
 {
 	// Unless 'force == true', obey the current status of the Visual checkbox
 	if ((!force) && (!ui.OptionsVisualCheck->isChecked())) return;
@@ -155,7 +155,7 @@ void CreateDialog::updateCreatedData(bool force)
 	// First, check destination collection
 	if (newCollection_ == NULL)
 	{
-		msg.print("Internal Error: No valid destination collection pointer in CreateDialog::updateCreatedData().\n");
+		msg.print("Internal Error: No valid destination collection pointer in CreateCollectionDialog::updateCreatedData().\n");
 		return;
 	}
 
@@ -201,7 +201,7 @@ void CreateDialog::updateCreatedData(bool force)
  * Widgets / Slots / Reimplementations
  */
 
-void CreateDialog::on_CloseButton_clicked(bool checked)
+void CreateCollectionDialog::on_CloseButton_clicked(bool checked)
 {
 	// Must remove collection pointed to by newCollection_, if it exists
 	if (newCollection_ != NULL) uChroma_->removeCollection(newCollection_);
@@ -212,7 +212,7 @@ void CreateDialog::on_CloseButton_clicked(bool checked)
 	hide();
 }
 
-void CreateDialog::on_CreateButton_clicked(bool checked)
+void CreateCollectionDialog::on_CreateButton_clicked(bool checked)
 {
 	// Make sure the data is up to date
 	updateCreatedData(true);
@@ -232,7 +232,7 @@ void CreateDialog::on_CreateButton_clicked(bool checked)
  * Equations Group
  */
 
-void CreateDialog::on_EquationEdit_textChanged(QString text)
+void CreateCollectionDialog::on_EquationEdit_textChanged(QString text)
 {
 	resetEquation();
 	equationValid_ = equation_.setCommands(text);
@@ -257,7 +257,7 @@ void CreateDialog::on_EquationEdit_textChanged(QString text)
 	updateCreatedData();
 }
 
-void CreateDialog::on_SelectEquationButton_clicked(bool checked)
+void CreateCollectionDialog::on_SelectEquationButton_clicked(bool checked)
 {
 }
 
@@ -266,7 +266,7 @@ void CreateDialog::on_SelectEquationButton_clicked(bool checked)
  */
 
 // Update grid data group
-void CreateDialog::updateGridGroup(bool refreshList)
+void CreateCollectionDialog::updateGridGroup(bool refreshList)
 {
 	refreshing_ = true;
 
@@ -301,43 +301,43 @@ void CreateDialog::updateGridGroup(bool refreshList)
 	refreshing_ = false;
 }
 
-void CreateDialog::on_GridSpecifyXMinSpin_valueChanged(double value)
+void CreateCollectionDialog::on_GridSpecifyXMinSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateDialog::on_GridSpecifyXMaxSpin_valueChanged(double value)
+void CreateCollectionDialog::on_GridSpecifyXMaxSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateDialog::on_GridSpecifyXDeltaSpin_valueChanged(double value)
+void CreateCollectionDialog::on_GridSpecifyXDeltaSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateDialog::on_GridSpecifyZMinSpin_valueChanged(double value)
+void CreateCollectionDialog::on_GridSpecifyZMinSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateDialog::on_GridSpecifyZMaxSpin_valueChanged(double value)
+void CreateCollectionDialog::on_GridSpecifyZMaxSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateDialog::on_GridSpecifyZDeltaSpin_valueChanged(double value)
+void CreateCollectionDialog::on_GridSpecifyZDeltaSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateDialog::on_GridTakeFromCollectionCombo_currentIndexChanged(int index)
+void CreateCollectionDialog::on_GridTakeFromCollectionCombo_currentIndexChanged(int index)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
@@ -348,7 +348,7 @@ void CreateDialog::on_GridTakeFromCollectionCombo_currentIndexChanged(int index)
  */
 
 // Update variable table
-void CreateDialog::updateVariableTable()
+void CreateCollectionDialog::updateVariableTable()
 {
 	refreshing_ = true;
 
@@ -397,7 +397,7 @@ void CreateDialog::updateVariableTable()
 	refreshing_ = false;
 }
 
-void CreateDialog::on_VariablesTable_cellChanged(int row, int column)
+void CreateCollectionDialog::on_VariablesTable_cellChanged(int row, int column)
 {
 	if (refreshing_) return;
 

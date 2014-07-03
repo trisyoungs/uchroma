@@ -25,7 +25,7 @@
 #include "version.h"
 
 // Constructor
-UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWindow_(*this), dataWindow_(*this), slicesWindow_(*this), sliceMonitorWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this), saveImageDialog_(this), createDialog_(this), dataImportDialog_(this), fitDialog_(this)
+UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWindow_(*this), dataWindow_(*this), slicesWindow_(*this), sliceMonitorWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this), saveImageDialog_(this), createCollectionDialog_(this), dataImportDialog_(this), fitDialog_(this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -54,7 +54,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	ui.MainView->setUChroma(this);
 	GraphWidget::setUChroma(this);
 	FitDialog::setUChroma(this);
-	CreateDialog::setUChroma(this);
+	CreateCollectionDialog::setUChroma(this);
 
 	// Load font for viewer
 	ui.MainView->setupFont(viewerFont_);
