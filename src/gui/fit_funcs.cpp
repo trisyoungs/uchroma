@@ -282,9 +282,9 @@ void FitDialog::updateSourceData(bool setInitialValues)
 	}
 
 	// Update info labels
-	DataSet* dataSet = sourceCollection_->dataSet(ui.SourceDataSetFromSpin->value()-1);
+	DataSet* dataSet = sourceCollection_->nDataSets() == 0 ? NULL : sourceCollection_->dataSet(ui.SourceDataSetFromSpin->value()-1);
 	ui.SourceFromZLabel->setText("Z = " + (dataSet ? QString::number(dataSet->data().z()) : "???"));
-	dataSet = sourceCollection_->dataSet(ui.SourceDataSetToSpin->value()-1);
+	dataSet = sourceCollection_->nDataSets() == 0 ? NULL : sourceCollection_->dataSet(ui.SourceDataSetToSpin->value()-1);
 	ui.SourceToZLabel->setText("Z = " + (dataSet ? QString::number(dataSet->data().z()) : "???"));
 
 	refreshing_ = false;

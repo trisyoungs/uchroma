@@ -31,6 +31,9 @@ void Viewer::constructLineXYSurface(PrimitiveList& primitives, const Array<doubl
 	// Resize primitive list so it's large enough for our needs
 	primitives.reinitialise(displayData.nItems(), true, abscissa.nItems(), (abscissa.nItems()-1)*2, GL_LINES, true);
 
+	// Check for low number of datasets
+	if (displayData.nItems() == 0) return;
+
 	// Temporary variables
 	GLfloat z;
 	Vec4<GLfloat> colour(0,0,0,1);

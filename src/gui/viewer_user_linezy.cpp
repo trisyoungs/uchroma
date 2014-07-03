@@ -31,6 +31,9 @@ void Viewer::constructLineZYSurface(PrimitiveList& primitives, const Array<doubl
 	// Resize primitive list so it's large enough for our needs
 	primitives.reinitialise(abscissa.nItems(), true, displayData.nItems(), (displayData.nItems()-1)*2, GL_LINES, true);
 
+	// Check for low number of datasets
+	if (displayData.nItems() == 0) return;
+
 	// Temporary variables
 	Vec4<GLfloat> colour(0,0,0,1);
 	int n, nPoints;
