@@ -109,8 +109,8 @@ void UChromaWindow::addCollectionsToTree(Collection* collection, QTreeWidgetItem
 
 	// Set icon...
 	if (collection->type() == Collection::MasterCollection) item->setIcon(0, QIcon(":/uchroma/icons/windows_collections.svg"));
-	else if (collection->type() == Collection::FitCollection) item->setIcon(0, QIcon(":/uchroma/icons/up.svg"));
-	else if (collection->type() == Collection::ExtractedCollection) item->setIcon(0, QIcon(":/uchroma/icons/right.svg"));
+	else if (collection->type() == Collection::FitCollection) item->setIcon(0, QIcon(":/uchroma/icons/collection_fit.svg"));
+	else if (collection->type() == Collection::ExtractedCollection) item->setIcon(0, QIcon(":/uchroma/icons/collection_extracted.svg"));
 
 	// If this is the current collection, select it
 	if (collection == currentCollection_) item->setSelected(true);
