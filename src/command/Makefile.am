@@ -4,5 +4,5 @@ libcommand_a_SOURCES = commands.cpp flow.cpp functions.cpp math.cpp operators.cp
 
 noinst_HEADERS = commands.h
 
-INCLUDES = -I$(top_srcdir)/src -I../
+INCLUDES = -I$(top_srcdir)/src -I../ @GUI_CFLAGS@
 

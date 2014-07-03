@@ -9,4 +9,5 @@ libparser_a_SOURCES = commandnode.cpp double.cpp grammar.yy integer.cpp parser.c
 
 noinst_HEADERS = accessor.h commandnode.h double.h integer.h parser.h returnvalue.h scopenode.h stepnode.h tree.h treenode.h variable.h variablelist.h variablenode.h vtypes.h 
 
-INCLUDES = -I$(top_srcdir)/src -I../ 
+INCLUDES = -I$(top_srcdir)/src -I../  @GUI_CFLAGS@
+
