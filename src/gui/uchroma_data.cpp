@@ -325,7 +325,7 @@ void UChromaWindow::clearData()
 	regenerateAxes_ = true;
 
 	// Interaction
-	interactionMode_ = UChromaWindow::NoInteraction;
+	interactionMode_ = InteractionMode::ViewInteraction;
 	interactionAxis_ = -1;
 	clickedInteractionValue_ = 0.0;
 	currentInteractionValue_ = 0.0;

@@ -140,7 +140,7 @@ bool Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate)
 	}
 
 	// Push a new instance to create the new display list / vertex array
-	collection->displayPrimitives().pushInstance(context());
+	collection->displayPrimitives().pushInstance(context(), extensionsStack_.last());
 	collection->setDisplayPrimitiveValid();
 
 	return true;

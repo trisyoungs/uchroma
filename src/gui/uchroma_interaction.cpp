@@ -22,6 +22,17 @@
 #include "gui/uchroma.h"
 
 /*
+ * Interaction Modes
+ */
+
+// Static list of interaction modes
+InteractionMode InteractionMode::interactionModes[] = {
+	{ "Fit (select X)",	"<b>Left, click-drag</b> Select X region for fitting" },
+	{ "View",		"<b>Right</b> Rotate view, <b>Middle</b> Translate view, <b>Wheel</b> Zoom view" },
+	{ "Zoom",		"<b>Left, click-drag</b> Zoom to selected region" }
+};
+
+/*
  * Private Functions
  */
 
@@ -115,15 +126,18 @@ int UChromaWindow::closestBin(int axis, double value)
  */
 
 // Set interaction mode and axis
-void UChromaWindow::setInteractionMode(UChromaWindow::InteractionMode mode, int axis)
+void UChromaWindow::setInteractionMode(InteractionMode::Mode mode, int axis)
 {
 	interactionMode_ = mode;
 	interactionAxis_ = axis;
 	ui.MainView->setInteractionPrimitive(axis);
+
+	// Update statusbar help text
+	statusBarInfoLabel_->setText(InteractionMode::interactionModes[mode].modeText);
 }
 
 // Return interaction mode
-UChromaWindow::InteractionMode UChromaWindow::interactionMode()
+InteractionMode::Mode UChromaWindow::interactionMode()
 {
 	return interactionMode_;
 }
@@ -144,7 +158,7 @@ bool UChromaWindow::interacting()
 void UChromaWindow::startInteraction(int mouseX, int mouseY, Qt::KeyboardModifiers modifiers)
 {
 	// Check that an interaction mode is currently set
-	if (interactionMode_ == UChromaWindow::NoInteraction) return;
+	if (interactionMode_ == InteractionMode::ViewInteraction) return;
 
 	// Calculate axis value at start of interaction
 	clickedInteractionValue_ = screenToAxis(interactionAxis_, mouseX, mouseY);
@@ -182,12 +196,12 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 	// Finalise interaction type
 	switch (interactionMode_)
 	{
-		case (UChromaWindow::FitDialogSelectXInteraction):
+		case (InteractionMode::FitDialogSelectXInteraction):
 			fitWindow_.ui.SourceXMinSpin->setValue(min(clickedInteractionValue_, currentInteractionValue_));
 			fitWindow_.ui.SourceXMaxSpin->setValue(max(clickedInteractionValue_, currentInteractionValue_));
 			fitWindow_.show();
 			break;
-		case (UChromaWindow::ZoomInteraction):
+		case (InteractionMode::ZoomInteraction):
 			setAxisMin(interactionAxis_, min(clickedInteractionValue_, currentInteractionValue_));
 			setAxisMax(interactionAxis_, max(clickedInteractionValue_, currentInteractionValue_));
 			updateAxesPrimitives();

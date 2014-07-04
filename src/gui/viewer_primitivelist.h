@@ -65,7 +65,7 @@ class PrimitiveList
 	// Return total number of defined indices
 	int nDefinedIndices();
 	// Push instance layer
-	void pushInstance(const QGLContext *context);
+	void pushInstance(const QGLContext *context, GLExtensions* extensions);
 	// Pop topmost instance layer
 	void popInstance(const QGLContext *context);
 	// Send to OpenGL (i.e. render)

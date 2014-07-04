@@ -280,7 +280,7 @@ void FitWindow::on_SourceDataSetToSpin_valueChanged(int value)
 
 void FitWindow::on_SourceXSelectButton_clicked(bool checked)
 {
-	uChroma_.setInteractionMode(UChromaWindow::FitDialogSelectXInteraction, 0);
+	uChroma_.setInteractionMode(InteractionMode::FitDialogSelectXInteraction, 0);
 	hide();
 }
 

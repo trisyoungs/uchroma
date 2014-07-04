@@ -41,8 +41,6 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	viewerFont_ = QDir::current().absoluteFilePath("wright.ttf");
 #endif
 	clearData();
-	interactionAxis_ = -1;
-	interactionMode_ = UChromaWindow::NoInteraction;
 	interacting_ = false;
 	refreshing_ = false;
 	addCollection();
@@ -82,6 +80,13 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	actionGroup->addAction(ui.actionAxesInteractX);
 	actionGroup->addAction(ui.actionAxesInteractY);
 	actionGroup->addAction(ui.actionAxesInteractZ);
+
+	// Add QLabel as a normal widget to the status bar
+	statusBarInfoLabel_ = new QLabel(this);
+	ui.StatusBar->addWidget(statusBarInfoLabel_);
+
+	// Set initial interaction mode
+	setInteractionMode(InteractionMode::ViewInteraction, -1);
 }
 
 // Destructor

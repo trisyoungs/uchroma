@@ -41,6 +41,37 @@
 // Forward Declarations
 /* None */
 
+/*
+ * Interaction Mode Information
+ */
+class InteractionMode
+{
+	public:
+	// Interaction Modes
+	enum Mode
+	{
+		FitDialogSelectXInteraction,
+		ViewInteraction,
+		ZoomInteraction,
+		nInteractionModes
+	};
+	// Name of mode
+	QString name;
+	// Usage text
+	QString modeText;
+
+
+	/*
+	 * Singleton
+	 */
+	public:
+	// Static list of interaction modes
+	static InteractionMode interactionModes[];
+};
+
+/*
+ * Main uChroma Window
+ */
 class UChromaWindow : public QMainWindow
 {
 	// All Qt declarations must include this macro
@@ -75,6 +106,8 @@ class UChromaWindow : public QMainWindow
 	DataImportDialog dataImportDialog_;
 	// Create Window Dialog
 	CreateCollectionDialog createCollectionDialog_;
+	// Statusbar info line label
+	QLabel* statusBarInfoLabel_;
 
 	public:
 	// Constructor / Destructor
@@ -477,18 +510,9 @@ class UChromaWindow : public QMainWindow
 	/*
 	 * Selection / Interaction
 	 */
-	public:
-	// Interaction Modes
-	enum InteractionMode
-	{
-		NoInteraction,
-		FitDialogSelectXInteraction,
-		ZoomInteraction
-	};
-
 	private:
 	// Current interaction mode
-	InteractionMode interactionMode_;
+	InteractionMode::Mode interactionMode_;
 	// Whether the user is currently interacting with the display
 	bool interacting_;
 	// Current axis target for interaction
@@ -506,9 +530,9 @@ class UChromaWindow : public QMainWindow
 
 	public:
 	// Set interaction mode and target axis
-	void setInteractionMode(InteractionMode mode, int axis);
+	void setInteractionMode(InteractionMode::Mode mode, int axis);
 	// Return interaction mode
-	InteractionMode interactionMode();
+		InteractionMode::Mode interactionMode();
 	// Return current axis target for interaction
 	int interactionAxis();
 	// Return whether the user is currently interacting with the display

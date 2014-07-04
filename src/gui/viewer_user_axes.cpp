@@ -67,6 +67,7 @@
 		// Normalise tickDirection
 		tickDir = axisTickDirection_[axis];
 		tickDir.normalise();
+		tickDir *= labelScale_;
 
 		// Create tick label transformation matrix
 		labelTransform.setIdentity();
@@ -124,7 +125,7 @@
 				if (log10(value) >= axisMin)
 				{
 					// Tick mark
-					ui.MainView->addAxisLine(axis, u, u+tickDir*(count == 0 ? 0.1 : 0.05));
+					ui.MainView->addAxisLine(axis, u, u+tickDir*(count == 0 ? 1.0 : 0.5));
 
 					// Tick label
 					if (count == 0)

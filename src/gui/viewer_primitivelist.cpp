@@ -118,9 +118,9 @@ Viewer* PrimitiveList::viewer()
 }
 
 // Push instance layer
-void PrimitiveList::pushInstance(const QGLContext *context)
+void PrimitiveList::pushInstance(const QGLContext* context, GLExtensions* extensions)
 {
-	for (Primitive* prim = primitives_.first(); prim != NULL; prim = prim->next) prim->pushInstance(context);
+	for (Primitive* prim = primitives_.first(); prim != NULL; prim = prim->next) prim->pushInstance(context, extensions);
 }
 
 // Pop topmost instance layer

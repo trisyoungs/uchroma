@@ -255,11 +255,11 @@ void UChromaWindow::interactionActionTriggered(int axis)
 	if ((interactionAxis_ == axis) || (axis == -1))
 	{
 		ui.actionAxesInteractNone->setChecked(true);
-		setInteractionMode(UChromaWindow::NoInteraction, -1);
+		setInteractionMode(InteractionMode::ViewInteraction, -1);
 	}
 	else
 	{
-		setInteractionMode(UChromaWindow::ZoomInteraction, axis);
+		setInteractionMode(InteractionMode::ZoomInteraction, axis);
 		updateInteractionPosition(ui.MainView->rMouseLast().x, ui.MainView->contextHeight() - ui.MainView->rMouseLast().y);
 	}
 

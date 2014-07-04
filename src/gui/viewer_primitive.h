@@ -34,6 +34,8 @@
 
 // Forward Declarations
 class QGLContext;
+class Viewer;
+class GLExtensions;
 
 // Primitive Instance
 class PrimitiveInstance : public ListItem<PrimitiveInstance>
@@ -47,6 +49,8 @@ class PrimitiveInstance : public ListItem<PrimitiveInstance>
 	private:
 	// Context to which primitive instance is associated
 	const QGLContext *context_;
+	// GL extension function pointers for this context
+	GLExtensions* extensions_;
 	// Type of instance
 	InstanceType type_;
 	// List ID of instance (if using display lists)
@@ -57,12 +61,16 @@ class PrimitiveInstance : public ListItem<PrimitiveInstance>
 	GLuint vboIndexObject_;
 	
 	public:
+	// Return context to which primitive instance is associated
+	const QGLContext *context();
+	// Set exensions object
+	void setExtensions(GLExtensions* extensions);
+	// Return GL extensions
+	const GLExtensions* extensions() const;
 	// Set display list data
 	void setDisplayList(const QGLContext *context, GLuint listObject);
 	// Set vbo object data
 	void setVBO(const QGLContext *context, GLuint vertexObject, GLuint indexObject);
-	// Return context to which primitive instance is associated
-	const QGLContext *context();
 	// Return type of instance
 	InstanceType type();
 	// Return display list object for instance
@@ -81,19 +89,10 @@ class Primitive : public ListItem<Primitive>
 	Primitive();
 	~Primitive();
 
+
 	/*
-	 * OpenGL Function Pointers (VBO)
+	 * Data
 	 */
-	static PFNGLGENBUFFERSPROC glGenBuffers;
-	static PFNGLBINDBUFFERPROC glBindBuffer;
-	static PFNGLBUFFERDATAPROC glBufferData;
-	static PFNGLBUFFERSUBDATAPROC glBufferSubData;
-	static PFNGLDELETEBUFFERSPROC glDeleteBuffers;
-
-
-	/*
-	// Data
-	*/
 	private:
 	// Vertex chunk for this primitive
 	VertexChunk vertexChunk_;
@@ -130,7 +129,7 @@ class Primitive : public ListItem<Primitive>
 	// Flag that this primitive should not use instances (rendering will use vertex arrays)
 	void setNoInstances();
 	// Push instance layer from current vertex chunk list
-	void pushInstance(const QGLContext *context);
+	void pushInstance(const QGLContext* context, GLExtensions* extensions);
 	// Pop topmost instance layer
 	void popInstance(const QGLContext *context);
 	// Set name of primitive

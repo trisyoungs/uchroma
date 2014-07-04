@@ -22,28 +22,7 @@
 #include "gui/viewer.uih"
 #include "gui/uchroma.h"
 #include "base/messenger.h"
-#include <GL/glext.h>
-#ifndef _WIN32
-#include <GL/glx.h>
-#endif
-
-/*
- * OpenGL Function Declarations
- */
-
-#ifdef _WIN32
-PFNGLBEGINQUERYPROC Viewer::glBeginQuery = (PFNGLBEGINQUERYPROC) wglGetProcAddress("glBeginQuery");
-PFNGLENDQUERYPROC Viewer::glEndQuery = (PFNGLENDQUERYPROC) wglGetProcAddress("glEndQuery");
-PFNGLGENQUERIESPROC Viewer::glGenQueries = (PFNGLGENQUERIESPROC) wglGetProcAddress("glGenQueries");
-PFNGLGETQUERYOBJECTIVPROC Viewer::glGetQueryObjectiv = (PFNGLGETQUERYOBJECTIVPROC) wglGetProcAddress("glGetQueryObjectiv");
-PFNGLGETQUERYOBJECTUI64VPROC Viewer::glGetQueryObjectui64v = (PFNGLGETQUERYOBJECTUI64VPROC) wglGetProcAddress("glGetQueryObjectui64v");
-#else
-PFNGLBEGINQUERYPROC Viewer::glBeginQuery = (PFNGLBEGINQUERYPROC) glXGetProcAddress((const GLubyte*) "glBeginQuery");
-PFNGLENDQUERYPROC Viewer::glEndQuery = (PFNGLENDQUERYPROC) glXGetProcAddress((const GLubyte*) "glEndQuery");
-PFNGLGENQUERIESPROC Viewer::glGenQueries = (PFNGLGENQUERIESPROC) glXGetProcAddress((const GLubyte*) "glGenQueries");
-PFNGLGETQUERYOBJECTIVPROC Viewer::glGetQueryObjectiv = (PFNGLGETQUERYOBJECTIVPROC) glXGetProcAddress((const GLubyte*) "glGetQueryObjectiv");
-PFNGLGETQUERYOBJECTUI64VPROC Viewer::glGetQueryObjectui64v = (PFNGLGETQUERYOBJECTUI64VPROC) glXGetProcAddress((const GLubyte*) "glGetQueryObjectui64v");
-#endif
+#include "gui/glextensions.h"
 
 /*
  * Image Formats
@@ -137,14 +116,13 @@ void Viewer::initializeGL()
 	msg.enter("Viewer::initializeGL");
 	valid_ = true;
 
-	// Query OpenGL Extensions and set features
-	const GLubyte* glexts = NULL;
-	glexts = glGetString(GL_EXTENSIONS);
-	vboExtension_ = (strstr((const char*)glexts, "GL_ARB_vertex_buffer_object") != NULL);
-	timerExtension_ = (strstr((const char*)glexts, "GL_ARB_timer_query") != NULL);
-	if (!vboExtension_)
+	// Create a GLExtensions object to probe features and give when pushing instances etc.
+	GLExtensions* extensions = extensionsStack_.add();
+
+	// Check for vertex buffer extensions
+	if ((!extensions->hasVBO()) && (Primitive::globalInstanceType() == PrimitiveInstance::VBOInstance))
 	{
-		printf("VBO Extension is not available, so reverting to display list instances.\n");
+		printf("VBO extension is requested but not available, so reverting to display lists instead.\n");
 		Primitive::setGlobalInstanceType(PrimitiveInstance::ListInstance);
 	}
 
@@ -152,7 +130,7 @@ void Viewer::initializeGL()
 	// that, when saving a bitmap using QGLWidget::renderPixmap(), we automatically create new display list
 	// objects, rather than having to worry about context sharing etc. Slow, but safer and more compatible.
 // 	msg.print("In Viewer::initializeGL, pushing instances for %i primitives...\n", primitiveList_.nItems());
-	for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->pushInstance(context());
+	for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->pushInstance(context(), extensions);
 
 	// Recreate surface primitives (so that images are saved correctly)
 	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) updateSurfacePrimitive(collection, true);
@@ -182,6 +160,9 @@ void Viewer::paintGL()
 
 	// Set the drawing flag so we don't have any rendering clashes
 	drawing_ = true;
+
+	// Grab topmost GLExtensions pointer
+	GLExtensions* extensions = extensionsStack_.last();
 
 	// Update / recreate axes, display data and surface primitives if necessary
 	uChroma_->updateAxesPrimitives();
@@ -288,10 +269,10 @@ void Viewer::paintGL()
 
 	// Create a query object to get timing information
 	GLuint timeQuery = 0;
-	if (timerExtension_)
+	if (extensions->hasQueries())
 	{
-		glGenQueries(1, &timeQuery);
-		glBeginQuery(GL_TIME_ELAPSED, timeQuery);
+		extensions->glGenQueries(1, &timeQuery);
+		extensions->glBeginQuery(GL_TIME_ELAPSED, timeQuery);
 	}
 
 	// Loop over master collections - the Collection::sendToGL routine will take care of any additional data collections
@@ -302,17 +283,17 @@ void Viewer::paintGL()
 	glDisable(GL_CLIP_PLANE1);
 
 	// End timer query
-	if (timerExtension_)
+	if (extensions->hasQueries())
 	{
-		glEndQuery(GL_TIME_ELAPSED);
+		extensions->glEndQuery(GL_TIME_ELAPSED);
 
 		// Wait for all results to become available
 		GLint available = 0;
 		GLuint64 timeElapsed = 0;
-		while (!available) { glGetQueryObjectiv(timeQuery, GL_QUERY_RESULT_AVAILABLE, &available); }
+		while (!available) { extensions->glGetQueryObjectiv(timeQuery, GL_QUERY_RESULT_AVAILABLE, &available); }
 
 		// Time taken is in ns, so convert to ms and write to a string
-		glGetQueryObjectui64v(timeQuery, GL_QUERY_RESULT, &timeElapsed);
+		extensions->glGetQueryObjectui64v(timeQuery, GL_QUERY_RESULT, &timeElapsed);
 		double ms = timeElapsed / 1.0e6;
 		renderTime_.sprintf("%0.2f ms", ms);
 		emit(renderComplete(renderTime_));
@@ -322,11 +303,12 @@ void Viewer::paintGL()
 	// Set the rendering flag to false
 	drawing_ = false;
 
-	// If we were rendering offscreen, we may delete the topmost primitive instance here
+	// If we were rendering offscreen, we may delete the topmost primitive instance and GLExtensions objects here
 	if (renderingOffscreen_)
 	{
 // 		msg.print("In Viewer::PaintGL, popping instances for %i primitives...\n", primitiveList_.nItems());
 		for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->popInstance(context());
+		extensionsStack_.removeLast();
 	}
 	
 	msg.exit("Viewer::paintGL");
