@@ -214,7 +214,7 @@ int Keywords::dataSetKeywordNArguments(Keywords::DataSetKeyword kwd)
 */
 
 // View Block Keywords
-const char* ViewBlockKeywords[] = { "BoundingBox", "BoundingBoxPlaneY", "EndView", "LabelFaceViewer", "LabelScale", "MatrixW", "MatrixX", "MatrixY", "MatrixZ", "Perspective", "TitleScale" };
+const char* ViewBlockKeywords[] = { "BoundingBox", "BoundingBoxPlaneY", "EndView", "LabelFaceViewer", "LabelScale", "MatrixX", "MatrixY", "MatrixZ", "MatrixW", "Perspective", "TitleScale" };
 
 // View Block NArguments
 int ViewKeywordNArguments[] = { 1, 1, 0, 1, 1, 4, 4, 4, 4, 1, 1 };

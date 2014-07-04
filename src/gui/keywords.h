@@ -177,10 +177,10 @@ class Keywords
 		EndViewKeyword,
 		LabelFaceViewerKeyword,
 		LabelScaleKeyword,
-		MatrixWKeyword,
 		MatrixXKeyword,
 		MatrixYKeyword,
 		MatrixZKeyword,
+		MatrixWKeyword,
 		PerspectiveKeyword,
 		TitleScaleKeyword,
 		nViewKeywords

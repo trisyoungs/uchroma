@@ -22,14 +22,15 @@
 #ifndef UCHROMA_GLEXTENSIONS_H
 #define UCHROMA_GLEXTENSIONS_H
 
-// #include <GL/gl.h>
 #ifdef _WIN32
 #include <windows.h>
+#include <GL/gl.h>
 #include "glext.h"
 #else
+#include <GL/glx.h>
 #endif
 #include "templates/list.h"
-#include <GL/glx.h>
+
 
 // GL Extensions
 class GLExtensions : public ListItem<GLExtensions>
@@ -37,8 +38,6 @@ class GLExtensions : public ListItem<GLExtensions>
 	public:
 	// Constructor
 	GLExtensions();
-	// Get function pointers
-	void getExtensions();
 
 
 	/*
