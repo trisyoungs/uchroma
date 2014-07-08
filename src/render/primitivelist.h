@@ -1,6 +1,6 @@
 /*
 	*** Rendering Primitive List
-	*** src/gui/viewer_primitivelist.h
+	*** src/render/primitivelist.h
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -22,7 +22,7 @@
 #ifndef UCHROMA_PRIMITIVELIST_H
 #define UCHROMA_PRIMITIVELIST_H
 
-#include "gui/viewer_primitive.h"
+#include "render/primitive.h"
 #include "templates/list.h"
 
 // Forward Declarations

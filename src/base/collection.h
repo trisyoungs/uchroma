@@ -26,10 +26,10 @@
 #include "base/displaydataset.h"
 #include "base/transformer.h"
 #include "base/colourscale.h"
-#include "gui/viewer_primitivelist.h"
+#include "render/primitivelist.h"
 
 // Forward Declarations
-/* None */
+class ViewPane;
 
 class Collection : public ListItem<Collection>
 {
@@ -319,6 +319,8 @@ class Collection : public ListItem<Collection>
 	PrimitiveList displayPrimitives_;
 	// Flag indicating whether display primitives are valid (and don't need to be regenerated)
 	bool displayPrimitivesValid_;
+	// View pane on which this data is being displayed
+	ViewPane* displayPane_;
 
 	public:
 	// Set whether data is visible
@@ -346,7 +348,11 @@ class Collection : public ListItem<Collection>
 	// Return list of display primitives
 	PrimitiveList& displayPrimitives();
 	// Update display data and surface if necessary
-	void updateDisplayData(Vec3<double> axisMin, Vec3<double> axisMax, Vec3<bool> axisInverted, Vec3<bool> axisLogarithmic, Vec3<double> axisStretch);
+	void updateDisplayData();
+	// Set view pane on which this data is being displayed
+	void setDisplayPane(ViewPane* pane);
+	// Return view pane on which this data is being displayed
+	ViewPane* displayPane();
 	// Send collection data to GL, including any associated fit and extracted data
 	void sendToGL();
 };

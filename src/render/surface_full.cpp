@@ -1,6 +1,6 @@
 /*
-	*** Scene Rendering Functions (User) - Full Surface Generation
-	*** src/gui/viewer_user_surface.cpp
+	*** Sufrace Generation - Full
+	*** src/render/surface_full.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,168 +19,41 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/viewer.uih"
-#include "gui/uchroma.h"
-
-// Construct normal / colour data for slice specified
-void Viewer::constructSurfaceStrip(const Array<double>& abscissa, DisplayDataSet* targetSlice, double yAxisScale, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, const ColourScale& colourScale, DisplayDataSet* previousSlice, DisplayDataSet* nextSlice)
-{
-	normals.clear();
-	colours.clear();
-	if ((previousSlice == NULL) && (nextSlice == NULL)) return;
-	
-	// Grab references to target arrays
-	const Array<double>& yTarget = targetSlice->y();
-	int nPoints = abscissa.nItems();
-	if (nPoints < 2) return;
-
-	// Get colour data
-	int n;
-	QColor colour;
-	for (n=0; n<nPoints; ++n)
-	{
-		colour = colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, yTarget.value(n)): yTarget.value(n)) / yAxisScale);
-		colours.add(Vec4<GLfloat>(colour.redF(), colour.greenF(), colour.blueF(), colour.alphaF()));
-	}
-
-	// Calculate normals
-	Vec3<double> v1, v2, v3;
-	double dz;
-	if (previousSlice && nextSlice)
-	{
-		// Grab other array references
-		const Array<double>& yPrev = previousSlice->y();
-		const Array<double>& yNext = nextSlice->y();
-		dz = previousSlice->z() - nextSlice->z();
-
-		// -- First point
-		v1.set(abscissa.value(1) - abscissa.value(0), yTarget.value(1) - yTarget.value(0), 0);
-		v2.set(0.0, yNext.value(0) - yPrev.value(0), dz);
-		normals.add(v1 * v2);
-// 		v3 = v1 * v2;
-// 		v3.normalise();
-// 		normals.add(v3);
-// 		printf("Norm %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", 0, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
-		// -- Points 1 to N-2
-		for (n=1; n<nPoints-1; ++n)
-		{
-			v1.set(abscissa.value(n+1) - abscissa.value(n-1), yTarget.value(n+1) - yTarget.value(n-1), 0.0);
-			v2.set(0.0, yNext.value(n) - yPrev.value(n), dz);
-			normals.add(v1 * v2);
-// 			v3 = v1 * v2;
-// 			v3.normalise();
-// 			normals.add(v3);
-// 			printf("Norm %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
-		}
-		// -- Last point
-		v1.set(abscissa.value(nPoints-1) - abscissa.value(nPoints-2), yTarget.value(nPoints-1) - yTarget.value(nPoints-2), 0.0);
-		v2.set(0.0, yPrev.value(nPoints-1) - yNext.value(nPoints-1), dz);
-		normals.add(v1 * v2);
-// 		v3 = v1 * v2;
-// 		v3.normalise();
-// 		normals.add(v3);
-// 		printf("Norm %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", nPoints-1, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
-	}
-	else if (previousSlice)
-	{
-		// Grab other array reference
-		const Array<double>& yPrev = previousSlice->y();
-		dz = previousSlice->z() - targetSlice->z();
-
-		// -- First point
-		v1.set(abscissa.value(1) - abscissa.value(0), yTarget.value(1) - yTarget.value(0), 0.0);
-		v2.set(0.0, yTarget.value(0) - yPrev.value(0), dz);
-		normals.add(v1 * v2);
-// 		v3 = v1 * v2;
-// 		v3.normalise();
-// 		normals.add(v3);
-// 		printf("Last %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", 0, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
-		// -- Points 1 to N-2
-		for (n=1; n<nPoints-1; ++n)
-		{
-			v1.set(abscissa.value(n+1) - abscissa.value(n-1), yTarget.value(n+1) - yTarget.value(n-1), 0.0);
-			v2.set(0.0, yTarget.value(n) - yPrev.value(n), dz);
-			normals.add(v1 * v2);
-// 			v3 = v1 * v2;
-// 			v3.normalise();
-// 			normals.add(v3);
-// 			printf("Last %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
-		}
-		// -- Last point
-		v1.set(abscissa.value(nPoints-1) - abscissa.value(nPoints-2), yTarget.value(nPoints-1) - yTarget.value(nPoints-2), 0.0);
-		v2.set(0.0, yTarget.value(nPoints-1) - yPrev.value(nPoints-1), dz);
-		normals.add(v1 * v2);
-// 		v3 = v1 * v2;
-// 		v3.normalise();
-// 		normals.add(v3);
-// 		printf("Last %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", nPoints-1, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
-	}
-	else
-	{
-		// Grab other array reference
-		const Array<double>& yNext = nextSlice->y();
-		dz = targetSlice->z() - nextSlice->z();
-
-		// -- First point
-		v1.set(abscissa.value(1) - abscissa.value(0), yTarget.value(1) - yTarget.value(0), 0.0);
-		v2.set(0.0, yNext.value(0) - yTarget.value(0), dz);
-		normals.add(v1 * v2);
-// 		v3 = v1 * v2;
-// 		v3.normalise();
-// 		normals.add(v3);
-// 		printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f)\n", 0, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
-		// -- Points 1 to N-2
-		for (n=1; n<nPoints-1; ++n)
-		{
-			v1.set(abscissa.value(n+1) - abscissa.value(n-1), yTarget.value(n+1) - yTarget.value(n-1), 0.0);
-			v2.set(0.0, yNext.value(n) - yTarget.value(n), dz);
-			normals.add(v1 * v2);
-// 			v3 = v1 * v2;
-// 			v3.normalise();
-// 			normals.add(v3);
-// 			printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f)\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
-		}
-		// -- Last point
-		v1.set(abscissa.value(nPoints-1) - abscissa.value(nPoints-2), yTarget.value(nPoints-1) - yTarget.value(nPoints-2), 0.0);
-		v2.set(0.0, yNext.value(nPoints-1) - yTarget.value(nPoints-1), dz);
-		normals.add(v1 * v2);
-// 		v3 = v1 * v2;
-// 		v3.normalise();
-// 		normals.add(v3);
-// 		printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f)\n", nPoints-1, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
-	}
-	
-	// Normalise normals
-	for (n=0; n<normals.nItems(); ++n) normals[n].normalise();
-}
+#include "render/surface.h"
 
 // Construct full surface representation of data
-void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale)
+void Surface::constructFull(PrimitiveList& primitives, double yAxisScale, bool yLogarithmic, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale)
 {
 	GLfloat zA, zB;
 
 	// Forget all data in current primitives
 	primitives.forgetAll();
 
+	// Check for low number of datasets or low number of points in x
+	if (displayData.nItems() == 0) return;
+	if (displayData.nItems() == 1)
+	{
+		// Special case, if there is exactly one dataset, draw a standard XY line surface instead
+		constructLineXY(primitives, yAxisScale, yLogarithmic, abscissa, displayData, colourScale);
+		return;
+	}
+	if (abscissa.nItems() < 2) return;
+
 	// Resize primitive list so it's large enough for our needs
 	int maxVertices = (abscissa.nItems()+1)*2;
 	int maxIndices = (abscissa.nItems()-1)*6;
 	primitives.reinitialise(displayData.nItems()-1, false, maxVertices, maxIndices, GL_TRIANGLES, true);
-
-	// Sanity check - are there enough slices to proceed?
-	if (displayData.nItems() < 2) return;
 
 	// Temporary variables
 	Array< Vec3<double> > normA, normB;
 	Array< Vec4<GLfloat> > colourA, colourB;
 	int n;
 	QColor colour;
-	double yAxisScale = uChroma_->axisStretch(1);
 	Vec3<double> nrm(0.0, 1.0, 0.0);
 
 	// Construct first slice data and set initial min/max values
 	DisplayDataSet* dataSetA = displayData.first();
-	constructSurfaceStrip(abscissa, dataSetA, yAxisScale, normA, colourA, colourScale, NULL, dataSetA->next);
+	constructSurfaceStrip(abscissa, dataSetA, yAxisScale, yLogarithmic, normA, colourA, colourScale, NULL, dataSetA->next);
 	int nPoints = abscissa.nItems();
 
 	// Create triangles
@@ -194,7 +67,7 @@ void Viewer::constructFullSurface(PrimitiveList& primitives, const Array<double>
 		DisplayDataSet* dataSetC = (dataSetB->next == NULL ? NULL : dataSetB->next);
 
 		// Construct data for current slice
-		constructSurfaceStrip(abscissa, dataSetB, yAxisScale, normB, colourB, colourScale, dataSetA, dataSetC);
+		constructSurfaceStrip(abscissa, dataSetB, yAxisScale, yLogarithmic, normB, colourB, colourScale, dataSetA, dataSetC);
 
 		// Grab z values
 		zA = (GLfloat) dataSetA->z();

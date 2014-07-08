@@ -70,6 +70,7 @@ void GraphWidget::staticDataChanged()
 	// Change the static data in PlotWidget for that currently in uChroma
 	if (!uChroma_) return;
 	ui.Graph->setStaticData(uChroma_->currentSlice());
+	ui.Graph->update();
 }
 
 /*
@@ -77,7 +78,7 @@ void GraphWidget::staticDataChanged()
  */
 
 // Add data to graph
-void GraphWidget::addData(ExtractedSlice* data)
+void GraphWidget::addData(DataSet* data)
 {
 	ui.Graph->addDataSet(data);
 }

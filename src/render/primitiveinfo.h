@@ -1,6 +1,6 @@
 /*
 	*** Primitive Info
-	*** src/gui/viewer_primitiveinfo.h
+	*** src/render/primitiveinfo.h
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.

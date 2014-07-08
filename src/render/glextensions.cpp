@@ -1,6 +1,6 @@
 /*
 	*** GL Extensions
-	*** src/gui/glextensions.cpp
+	*** src/render/glextensions.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,7 +19,7 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/glextensions.h"
+#include "render/glextensions.h"
 #include <string.h>
 
 // Constructor

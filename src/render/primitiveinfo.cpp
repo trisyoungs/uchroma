@@ -1,6 +1,6 @@
 /*
 	*** Primitive Info
-	*** src/gui/viewer_primitiveinfo.cpp
+	*** src/render/primitiveinfo.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -23,7 +23,7 @@
 #include <windows.h>
 #include <GL/gl.h>
 #endif
-#include "gui/viewer_primitiveinfo.h"
+#include "render/primitiveinfo.h"
 
 // Constructor
 PrimitiveInfo::PrimitiveInfo()

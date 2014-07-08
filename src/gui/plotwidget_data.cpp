@@ -50,13 +50,13 @@ PlotData::~PlotData()
 }
 
 // Set source data
-void PlotData::setData(ExtractedSlice* source)
+void PlotData::setData(DataSet* source)
 {
 	data_ = source;
 }
 
 // Return reference to contained data
-ExtractedSlice* PlotData::data()
+DataSet* PlotData::data()
 {
 	return data_;
 }
@@ -161,8 +161,7 @@ QPainterPath& PlotData::linePath()
  */
 bool PlotData::visible()
 {
-	if (data_ && data_->group()) return data_->group()->visible();
-	else return true;
+	return true;
 }
 
 /*!
@@ -256,5 +255,5 @@ void PlotData::stylePen(QPen& pen)
 	pen.setColor(lineColour_);
 
 	// Get line style from PlotDataGroup (if available)
-	if (data_ && data_->group()) pen.setDashPattern(data_->group()->dashes());
+// 	if (data_ && data_->group()) pen.setDashPattern(data_->group()->dashes());
 }

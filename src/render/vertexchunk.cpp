@@ -1,6 +1,6 @@
 /*
 	*** Vertex Chunk
-	*** src/gui/viewer_vertexchunk.cpp
+	*** src/render/vertexchunk.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,7 +19,7 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/viewer_vertexchunk.h"
+#include "render/vertexchunk.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -95,7 +95,7 @@ void VertexChunk::initialise(int newMaxVertices, int newMaxIndices, GLenum type,
 	}
 
 	// (Re)create indexData_ array if it doesn't currently exist or is too small
-	if ((!indexData_) || (newMaxIndices> maxIndices_))
+	if ((!indexData_) || (newMaxIndices > maxIndices_))
 	{
 		if (indexData_) delete[] indexData_;
 		maxIndices_ = newMaxIndices;

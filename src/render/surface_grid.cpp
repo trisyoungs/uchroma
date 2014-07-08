@@ -1,6 +1,6 @@
 /*
-	*** Scene Rendering Functions (User) - Grid Surface Generation
-	*** src/gui/viewer_user_grid.cpp
+	*** Surface Generation - Grid
+	*** src/render/surface_grid.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,81 +19,10 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/viewer.uih"
-#include "gui/uchroma.h"
-
-// Construct normal / colour data for vertex specified
-Vec3<double> Viewer::constructVertexNormals(const Array<double>& abscissa, int index, DisplayDataSet* targetDataSet, DisplayDataSet* previousDataSet, DisplayDataSet* nextDataSet, int nPoints)
-{
-	Vec3<double> normals;
-
-	// Grab references to first target array
-	const Array<double>& yTarget = targetDataSet->y();
-
-	// Check whether previous / next slice information is available
-	if ((previousDataSet == NULL) && (nextDataSet == NULL))
-	{
-		// Neither previous nor next slices exist - the normal will depend only on the previous and/or next points
-
-		// Check on index provided
-		if (index == 0)
-		{
-			// First point in array, so no previous points available
-		}
-		else if (index == (nPoints-1))
-		{
-			// Last point in array, so no next point available
-		}
-		else
-		{
-			// Point somewhere in middle of array, so have previous and next points
-		}
-	}
-	else if (previousDataSet == NULL)
-	{
-		// No previous slice available, so normals depend on this and next slice only
-
-		// Check on index provided
-		if (index == 0)
-		{
-			// First point in array, so no previous points available
-		}
-		else if (index == (nPoints-1))
-		{
-			// Last point in array, so no next point available
-		}
-		else
-		{
-			// Point somewhere in middle of array, so have previous and next points
-		}
-	}
-	else if (nextDataSet == NULL)
-	{
-		// No next slice available, so normals depend on this and previous slice only
-
-		// Check on index provided
-		if (index == 0)
-		{
-			// First point in array, so no previous points available
-		}
-		else if (index == (nPoints-1))
-		{
-			// Last point in array, so no next point available
-		}
-		else
-		{
-			// Point somewhere in middle of array, so have previous and next points
-		}
-	}
-	else
-	{
-		// Both previous and next slices available, so use all available data
-	}
-
-}
+#include "render/surface.h"
 
 // Construct grid surface representation of data
-void Viewer::constructGridSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale)
+void Surface::constructGrid(PrimitiveList& primitives, double yAxisScale, bool yLogarithmic, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale)
 {
 	// Forget all data in current primitives
 	primitives.forgetAll();
@@ -117,7 +46,6 @@ void Viewer::constructGridSurface(PrimitiveList& primitives, const Array<double>
 	int n, nPoints, offset = 0, i, nLimit, nMax;
 	Vec4<GLfloat> colour;
 	GLfloat zA, zB;
-	double yAxisScale = uChroma_->axisStretch(1);
 	Vec3<double> nrm(0.0, 1.0, 0.0);
 
 	DisplayDataSet** slices = displayData.array(), slice;
@@ -143,7 +71,7 @@ void Viewer::constructGridSurface(PrimitiveList& primitives, const Array<double>
 			if (yType.value(i) != DisplayDataSet::NoPoint)
 			{
 				// A value exists here, so define a vertex
-				colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, y.value(i)) : y.value(i)) / yAxisScale, colour);
+				colourScale.colour((yLogarithmic ? pow(10.0, y.value(i)) : y.value(i)) / yAxisScale, colour);
 				verticesA[n] = currentPrimitive->defineVertex(abscissa.value(i), y.value(i), z, nrm, colour);
 
 				// If the previous vertex also exists, draw a line here
@@ -167,7 +95,7 @@ void Viewer::constructGridSurface(PrimitiveList& primitives, const Array<double>
 				if (yType.value(offset+n) != DisplayDataSet::NoPoint)
 				{
 					// A value exists here, so define a vertex
-					colourScale.colour((uChroma_->axisLogarithmic(1) ? pow(10.0, y.value(i)) : y.value(i)) / yAxisScale, colour);
+					colourScale.colour((yLogarithmic ? pow(10.0, y.value(i)) : y.value(i)) / yAxisScale, colour);
 					verticesB[n] = currentPrimitive->defineVertex(abscissa.value(i), y.value(i), z, nrm, colour);
 
 					// If the previous vertex on this row also exists, draw a line here

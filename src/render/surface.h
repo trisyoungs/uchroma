@@ -1,0 +1,52 @@
+/*
+	*** Surface Creation
+	*** src/render/surface.h
+	Copyright T. Youngs 2013-2014
+
+	This file is part of uChroma.
+
+	uChroma is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	uChroma is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#ifndef UCHROMA_SURFACE_H
+#define UCHROMA_SURFACE_H
+
+#include "render/primitivelist.h"
+#include "base/displaydataset.h"
+#include "base/colourscale.h"
+
+// Forward Declarations
+/* none */
+
+// Surface Generation
+class Surface
+{
+	private:
+	// Construct normals for requested vertex TODO
+	static Vec3<double> constructVertexNormals(const Array<double>& abscissa, int index, DisplayDataSet* targetDataSet, DisplayDataSet* previousDataSet, DisplayDataSet* nextDataSet, int nPoints);
+	// Construct normal / colour surface data for dataset specified
+	static void constructSurfaceStrip(const Array<double>& abscissa, DisplayDataSet* targetDataSet, double yAxisScale, bool yLogarithmic, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, const ColourScale& colourScale, DisplayDataSet* previousDataSet, DisplayDataSet* nextDataSet);
+
+	public:
+	// Construct line surface representation of data in XY slices
+	static void constructLineXY(PrimitiveList& primitives, double yAxisScale, bool yLogarithmic, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
+	// Construct line surface representation of data in ZY slices
+	static void constructLineZY(PrimitiveList& primitives, double yAxisScale, bool yLogarithmic, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
+	// Construct line surface representation of data
+	static void constructGrid(PrimitiveList& primitives, double yAxisScale, bool yLogarithmic, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
+	// Construct full surface representation of data
+	static void constructFull(PrimitiveList& primitives, double yAxisScale, bool yLogarithmic, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
+};
+
+#endif

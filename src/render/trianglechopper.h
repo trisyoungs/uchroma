@@ -1,6 +1,6 @@
 /*
 	*** Triangle Storage Class
-	*** src/gui/viewer_trianglechopper.h
+	*** src/render/trianglechopper.h
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.

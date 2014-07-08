@@ -22,7 +22,8 @@
 #include "gui/viewer.uih"
 #include "gui/uchroma.h"
 #include "base/messenger.h"
-#include "gui/glextensions.h"
+#include "render/glextensions.h"
+#include "render/fontinstance.h"
 
 /*
  * Image Formats
@@ -67,26 +68,9 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	valid_ = false;
 	drawing_ = false;
 	renderingOffscreen_ = false;
-	hasPerspective_ = false;
-	perspectiveFieldOfView_ = 20.0;
-	slicePrimitivePosition_ = 0.0;
 
 	// Engine Setup
-	createPrimitives();
-	viewMatrix_[14] = -5.0;
-	font_ = NULL;
-	clipPlaneDelta_ = 0.0001;
-	clipPlaneBottom_[0] = 0.0;
-	clipPlaneBottom_[1] = 1.0;
-	clipPlaneBottom_[2] = 0.0;
-	clipPlaneBottom_[3] = 0.0;
-	clipPlaneTop_[0] = 0.0;
-	clipPlaneTop_[1] = -1.0;
-	clipPlaneTop_[2] = 0.0;
-	clipPlaneTop_[3] = 0.0;
-	clipPlaneYMin_ = 0.0;
-	clipPlaneYMax_ = 0.0;
-	correctTransparency_ = true;
+	correctTransparency_ = false;
 	useFrameBuffer_ = false;
 	lineWidth_ = 2.0;
 
@@ -120,10 +104,10 @@ void Viewer::initializeGL()
 	GLExtensions* extensions = extensionsStack_.add();
 
 	// Check for vertex buffer extensions
-	if ((!extensions->hasVBO()) && (Primitive::globalInstanceType() == PrimitiveInstance::VBOInstance))
+	if ((!extensions->hasVBO()) && (PrimitiveInstance::globalInstanceType() == PrimitiveInstance::VBOInstance))
 	{
 		printf("VBO extension is requested but not available, so reverting to display lists instead.\n");
-		Primitive::setGlobalInstanceType(PrimitiveInstance::ListInstance);
+		PrimitiveInstance::setGlobalInstanceType(PrimitiveInstance::ListInstance);
 	}
 
 	// Create an instance for each defined user primitive - we do this in every call to initialiseGL so
@@ -135,14 +119,8 @@ void Viewer::initializeGL()
 	// Recreate surface primitives (so that images are saved correctly)
 	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) updateSurfacePrimitive(collection, true);
 
-	// Set viewport matrix
-	viewportMatrix_[0] = 0;
-	viewportMatrix_[1] = 0;
-	viewportMatrix_[2] = contextWidth_;
-	viewportMatrix_[3] = contextHeight_;
-
-	// Recalculate projection matrix
-	projectionMatrix_ = calculateProjectionMatrix(hasPerspective_, perspectiveFieldOfView_, viewMatrix_[14]);
+	// Recalculate view layouts
+	uChroma_->recalculateViewLayout(contextWidth_, contextHeight_);
 
 	msg.exit("Viewer::initializeGL");
 }
@@ -165,7 +143,7 @@ void Viewer::paintGL()
 	GLExtensions* extensions = extensionsStack_.last();
 
 	// Update / recreate axes, display data and surface primitives if necessary
-	uChroma_->updateAxesPrimitives();
+	//uChroma_->updateAxesPrimitives();
 	uChroma_->updateDisplayData();
 	int nUpdated = 0;
 	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) if (updateSurfacePrimitive(collection)) ++nUpdated;
@@ -174,98 +152,15 @@ void Viewer::paintGL()
 	// Setup basic GL stuff
 	setupGL();
 
-	// Clear view
-	msg.print(Messenger::Verbose, " --> Clearing context, background, and setting pen colour\n");
-	glViewport(0, 0, contextWidth_, contextHeight_);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	GLfloat colourBlack[4] = { 0.0, 0.0, 0.0, 1.0 };
-
 	// Set colour mode
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_TEXTURE_2D);
 
-	// Set projection matrix
-	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixd(projectionMatrix_.matrix());
-
-	// Set modelview matrix as target for the remainder of the routine
-	glMatrixMode(GL_MODELVIEW);
-
-	// Set up our transformation matrix
-	Vec3<double> centreTranslation = -uChroma_->axesCoordCentre();
-	Matrix A;
-	A.setIdentity();
-	A.setTranslation(centreTranslation);
-	A = viewMatrix_ * A;
-	
-	// Send axis primitives to the display first
-	glLoadMatrixd(A.matrix());
-	glEnable(GL_MULTISAMPLE);
-	glEnable(GL_BLEND);
-	glColor4fv(colourBlack);
-
-	// -- Render axis text
-	if (font_)
-	{
-		font_->FaceSize(1);
-		textPrimitives_.renderAll(viewMatrix_, uChroma_->labelCorrectOrientation(), centreTranslation, font_);
-		for (int n=0; n<3; ++n) if (uChroma_->axisVisible(n)) axisTextPrimitives_[n].renderAll(viewMatrix_, uChroma_->labelCorrectOrientation(), centreTranslation, font_);
-	}
-
-	// -- Render axis lines
-	glEnable(GL_LINE_SMOOTH);
-	glLoadMatrixd(A.matrix());
-	glLineWidth(lineWidth_);
-	glDisable(GL_LIGHTING);
-	for (int axis=0; axis<3; ++axis) if (uChroma_->axisVisible(axis)) axisPrimitives_[axis].sendToGL();
-	glEnable(GL_LIGHTING);
-	glDisable(GL_LINE_SMOOTH);
-
-	// Render bounding box
-	boundingBoxPrimitive_.sendToGL();
-
-	// Render current selection marker
-	glLoadMatrixd(A.matrix());
-	int sliceAxis = uChroma_->interactionAxis();
-	if (sliceAxis != -1)
-	{
-		// Note - we do not need to check for inverted or logarithmic axes here, since the transformation matrix A takes care of that
-		Vec3<double> v;
-
-		// Draw starting interaction point (if we are interacting)
-		if (uChroma_->interacting())
-		{
-			v[sliceAxis] = uChroma_->clickedInteractionCoordinate() * uChroma_->axisStretch(sliceAxis);
-			glTranslated(v.x, v.y, v.z);
-			glColor4d(0.0, 0.0, 1.0, 0.5);
-			interactionPrimitive_.sendToGL();
-			interactionBoxPrimitive_.sendToGL();
-		}
-
-		// Draw current selection position
-		v[sliceAxis] = 	uChroma_->currentInteractionCoordinate() * uChroma_->axisStretch(sliceAxis) - v[sliceAxis];
-		glTranslated(v.x, v.y, v.z);
-		glColor4d(1.0, 0.0, 0.0, 0.5);
-		interactionPrimitive_.sendToGL();
-		interactionBoxPrimitive_.sendToGL();
-	}
-
-	// Render main surface
-	// -- Setup clip planes to enforce Y-axis limits
-	glLoadMatrixd(A.matrix());
-	glPushMatrix();
-	glTranslated(0.0, clipPlaneYMin_, 0.0);
-	glClipPlane (GL_CLIP_PLANE0, clipPlaneBottom_);
-	glEnable(GL_CLIP_PLANE0);
-	glPopMatrix();
-	glPushMatrix();
-	glTranslated(0.0, clipPlaneYMax_, 0.0);
-	glClipPlane (GL_CLIP_PLANE1, clipPlaneTop_);
-	glEnable(GL_CLIP_PLANE1);
-	glPopMatrix();
+	// Clear view
+	msg.print(Messenger::Verbose, " --> Clearing context, background, and setting pen colour\n");
+	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);
 
 	// Create a query object to get timing information
 	GLuint timeQuery = 0;
@@ -274,13 +169,136 @@ void Viewer::paintGL()
 		extensions->glGenQueries(1, &timeQuery);
 		extensions->glBeginQuery(GL_TIME_ELAPSED, timeQuery);
 	}
+	
+	// Loop over defined viewpanes
+	GLdouble clipPlaneBottom[4] = { 0.0, 1.0, 0.0, 0.0 }, clipPlaneTop[4] = { 0.0, -1.0, 0.0, 0.0 };
+	for (ViewPane* pane = uChroma_->viewPanes(); pane != NULL; pane = pane->next)
+	{
+		// Set viewport
+		glViewport(pane->viewportMatrix()[0], pane->viewportMatrix()[1], pane->viewportMatrix()[2], pane->viewportMatrix()[3]);
 
-	// Loop over master collections - the Collection::sendToGL routine will take care of any additional data collections
-	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) collection->sendToGL();
+		// Setup an orthographic matrix
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(pane->viewportMatrix()[0], pane->viewportMatrix()[0]+pane->viewportMatrix()[2], pane->viewportMatrix()[1], pane->viewportMatrix()[1] + pane->viewportMatrix()[3], -10, 10);
 
-	glDisable(GL_MULTISAMPLE);
-	glDisable(GL_CLIP_PLANE0);
-	glDisable(GL_CLIP_PLANE1);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glDisable(GL_LIGHTING);
+		GLfloat colourGray[4] = { 0.8, 0.8, 0.8, 1.0 };
+		GLfloat colourBlue[4] = { 0.64, 0.8, 1.0, 1.0 };
+		GLfloat colourWhite[4] = { 1.0, 1.0, 1.0, 1.0 };
+
+		// Draw graduated background for current pane
+		if (pane == uChroma_->currentViewPane())
+		{
+			glBegin(GL_QUADS);
+			glColor4fv(colourBlue);
+			glVertex3i(0, 0, 0);
+			glVertex3i(pane->viewportMatrix()[2]-1, 0, 0);
+			glColor4fv(colourWhite);
+			glVertex3i(pane->viewportMatrix()[2]-1, pane->viewportMatrix()[3]*0.5, 0);
+			glVertex3i(0, pane->viewportMatrix()[3]*0.5, 0);
+			glEnd();
+		}
+
+		// Draw a box around the pane
+		glColor4fv(colourGray);
+		glBegin(GL_LINE_LOOP);
+		glVertex3i(0, 0, 1);
+		glVertex3i(0, pane->viewportMatrix()[3]-1, 1);
+		glVertex3i(pane->viewportMatrix()[2]-1, pane->viewportMatrix()[3]-1, 1);
+		glVertex3i(pane->viewportMatrix()[2]-1, 0, 1);
+		glEnd();
+
+		// Set projection matrix
+		glMatrixMode(GL_PROJECTION);
+		glLoadMatrixd(pane->projectionMatrix().matrix());
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		// Set modelview matrix as target for the remainder of the routine
+		glMatrixMode(GL_MODELVIEW);
+
+		// Set up our transformation matrix
+		Vec3<double> centreTranslation = -pane->axes().axesCoordCentre();
+		Matrix A, viewMatrix = pane->viewMatrix();
+		A.setIdentity();
+		A.setTranslation(centreTranslation);
+		A = viewMatrix * A;
+		
+		// Send axis primitives to the display first
+		glLoadMatrixd(A.matrix());
+		glEnable(GL_MULTISAMPLE);
+		glEnable(GL_BLEND);
+		GLfloat colourBlack[4] = { 0.0, 0.0, 0.0, 1.0 };
+		glColor4fv(colourBlack);
+
+		// -- Render axis text
+		if (FontInstance::fontOK())
+		{
+			FontInstance::font()->FaceSize(1);
+			for (int n=0; n<3; ++n) if (pane->axes().axisVisible(n)) pane->axes().axisTextPrimitive(n).renderAll(viewMatrix, uChroma_->labelCorrectOrientation(), centreTranslation, FontInstance::font());
+		}
+
+		// -- Render axis lines
+		glEnable(GL_LINE_SMOOTH);
+		glLoadMatrixd(A.matrix());
+		glLineWidth(lineWidth_);
+		glDisable(GL_LIGHTING);
+		for (int axis=0; axis<3; ++axis) if (pane->axes().axisVisible(axis)) pane->axes().axisPrimitive(axis).sendToGL();
+		glEnable(GL_LIGHTING);
+		glDisable(GL_LINE_SMOOTH);
+
+		// Render bounding box
+		pane->boundingBoxPrimitive().sendToGL();
+
+		// Render current selection marker
+		glLoadMatrixd(A.matrix());
+		int sliceAxis = uChroma_->interactionAxis();
+		if ((pane == uChroma_->currentViewPane()) && (sliceAxis != -1))
+		{
+			// Note - we do not need to check for inverted or logarithmic axes here, since the transformation matrix A takes care of that
+			Vec3<double> v;
+
+			// Draw starting interaction point (if we are interacting)
+			if (uChroma_->interacting())
+			{
+				v[sliceAxis] = uChroma_->clickedInteractionCoordinate() * pane->axes().axisStretch(sliceAxis);
+				glTranslated(v.x, v.y, v.z);
+				glColor4d(0.0, 0.0, 1.0, 0.5);
+				pane->interactionPrimitive().sendToGL();
+				pane->interactionBoxPrimitive().sendToGL();
+			}
+
+			// Draw current selection position
+			v[sliceAxis] = 	uChroma_->currentInteractionCoordinate() * pane->axes().axisStretch(sliceAxis) - v[sliceAxis];
+			glTranslated(v.x, v.y, v.z);
+			glColor4d(1.0, 0.0, 0.0, 0.5);
+			pane->interactionPrimitive().sendToGL();
+			pane->interactionBoxPrimitive().sendToGL();
+		}
+
+		// Render main surface
+		// -- Setup clip planes to enforce Y-axis limits
+		glLoadMatrixd(A.matrix());
+		glPushMatrix();
+		glTranslated(0.0, pane->axes().clipPlaneYMin(), 0.0);
+		glClipPlane(GL_CLIP_PLANE0, clipPlaneBottom);
+		glEnable(GL_CLIP_PLANE0);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslated(0.0, pane->axes().clipPlaneYMax(), 0.0);
+		glClipPlane (GL_CLIP_PLANE1, clipPlaneTop);
+		glEnable(GL_CLIP_PLANE1);
+		glPopMatrix();
+
+		// Loop over master collections - the Collection::sendToGL routine will take care of any additional data collections
+		for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) collection->sendToGL();
+
+		glDisable(GL_MULTISAMPLE);
+		glDisable(GL_CLIP_PLANE0);
+		glDisable(GL_CLIP_PLANE1);
+	}
 
 	// End timer query
 	if (extensions->hasQueries())
@@ -321,62 +339,79 @@ void Viewer::resizeGL(int newwidth, int newheight)
 	contextWidth_ = (GLsizei) newwidth;
 	contextHeight_ = (GLsizei) newheight;
 
-	// Set viewport matrix
-	viewportMatrix_[0] = 0;
-	viewportMatrix_[1] = 0;
-	viewportMatrix_[2] = contextWidth_;
-	viewportMatrix_[3] = contextHeight_;
+	// Recalculate viewlayouts
+	uChroma_->recalculateViewLayout(contextWidth_, contextHeight_);
+}
 
-	// Recalculate projection matrix
-	projectionMatrix_ = calculateProjectionMatrix(hasPerspective_, perspectiveFieldOfView_, viewMatrix_[14]);
+// Setup basic GL properties (called each time before renderScene())
+void Viewer::setupGL()
+{
+	msg.enter("Viewer::setupGL");
+
+	// Define colours etc.
+	GLfloat backgroundColour[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	GLfloat spotlightAmbient[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	GLfloat spotlightDiffuse[4] = { 0.8f, 0.8f, 0.8f, 1.0f };
+	GLfloat spotlightSpecular[4] = { 0.7f, 0.7f, 0.7f, 1.0f };
+	GLfloat spotlightPosition[4] = { 100.0f, 100.0f, 0.0f, 0.0f };
+	GLfloat specularColour[4] = { 0.9f, 0.9f, 0.9f, 1.0f };
+
+	// Clear (background) colour
+	glClearColor(backgroundColour[0], backgroundColour[1], backgroundColour[2], backgroundColour[3]);
+
+	// Perspective hint
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+
+	// Enable depth buffer
+	glEnable(GL_DEPTH_TEST);
+
+	// Smooth shading
+	glShadeModel(GL_SMOOTH);
+
+	// Auto-normalise surface normals
+	glEnable(GL_NORMALIZE);	
+
+	// Set up the light model
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glEnable(GL_LIGHTING);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, spotlightAmbient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, spotlightDiffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, spotlightSpecular);
+	glLightfv(GL_LIGHT0, GL_POSITION, spotlightPosition);
+	glEnable(GL_LIGHT0);
+
+	// Set specular reflection colour
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specularColour);
+	glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 127);
+
+	// Configure antialiasing
+	glDisable(GL_MULTISAMPLE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+
+	// Configure fog effects
+//	glFogi(GL_FOG_MODE, GL_LINEAR);
+//	prefs.copyColour(Prefs::BackgroundColour, col);
+//	glFogfv(GL_FOG_COLOR, col);
+//	glFogf(GL_FOG_DENSITY, 0.35f);
+//	glHint(GL_FOG_HINT, GL_NICEST);
+//	glFogi(GL_FOG_START, prefs.depthNear());
+//	glFogi(GL_FOG_END, prefs.depthFar());
+//	glEnable(GL_FOG);
+	glDisable(GL_FOG);
+
+	// Configure face culling
+// 	glCullFace(GL_BACK);
+// 	glEnable(GL_CULL_FACE);
+
+	msg.exit("Viewer::setupGL");
 }
 
 /*
 // Character / Setup
 */
-
-// Setup font specified
-bool Viewer::setupFont(QString fontName)
-{
-	// If the current font is valid, and matches the name of the new font supplied, do nothing
-	if (font_ && (fontFile_ == fontName)) return true;
-
-	// Prevent anything from being drawn while we change the font
-	drawing_ = true;
-	
-	if (font_) delete font_;
-	font_ = NULL;
-	fontFile_ = fontName;
-
-	// Check if the file exists
-	if (!QFile::exists(fontFile_))
-	{
-		QMessageBox::warning(this, "Font Error", "The specified font file '" + fontFile_ + "' does not exist.");
-		drawing_ = false;
-		return false;
-	}
-
-	FTPolygonFont* newFont = new FTPolygonFont(qPrintable(fontName));
-	if (newFont->Error())
-	{
-		QMessageBox::warning(this, "Font Error", "Error creating primitives from '" + fontFile_ + "'.");
-		delete newFont;
-		fontBaseHeight_ = 1.0;
-	}
-	else
-	{
-		font_ = newFont;
-// 		font_->Depth(3.0);
-// 		font_->Outset(-.5, 1.5);
-		font_->FaceSize(1);
-		FTBBox boundingBox = font_->BBox("Hello");
-		fontBaseHeight_ = boundingBox.Upper().Yf() - boundingBox.Lower().Yf();
-
-	}
-
-	drawing_ = false;
-	return (font_ != NULL);
-}
 
 // Return the current height of the drawing area
 GLsizei Viewer::contextHeight() const
@@ -435,74 +470,6 @@ void Viewer::postRedisplay()
 	update();
 }
 
-// Return calculated projection matrix
-Matrix Viewer::calculateProjectionMatrix(bool perspective, double fov, double viewZOffset)
-{
-	Matrix result;
-	GLdouble top, bottom, right, left, aspect = (GLdouble) contextWidth_ / (GLdouble) contextHeight_;
-	GLdouble nearClip = 0.5, farClip = 2000.0;
-
-	if (perspective)
-	{
-		// Use reversed top and bottom values so we get y-axis (0,1,0) pointing up
-		top = tan(fov / DEGRAD) * 0.5;
-		bottom = -top;
-		left = -aspect*top;
-		right = aspect*top;
-		result.setColumn(0, (nearClip*2.0) / (right-left), 0.0, 0.0, 0.0);
-		result.setColumn(1, 0.0, (nearClip*2.0) / (top-bottom), 0.0, 0.0);
-		result.setColumn(2, (right+left)/(right-left), (top+bottom)/(top-bottom), -(farClip+nearClip)/(farClip-nearClip), -1.0);
-		result.setColumn(3, 0.0, 0.0, -(2.0*nearClip*farClip) / (farClip-nearClip), 0.0);
-		// Equivalent to the following code:
-		// glMatrixMode(GL_PROJECTION);
-		// glLoadIdentity();
-		// top = tan(prefs.perspectiveFov() / DEGRAD) * prefs.clipNear();
-		// bottom = -top;
-		// glFrustum(aspect*bottom, aspect*top, bottom, top, prefs.clipNear(), prefs.clipFar());
-		// glGetDoublev(GL_PROJECTION_MATRIX, modelProjectionMatrix_.matrix());
-	}
-	else
-	{
-		top = -tan(fov / DEGRAD) * viewZOffset;
-		bottom = -top;
-		left = -aspect*top;
-		right = aspect*top;
-
-		result.setColumn(0, 2.0 / (right-left), 0.0, 0.0, (right+left)/(right-left));
-		result.setColumn(1, 0.0, 2.0 / (top-bottom), 0.0, (top+bottom)/(top-bottom));
-		result.setColumn(2, 0.0, 0.0, -1.0/farClip, 0.0);
-		result.setColumn(3, 0.0, 0.0, 0.0, 1.0);
-		// Equivalent to the following code:
-		// glMatrixMode(GL_PROJECTION);
-		// glLoadIdentity();
-		// top = tan(prefs.perspectiveFov() / DEGRAD) * prefs.clipNear();
-		// bottom = -top;
-		// glOrtho(aspect*top, aspect*bottom, top, bottom, -prefs.clipFar(), prefs.clipFar());
-		// glGetDoublev(GL_PROJECTION_MATRIX, modelProjectionMatrix_.matrix());
-	}
-
-	return result;
-}
-                
-// Update transformation (view) matrix
-void Viewer::setViewMatrix(Matrix &mat)
-{
-	// Projection matrix needs to be updated if the zoom value has changed and we are *not* using perspective
-	if ((!hasPerspective_) && (fabs(mat[14] - viewMatrix_[14]) > 0.01))
-	{
-		// Recalculate projection matrix
-		projectionMatrix_ = calculateProjectionMatrix(hasPerspective_, perspectiveFieldOfView_, mat[14]);
-	}
-
-	viewMatrix_ = mat;
-}
-
-// Return transformation (view) matrix
-Matrix Viewer::viewMatrix()
-{
-	return viewMatrix_;
-}
-
 // Render or grab image
 QPixmap Viewer::generateImage(int w, int h)
 {
@@ -536,160 +503,3 @@ QPixmap Viewer::generateImage(int w, int h)
 	}
 }
 
-// Project given model coordinates into world coordinates
-Vec3<double> Viewer::modelToWorld(Vec3<double> &modelr)
-{
-	msg.enter("Viewer::modelToWorld");
-	Vec3<double> worldr;
-	Matrix vmat;
-	Vec4<double> pos, temp;
-
-	// Projection formula is : worldr = P x M x modelr
-	pos.set(modelr, 1.0);
-	// Get the world coordinates of the atom - Multiply by modelview matrix 'view'
-	vmat = viewMatrix_;
-//	vmat.applyTranslation(-cell_.centre().x, -cell_.centre().y, -cell_.centre().z);
-	temp = vmat * pos;
-	worldr.set(temp.x, temp.y, temp.z);
-	msg.exit("Viewer::modelToWorld");
-	return worldr;
-}
-
-// Project given model coordinates into screen coordinates
-Vec4<double> Viewer::modelToScreen(Vec3<double> &modelr, double screenradius)
-{
-	msg.enter("Viewer::modelToScreen");
-	Vec4<double> screenr, tempscreen;
-	Vec4<double> worldr;
-	Matrix vmat;
-	Vec4<double> pos;
-
-	// Projection formula is : worldr = P x M x modelr
-	pos.set(modelr, 1.0);
-
-	// Get the world coordinates of the point - Multiply by modelview matrix 'view'
-	vmat = viewMatrix_;
-	vmat.applyTranslation(-uChroma_->axesCoordCentre());
-	worldr = vmat * pos;
-
-	screenr = projectionMatrix_ * worldr;
-	screenr.x /= screenr.w;
-	screenr.y /= screenr.w;
-	screenr.x = viewportMatrix_[0] + viewportMatrix_[2]*(screenr.x+1)*0.5;
-	screenr.y = viewportMatrix_[1] + viewportMatrix_[3]*(screenr.y+1)*0.5;
-	screenr.z = screenr.z / screenr.w;
-
-	// Calculate 2D 'radius' around the point - Multiply world[x+delta] coordinates by P
-	if (screenradius > 0.0)
-	{
-		worldr.x += screenradius;
-		tempscreen = projectionMatrix_ * worldr;
-		tempscreen.x /= tempscreen.w;
-		screenr.w = fabs( (viewportMatrix_[0] + viewportMatrix_[2]*(tempscreen.x+1)*0.5) - screenr.x);
-	}
-	msg.exit("Viewer::modelToScreen");
-	return screenr;
-}
-
-// Return zoom level, assuming orthogonally-aligned view matrix, to display coordinates supplied
-double Viewer::calculateRequiredZoom(double xExtent, double yExtent, double fraction)
-{
-	// The supplied x and y extents should indicate the number of units in those directions
-	// from the origin that are to be displaye on-screen. The 'fraction' indicates how much of the
-	// available range on-screen to use, allowing a margin to be added. A value of '1.0' would
-	// put the extent with the highest units on the very edge of the display.
-
-	Vec4<double> rScreen, rProjected;
-	Vec4<double> worldr;
-	Vec4<double> pos;
-
-	// Calculate target screen coordinate
-	int targetX = (1.0 + fraction) * contextWidth_ * 0.5;
-	int targetY = (1.0 + fraction) * contextHeight_ * 0.5;
-	int screenX = targetX, screenY = targetY;
-
-	double zoom = 0.0;
-	int count = 0;
-	do
-	{
-		// Increase zoom distance
-		zoom -= max( max(screenX / targetX, screenY / targetY), 1);
-
-		// Get the world coordinates of the point - viewmatrix is assumed to be the identity matrix, plus the zoom factor in array index [14]
-		worldr.x = xExtent;
-		worldr.y = yExtent;
-		worldr.z = 0.0;
-
-		// Get projection matrix for this zoom level (orthogonal projection only)
-		Matrix projectionMatrix = calculateProjectionMatrix(hasPerspective_, perspectiveFieldOfView_, zoom);
-
-// 		rProjected = projectionMatrix * worldr;
-
-		// Multiply by view matrix to get screen coordinates
-// 		rScreen.x = viewportMatrix_[0] + viewportMatrix_[2]*((rProjected.x / rProjected.w)+1)*0.5;
-// 		rScreen.y = viewportMatrix_[1] + viewportMatrix_[3]*((rProjected.y / rProjected.w)+1)*0.5;
-
-		// Calculate screen X coordinate
-		screenX = viewportMatrix_[0] + viewportMatrix_[2]*((
-			(worldr.x * projectionMatrix[0] + worldr.z * projectionMatrix[8])
-			/ 
-			(worldr.x * projectionMatrix[3] + worldr.z * projectionMatrix[11] + projectionMatrix[15])
-			)+1)*0.5;
-		screenY = viewportMatrix_[1] + viewportMatrix_[3]*((
-			(worldr.y * projectionMatrix[5] + worldr.z * projectionMatrix[8])
-			/ 
-			(worldr.y * projectionMatrix[7] + worldr.z * projectionMatrix[11] + projectionMatrix[15])
-			)+1)*0.5;
-
-		// Limit the number of iterations so we can never get into an infinite loop
-		if (++count == 20) break;
-
-	} while ((screenX > targetX) || (screenY > targetY));
-	return zoom;
-}
-
-// Convert screen coordinates into model space coordinates
-Vec3<double> Viewer::screenToModel(int x, int y, double z)
-{
-	msg.enter("Viewer::screenToModel");
-	static Vec3<double> modelr;
-	Vec4<double> temp, worldr;
-	int newx, newy;
-	double dx, dy;
-
-	// Grab transformation matrix, apply translation correction, and invert
-	Matrix itransform = viewMatrix_;
-//	itransform.applyTranslation(-cell_.centre().x, -cell_.centre().y, -cell_.centre().z);
-	itransform.invert();
-
-	// Mirror y-coordinate
-	y = viewportMatrix_[3] - y;
-
-	// Project points at guide z-position and two other points along literal x and y to get scaling factors for screen coordinates
-	worldr.set(0.0,0.0,z, 1.0);
-	temp = projectionMatrix_ * worldr;
-	newx = viewportMatrix_[0] + viewportMatrix_[2]*(temp.x / temp.w + 1.0)*0.5;
-	newy = viewportMatrix_[1] + viewportMatrix_[3]*(temp.y / temp.w + 1.0)*0.5;
-
-	for (int n=0; n<10; ++n)
-	{
-		// Determine new (better) coordinate from a yardstick centred at current world coordinates
-		temp = projectionMatrix_ * Vec4<double>(worldr.x+1.0, worldr.y+1.0, worldr.z, worldr.w);
-		dx = viewportMatrix_[0] + viewportMatrix_[2]*(temp.x / temp.w + 1.0)*0.5 - newx;
-		dy = viewportMatrix_[1] + viewportMatrix_[3]*(temp.y / temp.w + 1.0)*0.5 - newy;
-
-		worldr.add((x-newx)/dx, (y-newy)/dy, 0.0, 0.0);
-// 		printf ("N=%i", n); worldr.print();
-		temp = projectionMatrix_ * worldr;
-		newx = viewportMatrix_[0] + viewportMatrix_[2]*(temp.x / temp.w + 1.0)*0.5;
-		newy = viewportMatrix_[1] + viewportMatrix_[3]*(temp.y / temp.w + 1.0)*0.5;
-// 		printf("NEW dx = %f, dy = %f, wantedxy = %f, %f\n", newx, newy, x, y);
-		if ((x == newx) && (y == newy)) break;
-	}
-
-	// Finally, invert to model coordinates
-	modelr = itransform * Vec3<double>(worldr.x, worldr.y, worldr.z);
-
-	msg.exit("Viewer::screenToModel");
-	return modelr;
-}

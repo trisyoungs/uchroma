@@ -1,6 +1,6 @@
 /*
 	*** Data2D Plotting Widget
-	*** src/plotwidget.uih
+	*** src/gui/plotwidget.uih
 	Copyright T. Youngs 2012-2013.
 
 	This file is part of uChroma.
@@ -27,7 +27,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 #include <QtSvg/QSvgGenerator>
-#include "base/slice.h"
+#include "base/dataset.h"
 #include "templates/reflist.h"
 
 // Forward Declarations
@@ -51,7 +51,7 @@ class PlotData : public ListItem<PlotData>
 	 */
 	private:
 	// Associated data
-	ExtractedSlice* data_;
+	DataSet* data_;
 	// QPainterPath of data
 	QPainterPath linePath_;
 	// Vertical offset to apply to data
@@ -65,9 +65,9 @@ class PlotData : public ListItem<PlotData>
 
 	public:
 	// Set data
-	void setData(ExtractedSlice* source);
+	void setData(DataSet* source);
 	// Return reference to contained data
-	ExtractedSlice* data();
+	DataSet* data();
 	// Determine data limits
 	void determineLimits();
 	// Regenerate QPainterPath
@@ -352,9 +352,9 @@ class PlotWidget : public QWidget
 
 	public:
 	// Add data to Plot
-	PlotData* addDataSet(ExtractedSlice* data, int yOffset = 0);
+	PlotData* addDataSet(DataSet* data, int yOffset = 0);
 	// Set static data
-	void setStaticData(ExtractedSlice* data);
+	void setStaticData(DataSet* data);
 	// Remove all data from plot
 	void removeAllDataSets();
 	// Return dataset list

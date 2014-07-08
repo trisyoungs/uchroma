@@ -45,19 +45,6 @@ bool Viewer::correctTransparency()
 	return correctTransparency_;
 }
 
-// Return whether the view has perspective
-bool Viewer::hasPerspective()
-{
-	return hasPerspective_;
-}
-
-// Set whether this view has perspective
-void Viewer::setHasPerspective(bool b)
-{
-	hasPerspective_ = b;
-	projectionMatrix_ = calculateProjectionMatrix(hasPerspective_, perspectiveFieldOfView_, viewMatrix_[14]);
-}
-
 // Set line width to use
 void Viewer::setLineWidth(double lineWidth)
 {

@@ -38,6 +38,9 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 	// Store event information
 	rMouseDown_.set(event->x(), event->y(), 0.0);
 
+	// The clicked pane will now become the current pane
+	if (uChroma_->setCurrentViewPane(event->x(), event->y())) postRedisplay();
+
 	// Do something with the button press event (e.g. context menu function, or interaction start)
 	if (buttonState_&Qt::LeftButton) uChroma_->startInteraction(event->x(), contextHeight_-event->y(), km);
 	else if (buttonState_&Qt::RightButton)
@@ -87,18 +90,13 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 		}
 		else 
 		{
-			// Rotate the view ('XY plane')
-			A.createRotationXY(delta.y/2.0, delta.x/2.0);
-			A.copyTranslationAndScaling(viewMatrix_);
-			// Reset translation and scaling on original matrix, and multiply
-			viewMatrix_.removeTranslationAndScaling();
-			viewMatrix_ = A * viewMatrix_;
+			if (uChroma_->currentViewPane()) uChroma_->currentViewPane()->rotateView(delta.y/2.0, delta.x/2.0);
 			refresh = true;
 		}
 	}
 	else if (buttonState_&Qt::MidButton)
 	{
-		viewMatrix_.adjustColumn(3, delta.x/15.0, -delta.y/15.0, 0.0, 0.0);
+		if (uChroma_->currentViewPane()) uChroma_->currentViewPane()->translateView(delta.x/15.0, -delta.y/15.0, 0.0);
 		refresh = true;
 	}
 	
@@ -110,6 +108,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 	}
 
 	rMouseLast_.set(event->x(), event->y(), 0.0);
+
 	setFocus();
 	
 	if (refresh) postRedisplay();
@@ -122,15 +121,14 @@ void Viewer::wheelEvent(QWheelEvent *event)
 	bool scrollup = event->delta() > 0;
 	
 	// Perform camera zoom
-	double dz = -viewMatrix_[14] * 0.15;
-	if (scrollup) dz = -dz;
-	viewMatrix_.adjustColumn(3, 0.0, 0.0, dz, 0.0);
-	// Never let camera z go below -1.0...
-	if (viewMatrix_[14] > -1.0) viewMatrix_[14] = -1.0;
-	postRedisplay();
+	if (uChroma_->currentViewPane())
+	{
+		double zrange = uChroma_->currentViewPane()->axes().axisStretch(2) * uChroma_->currentViewPane()->axes().axisRange(2);
+		if (zrange < 1.0) zrange = 1.0;
+		uChroma_->currentViewPane()->translateView(0.0, 0.0, 0.5*zrange*(scrollup ? -1.0 : 1.0));
+	}
 
-	// Recalculate projection matrix
-	projectionMatrix_ = calculateProjectionMatrix(hasPerspective_, perspectiveFieldOfView_, viewMatrix_[14]);
+	postRedisplay();
 
 	msg.exit("Viewer::wheelEvent");
 }
@@ -157,40 +155,27 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 	// Check datamodel...
 	bool refresh = false, ignore = true;
 	Qt::KeyboardModifiers km = event->modifiers();
-	Matrix A;
 	int n;
 	
 	switch (event->key())
 	{
 		case (Qt::Key_Left):
-			A.createRotationXY(0.0, km.testFlag(Qt::ShiftModifier) ? -1.0 : -10.0);
-			A.copyTranslationAndScaling(viewMatrix_);
-			viewMatrix_.removeTranslationAndScaling();
-			viewMatrix_ = A * viewMatrix_;
+			if (uChroma_->currentViewPane()) uChroma_->currentViewPane()->rotateView(0.0, km.testFlag(Qt::ShiftModifier) ? -1.0 : -10.0);
 			refresh = true;
 			ignore = false;
 			break;
 		case (Qt::Key_Right):
-			A.createRotationXY(0.0, km.testFlag(Qt::ShiftModifier) ? 1.0 : 10.0);
-			A.copyTranslationAndScaling(viewMatrix_);
-			viewMatrix_.removeTranslationAndScaling();
-			viewMatrix_ = A * viewMatrix_;
+			if (uChroma_->currentViewPane()) uChroma_->currentViewPane()->rotateView(0.0, km.testFlag(Qt::ShiftModifier) ? 1.0 : 10.0);
 			refresh = true;
 			ignore = false;
 			break;
 		case (Qt::Key_Up):
-			A.createRotationXY(km.testFlag(Qt::ShiftModifier) ? -1.0 : -10.0, 0.0);
-			A.copyTranslationAndScaling(viewMatrix_);
-			viewMatrix_.removeTranslationAndScaling();
-			viewMatrix_ = A * viewMatrix_;
+			if (uChroma_->currentViewPane()) uChroma_->currentViewPane()->rotateView(km.testFlag(Qt::ShiftModifier) ? -1.0 : -10.0, 0.0);
 			refresh = true;
 			ignore = false;
 			break;
 		case (Qt::Key_Down):
-			A.createRotationXY(km.testFlag(Qt::ShiftModifier) ? 1.0 : 10.0, 0.0);
-			A.copyTranslationAndScaling(viewMatrix_);
-			viewMatrix_.removeTranslationAndScaling();
-			viewMatrix_ = A * viewMatrix_;
+			if (uChroma_->currentViewPane()) uChroma_->currentViewPane()->rotateView(km.testFlag(Qt::ShiftModifier) ? 1.0 : 10.0, 0.0);
 			refresh = true;
 			ignore = false;
 			break;

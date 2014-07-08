@@ -169,8 +169,9 @@ void StyleWindow::on_ColourRGBGradientASetMinimumButton_clicked(bool checked)
 	// Check for a current Collection
 	Collection* currentCollection = uChroma_.currentCollection();
 	if (!currentCollection) return;
+	if (!currentCollection->displayPane()) return;
 
-	ui.ColourRGBGradientASpin->setValue(uChroma_.axisLimitMin(1));
+	ui.ColourRGBGradientASpin->setValue(currentCollection->displayPane()->axes().axisLimitMin(1));
 }
 
 void StyleWindow::on_ColourRGBGradientASetMaximumButton_clicked(bool checked)
@@ -178,8 +179,9 @@ void StyleWindow::on_ColourRGBGradientASetMaximumButton_clicked(bool checked)
 	// Check for a current Collection
 	Collection* currentCollection = uChroma_.currentCollection();
 	if (!currentCollection) return;
+	if (!currentCollection->displayPane()) return;
 
-	ui.ColourRGBGradientASpin->setValue(uChroma_.axisLimitMax(1));
+	ui.ColourRGBGradientASpin->setValue(currentCollection->displayPane()->axes().axisLimitMax(1));
 }
 
 void StyleWindow::on_ColourRGBGradientBButton_clicked(bool checked)
@@ -218,8 +220,9 @@ void StyleWindow::on_ColourRGBGradientBSetMinimumButton_clicked(bool checked)
 	// Check for a current Collection
 	Collection* currentCollection = uChroma_.currentCollection();
 	if (!currentCollection) return;
+	if (!currentCollection->displayPane()) return;
 
-	ui.ColourRGBGradientBSpin->setValue(uChroma_.axisLimitMin(1));
+	ui.ColourRGBGradientBSpin->setValue(currentCollection->displayPane()->axes().axisLimitMin(1));
 }
 
 void StyleWindow::on_ColourRGBGradientBSetMaximumButton_clicked(bool checked)
@@ -227,8 +230,9 @@ void StyleWindow::on_ColourRGBGradientBSetMaximumButton_clicked(bool checked)
 	// Check for a current Collection
 	Collection* currentCollection = uChroma_.currentCollection();
 	if (!currentCollection) return;
+	if (!currentCollection->displayPane()) return;
 
-	ui.ColourRGBGradientBSpin->setValue(uChroma_.axisLimitMax(1));
+	ui.ColourRGBGradientBSpin->setValue(currentCollection->displayPane()->axes().axisLimitMax(1));
 }
 
 // HSV Gradient
@@ -283,8 +287,9 @@ void StyleWindow::on_ColourHSVGradientASetMinimumButton_clicked(bool checked)
 	// Check for a current Collection
 	Collection* currentCollection = uChroma_.currentCollection();
 	if (!currentCollection) return;
+	if (!currentCollection->displayPane()) return;
 
-	ui.ColourHSVGradientASpin->setValue(uChroma_.axisLimitMin(1));
+	ui.ColourHSVGradientASpin->setValue(currentCollection->displayPane()->axes().axisLimitMin(1));
 }
 
 void StyleWindow::on_ColourHSVGradientASetMaximumButton_clicked(bool checked)
@@ -292,8 +297,9 @@ void StyleWindow::on_ColourHSVGradientASetMaximumButton_clicked(bool checked)
 	// Check for a current Collection
 	Collection* currentCollection = uChroma_.currentCollection();
 	if (!currentCollection) return;
+	if (!currentCollection->displayPane()) return;
 
-	ui.ColourHSVGradientASpin->setValue(uChroma_.axisLimitMax(1));
+	ui.ColourHSVGradientASpin->setValue(currentCollection->displayPane()->axes().axisLimitMax(1));
 }
 
 void StyleWindow::on_ColourHSVGradientBButton_clicked(bool checked)
@@ -332,8 +338,9 @@ void StyleWindow::on_ColourHSVGradientBSetMinimumButton_clicked(bool checked)
 	// Check for a current Collection
 	Collection* currentCollection = uChroma_.currentCollection();
 	if (!currentCollection) return;
+	if (!currentCollection->displayPane()) return;
 
-	ui.ColourHSVGradientBSpin->setValue(uChroma_.axisLimitMin(1));
+	ui.ColourHSVGradientBSpin->setValue(currentCollection->displayPane()->axes().axisLimitMin(1));
 }
 
 void StyleWindow::on_ColourHSVGradientBSetMaximumButton_clicked(bool checked)
@@ -341,8 +348,9 @@ void StyleWindow::on_ColourHSVGradientBSetMaximumButton_clicked(bool checked)
 	// Check for a current Collection
 	Collection* currentCollection = uChroma_.currentCollection();
 	if (!currentCollection) return;
+	if (!currentCollection->displayPane()) return;
 
-	ui.ColourHSVGradientBSpin->setValue(uChroma_.axisLimitMax(1));
+	ui.ColourHSVGradientBSpin->setValue(currentCollection->displayPane()->axes().axisLimitMax(1));
 }
 
 // Custom Gradient

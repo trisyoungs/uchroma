@@ -1,6 +1,6 @@
 /*
 	*** Triangle Chopper
-	*** src/gui/viewer_trianglechopper.cpp
+	*** src/render/trianglechopper.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.

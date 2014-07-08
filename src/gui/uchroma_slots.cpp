@@ -20,6 +20,7 @@
 */
 
 #include "gui/uchroma.h"
+#include "render/fontinstance.h"
 #include "templates/reflist.h"
 #include "version.h"
 
@@ -98,6 +99,10 @@ void UChromaWindow::on_actionFileSave_triggered(bool checked)
 		QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", inputFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
 		if (fileName.isEmpty()) return;
 		inputFile_ = fileName;
+
+		// Make sure the file has the right extension
+		QFileInfo fileInfo(inputFile_);
+		if (fileInfo.suffix() != "ucr") inputFile_ += ".ucr";
 	}
 
 	if (saveInputFile(inputFile_)) modified_ = false;
@@ -108,11 +113,15 @@ void UChromaWindow::on_actionFileSave_triggered(bool checked)
 
 void UChromaWindow::on_actionFileSaveAs_triggered(bool checked)
 {
-	// Has an input filename already been chosen?
+	// Get a filename from the user
 	QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", inputFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
 	if (fileName.isEmpty()) return;
-	
 	inputFile_ = fileName;
+
+	// Make sure the file has the right extension
+	QFileInfo fileInfo(inputFile_);
+	if (fileInfo.suffix() != "ucr") inputFile_ += ".ucr";
+
 	if (saveInputFile(inputFile_)) modified_ = false;
 
 	// Update title bar
@@ -162,26 +171,16 @@ bool UChromaWindow::checkBeforeClose()
 
 void UChromaWindow::on_actionViewPerspective_triggered(bool checked)
 {
-	ui.MainView->setHasPerspective(checked);
+	if (currentViewPane_) currentViewPane_->setHasPerspective(checked);
+
 	ui.MainView->update();
 }
 
 void UChromaWindow::on_actionViewReset_triggered(bool checked)
 {
-	Matrix A;
-	A.setIdentity();
+	if (currentViewPane_) currentViewPane_->resetView();
 
-	double zoom = ui.MainView->calculateRequiredZoom((axisMax_.x - axisMin_.x)*0.5, (axisMax_.y - axisMin_.y)*0.5, 0.9);
-	A[14] = zoom;
-
-	ui.MainView->setViewMatrix(A);
 	ui.MainView->update();
-}
-
-void UChromaWindow::on_actionViewGraphMode_triggered(bool checked)
-{
-	graphMode_ = checked;
-	updateDisplay();
 }
 
 /*
@@ -270,7 +269,7 @@ void UChromaWindow::interactionActionTriggered(int axis)
 
 void UChromaWindow::on_actionAxesShowAll_triggered(bool checked)
 {
-	showAllData();
+	currentViewPane_->showAllData();
 
 	updateGUI();
 }
@@ -355,13 +354,6 @@ void UChromaWindow::on_actionWindowsFit_triggered(bool checked)
 	else fitWindow_.hide();
 }
 
-void UChromaWindow::on_actionWindowsSlices_triggered(bool checked)
-{
-	if (refreshing_) return;
-	if (checked) slicesWindow_.updateAndShow();
-	else slicesWindow_.hide();
-}
-
 void UChromaWindow::on_actionWindowsSliceMonitor_triggered(bool checked)
 {
 	if (refreshing_) return;
@@ -380,7 +372,8 @@ void UChromaWindow::on_actionSettingsChooseFont_triggered(bool checked)
 	if (!newFont.isEmpty())
 	{
 		viewerFont_ = newFont;
-		ui.MainView->setupFont(viewerFont_);
+		if (!QFile::exists(viewerFont_)) QMessageBox::warning(this, "Font Error", "The specified font file '" + viewerFont_ + "' does not exist.");
+		else if (!FontInstance::setupFont(viewerFont_)) QMessageBox::warning(this, "Font Error", "Failed to create a font from the specified font file '" + viewerFont_ +"'.");
 		saveSettings();
 	}
 }

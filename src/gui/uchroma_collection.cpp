@@ -1,5 +1,5 @@
 /*
-	*** Main Window - Collection 
+	*** UChroma - Collection 
 	*** src/gui/uchroma_collection.cpp
 	Copyright T. Youngs 2013-2014
 
@@ -92,6 +92,34 @@ void UChromaWindow::on_CollectionRemoveButton_clicked(bool checked)
 	updateGUI();
 }
 
+// Update item in collections tree
+void UChromaWindow::updateCollectionTreeItem(QTreeWidgetItem* item)
+{
+	if (item == NULL) return;
+
+	// First, get Collection from item data
+	Collection* collection = VariantPointer<Collection>(item->data(0, Qt::UserRole));
+	if (collection == NULL) return;
+
+	// Set basic information
+	item->setText(0, collection->title());
+	item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+	item->setCheckState(0, collection->visible() ? Qt::Checked : Qt::Unchecked);
+
+	// Set icon
+	QString iconName;
+	// -- Get base name
+	if (collection->type() == Collection::MasterCollection) iconName = ":/uchroma/icons/collection_collection";
+	else if (collection->type() == Collection::FitCollection) iconName = ":/uchroma/icons/collection_fit";
+	else if (collection->type() == Collection::ExtractedCollection) iconName = ":/uchroma/icons/collection_extracted";
+	// -- If display pane is invalid, tweak icon name
+	if (collection->displayPane() == NULL) iconName += "_nopane";
+	item->setIcon(0, QIcon(iconName+".svg"));
+
+	// If this is the current collection, select it
+	if (collection == currentCollection_) item->setSelected(true);
+}
+
 // Add collection data to CollectionTree under specified item
 void UChromaWindow::addCollectionsToTree(Collection* collection, QTreeWidgetItem* parent)
 {
@@ -101,19 +129,9 @@ void UChromaWindow::addCollectionsToTree(Collection* collection, QTreeWidgetItem
 	else item = new QTreeWidgetItem(ui.CollectionTree, 0);
 
 	// Set item information
-	item->setText(0, collection->title());
 	item->setData(0, Qt::UserRole, VariantPointer<Collection>(collection));
-	item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-	item->setCheckState(0, collection->visible() ? Qt::Checked : Qt::Unchecked);
+	updateCollectionTreeItem(item);
 	item->setExpanded(true);
-
-	// Set icon...
-	if (collection->type() == Collection::MasterCollection) item->setIcon(0, QIcon(":/uchroma/icons/windows_collections.svg"));
-	else if (collection->type() == Collection::FitCollection) item->setIcon(0, QIcon(":/uchroma/icons/collection_fit.svg"));
-	else if (collection->type() == Collection::ExtractedCollection) item->setIcon(0, QIcon(":/uchroma/icons/collection_extracted.svg"));
-
-	// If this is the current collection, select it
-	if (collection == currentCollection_) item->setSelected(true);
 
 	// Add any additional data
 	for (Collection* fit = collection->fitData(); fit != NULL; fit = fit->next) addCollectionsToTree(fit, item);
@@ -127,13 +145,41 @@ void UChromaWindow::addCollectionsToTree(Collection* collection, QTreeWidgetItem
 // Context menu requested for CollectionTree
 void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 {
-	printf("ContextMenuRequested.\n");
+	// Build the context menu to display
+	QMenu paneMenu;
+	QList<QAction*> paneActions;
+	for (ViewPane* pane = viewLayout_.panes(); pane != NULL; pane = pane->next)
+	{
+		QAction* action = paneMenu.addAction(pane->name());
+		action->setData(VariantPointer<ViewPane>(pane));
+		paneActions << action;
+	}
+
+	QMenu contextMenu;
+	QAction* sendToPaneMenuAction = contextMenu.addMenu(&paneMenu);
+	sendToPaneMenuAction->setText("Send to pane");
+
+	// Show it
+	QAction* menuResult = contextMenu.exec(QCursor::pos());
+
+	// What was clicked?
+	if (paneActions.contains(menuResult))
+	{
+		// Check current display pane - if it is non-null we must remove it from that pane first
+		if (currentCollection_->displayPane()) currentCollection_->displayPane()->removeCollection(currentCollection_);
+		currentCollection_->setDisplayPane(VariantPointer<ViewPane>(menuResult->data()));
+
+		// Update the item
+		updateCollectionTreeItem(ui.CollectionTree->currentItem());
+
+		updateDisplay();
+	}
+
 }
 
 // Refresh collection list
 void UChromaWindow::refreshCollections()
 {
-	// Clear and repopulate list
 	ui.CollectionTree->clear();
 	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next) addCollectionsToTree(collection, NULL);
 

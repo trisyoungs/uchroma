@@ -24,7 +24,7 @@
 #include "base/lineparser.h"
 
 // Parse AxisBlock keywords
-bool UChromaWindow::readAxisBlock(LineParser& parser, int axis)
+bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 {
 	while (!parser.eofOrBlank())
 	{
@@ -42,7 +42,7 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, int axis)
 		{
 			// Auto ticks
 			case (Keywords::AutoTicksKeyword):
-				axisAutoTicks_[axis] = parser.argb(1);
+				axes.setAxisAutoTicks(axis, parser.argb(1));
 				break;
 			// End input block
 			case (Keywords::EndAxisKeyword):
@@ -50,64 +50,73 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, int axis)
 				break;
 			// First ticks
 			case (Keywords::FirstTickKeyword):
-				axisFirstTick_[axis] = parser.argd(1);
+				axes.setAxisFirstTick(axis, parser.argd(1));
 				break;
 			// Fractional positioning flag
 			case (Keywords::FractionalPositioningKeyword):
-				axisPositionIsFractional_[axis] = parser.argb(1);
+				axes.setAxisPositionIsFractional(axis, parser.argb(1));
 				break;
 			// Invert
 			case (Keywords::InvertKeyword):
-				axisInverted_[axis] = parser.argb(1);
+				axes.setAxisInverted(axis, parser.argb(1));
 				break;
 			// Axis label orientation
 			case (Keywords::LabelOrientationKeyword):
-				axisLabelOrientation_[axis].set(parser.argd(1), parser.argd(2), parser.argd(3));
+				axes.setAxisLabelOrientation(axis, 0, parser.argd(1));
+				axes.setAxisLabelOrientation(axis, 1, parser.argd(2));
+				axes.setAxisLabelOrientation(axis, 2, parser.argd(3));
 				break;
 			// Limits
 			case (Keywords::LimitsKeyword):
-				axisMin_[axis] = parser.argd(1);
-				axisMax_[axis] = parser.argd(2);
+				axes.setAxisMin(axis, parser.argd(1));
+				axes.setAxisMax(axis, parser.argd(2));
 				break;
 			// Axis logarithmic flag
 			case (Keywords::LogarithmicKeyword):
-				axisLogarithmic_[axis] = parser.argb(1);
+				axes.setAxisLogarithmic(axis, parser.argb(1));
 				break;
 			// Axis minor ticks
 			case (Keywords::MinorTicksKeyword):
-				axisMinorTicks_[axis] = parser.argi(1);
+				axes.setAxisMinorTicks(axis, parser.argi(1));
 				break;
 			// Axis position (in fractional axis coordinates)
 			case (Keywords::PositionFractionalKeyword):
-				axisPositionFractional_[axis].set(parser.argd(1), parser.argd(2), parser.argd(3));
+				axes.setAxisPositionFractional(axis, 0, parser.argd(1));
+				axes.setAxisPositionFractional(axis, 1, parser.argd(2));
+				axes.setAxisPositionFractional(axis, 2, parser.argd(3));
 				break;
 			// Axis position (in real surface-space coordinates)
 			case (Keywords::PositionRealKeyword):
-				axisPositionReal_[axis].set(parser.argd(1), parser.argd(2), parser.argd(3));
+				axes.setAxisPositionReal(axis, 0, parser.argd(1));
+				axes.setAxisPositionReal(axis, 1, parser.argd(2));
+				axes.setAxisPositionReal(axis, 2, parser.argd(3));
 				break;
 			// Axis stretch factors
 			case (Keywords::StretchKeyword):
-				axisStretch_[axis] = parser.argd(1);
+				axes.setAxisStretch(axis, parser.argd(1));
 				break;
 			// Axis tick deltas
 			case (Keywords::TickDeltaKeyword):
-				axisTickDelta_[axis] = parser.argd(1);
+				axes.setAxisTickDelta(axis, parser.argd(1));
 				break;
 			// Axis title
 			case (Keywords::TitleKeyword):
-				axisTitle_[axis] = parser.argc(1);
+				axes.setAxisTitle(axis, parser.argc(1));
 				break;
 			// Axis title anchors
 			case (Keywords::TitleAnchorKeyword):
-				axisTitleAnchor_[axis] = (TextPrimitive::HorizontalAnchor) parser.argi(1);
+				axes.setAxisTitleAnchor(axis, (Axes::AxisAnchor) parser.argi(1));
 				break;
 			// Axis title orientation
 			case (Keywords::TitleOrientationKeyword):
-				axisTitleOrientation_[axis].set(parser.argd(1), parser.argd(2), parser.argd(3), parser.argd(4));
+				axes.setAxisTitleOrientation(axis, 0, parser.argd(1));
+				axes.setAxisTitleOrientation(axis, 1, parser.argd(2));
+				axes.setAxisTitleOrientation(axis, 2, parser.argd(3));
+				axes.setAxisTitleOrientation(axis, 3, parser.argd(4));
 				break;
 			// Axis visibility
 			case (Keywords::VisibleAxisKeyword):
-				axisVisible_[axis] = parser.argb(1);
+				axes.setAxisVisible(axis, parser.argb(1));
 				break;
 			// Unrecognised keyword
 			default:
@@ -361,7 +370,7 @@ bool UChromaWindow::readSettingsBlock(LineParser& parser)
 	return false;
 }
 
-// Read AxisBlock keywords
+// Read ViewBlock keywords
 bool UChromaWindow::readViewBlock(LineParser& parser)
 {
 	int xyzw;
@@ -380,15 +389,6 @@ bool UChromaWindow::readViewBlock(LineParser& parser)
 		}
 		switch (viewKwd)
 		{
-			// Bounding Box
-			case (Keywords::BoundingBoxKeyword):
-				if ((parser.argi(1) < 0) || (parser.argi(1) >= UChromaWindow::nBoundingBoxes)) msg.print("Value is out of range for %s keyword.\n", Keywords::viewKeyword(viewKwd));
-				boundingBox_ = (UChromaWindow::BoundingBox) parser.argi(1);
-				break;
-			// Bounding Box plane y intercept
-			case (Keywords::BoundingBoxPlaneYKeyword):
-				boundingBoxPlaneY_ = parser.argd(1);
-				break;
 			// End input block
 			case (Keywords::EndViewKeyword):
 				return true;
@@ -397,27 +397,88 @@ bool UChromaWindow::readViewBlock(LineParser& parser)
 			case (Keywords::LabelFaceViewerKeyword):
 				labelFaceViewer_ = parser.argb(1);
 				break;
+			// Unrecognised Keyword
+			default:
+				msg.print("Error : Unrecognised view keyword: %s\n", parser.argc(0));
+				return false;
+		}
+	}
+	msg.print("Error : Unterminated 'View' block.\n");
+	return false;
+}
+
+// Read ViewPane keywords
+bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
+{
+	int xyzw, axis;
+
+	Matrix mat;
+	while (!parser.eofOrBlank())
+	{
+		// Get line from file
+		parser.getArgsDelim(LineParser::UseQuotes + LineParser::SkipBlanks);
+
+		// Get keyword and check number of arguments provided
+		Keywords::ViewPaneKeyword viewPaneKwd = Keywords::viewPaneKeyword(parser.argc(0));
+		if ((viewPaneKwd != Keywords::nViewPaneKeywords) && (Keywords::viewPaneKeywordNArguments(viewPaneKwd) > (parser.nArgs()-1)))
+		{
+			msg.print("Error : ViewPane keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::viewPaneKeyword(viewPaneKwd), Keywords::viewPaneKeywordNArguments(viewPaneKwd), parser.nArgs()-1);
+			return false;
+		}
+		switch (viewPaneKwd)
+		{
+			// Axis block
+			case (Keywords::AxisBlockKeyword):
+				// Get target axis...
+				axis = parser.argi(1);
+				if ((axis < 0) || (axis > 2))
+				{
+					QMessageBox::warning(this, "Error", "Axis index is out of range in input file.");
+					return false;
+				}
+				if (!readAxisBlock(parser, pane->axes(), axis)) return false;
+				break;
+			// Bounding Box
+			case (Keywords::BoundingBoxKeyword):
+				if ((parser.argi(1) < 0) || (parser.argi(1) >= ViewPane::nBoundingBoxes)) msg.print("Value is out of range for %s keyword.\n", Keywords::viewPaneKeyword(viewPaneKwd));
+				pane->setBoundingBox((ViewPane::BoundingBox) parser.argi(1));
+				break;
+			// Bounding Box plane y intercept
+			case (Keywords::BoundingBoxPlaneYKeyword):
+				pane->setBoundingBoxPlaneY(parser.argd(1));
+				break;
+			// End input block
+			case (Keywords::EndViewPaneKeyword):
+				return true;
+				break;
+			// Name
+			case (Keywords::GeometryKeyword):
+				pane->setBottomLeft(parser.argi(1), parser.argi(2));
+				pane->setSize(parser.argi(3), parser.argi(4));
+				break;
 			// Label scale
 			case (Keywords::LabelScaleKeyword):
-				labelScale_ = parser.argd(1);
+				pane->setLabelScale(parser.argd(1));
+				break;
+			// Name
+			case (Keywords::NameKeyword):
+				pane->setName(parser.argc(1));
 				break;
 			// Orthographic view
 			case (Keywords::PerspectiveKeyword):
-				ui.actionViewPerspective->setChecked(true);
+				pane->setHasPerspective(true);
 				break;
 			// Title scale
 			case (Keywords::TitleScaleKeyword):
-				titleScale_ = parser.argd(1);
+				pane->setTitleScale(parser.argd(1));
 				break;
 			// View Matrix
 			case (Keywords::MatrixXKeyword):
 			case (Keywords::MatrixYKeyword):
 			case (Keywords::MatrixZKeyword):
 			case (Keywords::MatrixWKeyword):
-				xyzw = viewKwd - Keywords::MatrixXKeyword;
-				mat = ui.MainView->viewMatrix();
-				mat.setColumn(xyzw, parser.argd(1), parser.argd(2), parser.argd(3), parser.argd(4));
-				ui.MainView->setViewMatrix(mat);
+				xyzw = viewPaneKwd - Keywords::MatrixXKeyword;
+				pane->setViewMatrixColumn(xyzw, parser.argd(1), parser.argd(2), parser.argd(3), parser.argd(4));
 				break;
 			// Unrecognised Keyword
 			default:
@@ -455,17 +516,6 @@ bool UChromaWindow::loadInputFile(QString fileName)
 		block = Keywords::inputBlock(parser.argc(0));
 		switch (block)
 		{
-			// Axis Block
-			case (Keywords::AxisBlock):
-				// Get target axis...
-				axis = parser.argi(1);
-				if ((axis < 0) || (axis > 2))
-				{
-					QMessageBox::warning(this, "Error", "Axis index is out of range in input file.");
-					return false;
-				}
-				success = readAxisBlock(parser, axis);
-				break;
 			// Collection Block
 			case (Keywords::CollectionBlock):
 				// Create new master Collection and set its title

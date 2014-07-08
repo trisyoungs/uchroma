@@ -37,7 +37,6 @@ class Keywords
 	// Input File Block Keyword Enum
 	enum InputBlock
 	{
-		AxisBlock,
 		CollectionBlock,
 		SettingsBlock,
 		ViewBlock,
@@ -172,17 +171,10 @@ class Keywords
 	// View Block Keyword Enum
 	enum ViewKeyword
 	{
-		BoundingBoxKeyword,
-		BoundingBoxPlaneYKeyword,
 		EndViewKeyword,
+		GridKeyword,
 		LabelFaceViewerKeyword,
-		LabelScaleKeyword,
-		MatrixXKeyword,
-		MatrixYKeyword,
-		MatrixZKeyword,
-		MatrixWKeyword,
-		PerspectiveKeyword,
-		TitleScaleKeyword,
+		ViewPaneBlockKeyword,
 		nViewKeywords
 	};
 	// Convert text string to ViewKeyword
@@ -191,6 +183,35 @@ class Keywords
 	static const char* viewKeyword(ViewKeyword kwd);
 	// Return minimum number of expected arguments
 	static int viewKeywordNArguments(ViewKeyword kwd);
+
+	/*
+	 * ViewPane Block Keywords
+	 */
+	public:
+	// ViewPane Block Keyword Enum
+	enum ViewPaneKeyword
+	{
+		AxisBlockKeyword,
+		BoundingBoxKeyword,
+		BoundingBoxPlaneYKeyword,
+		EndViewPaneKeyword,
+		GeometryKeyword,
+		LabelScaleKeyword,
+		MatrixXKeyword,
+		MatrixYKeyword,
+		MatrixZKeyword,
+		MatrixWKeyword,
+		NameKeyword,
+		PerspectiveKeyword,
+		TitleScaleKeyword,
+		nViewPaneKeywords
+	};
+	// Convert text string to ViewKeyword
+	static ViewPaneKeyword viewPaneKeyword(const char* s);
+	// Convert ViewKeyword to text string
+	static const char* viewPaneKeyword(ViewPaneKeyword kwd);
+	// Return minimum number of expected arguments
+	static int viewPaneKeywordNArguments(ViewPaneKeyword kwd);
 };
 
 #endif

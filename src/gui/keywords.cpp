@@ -24,33 +24,12 @@
 #include "base/messenger.h"
 #include <string.h>
 
-
-// Print list of valid keywords for InputBlock specified
-void Keywords::printValidKeywords(Keywords::InputBlock block)
-{
-	msg.print("Valid Keywords for '%s' block are:\n", inputBlock(block));
-	int n;
-	switch (block)
-	{
-		case (Keywords::AxisBlock):
-			for (n=0; n<Keywords::nAxisKeywords; ++n) msg.print("%s%s", n == 0 ? "" : ", ", axisKeyword( (AxisKeyword) n ));
-			break;
-		case (Keywords::CollectionBlock):
-			for (n=0; n<Keywords::nCollectionKeywords; ++n) msg.print("%s%s", n == 0 ? "" : ", ", collectionKeyword( (CollectionKeyword) n ));
-			break;
-		default:
-			msg.print("\nUnrecognised block given to Keywords::printValidKeywords.\n");
-			break;
-	}
-	msg.print("\n");
-}
-
 /*
 // Input Block Keywords
 */
 
 // Input File Block Keywords
-const char *InputBlockKeywords[] = { "Axis", "Collection", "Settings", "View" };
+const char *InputBlockKeywords[] = { "Collection", "Settings", "View" };
 
 /*!
  * \brief Convert text string to InputBlock
@@ -214,10 +193,10 @@ int Keywords::dataSetKeywordNArguments(Keywords::DataSetKeyword kwd)
 */
 
 // View Block Keywords
-const char* ViewBlockKeywords[] = { "BoundingBox", "BoundingBoxPlaneY", "EndView", "LabelFaceViewer", "LabelScale", "MatrixX", "MatrixY", "MatrixZ", "MatrixW", "Perspective", "TitleScale" };
+const char* ViewBlockKeywords[] = { "Grid", "EndView", "LabelFaceViewer", "ViewPane" };
 
 // View Block NArguments
-int ViewKeywordNArguments[] = { 1, 1, 0, 1, 1, 4, 4, 4, 4, 1, 1 };
+int ViewKeywordNArguments[] = { 2, 0, 1, 0 };
 
 /*!
  * \brief Convert text string to ViewKeyword
@@ -242,4 +221,39 @@ const char* Keywords::viewKeyword(Keywords::ViewKeyword kwd)
 int Keywords::viewKeywordNArguments(Keywords::ViewKeyword kwd)
 {
 	return ViewKeywordNArguments[kwd];
+}
+
+/*
+// ViewPane Keywords
+*/
+
+// ViewPane Block Keywords
+const char* ViewPaneBlockKeywords[] = { "Axis", "BoundingBox", "BoundingBoxPlaneY", "EndViewPane", "Geometry", "LabelScale", "MatrixX", "MatrixY", "MatrixZ", "MatrixW", "Name", "Perspective", "TitleScale" };
+
+// ViewPane Block NArguments
+int ViewPaneKeywordNArguments[] = { 1, 0, 4, 1, 4, 4, 4, 4, 1, 1, 1 };
+
+/*!
+ * \brief Convert text string to ViewPaneKeyword
+ */
+Keywords::ViewPaneKeyword Keywords::viewPaneKeyword(const char* s)
+{
+	for (int n=0; n<nViewPaneKeywords; ++n) if (strcmp(s,ViewPaneBlockKeywords[n]) == 0) return (Keywords::ViewPaneKeyword) n;
+	return nViewPaneKeywords;
+}
+
+/*!
+ * \brief Convert ViewPaneKeyword to text string
+ */
+const char* Keywords::viewPaneKeyword(Keywords::ViewPaneKeyword kwd)
+{
+	return ViewPaneBlockKeywords[kwd];
+}
+
+/*!
+ * \brief Return minimum number of expected arguments
+ */
+int Keywords::viewPaneKeywordNArguments(Keywords::ViewPaneKeyword kwd)
+{
+	return ViewPaneKeywordNArguments[kwd];
 }

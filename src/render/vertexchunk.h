@@ -1,6 +1,6 @@
 /*
 	*** Vertex Chunk Storage
-	*** src/gui/viewer_vertexchunk.h
+	*** src/render/vertexchunk.h
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.

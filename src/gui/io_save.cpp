@@ -36,26 +36,26 @@ const char* stringBool(bool b)
 }
 
 // Write AxisBlock keywords
-bool UChromaWindow::writeAxisBlock(LineParser& parser, int axis)
+bool UChromaWindow::writeAxisBlock(LineParser& parser, Axes& axes, int axis)
 {
-	parser.writeLineF("%s %i\n", Keywords::inputBlock(Keywords::AxisBlock), axis);
-	parser.writeLineF("  %s %s\n", Keywords::axisKeyword(Keywords::AutoTicksKeyword), stringBool(axisAutoTicks_[axis]));
-	parser.writeLineF("  %s %f\n", Keywords::axisKeyword(Keywords::FirstTickKeyword), axisFirstTick_[axis]);
-	parser.writeLineF("  %s %s\n", Keywords::axisKeyword(Keywords::FractionalPositioningKeyword), stringBool(axisPositionIsFractional_[axis]));
-	parser.writeLineF("  %s %f\n", Keywords::axisKeyword(Keywords::TickDeltaKeyword), axisTickDelta_[axis]);
-	parser.writeLineF("  %s %i\n", Keywords::axisKeyword(Keywords::MinorTicksKeyword), axisMinorTicks_[axis]);
-	parser.writeLineF("  %s %i\n", Keywords::axisKeyword(Keywords::TitleAnchorKeyword), axisTitleAnchor_[axis]);
-	parser.writeLineF("  %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionFractionalKeyword), axisPositionFractional_[axis].x, axisPositionFractional_[axis].y, axisPositionFractional_[axis].z);
-	parser.writeLineF("  %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionRealKeyword), axisPositionReal_[axis].x, axisPositionReal_[axis].y, axisPositionReal_[axis].z);
-	parser.writeLineF("  %s %f %f %f\n", Keywords::axisKeyword(Keywords::LabelOrientationKeyword), axisLabelOrientation_[axis].x, axisLabelOrientation_[axis].y, axisLabelOrientation_[axis].z);
-	parser.writeLineF("  %s '%s'\n", Keywords::axisKeyword(Keywords::TitleKeyword), qPrintable(axisTitle_[axis]));
-	parser.writeLineF("  %s %f %f %f %f\n", Keywords::axisKeyword(Keywords::TitleOrientationKeyword), axisTitleOrientation_[axis].x, axisTitleOrientation_[axis].y, axisTitleOrientation_[axis].z, axisTitleOrientation_[axis].w);
-	parser.writeLineF("  %s %s\n", Keywords::axisKeyword(Keywords::InvertKeyword), stringBool(axisInverted_[axis]));
-	parser.writeLineF("  %s %f %f\n", Keywords::axisKeyword(Keywords::LimitsKeyword), axisMin_[axis], axisMax_[axis]);
-	parser.writeLineF("  %s %s\n", Keywords::axisKeyword(Keywords::LogarithmicKeyword), stringBool(axisLogarithmic_[axis]));
-	parser.writeLineF("  %s %s\n", Keywords::axisKeyword(Keywords::VisibleAxisKeyword), stringBool(axisVisible_[axis]));
-	parser.writeLineF("  %s %f\n", Keywords::axisKeyword(Keywords::StretchKeyword), axisStretch_[axis]);
-	parser.writeLineF("%s\n", Keywords::axisKeyword(Keywords::EndAxisKeyword));
+	parser.writeLineF("    %s %i\n", Keywords::ViewPaneKeyword(Keywords::AxisBlockKeyword), axis);
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::AutoTicksKeyword), stringBool(axes.axisAutoTicks(axis)));
+	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::FirstTickKeyword), axes.axisFirstTick(axis));
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::FractionalPositioningKeyword), stringBool(axes.axisPositionIsFractional(axis)));
+	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::TickDeltaKeyword), axes.axisTickDelta(axis));
+	parser.writeLineF("      %s %i\n", Keywords::axisKeyword(Keywords::MinorTicksKeyword), axes.axisMinorTicks(axis));
+	parser.writeLineF("      %s %i\n", Keywords::axisKeyword(Keywords::TitleAnchorKeyword), axes.axisTitleAnchor(axis));
+	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionFractionalKeyword), axes.axisPositionFractional(axis).x, axes.axisPositionFractional(axis).y, axes.axisPositionFractional(axis).z);
+	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionRealKeyword), axes.axisPositionReal(axis).x, axes.axisPositionReal(axis).y, axes.axisPositionReal(axis).z);
+	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::LabelOrientationKeyword), axes.axisLabelOrientation(axis).x, axes.axisLabelOrientation(axis).y, axes.axisLabelOrientation(axis).z);
+	parser.writeLineF("      %s '%s'\n", Keywords::axisKeyword(Keywords::TitleKeyword), qPrintable(axes.axisTitle(axis)));
+	parser.writeLineF("      %s %f %f %f %f\n", Keywords::axisKeyword(Keywords::TitleOrientationKeyword), axes.axisTitleOrientation(axis).x, axes.axisTitleOrientation(axis).y, axes.axisTitleOrientation(axis).z, axes.axisTitleOrientation(axis).w);
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::InvertKeyword), stringBool(axes.axisInverted(axis)));
+	parser.writeLineF("      %s %f %f\n", Keywords::axisKeyword(Keywords::LimitsKeyword), axes.axisMin(axis), axes.axisMax(axis));
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::LogarithmicKeyword), stringBool(axes.axisLogarithmic(axis)));
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::VisibleAxisKeyword), stringBool(axes.axisVisible(axis)));
+	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::StretchKeyword), axes.axisStretch(axis));
+	parser.writeLineF("    %s\n", Keywords::axisKeyword(Keywords::EndAxisKeyword));
 
 	return true;
 }
@@ -165,19 +165,36 @@ bool UChromaWindow::writeSettingsBlock(LineParser& parser)
 // Write ViewBlock keywords
 bool UChromaWindow::writeViewBlock(LineParser& parser)
 {
-	Matrix mat = ui.MainView->viewMatrix();
 	parser.writeLineF("%s\n", Keywords::inputBlock(Keywords::ViewBlock));
-	parser.writeLineF("  %s %i\n", Keywords::viewKeyword(Keywords::BoundingBoxKeyword), boundingBox_);
-	parser.writeLineF("  %s %f\n", Keywords::viewKeyword(Keywords::BoundingBoxPlaneYKeyword), boundingBoxPlaneY_);
 	parser.writeLineF("  %s %s\n", Keywords::viewKeyword(Keywords::LabelFaceViewerKeyword), stringBool(labelFaceViewer_));
-	parser.writeLineF("  %s %f\n", Keywords::viewKeyword(Keywords::LabelScaleKeyword), labelScale_);
-	parser.writeLineF("  %s %f\n", Keywords::viewKeyword(Keywords::TitleScaleKeyword), titleScale_);
-	parser.writeLineF("  %s %f %f %f %f\n", Keywords::viewKeyword(Keywords::MatrixXKeyword), mat[0], mat[1], mat[2], mat[3]);
-	parser.writeLineF("  %s %f %f %f %f\n", Keywords::viewKeyword(Keywords::MatrixYKeyword), mat[4], mat[5], mat[6], mat[7]);
-	parser.writeLineF("  %s %f %f %f %f\n", Keywords::viewKeyword(Keywords::MatrixZKeyword), mat[8], mat[9], mat[10], mat[11]);
-	parser.writeLineF("  %s %f %f %f %f\n", Keywords::viewKeyword(Keywords::MatrixWKeyword), mat[12], mat[13], mat[14], mat[15]);
-	if (ui.actionViewPerspective->isChecked()) parser.writeLineF("  %s\n", Keywords::viewKeyword(Keywords::PerspectiveKeyword));
+
+	// Loop over defined panes
+	for (ViewPane* pane = viewLayout_.panes(); pane != NULL; pane = pane->next) writeViewPaneBlock(parser, pane);
+
 	parser.writeLineF("%s\n", Keywords::viewKeyword(Keywords::EndViewKeyword));
+
+	return true;
+}
+
+// Write ViewPaneBlock keywords
+bool UChromaWindow::writeViewPaneBlock(LineParser& parser, ViewPane* pane)
+{
+	parser.writeLineF("  %s\n", Keywords::viewKeyword(Keywords::ViewPaneBlockKeyword));
+	parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::NameKeyword), qPrintable(pane->name()));
+	parser.writeLineF("    %s %i %i %i %i\n", Keywords::viewPaneKeyword(Keywords::GeometryKeyword), pane->bottomEdge(), pane->leftEdge(), pane->width(), pane->height()); 
+	for (int axis=0; axis < 3; ++axis) writeAxisBlock(parser, pane->axes(), axis);
+
+	parser.writeLineF("    %s %f\n", Keywords::viewPaneKeyword(Keywords::LabelScaleKeyword), pane->labelScale());
+	parser.writeLineF("    %s %f\n", Keywords::viewPaneKeyword(Keywords::TitleScaleKeyword), pane->titleScale());
+	parser.writeLineF("    %s %i\n", Keywords::viewPaneKeyword(Keywords::BoundingBoxKeyword), pane->boundingBox());
+	parser.writeLineF("    %s %f\n", Keywords::viewPaneKeyword(Keywords::BoundingBoxPlaneYKeyword), pane->boundingBoxPlaneY());
+	Matrix mat = pane->viewMatrix();
+	parser.writeLineF("    %s %f %f %f %f\n", Keywords::viewPaneKeyword(Keywords::MatrixXKeyword), mat[0], mat[1], mat[2], mat[3]);
+	parser.writeLineF("    %s %f %f %f %f\n", Keywords::viewPaneKeyword(Keywords::MatrixYKeyword), mat[4], mat[5], mat[6], mat[7]);
+	parser.writeLineF("    %s %f %f %f %f\n", Keywords::viewPaneKeyword(Keywords::MatrixZKeyword), mat[8], mat[9], mat[10], mat[11]);
+	parser.writeLineF("    %s %f %f %f %f\n", Keywords::viewPaneKeyword(Keywords::MatrixWKeyword), mat[12], mat[13], mat[14], mat[15]);
+	if (pane->hasPerspective()) parser.writeLineF("  %s\n", Keywords::viewPaneKeyword(Keywords::PerspectiveKeyword));
+	parser.writeLineF("  %s\n", Keywords::viewPaneKeyword(Keywords::EndViewPaneKeyword));
 
 	return true;
 }
@@ -193,17 +210,14 @@ bool UChromaWindow::saveInputFile(QString fileName)
 		return false;
 	}
 
-	// Write axis definitions
-	for (int axis=0; axis < 3; ++axis) writeAxisBlock(parser, axis);
-
 	// Write Settings Data
 	writeSettingsBlock(parser);
 
-	// Write View Data
-	writeViewBlock(parser);
-
 	// Write Collection Data
 	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next) writeCollectionBlock(parser, collection);
+
+	// Write View Data
+	writeViewBlock(parser);
 
 	parser.closeFiles();
 	return true;

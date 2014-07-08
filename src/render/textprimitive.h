@@ -1,6 +1,6 @@
 /*
 	*** Text Primitive
-	*** src/gui/viewer_textprimitive.h
+	*** src/render/textprimitive.h
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -22,24 +22,20 @@
 #ifndef UCHROMA_TEXTPRIMITIVE_H
 #define UCHROMA_TEXTPRIMITIVE_H
 
-#include <QtGui/QtGui>
 #include "math/matrix.h"
 #include "templates/vector3.h"
 #include "templates/list.h"
 #include <FTGL/ftgl.h>
+#include <QtCore/QString>
 
 #define TEXTCHUNKSIZE 100
 
 // Forward Declarations
-class Viewer;
+/* none */
 
 // Text Primitive
 class TextPrimitive
 {
-	public:
-	// Horizontal anchor enum
-	enum HorizontalAnchor { AnchorLeft=0, AnchorCentre=1, AnchorRight=2 };
-
 	private:
 	// Local transform matrix for the text
 	Matrix localTransform_;

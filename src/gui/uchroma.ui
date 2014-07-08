@@ -649,7 +649,6 @@
     <addaction name="separator"/>
     <addaction name="actionWindowsAxes"/>
     <addaction name="actionWindowsFit"/>
-    <addaction name="actionWindowSlices"/>
     <addaction name="actionWindowsSliceMonitor"/>
    </widget>
    <widget class="QMenu" name="menuCollections">
@@ -733,7 +732,6 @@
    <addaction name="separator"/>
    <addaction name="actionWindowsAxes"/>
    <addaction name="actionWindowsFit"/>
-   <addaction name="actionWindowSlices"/>
    <addaction name="actionWindowsSliceMonitor"/>
   </widget>
   <widget class="QToolBar" name="ViewToolBar">
@@ -1021,14 +1019,6 @@
    </property>
    <property name="text">
     <string>&amp;View</string>
-   </property>
-  </action>
-  <action name="actionWindowSlices">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>S&amp;lices</string>
    </property>
   </action>
   <action name="actionWindowsCollections">

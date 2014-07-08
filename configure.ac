@@ -3,7 +3,7 @@
 AC_PREREQ(2.60)
 
 # Set program name, version, bug-address and source directory
-m4_define([UCHROMA_VERSION],[r101])
+m4_define([UCHROMA_VERSION],[r102])
 AC_INIT(uchroma,UCHROMA_VERSION,tris@projectaten.net)
 AC_CONFIG_SRCDIR([src/])
 
@@ -142,6 +142,7 @@ AC_OUTPUT(Makefile
 src/Makefile
 src/base/Makefile
 src/gui/Makefile
+src/render/Makefile
 src/math/Makefile
 src/parser/Makefile
 src/command/Makefile

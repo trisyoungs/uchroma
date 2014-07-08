@@ -24,11 +24,8 @@
 
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QObject>
-#include <FTGL/ftgl.h>
-#include "gui/viewer_primitive.h"
-#include "gui/viewer_primitiveinfo.h"
-#include "gui/viewer_primitivelist.h"
-#include "gui/viewer_textprimitive.h"
+#include "render/primitive.h"
+#include "base/axes.h"
 #include "base/colourscale.h"
 #include "base/data2d.h"
 #include "templates/list.h"
@@ -39,6 +36,7 @@ class ColourScale;
 class UChromaWindow;
 class Collection;
 class DisplayDataSet;
+class ViewPane;
 
 // Base rendering widget
 class Viewer : public QGLWidget
@@ -70,30 +68,14 @@ class Viewer : public QGLWidget
 	private:
 	// GLExtension pointer stack
 	List<GLExtensions> extensionsStack_;
-	// Width, height, and aspect ratio of the canvas
+	// Width, height, and aspect ratio of the context
 	GLsizei contextWidth_, contextHeight_;
-	// Flag to indicate whether we may draw to the canvas
+	// Flag to indicate whether we may draw to the context
 	bool valid_;
-	// Flag indicating if we are currently drawing to this canvas
+	// Flag indicating if we are currently drawing to this context
 	bool drawing_;
 	// Flag specifying whether we are currently rendering offscreen
 	bool renderingOffscreen_; 
-	// Projection matrix for the scene
-	Matrix projectionMatrix_;
-	// Field of view angle used in projectionMatrix_ when using perspective
-	double perspectiveFieldOfView_;
-	// View matrix for the scene (modified by mouse/keyboard input)
-	Matrix viewMatrix_;
-	// Inverse of view matrix
-	Matrix viewMatrixInverse_;
-	// Viewport matrix for the scene
-	GLuint viewportMatrix_[4];
-	// Font file last passed to setupFont()
-	QString fontFile_;
-	// FTGL font for text
-	FTFont* font_;
-	// Basic font height (from baseline to top of normal height letter)
-	double fontBaseHeight_;
 	// String containing time taken to do last render
 	QString renderTime_;
 
@@ -105,9 +87,11 @@ class Viewer : public QGLWidget
 	// Resize function
 	void resizeGL(int, int);
 
+	private:
+	// Setup basic GL properties
+	void setupGL();
+
 	public:
-	// Setup font specified
-	bool setupFont(QString fontName);
 	// Return the current height of the drawing area
 	GLsizei contextHeight() const;
 	// Return the current width of the drawing area
@@ -118,24 +102,8 @@ class Viewer : public QGLWidget
 	void checkGlError();
 	// Refresh widget / scene
 	void postRedisplay();
-	// Return calculated projection matrix
-	Matrix calculateProjectionMatrix(bool perspective, double fov, double viewZOffset);
-	// Update transformation (view) matrix
-	void setViewMatrix(Matrix& mat);
-	// Return transformation (view) matrix
-	Matrix viewMatrix();
 	// Render or grab image
 	QPixmap generateImage(int w, int h);
-	// Reset current view
-	void resetView();
-	// Project given model coordinates into world coordinates
-	Vec3<double> modelToWorld(Vec3<double> &modelr);
-	// Project given model coordinates into screen coordinates
-	Vec4<double> modelToScreen(Vec3<double> &modelr, double screenradius = -1.0);
-	// Return zoom level, assuming orthogonally-aligned view matrix, to display coordinates supplied
-	double calculateRequiredZoom(double xExtent, double yExtent, double fraction);
-	// Convert screen coordinates into model space coordinates
-	Vec3<double> screenToModel(int x, int y, double z);
 
 
 	/*
@@ -174,20 +142,6 @@ class Viewer : public QGLWidget
 
 
 	/*
-	// Object Lists
-	*/
-	private:
-	// List of filtered solid primitives
-	List<PrimitiveInfo> solidPrimitives_;
-	// List of filtered transparent primitives
-	List<PrimitiveInfo> transparentPrimitives_;
-	// List of line primitives
-	List<PrimitiveInfo> linePrimitives_;
-	// List of general text primitives
-	TextPrimitiveList textPrimitives_;
-
-
-	/*
 	// Rendering Preferences
 	// (in viewer_prefs.cpp)
 	*/ 
@@ -196,8 +150,6 @@ class Viewer : public QGLWidget
 	bool useFrameBuffer_;
 	// Flag specifying whether to correct transparency artefacts
 	bool correctTransparency_;
-	// Flag specifying whether the view has perspective
-	bool hasPerspective_;
 	// Line width to use for line primitives
 	double lineWidth_;
 	
@@ -210,10 +162,6 @@ class Viewer : public QGLWidget
 	void setCorrectTransparency(bool b);
 	// Return whether to correct transparency artefacts
 	bool correctTransparency();
-	// Return whether the view has perspective
-	bool hasPerspective();
-	// Set whether this view has perspective
-	void setHasPerspective(bool b);
 	// Set line width to use for line primitives
 	void setLineWidth(double lineWidth);
 
@@ -224,34 +172,8 @@ class Viewer : public QGLWidget
 	private:
 	// Reference list of all created primitives (to which all user primitives must be added)
 	RefList<Primitive,int> primitiveList_;
-	// Display primitives
-	Primitive axisPrimitives_[3], interactionPrimitive_, interactionBoxPrimitive_, boundingBoxPrimitive_;
-	// Axis text primitives
-	TextPrimitiveList axisTextPrimitives_[3];
-	// Y axis clip plane definitions
-	GLdouble clipPlaneBottom_[4], clipPlaneTop_[4], clipPlaneYMin_, clipPlaneYMax_;
-	// Delta to add to Y clip plane limits
-	double clipPlaneDelta_;
-	// Current axis position of slice primitive
-	double slicePrimitivePosition_;
 
 	private:
-	// Create necessary primitives (called once when Viewer is constructed)
-	void createPrimitives();
-	// Setup basic GL properties
-	void setupGL();
-	// Construct line surface representation of data in XY slices
-	void constructLineXYSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
-	// Construct line surface representation of data in ZY slices
-	void constructLineZYSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
-	// Construct line surface representation of data
-	void constructGridSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
-	// Construct gridded surface representation of data
-	Vec3<double> constructVertexNormals(const Array<double>& abscissa, int index, DisplayDataSet* targetDataSet, DisplayDataSet* previousDataSet, DisplayDataSet* nextDataSet, int nPoints);
-	// Construct normal / colour surface data for dataset specified
-	void constructSurfaceStrip(const Array<double>& abscissa, DisplayDataSet* targetDataSet, double yAxisScale, Array< Vec3< double > >& normals, Array< Vec4< GLfloat > >& colours, const ColourScale& colourScale, DisplayDataSet* previousDataSet, DisplayDataSet* nextDataSet);
-	// Construct full surface representation of data
-	void constructFullSurface(PrimitiveList& primitives, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
 	// Create/update surface primitive for specified collection
 	bool updateSurfacePrimitive(Collection* collection, bool forceUpdate = false);
 
@@ -260,20 +182,6 @@ class Viewer : public QGLWidget
 	void addCollectionPrimitive(Primitive* primitive);
 	// Remove collection primitive from primitive list
 	void removeCollectionPrimitive(Primitive* primitive);
-	// Clear specified axis primitives
-	void clearAxisPrimitives(int axis);
-	// Add line to axis primitive
-	void addAxisLine(int axis, Vec3<double> v1, Vec3<double> v2);
-	// Add entry to axis text primitive
-	void addAxisText(int axis, QString text, Vec3<double> origin, Matrix transform, TextPrimitive::HorizontalAnchor textAlignment = TextPrimitive::AnchorCentre);
-	// Calculate axis slice value at current mouse position
-	void calculateMouseAxisValue();
-	// Set interaction primitive to specified axis
-	void setInteractionPrimitive(int axis);
-	// Create bounding box
-	void createBoundingBox(int type, double planeY);
-	// Set Y clip plane limits
-	void setYClip(double yMin, double yMax);
 	
 	signals:
 	// View was clicked on

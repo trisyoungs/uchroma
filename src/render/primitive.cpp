@@ -1,6 +1,6 @@
 /*
 	*** Rendering Primitive
-	*** src/gui/viewer_primitive.cpp
+	*** src/render/primitive.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,90 +19,9 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/glextensions.h"
-#include "gui/viewer_primitive.h"
+#include "render/glextensions.h"
+#include "render/primitive.h"
 #include <string.h>
-
-// Static members
-PrimitiveInstance::InstanceType Primitive::globalInstanceType_ = PrimitiveInstance::VBOInstance;
-
-/*
- * Primitive Instance
- */
-
-// Constructor
-PrimitiveInstance::PrimitiveInstance() : ListItem<PrimitiveInstance>()
-{
-	// Private variables
-	context_ = NULL;
-	type_ = PrimitiveInstance::ListInstance;
-	listObject_ = 0;
-	vboVertexObject_ = 0;
-	vboIndexObject_ = 0;
-}
-
-// Set display list data
-void PrimitiveInstance::setDisplayList(const QGLContext *context, GLuint listObject)
-{
-	context_ = context;
-	type_ = PrimitiveInstance::ListInstance;
-	listObject_ = listObject;
-}
-
-// Set vbo object data
-void PrimitiveInstance::setVBO(const QGLContext *context, GLuint vertexObject, GLuint indexObject)
-{
-	context_ = context;
-	type_ = PrimitiveInstance::VBOInstance;
-	vboVertexObject_ = vertexObject;
-	vboIndexObject_ = indexObject;
-}
-
-// Return context to which primitive instance is associated
-const QGLContext *PrimitiveInstance::context()
-{
-	return context_;
-}
-
-// Set exensions object
-void PrimitiveInstance::setExtensions(GLExtensions* extensions)
-{
-	extensions_ = extensions;
-}
-
-// Return GL extensions
-const GLExtensions* PrimitiveInstance::extensions() const
-{
-	return extensions_;
-}
-
-// Return type of instance
-PrimitiveInstance::InstanceType PrimitiveInstance::type()
-{
-	return type_;
-}
-
-// Return display list object for instance
-GLuint PrimitiveInstance::listObject()
-{
-	return listObject_;
-}
-
-// Return VBO ID of vertex array for instance
-GLuint PrimitiveInstance::vboVertexObject()
-{
-	return vboVertexObject_;
-}
-
-// Return VBO ID of index array for instance
-GLuint PrimitiveInstance::vboIndexObject()
-{
-	return vboIndexObject_;
-}
-
-/*
-// Primitive
-*/
 
 // Constructor
 Primitive::Primitive() : ListItem<Primitive>()
@@ -110,24 +29,11 @@ Primitive::Primitive() : ListItem<Primitive>()
 	colouredVertexData_ = false;
 	type_ = GL_TRIANGLES;
 	useInstances_ = true;
-	name_ = "<UnnamedPrimitive>";
 }
 
 // Destructor
 Primitive::~Primitive()
 {
-}
-
-// Return global instance type to use
-PrimitiveInstance::InstanceType Primitive::globalInstanceType()
-{
-	return globalInstanceType_;
-}
-
-// Set global instance type to use
-void Primitive::setGlobalInstanceType(PrimitiveInstance::InstanceType instanceType)
-{
-	Primitive::globalInstanceType_ = instanceType;
 }
 
 // Initialise primitive
@@ -154,18 +60,6 @@ int Primitive::nDefinedVertices() const
 int Primitive::nDefinedIndices() const
 {
 	return vertexChunk_.nDefinedIndices();
-}
-
-// Set name of primitive
-void Primitive::setName(const char *s)
-{
-	name_ = s;
-}
-
-// Return name of primitive
-const char *Primitive::name() const
-{
-	return name_.get();
 }
 
 // Return first chunk vertex array
@@ -202,7 +96,7 @@ void Primitive::pushInstance(const QGLContext* context, GLExtensions* extensions
 	pi->setExtensions(extensions);
 
 	// Vertex buffer object or plain old display list?
-	if (Primitive::globalInstanceType_ == PrimitiveInstance::VBOInstance)
+	if (PrimitiveInstance::globalInstanceType() == PrimitiveInstance::VBOInstance)
 	{
 		// Prepare local array of data to pass to VBO
 		int offset;

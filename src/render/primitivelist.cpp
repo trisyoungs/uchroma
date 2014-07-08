@@ -1,6 +1,6 @@
 /*
-	*** Rendering PrimitiveList List
-	*** src/gui/viewer_primitivelist.cpp
+	*** Rendering Primitive List
+	*** src/render/primitivelist.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,12 +19,8 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/viewer_primitivelist.h"
+#include "render/primitivelist.h"
 #include "gui/viewer.uih"
-
-/*
- * PrimitiveList
- */
 
 // Constructor
 PrimitiveList::PrimitiveList()

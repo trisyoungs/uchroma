@@ -1,6 +1,6 @@
 /*
 	*** Primitive Vertex/Index Generation Functions
-	*** src/render/viewer_primitive_vertex.cpp
+	*** src/render/primitive_vertex.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,7 +19,7 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/viewer_primitive.h"
+#include "render/primitive.h"
 #include "math/constants.h"
 #include "templates/vector3.h"
 #include <math.h>

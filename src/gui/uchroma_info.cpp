@@ -1,5 +1,5 @@
 /*
-	*** Main Window - Info Bar 
+	*** UChroma - Info Bar 
 	*** src/gui/uchroma_info.cpp
 	Copyright T. Youngs 2013-2014
 

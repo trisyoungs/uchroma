@@ -552,7 +552,7 @@ void PlotWidget::setYMaxLimit(bool enabled)
 /*!
  * \brief Add data to Plot
  */
-PlotData* PlotWidget::addDataSet(ExtractedSlice* data, int yOffset)
+PlotData* PlotWidget::addDataSet(DataSet* data, int yOffset)
 {
 	// Check supplied data pointer
 	if (data == NULL)
@@ -564,9 +564,6 @@ PlotData* PlotWidget::addDataSet(ExtractedSlice* data, int yOffset)
 	PlotData* pd = dataSets_.add();
 	pd->setData(data);
 	pd->setVerticalOffset(yOffset);
-
-	// Transform it according to the current settings // TODO
-	pd->data()->transformData(0, 0);
 
 	// Determine limits for this data, and adjust parent's relative limits if necessary
 	pd->determineLimits();
@@ -581,15 +578,13 @@ PlotData* PlotWidget::addDataSet(ExtractedSlice* data, int yOffset)
 }
 
 // Set static data
-void PlotWidget::setStaticData(ExtractedSlice* data)
+void PlotWidget::setStaticData(DataSet* data)
 {
 	// Take copy of data
 	staticDataSet_.setData(data);
 
-	// Transform it according to the current settings // TODO
-	staticDataSet_.data()->transformData(0, 0);
-
 	staticDataSet_.determineLimits();
+	printf("Limits %f %f\n", staticDataSet_.xMin(), staticDataSet_.xMax());
 
 	// Autoscale view if requested
 	if (autoScale_) fitData(true);

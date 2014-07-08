@@ -1,5 +1,11 @@
 <RCC>
   <qresource prefix="/uchroma">
+    <file>icons/collection_collection_nopane.svg</file>
+    <file>icons/collection_collection.svg</file>
+    <file>icons/collection_extracted_nopane.svg</file>
+    <file>icons/collection_extracted.svg</file>
+    <file>icons/collection_fit_nopane.svg</file>
+    <file>icons/collection_fit.svg</file>
     <file>icons/collection_fit.svg</file>
     <file>icons/collection_extracted.svg</file>
     <file>icons/info_interaction.svg</file>

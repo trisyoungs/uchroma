@@ -68,7 +68,7 @@ class GraphWidget : public QWidget
 
 	public:
 	// Add data to graph
-	void addData(ExtractedSlice* data);
+	void addData(DataSet* data);
 };
 
 #endif

@@ -394,7 +394,7 @@ void PlotWidget::drawLegend(QPainter& painter)
 		painter.drawText(textRect, Qt::AlignLeft, pd->data()->title());
 		textRect.moveTop( textRect.top() + textRect.height() + legendSpacing);
 		
-		if (pd->data()->group() != NULL) pen.setDashPattern(pd->data()->group()->dashes());
+// 		if (pd->data()->group() != NULL) pen.setDashPattern(pd->data()->group()->dashes());
 		pen.setColor(lineColour(count));
 		painter.setPen(pen);
 		painter.drawLine(legendLine);

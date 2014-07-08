@@ -129,7 +129,11 @@ void DataWindow::on_AddFilesButton_clicked(bool checked)
 
 	// Query whether limits should be updated to encompass all data
 	QMessageBox::Button button = QMessageBox::question(this, "New Data Loaded", "New data has been loaded - set current data limts to encompass all data?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-	if (button == QMessageBox::Yes) uChroma_.showAllData();
+	if (button == QMessageBox::Yes)
+	{
+		// Check display pane for current collection
+		if (currentCollection->displayPane()) currentCollection->displayPane()->showAllData();
+	}
 
 	// Need to update GUI
 	uChroma_.setAsModified();

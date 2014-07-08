@@ -26,7 +26,7 @@
 #include <QtCore/QObject>
 #include "gui/ui_fit.h"
 #include "base/dnchar.h"
-#include "base/slice.h"
+#include "base/data2d.h"
 #include "base/equationvariable.h"
 #include "parser/tree.h"
 #include "templates/array.h"

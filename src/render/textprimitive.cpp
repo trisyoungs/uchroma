@@ -1,6 +1,6 @@
 /*
 	*** Text Primitive
-	*** src/gui/viewer_textprimitive.cpp
+	*** src/render/textprimitive.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,8 +19,7 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/viewer_textprimitive.h"
-#include "gui/viewer.uih"
+#include "render/textprimitive.h"
 #include "math/constants.h"
 
 /*

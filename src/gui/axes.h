@@ -23,7 +23,7 @@
 #define UCHROMA_AXESWINDOW_H
 
 #include "gui/ui_axes.h"
-#include "gui/viewer_textprimitive.h"
+#include "base/axes.h"
 
 // Forward Declarations
 class UChromaWindow;
@@ -63,6 +63,8 @@ class AxesWindow : public QWidget
 	 * Convenience Functions
 	 */
 	private:
+	bool haveCurrentAxes();
+	Axes& currentAxes();
 	bool axisInvertChanged(int axis, bool checked);
 	bool axisLogarithmicChanged(int axis, bool checked);
 	bool axisVisibleChanged(int axis, bool checked);
@@ -79,7 +81,7 @@ class AxesWindow : public QWidget
 	bool axisMinorTicksChanged(int axis, int value);
 	bool axisTitleChanged(int axis, QString& title);
 	bool axisTitleOrientationChanged(int axis, int component, double value);
-	bool axisTitleAlignmentChanged(int axis, TextPrimitive::HorizontalAnchor anchor);
+	bool axisTitleAlignmentChanged(int axis, Axes::AxisAnchor anchor);
 
 
 	/*

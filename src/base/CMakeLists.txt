@@ -1,30 +1,34 @@
 add_library(base
-collection.cpp
-colourscale.cpp
-data2d.cpp
-dataset.cpp
-displaydataset.cpp
-dnchar.cpp
-equationvariable.cpp
-lineparser.cpp
-messenger.cpp
-nxs.cpp
-slice.cpp
-sysfunc.cpp
-transformer.cpp
-collection.h
-colourscale.h
-data2d.h
-dataset.h
-displaydataset.h
-dnchar.h
-equationvariable.h
-lineparser.h
-messenger.h
-nxs.h
-slice.h
-sysfunc.h
-transformer.h
+  axes.cpp
+  collection.cpp
+  colourscale.cpp
+  data2d.cpp
+  dataset.cpp
+  displaydataset.cpp
+  dnchar.cpp
+  equationvariable.cpp
+  lineparser.cpp
+  messenger.cpp
+  nxs.cpp
+  sysfunc.cpp
+  transformer.cpp
+  viewlayout.cpp
+  viewpane.cpp
+  axes.h
+  collection.h
+  colourscale.h
+  data2d.h
+  dataset.h
+  displaydataset.h
+  dnchar.h
+  equationvariable.h
+  lineparser.h
+  messenger.h
+  nxs.h
+  sysfunc.h
+  transformer.h
+  viewlayout.h
+  viewpane.h
 )
 
 include_directories(
