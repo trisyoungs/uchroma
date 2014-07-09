@@ -26,7 +26,10 @@
 #include "version.h"
 
 // Constructor
-UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWindow_(*this), createWindow_(*this), dataWindow_(*this), fitWindow_(*this), sliceMonitorWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this), saveImageDialog_(this), dataImportDialog_(this), viewLayout_(*this)
+UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
+	axesWindow_(*this), createWindow_(*this), dataWindow_(*this), fitWindow_(*this),
+	layoutWindow_(*this), sliceMonitorWindow_(*this), styleWindow_(*this), transformWindow_(*this),
+	viewWindow_(*this), saveImageDialog_(this), dataImportDialog_(this), viewLayout_(*this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -52,8 +55,9 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	interacting_ = false;
 	refreshing_ = false;
 
-	// Set basic view layout
+	// Set basic view layout, and give pointer to PaneOrganiser in LayoutWindow
 	currentViewPane_ = viewLayout_.setDefault();
+	layoutWindow_.ui.Organiser->setViewLayout(&viewLayout_);
 
 	// Add an empty collection, and add it to the current view pane
 	currentViewPane_->addCollection(addCollection());

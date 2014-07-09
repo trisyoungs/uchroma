@@ -605,7 +605,7 @@
      <x>0</x>
      <y>0</y>
      <width>1092</width>
-     <height>23</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -732,6 +732,7 @@
    <addaction name="actionWindowsAxes"/>
    <addaction name="actionWindowsCreate"/>
    <addaction name="actionWindowsFit"/>
+   <addaction name="actionWindowsLayout"/>
    <addaction name="actionWindowsSliceMonitor"/>
   </widget>
   <widget class="QToolBar" name="ViewToolBar">
@@ -1187,6 +1188,17 @@
    </property>
    <property name="toolTip">
     <string>Create new collections from scratch</string>
+   </property>
+  </action>
+  <action name="actionWindowsLayout">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Layout</string>
+   </property>
+   <property name="toolTip">
+    <string>Adjust / modify pane number and layout</string>
    </property>
   </action>
  </widget>

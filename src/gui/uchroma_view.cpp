@@ -21,6 +21,12 @@
 
 #include "gui/uchroma.h"
 
+// Return curreent view layout
+ViewLayout* UChromaWindow::viewLayout()
+{
+	return &viewLayout_;
+}
+
 // Recalculate layout pane positions / sizes (after context resize etc.)
 void UChromaWindow::recalculateViewLayout(int contextWidth, int contextHeight)
 {

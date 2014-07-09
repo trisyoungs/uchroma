@@ -36,6 +36,8 @@ fit_simplex.cpp
 fit_target.cpp
 gradientbar_funcs.cpp
 graphwidget_funcs.cpp
+layout_funcs.cpp
+paneorganiser_funcs.cpp
 plotwidget_data.cpp
 plotwidget_funcs.cpp
 plotwidget_paintevent.cpp
@@ -43,7 +45,6 @@ slicemonitor_funcs.cpp
 style_funcs.cpp
 texponentialspin_funcs.cpp
 transform_funcs.cpp 
-uchroma_data.cpp
 view_funcs.cpp
 viewer_funcs.cpp
 viewer_input.cpp
@@ -60,6 +61,7 @@ SET(pro_MOC_HDRS
   equationselect.h
   fit.h
   graphwidget.h
+  layout.h
   saveimage.h
   slicemonitor.h
   style.h
@@ -67,6 +69,7 @@ SET(pro_MOC_HDRS
   view.h
   colourbutton.uih
   gradientbar.uih
+  paneorganiser.uih
   plotwidget.uih
   texponentialspin.uih
   viewer.uih

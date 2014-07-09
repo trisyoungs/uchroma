@@ -355,6 +355,13 @@ void UChromaWindow::on_actionWindowsFit_triggered(bool checked)
 	else fitWindow_.hide();
 }
 
+void UChromaWindow::on_actionWindowsLayout_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) layoutWindow_.updateAndShow();
+	else layoutWindow_.hide();
+}
+
 void UChromaWindow::on_actionWindowsSliceMonitor_triggered(bool checked)
 {
 	if (refreshing_) return;

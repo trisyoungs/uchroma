@@ -27,6 +27,7 @@
 #include "gui/create.h"
 #include "gui/data.h"
 #include "gui/fit.h"
+#include "gui/layout.h"
 #include "gui/slicemonitor.h"
 #include "gui/style.h"
 #include "gui/transform.h"
@@ -92,6 +93,8 @@ class UChromaWindow : public QMainWindow
 	DataWindow dataWindow_;
 	// Fit Window
 	FitWindow fitWindow_;
+	// Layout Window
+	LayoutWindow layoutWindow_;
 	// Slice Monitor Window
 	SliceMonitorWindow sliceMonitorWindow_;
 	// Style Window
@@ -195,6 +198,7 @@ class UChromaWindow : public QMainWindow
 	void on_actionWindowsAxes_triggered(bool checked);
 	void on_actionWindowsCreate_triggered(bool checked);
 	void on_actionWindowsFit_triggered(bool checked);
+	void on_actionWindowsLayout_triggered(bool checked);
 	void on_actionWindowsSliceMonitor_triggered(bool checked);
 
 
@@ -355,12 +359,14 @@ class UChromaWindow : public QMainWindow
 	private:
 	// List of available view layouts
 	ParentList<ViewLayout,UChromaWindow> viewLayouts_;
-	// View layout being used
+	// Current view layout
 	ViewLayout viewLayout_;
 	// Current view pane
 	ViewPane* currentViewPane_;
 
 	public:
+	// Return curreent view layout
+	ViewLayout* viewLayout();
 	// Recalculate layout pane positions / sizes (after context resize etc.)
 	void recalculateViewLayout(int contextWidth, int contextHeight);
 	// Set current view pane to the one under the specified screen coordinates
