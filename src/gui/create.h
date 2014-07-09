@@ -1,5 +1,5 @@
 /*
-	*** Create Widget
+	*** Create Window
 	*** src/gui/create.h
 	Copyright T. Youngs 2012-2014.
 
@@ -38,31 +38,29 @@ class DataSet;
 class Variable;
 
 /*
- * Create Collection Dialog
+ * Create Window
  */
-class CreateCollectionDialog : public QDialog
+class CreateWindow : public QWidget
 {
 	Q_OBJECT
 
 	public:
 	// Constructor
-	CreateCollectionDialog(QWidget *parent);
+	CreateWindow(UChromaWindow& parent);
 	// Destructor
-	~CreateCollectionDialog();
+	~CreateWindow();
 	// Main form declaration
-	Ui::CreateCollectionDialog ui;
+	Ui::CreateWindow ui;
+	// UChromaWindow reference
+	UChromaWindow& uChroma_;
 
+	protected:
+	// Window close event
+	void closeEvent(QCloseEvent* event);
 
-	/*
-	 * Link to UChroma
-	 */
-	private:
-	// UChromaWindow pointer
-	static UChromaWindow* uChroma_;
-	
-	public:
-	// Set UChromaWindow pointer
-	static void setUChroma(UChromaWindow* ptr);
+	signals:
+	// Window closed signal
+	void windowClosed(bool);
 
 
 	/*
@@ -71,10 +69,7 @@ class CreateCollectionDialog : public QDialog
 	private:
 	// Whether the window is refreshing / updating its controls
 	bool refreshing_;
-	
-	private:
-	// Refresh main view (if options permit) after fit params have changed
-	void updateMainView();
+
 
 	public:
 	// Update data and show window
@@ -97,8 +92,6 @@ class CreateCollectionDialog : public QDialog
 	Variable* xVariable_, *zVariable_;
 	// List of variables targetted in create process
 	RefList<EquationVariable,bool> usedVariables_;
-	// Newly created collection (if any)
-	Collection* newCollection_;
 
 	private:
 	// Reset equation
@@ -106,7 +99,7 @@ class CreateCollectionDialog : public QDialog
 	// Update variables list
 	void updateVariables();
 	// Update created data
-	void updateCreatedData(bool force = false);
+	void createData(Collection* target);
 
 
 	/*

@@ -20,9 +20,10 @@
 */
 
 #include "base/viewlayout.h"
+#include "gui/uchroma.h"
 
 // Constructor
-ViewLayout::ViewLayout() : ListItem<ViewLayout>()
+ViewLayout::ViewLayout(UChromaWindow& parent) : ListItem<ViewLayout>(), parent_(parent)
 {
 	nColumns_ = 1;
 	nRows_ = 1;
@@ -36,7 +37,7 @@ ViewLayout::~ViewLayout()
 }
 
 // Copy constructor
-ViewLayout::ViewLayout(const ViewLayout& source)
+ViewLayout::ViewLayout(const ViewLayout& source) : parent_(parent_)
 {
 	(*this) = source;
 }
@@ -51,6 +52,16 @@ void ViewLayout::operator=(const ViewLayout& source)
 	nColumns_ = source.nColumns_;
 	nRows_ = source.nRows_;
 	panes_ = source.panes_;
+}
+
+/*
+ * Parent
+ */
+
+// Set as modified (call parent routine)
+void ViewLayout::setAsModified()
+{
+	parent_.setAsModified();
 }
 
 /*
@@ -105,7 +116,7 @@ int ViewLayout::nRows() const
 // Add pane to layout
 ViewPane* ViewLayout::addPane(QString name, int left, int top, int width, int height)
 {
-	ViewPane* pane = panes_.add();
+	ViewPane* pane = panes_.add(*this);
 	pane->setName(name);
 	pane->setSize(width, height);
 

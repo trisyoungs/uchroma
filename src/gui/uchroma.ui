@@ -605,7 +605,7 @@
      <x>0</x>
      <y>0</y>
      <width>1092</width>
-     <height>29</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -656,7 +656,6 @@
      <string>&amp;Collections</string>
     </property>
     <addaction name="actionCollectionsNew"/>
-    <addaction name="actionCollectionsCreate"/>
     <addaction name="separator"/>
     <addaction name="actionCollectionsFocusNext"/>
     <addaction name="actionCollectionsFocusPrevious"/>
@@ -731,6 +730,7 @@
    <addaction name="actionWindowsView"/>
    <addaction name="separator"/>
    <addaction name="actionWindowsAxes"/>
+   <addaction name="actionWindowsCreate"/>
    <addaction name="actionWindowsFit"/>
    <addaction name="actionWindowsSliceMonitor"/>
   </widget>
@@ -1176,6 +1176,17 @@
    </property>
    <property name="text">
     <string>Log</string>
+   </property>
+  </action>
+  <action name="actionWindowsCreate">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Create</string>
+   </property>
+   <property name="toolTip">
+    <string>Create new collections from scratch</string>
    </property>
   </action>
  </widget>

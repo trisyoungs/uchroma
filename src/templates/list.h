@@ -62,15 +62,13 @@ template <class T> class List
 	~List();
 	// Copy Constructor
 	List<T>(const List<T>& source);
-	// Assignment operator
-	void operator=(const List<T>& source);
 
 
 	/*!
 	 * \name Item List
 	 */
 	///@{
-	private:
+	protected:
 	// Pointers to head and tail of list
 	T *listHead_, *listTail_;
 	// Number of items in list
@@ -130,8 +128,6 @@ template <class T> class List
 	// Operators
 	*/
 	public:
-	// Assignment operator
-	void operator=(List<T> &source);
 	// Element access operator
 	T *operator[](int);
 
@@ -184,19 +180,6 @@ template <class T> List<T>::~List()
 template <class T> List<T>::List(const List<T>& source)
 {
 	(*this) = source;
-}
-
-// Assignment operator
-template <class T> void List<T>::operator=(const List<T>& source)
-{
-	clear();
-
-	// Loop over items in other list, copying each to a new list item here
-	for (T* sourceItem = source.first(); sourceItem != NULL; sourceItem = sourceItem->next)
-	{
-		T* newItem = new T;
-		(*newItem) = (*sourceItem);
-	}
 }
 
 /*!
@@ -750,27 +733,6 @@ template <class T> void List<T>::moveAfter(T *item, T *reference)
 */
 
 /*!
- * \brief Assignment operator =
- */
-template <class T> void List<T>::operator=(List<T> &source)
-{
-	// Clear any current data in the list...
-	clear();
-	T *newitem, *olditem;
-	for (olditem = source.first(); olditem != NULL; olditem = olditem->next)
-	{
-		// To ensure that we don't mess around with the pointers of the old list, copy the object and then own it
-		newitem = new T;
-		*newitem = *olditem;
-		newitem->prev = NULL;
-		newitem->next = NULL;
-		own(newitem);
-	}
-	// Don't deep-copy the static list, just flag that it must be regenerated if required.
-	regenerate_ = 1;
-}
-
-/*!
  * \brief Element access operator
  */
 template <class T> T *List<T>::operator[](int index)
@@ -784,5 +746,20 @@ template <class T> T *List<T>::operator[](int index)
 #endif
 	return array()[index];
 }
+
+/*
+ * List with Parent references for items
+ */
+template <class T, class P> class ParentList : public List<T>
+{
+	public:
+	// Override the add() member function
+	T* add(P& parent)
+	{
+		T *newitem = new T(parent);
+		List<T>::own(newitem);
+		return newitem;
+	}
+};
 
 #endif

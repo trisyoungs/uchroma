@@ -38,7 +38,7 @@ class ViewPane : public ListItem<ViewPane>
 {
 	public:
 	// Constructor / Destructor
-	ViewPane();
+	ViewPane(ViewLayout& parent);
 	~ViewPane();
 	// Copy constructor
 	ViewPane(const ViewPane& source);
@@ -47,11 +47,22 @@ class ViewPane : public ListItem<ViewPane>
 
 
 	/*
-	 * Position / Geometry
+	 * Parent
 	 */
 	private:
 	// Layout in which this pane exists
-	ViewLayout* parent_;
+	ViewLayout& parent_;
+
+	public:
+	// Set as modified (call parent routine)
+	void setAsModified();
+
+
+	/*
+	 * Position / Geometry
+	 */
+	private:
+
 	// Name of pane
 	QString name_;
 	// Top edge position (row index)
@@ -66,8 +77,6 @@ class ViewPane : public ListItem<ViewPane>
 	GLuint viewportMatrix_[4];
 
 	public:
-	// Set parent layout
-	void setParent(ViewLayout* parent);
 	// Set name of pane
 	void setName(QString name);
 	// Return name of pane

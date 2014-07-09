@@ -167,7 +167,8 @@ void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 	{
 		// Check current display pane - if it is non-null we must remove it from that pane first
 		if (currentCollection_->displayPane()) currentCollection_->displayPane()->removeCollection(currentCollection_);
-		currentCollection_->setDisplayPane(VariantPointer<ViewPane>(menuResult->data()));
+		ViewPane* pane = VariantPointer<ViewPane>(menuResult->data());
+		if (pane) pane->addCollection(currentCollection_);
 
 		// Update the item
 		updateCollectionTreeItem(ui.CollectionTree->currentItem());

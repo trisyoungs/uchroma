@@ -27,6 +27,8 @@
 Axes::Axes(ViewPane& parent) : parent_(parent)
 {
 	// Definition
+	axisLimitMin_.zero();
+	axisLimitMax_.set(10.0, 10.0, 10.0);
 	axisMin_.zero();
 	axisMax_.set(10.0, 10.0, 10.0);
 	axisInverted_.set(false, false, false);
@@ -77,6 +79,7 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	clipPlaneYMin_ = 0.0;
 	clipPlaneYMax_ = 0.0;
 	primitivesValid_ = false;
+	parent_.setAsModified();
 }
 
 // Destructor
@@ -139,33 +142,38 @@ void Axes::operator=(const Axes& source)
 	clipPlaneYMin_ = 0.0;
 	clipPlaneYMax_ = 0.0;
 	primitivesValid_ = false;
+	parent_.setAsModified();
 }
 
 /*
  * Definition
  */
 
-// Clamp axis position and min/max to current limits
+// Clamp axis position and min/max to current limits if necessary
 void Axes::clampAxis(int axis)
 {
-	// Clamp current axis values if necessary
-	if (axisMin_[axis] < axisLimitMin_[axis]) setAxisToLimit(axis, true);
-	if (axisMax_[axis] > axisLimitMax_[axis]) setAxisToLimit(axis, false);
-
-	// Clamp axis position point values if necessary
-	for (int axis=0; axis < 3; ++axis)
+	if (axisLogarithmic_[axis])
 	{
-		if (axisPositionReal_[axis][(axis+1)%3] < axisLimitMin_[(axis+1)%3])
-		{
-			axisPositionReal_[axis].set((axis+1)%3, axisLimitMin_[(axis+1)%3]);
-			primitivesValid_ = false;
-		}
-		if (axisPositionReal_[axis][(axis+2)%3] < axisLimitMin_[(axis+2)%3])
-		{
-			axisPositionReal_[axis].set((axis+2)%3, axisLimitMin_[(axis+2)%3]);
-			primitivesValid_ = false;
-		}
+		if (axisMin_[axis] < axisLimitMin_[axis]) setAxisToLimit(axis, true);
+// 		if (axisMax_[axis] > axisLimitMax_[axis]) setAxisToLimit(axis, false);
 	}
+
+// 	// Clamp axis position point values if necessary
+// 	for (int axis=0; axis < 3; ++axis)
+// 	{
+// 		if (axisPositionReal_[axis][(axis+1)%3] < axisLimitMin_[(axis+1)%3])
+// 		{
+// 			axisPositionReal_[axis].set((axis+1)%3, axisLimitMin_[(axis+1)%3]);
+// 			primitivesValid_ = false;
+// 			parent_.setAsModified();
+// 		}
+// 		if (axisPositionReal_[axis][(axis+2)%3] < axisLimitMin_[(axis+2)%3])
+// 		{
+// 			axisPositionReal_[axis].set((axis+2)%3, axisLimitMin_[(axis+2)%3]);
+// 			primitivesValid_ = false;
+// 			parent_.setAsModified();
+// 		}
+// 	}
 }
 
 // Set minimum value for specified axis
@@ -174,6 +182,8 @@ void Axes::setAxisMin(int axis, double value)
 	axisMin_[axis] = value;
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
+	parent_.flagCollectionDataInvalid();
 }
 
 // Return minimum value for specified axis
@@ -188,6 +198,8 @@ void Axes::setAxisMax(int axis, double value)
 	axisMax_[axis] = value;
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
+	parent_.flagCollectionDataInvalid();
 }
 
 // Return maximum value for specified axis
@@ -209,6 +221,7 @@ void Axes::setAxisToLimit(int axis, bool minLim)
 	else axisMax_[axis] = axisLimitMax_[axis];
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
 }
 
 // Set axis minimum limit for specified axis
@@ -263,6 +276,8 @@ void Axes::setAxisInverted(int axis, bool b)
 	axisInverted_[axis] = b;
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
+	parent_.flagCollectionDataInvalid();
 }
 
 // Return whether axis is inverted
@@ -280,6 +295,8 @@ void Axes::setAxisLogarithmic(int axis, bool b)
 	clampAxis(axis);
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
+	parent_.flagCollectionDataInvalid();
 }
 
 // Return whether axis is logarithmic
@@ -306,6 +323,8 @@ void Axes::setAxisStretch(int axis, double value)
 	axisStretch_[axis] = value;
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
+	parent_.flagCollectionDataInvalid();
 }
 
 // Return stretch factor for axis
@@ -320,6 +339,7 @@ void Axes::setAxisPositionIsFractional(int axis, bool b)
 	axisPositionIsFractional_[axis] = b;
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
 }
 
 // Return fractional position flag for axis
@@ -337,6 +357,7 @@ void Axes::setAxisPositionReal(int axis, int dir, double value)
 	axisPositionReal_[axis].set(dir, value);
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
 }
 
 // Set axis position to axis limit (in real surface-space coordinates)
@@ -345,6 +366,7 @@ void Axes::setAxisPositionRealToLimit(int axis, int dir, bool minLim)
 	axisPositionReal_[axis].set(dir, minLim ? axisLimitMin_[dir] : axisLimitMax_[dir]);
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
 }
 
 // Return axis position (in real surface-space coordinates)
@@ -362,6 +384,7 @@ void Axes::setAxisPositionFractional(int axis, int dir, double value)
 	axisPositionFractional_[axis].set(dir, value);
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
 }
 
 // Return axis position (in fractional axis coordinates)
@@ -376,6 +399,7 @@ void Axes::setAxisTickDirection(int axis, int dir, double value)
 	axisTickDirection_[axis].set(dir, value);
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
 }
 
 // Return axis tick direction
@@ -390,6 +414,7 @@ void Axes::setAxisFirstTick(int axis, double value)
 	axisFirstTick_[axis] = value;
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
 
 }
 
@@ -405,6 +430,7 @@ void Axes::setAxisTickDelta(int axis, double value)
 	axisTickDelta_[axis] = value;
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
 }
 
 // Return tick delta for axes
@@ -419,6 +445,7 @@ void Axes::setAxisAutoTicks(int axis, bool b)
 	axisAutoTicks_[axis] = b;
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
 }
 
 // Return whether to calculate ticks automatically
@@ -433,6 +460,7 @@ void Axes::setAxisMinorTicks(int axis, int value)
 	axisMinorTicks_[axis] = value;
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
 }
 
 // Return number of minor ticks in major tick intervals
@@ -503,6 +531,7 @@ void Axes::setAxisLabelOrientation(int axis, int component, double value)
 	axisLabelOrientation_[axis].set(component, value);
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
 }
 
 // Return orientation of labels for specified axis
@@ -517,6 +546,7 @@ void Axes::setAxisTitle(int axis, QString title)
 	axisTitle_[axis] = title;
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
 }
 
 // Return title for specified axis
@@ -531,6 +561,7 @@ void Axes::setAxisTitleOrientation(int axis, int component, double value)
 	axisTitleOrientation_[axis].set(component, value);
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
 }
 
 // Return orientation of titles for specified axis
@@ -545,6 +576,7 @@ void Axes::setAxisTitleAnchor(int axis, Axes::AxisAnchor anchor)
 	axisTitleAnchor_[axis] = anchor;
 
 	primitivesValid_ = false;
+	parent_.setAsModified();
 }
 
 // Return axis title text anchor position for specified axis
@@ -801,6 +833,7 @@ GLdouble Axes::clipPlaneYMax()
 void Axes::setPrimitivesInvalid()
 {
 	primitivesValid_ = false;
+	parent_.setAsModified();
 }
 
 // Return axis primitive for axis specified

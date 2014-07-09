@@ -21,13 +21,13 @@
 
 #include "base/viewpane.h"
 #include "base/collection.h"
+#include "base/viewlayout.h"
 #include <algorithm>
 
 // Constructor
-ViewPane::ViewPane() : ListItem<ViewPane>(), axes_(*this)
+ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), parent_(parent), axes_(*this)
 {
 	// Geometry / position
-	parent_ = NULL;
 	bottomEdge_ = 0;
 	leftEdge_ = 0;
 	height_ = 0;
@@ -58,7 +58,7 @@ ViewPane::~ViewPane()
 }
 
 // Copy constructor
-ViewPane::ViewPane(const ViewPane& source) : axes_(*this)
+ViewPane::ViewPane(const ViewPane& source) : parent_(parent_), axes_(*this)
 {
 	(*this) = source;
 }
@@ -87,11 +87,20 @@ void ViewPane::operator=(const ViewPane& source)
 	titleScale_ = source.titleScale_;
 }
 
-// Set parent layout
-void ViewPane::setParent(ViewLayout* parent)
+/*
+ * Parent
+ */
+
+// Set as modified (call parent routine)
+void ViewPane::setAsModified()
 {
-	parent_ = parent;
+	// Pass the modification notification upwards
+	parent_.setAsModified();
 }
+
+/*
+ * Position / Geometry
+ */
 
 // Set name of pane
 void ViewPane::setName(QString name)
@@ -531,7 +540,7 @@ Vec3<double> ViewPane::transformedDataMinima()
 // Return absolute maximum transformed values over all associated collections
 Vec3<double> ViewPane::transformedDataMaxima()
 {
-	if (collections_.nItems() == 0) return Vec3<double>(0.0,0.0,0.0);
+	if (collections_.nItems() == 0) return Vec3<double>(10.0,10.0,10.0);
 
 	// Set starting values from first collection
 	Vec3<double> v, maxima = collections_.first()->item->transformMax();
@@ -565,7 +574,7 @@ Vec3<double> ViewPane::transformedDataPositiveMinima()
 // Return absolute maximum positive transformed values over all associated collections
 Vec3<double> ViewPane::transformedDataPositiveMaxima()
 {
-	if (collections_.nItems() == 0) return Vec3<double>(1.0, 1.0, 1.0);
+	if (collections_.nItems() == 0) return Vec3<double>(10.0, 10.0, 10.0);
 
 	// Set starting values from first collection
 	Vec3<double> v, maxima = collections_.first()->item->transformMaxPositive();

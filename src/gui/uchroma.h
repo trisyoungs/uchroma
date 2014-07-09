@@ -24,15 +24,15 @@
 
 #include "gui/ui_uchroma.h"
 #include "gui/axes.h"
+#include "gui/create.h"
 #include "gui/data.h"
+#include "gui/fit.h"
 #include "gui/slicemonitor.h"
 #include "gui/style.h"
 #include "gui/transform.h"
 #include "gui/view.h"
 #include "gui/saveimage.h"
-#include "gui/create.h"
 #include "gui/dataimport.h"
-#include "gui/fit.h"
 #include "base/collection.h"
 #include "base/transformer.h"
 #include "base/lineparser.h"
@@ -86,6 +86,8 @@ class UChromaWindow : public QMainWindow
 	bool refreshing_;
 	// Axes Window
 	AxesWindow axesWindow_;
+	// Create Window
+	CreateWindow createWindow_;
 	// Data Window
 	DataWindow dataWindow_;
 	// Fit Window
@@ -102,8 +104,6 @@ class UChromaWindow : public QMainWindow
 	SaveImageDialog saveImageDialog_;
 	// Data Import Dialog
 	DataImportDialog dataImportDialog_;
-	// Create Window Dialog
-	CreateCollectionDialog createCollectionDialog_;
 	// Statusbar info line label
 	QLabel* statusBarInfoLabel_;
 
@@ -156,7 +156,6 @@ class UChromaWindow : public QMainWindow
 	 */
 	private slots:
 	void on_actionCollectionsNew_triggered(bool checked);
-	void on_actionCollectionsCreate_triggered(bool checked);
 	void on_actionCollectionsFocusNext_triggered(bool checked);
 	void on_actionCollectionsFocusPrevious_triggered(bool checked);
 
@@ -194,6 +193,7 @@ class UChromaWindow : public QMainWindow
 	void on_actionWindowsTransform_triggered(bool checked);
 	void on_actionWindowsView_triggered(bool checked);
 	void on_actionWindowsAxes_triggered(bool checked);
+	void on_actionWindowsCreate_triggered(bool checked);
 	void on_actionWindowsFit_triggered(bool checked);
 	void on_actionWindowsSliceMonitor_triggered(bool checked);
 
@@ -354,7 +354,7 @@ class UChromaWindow : public QMainWindow
 	 */
 	private:
 	// List of available view layouts
-	List<ViewLayout> viewLayouts_;
+	ParentList<ViewLayout,UChromaWindow> viewLayouts_;
 	// View layout being used
 	ViewLayout viewLayout_;
 	// Current view pane

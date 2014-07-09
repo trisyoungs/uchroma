@@ -23,13 +23,12 @@
 #include "gui/uchroma.h"
 #include "parser/scopenode.h"
 
-// Static singletons
-UChromaWindow* CreateCollectionDialog::uChroma_ = NULL;
-
 // Constructor
-CreateCollectionDialog::CreateCollectionDialog(QWidget* parent) : QDialog(parent)
+CreateWindow::CreateWindow(UChromaWindow& parent) : QWidget(&parent), uChroma_(parent)
 {
 	ui.setupUi(this);
+
+	QWidget::setWindowFlags(Qt::Tool);
 
 	// Set default values in some widgets
 	ui.GridSpecifyXMinSpin->setValue(0.0);
@@ -42,7 +41,6 @@ CreateCollectionDialog::CreateCollectionDialog(QWidget* parent) : QDialog(parent
 	ui.GridSpecifyZDeltaSpin->setMinimumValue(1.0e-5);
 
 	refreshing_ = false;
-	newCollection_ = NULL;
 	resetEquation();
 	ui.EquationEdit->setText("cos(x)*A");
 	equationValid_ = equation_.setCommands("cos(x)*A");
@@ -50,46 +48,25 @@ CreateCollectionDialog::CreateCollectionDialog(QWidget* parent) : QDialog(parent
 }
 
 // Destructor
-CreateCollectionDialog::~CreateCollectionDialog()
+CreateWindow::~CreateWindow()
 {
 }
 
-/*
- * Link to UChroma
- */
-
-
-// Set UChromaWindow pointer
-void CreateCollectionDialog::setUChroma(UChromaWindow* ptr)
+// Window close event
+void CreateWindow::closeEvent(QCloseEvent* event)
 {
-	uChroma_ = ptr;
+	emit(windowClosed(false));
 }
 
 /*
  * Window Functions
  */
 
-// Refresh main view (if options permit) after fit params have changed
-void CreateCollectionDialog::updateMainView()
-{
-	if (ui.OptionsVisualCheck->isChecked())
-	{
-		// Generate updated data, and refresh the main view
-		updateCreatedData();
-		uChroma_->updateDisplay();
-	}
-}
-
 // Update data in window
-void CreateCollectionDialog::updateAndShow()
+void CreateWindow::updateAndShow()
 {
-	// Create a new collection for use by the window
-	newCollection_ = uChroma_->addCollection("New Creation");
-	updateCreatedData();
-
 	updateGridGroup();
 	updateVariableTable();
-	updateMainView();
 
 	show();
 }
@@ -99,7 +76,7 @@ void CreateCollectionDialog::updateAndShow()
  */
 
 // Reset equation
-void CreateCollectionDialog::resetEquation()
+void CreateWindow::resetEquation()
 {
 	equation_.clear();
 	xVariable_ = equation_.addGlobalVariable("x");
@@ -109,7 +86,7 @@ void CreateCollectionDialog::resetEquation()
 }
 
 // Update variables list
-void CreateCollectionDialog::updateVariables()
+void CreateWindow::updateVariables()
 {
 	// First, clear all 'used' flags
 	EquationVariable* eqVar;
@@ -146,16 +123,16 @@ void CreateCollectionDialog::updateVariables()
 	}
 }
 
-// Update created data
-void CreateCollectionDialog::updateCreatedData(bool force)
+// Create data
+void CreateWindow::createData(Collection* target)
 {
-	// Unless 'force == true', obey the current status of the Visual checkbox
-	if ((!force) && (!ui.OptionsVisualCheck->isChecked())) return;
+	// First, check equation status
+	if (!equationValid_) return;
 
-	// First, check destination collection
-	if (newCollection_ == NULL)
+	// Second, check destination collection
+	if (target == NULL)
 	{
-		msg.print("Internal Error: No valid destination collection pointer in CreateCollectionDialog::updateCreatedData().\n");
+		msg.print("Internal Error: No valid destination collection pointer in CreateWindow::updateCreatedData().\n");
 		return;
 	}
 
@@ -166,13 +143,13 @@ void CreateCollectionDialog::updateCreatedData(bool force)
 	if (ui.GridSpecifyRadio->isChecked())
 	{
 		// A grid has been specified by hand, so can clear all old data and recreate it
-		newCollection_->clearDataSets();
+		target->clearDataSets();
 		double z = ui.GridSpecifyZMinSpin->value();
 		while (z <= ui.GridSpecifyZMaxSpin->value())
 		{
 			// Create new dataset at this z
-			DataSet* newDataSet = newCollection_->addDataSet();
-			newCollection_->setDataSetZ(newDataSet, z);
+			DataSet* newDataSet = target->addDataSet();
+			target->setDataSetZ(newDataSet, z);
 			Data2D& newData = newDataSet->data();
 
 			double x = ui.GridSpecifyXMinSpin->value();
@@ -192,47 +169,40 @@ void CreateCollectionDialog::updateCreatedData(bool force)
 	else
 	{
 	}
-
-	// Update main window
-	uChroma_->updateGUI();
 }
 
 /*
  * Widgets / Slots / Reimplementations
  */
 
-void CreateCollectionDialog::on_CloseButton_clicked(bool checked)
+void CreateWindow::on_CloseButton_clicked(bool checked)
 {
-	// Must remove collection pointed to by newCollection_, if it exists
-	if (newCollection_ != NULL) uChroma_->removeCollection(newCollection_);
-	newCollection_ = NULL;
+	uChroma_.updateSubWindows();
 
-	uChroma_->updateSubWindows();
+	emit(windowClosed(false));
 
 	hide();
 }
 
-void CreateCollectionDialog::on_CreateButton_clicked(bool checked)
+void CreateWindow::on_CreateButton_clicked(bool checked)
 {
+	// Create a new collection
+	Collection* target = uChroma_.addCollection(ui.EquationEdit->text());
+	if (uChroma_.currentViewPane()) uChroma_.currentViewPane()->addCollection(target);
+	
 	// Make sure the data is up to date
-	updateCreatedData(true);
+	createData(target);
 
-	uChroma_->setAsModified();
+	uChroma_.setAsModified();
 
-	// Set the title of the current collection to the current equation text
-	newCollection_->setTitle(ui.EquationEdit->text());
-
-	// Create another new collection for the next creation...
-	newCollection_ = uChroma_->addCollection("New Creation");
-
-	uChroma_->updateGUI();
+	uChroma_.updateGUI();
 }
 
 /*
  * Equations Group
  */
 
-void CreateCollectionDialog::on_EquationEdit_textChanged(QString text)
+void CreateWindow::on_EquationEdit_textChanged(QString text)
 {
 	resetEquation();
 	equationValid_ = equation_.setCommands(text);
@@ -252,12 +222,9 @@ void CreateCollectionDialog::on_EquationEdit_textChanged(QString text)
 	// Update list of variables
 	updateVariables();
 	updateVariableTable();
-
-	// Update data
-	updateCreatedData();
 }
 
-void CreateCollectionDialog::on_SelectEquationButton_clicked(bool checked)
+void CreateWindow::on_SelectEquationButton_clicked(bool checked)
 {
 }
 
@@ -266,7 +233,7 @@ void CreateCollectionDialog::on_SelectEquationButton_clicked(bool checked)
  */
 
 // Update grid data group
-void CreateCollectionDialog::updateGridGroup(bool refreshList)
+void CreateWindow::updateGridGroup(bool refreshList)
 {
 	refreshing_ = true;
 
@@ -275,7 +242,7 @@ void CreateCollectionDialog::updateGridGroup(bool refreshList)
 	{
 		int currentIndex = ui.GridTakeFromCollectionCombo->currentIndex();
 		ui.GridTakeFromCollectionCombo->clear();
-		for (Collection* c = uChroma_->collections(); c != NULL; c = c->next) ui.GridTakeFromCollectionCombo->addItem(c->title());
+		for (Collection* c = uChroma_.collections(); c != NULL; c = c->next) ui.GridTakeFromCollectionCombo->addItem(c->title());
 		if ((currentIndex != -1) && (currentIndex < ui.GridTakeFromCollectionCombo->count())) ui.GridTakeFromCollectionCombo->setCurrentIndex(currentIndex);
 		else ui.GridTakeFromCollectionCombo->setCurrentIndex(0);
 	}
@@ -301,43 +268,43 @@ void CreateCollectionDialog::updateGridGroup(bool refreshList)
 	refreshing_ = false;
 }
 
-void CreateCollectionDialog::on_GridSpecifyXMinSpin_valueChanged(double value)
+void CreateWindow::on_GridSpecifyXMinSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateCollectionDialog::on_GridSpecifyXMaxSpin_valueChanged(double value)
+void CreateWindow::on_GridSpecifyXMaxSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateCollectionDialog::on_GridSpecifyXDeltaSpin_valueChanged(double value)
+void CreateWindow::on_GridSpecifyXDeltaSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateCollectionDialog::on_GridSpecifyZMinSpin_valueChanged(double value)
+void CreateWindow::on_GridSpecifyZMinSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateCollectionDialog::on_GridSpecifyZMaxSpin_valueChanged(double value)
+void CreateWindow::on_GridSpecifyZMaxSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateCollectionDialog::on_GridSpecifyZDeltaSpin_valueChanged(double value)
+void CreateWindow::on_GridSpecifyZDeltaSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateCollectionDialog::on_GridTakeFromCollectionCombo_currentIndexChanged(int index)
+void CreateWindow::on_GridTakeFromCollectionCombo_currentIndexChanged(int index)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
@@ -348,7 +315,7 @@ void CreateCollectionDialog::on_GridTakeFromCollectionCombo_currentIndexChanged(
  */
 
 // Update variable table
-void CreateCollectionDialog::updateVariableTable()
+void CreateWindow::updateVariableTable()
 {
 	refreshing_ = true;
 
@@ -397,7 +364,7 @@ void CreateCollectionDialog::updateVariableTable()
 	refreshing_ = false;
 }
 
-void CreateCollectionDialog::on_VariablesTable_cellChanged(int row, int column)
+void CreateWindow::on_VariablesTable_cellChanged(int row, int column)
 {
 	if (refreshing_) return;
 

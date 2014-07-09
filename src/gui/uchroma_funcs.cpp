@@ -26,7 +26,7 @@
 #include "version.h"
 
 // Constructor
-UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWindow_(*this), dataWindow_(*this), fitWindow_(*this), sliceMonitorWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this), saveImageDialog_(this), createCollectionDialog_(this), dataImportDialog_(this)
+UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWindow_(*this), createWindow_(*this), dataWindow_(*this), fitWindow_(*this), sliceMonitorWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this), saveImageDialog_(this), dataImportDialog_(this), viewLayout_(*this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -57,6 +57,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 
 	// Add an empty collection, and add it to the current view pane
 	currentViewPane_->addCollection(addCollection());
+	currentViewPane_->translateView(0.0, 0.0, -15.0);
 
 	// Load settings...
 	loadSettings();
@@ -64,7 +65,6 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 	// Set UChroma pointers in widgets/dialogs where necessary
 	ui.MainView->setUChroma(this);
 	GraphWidget::setUChroma(this);
-	CreateCollectionDialog::setUChroma(this);
 
 	// Load font for viewer
 	if (!QFile::exists(viewerFont_)) QMessageBox::warning(this, "Font Error", "The specified font file '" + viewerFont_ + "' does not exist.");

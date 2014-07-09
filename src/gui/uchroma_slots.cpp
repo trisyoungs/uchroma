@@ -194,12 +194,6 @@ void UChromaWindow::on_actionCollectionsNew_triggered(bool checked)
 	updateGUI();
 }
 
-void UChromaWindow::on_actionCollectionsCreate_triggered(bool checked)
-{
-	if (refreshing_) return;
-	createCollectionDialog_.updateAndShow();
-}
-
 void UChromaWindow::on_actionCollectionsFocusNext_triggered(bool checked)
 {
 	focusNextCollection();
@@ -345,6 +339,13 @@ void UChromaWindow::on_actionWindowsAxes_triggered(bool checked)
 	if (refreshing_) return;
 	if (checked) axesWindow_.updateAndShow();
 	else axesWindow_.hide();
+}
+
+void UChromaWindow::on_actionWindowsCreate_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) createWindow_.updateAndShow();
+	else createWindow_.hide();
 }
 
 void UChromaWindow::on_actionWindowsFit_triggered(bool checked)

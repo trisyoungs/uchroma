@@ -27,19 +27,31 @@
 #include <QtCore/QString>
 
 // Forward Declarations
-/* none */
+class UChromaWindow;
 
 // ViewLayout
 class ViewLayout : public ListItem<ViewLayout>
 {
 	public:
 	// Constructor / Destructor
-	ViewLayout();
+	ViewLayout(UChromaWindow& parent);
 	~ViewLayout();
 	// Copy constructor
 	ViewLayout(const ViewLayout& source);
 	// Assignment operator
 	void operator=(const ViewLayout& source);
+
+
+	/*
+	 * Parent
+	 */
+	private:
+	// Layout in which this pane exists
+	UChromaWindow& parent_;
+
+	public:
+	// Set as modified (call parent routine)
+	void setAsModified();
 
 
 	/*
@@ -57,7 +69,7 @@ class ViewLayout : public ListItem<ViewLayout>
 	// Height of grid pixel
 	int pixelHeight_;
 	// List of panes in this layout
-	List<ViewPane> panes_;
+	ParentList<ViewPane,ViewLayout> panes_;
 
 	public:
 	// Clear layout data

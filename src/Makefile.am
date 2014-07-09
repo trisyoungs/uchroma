@@ -1,6 +1,6 @@
 bin_PROGRAMS = uchroma
 
-SUBDIRS = templates base math parser command render gui
+SUBDIRS = gui templates base math parser command render
 
 noinst_HEADERS = version.h
 
