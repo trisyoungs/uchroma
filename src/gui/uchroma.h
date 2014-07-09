@@ -346,7 +346,7 @@ class UChromaWindow : public QMainWindow
 	// Return currently-selected Collection
 	Collection* currentCollection();
 	// Clear current data
-	void clearData();
+	void clearData(bool resetLayout);
 
 
 	/*

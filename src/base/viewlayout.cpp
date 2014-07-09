@@ -24,8 +24,8 @@
 // Constructor
 ViewLayout::ViewLayout() : ListItem<ViewLayout>()
 {
-	nColumns_ = 0;
-	nRows_ = 0;
+	nColumns_ = 1;
+	nRows_ = 1;
 	pixelWidth_ = 0;
 	pixelHeight_ = 0;
 }
@@ -33,6 +33,48 @@ ViewLayout::ViewLayout() : ListItem<ViewLayout>()
 // Destructor
 ViewLayout::~ViewLayout()
 {
+}
+
+// Copy constructor
+ViewLayout::ViewLayout(const ViewLayout& source)
+{
+	(*this) = source;
+}
+
+// Assignment operator
+void ViewLayout::operator=(const ViewLayout& source)
+{
+	// Clear current data
+	panes_.clear();
+
+	// Copy source data
+	nColumns_ = source.nColumns_;
+	nRows_ = source.nRows_;
+	panes_ = source.panes_;
+}
+
+/*
+ * Layout
+ */
+
+// Clear layout data
+void ViewLayout::clear()
+{
+	name_ = "<New Layout>";
+	nColumns_ = 1;
+	nRows_ = 1;
+	panes_.clear();
+}
+
+// Set default layout
+ViewPane* ViewLayout::setDefault()
+{
+	clear();
+
+	setName("Default");
+	setGrid(1, 1);
+	ViewPane* pane = addPane("Main view", 0, 0, 1, 1);
+	return pane;
 }
 
 // Set name
@@ -46,6 +88,18 @@ void ViewLayout::setGrid(int nColumns, int nRows)
 {
 	nColumns_ = nColumns;
 	nRows_ = nRows;
+}
+
+// Return number of columns in layout
+int ViewLayout::nColumns() const
+{
+	return nColumns_;
+}
+
+// Return number of rows in layout
+int ViewLayout::nRows() const
+{
+	return nRows_;
 }
 
 // Add pane to layout

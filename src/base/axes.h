@@ -38,7 +38,10 @@ class Axes
 	// Constructor / Destructor
 	Axes(ViewPane& parent);
 	~Axes();
-	public:
+	// Copy constructor
+	Axes(const Axes& source);
+	// Assignment operator
+	void operator=(const Axes& source);
 	// Anchor enum
 	enum AxisAnchor { AnchorLeft=0, AnchorCentre=1, AnchorRight=2 };
 

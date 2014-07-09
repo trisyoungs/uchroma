@@ -78,6 +78,8 @@ Collection::Collection() : ListItem<Collection>()
 // Destructor
 Collection::~Collection()
 {
+	// Ensure that the collection is removed from the pane it is being displayed in
+	if (displayPane_) displayPane_->removeCollection(this);
 }
 
 // Copy constructor

@@ -156,6 +156,8 @@ class ViewPane : public ListItem<ViewPane>
 	void addCollection(Collection* collection);
 	// Remove reference to collection
 	void removeCollection(Collection* collection);
+	// Return first collection reference
+	RefListItem<Collection,bool>* collections();
 	// Flag all collections for updating
 	void flagCollectionDataInvalid();
 	// Return absolute minimum transformed values over all associated collections

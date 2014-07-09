@@ -53,6 +53,38 @@ ViewPane::ViewPane() : ListItem<ViewPane>(), axes_(*this)
 // Destructor
 ViewPane::~ViewPane()
 {
+	// Notify all associated collections that we no longer exist
+	for (RefListItem<Collection,bool>* ri = collections_.first(); ri != NULL; ri = ri->next) ri->item->setDisplayPane(NULL);
+}
+
+// Copy constructor
+ViewPane::ViewPane(const ViewPane& source) : axes_(*this)
+{
+	(*this) = source;
+}
+
+// Assignment operator
+void ViewPane::operator=(const ViewPane& source)
+{
+	// Geometry / position
+	bottomEdge_ = source.bottomEdge_;
+	leftEdge_ = source.leftEdge_;
+	height_ = source.height_;
+	width_ = source.width_;
+
+	// Projection / view	
+	hasPerspective_ = source.hasPerspective_;
+	perspectiveFieldOfView_ = source.perspectiveFieldOfView_;
+	viewMatrix_ = source.viewMatrix_;
+
+	// Axes
+	axes_ = source.axes_;
+
+	// Style
+	boundingBox_ = source.boundingBox_;
+	boundingBoxPlaneY_ = source.boundingBoxPlaneY_;
+	labelScale_ = source.labelScale_;
+	titleScale_ = source.titleScale_;
 }
 
 // Set parent layout
@@ -452,6 +484,12 @@ void ViewPane::addCollection(Collection* collection)
 {
 	if (collections_.contains(collection)) msg.print("Internal Error: Pane '%s' already contains collection '%s'\n", qPrintable(name_), qPrintable(collection->title()));
 	else collections_.add(collection);
+
+	// Tell the collection that we now are displaying it
+	collection->setDisplayPane(this);
+
+	// Update data limits for axes
+	updateAxisLimits();
 }
 
 // Remove reference to collection
@@ -459,6 +497,12 @@ void ViewPane::removeCollection(Collection* collection)
 {
 	if (!collections_.contains(collection)) msg.print("Internal Error: Pane '%s' does not contain collection '%s'\n", qPrintable(name_), qPrintable(collection->title()));
 	else collections_.remove(collection);
+}
+
+// Return first collection reference
+RefListItem<Collection,bool>* ViewPane::collections()
+{
+	return collections_.first();
 }
 
 // Flag all collections for updating

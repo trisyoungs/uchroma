@@ -58,7 +58,7 @@ void UChromaWindow::on_actionFileNew_triggered(bool checked)
 	}
 
 	// Clear data and create new, empty collection ready for use
-	clearData();
+	clearData(false);
 	currentCollection_ = addCollection();
 
 	// Update the GUI
@@ -84,7 +84,7 @@ void UChromaWindow::on_actionFileLoad_triggered(bool checked)
 	inputFileDirectory_ = fileName;
 
 	// Clear existing data and load input file
-	clearData();
+	clearData(true);
 	loadInputFile(fileName);
 
 	// Update the GUI

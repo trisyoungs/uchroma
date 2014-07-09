@@ -21,7 +21,6 @@ uchroma_view.cpp
 io_load.cpp
 io_save.cpp
 keywords.cpp
-glextensions.cpp
 axes_funcs.cpp
 create_funcs.cpp
 data_funcs.cpp

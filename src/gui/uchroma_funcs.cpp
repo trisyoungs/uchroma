@@ -41,17 +41,22 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent), axesWin
 #else
 	viewerFont_ = QDir::current().absoluteFilePath("wright.ttf");
 #endif
-	clearData();
+	imageExportFile_ = "image.png";
+	imageExportWidth_ = 800;
+	imageExportHeight_ = 600;
+	imageExportMaintainAspect_ = true;
+	imageExportFormat_ = Viewer::PNGFormat;
+
+	// Clear data
+	clearData(true);
 	interacting_ = false;
 	refreshing_ = false;
 
 	// Set basic view layout
-	viewLayout_.setName("Current");
-	viewLayout_.setGrid(4, 4);
-	currentViewPane_ = viewLayout_.addPane("Main view", 0, 0, 4, 4);
+	currentViewPane_ = viewLayout_.setDefault();
 
-	// Add an empty collection
-	addCollection();
+	// Add an empty collection, and add it to the current view pane
+	currentViewPane_->addCollection(addCollection());
 
 	// Load settings...
 	loadSettings();

@@ -60,12 +60,20 @@ class ViewLayout : public ListItem<ViewLayout>
 	List<ViewPane> panes_;
 
 	public:
+	// Clear layout data
+	void clear();
+	// Set default layout data
+	ViewPane* setDefault();
 	// Set name
 	void setName(QString name);
 	// Set number of rows and columns
 	void setGrid(int nColumns, int nRows);
+	// Return number of columns in layout
+	int nColumns() const;
+	// Return number of rows in layout
+	int nRows() const;
 	// Add pane to layout
-	ViewPane* addPane(QString name, int left, int top, int width, int height);
+	ViewPane* addPane(QString name = QString(), int left = 0, int top = 0, int width = 1, int height = 1);
 	// Return list of panes
 	ViewPane* panes();
 

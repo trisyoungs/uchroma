@@ -84,6 +84,63 @@ Axes::~Axes()
 {
 }
 
+// Copy constructor
+Axes::Axes(const Axes& source) : parent_(parent_)
+{
+	(*this) = source;
+}
+
+// Assignment operator
+void Axes::operator=(const Axes& source)
+{
+	// Definition
+	axisMin_ = source.axisMin_;
+	axisMax_ = source.axisMax_;
+	axisInverted_ = source.axisInverted_;
+	axisLogarithmic_ = source.axisLogarithmic_;
+	axisVisible_ = source.axisVisible_;
+	axisPositionIsFractional_ = source.axisPositionIsFractional_;
+	axisPositionReal_[0] = source.axisPositionReal_[0];
+	axisPositionReal_[1] = source.axisPositionReal_[1];
+	axisPositionReal_[2] = source.axisPositionReal_[2];
+	axisPositionFractional_[0] = source.axisPositionFractional_[0];
+	axisPositionFractional_[1] = source.axisPositionFractional_[1];
+	axisPositionFractional_[2] = source.axisPositionFractional_[2];
+	axisCoordMin_[0] = source.axisCoordMin_[0];
+	axisCoordMin_[1] = source.axisCoordMin_[1];
+	axisCoordMin_[2] = source.axisCoordMin_[2];
+	axisCoordMax_[0] = source.axisCoordMax_[0];
+	axisCoordMax_[1] = source.axisCoordMax_[1];
+	axisCoordMax_[2] = source.axisCoordMax_[2];
+	axisStretch_ = source.axisStretch_;
+
+	// Ticks / Labels
+	axisTickDirection_[0] = source.axisTickDirection_[0];
+	axisTickDirection_[1] = source.axisTickDirection_[1];
+	axisTickDirection_[2] = source.axisTickDirection_[2];
+	axisFirstTick_ = source.axisFirstTick_;
+	axisTickDelta_ = source.axisTickDelta_;
+	axisAutoTicks_ = source.axisAutoTicks_;
+	axisMinorTicks_ = source.axisMinorTicks_;
+	axisLabelOrientation_[0] = source.axisLabelOrientation_[0];
+	axisLabelOrientation_[1] = source.axisLabelOrientation_[1];
+	axisLabelOrientation_[2] = source.axisLabelOrientation_[2];
+	axisTitle_[0] = source.axisTitle_[0];
+	axisTitle_[1] = source.axisTitle_[1];
+	axisTitle_[2] = source.axisTitle_[2];
+	axisTitleOrientation_[0] = source.axisTitleOrientation_[0];
+	axisTitleOrientation_[1] = source.axisTitleOrientation_[1];
+	axisTitleOrientation_[2] = source.axisTitleOrientation_[2];
+	axisTitleAnchor_[0] = source.axisTitleAnchor_[0];
+	axisTitleAnchor_[1] = source.axisTitleAnchor_[1];
+	axisTitleAnchor_[2] = source.axisTitleAnchor_[2];
+
+	// GL
+	clipPlaneYMin_ = 0.0;
+	clipPlaneYMax_ = 0.0;
+	primitivesValid_ = false;
+}
+
 /*
  * Definition
  */

@@ -35,8 +35,6 @@ Collection* UChromaWindow::addCollection(QString title)
 
 	// Add an empty collection
 	currentCollection_ = collections_.add();
-	currentCollection_->setDisplayPane(currentViewPane_);
-	currentViewPane_->addCollection(currentCollection_);
 
 	// Set link to MainView's primitive reflist
 	currentCollection_->displayPrimitives().setViewer(ui.MainView);
@@ -146,7 +144,7 @@ Collection* UChromaWindow::currentCollection()
 }
 
 // Clear current data
-void UChromaWindow::clearData()
+void UChromaWindow::clearData(bool resetLayout)
 {
 	// Collections
 	collections_.clear();
@@ -154,12 +152,13 @@ void UChromaWindow::clearData()
 	// Data
 	modified_ = false;
 	inputFile_ = "";
-	imageExportFile_ = "image.png";
-	imageExportWidth_ = 800;
-	imageExportHeight_ = 600;
-	imageExportMaintainAspect_ = true;
-	imageExportFormat_ = Viewer::PNGFormat;
-	// viewerFont_ = ??
+
+	// Layout
+	if (resetLayout)
+	{
+		viewLayout_.clear();
+		currentViewPane_ = NULL;
+	}
 
 	// Interaction
 	interactionMode_ = InteractionMode::ViewInteraction;

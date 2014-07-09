@@ -373,8 +373,7 @@ bool UChromaWindow::readSettingsBlock(LineParser& parser)
 // Read ViewBlock keywords
 bool UChromaWindow::readViewBlock(LineParser& parser)
 {
-	int xyzw;
-	Matrix mat;
+	ViewPane* pane;
 	while (!parser.eofOrBlank())
 	{
 		// Get line from file
@@ -393,9 +392,18 @@ bool UChromaWindow::readViewBlock(LineParser& parser)
 			case (Keywords::EndViewKeyword):
 				return true;
 				break;
+			// Grid specification
+			case (Keywords::GridKeyword):
+				viewLayout_.setGrid(parser.argi(1), parser.argi(2));
+				break;
 			// Labels face viewer flag
 			case (Keywords::LabelFaceViewerKeyword):
 				labelFaceViewer_ = parser.argb(1);
+				break;
+			// ViewPane definition
+			case (Keywords::ViewPaneBlockKeyword):
+				pane = viewLayout_.addPane(parser.argc(1));
+				if (!readViewPaneBlock(parser, pane)) return false;
 				break;
 			// Unrecognised Keyword
 			default:
@@ -411,7 +419,7 @@ bool UChromaWindow::readViewBlock(LineParser& parser)
 bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 {
 	int xyzw, axis;
-
+	Collection* collection;
 	Matrix mat;
 	while (!parser.eofOrBlank())
 	{
@@ -447,6 +455,13 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 			case (Keywords::BoundingBoxPlaneYKeyword):
 				pane->setBoundingBoxPlaneY(parser.argd(1));
 				break;
+			// Collection association
+			case (Keywords::CollectionAssociatedKeyword):
+				// Find named collection
+				collection = findCollection(parser.argc(1));
+				if (collection == NULL) msg.print("Warning - Collection '%s' is listed in ViewPane '%s', but no collection by this name exists.\n", parser.argc(1), qPrintable(pane->name()));
+				else pane->addCollection(collection);
+				break;
 			// End input block
 			case (Keywords::EndViewPaneKeyword):
 				return true;
@@ -459,10 +474,6 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 			// Label scale
 			case (Keywords::LabelScaleKeyword):
 				pane->setLabelScale(parser.argd(1));
-				break;
-			// Name
-			case (Keywords::NameKeyword):
-				pane->setName(parser.argc(1));
 				break;
 			// Orthographic view
 			case (Keywords::PerspectiveKeyword):
@@ -502,7 +513,7 @@ bool UChromaWindow::loadInputFile(QString fileName)
 	}
 
 	// Clear existing data
-	clearData();
+	clearData(true);
 
 	// Read line from file and decide what to do with it
 	Keywords::InputBlock block;
@@ -540,7 +551,6 @@ bool UChromaWindow::loadInputFile(QString fileName)
 					}
 				}
 				break;
-				
 			// Settings
 			case (Keywords::SettingsBlock):
 				success = readSettingsBlock(parser);
@@ -558,8 +568,8 @@ bool UChromaWindow::loadInputFile(QString fileName)
 	parser.closeFiles();
 
 	// Set necessary variables
+	currentViewPane_ = viewLayout_.panes();
 	inputFile_ = fileName;
 	modified_ = false;
-	
 	return true;
 }

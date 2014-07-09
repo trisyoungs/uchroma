@@ -193,10 +193,10 @@ int Keywords::dataSetKeywordNArguments(Keywords::DataSetKeyword kwd)
 */
 
 // View Block Keywords
-const char* ViewBlockKeywords[] = { "Grid", "EndView", "LabelFaceViewer", "ViewPane" };
+const char* ViewBlockKeywords[] = { "EndView", "Grid", "LabelFaceViewer", "ViewPane" };
 
 // View Block NArguments
-int ViewKeywordNArguments[] = { 2, 0, 1, 0 };
+int ViewKeywordNArguments[] = { 0, 2, 1, 1 };
 
 /*!
  * \brief Convert text string to ViewKeyword
@@ -228,10 +228,10 @@ int Keywords::viewKeywordNArguments(Keywords::ViewKeyword kwd)
 */
 
 // ViewPane Block Keywords
-const char* ViewPaneBlockKeywords[] = { "Axis", "BoundingBox", "BoundingBoxPlaneY", "EndViewPane", "Geometry", "LabelScale", "MatrixX", "MatrixY", "MatrixZ", "MatrixW", "Name", "Perspective", "TitleScale" };
+const char* ViewPaneBlockKeywords[] = { "Axis", "BoundingBox", "BoundingBoxPlaneY", "Collection", "EndViewPane", "Geometry", "LabelScale", "MatrixX", "MatrixY", "MatrixZ", "MatrixW", "Perspective", "TitleScale" };
 
 // ViewPane Block NArguments
-int ViewPaneKeywordNArguments[] = { 1, 0, 4, 1, 4, 4, 4, 4, 1, 1, 1 };
+int ViewPaneKeywordNArguments[] = { 1, 1, 1, 1, 0, 4, 1, 4, 4, 4, 4, 1, 1 };
 
 /*!
  * \brief Convert text string to ViewPaneKeyword

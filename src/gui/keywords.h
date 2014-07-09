@@ -194,6 +194,7 @@ class Keywords
 		AxisBlockKeyword,
 		BoundingBoxKeyword,
 		BoundingBoxPlaneYKeyword,
+		CollectionAssociatedKeyword,
 		EndViewPaneKeyword,
 		GeometryKeyword,
 		LabelScaleKeyword,
@@ -201,7 +202,6 @@ class Keywords
 		MatrixYKeyword,
 		MatrixZKeyword,
 		MatrixWKeyword,
-		NameKeyword,
 		PerspectiveKeyword,
 		TitleScaleKeyword,
 		nViewPaneKeywords
