@@ -114,6 +114,8 @@ void ViewLayout::setGrid(int nColumns, int nRows)
 {
 	nColumns_ = nColumns;
 	nRows_ = nRows;
+
+	recalculatePixels();
 }
 
 // Return number of columns in layout
@@ -140,6 +142,8 @@ ViewPane* ViewLayout::addPane(QString name, int left, int top, int width, int he
 	pane->setSize(width, height);
 
 	pane->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
+
+	setAsModified();
 
 	return pane;
 }

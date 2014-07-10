@@ -84,8 +84,9 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	// Connect CollectionTree context menu signal
 	connect(ui.CollectionTree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(collectionTreeContextMenuRequested(QPoint)));
 
-	// Connect LayoutWindow PaneOrganiser update signal
+	// Connect LayoutWindow and PaneOrganiser update signals
 	connect(layoutWindow_.ui.Organiser, SIGNAL(updateMainDisplay()), this, SLOT(updateDisplay()));
+	connect(&layoutWindow_, SIGNAL(updateMainDisplay()), this, SLOT(updateDisplay()));
 
 	// Connect sub-window closed signal to toggle buttons / menu items in uChroma's main window
 	connect(&axesWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsAxes, SLOT(setChecked(bool)));

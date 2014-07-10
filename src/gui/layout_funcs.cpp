@@ -65,14 +65,16 @@ void LayoutWindow::on_GridNColumnsSpin_valueChanged(int value)
 
 	uChroma_.viewLayout()->setGrid(value, ui.GridNRowsSpin->value());
 	updateControls();
+	emit(updateMainDisplay());
 }
 
 void LayoutWindow::on_GridNRowsSpin_valueChanged(int value)
 {
 	if (refreshing_) return;
 
-	uChroma_.viewLayout()->setGrid(ui.GridNRowsSpin->value(), value);
+	uChroma_.viewLayout()->setGrid(ui.GridNColumnsSpin->value(), value);
 	updateControls();
+	emit(updateMainDisplay());
 }
 
 void LayoutWindow::on_PaneAddButton_clicked(bool checked)

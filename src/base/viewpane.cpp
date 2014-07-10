@@ -106,6 +106,8 @@ void ViewPane::setAsModified()
 void ViewPane::setName(QString name)
 {
 	name_ = name;
+
+	setAsModified();
 }
 
 // Return name of pane
@@ -119,6 +121,8 @@ void ViewPane::setBottomLeft(int bottom, int left)
 {
 	bottomEdge_ = bottom;
 	leftEdge_ = left;
+
+	setAsModified();
 }
 
 // Return bottom edge of pane
@@ -138,6 +142,8 @@ void ViewPane::setSize(int w, int h)
 {
 	width_ = w;
 	height_ = h;
+
+	setAsModified();
 }
 
 // Return width of pane (in columns)
@@ -218,6 +224,8 @@ const char* ViewPane::paneRole(ViewPane::PaneRole role)
 void ViewPane::setRole(ViewPane::PaneRole role)
 {
 	role_ = role;
+
+	setAsModified();
 }
 
 // Return role of this pane
@@ -230,18 +238,24 @@ ViewPane::PaneRole ViewPane::role()
 void ViewPane::setRoleAssociatedPane(ViewPane* pane)
 {
 	roleAssociatedPane_ = pane;
+
+	setAsModified();
 }
 
 // Return associated target pane for role, if relevant
 ViewPane* ViewPane::roleAssociatedPane()
 {
 	return roleAssociatedPane_;
+
+	setAsModified();
 }
 
 // Set associated target collection for role, if relevant
 void ViewPane::setRoleAssociatedCollection(Collection* collection)
 {
 	roleAssociatedCollection_ = collection;
+
+	setAsModified();
 }
 
 // Return associated target collection for role, if relevant

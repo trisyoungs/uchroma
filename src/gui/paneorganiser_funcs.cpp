@@ -188,11 +188,14 @@ void PaneOrganiser::resizeEvent(QResizeEvent* event)
 void PaneOrganiser::paintEvent(QPaintEvent *event)
 {
 	const int paneMargin = 4;
-	QPainter painter(this);
-
 	QBrush paneBrush(QColor(234,234,234));
 	QBrush whiteBrush(Qt::white);
 	QPen pen(Qt::NoPen);
+
+	// Update pixel sizes
+	calculateLayoutPixelSize();
+
+	QPainter painter(this);
 	painter.setPen(pen);
 
 	// Set some rectangles

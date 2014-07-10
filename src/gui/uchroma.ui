@@ -605,7 +605,7 @@
      <x>0</x>
      <y>0</y>
      <width>1092</width>
-     <height>23</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -766,6 +766,7 @@
    </attribute>
    <addaction name="actionAxesShowAll"/>
    <addaction name="separator"/>
+   <addaction name="actionAxesInteractNone"/>
    <addaction name="actionAxesInteractX"/>
    <addaction name="actionAxesInteractY"/>
    <addaction name="actionAxesInteractZ"/>
@@ -919,6 +920,10 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/windows_fit.svg</normaloff>:/uchroma/icons/windows_fit.svg</iconset>
+   </property>
    <property name="text">
     <string>Fit</string>
    </property>
@@ -931,7 +936,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="icons.qrc">
+    <iconset>
      <normaloff>:/uchroma/icons/collections_create.svg</normaloff>:/uchroma/icons/collections_create.svg</iconset>
    </property>
    <property name="text">
@@ -1170,6 +1175,9 @@
    <property name="shortcut">
     <string>Esc</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionAxesQuickLog">
    <property name="checkable">
@@ -1183,6 +1191,10 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/windows_create.svg</normaloff>:/uchroma/icons/windows_create.svg</iconset>
+   </property>
    <property name="text">
     <string>Create</string>
    </property>
@@ -1193,6 +1205,10 @@
   <action name="actionWindowsLayout">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/windows_layout.svg</normaloff>:/uchroma/icons/windows_layout.svg</iconset>
    </property>
    <property name="text">
     <string>Layout</string>

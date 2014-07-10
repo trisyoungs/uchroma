@@ -69,10 +69,6 @@ class LayoutWindow : public QWidget
 	// Return current pane
 	ViewPane* currentPane();
 
-	public slots:
-	// Set current pane from grid coordinates
-// 	void setCurrenPane(int gridX, int gridY);
-
 
 	/*
 	 * Convenience Functions
@@ -93,6 +89,14 @@ class LayoutWindow : public QWidget
 	void on_PaneNameEdit_textChanged(QString text);
 	void on_PaneRoleCombo_currentIndexChanged(int index);
 	void on_Organiser_currentPaneChanged(int gridX, int gridY);
+
+
+	/*
+	 * Signale
+	 */
+	signals:
+	// Main display update required
+	void updateMainDisplay();
 
 
 	/*
