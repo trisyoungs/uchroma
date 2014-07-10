@@ -202,7 +202,7 @@ void TransformWindow::on_TransformZInterpolateConstrainCheck_clicked(bool checke
 // Update controls and show window
 void TransformWindow::updateAndShow()
 {
-	updateControls();
+	updateControls(true);
 	show();
 	move(uChroma_.centrePos() - QPoint(width()/2, height()/2));
 }

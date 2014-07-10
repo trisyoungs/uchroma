@@ -59,6 +59,22 @@ class LayoutWindow : public QWidget
 
 
 	/*
+	 * Current Pane
+	 */
+	private:
+	// Current pane selected in PaneOrganiser
+	ViewPane* currentPane_;
+
+	public:
+	// Return current pane
+	ViewPane* currentPane();
+
+	public slots:
+	// Set current pane from grid coordinates
+// 	void setCurrenPane(int gridX, int gridY);
+
+
+	/*
 	 * Convenience Functions
 	 */
 	private:
@@ -68,6 +84,15 @@ class LayoutWindow : public QWidget
 	 * Slots
 	 */
 	private slots:
+	void on_GridNColumnsSpin_valueChanged(int value);
+	void on_GridNRowsSpin_valueChanged(int value);
+	void on_PaneAddButton_clicked(bool checked);
+	void on_PaneRemoveButton_clicked(bool checked);
+	void on_PaneNextButton_clicked(bool checked);
+	void on_PanePreviousButton_clicked(bool checked);
+	void on_PaneNameEdit_textChanged(QString text);
+	void on_PaneRoleCombo_currentIndexChanged(int index);
+	void on_Organiser_currentPaneChanged(int gridX, int gridY);
 
 
 	/*

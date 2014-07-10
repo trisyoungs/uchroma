@@ -195,6 +195,62 @@ bool ViewPane::containsGridReference(int gridX, int gridY)
 }
 
 /*
+ * Role
+ */
+
+// Role of pane
+const char* RoleKeywords[ViewPane::nPaneRoles] = { "Display", "FitResults", "Extraction" };
+
+// Convert text string to PaneRole
+ViewPane::PaneRole ViewPane::paneRole(const char* s)
+{
+	for (int n=0; n<ViewPane::nPaneRoles; ++n) if (strcmp(s,RoleKeywords[n]) == 0) return (ViewPane::PaneRole) n;
+	return ViewPane::nPaneRoles;
+}
+
+// Convert InputBlock to text string
+const char* ViewPane::paneRole(ViewPane::PaneRole role)
+{
+	return RoleKeywords[role];
+}
+
+// Set role of this pane
+void ViewPane::setRole(ViewPane::PaneRole role)
+{
+	role_ = role;
+}
+
+// Return role of this pane
+ViewPane::PaneRole ViewPane::role()
+{
+	return role_;
+}
+
+// Set associated target pane for role, if relevant
+void ViewPane::setRoleAssociatedPane(ViewPane* pane)
+{
+	roleAssociatedPane_ = pane;
+}
+
+// Return associated target pane for role, if relevant
+ViewPane* ViewPane::roleAssociatedPane()
+{
+	return roleAssociatedPane_;
+}
+
+// Set associated target collection for role, if relevant
+void ViewPane::setRoleAssociatedCollection(Collection* collection)
+{
+	roleAssociatedCollection_ = collection;
+}
+
+// Return associated target collection for role, if relevant
+Collection* ViewPane::roleAssociatedCollection()
+{
+	return roleAssociatedCollection_;
+}
+
+/*
  * Projection / View
  */
 	

@@ -62,7 +62,6 @@ class ViewPane : public ListItem<ViewPane>
 	 * Position / Geometry
 	 */
 	private:
-
 	// Name of pane
 	QString name_;
 	// Top edge position (row index)
@@ -101,6 +100,40 @@ class ViewPane : public ListItem<ViewPane>
 	bool containsCoordinate(int mouseX, int mouseY);
 	// Return whether the specified grid reference is in this pane
 	bool containsGridReference(int gridX, int gridY);
+
+
+	/*
+	 * Role
+	 */
+	public:
+	// Role of pane
+	enum PaneRole { DisplayPane, FitResultsRole, ExtractionRole, nPaneRoles };
+	// Convert text string to PaneRole
+	static PaneRole paneRole(const char* s);
+	// Convert InputBlock to text string
+	static const char* paneRole(PaneRole role);
+
+	private:
+	// Role of this pane
+	PaneRole role_;
+	// Associated target pane for role, if relevant
+	ViewPane* roleAssociatedPane_;
+	// Associated target collection for role, if relevant
+	Collection* roleAssociatedCollection_;
+
+	public:
+	// Set role of this pane
+	void setRole(PaneRole role);
+	// Return role of this pane
+	PaneRole role();
+	// Set associated target pane for role, if relevant
+	void setRoleAssociatedPane(ViewPane* pane);
+	// Return associated target pane for role, if relevant
+	ViewPane* roleAssociatedPane();
+	// Set associated target collection for role, if relevant
+	void setRoleAssociatedCollection(Collection* collection);
+	// Return associated target collection for role, if relevant
+	Collection* roleAssociatedCollection();
 
 
 	/*

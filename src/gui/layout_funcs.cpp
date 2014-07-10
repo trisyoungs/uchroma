@@ -33,6 +33,10 @@ LayoutWindow::LayoutWindow(UChromaWindow& parent) : QWidget(&parent), uChroma_(p
 
 	QWidget::setWindowFlags(Qt::Tool);
 
+	// Set items in PaneRoleCombo
+	for (int n=0; n<ViewPane::nPaneRoles; ++n) ui.PaneRoleCombo->addItem(ViewPane::paneRole((ViewPane::PaneRole) n));
+	currentPane_ = NULL;
+
 	refreshing_ = false;
 }
 
@@ -55,6 +59,82 @@ void LayoutWindow::closeEvent(QCloseEvent *event)
  * Slots
  */
 
+void LayoutWindow::on_GridNColumnsSpin_valueChanged(int value)
+{
+	if (refreshing_) return;
+
+	uChroma_.viewLayout()->setGrid(value, ui.GridNRowsSpin->value());
+	updateControls();
+}
+
+void LayoutWindow::on_GridNRowsSpin_valueChanged(int value)
+{
+	if (refreshing_) return;
+
+	uChroma_.viewLayout()->setGrid(ui.GridNRowsSpin->value(), value);
+	updateControls();
+}
+
+void LayoutWindow::on_PaneAddButton_clicked(bool checked)
+{
+	if (refreshing_) return;
+
+	currentPane_ = uChroma_.viewLayout()->addPane("New Pane");
+
+	updateControls();
+}
+
+void LayoutWindow::on_PaneRemoveButton_clicked(bool checked)
+{
+	if (refreshing_) return;
+}
+
+void LayoutWindow::on_PaneNextButton_clicked(bool checked)
+{
+	if (refreshing_) return;
+
+	if (currentPane_) currentPane_ = currentPane_->next;
+	if (!currentPane_) currentPane_ = uChroma_.viewLayout()->panes();
+
+	updateControls();
+}
+
+void LayoutWindow::on_PanePreviousButton_clicked(bool checked)
+{
+	if (refreshing_) return;
+
+	if (currentPane_) currentPane_ = currentPane_->prev;
+	if (!currentPane_) currentPane_ = uChroma_.viewLayout()->lastPane();
+
+	updateControls();
+}
+
+void LayoutWindow::on_PaneNameEdit_textChanged(QString text)
+{
+	if (refreshing_) return;
+
+	if (currentPane_) currentPane_->setName(text);
+	ui.Organiser->update();
+}
+
+void LayoutWindow::on_PaneRoleCombo_currentIndexChanged(int index)
+{
+	if (refreshing_) return;
+
+	if (currentPane_) currentPane_->setRole((ViewPane::PaneRole) index);
+	ui.Organiser->update();
+}
+
+void LayoutWindow::on_Organiser_currentPaneChanged(int gridX, int gridY)
+{
+	if (refreshing_) return;
+
+	// Get pane at the specified grid coordinates
+	currentPane_ = uChroma_.viewLayout()->paneAtGrid(gridX, gridY);
+
+	updateControls();
+}
+
 /*
  * Update
  */
@@ -62,7 +142,7 @@ void LayoutWindow::closeEvent(QCloseEvent *event)
 // Update controls and show window
 void LayoutWindow::updateAndShow()
 {
-	updateControls();
+	updateControls(true);
 	show();
 	move(uChroma_.centrePos() - QPoint(width()/2, height()/2));
 }
@@ -73,11 +153,25 @@ void LayoutWindow::updateControls(bool force)
 	// If the window isn't visible, do nothing...
 	if ((!isVisible()) && (!force) ) return;
 
-	if (!uChroma_.currentViewPane()) return;
-	
 	refreshing_ = true;
 
-// 	ui.Organiser->calculateLayoutPixelSize();
+	// Make a check on the currentPane_ to see if it still exists in the layout...
+	if (currentPane_ && (!uChroma_.viewLayout()->containsPane(currentPane_))) currentPane_ = uChroma_.viewLayout()->panes();
+
+	ui.Organiser->update();
+
+	ui.GridNColumnsSpin->setValue(uChroma_.viewLayout()->nColumns());
+	ui.GridNRowsSpin->setValue(uChroma_.viewLayout()->nRows());
+
+	// Check that a valid pane is selected in the organiser
+	ui.PaneNameEdit->setEnabled(currentPane_);
+	ui.PaneRoleCombo->setEnabled(currentPane_);
+	ui.PaneRemoveButton->setEnabled(currentPane_);
+	if (currentPane_)
+	{
+		ui.PaneNameEdit->setText(currentPane_->name());
+		ui.PaneRoleCombo->setCurrentIndex(currentPane_->role());
+	}
 
 	refreshing_ = false;
 }

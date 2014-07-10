@@ -139,6 +139,8 @@ ViewPane* ViewLayout::addPane(QString name, int left, int top, int width, int he
 	pane->setName(name);
 	pane->setSize(width, height);
 
+	pane->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
+
 	return pane;
 }
 
@@ -148,10 +150,22 @@ ViewPane* ViewLayout::panes()
 	return panes_.first();
 }
 
+// Return last pane in list
+ViewPane* ViewLayout::lastPane()
+{
+	return panes_.last();
+}
+
 // Return index of specified pane in list
 int ViewLayout::paneIndex(ViewPane* pane)
 {
 	return panes_.indexOf(pane);
+}
+
+// Return if pane is in the current list
+bool ViewLayout::containsPane(ViewPane* pane)
+{
+	return panes_.contains(pane);
 }
 
 // Set new layout size

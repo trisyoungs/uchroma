@@ -108,10 +108,14 @@ class ViewLayout : public ListItem<ViewLayout>
 	public:
 	// Add pane to layout
 	ViewPane* addPane(QString name = QString(), int left = 0, int top = 0, int width = 1, int height = 1);
-	// Return list of panes
+	// Return first pane in list
 	ViewPane* panes();
+	// Return last pane in list
+	ViewPane* lastPane();
 	// Return index of specified pane in list
 	int paneIndex(ViewPane* pane);
+	// Return if pane is in the current list
+	bool containsPane(ViewPane* pane);
 	// Return pane under specified coordinate
 	ViewPane* paneAt(int mouseX, int mouseY);
 	// Return pane containing specified grid reference

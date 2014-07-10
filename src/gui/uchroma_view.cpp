@@ -50,9 +50,3 @@ ViewPane* UChromaWindow::currentViewPane()
 {
 	return currentViewPane_;
 }
-
-// Return first ViewPane in current layout
-ViewPane* UChromaWindow::viewPanes()
-{
-	return viewLayout_.panes();
-}

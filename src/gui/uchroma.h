@@ -373,8 +373,6 @@ class UChromaWindow : public QMainWindow
 	bool setCurrentViewPane(int mouseX, int mouseY);
 	// Return current view pane
 	ViewPane* currentViewPane();
-	// Return first ViewPane in current layout
-	ViewPane* viewPanes();
 
 
 	/*

@@ -311,8 +311,8 @@ void FitWindow::updateDestinationGroup()
 // Update controls and show window
 void FitWindow::updateAndShow()
 {
+	updateControls(true);
 	show();
-	updateControls();
 	move(uChroma_.centrePos() - QPoint(width()/2, height()/2));
 }
 

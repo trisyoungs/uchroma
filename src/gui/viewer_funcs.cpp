@@ -172,7 +172,7 @@ void Viewer::paintGL()
 	
 	// Loop over defined viewpanes
 	GLdouble clipPlaneBottom[4] = { 0.0, 1.0, 0.0, 0.0 }, clipPlaneTop[4] = { 0.0, -1.0, 0.0, 0.0 };
-	for (ViewPane* pane = uChroma_->viewPanes(); pane != NULL; pane = pane->next)
+	for (ViewPane* pane = uChroma_->viewLayout()->panes(); pane != NULL; pane = pane->next)
 	{
 		// Set viewport
 		glViewport(pane->viewportMatrix()[0], pane->viewportMatrix()[1], pane->viewportMatrix()[2], pane->viewportMatrix()[3]);

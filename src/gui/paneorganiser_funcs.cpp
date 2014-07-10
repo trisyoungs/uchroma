@@ -65,13 +65,19 @@ void PaneOrganiser::setViewLayout(ViewLayout* layout)
 {
 	viewLayout_ = layout;
 
+	if (layout->panes()) emit(currentPaneChanged(layout->panes()->leftEdge(), layout->panes()->bottomEdge()));
+
 	calculateLayoutPixelSize();
 
 	update();
 }
 
 /*
- * Events
+ * Interaction
+ */
+
+/*
+ * Qt
  */
 
 void PaneOrganiser::dragEnterEvent(QDragEnterEvent *event)
@@ -134,7 +140,10 @@ void PaneOrganiser::mousePressEvent(QMouseEvent *event)
 	dragPane_ = viewLayout_->paneAtGrid(clickedGridReference_.x(), clickedGridReference_.y());
 	if (!dragPane_) return;
 
-	// Update view immediately so the pane disappears
+	// Emit currentPaneChanged()
+	emit(currentPaneChanged(clickedGridReference_.x(), clickedGridReference_.y()));
+
+	// Update view immediately so the pane being dragged disappears
 	update();
 
 	// Draw image of the pane
@@ -142,7 +151,9 @@ void PaneOrganiser::mousePressEvent(QMouseEvent *event)
 	int paneIndex = viewLayout_->paneIndex(dragPane_);
 	QPainter painter(&paneImage);
 	painter.setBrush(QColor(paneIndex&1 ? 255 : 128, paneIndex&2 ? 255 : 128, paneIndex&4 ? 255 : 128, 255));
-	painter.drawRect(QRect(0, 0, paneImage.width(), paneImage.height()));
+	QRect paneRect(0, 0, paneImage.width(), paneImage.height());
+	painter.drawRect(paneRect);
+	painter.drawText(paneRect,  Qt::AlignHCenter | Qt::AlignVCenter, dragPane_->name());
 	painter.end();
 
 	// Construct mime data for drag event
@@ -237,6 +248,10 @@ void PaneOrganiser::paintEvent(QPaintEvent *event)
 			paneRect.setCoords(pane->leftEdge()*layoutPixelWidth_, height()-pane->bottomEdge()*layoutPixelHeight_, (pane->leftEdge()+pane->width())*layoutPixelWidth_, height()-(pane->bottomEdge()+pane->height())*layoutPixelHeight_);
 		}
 		painter.drawRect(paneRect);
+
+		// Draw on text
+		painter.setPen(Qt::black);
+		painter.drawText(paneRect, Qt::AlignHCenter | Qt::AlignVCenter, pane->name());
 	}
 
 	painter.end();

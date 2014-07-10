@@ -59,7 +59,7 @@ class PaneOrganiser : public QWidget
 
 
 	/*
-	 * Drag / Drop
+	 * Interaction
 	 */
 	private:
 	// Pane we are currently dragging
@@ -68,6 +68,9 @@ class PaneOrganiser : public QWidget
 	QPoint clickedGridReference_;
 	// Grid coordinate we are currently dragging over
 	QPoint dragGridReference_;
+
+	signals:
+	void currentPaneChanged(int gridX, int gridY);
 
 
 	/*
