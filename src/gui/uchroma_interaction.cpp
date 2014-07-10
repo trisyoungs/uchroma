@@ -194,11 +194,10 @@ void UChromaWindow::startInteraction(int mouseX, int mouseY, Qt::KeyboardModifie
 	// Check that an interaction mode is currently set
 	if (interactionMode_ == InteractionMode::ViewInteraction) return;
 
-	// Set interaction pane
-	currentViewPane_ = viewLayout_.paneAt(mouseX, mouseY);
+	// Check interaction pane
 	if (currentViewPane_ == NULL)
 	{
-		msg.print("NULL interaction pane at (%i,%i) - refusing to start interaction.\n", mouseX, mouseY);
+		msg.print("NULL interaction pane - refusing to start interaction.\n");
 		return;
 	}
 

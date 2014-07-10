@@ -180,7 +180,7 @@ void Viewer::paintGL()
 		// Setup an orthographic matrix
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(pane->viewportMatrix()[0], pane->viewportMatrix()[0]+pane->viewportMatrix()[2], pane->viewportMatrix()[1], pane->viewportMatrix()[1] + pane->viewportMatrix()[3], -10, 10);
+		glOrtho(0, pane->viewportMatrix()[2], 0, pane->viewportMatrix()[3], -10, 10);
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
@@ -278,26 +278,32 @@ void Viewer::paintGL()
 			pane->interactionBoxPrimitive().sendToGL();
 		}
 
-		// Render main surface
-		// -- Setup clip planes to enforce Y-axis limits
-		glLoadMatrixd(A.matrix());
-		glPushMatrix();
-		glTranslated(0.0, pane->axes().clipPlaneYMin(), 0.0);
-		glClipPlane(GL_CLIP_PLANE0, clipPlaneBottom);
-		glEnable(GL_CLIP_PLANE0);
-		glPopMatrix();
-		glPushMatrix();
-		glTranslated(0.0, pane->axes().clipPlaneYMax(), 0.0);
-		glClipPlane (GL_CLIP_PLANE1, clipPlaneTop);
-		glEnable(GL_CLIP_PLANE1);
-		glPopMatrix();
+		// Render collections in this pane
+		for (RefListItem<Collection,bool>* ri = pane->collections(); ri != NULL; ri = ri->next)
+		{
+			Collection* collection = ri->item;
 
-		// Loop over master collections - the Collection::sendToGL routine will take care of any additional data collections
-		for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) collection->sendToGL();
+			// Setup clip planes to enforce Y-axis limits
+			glLoadMatrixd(A.matrix());
+			glPushMatrix();
+			glTranslated(0.0, pane->axes().clipPlaneYMin(), 0.0);
+			glClipPlane(GL_CLIP_PLANE0, clipPlaneBottom);
+			glEnable(GL_CLIP_PLANE0);
+			glPopMatrix();
+			glPushMatrix();
+			glTranslated(0.0, pane->axes().clipPlaneYMax(), 0.0);
+			glClipPlane (GL_CLIP_PLANE1, clipPlaneTop);
+			glEnable(GL_CLIP_PLANE1);
+			glPopMatrix();
 
-		glDisable(GL_MULTISAMPLE);
-		glDisable(GL_CLIP_PLANE0);
-		glDisable(GL_CLIP_PLANE1);
+			// Draw it
+			collection->sendToGL();
+
+			// Disable current clip planes
+			glDisable(GL_MULTISAMPLE);
+			glDisable(GL_CLIP_PLANE0);
+			glDisable(GL_CLIP_PLANE1);
+		}
 	}
 
 	// End timer query

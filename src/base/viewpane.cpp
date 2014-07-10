@@ -175,12 +175,22 @@ GLuint* ViewPane::viewportMatrix()
 }
 
 // Return whether the specified coordinate is in this pane
-bool ViewPane::containsPoint(int mouseX, int mouseY)
+bool ViewPane::containsCoordinate(int layoutX, int layoutY)
 {
-	if (mouseX < viewportMatrix_[0]) return false;
-	if (mouseX > (viewportMatrix_[0]+viewportMatrix_[2])) return false;
-	if (mouseY < viewportMatrix_[1]) return false;
-	if (mouseY > (viewportMatrix_[1]+viewportMatrix_[3])) return false;
+	if (layoutX < viewportMatrix_[0]) return false;
+	if (layoutX > (viewportMatrix_[0]+viewportMatrix_[2])) return false;
+	if (layoutY < viewportMatrix_[1]) return false;
+	if (layoutY > (viewportMatrix_[1]+viewportMatrix_[3])) return false;
+	return true;
+}
+
+// Return whether the specified grid reference is in this pane
+bool ViewPane::containsGridReference(int gridX, int gridY)
+{
+	if (gridX < leftEdge_) return false;
+	if (gridX >= (leftEdge_+width_)) return false;
+	if (gridY < bottomEdge_) return false;
+	if (gridY >= (bottomEdge_+height_)) return false;
 	return true;
 }
 

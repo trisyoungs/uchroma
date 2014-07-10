@@ -30,7 +30,7 @@ ViewLayout* UChromaWindow::viewLayout()
 // Recalculate layout pane positions / sizes (after context resize etc.)
 void UChromaWindow::recalculateViewLayout(int contextWidth, int contextHeight)
 {
-	viewLayout_.resizePanes(contextWidth, contextHeight);
+	viewLayout_.resize(contextWidth, contextHeight);
 	
 	updateDisplay();
 }

@@ -26,6 +26,7 @@
 
 // Forward declarations
 class ViewLayout;
+class ViewPane;
 
 // Pane Organiser
 class PaneOrganiser : public QWidget
@@ -49,11 +50,29 @@ class PaneOrganiser : public QWidget
 	private:
 	// Calculate pixel size based on current widget geometry
 	void calculateLayoutPixelSize();
+	// Return grid reference containing coordinates supplied
+	QPoint gridReference(QPoint point);
 
 	public:
 	// Set layout to display / organise
 	void setViewLayout(ViewLayout* layout);
 
+
+	/*
+	 * Drag / Drop
+	 */
+	private:
+	// Pane we are currently dragging
+	ViewPane* dragPane_;
+	// Clicked grid reference
+	QPoint clickedGridReference_;
+	// Grid coordinate we are currently dragging over
+	QPoint dragGridReference_;
+
+
+	/*
+	 * Qt
+	 */
 	protected:
 	void dragEnterEvent(QDragEnterEvent *event);
 	void dragLeaveEvent(QDragLeaveEvent *event);
@@ -63,13 +82,9 @@ class PaneOrganiser : public QWidget
 	void resizeEvent(QResizeEvent* event);
 	void paintEvent(QPaintEvent *event);
 
-	private:
-	int findPiece(const QRect &pieceRect) const;
-	const QRect targetSquare(const QPoint &position) const;
-
-	QRect highlightedRect;
-	int inPlace;
-	int m_ImageSize;
+	signals:
+	// Main display update required
+	void updateMainDisplay();
 };
 
 #endif

@@ -29,6 +29,8 @@ ViewLayout::ViewLayout(UChromaWindow& parent) : ListItem<ViewLayout>(), parent_(
 	nRows_ = 1;
 	pixelWidth_ = 0;
 	pixelHeight_ = 0;
+	remainingWidth_ = 0;
+	remainingHeight_ = 0;
 }
 
 // Destructor
@@ -67,6 +69,19 @@ void ViewLayout::setAsModified()
 /*
  * Layout
  */
+
+// Recalculate pixel dimensions and remainder
+void ViewLayout::recalculatePixels()
+{
+	// Set new pixel widths
+	pixelWidth_ = layoutWidth_ / nColumns_;
+	pixelHeight_ = layoutHeight_ / nRows_;
+
+	// Recalculate pane sizes
+	remainingWidth_ = layoutWidth_ - nColumns_*pixelWidth_;
+	remainingHeight_ = layoutHeight_ - nRows_*pixelHeight_;
+	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next) pane->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
+}
 
 // Clear layout data
 void ViewLayout::clear()
@@ -113,6 +128,10 @@ int ViewLayout::nRows() const
 	return nRows_;
 }
 
+/*
+ * Pane Functions
+ */
+
 // Add pane to layout
 ViewPane* ViewLayout::addPane(QString name, int left, int top, int width, int height)
 {
@@ -129,28 +148,40 @@ ViewPane* ViewLayout::panes()
 	return panes_.first();
 }
 
-/*
- * Pane Functions
- */
-
-// Recalculate pane sizes based on current context dimensions
-void ViewLayout::resizePanes(int contextWidth, int contextHeight)
+// Return index of specified pane in list
+int ViewLayout::paneIndex(ViewPane* pane)
 {
-	// Set new pixel widths
-	pixelWidth_ = contextWidth / nColumns_;
-	pixelHeight_ = contextHeight / nRows_;
-
-	// Recalculate pane sizes
-	int widthRemainder = contextWidth - nColumns_*pixelWidth_;
-	int heightRemainder = contextHeight - nRows_*pixelHeight_;
-	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next) pane->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, widthRemainder, heightRemainder);
+	return panes_.indexOf(pane);
 }
 
-// Return pane under specified point
+// Set new layout size
+void ViewLayout::resize(int contextWidth, int contextHeight)
+{
+	layoutWidth_ = contextWidth;
+	layoutHeight_ = contextHeight;
+
+	recalculatePixels();
+}
+
+// Return pane under specified coordinate
 ViewPane* ViewLayout::paneAt(int mouseX, int mouseY)
 {
-	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next) if (pane->containsPoint(mouseX, mouseY)) return pane;
+	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next) if (pane->containsCoordinate(mouseX, layoutHeight_-mouseY)) return pane;
 	return NULL;
+}
+
+// Return pane containing specified grid reference
+ViewPane* ViewLayout::paneAtGrid(int gridX, int gridY)
+{
+	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next) if (pane->containsGridReference(gridX, gridY)) return pane;
+	return NULL;
+}
+
+// Translate pane by the amount specified
+void ViewLayout::translatePane(ViewPane* pane, int deltaX, int deltaY)
+{
+	pane->setBottomLeft(pane->bottomEdge()+deltaY, pane->leftEdge()+deltaX);
+	pane->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
 }
 
 // Reset view of all panes

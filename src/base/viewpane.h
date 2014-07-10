@@ -98,7 +98,9 @@ class ViewPane : public ListItem<ViewPane>
 	// Return viewport matrix
 	GLuint* viewportMatrix();
 	// Return whether the specified coordinate is in this pane
-	bool containsPoint(int mouseX, int mouseY);
+	bool containsCoordinate(int mouseX, int mouseY);
+	// Return whether the specified grid reference is in this pane
+	bool containsGridReference(int gridX, int gridY);
 
 
 	/*

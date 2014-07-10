@@ -64,12 +64,22 @@ class ViewLayout : public ListItem<ViewLayout>
 	int nColumns_;
 	// Number of rows in layout
 	int nRows_;
+	// Current layout width
+	int layoutWidth_;
+	// Current layout height
+	int layoutHeight_;
 	// Width of grid pixel
 	int pixelWidth_;
 	// Height of grid pixel
 	int pixelHeight_;
-	// List of panes in this layout
-	ParentList<ViewPane,ViewLayout> panes_;
+	// Remaining width at right edge
+	int remainingWidth_;
+	// Remaining height at top edge
+	int remainingHeight_;
+
+	private:
+	// Recalculate pixel dimensions and remainder
+	void recalculatePixels();
 
 	public:
 	// Clear layout data
@@ -84,20 +94,30 @@ class ViewLayout : public ListItem<ViewLayout>
 	int nColumns() const;
 	// Return number of rows in layout
 	int nRows() const;
-	// Add pane to layout
-	ViewPane* addPane(QString name = QString(), int left = 0, int top = 0, int width = 1, int height = 1);
-	// Return list of panes
-	ViewPane* panes();
+	// Set new layout size
+	void resize(int contextWidth, int contextHeight);
 
 
 	/*
 	 * Pane Functions
 	 */
+	private:
+	// List of panes in this layout
+	ParentList<ViewPane,ViewLayout> panes_;
+
 	public:
-	// Recalculate pane sizes based on current context dimensions
-	void resizePanes(int contextWidth, int contextHeight);
-	// Return pane under specified point
+	// Add pane to layout
+	ViewPane* addPane(QString name = QString(), int left = 0, int top = 0, int width = 1, int height = 1);
+	// Return list of panes
+	ViewPane* panes();
+	// Return index of specified pane in list
+	int paneIndex(ViewPane* pane);
+	// Return pane under specified coordinate
 	ViewPane* paneAt(int mouseX, int mouseY);
+	// Return pane containing specified grid reference
+	ViewPane* paneAtGrid(int gridX, int gridY);
+	// Translate pane by the amount specified
+	void translatePane(ViewPane* pane, int deltaX, int deltaY);
 	// Reset view of all panes
 	void resetView();
 	// Update interaction primitives for all panes
