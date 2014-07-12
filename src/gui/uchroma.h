@@ -370,7 +370,7 @@ class UChromaWindow : public QMainWindow
 	// Recalculate layout pane positions / sizes (after context resize etc.)
 	void recalculateViewLayout(int contextWidth, int contextHeight);
 	// Set current view pane to the one under the specified screen coordinates
-	bool setCurrentViewPane(int mouseX, int mouseY);
+	bool setCurrentViewPane(int layoutX, int layoutY);
 	// Return current view pane
 	ViewPane* currentViewPane();
 

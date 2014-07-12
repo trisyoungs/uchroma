@@ -117,7 +117,7 @@ class ViewLayout : public ListItem<ViewLayout>
 	// Return if pane is in the current list
 	bool containsPane(ViewPane* pane);
 	// Return pane under specified coordinate
-	ViewPane* paneAt(int mouseX, int mouseY);
+	ViewPane* paneAt(int layoutX, int layoutY);
 	// Return pane containing specified grid reference
 	ViewPane* paneAtGrid(int gridX, int gridY);
 	// Translate pane by the amount specified

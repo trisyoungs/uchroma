@@ -36,9 +36,9 @@ void UChromaWindow::recalculateViewLayout(int contextWidth, int contextHeight)
 }
 
 // Set current view pane to the one under the specified screen coordinates
-bool UChromaWindow::setCurrentViewPane(int mouseX, int mouseY)
+bool UChromaWindow::setCurrentViewPane(int layoutX, int layoutY)
 {
-	ViewPane* newCurrentPane = viewLayout_.paneAt(mouseX, mouseY);
+	ViewPane* newCurrentPane = viewLayout_.paneAt(layoutX, layoutY);
 	if (newCurrentPane == NULL) return false;
 
 	currentViewPane_ = newCurrentPane;

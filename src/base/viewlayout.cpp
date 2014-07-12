@@ -182,9 +182,9 @@ void ViewLayout::resize(int contextWidth, int contextHeight)
 }
 
 // Return pane under specified coordinate
-ViewPane* ViewLayout::paneAt(int mouseX, int mouseY)
+ViewPane* ViewLayout::paneAt(int layoutX, int layoutY)
 {
-	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next) if (pane->containsCoordinate(mouseX, layoutHeight_-mouseY)) return pane;
+	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next) if (pane->containsCoordinate(layoutX, layoutY)) return pane;
 	return NULL;
 }
 

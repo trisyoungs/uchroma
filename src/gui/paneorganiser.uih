@@ -46,6 +46,8 @@ class PaneOrganiser : public QWidget
 	ViewLayout* viewLayout_;
 	// Local layout 'pixel' dimensions
 	int layoutPixelWidth_, layoutPixelHeight_;
+	// Margin to use in display
+	int paneMargin_;
 
 	private:
 	// Calculate pixel size based on current widget geometry
@@ -62,19 +64,31 @@ class PaneOrganiser : public QWidget
 	 * Interaction
 	 */
 	private:
+	// Pane Handles
+	enum PaneHandle { BottomLeftHandle, BottomMiddleHandle, BottomRightHandle, MiddleLeftHandle, MiddleRightHandle, TopLeftHandle, TopMiddleHandle, TopRightHandle, nHandles };
+	// Pane currently under mouse
+	ViewPane* paneUnderMouse_;
 	// Pane we are currently dragging
 	ViewPane* dragPane_;
+	// Pane we are currently stretching
+	ViewPane* stretchPane_;
+	// Handle grabbed if stretching
+	PaneHandle stretchHandle_;
 	// Clicked grid reference
 	QPoint clickedGridReference_;
 	// Grid coordinate we are currently dragging over
 	QPoint dragGridReference_;
+
+	private:
+	// Return handle under mouse (if any)
+	PaneOrganiser::PaneHandle handleUnderMouse(ViewPane* pane, int mouseX, int mouseY);
 
 	signals:
 	void currentPaneChanged(int gridX, int gridY);
 
 
 	/*
-	 * Qt
+	 * Signals / Slots
 	 */
 	protected:
 	void dragEnterEvent(QDragEnterEvent *event);
@@ -82,6 +96,8 @@ class PaneOrganiser : public QWidget
 	void dragMoveEvent(QDragMoveEvent *event);
 	void dropEvent(QDropEvent *event);
 	void mousePressEvent(QMouseEvent *event);
+	void mouseMoveEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);
 	void resizeEvent(QResizeEvent* event);
 	void paintEvent(QPaintEvent *event);
 

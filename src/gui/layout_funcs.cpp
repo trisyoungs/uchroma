@@ -33,9 +33,11 @@ LayoutWindow::LayoutWindow(UChromaWindow& parent) : QWidget(&parent), uChroma_(p
 
 	QWidget::setWindowFlags(Qt::Tool);
 
+	refreshing_ = true;
+
+	currentPane_ = NULL;
 	// Set items in PaneRoleCombo
 	for (int n=0; n<ViewPane::nPaneRoles; ++n) ui.PaneRoleCombo->addItem(ViewPane::paneRole((ViewPane::PaneRole) n));
-	currentPane_ = NULL;
 
 	refreshing_ = false;
 }

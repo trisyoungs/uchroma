@@ -105,7 +105,14 @@
           <number>4</number>
          </property>
          <item>
-          <widget class="PaneOrganiser" name="Organiser" native="true"/>
+          <widget class="PaneOrganiser" name="Organiser" native="true">
+           <property name="mouseTracking">
+            <bool>true</bool>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>

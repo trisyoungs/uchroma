@@ -39,7 +39,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 	rMouseDown_.set(event->x(), event->y(), 0.0);
 
 	// The clicked pane will now become the current pane
-	if (uChroma_->setCurrentViewPane(event->x(), event->y())) postRedisplay();
+	if (uChroma_->setCurrentViewPane(event->x(), height()-event->y())) postRedisplay();
 
 	// Do something with the button press event (e.g. context menu function, or interaction start)
 	if (buttonState_&Qt::LeftButton) uChroma_->startInteraction(event->x(), contextHeight_-event->y(), km);
@@ -119,7 +119,10 @@ void Viewer::wheelEvent(QWheelEvent *event)
 {
 	msg.enter("Viewer::wheelEvent");
 	bool scrollup = event->delta() > 0;
-	
+
+	// The pane underneath the mouse will now become the current pane
+	if (uChroma_->setCurrentViewPane(event->x(), height()-event->y())) postRedisplay();
+
 	// Perform camera zoom
 	if (uChroma_->currentViewPane())
 	{
