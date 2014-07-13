@@ -475,14 +475,6 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 			case (Keywords::LabelScaleKeyword):
 				pane->setLabelScale(parser.argd(1));
 				break;
-			// Orthographic view
-			case (Keywords::PerspectiveKeyword):
-				pane->setHasPerspective(true);
-				break;
-			// Title scale
-			case (Keywords::TitleScaleKeyword):
-				pane->setTitleScale(parser.argd(1));
-				break;
 			// View Matrix
 			case (Keywords::MatrixXKeyword):
 			case (Keywords::MatrixYKeyword):
@@ -490,6 +482,18 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 			case (Keywords::MatrixWKeyword):
 				xyzw = viewPaneKwd - Keywords::MatrixXKeyword;
 				pane->setViewMatrixColumn(xyzw, parser.argd(1), parser.argd(2), parser.argd(3), parser.argd(4));
+				break;
+			// Perspective
+			case (Keywords::PerspectiveKeyword):
+				pane->setHasPerspective(true);
+				break;
+			// Title scale
+			case (Keywords::TitleScaleKeyword):
+				pane->setTitleScale(parser.argd(1));
+				break;
+			// Two Dimensional flag
+			case (Keywords::TwoDimensionalKeyword):
+				pane->setTwoDimensional(parser.argb(1));
 				break;
 			// Unrecognised Keyword
 			default:

@@ -44,6 +44,8 @@ class ViewPane : public ListItem<ViewPane>
 	ViewPane(const ViewPane& source);
 	// Assignment operator
 	void operator=(const ViewPane& source);
+	// Pane Handles
+	enum PaneHandle { BottomLeftHandle, BottomMiddleHandle, BottomRightHandle, MiddleLeftHandle, MiddleRightHandle, TopLeftHandle, TopMiddleHandle, TopRightHandle, nHandles };
 
 
 	/*
@@ -72,6 +74,8 @@ class ViewPane : public ListItem<ViewPane>
 	int width_;
 	// Height of pane (in rows)
 	int height_;
+	// Aspect ratio of pane
+	double aspectRatio_;
 	// Viewport matrix for GL
 	GLuint viewportMatrix_[4];
 
@@ -92,6 +96,10 @@ class ViewPane : public ListItem<ViewPane>
 	int width();
 	// Return height of pane (in rows)
 	int height();
+	// Move specified handle by specified amount
+	void moveHandle(PaneHandle handle, int deltaX, int deltaY);
+	// Return geometry that would result after moving the specified handle
+	Vec4<int> geometryAfterHandleMove(PaneHandle handle, int deltaX, int deltaY);
 	// Recalculate viewport matrix based on grid pixel dimensions provided
 	void recalculateViewport(int gridPixelWidth, int gridPixelHeight, int nColumns, int nRows, int widthRemainder, int heightRemainder);
 	// Return viewport matrix
@@ -116,6 +124,8 @@ class ViewPane : public ListItem<ViewPane>
 	private:
 	// Role of this pane
 	PaneRole role_;
+	// Whether this pane is a 2D plot
+	bool twoDimensional_;
 	// Associated target pane for role, if relevant
 	ViewPane* roleAssociatedPane_;
 	// Associated target collection for role, if relevant
@@ -126,6 +136,10 @@ class ViewPane : public ListItem<ViewPane>
 	void setRole(PaneRole role);
 	// Return role of this pane
 	PaneRole role();
+	// Set whether this pane is a 2D plot
+	void setTwoDimensional(bool b);
+	// Return whether this pane is a 2D plot
+	bool twoDimensional();
 	// Set associated target pane for role, if relevant
 	void setRoleAssociatedPane(ViewPane* pane);
 	// Return associated target pane for role, if relevant
@@ -152,6 +166,8 @@ class ViewPane : public ListItem<ViewPane>
 	Matrix viewMatrixInverse_;
 
 	private:
+	// Return calculate view matrix
+	Matrix calculateViewMatrix();
 	// Return calculated projection matrix
 	Matrix calculateProjectionMatrix(double zoom);
 

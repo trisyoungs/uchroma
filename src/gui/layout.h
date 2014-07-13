@@ -88,6 +88,7 @@ class LayoutWindow : public QWidget
 	void on_PanePreviousButton_clicked(bool checked);
 	void on_PaneNameEdit_textChanged(QString text);
 	void on_PaneRoleCombo_currentIndexChanged(int index);
+	void on_Pane2DCheck_clicked(bool checked);
 	void on_Organiser_currentPaneChanged(int gridX, int gridY);
 
 

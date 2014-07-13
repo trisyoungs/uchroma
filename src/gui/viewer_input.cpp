@@ -72,7 +72,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 {
 	Vec3<double> delta;
 	Matrix A;
-	
+	printf("MME %i %i\n", event->x(), event->y());
 	// Get event information and position delta
 	Qt::KeyboardModifiers km = event->modifiers();
 	delta.set(event->x(), event->y(), 0.0);

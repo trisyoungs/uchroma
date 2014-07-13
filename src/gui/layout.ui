@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>378</width>
+    <width>381</width>
     <height>473</height>
    </rect>
   </property>
@@ -230,6 +230,13 @@
          <widget class="QLabel" name="label_2">
           <property name="text">
            <string>Role</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QCheckBox" name="Pane2DCheck">
+          <property name="text">
+           <string>2D</string>
           </property>
          </widget>
         </item>

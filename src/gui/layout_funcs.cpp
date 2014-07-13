@@ -129,6 +129,14 @@ void LayoutWindow::on_PaneRoleCombo_currentIndexChanged(int index)
 	ui.Organiser->update();
 }
 
+void LayoutWindow::on_Pane2DCheck_clicked(bool checked)
+{
+	if (refreshing_) return;
+
+	if (currentPane_) currentPane_->setTwoDimensional(checked);
+	emit(updateMainDisplay());
+}
+
 void LayoutWindow::on_Organiser_currentPaneChanged(int gridX, int gridY)
 {
 	if (refreshing_) return;
@@ -175,6 +183,7 @@ void LayoutWindow::updateControls(bool force)
 	{
 		ui.PaneNameEdit->setText(currentPane_->name());
 		ui.PaneRoleCombo->setCurrentIndex(currentPane_->role());
+		ui.Pane2DCheck->setChecked(currentPane_->twoDimensional());
 	}
 
 	refreshing_ = false;

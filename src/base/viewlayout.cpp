@@ -61,8 +61,10 @@ void ViewLayout::operator=(const ViewLayout& source)
  */
 
 // Set as modified (call parent routine)
-void ViewLayout::setAsModified()
+void ViewLayout::setAsModified(ViewPane* caller)
 {
+	if (caller) caller->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
+
 	parent_.setAsModified();
 }
 

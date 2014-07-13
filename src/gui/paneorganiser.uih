@@ -22,11 +22,11 @@
 #ifndef UCHROMA_PANEORGANISER_H
 #define UCHROMA_PANEORGANISER_H
 
+#include "base/viewpane.h"
 #include <QtGui/QWidget>
 
 // Forward declarations
 class ViewLayout;
-class ViewPane;
 
 // Pane Organiser
 class PaneOrganiser : public QWidget
@@ -64,24 +64,24 @@ class PaneOrganiser : public QWidget
 	 * Interaction
 	 */
 	private:
-	// Pane Handles
-	enum PaneHandle { BottomLeftHandle, BottomMiddleHandle, BottomRightHandle, MiddleLeftHandle, MiddleRightHandle, TopLeftHandle, TopMiddleHandle, TopRightHandle, nHandles };
+	// Interaction mode
+	enum InteractionMode { NoInteraction, DragInteraction, StretchInteraction };
 	// Pane currently under mouse
 	ViewPane* paneUnderMouse_;
-	// Pane we are currently dragging
-	ViewPane* dragPane_;
-	// Pane we are currently stretching
-	ViewPane* stretchPane_;
+	// Grid coordinate currently under mouse
+	QPoint gridReferenceUnderMouse_;
+	// Pane currently being interacted with
+	ViewPane* interactionPane_;
+	// Current interaction mode
+	InteractionMode interactionMode_;
 	// Handle grabbed if stretching
-	PaneHandle stretchHandle_;
+	ViewPane::PaneHandle stretchHandle_;
 	// Clicked grid reference
 	QPoint clickedGridReference_;
-	// Grid coordinate we are currently dragging over
-	QPoint dragGridReference_;
 
 	private:
-	// Return handle under mouse (if any)
-	PaneOrganiser::PaneHandle handleUnderMouse(ViewPane* pane, int mouseX, int mouseY);
+	// Update values under mouse
+	void updateUnderMouse(QPoint pos);
 
 	signals:
 	void currentPaneChanged(int gridX, int gridY);

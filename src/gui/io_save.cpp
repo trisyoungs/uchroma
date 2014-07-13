@@ -184,6 +184,7 @@ bool UChromaWindow::writeViewPaneBlock(LineParser& parser, ViewPane* pane)
 	parser.writeLineF("    %s %i %i %i %i\n", Keywords::viewPaneKeyword(Keywords::GeometryKeyword), pane->bottomEdge(), pane->leftEdge(), pane->width(), pane->height()); 
 	for (RefListItem<Collection,bool>* ri = pane->collections(); ri != NULL; ri = ri->next) parser.writeLineF("  %s '%s'\n", Keywords::viewPaneKeyword(Keywords::CollectionAssociatedKeyword), qPrintable(ri->item->title())); 
 	for (int axis=0; axis < 3; ++axis) writeAxisBlock(parser, pane->axes(), axis);
+	parser.writeLineF("    %s %s\n", Keywords::viewPaneKeyword(Keywords::TwoDimensionalKeyword), stringBool(pane->twoDimensional()));
 	parser.writeLineF("    %s %f\n", Keywords::viewPaneKeyword(Keywords::LabelScaleKeyword), pane->labelScale());
 	parser.writeLineF("    %s %f\n", Keywords::viewPaneKeyword(Keywords::TitleScaleKeyword), pane->titleScale());
 	parser.writeLineF("    %s %i\n", Keywords::viewPaneKeyword(Keywords::BoundingBoxKeyword), pane->boundingBox());

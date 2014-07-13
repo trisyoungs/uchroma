@@ -32,11 +32,18 @@ ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), parent_(parent), 
 	leftEdge_ = 0;
 	height_ = 0;
 	width_ = 0;
+	aspectRatio_ = 1.0;
 
 	// Projection / view	
 	hasPerspective_ = false;
 	perspectiveFieldOfView_ = 20.0;
 	viewMatrix_[14] = -5.0;
+
+	// Role
+	role_ = ViewPane::DisplayPane;
+	twoDimensional_ = false;
+	roleAssociatedPane_ = NULL;
+	roleAssociatedCollection_ = NULL;
 
 	// Style
 	boundingBox_ = ViewPane::NoBox;
@@ -95,7 +102,7 @@ void ViewPane::operator=(const ViewPane& source)
 void ViewPane::setAsModified()
 {
 	// Pass the modification notification upwards
-	parent_.setAsModified();
+	parent_.setAsModified(this);
 }
 
 /*
@@ -158,6 +165,59 @@ int ViewPane::height()
 	return height_;
 }
 
+// Move specified handle by specified amount
+void ViewPane::moveHandle(PaneHandle handle, int deltaX, int deltaY)
+{
+	Vec4<int> newGeometry = geometryAfterHandleMove(handle, deltaX, deltaY);
+	leftEdge_ = newGeometry.x;
+	bottomEdge_ = newGeometry.y;
+	width_ = newGeometry.z;
+	height_ = newGeometry.w;
+
+	setAsModified();
+}
+
+// Return geometry that would result after moving the specified handle
+Vec4<int> ViewPane::geometryAfterHandleMove(PaneHandle handle, int deltaX, int deltaY)
+{
+	// Result contains leftEdge_, bottomEdge_, width_, height_
+	Vec4<int> result(leftEdge_, bottomEdge_, width_, height_);
+	printf("Handle %i, dx=%i, dy=%i\n", handle, deltaX, deltaY);
+	switch (handle)
+	{
+		case (ViewPane::BottomLeftHandle):
+			if ((deltaX < 0) || ((result.z - deltaX) > 0)) { result.x += deltaX; result.z -= deltaX; }
+			if ((deltaY < 0) || ((result.w - deltaY) > 0)) { result.y += deltaY; result.w -= deltaY; }
+			break;
+		case (ViewPane::BottomMiddleHandle):
+			if ((deltaY < 0) || ((result.w - deltaY) > 0)) { result.y += deltaY; result.w -= deltaY; }
+			break;
+		case (ViewPane::BottomRightHandle):
+			if ((deltaX > 0) || ((result.z + deltaX) > 0)) result.z += deltaX;
+			if ((deltaY < 0) || ((result.w - deltaY) > 0)) { result.y += deltaY; result.w -= deltaY; }
+			break;
+		case (ViewPane::MiddleLeftHandle):
+			if ((deltaX < 0) || ((result.z - deltaX) > 0)) { result.x += deltaX; result.z -= deltaX; }
+			break;
+		case (ViewPane::MiddleRightHandle):
+			if ((deltaX > 0) || ((result.z + deltaX) > 0)) result.z += deltaX;
+			break;
+		case (ViewPane::TopLeftHandle):
+			if ((deltaX < 0) || ((result.z - deltaX) > 0)) { result.x += deltaX; result.z -= deltaX; }
+			if ((deltaY > 0) || ((result.w + deltaY) > 0)) result.w += deltaY;
+			break;
+		case (ViewPane::TopMiddleHandle):
+			if ((deltaY > 0) || ((result.w + deltaY) > 0)) result.w += deltaY;
+			break;
+		case (ViewPane::TopRightHandle):
+			if ((deltaX > 0) || ((result.z + deltaX) > 0)) result.z += deltaX;
+			if ((deltaY > 0) || ((result.w + deltaY) > 0)) result.w += deltaY;
+			break;
+	}
+
+	return result;
+}
+
 // Recalculate viewport matrix based on grid pixel dimensions provided
 void ViewPane::recalculateViewport(int gridPixelWidth, int gridPixelHeight, int nColumns, int nRows, int widthRemainder, int heightRemainder)
 {
@@ -165,12 +225,14 @@ void ViewPane::recalculateViewport(int gridPixelWidth, int gridPixelHeight, int 
 	viewportMatrix_[1] = gridPixelHeight * bottomEdge_;
 	viewportMatrix_[2] = gridPixelWidth * width_;
 	viewportMatrix_[3] = gridPixelHeight * height_;
+	aspectRatio_ = double(width_) / double(height_);
 
 	// Add on the remainder if the top or right edges are extreme
 	if ((leftEdge_+width_) == nColumns) viewportMatrix_[2] += widthRemainder;
 	if ((bottomEdge_+height_) == nRows) viewportMatrix_[3] += heightRemainder;
 
-	// Recalculate projection matrix
+	// Recalculate projection matrix and view matrix (if 2D)
+	if (twoDimensional_) viewMatrix_ = calculateViewMatrix();
 	projectionMatrix_ = calculateProjectionMatrix(viewMatrix_[14]);
 }
 
@@ -234,6 +296,24 @@ ViewPane::PaneRole ViewPane::role()
 	return role_;
 }
 
+// Set whether this pane is a 2D plot
+void ViewPane::setTwoDimensional(bool b)
+{
+	twoDimensional_ = b;
+
+	// Recalculate viewmatrix
+	if (twoDimensional_) viewMatrix_ = calculateViewMatrix();
+	else resetView();
+
+	setAsModified();
+}
+
+// Return whether this pane is a 2D plot
+bool ViewPane::twoDimensional()
+{
+	return twoDimensional_;
+}
+
 // Set associated target pane for role, if relevant
 void ViewPane::setRoleAssociatedPane(ViewPane* pane)
 {
@@ -267,13 +347,45 @@ Collection* ViewPane::roleAssociatedCollection()
 /*
  * Projection / View
  */
-	
+
+// Return calculate view matrix
+Matrix ViewPane::calculateViewMatrix()
+{
+	Matrix A;
+	A = viewMatrix_;
+
+	if (twoDimensional_)
+	{
+		// Reset the matrix
+		A.setIdentity();
+
+		// Setup some variables
+		// -- Margins (in pixels)
+		double marginLeft = 100.0, marginRight = 5.0;
+		double fractionalXLength = 1.0 - viewportMatrix_[2] / (marginLeft+marginRight);
+
+		// Construct a matrix to setup the 2D view properly
+		// Set scaling factors so that axes reach extreme coordinates
+		A[0] = ( 1.5 / (0.5*axes_.axisRange(0)) ) * aspectRatio_;
+		A[5] = ( 1.5 / (0.5*axes_.axisRange(1)) ) / aspectRatio_;
+		A[14] = -5.0;
+		A.print();
+		viewMatrix_ = A;
+		Vec4<double> v = modelToScreen(-axes_.axisRange(0)*0.5);
+		printf("XMin = %f", v.x / viewportMatrix_[2]); v.print();
+		v = modelToScreen(axes_.axisRange(0)*0.5);
+		printf("XMax = %f", v.x / viewportMatrix_[2]); v.print();
+	}
+
+	return A;
+}
+
 // Return calculated projection matrix
 Matrix ViewPane::calculateProjectionMatrix(double orthoZoom)
 {
 	Matrix result;
 
-	GLdouble top, bottom, right, left, aspect = (GLdouble) viewportMatrix_[2] / (GLdouble) viewportMatrix_[3];
+	GLdouble top, bottom, right, left;
 	GLdouble nearClip = 0.5, farClip = 2000.0;
 
 	if (hasPerspective_)
@@ -281,8 +393,8 @@ Matrix ViewPane::calculateProjectionMatrix(double orthoZoom)
 		// Use reversed top and bottom values so we get y-axis (0,1,0) pointing up
 		top = tan(perspectiveFieldOfView_ / DEGRAD) * 0.5;
 		bottom = -top;
-		left = -aspect*top;
-		right = aspect*top;
+		left = -aspectRatio_*top;
+		right = aspectRatio_*top;
 		result.setColumn(0, (nearClip*2.0) / (right-left), 0.0, 0.0, 0.0);
 		result.setColumn(1, 0.0, (nearClip*2.0) / (top-bottom), 0.0, 0.0);
 		result.setColumn(2, (right+left)/(right-left), (top+bottom)/(top-bottom), -(farClip+nearClip)/(farClip-nearClip), -1.0);
@@ -299,8 +411,8 @@ Matrix ViewPane::calculateProjectionMatrix(double orthoZoom)
 	{
 		top = -tan(perspectiveFieldOfView_ / DEGRAD) * orthoZoom;
 		bottom = -top;
-		left = -aspect*top;
-		right = aspect*top;
+		left = -aspectRatio_*top;
+		right = aspectRatio_*top;
 
 		result.setColumn(0, 2.0 / (right-left), 0.0, 0.0, (right+left)/(right-left));
 		result.setColumn(1, 0.0, 2.0 / (top-bottom), 0.0, (top+bottom)/(top-bottom));
@@ -341,6 +453,9 @@ bool ViewPane::hasPerspective()
 // Update transformation (view) matrix
 void ViewPane::setViewMatrix(Matrix &mat)
 {
+	// If this is a two-dimensional graph, ignore the request
+	if (twoDimensional_) return;
+
 	// Projection matrix needs to be updated if the zoom value has changed and we are *not* using perspective
 	if ((!hasPerspective_) && (fabs(mat[14] - viewMatrix_[14]) > 0.01)) projectionMatrix_ = calculateProjectionMatrix(mat[14]);
 
@@ -350,6 +465,9 @@ void ViewPane::setViewMatrix(Matrix &mat)
 // Update single column of view matrix
 void ViewPane::setViewMatrixColumn(int column, double x, double y, double z, double w)
 {
+	// If this is a two-dimensional graph, ignore the request
+	if (twoDimensional_) return;
+
 	// Projection matrix needs to be updated if the zoom value has changed and we are *not* using perspective
 	if ((!hasPerspective_) && (column == 3) && (fabs(z - viewMatrix_[14]) > 0.01)) projectionMatrix_ = calculateProjectionMatrix(z);
 	
@@ -359,6 +477,9 @@ void ViewPane::setViewMatrixColumn(int column, double x, double y, double z, dou
 // Rotate view matrix about x and y by amounts specified
 void ViewPane::rotateView(double dx, double dy)
 {
+	// If this is a two-dimensional graph, ignore the request
+	if (twoDimensional_) return;
+
 	Matrix A;
 	A.createRotationXY(dx, dy);
 	A.copyTranslationAndScaling(viewMatrix_);
@@ -369,6 +490,9 @@ void ViewPane::rotateView(double dx, double dy)
 // Translate view matrix by amounts specified
 void ViewPane::translateView(double dx, double dy, double dz)
 {
+	// If this is a two-dimensional graph, ignore the request
+	if (twoDimensional_) return;
+
 	viewMatrix_.adjustColumn(3, dx, dy, dz, 0.0);
 	if ((!hasPerspective_) && (fabs(dz) > 1.0e-4)) projectionMatrix_ = calculateProjectionMatrix(viewMatrix_[14]);
 }
@@ -446,6 +570,9 @@ double ViewPane::calculateRequiredZoom(double xExtent, double yExtent, double fr
 	Vec4<double> worldr;
 	Vec4<double> pos;
 
+	// Sanity check
+	if (viewportMatrix_[2] == 0) return 1.0;
+
 	// Calculate target screen coordinate
 	int targetX = (1.0 + fraction) * viewportMatrix_[2] * 0.5;
 	int targetY = (1.0 + fraction) * viewportMatrix_[3] * 0.5;
@@ -455,6 +582,7 @@ double ViewPane::calculateRequiredZoom(double xExtent, double yExtent, double fr
 	int count = 0;
 	do
 	{
+		printf("lkjlkjlk\n");
 		// Increase zoom distance
 		zoom -= std::max( std::max(screenX / targetX, screenY / targetY), 1);
 

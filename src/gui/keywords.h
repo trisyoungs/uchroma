@@ -204,6 +204,7 @@ class Keywords
 		MatrixWKeyword,
 		PerspectiveKeyword,
 		TitleScaleKeyword,
+		TwoDimensionalKeyword,
 		nViewPaneKeywords
 	};
 	// Convert text string to ViewKeyword

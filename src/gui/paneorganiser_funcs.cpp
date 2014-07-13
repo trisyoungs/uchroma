@@ -35,10 +35,11 @@ PaneOrganiser::PaneOrganiser(QWidget* parent) : QWidget(parent)
 	layoutPixelHeight_ = 1;
 	layoutPixelWidth_ = 1;
 	paneUnderMouse_ = NULL;
-	dragPane_ = NULL;
-	dragGridReference_ = QPoint();
-	stretchPane_ = NULL;
-	stretchHandle_ = PaneOrganiser::nHandles;
+	gridReferenceUnderMouse_ = QPoint();
+	clickedGridReference_ = QPoint();
+	stretchHandle_ = ViewPane::nHandles;
+	interactionMode_ = NoInteraction;
+	interactionPane_ = NULL;
 }
 
 /*
@@ -80,41 +81,58 @@ void PaneOrganiser::setViewLayout(ViewLayout* layout)
  * Interaction
  */
 
-// Return handle under mouse (if any)
-PaneOrganiser::PaneHandle PaneOrganiser::handleUnderMouse(ViewPane* pane, int mouseX, int mouseY)
+// Update values under mouse
+void PaneOrganiser::updateUnderMouse(QPoint pos)
 {
-	// Handle size is twice the paneMargin_
-	QRect handleRect(0, 0, paneMargin_*2, paneMargin_*2);
-	QPoint paneBottomLeft = QPoint(pane->leftEdge()*layoutPixelWidth_, pane->bottomEdge()*layoutPixelHeight_);
-	QPoint paneSize = QPoint(pane->width()*layoutPixelWidth_, pane->height()*layoutPixelHeight_);
+	// Get grid reference currently under mouse
+	gridReferenceUnderMouse_ = gridReference(pos);
 
-	// -- Bottom left
-	handleRect.moveBottomLeft(QPoint(paneBottomLeft.x(), paneBottomLeft.y()));
-	printf("BL %i %i   MOUSE %i %i\n", handleRect.x(), handleRect.y(), mouseX, mouseY);
-	if (handleRect.contains(mouseX, mouseY)) return PaneOrganiser::BottomLeftHandle;
-	// -- Bottom middle
-	handleRect.moveBottomLeft(QPoint(paneBottomLeft.x()+0.5*paneSize.x()-paneMargin_, height()-paneBottomLeft.y()));
-	if (handleRect.contains(mouseX, mouseY)) return PaneOrganiser::BottomMiddleHandle;
-	// -- Bottom right
-	handleRect.moveBottomRight(QPoint(paneBottomLeft.x()+paneSize.x(), height()-pane->bottomEdge()*layoutPixelHeight_));
-	if (handleRect.contains(mouseX, mouseY)) return PaneOrganiser::BottomRightHandle;
-	// -- Middle left
-	handleRect.moveBottomLeft(QPoint(paneBottomLeft.x(), height()-(paneBottomLeft.y()+0.5*paneSize.y()-paneMargin_)));
-	if (handleRect.contains(mouseX, mouseY)) return PaneOrganiser::MiddleLeftHandle;
-	// -- Middle right
-	handleRect.moveBottomRight(QPoint(paneBottomLeft.x()+paneSize.x(), height()-(paneBottomLeft.y()+0.5*paneSize.y()-paneMargin_)));
-	if (handleRect.contains(mouseX, mouseY)) return PaneOrganiser::MiddleRightHandle;
-	// -- Top left
-	handleRect.moveTopLeft(QPoint(paneBottomLeft.x(), height()-(paneBottomLeft.y()+paneSize.y())));
-	if (handleRect.contains(mouseX, mouseY)) return PaneOrganiser::TopLeftHandle;
-	// -- Top middle
-	handleRect.moveTopLeft(QPoint(paneBottomLeft.x()+0.5*paneSize.x()-paneMargin_, height()-(paneBottomLeft.y()+paneSize.y())));
-	if (handleRect.contains(mouseX, mouseY)) return PaneOrganiser::TopMiddleHandle;
-	// -- Top right
-	handleRect.moveTopRight(QPoint(paneBottomLeft.x()+paneSize.x(), height()-(paneBottomLeft.y()+paneSize.y())));
-	if (handleRect.contains(mouseX, mouseY)) return PaneOrganiser::TopRightHandle;
+	// Get pane under mouse
+	ViewPane* hoverPane = viewLayout_->paneAtGrid(gridReferenceUnderMouse_.x(), gridReferenceUnderMouse_.y());
 
-	return PaneOrganiser::nHandles;
+	// If we are over a pane, see if we are over a handle
+	ViewPane::PaneHandle handle = ViewPane::nHandles;
+	if (hoverPane)
+	{
+		// Handle size is twice the paneMargin_
+		QRect handleRect(0, 0, paneMargin_*2, paneMargin_*2);
+		QPoint paneBottomLeft = QPoint(hoverPane->leftEdge()*layoutPixelWidth_, hoverPane->bottomEdge()*layoutPixelHeight_);
+		QPoint paneSize = QPoint(hoverPane->width()*layoutPixelWidth_, hoverPane->height()*layoutPixelHeight_);
+
+		// -- Bottom left
+		handleRect.moveBottomLeft(QPoint(paneBottomLeft.x(), paneBottomLeft.y()));
+		if (handleRect.contains(pos.x(), pos.y())) handle = ViewPane::BottomLeftHandle;
+		// -- Bottom middle
+		handleRect.moveBottomLeft(QPoint(paneBottomLeft.x()+0.5*paneSize.x()-paneMargin_, height()-paneBottomLeft.y()));
+		if (handleRect.contains(pos.x(), pos.y())) handle = ViewPane::BottomMiddleHandle;
+		// -- Bottom right
+		handleRect.moveBottomRight(QPoint(paneBottomLeft.x()+paneSize.x(), height()-hoverPane->bottomEdge()*layoutPixelHeight_));
+		if (handleRect.contains(pos.x(), pos.y())) handle = ViewPane::BottomRightHandle;
+		// -- Middle left
+		handleRect.moveBottomLeft(QPoint(paneBottomLeft.x(), height()-(paneBottomLeft.y()+0.5*paneSize.y()-paneMargin_)));
+		if (handleRect.contains(pos.x(), pos.y())) handle = ViewPane::MiddleLeftHandle;
+		// -- Middle right
+		handleRect.moveBottomRight(QPoint(paneBottomLeft.x()+paneSize.x(), height()-(paneBottomLeft.y()+0.5*paneSize.y()-paneMargin_)));
+		if (handleRect.contains(pos.x(), pos.y())) handle = ViewPane::MiddleRightHandle;
+		// -- Top left
+		handleRect.moveTopLeft(QPoint(paneBottomLeft.x(), height()-(paneBottomLeft.y()+paneSize.y())));
+		if (handleRect.contains(pos.x(), pos.y())) handle = ViewPane::TopLeftHandle;
+		// -- Top middle
+		handleRect.moveTopLeft(QPoint(paneBottomLeft.x()+0.5*paneSize.x()-paneMargin_, height()-(paneBottomLeft.y()+paneSize.y())));
+		if (handleRect.contains(pos.x(), pos.y())) handle = ViewPane::TopMiddleHandle;
+		// -- Top right
+		handleRect.moveTopRight(QPoint(paneBottomLeft.x()+paneSize.x(), height()-(paneBottomLeft.y()+paneSize.y())));
+		if (handleRect.contains(pos.x(), pos.y())) handle = ViewPane::TopRightHandle;
+	}
+
+	// Check values and update widget if necessary
+	bool updateWidget = false;
+	if (hoverPane != paneUnderMouse_) updateWidget = true;
+	else if ((handle != stretchHandle_) || (interactionMode_ == StretchInteraction)) updateWidget = true;
+	paneUnderMouse_ = hoverPane;
+	if (interactionMode_ != StretchInteraction) stretchHandle_ = handle;
+
+	if (updateWidget) update();
 }
 
 /*
@@ -137,8 +155,7 @@ void PaneOrganiser::dragLeaveEvent(QDragLeaveEvent *event)
 
 void PaneOrganiser::dragMoveEvent(QDragMoveEvent *event)
 {
-	// Get grid reference currently under mouse
-	dragGridReference_ = gridReference(event->pos());
+	updateUnderMouse(event->pos());
 
 	if (event->mimeData()->hasFormat("image/x-uchroma-pane"))
 	{
@@ -154,9 +171,10 @@ void PaneOrganiser::dropEvent(QDropEvent *event)
 {
 	if (event->mimeData()->hasFormat("image/x-uchroma-pane"))
 	{
-		viewLayout_->translatePane(dragPane_, dragGridReference_.x()-clickedGridReference_.x(), dragGridReference_.y()-clickedGridReference_.y());
+		viewLayout_->translatePane(interactionPane_, gridReferenceUnderMouse_.x()-clickedGridReference_.x(), gridReferenceUnderMouse_.y()-clickedGridReference_.y());
 
-		dragPane_ = NULL;
+		interactionMode_ = NoInteraction;
+		interactionPane_ = NULL;
 		update();
 
 		event->setDropAction(Qt::MoveAction);
@@ -177,74 +195,89 @@ void PaneOrganiser::mousePressEvent(QMouseEvent *event)
 	clickedGridReference_ = gridReference(event->pos());
 	if (clickedGridReference_.x() == -1) return;
 
-	// Is there a pane at this reference?
-	dragPane_ = viewLayout_->paneAtGrid(clickedGridReference_.x(), clickedGridReference_.y());
-	if (!dragPane_) return;
+	// Is there a pane currently under the mouse?
+	if (!paneUnderMouse_) return;
 
 	// Emit currentPaneChanged()
 	emit(currentPaneChanged(clickedGridReference_.x(), clickedGridReference_.y()));
 
-	// Update view immediately so the pane being dragged disappears
-	update();
-
-	// Draw image of the pane
-	QPixmap paneImage(dragPane_->width()*layoutPixelWidth_, dragPane_->height()*layoutPixelHeight_);
-	int paneIndex = viewLayout_->paneIndex(dragPane_);
-	QPainter painter(&paneImage);
-	painter.setBrush(QColor(paneIndex&1 ? 255 : 128, paneIndex&2 ? 255 : 128, paneIndex&4 ? 255 : 128, 255));
-	painter.setPen(Qt::NoPen);
-	QRect paneRect(0, 0, paneImage.width(), paneImage.height());
-	painter.drawRect(paneRect);
-	painter.drawText(paneRect,  Qt::AlignHCenter | Qt::AlignVCenter, dragPane_->name());
-	painter.end();
-
-	// Construct mime data for drag event
-	QByteArray itemData;
-	QDataStream dataStream(&itemData, QIODevice::WriteOnly);
-	dataStream << clickedGridReference_;
-	QMimeData *mimeData = new QMimeData;
-	mimeData->setData("image/x-uchroma-pane", itemData);
-
-	QDrag *drag = new QDrag(this);
-	drag->setMimeData(mimeData);
-	drag->setHotSpot(event->pos() - QPoint(dragPane_->leftEdge()*layoutPixelWidth_, height()-(dragPane_->bottomEdge()+dragPane_->height())*layoutPixelHeight_));
-	drag->setPixmap(paneImage);
-
-	// Begin the drag event
-	if (drag->exec(Qt::MoveAction) != Qt::MoveAction)
+	// Are we over a handle (in which case start a stretch)? If not, start a drag
+	if (stretchHandle_ != ViewPane::nHandles)
 	{
-		// Reset everything, and do not perform a move
-		dragPane_ = NULL;
-		dragGridReference_ = QPoint();
-		update();
+		// Start stretch
+		interactionMode_ = StretchInteraction;
+		interactionPane_ = paneUnderMouse_;
+		
 	}
+	else
+	{
+		// Start drag
+		interactionMode_ = DragInteraction;
+		interactionPane_ = paneUnderMouse_;
+
+		// Draw image of the pane
+		QPixmap paneImage(interactionPane_->width()*layoutPixelWidth_, interactionPane_->height()*layoutPixelHeight_);
+		int paneIndex = viewLayout_->paneIndex(interactionPane_);
+		QPainter painter(&paneImage);
+		painter.setBrush(QColor(paneIndex&1 ? 255 : 128, paneIndex&2 ? 255 : 128, paneIndex&4 ? 255 : 128, 255));
+		painter.setPen(Qt::NoPen);
+		QRect paneRect(0, 0, paneImage.width(), paneImage.height());
+		painter.drawRect(paneRect);
+		painter.setBrush(Qt::NoBrush);
+		painter.setPen(Qt::black);
+		painter.drawText(paneRect,  Qt::AlignHCenter | Qt::AlignVCenter, interactionPane_->name());
+		painter.end();
+
+		// Construct mime data for drag event
+		QByteArray itemData;
+		QDataStream dataStream(&itemData, QIODevice::WriteOnly);
+		dataStream << clickedGridReference_;
+		QMimeData *mimeData = new QMimeData;
+		mimeData->setData("image/x-uchroma-pane", itemData);
+
+		QDrag *drag = new QDrag(this);
+		drag->setMimeData(mimeData);
+		drag->setHotSpot(event->pos() - QPoint(interactionPane_->leftEdge()*layoutPixelWidth_, height()-(interactionPane_->bottomEdge()+interactionPane_->height())*layoutPixelHeight_));
+		drag->setPixmap(paneImage);
+
+		// Begin the drag event
+		if (drag->exec(Qt::MoveAction) != Qt::MoveAction)
+		{
+			// Reset everything, and do not perform a move
+			interactionMode_ = NoInteraction;
+			interactionPane_ = NULL;
+			update();
+		}
+	}
+
+	// Update view immediately so the pane being dragged or stretched is redrawn
+	update();
 }
 
 void PaneOrganiser::mouseMoveEvent(QMouseEvent *event)
 {
-	// If we are currently in the middle of a drag, ignore this event
-	if (dragPane_) event->ignore();
-
-	// Check for a pane under the mouse and, if there is one, see if we're over a handle
-	QPoint gridRef = gridReference(event->pos());
-	ViewPane* hoverPane = viewLayout_->paneAtGrid(gridRef.x(), gridRef.y());
-	PaneOrganiser::PaneHandle handle = PaneOrganiser::nHandles;
-	if (hoverPane) handle = handleUnderMouse(hoverPane, event->x(), event->y());
-
-	// Check values and update widget if necessary
-	bool updateWidget = false;
-	if (hoverPane != paneUnderMouse_) updateWidget = true;
-	else if (handle != stretchHandle_) updateWidget = true;
-	paneUnderMouse_ = hoverPane;
-	stretchHandle_ = handle;
-
-	if (updateWidget) update();
+	updateUnderMouse(event->pos());
 
 	event->accept();
 }
 
 void PaneOrganiser::mouseReleaseEvent(QMouseEvent *event)
 {
+	// If we were stretching a pane, we must update the pane size here...
+	if (interactionMode_ == StretchInteraction)
+	{
+		QPoint delta(gridReferenceUnderMouse_ - clickedGridReference_);
+		interactionPane_->moveHandle(stretchHandle_, delta.x(), delta.y());
+
+		emit(updateMainDisplay());
+	}
+
+	// End current interaction mode
+	interactionMode_ = NoInteraction;
+	stretchHandle_ = ViewPane::nHandles;
+	interactionPane_ = NULL;
+
+	update();
 }
 
 void PaneOrganiser::resizeEvent(QResizeEvent* event)
@@ -296,7 +329,7 @@ void PaneOrganiser::paintEvent(QPaintEvent *event)
 	// Draw panes
 	int colourCount = 0;
 	QColor paneColour;
-	QPoint paneBottomLeft, paneSize;
+	QPoint paneBottomLeft, paneSize, paneDelta;
 	for (ViewPane* pane = viewLayout_->panes(); pane != NULL; pane = pane->next)
 	{
 		// Set pane brush here, so we always cycle through the colours
@@ -309,66 +342,80 @@ void PaneOrganiser::paintEvent(QPaintEvent *event)
 		paneBottomLeft = QPoint(pane->leftEdge()*layoutPixelWidth_, pane->bottomEdge()*layoutPixelHeight_);
 		paneSize = QPoint(pane->width()*layoutPixelWidth_, pane->height()*layoutPixelHeight_);
 
-		// If there is a current dragPane_, draw a drop indicator highlighting the new position instead of the actual pane
-		if (pane == dragPane_)
-		{
-			paneColour.setAlpha(60);
-			painter.setBrush(paneColour);
-			QPoint newBottomLeft = QPoint(pane->leftEdge(), pane->bottomEdge()) + (dragGridReference_ - clickedGridReference_);
-			paneRect.setCoords(newBottomLeft.x()*layoutPixelWidth_, height()-newBottomLeft.y()*layoutPixelHeight_, (newBottomLeft.x()+pane->width())*layoutPixelWidth_-2, height()-(newBottomLeft.y()+pane->height())*layoutPixelHeight_-2);
-		}
-		else if (pane == stretchPane_)
-		{
-		}
-		else
+		// If this is not the interaction pane, just draw it normally
+		if (pane != interactionPane_)
 		{
 			// Construct a rectangle for this pane
 			painter.setBrush(paneColour);
 			paneRect.setCoords(paneBottomLeft.x(), height()-paneBottomLeft.y(), paneBottomLeft.x()+paneSize.x(), height()-(paneBottomLeft.y()+paneSize.y()));
+			painter.drawRect(paneRect);
 		}
-		painter.drawRect(paneRect);
+		else if (interactionMode_ == DragInteraction)
+		{
+			// Draw a drop indicator highlighting the new position instead of the actual pane
+			paneColour.setAlpha(60);
+			painter.setBrush(paneColour);
+			QPoint newBottomLeft = QPoint(pane->leftEdge(), pane->bottomEdge()) + (gridReferenceUnderMouse_ - clickedGridReference_);
+			paneRect.setCoords(newBottomLeft.x()*layoutPixelWidth_, height()-newBottomLeft.y()*layoutPixelHeight_, (newBottomLeft.x()+pane->width())*layoutPixelWidth_-2, height()-(newBottomLeft.y()+pane->height())*layoutPixelHeight_-2);
+			painter.drawRect(paneRect);
+		}
+		else if (interactionMode_ == StretchInteraction)
+		{
+			// Recalculate pane geometry to account for the stretch (and so the handles will be drawn properly later)
+			paneDelta = QPoint(gridReferenceUnderMouse_ - clickedGridReference_);
+			Vec4<int> newGeometry = interactionPane_->geometryAfterHandleMove(stretchHandle_, paneDelta.x(), paneDelta.y());
+			paneBottomLeft = QPoint(newGeometry.x*layoutPixelWidth_, newGeometry.y*layoutPixelHeight_);
+			paneSize = QPoint(newGeometry.z*layoutPixelWidth_, newGeometry.w*layoutPixelHeight_);
+
+			// Draw the resized rectangle
+			QBrush stretchBrush(Qt::DiagCrossPattern);
+			stretchBrush.setColor(paneColour);
+			painter.setBrush(stretchBrush);
+			paneRect.setCoords(paneBottomLeft.x(), height()-paneBottomLeft.y(), paneBottomLeft.x()+paneSize.x(), height()-(paneBottomLeft.y()+paneSize.y()));
+			painter.drawRect(paneRect);
+		}
 
 		// Draw on text
 		painter.setPen(Qt::black);
 		painter.drawText(paneRect, Qt::AlignHCenter | Qt::AlignVCenter, pane->name());
 
 		// Draw on resizing handles
-		if ((pane == paneUnderMouse_) && (dragPane_ == NULL))
+		if ((interactionMode_ != DragInteraction) && ((pane == paneUnderMouse_) || (pane == interactionPane_)))
 		{
 			paneColour.setAlpha(255);
 			painter.setPen(Qt::NoPen);
 			painter.setBrush(paneColour);
 			// -- Bottom left
 			handleRect.moveBottomLeft(QPoint(paneBottomLeft.x(), height()-paneBottomLeft.y()));
-			painter.setBrush(stretchHandle_ == PaneOrganiser::BottomLeftHandle ? whiteBrush : paneColour);
+			painter.setBrush(stretchHandle_ == ViewPane::BottomLeftHandle ? whiteBrush : paneColour);
 			painter.drawRect(handleRect);
 			// -- Bottom middle
 			handleRect.moveBottomLeft(QPoint(paneBottomLeft.x()+0.5*paneSize.x()-paneMargin_, height()-paneBottomLeft.y()));
-			painter.setBrush(stretchHandle_ == PaneOrganiser::BottomMiddleHandle ? whiteBrush : paneColour);
+			painter.setBrush(stretchHandle_ == ViewPane::BottomMiddleHandle ? whiteBrush : paneColour);
 			painter.drawRect(handleRect);
 			// -- Bottom right
-			handleRect.moveBottomRight(QPoint(paneBottomLeft.x()+paneSize.x(), height()-pane->bottomEdge()*layoutPixelHeight_));
-			painter.setBrush(stretchHandle_ == PaneOrganiser::BottomRightHandle ? whiteBrush : paneColour);
+			handleRect.moveBottomRight(QPoint(paneBottomLeft.x()+paneSize.x(), height()-paneBottomLeft.y()));
+			painter.setBrush(stretchHandle_ == ViewPane::BottomRightHandle ? whiteBrush : paneColour);
 			painter.drawRect(handleRect);
 			// -- Middle left
 			handleRect.moveBottomLeft(QPoint(paneBottomLeft.x(), height()-(paneBottomLeft.y()+0.5*paneSize.y()-paneMargin_)));
-			painter.setBrush(stretchHandle_ == PaneOrganiser::MiddleLeftHandle ? whiteBrush : paneColour);
+			painter.setBrush(stretchHandle_ == ViewPane::MiddleLeftHandle ? whiteBrush : paneColour);
 			painter.drawRect(handleRect);
 			// -- Middle right
 			handleRect.moveBottomRight(QPoint(paneBottomLeft.x()+paneSize.x(), height()-(paneBottomLeft.y()+0.5*paneSize.y()-paneMargin_)));
-			painter.setBrush(stretchHandle_ == PaneOrganiser::MiddleRightHandle ? whiteBrush : paneColour);
+			painter.setBrush(stretchHandle_ == ViewPane::MiddleRightHandle ? whiteBrush : paneColour);
 			painter.drawRect(handleRect);
 			// -- Top left
 			handleRect.moveTopLeft(QPoint(paneBottomLeft.x(), height()-(paneBottomLeft.y()+paneSize.y())));
-			painter.setBrush(stretchHandle_ == PaneOrganiser::TopLeftHandle ? whiteBrush : paneColour);
+			painter.setBrush(stretchHandle_ == ViewPane::TopLeftHandle ? whiteBrush : paneColour);
 			painter.drawRect(handleRect);
 			// -- Top middle
 			handleRect.moveTopLeft(QPoint(paneBottomLeft.x()+0.5*paneSize.x()-paneMargin_, height()-(paneBottomLeft.y()+paneSize.y())));
-			painter.setBrush(stretchHandle_ == PaneOrganiser::TopMiddleHandle ? whiteBrush : paneColour);
+			painter.setBrush(stretchHandle_ == ViewPane::TopMiddleHandle ? whiteBrush : paneColour);
 			painter.drawRect(handleRect);
 			// -- Top right
 			handleRect.moveTopRight(QPoint(paneBottomLeft.x()+paneSize.x(), height()-(paneBottomLeft.y()+paneSize.y())));
-			painter.setBrush(stretchHandle_ == PaneOrganiser::TopRightHandle ? whiteBrush : paneColour);
+			painter.setBrush(stretchHandle_ == ViewPane::TopRightHandle ? whiteBrush : paneColour);
 			painter.drawRect(handleRect);
 		}
 	}

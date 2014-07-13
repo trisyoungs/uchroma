@@ -51,7 +51,7 @@ class ViewLayout : public ListItem<ViewLayout>
 
 	public:
 	// Set as modified (call parent routine)
-	void setAsModified();
+	void setAsModified(ViewPane* caller = NULL);
 
 
 	/*
