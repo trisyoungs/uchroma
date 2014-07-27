@@ -115,7 +115,7 @@ class ViewPane : public ListItem<ViewPane>
 	 */
 	public:
 	// Role of pane
-	enum PaneRole { DisplayPane, FitResultsRole, ExtractionRole, nPaneRoles };
+	enum PaneRole { DisplayPane, FitResultsRole, ExtractionRole, SliceMonitorRole, nPaneRoles };
 	// Convert text string to PaneRole
 	static PaneRole paneRole(const char* s);
 	// Convert InputBlock to text string
@@ -232,6 +232,8 @@ class ViewPane : public ListItem<ViewPane>
 	Axes& axes();
 	// Update axis limits to represent data extent of associated collections
 	void updateAxisLimits();
+	// Update current slices for all collections displayed in this pane
+	void collectionsUpdateCurrentSlices(int axis, double axisValue);
 
 
 	/*

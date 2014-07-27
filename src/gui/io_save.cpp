@@ -195,6 +195,8 @@ bool UChromaWindow::writeViewPaneBlock(LineParser& parser, ViewPane* pane)
 	parser.writeLineF("    %s %f %f %f %f\n", Keywords::viewPaneKeyword(Keywords::MatrixZKeyword), mat[8], mat[9], mat[10], mat[11]);
 	parser.writeLineF("    %s %f %f %f %f\n", Keywords::viewPaneKeyword(Keywords::MatrixWKeyword), mat[12], mat[13], mat[14], mat[15]);
 	if (pane->hasPerspective()) parser.writeLineF("  %s\n", Keywords::viewPaneKeyword(Keywords::PerspectiveKeyword));
+	parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::RoleKeyword), ViewPane::paneRole(pane->role()));
+	if (pane->roleAssociatedCollection()) parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::RoleAssociatedCollectionKeyword), qPrintable(pane->roleAssociatedCollection()->title()));
 	parser.writeLineF("  %s\n", Keywords::viewPaneKeyword(Keywords::EndViewPaneKeyword));
 
 	return true;

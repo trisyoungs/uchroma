@@ -28,7 +28,7 @@
 // Constructor
 UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	axesWindow_(*this), createWindow_(*this), dataWindow_(*this), fitWindow_(*this),
-	layoutWindow_(*this), sliceMonitorWindow_(*this), styleWindow_(*this), transformWindow_(*this),
+	layoutWindow_(*this), styleWindow_(*this), transformWindow_(*this),
 	viewWindow_(*this), saveImageDialog_(this), dataImportDialog_(this), viewLayout_(*this)
 {
 	// Initialise the icon resource
@@ -68,7 +68,6 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 
 	// Set UChroma pointers in widgets/dialogs where necessary
 	ui.MainView->setUChroma(this);
-	GraphWidget::setUChroma(this);
 
 	// Load font for viewer
 	if (!QFile::exists(viewerFont_)) QMessageBox::warning(this, "Font Error", "The specified font file '" + viewerFont_ + "' does not exist.");
@@ -77,9 +76,6 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	// Connect signals / slots between the Viewer and uChroma
 	connect(ui.MainView, SIGNAL(renderComplete(QString)), this, SLOT(updateRenderTimeLabel(QString)));
 	connect(ui.MainView, SIGNAL(surfacePrimitivesUpdated()), this, SLOT(updateCollectionInfo()));
-
-	// Connect signals / slots between SliceMonitor and main UI
-	connect(this, SIGNAL(currentSliceDataChanged()), sliceMonitorWindow_.ui.MonitorGraph, SLOT(staticDataChanged()));
 
 	// Connect CollectionTree context menu signal
 	connect(ui.CollectionTree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(collectionTreeContextMenuRequested(QPoint)));
@@ -163,7 +159,6 @@ void UChromaWindow::updateSubWindows()
 	axesWindow_.updateControls();
 	dataWindow_.updateControls();
 	fitWindow_.updateControls();
-	sliceMonitorWindow_.updateControls();
 	styleWindow_.updateControls();
 	transformWindow_.updateControls();
 	viewWindow_.updateControls();
@@ -194,6 +189,23 @@ void UChromaWindow::updateDisplayData()
 // Update display
 void UChromaWindow::updateDisplay()
 {
+	// Satisfy all registered collsction changes first
+	RefListItem<Collection,Collection::CollectionSignal>* ri = Collection::collectionSignals();
+	while (ri)
+	{
+		printf("UChromaWindow::updateDisplay() : Collection %p (%s), signal = %i\n", ri->item, qPrintable(ri->item->title()), ri->data);
+		switch (ri->data)
+		{
+			// Current slice has changed
+			case (Collection::CurrentSliceChangedSignal):
+				// 
+				break;
+		}
+
+		// Have now dealt with this signal, so delete it and move on to the next
+		ri = Collection::deleteCollectionSignal(ri);
+	}
+
 	ui.MainView->postRedisplay();
 }
 

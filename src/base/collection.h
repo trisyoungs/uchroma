@@ -159,7 +159,8 @@ class Collection : public ListItem<Collection>
 	{
 		MasterCollection,
 		FitCollection,
-		ExtractedCollection
+		ExtractedCollection,
+		CurrentSliceCollection
 	};
 
 	private:
@@ -171,6 +172,14 @@ class Collection : public ListItem<Collection>
 	List<Collection> fitData_;
 	// List of slices extracted from parent
 	List<Collection> extractedData_;
+	// Current slice data
+	Collection* currentSlice_;	
+
+	private:
+	// Return axis bin value of closest point to supplied value
+	int closestBin(int axis, double value);
+	// Get slice at specified axis and bin
+	void getSlice(int axis, int bin);
 
 	public:
 	// Find collection with name specified
@@ -197,6 +206,30 @@ class Collection : public ListItem<Collection>
 	Collection* extractedData();
 	// Remove specified extracted data from list
 	void removeExtractedData(Collection* collection);
+	// Update current slice based on specified axis and bin
+	void updateCurrentSlice(int axis, double axisValue);
+	// Extract current slice based on specified axis and bin
+	void extractCurrentSlice(int axis, double axisValue);
+
+
+	/*
+	 * Dependent Data / Signalling
+	 */
+	public:
+	// Data changed signal
+	enum CollectionSignal { CollectionCreatedSignal, CollectionDeletedSignal, CurrentSliceChangedSignal, DataChangedSignal, ExtractedDataAddedSignal };
+
+	private:
+	// List of notifications over all collections
+	static RefList<Collection,CollectionSignal> collectionSignals_;
+	// Notify dependents that something in this collection has changed
+	void notifyDependents(Collection* source, Collection::CollectionSignal signal);
+
+	public:
+	// Return first signal in lists
+	static RefListItem<Collection,CollectionSignal>* collectionSignals();
+	// Delete specified signal and return next
+	static RefListItem<Collection,CollectionSignal>* deleteCollectionSignal(RefListItem<Collection,CollectionSignal>* collectionSignal);
 
 
 	/*

@@ -402,7 +402,9 @@ bool UChromaWindow::readViewBlock(LineParser& parser)
 				break;
 			// ViewPane definition
 			case (Keywords::ViewPaneBlockKeyword):
-				pane = viewLayout_.addPane(parser.argc(1));
+				// Check to see if pane has already been created (through it being referenced by another pane)
+				pane = viewLayout_.pane(parser.argc(1));
+				if (!pane) pane = viewLayout_.addPane(parser.argc(1));
 				if (!readViewPaneBlock(parser, pane)) return false;
 				break;
 			// Unrecognised Keyword
@@ -421,6 +423,7 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 	int xyzw, axis;
 	Collection* collection;
 	Matrix mat;
+	ViewPane::PaneRole role;
 	while (!parser.eofOrBlank())
 	{
 		// Get line from file
@@ -486,6 +489,32 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 			// Perspective
 			case (Keywords::PerspectiveKeyword):
 				pane->setHasPerspective(true);
+				break;
+			// Role
+			case (Keywords::RoleKeyword):
+				role = ViewPane::paneRole(parser.argc(1));
+				if (role == ViewPane::nPaneRoles)
+				{
+					msg.print("Error: Unrecognised role '%s' for pane '%s'.\n", parser.argc(1), qPrintable(pane->name()));
+					return false;
+				}
+				pane->setRole(role);
+				break;
+			// Role associated collection
+			case (Keywords::RoleAssociatedCollectionKeyword):
+				collection = findCollection(parser.argc(1));
+				if (!collection)
+				{
+					msg.print("Error: Collection '%s' not found, and can't be associated to pane '%s'.\n", parser.argc(1), qPrintable(pane->name()));
+					return false;
+				}
+				pane->setRoleAssociatedCollection(collection);
+				break;
+			// Role target pane
+			case (Keywords::RoleAssociatedPaneKeyword):
+				pane = viewLayout_.pane(parser.argc(1));
+				if (!pane) pane = viewLayout_.addPane(parser.argc(1));
+				pane->setRoleAssociatedPane(pane);
 				break;
 			// Title scale
 			case (Keywords::TitleScaleKeyword):

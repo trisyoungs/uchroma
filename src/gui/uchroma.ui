@@ -649,7 +649,6 @@
     <addaction name="separator"/>
     <addaction name="actionWindowsAxes"/>
     <addaction name="actionWindowsFit"/>
-    <addaction name="actionWindowsSliceMonitor"/>
    </widget>
    <widget class="QMenu" name="menuCollections">
     <property name="title">
@@ -733,7 +732,6 @@
    <addaction name="actionWindowsCreate"/>
    <addaction name="actionWindowsFit"/>
    <addaction name="actionWindowsLayout"/>
-   <addaction name="actionWindowsSliceMonitor"/>
   </widget>
   <widget class="QToolBar" name="ViewToolBar">
    <property name="windowTitle">
@@ -903,17 +901,6 @@
    </property>
    <property name="toolTip">
     <string>Choose Font</string>
-   </property>
-  </action>
-  <action name="actionWindowsSliceMonitor">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Slice &amp;Monitor</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+M</string>
    </property>
   </action>
   <action name="actionWindowsFit">

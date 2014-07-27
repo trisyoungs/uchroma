@@ -362,13 +362,6 @@ void UChromaWindow::on_actionWindowsLayout_triggered(bool checked)
 	else layoutWindow_.hide();
 }
 
-void UChromaWindow::on_actionWindowsSliceMonitor_triggered(bool checked)
-{
-	if (refreshing_) return;
-	if (checked) sliceMonitorWindow_.updateAndShow();
-	else sliceMonitorWindow_.hide();
-}
-
 /*
  * Settings Actions
  */

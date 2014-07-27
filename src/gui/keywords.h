@@ -203,6 +203,9 @@ class Keywords
 		MatrixZKeyword,
 		MatrixWKeyword,
 		PerspectiveKeyword,
+		RoleKeyword,
+		RoleAssociatedCollectionKeyword,
+		RoleAssociatedPaneKeyword,
 		TitleScaleKeyword,
 		TwoDimensionalKeyword,
 		nViewPaneKeywords

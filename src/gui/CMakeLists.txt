@@ -35,13 +35,11 @@ fit_sd.cpp
 fit_simplex.cpp
 fit_target.cpp
 gradientbar_funcs.cpp
-graphwidget_funcs.cpp
 layout_funcs.cpp
 paneorganiser_funcs.cpp
 plotwidget_data.cpp
 plotwidget_funcs.cpp
 plotwidget_paintevent.cpp
-slicemonitor_funcs.cpp
 style_funcs.cpp
 texponentialspin_funcs.cpp
 transform_funcs.cpp 
@@ -60,10 +58,8 @@ SET(pro_MOC_HDRS
   dataimport.h
   equationselect.h
   fit.h
-  graphwidget.h
   layout.h
   saveimage.h
-  slicemonitor.h
   style.h
   transform.h
   view.h
@@ -83,9 +79,7 @@ SET(pro_UIS
   dataimport.ui
   equationselect.ui
   fit.ui
-  graphwidget.ui
   saveimage.ui
-  slicemonitor.ui
   style.ui
   transform.ui
   view.ui

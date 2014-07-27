@@ -28,7 +28,6 @@
 #include "gui/data.h"
 #include "gui/fit.h"
 #include "gui/layout.h"
-#include "gui/slicemonitor.h"
 #include "gui/style.h"
 #include "gui/transform.h"
 #include "gui/view.h"
@@ -95,8 +94,6 @@ class UChromaWindow : public QMainWindow
 	FitWindow fitWindow_;
 	// Layout Window
 	LayoutWindow layoutWindow_;
-	// Slice Monitor Window
-	SliceMonitorWindow sliceMonitorWindow_;
 	// Style Window
 	StyleWindow styleWindow_;
 	// Transform Window
@@ -199,7 +196,6 @@ class UChromaWindow : public QMainWindow
 	void on_actionWindowsCreate_triggered(bool checked);
 	void on_actionWindowsFit_triggered(bool checked);
 	void on_actionWindowsLayout_triggered(bool checked);
-	void on_actionWindowsSliceMonitor_triggered(bool checked);
 
 
 	/*
@@ -391,16 +387,10 @@ class UChromaWindow : public QMainWindow
 	Qt::KeyboardModifiers clickedInteractionModifiers_;
 	// Current interaction position on axis
 	double currentInteractionValue_;
-	// Current slice data
-	DataSet currentSlice_;
 
 	private:
 	// Calculate selection axis coordinate from supplied screen coordinates
 	double screenToAxis(int axis, int mouseX, int mouseY);
-	// Return axis bin value of closest point to supplied value
-	int closestBin(int axis, double value);
-	// Extract slice based on specified axis and bin
-	DataSet extractSlice(int axis, int bin);
 
 	public:
 	// Set interaction mode and target axis
@@ -427,10 +417,6 @@ class UChromaWindow : public QMainWindow
 	double currentInteractionCoordinate();
 	// Return current slice data
 	DataSet* currentSlice();
-
-	signals:
-	// Slice data has changed
-	void currentSliceDataChanged();
 
 
 	/*

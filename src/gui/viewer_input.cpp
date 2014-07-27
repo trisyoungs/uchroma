@@ -24,8 +24,8 @@
 #include <QtGui/QMouseEvent>
 
 /*
-// Mouse Input
-*/
+ * Mouse Input
+ */
 
 // Qt Signal (mouse press event)
 void Viewer::mousePressEvent(QMouseEvent *event)
@@ -62,7 +62,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
 	// Notify uChroma that the mouse button has been released
 	uChroma_->endInteraction(event->x(), contextHeight_-event->y());
 
-	postRedisplay();
+	uChroma_->updateGUI();
 	
 	msg.exit("Viewer::mouseReleaseEvent");
 }
@@ -72,7 +72,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 {
 	Vec3<double> delta;
 	Matrix A;
-	printf("MME %i %i\n", event->x(), event->y());
+
 	// Get event information and position delta
 	Qt::KeyboardModifiers km = event->modifiers();
 	delta.set(event->x(), event->y(), 0.0);
@@ -110,8 +110,8 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 	rMouseLast_.set(event->x(), event->y(), 0.0);
 
 	setFocus();
-	
-	if (refresh) postRedisplay();
+
+	if (refresh) uChroma_->updateGUI();
 }
 
 // Qt Signal (mouse wheel event)
@@ -149,8 +149,8 @@ Vec3<double> Viewer::rMouseLast()
 }
 
 /*
-// Key Input
-*/
+ * Key Input
+ */
 
 // Qt Slot (key press event)
 void Viewer::keyPressEvent(QKeyEvent *event)

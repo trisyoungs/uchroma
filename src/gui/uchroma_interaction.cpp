@@ -79,80 +79,6 @@ double UChromaWindow::screenToAxis(int axis, int mouseX, int mouseY)
 	return axisValue;
 }
 
-// Return axis bin value of closest point to supplied value
-int UChromaWindow::closestBin(int axis, double value)
-{
-	if (!currentCollection_) return -1;
-	if (currentCollection_->nDataSets() == 0) return -1;
-
-	if (axis == 0)
-	{
-		// Check X array of first slice
-		Array<double>& x = currentCollection_->dataSets()->transformedData().arrayX();
-		int midIndex, loIndex = 0, hiIndex = x.nItems() - 1;
-		if (value < x.value(0)) return 0;
-		if (value > x.value(hiIndex)) return hiIndex;
-		// Binary... chop!
-		while ((hiIndex - loIndex) > 1)
-		{
-			midIndex = (hiIndex + loIndex) / 2;
-			if (x.value(midIndex) <= value) loIndex = midIndex;
-			else hiIndex = midIndex;
-		}
-		if (fabs(x.value(loIndex) - value) < fabs(x.value(hiIndex) - value)) return loIndex;
-		else return hiIndex;
-	}
-	else if (axis == 1)
-	{
-		// ???
-	}
-	else if (axis == 2)
-	{
-		// Check z-values
-		int closest = 0, n = 0;
-		double delta, closestDelta = fabs(currentCollection_->dataSets()->transformedData().z() - value);
-		for (DataSet* dataSet = currentCollection_->dataSets()->next; dataSet != NULL; dataSet = dataSet->next)
-		{
-			delta = fabs(dataSet->transformedData().z() - value);
-			++n;
-			if (delta < closestDelta)
-			{
-				closest = n;
-				closestDelta = delta;
-			}
-		}
-		return closest;
-	}
-	else return -1;
-}
-
-// Extract slice based on specified axis and bin
-DataSet UChromaWindow::extractSlice(int axis, int bin)
-{
-	if (bin == -1) DataSet();
-
-	// Construct slice based on current interaction axis
-	DataSet extractedData;
-	if (interactionAxis_ == 0)
-	{
-		// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated - TODO)
-		for (DataSet* dataSet = currentCollection_->dataSets(); dataSet != NULL; dataSet = dataSet->next) extractedData.data().addPoint(dataSet->transformedData().z(), dataSet->transformedData().y(bin));
-		extractedData.setTitle("X = " + QString::number(currentCollection_->dataSets()->transformedData().x(bin)));
-	}
-	else if (interactionAxis_ == 1)
-	{
-		// TODO - Generate contour map?
-	}
-	else if (interactionAxis_ == 2)
-	{
-		// Slice through Z - i.e. original slice data
-		extractedData.data() = currentCollection_->dataSet(bin)->data();
-		extractedData.setTitle("Z = " + QString::number(currentCollection_->dataSet(bin)->transformedData().z()));
-	}
-
-	return extractedData;
-}
-
 /*
  * Public Functions
  */
@@ -218,13 +144,8 @@ void UChromaWindow::updateInteractionPosition(int mouseX, int mouseY)
 		// Calculate axis value
 		currentInteractionValue_ = screenToAxis(interactionAxis_, mouseX, mouseY);
 
-		// Extract slice from data?
-		if (sliceMonitorWindow_.isVisible())
-		{
-			currentSlice_ = extractSlice(interactionAxis_, closestBin(interactionAxis_, currentInteractionValue_));
-			emit(currentSliceDataChanged());
-			sliceMonitorWindow_.updateControls();
-		}
+		// Extract slice from collections in current pane
+		currentViewPane_->collectionsUpdateCurrentSlices(interactionAxis_, currentInteractionValue_);
 	}
 	else
 	{
@@ -262,9 +183,7 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 			// Ctrl : Extract slice
 			if (clickedInteractionModifiers_.testFlag(Qt::ControlModifier))
 			{
-				DataSet newData = extractSlice(interactionAxis_, closestBin(interactionAxis_, currentInteractionValue_));
-				Collection* newExtractedData = currentCollection_->addExtractedData(newData.title());
-				newExtractedData->addDataSet(&newData);
+				currentCollection_->extractCurrentSlice(interactionAxis_, currentInteractionValue_);
 				refreshCollections();
 			}
 			else
@@ -327,10 +246,3 @@ double UChromaWindow::currentInteractionCoordinate()
 	if (axes.axisLogarithmic(interactionAxis_)) return (axes.axisInverted(interactionAxis_) ? log10(axes.axisMax(interactionAxis_)/currentInteractionValue_) : log10(currentInteractionValue_));
 	else return (axes.axisInverted(interactionAxis_) ? axes.axisMax(interactionAxis_) - currentInteractionValue_ : currentInteractionValue_);
 }
-
-// Return current slice data
-DataSet* UChromaWindow::currentSlice()
-{
-	return &currentSlice_;
-}
-

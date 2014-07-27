@@ -162,6 +162,13 @@ ViewPane* ViewLayout::lastPane()
 	return panes_.last();
 }
 
+// Return named pane (if it exists)
+ViewPane* ViewLayout::pane(QString name)
+{
+	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next) if (pane->name() == name) return pane;
+	return NULL;
+}
+
 // Return index of specified pane in list
 int ViewLayout::paneIndex(ViewPane* pane)
 {

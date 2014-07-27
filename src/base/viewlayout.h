@@ -112,6 +112,8 @@ class ViewLayout : public ListItem<ViewLayout>
 	ViewPane* panes();
 	// Return last pane in list
 	ViewPane* lastPane();
+	// Return named pane (if it exists)
+	ViewPane* pane(QString name);
 	// Return index of specified pane in list
 	int paneIndex(ViewPane* pane);
 	// Return if pane is in the current list

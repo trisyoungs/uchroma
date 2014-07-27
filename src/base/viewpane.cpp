@@ -267,7 +267,7 @@ bool ViewPane::containsGridReference(int gridX, int gridY)
  */
 
 // Role of pane
-const char* RoleKeywords[ViewPane::nPaneRoles] = { "Display", "FitResults", "Extraction" };
+const char* RoleKeywords[ViewPane::nPaneRoles] = { "Display", "FitResults", "Extraction", "SliceMonitor" };
 
 // Convert text string to PaneRole
 ViewPane::PaneRole ViewPane::paneRole(const char* s)
@@ -582,7 +582,6 @@ double ViewPane::calculateRequiredZoom(double xExtent, double yExtent, double fr
 	int count = 0;
 	do
 	{
-		printf("lkjlkjlk\n");
 		// Increase zoom distance
 		zoom -= std::max( std::max(screenX / targetX, screenY / targetY), 1);
 
@@ -826,6 +825,12 @@ void ViewPane::updateAxisLimits()
 			axes_.setAxisLimitMax(axis, dataMax[axis]);
 		}
 	}
+}
+
+// Update current slices for all collections displayed in this pane
+void ViewPane::collectionsUpdateCurrentSlices(int axis, double axisValue)
+{
+	for (RefListItem<Collection,bool>* ri = collections_.first(); ri != NULL; ri = ri->next) ri->item->updateCurrentSlice(axis, axisValue);
 }
 
 /*

@@ -23,6 +23,9 @@
 #include "base/viewpane.h"
 #include <limits>
 
+// Static Members
+RefList<Collection,Collection::CollectionSignal> Collection::collectionSignals_;
+
 // Constructor
 Collection::Collection() : ListItem<Collection>()
 {
@@ -65,6 +68,7 @@ Collection::Collection() : ListItem<Collection>()
 	// Associated data
 	parent_ = NULL;
 	type_ = Collection::MasterCollection;
+	currentSlice_ = NULL;
 
 	// Display
 	visible_ = true;
@@ -464,6 +468,85 @@ double Collection::interpolationStep(int axis)
  * Associated Data
  */
 
+// Return axis bin value of closest point to supplied value
+int Collection::closestBin(int axis, double value)
+{
+	if (dataSets_.nItems() == 0) return -1;
+
+	if (axis == 0)
+	{
+		// Check X array of first slice
+		Array<double>& x = dataSets_.first()->transformedData().arrayX();
+		int midIndex, loIndex = 0, hiIndex = x.nItems() - 1;
+		if (value < x.value(0)) return 0;
+		if (value > x.value(hiIndex)) return hiIndex;
+		// Binary... chop!
+		while ((hiIndex - loIndex) > 1)
+		{
+			midIndex = (hiIndex + loIndex) / 2;
+			if (x.value(midIndex) <= value) loIndex = midIndex;
+			else hiIndex = midIndex;
+		}
+		if (fabs(x.value(loIndex) - value) < fabs(x.value(hiIndex) - value)) return loIndex;
+		else return hiIndex;
+	}
+	else if (axis == 1)
+	{
+		// ???
+	}
+	else if (axis == 2)
+	{
+		// Check z-values
+		int closest = 0, n = 0;
+		double delta, closestDelta = fabs(dataSets_.first()->transformedData().z() - value);
+		for (DataSet* dataSet = dataSets_.first()->next; dataSet != NULL; dataSet = dataSet->next)
+		{
+			delta = fabs(dataSet->transformedData().z() - value);
+			++n;
+			if (delta < closestDelta)
+			{
+				closest = n;
+				closestDelta = delta;
+			}
+		}
+		return closest;
+	}
+	else return -1;
+}
+
+// Get slice at specified axis and bin
+void Collection::getSlice(int axis, int bin)
+{
+	// Create the currentSlice_ collection if it doesn't already exist
+	if (currentSlice_ == NULL)
+	{
+		currentSlice_ = new Collection;
+		currentSlice_->parent_ = this;
+		currentSlice_->type_ = Collection::CurrentSliceCollection;
+	}
+
+	// Are supplied bin and axis valid?
+	if ((bin == -1) || (axis == -1)) currentSlice_->clearDataSets();
+	else if (axis == 0)
+	{
+		DataSet* newDataSet = currentSlice_->addDataSet();
+
+		// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated - TODO)
+		for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next) newDataSet->data().addPoint(dataSet->transformedData().z(), dataSet->transformedData().y(bin));
+		currentSlice_->setTitle("X = " + QString::number(dataSets_.first()->transformedData().x(bin)));
+	}
+	else if (axis == 1)
+	{
+		// TODO - Generate contour map?
+	}
+	else if (axis == 2)
+	{
+		// Slice through Z - i.e. original slice data
+		currentSlice_->addDataSet(dataSets_[bin]);
+		currentSlice_->setTitle("Z = " + QString::number(dataSets_[bin]->transformedData().z()));
+	}
+}
+
 // Find collection with name specified
 Collection* Collection::findCollection(QString name)
 {
@@ -603,6 +686,51 @@ void Collection::removeExtractedData(Collection* collection)
 Collection* Collection::extractedData()
 {
 	return extractedData_.first();
+}
+
+// Update current slice based on specified axis and value
+void Collection::updateCurrentSlice(int axis, double axisValue)
+{
+	getSlice(axis, closestBin(axis, axisValue));
+
+	notifyDependents(this, Collection::CurrentSliceChangedSignal);
+}
+
+// Extract current slice based on specified axis and value
+void Collection::extractCurrentSlice(int axis, double axisValue)
+{
+	getSlice(axis, closestBin(axis, axisValue));
+
+	Collection* newExtractedData = addExtractedData(currentSlice_->title());
+		newExtractedData->addDataSet(currentSlice_->dataSets());
+
+	notifyDependents(newExtractedData, Collection::CollectionCreatedSignal);
+	notifyDependents(this, Collection::ExtractedDataAddedSignal);
+}
+
+/*
+ * Dependent Data / Signalling
+ */
+
+// Notify dependents that something in this collection has changed
+void Collection::notifyDependents(Collection* source, Collection::CollectionSignal signal)
+{
+	// Add signal to list
+	collectionSignals_.add(source, signal);
+}
+
+// Return first signal in lists
+RefListItem<Collection,Collection::CollectionSignal>* Collection::collectionSignals()
+{
+	return collectionSignals_.first();
+}
+
+// Delete specified signal and return next
+RefListItem<Collection,Collection::CollectionSignal>* Collection::deleteCollectionSignal(RefListItem<Collection,Collection::CollectionSignal>* collectionSignal)
+{
+	RefListItem<Collection,Collection::CollectionSignal>* nextSignal = collectionSignal->next;
+	collectionSignals_.remove(collectionSignal);
+	return nextSignal;
 }
 
 /*
