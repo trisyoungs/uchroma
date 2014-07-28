@@ -344,6 +344,34 @@ Collection* ViewPane::roleAssociatedCollection()
 	return roleAssociatedCollection_;
 }
 
+// Return whether supplied Collection changed/update signal is relevant to this pane
+bool ViewPane::processUpdate(Collection* source, Collection::CollectionSignal signal)
+{
+	// Check signal type and act on it if relevant
+	
+	switch (signal)
+	{
+		// Signal: CurrentSliceChanged (current slice has changed in source collection)
+		// Relevance: Only if role_ == SliceMonitorRole
+		case (Collection::CurrentSliceChangedSignal):
+			if (role_ != ViewPane::SliceMonitorRole) return false;
+			// Check to see if the collection is relevant to this pane
+			if ((roleAssociatedPane_ == source->displayPane()) || (roleAssociatedCollection_ == source))
+			{
+				// Check to see if the pane is already displaying this collection's monitoring Collection
+				if (collections_.contains(source->currentSlice())) return true;
+
+				// Must add the slice to this pane
+				addCollection(source->currentSlice());
+				return true;
+			}
+			break;
+	}
+
+	// Signal not relevant to this pane, so return false
+	return false;
+}
+
 /*
  * Projection / View
  */
@@ -572,6 +600,7 @@ double ViewPane::calculateRequiredZoom(double xExtent, double yExtent, double fr
 
 	// Sanity check
 	if (viewportMatrix_[2] == 0) return 1.0;
+	if (viewportMatrix_[3] == 0) return 1.0;
 
 	// Calculate target screen coordinate
 	int targetX = (1.0 + fraction) * viewportMatrix_[2] * 0.5;

@@ -23,6 +23,7 @@
 #define UCHROMA_VIEWPANE_H
 
 #include "base/axes.h"
+#include "base/collection.h"
 #include "math/matrix.h"
 #include "templates/list.h"
 #include "templates/reflist.h"
@@ -30,7 +31,6 @@
 #include <QtCore/QString>
 
 // Forward Declarations
-class Collection;
 class ViewLayout;
 
 // ViewPane
@@ -148,6 +148,8 @@ class ViewPane : public ListItem<ViewPane>
 	void setRoleAssociatedCollection(Collection* collection);
 	// Return associated target collection for role, if relevant
 	Collection* roleAssociatedCollection();
+	// Process supplied Collection changed/update signal if it is relevant to this pane
+	bool processUpdate(Collection* source, Collection::CollectionSignal signal);
 
 
 	/*

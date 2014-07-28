@@ -523,6 +523,7 @@ void Collection::getSlice(int axis, int bin)
 		currentSlice_ = new Collection;
 		currentSlice_->parent_ = this;
 		currentSlice_->type_ = Collection::CurrentSliceCollection;
+		XXX Missing call to currentCollection_->displayPrimitives().setViewer(ui.MainView);
 	}
 
 	// Are supplied bin and axis valid?
@@ -702,12 +703,18 @@ void Collection::extractCurrentSlice(int axis, double axisValue)
 	getSlice(axis, closestBin(axis, axisValue));
 
 	Collection* newExtractedData = addExtractedData(currentSlice_->title());
-		newExtractedData->addDataSet(currentSlice_->dataSets());
+	newExtractedData->addDataSet(currentSlice_->dataSets());
 
 	notifyDependents(newExtractedData, Collection::CollectionCreatedSignal);
 	notifyDependents(this, Collection::ExtractedDataAddedSignal);
 }
 
+// Return current slice
+Collection* Collection::currentSlice()
+{
+	return currentSlice_;
+}
+	
 /*
  * Dependent Data / Signalling
  */
@@ -1106,6 +1113,8 @@ void Collection::setDisplayDataInvalid()
 	for (Collection* fit = fitData_.first(); fit != NULL; fit = fit->next) fit->setDisplayDataInvalid();
 	// -- Extracted data
 	for (Collection* extract = extractedData_.first(); extract != NULL; extract = extract->next) extract->setDisplayDataInvalid();
+	// -- Current slice
+	if (currentSlice_) currentSlice_->setDisplayDataInvalid();
 
 	displayDataValid_ = false;
 }
@@ -1136,6 +1145,8 @@ void Collection::updateDisplayData()
 	for (Collection* fit = fitData_.first(); fit != NULL; fit = fit->next) fit->updateDisplayData();
 	// -- Extracted data
 	for (Collection* extract = extractedData_.first(); extract != NULL; extract = extract->next) extract->updateDisplayData();
+	// -- Current slice
+	if (currentSlice_) currentSlice_->updateDisplayData();
 
 	// Is surface reconstruction necessary?
 	if (displayDataValid_) return;
@@ -1149,7 +1160,7 @@ void Collection::updateDisplayData()
 	// Grab some stuff from the pane's axes
 	Vec3<double> axisMin(displayPane_->axes().axisMin(0), displayPane_->axes().axisMin(1), displayPane_->axes().axisMin(2));
 	Vec3<double> axisMax(displayPane_->axes().axisMax(0), displayPane_->axes().axisMax(1), displayPane_->axes().axisMax(2));
-	
+
 	// Clear old displayData_ and create temporary Data2D list for display data construction
 	List<Data2D> transformedData;
 	displayData_.clear();
@@ -1165,7 +1176,8 @@ void Collection::updateDisplayData()
 		// Z
 		double z = dataSet->transformedData().z();
 		// -- Is the transformed Z value within range?
-		if ((z < axisMin.z) || (z > axisMax.z))
+		// -- If the pane is 2D, display all data regardless of z
+		if ((!displayPane_->twoDimensional()) && ((z < axisMin.z) || (z > axisMax.z)))
 		{
 			dataSet = displayPane_->axes().axisInverted(2) ? dataSet->prev : dataSet->next;
 			continue;
@@ -1343,12 +1355,6 @@ ViewPane* Collection::displayPane()
 // Send collection data to GL, including any associated fit and extracted data
 void Collection::sendToGL()
 {
-	// Associated data first
-	// -- Fit data
-	for (Collection* fit = fitData_.first(); fit != NULL; fit = fit->next) fit->sendToGL();
-	// -- Extracted data
-	for (Collection* extract = extractedData_.first(); extract != NULL; extract = extract->next) extract->sendToGL();
-
 	// If this collection is not visible return now
 	if (!visible_) return;
 

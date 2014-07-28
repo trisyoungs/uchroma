@@ -423,6 +423,7 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 	int xyzw, axis;
 	Collection* collection;
 	Matrix mat;
+	ViewPane* associatedPane;
 	ViewPane::PaneRole role;
 	while (!parser.eofOrBlank())
 	{
@@ -512,9 +513,9 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				break;
 			// Role target pane
 			case (Keywords::RoleAssociatedPaneKeyword):
-				pane = viewLayout_.pane(parser.argc(1));
-				if (!pane) pane = viewLayout_.addPane(parser.argc(1));
-				pane->setRoleAssociatedPane(pane);
+				associatedPane = viewLayout_.pane(parser.argc(1));
+				if (!associatedPane) associatedPane = viewLayout_.addPane(parser.argc(1));
+				pane->setRoleAssociatedPane(associatedPane);
 				break;
 			// Title scale
 			case (Keywords::TitleScaleKeyword):

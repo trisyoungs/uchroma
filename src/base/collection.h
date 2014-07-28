@@ -210,6 +210,8 @@ class Collection : public ListItem<Collection>
 	void updateCurrentSlice(int axis, double axisValue);
 	// Extract current slice based on specified axis and bin
 	void extractCurrentSlice(int axis, double axisValue);
+	// Return current slice
+	Collection* currentSlice();
 
 
 	/*

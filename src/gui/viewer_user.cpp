@@ -36,6 +36,8 @@ bool Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate)
 	for (Collection* fit = collection->fitData(); fit != NULL; fit = fit->next) if (updateSurfacePrimitive(fit, forceUpdate)) ++nUpdated;
 	// -- Extracted data
 	for (Collection* extract = collection->extractedData(); extract != NULL; extract = extract->next) if (updateSurfacePrimitive(extract, forceUpdate)) ++nUpdated;
+	// -- Current Slice
+	if (collection->currentSlice()) if (updateSurfacePrimitive(collection->currentSlice(), forceUpdate)) ++nUpdated;
 
 	// Check whether the primitive for this collection needs updating
 	if (collection->displayPrimitivesValid() && collection->colourScaleValid() && (!forceUpdate)) return (nUpdated != 0);

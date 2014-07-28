@@ -23,6 +23,7 @@
 #define UCHROMA_VIEWLAYOUT_H
 
 #include "base/viewpane.h"
+#include "base/collection.h"
 #include "templates/list.h"
 #include <QtCore/QString>
 
@@ -128,6 +129,14 @@ class ViewLayout : public ListItem<ViewLayout>
 	void resetView();
 	// Update interaction primitives for all panes
 	void updateInteractionPrimitives(int axis);
+
+
+	/*
+	 * Signal / Update
+	 */
+	public:
+	// Process supplied Collection changed/update signal
+	   bool processUpdate(Collection* source, Collection::CollectionSignal signal);
 };
 
 #endif

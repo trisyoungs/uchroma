@@ -189,18 +189,15 @@ void UChromaWindow::updateDisplayData()
 // Update display
 void UChromaWindow::updateDisplay()
 {
-	// Satisfy all registered collsction changes first
+	// Satisfy all registered collection changes first
+	ViewPane* targetPane;
 	RefListItem<Collection,Collection::CollectionSignal>* ri = Collection::collectionSignals();
 	while (ri)
 	{
 		printf("UChromaWindow::updateDisplay() : Collection %p (%s), signal = %i\n", ri->item, qPrintable(ri->item->title()), ri->data);
-		switch (ri->data)
-		{
-			// Current slice has changed
-			case (Collection::CurrentSliceChangedSignal):
-				// 
-				break;
-		}
+
+		// Pass this change to the viewLayout_...
+		viewLayout_.processUpdate(ri->item, ri->data);
 
 		// Have now dealt with this signal, so delete it and move on to the next
 		ri = Collection::deleteCollectionSignal(ri);
