@@ -22,6 +22,9 @@
 #include "render/primitivelist.h"
 #include "gui/viewer.uih"
 
+// Static members
+Viewer* PrimitiveList::viewer_ = NULL;
+
 // Constructor
 PrimitiveList::PrimitiveList()
 {
@@ -47,7 +50,7 @@ void PrimitiveList::forgetAll()
 	for (Primitive* prim = primitives_.first(); prim != NULL; prim = prim->next) prim->forgetAll();
 }
 
-// Resize list so it is large enough to accomodate specified number of Primitives
+// Resize list so it is large enough to accommodate specified number of Primitives
 void PrimitiveList::reinitialise(int newSize, bool allowShrink, int maxVertices, int maxIndices, GLenum type, bool colourData)
 {
 	// Add enough primitives to match the new size
@@ -101,16 +104,10 @@ int PrimitiveList::nDefinedIndices()
 	return totalIndices;
 }
 
-// Set viewer
+// Set viewer (static)
 void PrimitiveList::setViewer(Viewer* viewer)
 {
 	viewer_ = viewer;
-}
-
-// Return viewer in which these primitives are to be displayed
-Viewer* PrimitiveList::viewer()
-{
-	return viewer_;
 }
 
 // Push instance layer

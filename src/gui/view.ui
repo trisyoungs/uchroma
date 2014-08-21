@@ -65,7 +65,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="ViewLabelScaleSpin">
+         <widget class="QDoubleSpinBox" name="ViewLabelPointSizeSpin">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -76,10 +76,10 @@
            <double>0.010000000000000</double>
           </property>
           <property name="singleStep">
-           <double>0.010000000000000</double>
+           <double>0.500000000000000</double>
           </property>
           <property name="value">
-           <double>0.500000000000000</double>
+           <double>10.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -91,7 +91,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="ViewTitleScaleSpin">
+         <widget class="QDoubleSpinBox" name="ViewTitlePointSizeSpin">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -102,10 +102,10 @@
            <double>0.010000000000000</double>
           </property>
           <property name="singleStep">
-           <double>0.010000000000000</double>
+           <double>0.500000000000000</double>
           </property>
           <property name="value">
-           <double>0.500000000000000</double>
+           <double>12.000000000000000</double>
           </property>
          </widget>
         </item>

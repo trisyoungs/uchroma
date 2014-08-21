@@ -45,13 +45,13 @@ class PrimitiveList
 	// List of Primitives owned and managed by this list
 	List<Primitive> primitives_;
 	// Viewer in which these primitives are to be displayed
-	Viewer* viewer_;
+	static Viewer* viewer_;
 
 	public:
 	// Set Viewer in which these primitives are to be displayed
-	void setViewer(Viewer* viewer);
-	// Return viewer in which these primitives are to be displayed
-	Viewer* viewer();
+	static void setViewer(Viewer* viewer);
+// 	// Return viewer in which these primitives are to be displayed
+// 	Viewer* viewer();
 	// Clear existing data
 	void clear();
 	// Forget all data, leaving arrays intact

@@ -207,7 +207,6 @@ void PaneOrganiser::mousePressEvent(QMouseEvent *event)
 		// Start stretch
 		interactionMode_ = StretchInteraction;
 		interactionPane_ = paneUnderMouse_;
-		
 	}
 	else
 	{

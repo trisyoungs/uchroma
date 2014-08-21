@@ -23,8 +23,8 @@
 #include "math/constants.h"
 
 /*
-// Text Primitive
-*/
+ * Text Primitive
+ */
 
 // Set data
 void TextPrimitive::set(QString text, Vec3<double> origin, Vec3<double> centre, Matrix& transform)
@@ -62,8 +62,8 @@ QString& TextPrimitive::text()
 }
 
 /*
-// Text Primitive Chunk
-*/
+ * Text Primitive Chunk
+ */
 
 // Constructor
 TextPrimitiveChunk::TextPrimitiveChunk()
@@ -96,7 +96,7 @@ void TextPrimitiveChunk::add(QString text, Vec3<double> origin, Vec3<double> cen
 }
 
 // Render all primitives in chunk
-void TextPrimitiveChunk::renderAll(Matrix viewMatrix, bool correctView, Vec3<double> globalCenter, FTFont* font)
+void TextPrimitiveChunk::renderAll(Matrix viewMatrix, Vec3< double > globalCenter, FTFont* font, bool correctOrientation, double scaling)
 {
 	Matrix A, B;
 	for (int n=0; n<nTextPrimitives_; ++n)
@@ -105,8 +105,11 @@ void TextPrimitiveChunk::renderAll(Matrix viewMatrix, bool correctView, Vec3<dou
 		A = textPrimitives_[n].localTransform();
 		A.addTranslation(globalCenter + textPrimitives_[n].origin());
 
+		// Calculate general matrix to shift to correct position and rotation
 		B = viewMatrix * A;
-		if (correctView)
+
+		// Apply corrections
+		if (correctOrientation)
 		{
 			if (A[5] < 0.0)
 			{
@@ -121,15 +124,25 @@ void TextPrimitiveChunk::renderAll(Matrix viewMatrix, bool correctView, Vec3<dou
 				B = viewMatrix * A;
 			}
 		}
-		
+
+		// We now scale the matrix in order to give consistent text size regardless of zoom
+		// Also corrects aspect ratio of text when using 2D view with scaled view matrix
+		double scale = B[14] / scaling;
+		B.columnMultiply(2, scale);
+		B.columnNormalise(0);
+		B.columnNormalise(1);
+		scale = B.columnMagnitude(2);
+		B.columnMultiply(0, scale);
+		B.columnMultiply(1, scale);
 		glLoadMatrixd(B.matrix());
+		
 		font->Render(qPrintable(textPrimitives_[n].text()), -1, textPrimitives_[n].centre());
 	}
 }
 
 /*
-// Text Primitive List
-*/
+ * Text Primitive List
+ */
 
 // Constructor
 TextPrimitiveList::TextPrimitiveList()
@@ -155,8 +168,8 @@ void TextPrimitiveList::add(QString text, Vec3<double> origin, Vec3<double> cent
 }
 
 // Render all primitives in list
-void TextPrimitiveList::renderAll(Matrix viewMatrix, bool correctView, Vec3<double> globalCentre, FTFont* font)
+void TextPrimitiveList::renderAll(Matrix viewMatrix, Vec3<double> globalCenter, FTFont* font, bool correctOrientation, double scaling)
 {
-	for (TextPrimitiveChunk *chunk = textPrimitives_.first(); chunk != NULL; chunk = chunk->next) chunk->renderAll(viewMatrix, correctView, globalCentre, font);
+	for (TextPrimitiveChunk *chunk = textPrimitives_.first(); chunk != NULL; chunk = chunk->next) chunk->renderAll(viewMatrix, globalCenter, font, correctOrientation, scaling);
 }
 

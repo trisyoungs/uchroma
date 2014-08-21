@@ -21,6 +21,8 @@
 
 #include "gui/layout.h"
 #include "gui/uchroma.h"
+#include "gui/targetselect.h"
+#include "templates/variantpointer.h"
 
 /*
  * Window Functions
@@ -58,7 +60,7 @@ void LayoutWindow::closeEvent(QCloseEvent *event)
  */
 
 /*
- * Slots
+ * Slots - Pane Layout
  */
 
 void LayoutWindow::on_GridNColumnsSpin_valueChanged(int value)
@@ -113,6 +115,20 @@ void LayoutWindow::on_PanePreviousButton_clicked(bool checked)
 	updateControls();
 }
 
+void LayoutWindow::on_Organiser_currentPaneChanged(int gridX, int gridY)
+{
+	if (refreshing_) return;
+
+	// Get pane at the specified grid coordinates
+	currentPane_ = uChroma_.viewLayout()->paneAtGrid(gridX, gridY);
+
+	updateControls();
+}
+
+/*
+ * Slots - Pane Basic Info
+ */
+
 void LayoutWindow::on_PaneNameEdit_textChanged(QString text)
 {
 	if (refreshing_) return;
@@ -126,7 +142,7 @@ void LayoutWindow::on_PaneRoleCombo_currentIndexChanged(int index)
 	if (refreshing_) return;
 
 	if (currentPane_) currentPane_->setRole((ViewPane::PaneRole) index);
-	ui.Organiser->update();
+	updateControls();
 }
 
 void LayoutWindow::on_Pane2DCheck_clicked(bool checked)
@@ -137,15 +153,47 @@ void LayoutWindow::on_Pane2DCheck_clicked(bool checked)
 	emit(updateMainDisplay());
 }
 
-void LayoutWindow::on_Organiser_currentPaneChanged(int gridX, int gridY)
-{
-	if (refreshing_) return;
+/*
+ * Slots - Pane Targets
+ */
 
-	// Get pane at the specified grid coordinates
-	currentPane_ = uChroma_.viewLayout()->paneAtGrid(gridX, gridY);
+void LayoutWindow::on_PaneTargetsList_currentRowChanged(int index)
+{
+	ui.PaneRemoveTargetButton->setEnabled(index != -1);
+}
+
+void LayoutWindow::on_PaneAddTargetButton_clicked(bool checked)
+{
+	TargetSelectDialog targetSelect(this);
+	targetSelect.populateLists(currentPane_, uChroma_.viewLayout()->panes(), uChroma_.collections());
+	if (targetSelect.exec())
+	{
+		// Get lists of panes and collections, and add them to the targets list
+		RefList<ViewPane,bool> panes = targetSelect.selectedPanes();
+		for (RefListItem<ViewPane,bool>* ri = panes.first(); ri != NULL; ri = ri->next) currentPane_->addRoleTargetPane(ri->item);
+		RefList<Collection,bool> collections = targetSelect.selectedCollections();
+		for (RefListItem<Collection,bool>* rj = collections.first(); rj != NULL; rj = rj->next) currentPane_->addRoleTargetCollection(rj->item);
+	}
 
 	updateControls();
 }
+
+void LayoutWindow::on_PaneRemoveTargetButton_clicked(bool checked)
+{
+	// Get list of current items
+	QList<QListWidgetItem*> items = ui.PaneTargetsList->selectedItems();
+	for (int n=0; n<items.count(); ++n)
+	{
+		if (items[n]->text().startsWith("(C)")) currentPane_->removeRoleTargetCollection(VariantPointer<Collection>(items[n]->data(Qt::UserRole)));
+		else if (items[n]->text().startsWith("(P)")) currentPane_->removeRoleTargetPane(VariantPointer<ViewPane>(items[n]->data(Qt::UserRole)));
+	}
+
+	updateControls();
+}
+
+/*
+ * Slots - Pane Role Options
+ */
 
 /*
  * Update
@@ -163,7 +211,7 @@ void LayoutWindow::updateAndShow()
 void LayoutWindow::updateControls(bool force)
 {
 	// If the window isn't visible, do nothing...
-	if ((!isVisible()) && (!force) ) return;
+	if ((!isVisible()) && (!force)) return;
 
 	refreshing_ = true;
 
@@ -184,6 +232,28 @@ void LayoutWindow::updateControls(bool force)
 		ui.PaneNameEdit->setText(currentPane_->name());
 		ui.PaneRoleCombo->setCurrentIndex(currentPane_->role());
 		ui.Pane2DCheck->setChecked(currentPane_->twoDimensional());
+
+		// Update targets list
+		ui.PaneTargetsList->clear();
+		for (RefListItem<ViewPane,bool>* ri = currentPane_->roleTargetPanes(); ri != NULL; ri = ri->next)
+		{
+			QListWidgetItem* item;
+			item = new QListWidgetItem(ui.PaneTargetsList);
+			item->setText("(P) " + ri->item->name());
+			item->setData(Qt::UserRole, VariantPointer<ViewPane>(ri->item));
+		}
+		for (RefListItem<Collection,bool>* ri = currentPane_->roleTargetCollections(); ri != NULL; ri = ri->next)
+		{
+			QListWidgetItem* item;
+			item = new QListWidgetItem(ui.PaneTargetsList);
+			item->setText("(C) " + ri->item->title());
+			item->setData(Qt::UserRole, VariantPointer<Collection>(ri->item));
+		}
+
+		// Set the correct stack page for the selected role
+		ui.PaneRoleStack->setCurrentIndex(currentPane_->role());
+		// -- Set stack page controls
+// 		ui.
 	}
 
 	refreshing_ = false;

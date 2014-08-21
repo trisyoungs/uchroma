@@ -48,6 +48,10 @@ bool Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate)
 	
 	// Need a valid set of axes in order to construct the surface
 	if (!collection->displayPane()) return false;
+// 	XXX Do we?
+	/* We only get the Y-axis stretch and logarithm bool from it - similar options for X and Z are already accounted for.... 
+	 * Can we not remove the stretch from within Collection::updateDisplayData(), remove all axis limits defining the generation, and use clip planes and matrix scaling instead?
+	 */
 
 	// Recreate primitive depending on current style
 	double yStretch = collection->displayPane()->axes().axisStretch(1);

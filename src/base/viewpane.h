@@ -115,7 +115,7 @@ class ViewPane : public ListItem<ViewPane>
 	 */
 	public:
 	// Role of pane
-	enum PaneRole { DisplayPane, FitResultsRole, ExtractionRole, SliceMonitorRole, nPaneRoles };
+	enum PaneRole { FitResultsRole, ExtractionRole, SliceMonitorRole, StandardRole, nPaneRoles };
 	// Convert text string to PaneRole
 	static PaneRole paneRole(const char* s);
 	// Convert InputBlock to text string
@@ -126,10 +126,10 @@ class ViewPane : public ListItem<ViewPane>
 	PaneRole role_;
 	// Whether this pane is a 2D plot
 	bool twoDimensional_;
-	// Associated target pane for role, if relevant
-	ViewPane* roleAssociatedPane_;
-	// Associated target collection for role, if relevant
-	Collection* roleAssociatedCollection_;
+	// Target target pane for role, if relevant
+	RefList<ViewPane,bool> roleTargetPanes_;
+	// Target target collection for role, if relevant
+	RefList<Collection,bool> roleTargetCollections_;
 
 	public:
 	// Set role of this pane
@@ -140,14 +140,22 @@ class ViewPane : public ListItem<ViewPane>
 	void setTwoDimensional(bool b);
 	// Return whether this pane is a 2D plot
 	bool twoDimensional();
-	// Set associated target pane for role, if relevant
-	void setRoleAssociatedPane(ViewPane* pane);
-	// Return associated target pane for role, if relevant
-	ViewPane* roleAssociatedPane();
-	// Set associated target collection for role, if relevant
-	void setRoleAssociatedCollection(Collection* collection);
-	// Return associated target collection for role, if relevant
-	Collection* roleAssociatedCollection();
+	// Add target pane for role
+	void addRoleTargetPane(ViewPane* pane);
+	// Remove target pane for role
+	void removeRoleTargetPane(ViewPane* pane);
+	// Return whether specified pane is a target
+	bool roleIsTargetPane(ViewPane* pane);
+	// Return first target target pane for role
+	RefListItem<ViewPane,bool>* roleTargetPanes();
+	// Add target collection for role
+	void addRoleTargetCollection(Collection* collection);
+	// Remove target collection for role
+	void removeRoleTargetCollection(Collection* collection);
+	// Return whether specified collection is a target
+	bool roleIsTargetCollection(Collection* collection);
+	// Return target target collection for role
+	RefListItem<Collection,bool>* roleTargetCollections();
 	// Process supplied Collection changed/update signal if it is relevant to this pane
 	bool processUpdate(Collection* source, Collection::CollectionSignal signal);
 
@@ -168,8 +176,6 @@ class ViewPane : public ListItem<ViewPane>
 	Matrix viewMatrixInverse_;
 
 	private:
-	// Return calculate view matrix
-	Matrix calculateViewMatrix();
 	// Return calculated projection matrix
 	Matrix calculateProjectionMatrix(double zoom);
 
@@ -251,9 +257,11 @@ class ViewPane : public ListItem<ViewPane>
 	// Y-intercept of bounding XZ plane
 	double boundingBoxPlaneY_;
 	// Font scaling for axis value labels
-	double labelScale_;
+	double labelPointSize_;
 	// Font scaling for titles
-	double titleScale_;
+	double titlePointSize_;
+	// Text z scaling factor
+	double textZScale_;
 
 	public:
 	// Set current bounding box type
@@ -264,14 +272,16 @@ class ViewPane : public ListItem<ViewPane>
 	void setBoundingBoxPlaneY(double value);
 	// Return y intercept for plane bounding box
 	double boundingBoxPlaneY();
-	// Set font scaling for axis value labels
-	void setLabelScale(double value);
-	// Return font scaling for axis value labels
-	double labelScale();
-	// Return font scaling for titles
-	void setTitleScale(double value);
-	// Return font scaling for titles
-	double titleScale();
+	// Set font point size for axis value labels
+	void setLabelPointSize(double value);
+	// Return font point size for axis value labels
+	double labelPointSize();
+	// Return font point size for titles
+	void setTitlePointSize(double value);
+	// Return font point size for titles
+	double titlePointSize();
+	// Return text z scaling factor
+	double textZScale();
 
 
 	/*

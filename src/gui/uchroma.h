@@ -149,6 +149,8 @@ class UChromaWindow : public QMainWindow
 	private slots:
 	void on_actionViewPerspective_triggered(bool checked);
 	void on_actionViewReset_triggered(bool checked);
+	void on_actionViewShowAll_triggered(bool checked);
+	void on_actionView2D_triggered(bool checked);
 
 
 	/*
@@ -169,18 +171,17 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * Axes Actions
+	 * Interact Actions
 	 */
 	private:
 	// Change interaction axis target
 	void interactionActionTriggered(int axis);
 
 	private slots:
-	void on_actionAxesShowAll_triggered(bool checked);
-	void on_actionAxesInteractX_triggered(bool checked);
-	void on_actionAxesInteractY_triggered(bool checked);
-	void on_actionAxesInteractZ_triggered(bool checked);
-	void on_actionAxesInteractNone_triggered(bool checked);
+	void on_actionInteractX_triggered(bool checked);
+	void on_actionInteractY_triggered(bool checked);
+	void on_actionInteractZ_triggered(bool checked);
+	void on_actionInteractNone_triggered(bool checked);
 
 
 	/*
@@ -249,6 +250,8 @@ class UChromaWindow : public QMainWindow
 	void updateGUI();
 	// Update all subwindows
 	void updateSubWindows();
+	// Update tool bars
+	void updateToolBars();
 	// Update title bar
 	void updateTitleBar();
 	// Update display data (used for surfaces) in all collections

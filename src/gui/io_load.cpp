@@ -476,8 +476,8 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				pane->setSize(parser.argi(3), parser.argi(4));
 				break;
 			// Label scale
-			case (Keywords::LabelScaleKeyword):
-				pane->setLabelScale(parser.argd(1));
+			case (Keywords::LabelPointSizeKeyword):
+				pane->setLabelPointSize(parser.argd(1));
 				break;
 			// View Matrix
 			case (Keywords::MatrixXKeyword):
@@ -502,24 +502,24 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				pane->setRole(role);
 				break;
 			// Role associated collection
-			case (Keywords::RoleAssociatedCollectionKeyword):
+			case (Keywords::RoleTargetCollectionKeyword):
 				collection = findCollection(parser.argc(1));
 				if (!collection)
 				{
 					msg.print("Error: Collection '%s' not found, and can't be associated to pane '%s'.\n", parser.argc(1), qPrintable(pane->name()));
 					return false;
 				}
-				pane->setRoleAssociatedCollection(collection);
+				pane->addRoleTargetCollection(collection);
 				break;
 			// Role target pane
-			case (Keywords::RoleAssociatedPaneKeyword):
+			case (Keywords::RoleTargetPaneKeyword):
 				associatedPane = viewLayout_.pane(parser.argc(1));
 				if (!associatedPane) associatedPane = viewLayout_.addPane(parser.argc(1));
-				pane->setRoleAssociatedPane(associatedPane);
+				pane->addRoleTargetPane(associatedPane);
 				break;
 			// Title scale
-			case (Keywords::TitleScaleKeyword):
-				pane->setTitleScale(parser.argd(1));
+			case (Keywords::TitlePointSizeKeyword):
+				pane->setTitlePointSize(parser.argd(1));
 				break;
 			// Two Dimensional flag
 			case (Keywords::TwoDimensionalKeyword):

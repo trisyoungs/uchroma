@@ -11,10 +11,11 @@
     <file>icons/collection_fit.svg</file>
     <file>icons/collection_extracted.svg</file>
     <file>icons/info_interaction.svg</file>
-    <file>icons/axes_interactx.svg</file>
-    <file>icons/axes_interacty.svg</file>
-    <file>icons/axes_interactz.svg</file>
     <file>icons/axes_showall.svg</file>
+    <file>icons/interact_none.svg</file>
+    <file>icons/interact_x.svg</file>
+    <file>icons/interact_y.svg</file>
+    <file>icons/interact_z.svg</file>
     <file>icons/collections_new.svg</file>
     <file>icons/windows_create.svg</file>
     <file>icons/collections_next.svg</file>

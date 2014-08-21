@@ -523,7 +523,6 @@ void Collection::getSlice(int axis, int bin)
 		currentSlice_ = new Collection;
 		currentSlice_->parent_ = this;
 		currentSlice_->type_ = Collection::CurrentSliceCollection;
-		XXX Missing call to currentCollection_->displayPrimitives().setViewer(ui.MainView);
 	}
 
 	// Are supplied bin and axis valid?
@@ -546,6 +545,9 @@ void Collection::getSlice(int axis, int bin)
 		currentSlice_->addDataSet(dataSets_[bin]);
 		currentSlice_->setTitle("Z = " + QString::number(dataSets_[bin]->transformedData().z()));
 	}
+
+	currentSlice_->setDisplayDataInvalid();
+	currentSlice_->setDataChanged();
 }
 
 // Find collection with name specified
@@ -645,9 +647,6 @@ Collection* Collection::addFitData(QString title)
 	newFit->type_ = Collection::FitCollection;
 	newFit->setParent(this);
 
-	// Set link to MainView's primitive reflist (copy pointer set in parent collection)
-	newFit->displayPrimitives_.setViewer(displayPrimitives_.viewer());
-
 	return newFit;
 }
 
@@ -670,9 +669,6 @@ Collection* Collection::addExtractedData(QString title)
 	newExtract->setTitle(title);
 	newExtract->type_ = Collection::ExtractedCollection;
 	newExtract->setParent(this);
-
-	// Set link to MainView's primitive reflist (copy pointer set in parent collection)
-	newExtract->displayPrimitives_.setViewer(displayPrimitives_.viewer());
 
 	return newExtract;
 }

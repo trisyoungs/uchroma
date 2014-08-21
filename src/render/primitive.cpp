@@ -159,9 +159,13 @@ void Primitive::pushInstance(const QGLContext* context, GLExtensions* extensions
 	{
 		// Generate display list
 		int listId = glGenLists(1);
-		glNewList(listId, GL_COMPILE);
-		vertexChunk_.sendToGL();
-		glEndList();
+		if (listId == 0) msg.print("Primitive::pushInstance - glGenLists(1) returned 0!\n!");
+		else
+		{
+			glNewList(listId, GL_COMPILE);
+			vertexChunk_.sendToGL();
+			glEndList();
+		}
 
 		// Store data
 		pi->setDisplayList(context, listId);
@@ -233,7 +237,7 @@ void Primitive::sendToGL() const
 			glDisableClientState(GL_COLOR_ARRAY);
 			if (vertexChunk_.hasIndices()) glDisableClientState(GL_INDEX_ARRAY);
 		}
-		else glCallList(pi->listObject());
+		else if (pi->listObject() != 0) glCallList(pi->listObject());
 	}
 	else vertexChunk_.sendToGL();
 }

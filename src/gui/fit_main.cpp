@@ -266,12 +266,14 @@ bool FitWindow::minimise()
 	// Print results...
 	printMessage("Final, fitted parameters are:");
 	int n = 0;
-	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next, ++n)
+	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next)
 	{
 		// Grab variable pointer from FitVariable
 		EquationVariable* var = ri->item;
 
 		printMessage("\t%s\t=\t%e", qPrintable(var->name()), alpha[n]);
+
+		++n;
 	}
 	
 	return result;

@@ -41,6 +41,7 @@ plotwidget_data.cpp
 plotwidget_funcs.cpp
 plotwidget_paintevent.cpp
 style_funcs.cpp
+targetselect_funcs.cpp
 texponentialspin_funcs.cpp
 transform_funcs.cpp 
 view_funcs.cpp
@@ -61,6 +62,7 @@ SET(pro_MOC_HDRS
   layout.h
   saveimage.h
   style.h
+  targetselect.h
   transform.h
   view.h
   colourbutton.uih
@@ -81,6 +83,7 @@ SET(pro_UIS
   fit.ui
   saveimage.ui
   style.ui
+  targetselect.ui
   transform.ui
   view.ui
   uchroma.ui

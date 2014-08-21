@@ -79,7 +79,6 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	clipPlaneYMin_ = 0.0;
 	clipPlaneYMax_ = 0.0;
 	primitivesValid_ = false;
-	parent_.setAsModified();
 }
 
 // Destructor
@@ -668,7 +667,7 @@ void Axes::updateAxisPrimitives()
 		// Normalise tickDirection
 		tickDir = axisTickDirection_[axis];
 		tickDir.normalise();
-		tickDir *= parent_.labelScale();
+// 		tickDir *= parent_.labelScale();
 
 		// Create tick label transformation matrix
 		labelTransform.setIdentity();
@@ -678,7 +677,7 @@ void Axes::updateAxisPrimitives()
 		labelTransform.applyTranslation(tickDir * axisLabelOrientation_[axis].z);
 		// 3) Perform in-plane rotation
 		labelTransform.applyRotationZ(axisLabelOrientation_[axis].y);
-		labelTransform.applyScaling(parent_.labelScale(), parent_.labelScale(), parent_.labelScale());
+		labelTransform.applyScaling(parent_.labelPointSize(), parent_.labelPointSize(), parent_.labelPointSize());
 
 		// Create axis title transformation matrix
 		titleTransform.setIdentity();
@@ -688,7 +687,7 @@ void Axes::updateAxisPrimitives()
 		titleTransform.applyTranslation(tickDir * axisTitleOrientation_[axis].z);
 		// 3) Perform in-plane rotation
 		titleTransform.applyRotationZ(axisTitleOrientation_[axis].y);
-		titleTransform.applyScaling(parent_.titleScale(), parent_.titleScale(), parent_.titleScale());
+		titleTransform.applyScaling(parent_.titlePointSize(), parent_.titlePointSize(), parent_.titlePointSize());
 
 		if (axisLogarithmic_[axis])
 		{

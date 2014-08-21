@@ -605,7 +605,7 @@
      <x>0</x>
      <y>0</y>
      <width>1092</width>
-     <height>29</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -751,8 +751,10 @@
    </attribute>
    <addaction name="actionViewReset"/>
    <addaction name="actionViewPerspective"/>
+   <addaction name="actionViewShowAll"/>
+   <addaction name="actionView2D"/>
   </widget>
-  <widget class="QToolBar" name="AxesToolbar">
+  <widget class="QToolBar" name="InteractToolBar">
    <property name="windowTitle">
     <string>toolBar_3</string>
    </property>
@@ -762,12 +764,10 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionAxesShowAll"/>
-   <addaction name="separator"/>
-   <addaction name="actionAxesInteractNone"/>
-   <addaction name="actionAxesInteractX"/>
-   <addaction name="actionAxesInteractY"/>
-   <addaction name="actionAxesInteractZ"/>
+   <addaction name="actionInteractNone"/>
+   <addaction name="actionInteractX"/>
+   <addaction name="actionInteractY"/>
+   <addaction name="actionInteractZ"/>
   </widget>
   <widget class="QToolBar" name="CollectionToolBar">
    <property name="windowTitle">
@@ -779,7 +779,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionCollectionsCreate"/>
    <addaction name="actionCollectionsFocusNext"/>
    <addaction name="actionCollectionsFocusPrevious"/>
    <addaction name="separator"/>
@@ -916,21 +915,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
-   </property>
-  </action>
-  <action name="actionCollectionsCreate">
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>:/uchroma/icons/collections_create.svg</normaloff>:/uchroma/icons/collections_create.svg</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Create...</string>
-   </property>
-   <property name="toolTip">
-    <string>Create a collection from a specified equation</string>
    </property>
   </action>
   <action name="actionWindowsAxes">
@@ -1081,13 +1065,16 @@
     <string>&amp;Load XY Datasets</string>
    </property>
   </action>
-  <action name="actionAxesShowAll">
+  <action name="actionViewShowAll">
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/uchroma/icons/axes_showall.svg</normaloff>:/uchroma/icons/axes_showall.svg</iconset>
    </property>
    <property name="text">
-    <string>AxesShowAll</string>
+    <string>ViewShowAll</string>
+   </property>
+   <property name="iconText">
+    <string>ViewShowAll</string>
    </property>
    <property name="toolTip">
     <string>Expand limits of axes in order to include all data</string>
@@ -1101,16 +1088,16 @@
     <string>Reload datasets from their associated files</string>
    </property>
   </action>
-  <action name="actionAxesInteractX">
+  <action name="actionInteractX">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/uchroma/icons/axes_interactx.svg</normaloff>:/uchroma/icons/axes_interactx.svg</iconset>
+     <normaloff>:/uchroma/icons/interact_x.svg</normaloff>:/uchroma/icons/interact_x.svg</iconset>
    </property>
    <property name="text">
-    <string/>
+    <string>InteractX</string>
    </property>
    <property name="toolTip">
     <string>Select / monitor X axis</string>
@@ -1118,17 +1105,20 @@
    <property name="shortcut">
     <string>X</string>
    </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
   </action>
-  <action name="actionAxesInteractY">
+  <action name="actionInteractY">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/uchroma/icons/axes_interacty.svg</normaloff>:/uchroma/icons/axes_interacty.svg</iconset>
+     <normaloff>:/uchroma/icons/interact_y.svg</normaloff>:/uchroma/icons/interact_y.svg</iconset>
    </property>
    <property name="text">
-    <string/>
+    <string>InteractY</string>
    </property>
    <property name="toolTip">
     <string>Select / monitor Y axis</string>
@@ -1136,14 +1126,20 @@
    <property name="shortcut">
     <string>Y</string>
    </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
   </action>
-  <action name="actionAxesInteractZ">
+  <action name="actionInteractZ">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/uchroma/icons/axes_interactz.svg</normaloff>:/uchroma/icons/axes_interactz.svg</iconset>
+     <normaloff>:/uchroma/icons/interact_z.svg</normaloff>:/uchroma/icons/interact_z.svg</iconset>
+   </property>
+   <property name="text">
+    <string>InteractZ</string>
    </property>
    <property name="toolTip">
     <string>Select / monitor Z axis</string>
@@ -1151,10 +1147,17 @@
    <property name="shortcut">
     <string>Z</string>
    </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
   </action>
-  <action name="actionAxesInteractNone">
+  <action name="actionInteractNone">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/interact_none.svg</normaloff>:/uchroma/icons/interact_none.svg</iconset>
    </property>
    <property name="text">
     <string>No Interaction</string>
@@ -1162,8 +1165,11 @@
    <property name="shortcut">
     <string>Esc</string>
    </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionAxesQuickLog">
@@ -1202,6 +1208,14 @@
    </property>
    <property name="toolTip">
     <string>Adjust / modify pane number and layout</string>
+   </property>
+  </action>
+  <action name="actionView2D">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>2D</string>
    </property>
   </action>
  </widget>

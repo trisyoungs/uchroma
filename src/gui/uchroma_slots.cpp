@@ -183,6 +183,20 @@ void UChromaWindow::on_actionViewReset_triggered(bool checked)
 	ui.MainView->update();
 }
 
+void UChromaWindow::on_actionViewShowAll_triggered(bool checked)
+{
+	currentViewPane_->showAllData();
+
+	updateGUI();
+}
+
+void UChromaWindow::on_actionView2D_triggered(bool checked)
+{
+	currentViewPane_->setTwoDimensional(checked);
+
+	ui.MainView->update();
+}
+
 /*
  * Collections
  */
@@ -247,7 +261,7 @@ void UChromaWindow::interactionActionTriggered(int axis)
 	// Toggle interaction axis
 	if ((interactionAxis_ == axis) || (axis == -1))
 	{
-		ui.actionAxesInteractNone->setChecked(true);
+		ui.actionInteractNone->setChecked(true);
 		setInteractionMode(InteractionMode::ViewInteraction, -1);
 	}
 	else
@@ -261,39 +275,32 @@ void UChromaWindow::interactionActionTriggered(int axis)
 	updateCoordinateInfo();
 }
 
-void UChromaWindow::on_actionAxesShowAll_triggered(bool checked)
-{
-	currentViewPane_->showAllData();
-
-	updateGUI();
-}
-
-void UChromaWindow::on_actionAxesInteractX_triggered(bool checked)
+void UChromaWindow::on_actionInteractX_triggered(bool checked)
 {
 	if (refreshing_) return;
 
 	interactionActionTriggered(0);
 }
 
-void UChromaWindow::on_actionAxesInteractY_triggered(bool checked)
+void UChromaWindow::on_actionInteractY_triggered(bool checked)
 {
 	if (refreshing_) return;
 
 	interactionActionTriggered(1);
 }
 
-void UChromaWindow::on_actionAxesInteractZ_triggered(bool checked)
+void UChromaWindow::on_actionInteractZ_triggered(bool checked)
 {
 	if (refreshing_) return;
 
 	interactionActionTriggered(2);
 }
 
-void UChromaWindow::on_actionAxesInteractNone_triggered(bool checked)
+void UChromaWindow::on_actionInteractNone_triggered(bool checked)
 {
 	if (refreshing_) return;
 
-	interactionActionTriggered(2);
+	interactionActionTriggered(-1);
 }
 
 /*

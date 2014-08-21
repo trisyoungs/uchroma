@@ -37,19 +37,22 @@ ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), parent_(parent), 
 	// Projection / view	
 	hasPerspective_ = false;
 	perspectiveFieldOfView_ = 20.0;
+	viewportMatrix_[0] = 0;
+	viewportMatrix_[1] = 0;
+	viewportMatrix_[2] = 0;
+	viewportMatrix_[3] = 0;
 	viewMatrix_[14] = -5.0;
 
 	// Role
-	role_ = ViewPane::DisplayPane;
+	role_ = ViewPane::StandardRole;
 	twoDimensional_ = false;
-	roleAssociatedPane_ = NULL;
-	roleAssociatedCollection_ = NULL;
 
 	// Style
 	boundingBox_ = ViewPane::NoBox;
 	boundingBoxPlaneY_ = 0.0;
-	labelScale_ = 0.1;
-	titleScale_ = 0.12;
+	labelPointSize_ = 10.0;
+	titlePointSize_ = 12.0;
+	textZScale_ = -1.0;
 
 	// GL
 	interactionPrimitive_.setNoInstances();
@@ -82,6 +85,10 @@ void ViewPane::operator=(const ViewPane& source)
 	// Projection / view	
 	hasPerspective_ = source.hasPerspective_;
 	perspectiveFieldOfView_ = source.perspectiveFieldOfView_;
+	viewportMatrix_[0] = source.viewportMatrix_[0];
+	viewportMatrix_[1] = source.viewportMatrix_[1];
+	viewportMatrix_[2] = source.viewportMatrix_[2];
+	viewportMatrix_[3] = source.viewportMatrix_[3];
 	viewMatrix_ = source.viewMatrix_;
 
 	// Axes
@@ -90,8 +97,8 @@ void ViewPane::operator=(const ViewPane& source)
 	// Style
 	boundingBox_ = source.boundingBox_;
 	boundingBoxPlaneY_ = source.boundingBoxPlaneY_;
-	labelScale_ = source.labelScale_;
-	titleScale_ = source.titleScale_;
+	labelPointSize_ = source.labelPointSize_;
+	titlePointSize_ = source.titlePointSize_;
 }
 
 /*
@@ -182,7 +189,6 @@ Vec4<int> ViewPane::geometryAfterHandleMove(PaneHandle handle, int deltaX, int d
 {
 	// Result contains leftEdge_, bottomEdge_, width_, height_
 	Vec4<int> result(leftEdge_, bottomEdge_, width_, height_);
-	printf("Handle %i, dx=%i, dy=%i\n", handle, deltaX, deltaY);
 	switch (handle)
 	{
 		case (ViewPane::BottomLeftHandle):
@@ -225,15 +231,15 @@ void ViewPane::recalculateViewport(int gridPixelWidth, int gridPixelHeight, int 
 	viewportMatrix_[1] = gridPixelHeight * bottomEdge_;
 	viewportMatrix_[2] = gridPixelWidth * width_;
 	viewportMatrix_[3] = gridPixelHeight * height_;
-	aspectRatio_ = double(width_) / double(height_);
+	aspectRatio_ = double(viewportMatrix_[2]) / double(viewportMatrix_[3]);
 
 	// Add on the remainder if the top or right edges are extreme
 	if ((leftEdge_+width_) == nColumns) viewportMatrix_[2] += widthRemainder;
 	if ((bottomEdge_+height_) == nRows) viewportMatrix_[3] += heightRemainder;
 
 	// Recalculate projection matrix and view matrix (if 2D)
-	if (twoDimensional_) viewMatrix_ = calculateViewMatrix();
 	projectionMatrix_ = calculateProjectionMatrix(viewMatrix_[14]);
+	resetView();
 }
 
 // Return viewport matrix
@@ -267,7 +273,7 @@ bool ViewPane::containsGridReference(int gridX, int gridY)
  */
 
 // Role of pane
-const char* RoleKeywords[ViewPane::nPaneRoles] = { "Display", "FitResults", "Extraction", "SliceMonitor" };
+const char* RoleKeywords[ViewPane::nPaneRoles] = { "FitResults", "Extraction", "SliceMonitor", "Standard" };
 
 // Convert text string to PaneRole
 ViewPane::PaneRole ViewPane::paneRole(const char* s)
@@ -302,8 +308,7 @@ void ViewPane::setTwoDimensional(bool b)
 	twoDimensional_ = b;
 
 	// Recalculate viewmatrix
-	if (twoDimensional_) viewMatrix_ = calculateViewMatrix();
-	else resetView();
+	resetView();
 
 	setAsModified();
 }
@@ -314,99 +319,106 @@ bool ViewPane::twoDimensional()
 	return twoDimensional_;
 }
 
-// Set associated target pane for role, if relevant
-void ViewPane::setRoleAssociatedPane(ViewPane* pane)
+// Add target pane for role
+void ViewPane::addRoleTargetPane(ViewPane* pane)
 {
-	roleAssociatedPane_ = pane;
+	roleTargetPanes_.add(pane);
 
 	setAsModified();
 }
 
-// Return associated target pane for role, if relevant
-ViewPane* ViewPane::roleAssociatedPane()
+// Remove target pane for role
+void ViewPane::removeRoleTargetPane(ViewPane* pane)
 {
-	return roleAssociatedPane_;
+	roleTargetPanes_.remove(pane);
 
 	setAsModified();
 }
 
-// Set associated target collection for role, if relevant
-void ViewPane::setRoleAssociatedCollection(Collection* collection)
+// Return whether specified pane is a target
+bool ViewPane::roleIsTargetPane(ViewPane* pane)
 {
-	roleAssociatedCollection_ = collection;
+	return roleTargetPanes_.contains(pane);
+}
+
+// Return target panes for role
+RefListItem<ViewPane,bool>* ViewPane::roleTargetPanes()
+{
+	return roleTargetPanes_.first();
+}
+
+// Add target collection for role
+void ViewPane::addRoleTargetCollection(Collection* collection)
+{
+	roleTargetCollections_.add(collection);
 
 	setAsModified();
 }
 
-// Return associated target collection for role, if relevant
-Collection* ViewPane::roleAssociatedCollection()
+// Remove target collection for role
+void ViewPane::removeRoleTargetCollection(Collection* collection)
 {
-	return roleAssociatedCollection_;
+	roleTargetCollections_.remove(collection);
+
+	setAsModified();
 }
 
-// Return whether supplied Collection changed/update signal is relevant to this pane
+// Return whether specified collection is a target
+bool ViewPane::roleIsTargetCollection(Collection* collection)
+{
+	return roleTargetCollections_.contains(collection);
+}
+
+// Return target collections for role
+RefListItem<Collection,bool>* ViewPane::roleTargetCollections()
+{
+	return roleTargetCollections_.first();
+}
+
+// Process supplied Collection changed/update signal if it is relevant to this pane
 bool ViewPane::processUpdate(Collection* source, Collection::CollectionSignal signal)
 {
-	// Check signal type and act on it if relevant
-	
 	switch (signal)
 	{
-		// Signal: CurrentSliceChanged (current slice has changed in source collection)
-		// Relevance: Only if role_ == SliceMonitorRole
+		// Collection Created
+		// -- Role Relevance : ???
+		case (Collection::CollectionCreatedSignal):
+			return false;
+			break;
+		// Collection Deleted
+		// -- Role Relevance : All
+		case (Collection::CollectionDeletedSignal):
+			// If the emitting collection is a current target, remove it from our list
+			if (!roleIsTargetCollection(source)) return false;
+			removeRoleTargetCollection(source);
+			break;
+		// Current Slice Changed
+		// -- Role Relevance : SliceMonitorRole
 		case (Collection::CurrentSliceChangedSignal):
 			if (role_ != ViewPane::SliceMonitorRole) return false;
-			// Check to see if the collection is relevant to this pane
-			if ((roleAssociatedPane_ == source->displayPane()) || (roleAssociatedCollection_ == source))
-			{
-				// Check to see if the pane is already displaying this collection's monitoring Collection
-				if (collections_.contains(source->currentSlice())) return true;
-
-				// Must add the slice to this pane
-				addCollection(source->currentSlice());
-				return true;
-			}
+			// Update axes limits if autoscaling?????? XXX TODO
 			break;
+		// Data Changed
+		// -- Role Relevance : ???
+		case (Collection::DataChangedSignal):
+			return false;
+			break;
+		// Extracted Data Added
+		// -- Role Relevance : ???
+		case (Collection::ExtractedDataAddedSignal):
+			return false;
+			break;
+		default:
+			msg.print("ViewPane::processUpdate - Unrecognised signal %i sent from collection '%s'\n", signal, qPrintable(source->title()));
+			return false;
 	}
 
-	// Signal not relevant to this pane, so return false
-	return false;
+	return true;
 }
 
 /*
  * Projection / View
  */
-
-// Return calculate view matrix
-Matrix ViewPane::calculateViewMatrix()
-{
-	Matrix A;
-	A = viewMatrix_;
-
-	if (twoDimensional_)
-	{
-		// Reset the matrix
-		A.setIdentity();
-
-		// Setup some variables
-		// -- Margins (in pixels)
-		double marginLeft = 100.0, marginRight = 5.0;
-		double fractionalXLength = 1.0 - viewportMatrix_[2] / (marginLeft+marginRight);
-
-		// Construct a matrix to setup the 2D view properly
-		// Set scaling factors so that axes reach extreme coordinates
-		A[0] = ( 1.5 / (0.5*axes_.axisRange(0)) ) * aspectRatio_;
-		A[5] = ( 1.5 / (0.5*axes_.axisRange(1)) ) / aspectRatio_;
-		A[14] = -5.0;
-		A.print();
-		viewMatrix_ = A;
-		Vec4<double> v = modelToScreen(-axes_.axisRange(0)*0.5);
-		printf("XMin = %f", v.x / viewportMatrix_[2]); v.print();
-		v = modelToScreen(axes_.axisRange(0)*0.5);
-		printf("XMax = %f", v.x / viewportMatrix_[2]); v.print();
-	}
-
-	return A;
-}
 
 // Return calculated projection matrix
 Matrix ViewPane::calculateProjectionMatrix(double orthoZoom)
@@ -416,7 +428,7 @@ Matrix ViewPane::calculateProjectionMatrix(double orthoZoom)
 	GLdouble top, bottom, right, left;
 	GLdouble nearClip = 0.5, farClip = 2000.0;
 
-	if (hasPerspective_)
+	if (hasPerspective_ && (!twoDimensional_))
 	{
 		// Use reversed top and bottom values so we get y-axis (0,1,0) pointing up
 		top = tan(perspectiveFieldOfView_ / DEGRAD) * 0.5;
@@ -696,14 +708,54 @@ Vec3<double> ViewPane::screenToModel(int x, int y, double z)
 // Reset view
 void ViewPane::resetView()
 {
-	Matrix A;
-	A.setIdentity();
+	Vec4<double> unit;
 
-	A[14] = calculateRequiredZoom((axes_.axisMax(0) - axes_.axisMin(0))*0.5, (axes_.axisMax(1) - axes_.axisMin(1))*0.5, 0.9);
+	// Reset the current view matrix
+	viewMatrix_.setIdentity();
 
-	setViewMatrix(A);
+	// Calculate text scaling factor
+	viewMatrix_[14] = -10.0;
+	projectionMatrix_ = calculateProjectionMatrix(viewMatrix_[14]);
+	unit = modelToScreen(Vec3<double>(0.0, 1.0+axes_.axesCoordCentre().y, 0.0));
+	unit.y -= viewportMatrix_[1] + viewportMatrix_[3]*0.5;
+	textZScale_ = unit.y*viewMatrix_[14];
+	
+	if (twoDimensional_)
+	{
+		// Set a 'default' zoom for the 2D view
+		viewMatrix_[14] = -10.0;
+
+		// Project a point one unit each along X and Y, accounting for the axes global centre
+		unit = modelToScreen(Vec3<double>(1.0+axes_.axesCoordCentre().x, 1.0+axes_.axesCoordCentre().y,0.0));
+
+		// Subtract off the viewpoint centre coordinate in order to get literal 'pixels per unit' for X and Y axes range
+		unit.x -= viewportMatrix_[0] + viewportMatrix_[2]/2.0;
+		unit.y -= viewportMatrix_[1] + viewportMatrix_[3]/2.0;
+
+		// Setup some variables
+		// -- Margins (in pixels)
+		int marginLeft = 50, marginRight = 10;
+		int marginTop = 10, marginBottom = (labelPointSize_ + titlePointSize_) * 1.5;
+		// -- Available width for axes, accounting for margins
+		int availableWidth = viewportMatrix_[2] - (marginLeft+marginRight);
+		int availableHeight = viewportMatrix_[3] - (marginTop+marginBottom);
+
+		// Set scaling factors so that axes reach extreme coordinates
+		viewMatrix_[0] = availableWidth / (unit.x * axes_.axisRange(0));
+		viewMatrix_[5] = availableHeight / (unit.y * axes_.axisRange(1));
+
+		// Set a translation in order to set the margins as requested
+		viewMatrix_[12] = 0.5 * (marginLeft - marginRight) / unit.x;
+		viewMatrix_[13] = 0.5 * (marginBottom - marginTop) / unit.y;
+	}
+	else
+	{
+		viewMatrix_[14] = calculateRequiredZoom((axes_.axisMax(0) - axes_.axisMin(0))*0.5, (axes_.axisMax(1) - axes_.axisMin(1))*0.5, 0.9);
+	}
+
+	// Recalculate projection matrix
+	projectionMatrix_ = calculateProjectionMatrix(viewMatrix_[14]);
 }
-
 
 // Set display limits to show all available data
 void ViewPane::showAllData()
@@ -896,32 +948,38 @@ double ViewPane::boundingBoxPlaneY()
 	return boundingBoxPlaneY_;
 }
 
-// Set font scaling for axis value labels
-void ViewPane::setLabelScale(double value)
+// Set font point size for axis value labels
+void ViewPane::setLabelPointSize(double value)
 {
-	labelScale_ = value;
+	labelPointSize_ = value;
 
 	axes_.setPrimitivesInvalid();
 }
 
-// Return font scaling for axis value labels
-double ViewPane::labelScale()
+// Return font point size for axis value labels
+double ViewPane::labelPointSize()
 {
-	return labelScale_;
+	return labelPointSize_;
 }
 
-// Return font scaling for titles
-void ViewPane::setTitleScale(double value)
+// Return font point size for titles
+void ViewPane::setTitlePointSize(double value)
 {
-	titleScale_ = value;
+	titlePointSize_ = value;
 
 	axes_.setPrimitivesInvalid();
 }
 
-// Return font scaling for titles
-double ViewPane::titleScale()
+// Return font point size for titles
+double ViewPane::titlePointSize()
 {
-	return titleScale_;
+	return titlePointSize_;
+}
+
+// Return text z scaling factor
+double ViewPane::textZScale()
+{
+	return textZScale_;
 }
 
 /*

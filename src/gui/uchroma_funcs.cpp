@@ -77,6 +77,9 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	connect(ui.MainView, SIGNAL(renderComplete(QString)), this, SLOT(updateRenderTimeLabel(QString)));
 	connect(ui.MainView, SIGNAL(surfacePrimitivesUpdated()), this, SLOT(updateCollectionInfo()));
 
+	// Set a static pointer to the main viewer in PrimitiveList
+	PrimitiveList::setViewer(ui.MainView);
+
 	// Connect CollectionTree context menu signal
 	connect(ui.CollectionTree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(collectionTreeContextMenuRequested(QPoint)));
 
@@ -96,10 +99,10 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 
 	// Create an action group for the axis interact buttons
 	QActionGroup* actionGroup = new QActionGroup(this);
-	actionGroup->addAction(ui.actionAxesInteractNone);
-	actionGroup->addAction(ui.actionAxesInteractX);
-	actionGroup->addAction(ui.actionAxesInteractY);
-	actionGroup->addAction(ui.actionAxesInteractZ);
+	actionGroup->addAction(ui.actionInteractNone);
+	actionGroup->addAction(ui.actionInteractX);
+	actionGroup->addAction(ui.actionInteractY);
+	actionGroup->addAction(ui.actionInteractZ);
 
 	// Add QLabel as a normal widget to the status bar
 	statusBarInfoLabel_ = new QLabel(this);
@@ -143,6 +146,7 @@ void UChromaWindow::updateGUI()
 
 	refreshCollections();
 	
+	updateToolBars();
 	updateSubWindows();
 	updateTitleBar();
 	updateDisplay();
@@ -180,6 +184,16 @@ void UChromaWindow::updateTitleBar()
 	else setWindowTitle("uChroma v" + QString(UCHROMAREVISION) + " - " + inputFile_);
 }
 
+// Update tool bars
+void UChromaWindow::updateToolBars()
+{
+	// Toggle perspective and 2D based on current pane
+	if (! currentViewPane_) return;
+
+	ui.actionViewPerspective->setChecked(currentViewPane_->hasPerspective());
+	ui.actionView2D->setChecked(currentViewPane_->twoDimensional());
+}
+
 // Update display data
 void UChromaWindow::updateDisplayData()
 {
@@ -190,11 +204,17 @@ void UChromaWindow::updateDisplayData()
 void UChromaWindow::updateDisplay()
 {
 	// Satisfy all registered collection changes first
-	ViewPane* targetPane;
 	RefListItem<Collection,Collection::CollectionSignal>* ri = Collection::collectionSignals();
 	while (ri)
 	{
 		printf("UChromaWindow::updateDisplay() : Collection %p (%s), signal = %i\n", ri->item, qPrintable(ri->item->title()), ri->data);
+		switch (ri->data)
+		{
+			// Current slice has changed
+			case (Collection::CurrentSliceChangedSignal):
+				printf("Slice changed...\n");
+				break;
+		}
 
 		// Pass this change to the viewLayout_...
 		viewLayout_.processUpdate(ri->item, ri->data);

@@ -132,22 +132,22 @@ void ViewWindow::on_ViewLabelsFaceViewerCheck_clicked(bool checked)
 	uChroma_.updateDisplay();
 }
 
-void ViewWindow::on_ViewLabelScaleSpin_valueChanged(double value)
+void ViewWindow::on_ViewLabelPointSizeSpin_valueChanged(double value)
 {
 	if (refreshing_ || (!uChroma_.currentViewPane())) return;
 	
-	uChroma_.currentViewPane()->setLabelScale(value);
+	uChroma_.currentViewPane()->setLabelPointSize(value);
 
 	// Update display
 	uChroma_.setAsModified();
 	uChroma_.updateDisplay();
 }
 
-void ViewWindow::on_ViewTitleScaleSpin_valueChanged(double value)
+void ViewWindow::on_ViewTitlePointSizeSpin_valueChanged(double value)
 {
 	if (refreshing_ || (!uChroma_.currentViewPane())) return;
 	
-	uChroma_.currentViewPane()->setTitleScale(value);
+	uChroma_.currentViewPane()->setTitlePointSize(value);
 
 	// Update display
 	uChroma_.setAsModified();
@@ -183,8 +183,8 @@ void ViewWindow::updateControls(bool force)
 	ui.ViewBoundingBoxPlaneYSpin->setValue(uChroma_.currentViewPane()->boundingBoxPlaneY());
 
 	// Label Options
-	ui.ViewLabelScaleSpin->setValue(uChroma_.currentViewPane()->labelScale());
-	ui.ViewTitleScaleSpin->setValue(uChroma_.currentViewPane()->titleScale());
+	ui.ViewLabelPointSizeSpin->setValue(uChroma_.currentViewPane()->labelPointSize());
+	ui.ViewTitlePointSizeSpin->setValue(uChroma_.currentViewPane()->titlePointSize());
 	ui.ViewLabelsFaceViewerCheck->setChecked(uChroma_.labelFaceViewer());
 
 	refreshing_ = false;

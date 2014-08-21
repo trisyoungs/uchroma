@@ -82,7 +82,7 @@ class TextPrimitiveChunk
 	// Add primitive to list
 	void add(QString text, Vec3<double> origin, Vec3<double> centre, Matrix& transform);
 	// Render all primitives in chunk
-	void renderAll(Matrix viewMatrix, bool correctView, Vec3<double> globalCenter, FTFont* font);
+	void renderAll(Matrix viewMatrix, Vec3<double> globalCenter, FTFont* font, bool correctOrientation, double scaling);
 };
 
 // Text Primitive List
@@ -104,7 +104,7 @@ class TextPrimitiveList
 	// Add primitive to list
 	void add(QString text, Vec3<double> origin, Vec3<double> centre, Matrix& transform);
 	// Render all primitives in list
-	void renderAll(Matrix viewMatrix, bool correctView, Vec3<double> globalCenter, FTFont* font);
+	void renderAll(Matrix viewMatrix, Vec3<double> globalCenter, FTFont* font, bool correctOrientation, double scaling);
 };
 
 #endif

@@ -89,8 +89,8 @@ void ViewLayout::recalculatePixels()
 void ViewLayout::clear()
 {
 	name_ = "<New Layout>";
-	nColumns_ = 1;
-	nRows_ = 1;
+	nColumns_ = 4;
+	nRows_ = 4;
 	panes_.clear();
 }
 
@@ -100,8 +100,8 @@ ViewPane* ViewLayout::setDefault()
 	clear();
 
 	setName("Default");
-	setGrid(1, 1);
-	ViewPane* pane = addPane("Main view", 0, 0, 1, 1);
+	setGrid(4, 4);
+	ViewPane* pane = addPane("Main view", 0, 0, 4, 4);
 	return pane;
 }
 
@@ -193,20 +193,25 @@ void ViewLayout::resize(int contextWidth, int contextHeight)
 // Return pane under specified coordinate
 ViewPane* ViewLayout::paneAt(int layoutX, int layoutY)
 {
-	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next) if (pane->containsCoordinate(layoutX, layoutY)) return pane;
+	// Search in reverse order, since this reflects the 'stack' when drawn
+	for (ViewPane* pane = panes_.last(); pane != NULL; pane = pane->prev) if (pane->containsCoordinate(layoutX, layoutY)) return pane;
 	return NULL;
 }
 
 // Return pane containing specified grid reference
 ViewPane* ViewLayout::paneAtGrid(int gridX, int gridY)
 {
-	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next) if (pane->containsGridReference(gridX, gridY)) return pane;
+	// Search in reverse order, since this reflects the 'stack' when drawn
+	for (ViewPane* pane = panes_.last(); pane != NULL; pane = pane->prev) if (pane->containsGridReference(gridX, gridY)) return pane;
 	return NULL;
 }
 
 // Translate pane by the amount specified
 void ViewLayout::translatePane(ViewPane* pane, int deltaX, int deltaY)
 {
+	// Check that a meaningful delta was supplied
+	if ((deltaX == 0) && (deltaY == 0)) return;
+
 	pane->setBottomLeft(pane->bottomEdge()+deltaY, pane->leftEdge()+deltaX);
 	pane->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
 }

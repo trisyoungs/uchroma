@@ -78,8 +78,8 @@ class ViewWindow : public QWidget
 	void on_ViewBoundingBoxPlaneYSetMaximumButton_clicked(bool checked);
 	// -- Label Facing
 	void on_ViewLabelsFaceViewerCheck_clicked(bool checked);
-	void on_ViewLabelScaleSpin_valueChanged(double value);
-	void on_ViewTitleScaleSpin_valueChanged(double value);
+	void on_ViewLabelPointSizeSpin_valueChanged(double value);
+	void on_ViewTitlePointSizeSpin_valueChanged(double value);
 
 
 	/*

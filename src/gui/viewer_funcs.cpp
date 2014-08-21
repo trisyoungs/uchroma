@@ -186,7 +186,7 @@ void Viewer::paintGL()
 		glLoadIdentity();
 		glDisable(GL_LIGHTING);
 		GLfloat colourGray[4] = { 0.8, 0.8, 0.8, 1.0 };
-		GLfloat colourBlue[4] = { 0.64, 0.8, 1.0, 1.0 };
+		GLfloat colourBlue[4] = { 0.88, 0.95, 1.0, 1.0 };
 		GLfloat colourWhite[4] = { 1.0, 1.0, 1.0, 1.0 };
 
 		// Draw graduated background for current pane
@@ -232,12 +232,13 @@ void Viewer::paintGL()
 		glEnable(GL_BLEND);
 		GLfloat colourBlack[4] = { 0.0, 0.0, 0.0, 1.0 };
 		glColor4fv(colourBlack);
+		int maxAxis = (pane->twoDimensional() ? 2 : 3);
 
 		// -- Render axis text
 		if (FontInstance::fontOK())
 		{
 			FontInstance::font()->FaceSize(1);
-			for (int n=0; n<3; ++n) if (pane->axes().axisVisible(n)) pane->axes().axisTextPrimitive(n).renderAll(viewMatrix, uChroma_->labelCorrectOrientation(), centreTranslation, FontInstance::font());
+			for (int n=0; n<maxAxis; ++n) if (pane->axes().axisVisible(n)) pane->axes().axisTextPrimitive(n).renderAll(viewMatrix, centreTranslation, FontInstance::font(), uChroma_->labelCorrectOrientation(), pane->textZScale());
 		}
 
 		// -- Render axis lines
@@ -245,7 +246,7 @@ void Viewer::paintGL()
 		glLoadMatrixd(A.matrix());
 		glLineWidth(lineWidth_);
 		glDisable(GL_LIGHTING);
-		for (int axis=0; axis<3; ++axis) if (pane->axes().axisVisible(axis)) pane->axes().axisPrimitive(axis).sendToGL();
+		for (int axis=0; axis<maxAxis; ++axis) if (pane->axes().axisVisible(axis)) pane->axes().axisPrimitive(axis).sendToGL();
 		glEnable(GL_LIGHTING);
 		glDisable(GL_LINE_SMOOTH);
 
@@ -278,32 +279,49 @@ void Viewer::paintGL()
 			pane->interactionBoxPrimitive().sendToGL();
 		}
 
-		// Render collections in this pane
-		for (RefListItem<Collection,bool>* ri = pane->collections(); ri != NULL; ri = ri->next)
+		// Setup clip planes to enforce Y-axis limits
+		glLoadMatrixd(A.matrix());
+		glPushMatrix();
+		glTranslated(0.0, pane->axes().clipPlaneYMin(), 0.0);
+		glClipPlane(GL_CLIP_PLANE0, clipPlaneBottom);
+		glEnable(GL_CLIP_PLANE0);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslated(0.0, pane->axes().clipPlaneYMax(), 0.0);
+		glClipPlane (GL_CLIP_PLANE1, clipPlaneTop);
+		glEnable(GL_CLIP_PLANE1);
+		glPopMatrix();
+
+		// Render relevant data to this pane
+		switch (pane->role())
 		{
-			Collection* collection = ri->item;
-
-			// Setup clip planes to enforce Y-axis limits
-			glLoadMatrixd(A.matrix());
-			glPushMatrix();
-			glTranslated(0.0, pane->axes().clipPlaneYMin(), 0.0);
-			glClipPlane(GL_CLIP_PLANE0, clipPlaneBottom);
-			glEnable(GL_CLIP_PLANE0);
-			glPopMatrix();
-			glPushMatrix();
-			glTranslated(0.0, pane->axes().clipPlaneYMax(), 0.0);
-			glClipPlane (GL_CLIP_PLANE1, clipPlaneTop);
-			glEnable(GL_CLIP_PLANE1);
-			glPopMatrix();
-
-			// Draw it
-			collection->sendToGL();
-
-			// Disable current clip planes
-			glDisable(GL_MULTISAMPLE);
-			glDisable(GL_CLIP_PLANE0);
-			glDisable(GL_CLIP_PLANE1);
+			// Slice Monitor Pane - Render monitor slices for all target collections
+			case (ViewPane::SliceMonitorRole):
+				for (RefListItem<Collection,bool>* ri = pane->roleTargetCollections(); ri != NULL; ri = ri->next)
+				{
+					Collection* collection = ri->item;
+					if (collection->currentSlice())
+					{
+						collection->currentSlice()->sendToGL();
+						printf("XXXX : %i  %i\n", collection->currentSlice()->displayPrimitivesValid(), collection->currentSlice()->displayPrimitives().nDefinedVertices());
+						printf("Sent current slice for collecion '%s' to the display...\n", qPrintable(collection->title()));
+					}
+				}
+				break;
+			// Standard Pane - Render all associated collections
+			case (ViewPane::StandardRole):
+				for (RefListItem<Collection,bool>* ri = pane->collections(); ri != NULL; ri = ri->next) ri->item->sendToGL();
+// 					glDisable(GL_MULTISAMPLE);
+				break;
+			default:
+				msg.print("No data to be rendered for target pane?\n");
+				break;
 		}
+
+		// Disable current clip planes
+		glDisable(GL_CLIP_PLANE0);
+		glDisable(GL_CLIP_PLANE1);
+
 	}
 
 	// End timer query
