@@ -28,7 +28,6 @@ Viewer* PrimitiveList::viewer_ = NULL;
 // Constructor
 PrimitiveList::PrimitiveList()
 {
-	viewer_ = NULL;
 }
 
 // Destructor

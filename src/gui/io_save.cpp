@@ -196,7 +196,7 @@ bool UChromaWindow::writeViewPaneBlock(LineParser& parser, ViewPane* pane)
 	parser.writeLineF("    %s %f %f %f %f\n", Keywords::viewPaneKeyword(Keywords::MatrixWKeyword), mat[12], mat[13], mat[14], mat[15]);
 	if (pane->hasPerspective()) parser.writeLineF("  %s\n", Keywords::viewPaneKeyword(Keywords::PerspectiveKeyword));
 	parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::RoleKeyword), ViewPane::paneRole(pane->role()));
-	for (RefListItem<Collection,bool>* ri = pane->roleTargetCollections(); ri != NULL; ri = ri->next) parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::RoleTargetCollectionKeyword), qPrintable(ri->item->title()));
+	for (RefListItem<Collection,TargetData>* ri = pane->roleTargetCollections(); ri != NULL; ri = ri->next) parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::RoleTargetCollectionKeyword), qPrintable(ri->item->title()));
 	for (RefListItem<ViewPane,bool>* ri = pane->roleTargetPanes(); ri != NULL; ri = ri->next) parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::RoleTargetPaneKeyword), qPrintable(ri->item->name()));
 	parser.writeLineF("  %s\n", Keywords::viewPaneKeyword(Keywords::EndViewPaneKeyword));
 

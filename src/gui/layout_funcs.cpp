@@ -242,7 +242,7 @@ void LayoutWindow::updateControls(bool force)
 			item->setText("(P) " + ri->item->name());
 			item->setData(Qt::UserRole, VariantPointer<ViewPane>(ri->item));
 		}
-		for (RefListItem<Collection,bool>* ri = currentPane_->roleTargetCollections(); ri != NULL; ri = ri->next)
+		for (RefListItem<Collection,TargetData>* ri = currentPane_->roleTargetCollections(); ri != NULL; ri = ri->next)
 		{
 			QListWidgetItem* item;
 			item = new QListWidgetItem(ui.PaneTargetsList);

@@ -11,6 +11,7 @@ add_library(base
   messenger.cpp
   nxs.cpp
   sysfunc.cpp
+  targetdata.cpp
   transformer.cpp
   viewlayout.cpp
   viewpane.cpp
@@ -26,6 +27,7 @@ add_library(base
   messenger.h
   nxs.h
   sysfunc.h
+  targetdata.h
   transformer.h
   viewlayout.h
   viewpane.h

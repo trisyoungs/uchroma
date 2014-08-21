@@ -194,12 +194,6 @@ void UChromaWindow::updateToolBars()
 	ui.actionView2D->setChecked(currentViewPane_->twoDimensional());
 }
 
-// Update display data
-void UChromaWindow::updateDisplayData()
-{
-	for (Collection* c = collections_.first(); c != NULL; c = c->next) c->updateDisplayData();
-}
-
 // Update display
 void UChromaWindow::updateDisplay()
 {
@@ -207,14 +201,7 @@ void UChromaWindow::updateDisplay()
 	RefListItem<Collection,Collection::CollectionSignal>* ri = Collection::collectionSignals();
 	while (ri)
 	{
-		printf("UChromaWindow::updateDisplay() : Collection %p (%s), signal = %i\n", ri->item, qPrintable(ri->item->title()), ri->data);
-		switch (ri->data)
-		{
-			// Current slice has changed
-			case (Collection::CurrentSliceChangedSignal):
-				printf("Slice changed...\n");
-				break;
-		}
+// 		printf("UChromaWindow::updateDisplay() : Collection %p (%s), signal = %i\n", ri->item, qPrintable(ri->item->title()), ri->data);
 
 		// Pass this change to the viewLayout_...
 		viewLayout_.processUpdate(ri->item, ri->data);

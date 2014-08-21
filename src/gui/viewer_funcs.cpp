@@ -142,13 +142,6 @@ void Viewer::paintGL()
 	// Grab topmost GLExtensions pointer
 	GLExtensions* extensions = extensionsStack_.last();
 
-	// Update / recreate axes, display data and surface primitives if necessary
-	//uChroma_->updateAxesPrimitives();
-	uChroma_->updateDisplayData();
-	int nUpdated = 0;
-	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) if (updateSurfacePrimitive(collection)) ++nUpdated;
-	if (nUpdated > 0) emit(surfacePrimitivesUpdated());
-
 	// Setup basic GL stuff
 	setupGL();
 
@@ -170,6 +163,9 @@ void Viewer::paintGL()
 		extensions->glBeginQuery(GL_TIME_ELAPSED, timeQuery);
 	}
 	
+	// Update / recreate axes, display data and surface primitives if necessary
+	int nSurfacesUpdated = 0;
+
 	// Loop over defined viewpanes
 	GLdouble clipPlaneBottom[4] = { 0.0, 1.0, 0.0, 0.0 }, clipPlaneTop[4] = { 0.0, -1.0, 0.0, 0.0 };
 	for (ViewPane* pane = uChroma_->viewLayout()->panes(); pane != NULL; pane = pane->next)
@@ -293,36 +289,22 @@ void Viewer::paintGL()
 		glPopMatrix();
 
 		// Render relevant data to this pane
-		switch (pane->role())
+		Collection* collection;
+		for (RefListItem<Collection,bool>* ri = pane->collections(); ri != NULL; ri = ri->next)
 		{
-			// Slice Monitor Pane - Render monitor slices for all target collections
-			case (ViewPane::SliceMonitorRole):
-				for (RefListItem<Collection,bool>* ri = pane->roleTargetCollections(); ri != NULL; ri = ri->next)
-				{
-					Collection* collection = ri->item;
-					if (collection->currentSlice())
-					{
-						collection->currentSlice()->sendToGL();
-						printf("XXXX : %i  %i\n", collection->currentSlice()->displayPrimitivesValid(), collection->currentSlice()->displayPrimitives().nDefinedVertices());
-						printf("Sent current slice for collecion '%s' to the display...\n", qPrintable(collection->title()));
-					}
-				}
-				break;
-			// Standard Pane - Render all associated collections
-			case (ViewPane::StandardRole):
-				for (RefListItem<Collection,bool>* ri = pane->collections(); ri != NULL; ri = ri->next) ri->item->sendToGL();
-// 					glDisable(GL_MULTISAMPLE);
-				break;
-			default:
-				msg.print("No data to be rendered for target pane?\n");
-				break;
+			collection = ri->item;
+// 			printf("PANE '%s' : Update and render collection %p ('%s')\n", qPrintable(pane->name()), collection, qPrintable(collection->title()));
+			collection->updateDisplayData();
+			if (updateSurfacePrimitive(collection)) ++nSurfacesUpdated;
+
+			collection->sendToGL();
 		}
 
 		// Disable current clip planes
 		glDisable(GL_CLIP_PLANE0);
 		glDisable(GL_CLIP_PLANE1);
-
 	}
+	if (nSurfacesUpdated > 0) emit(surfacePrimitivesUpdated());
 
 	// End timer query
 	if (extensions->hasQueries())

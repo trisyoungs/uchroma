@@ -24,6 +24,7 @@
 
 #include "base/axes.h"
 #include "base/collection.h"
+#include "base/targetdata.h"
 #include "math/matrix.h"
 #include "templates/list.h"
 #include "templates/reflist.h"
@@ -129,7 +130,7 @@ class ViewPane : public ListItem<ViewPane>
 	// Target target pane for role, if relevant
 	RefList<ViewPane,bool> roleTargetPanes_;
 	// Target target collection for role, if relevant
-	RefList<Collection,bool> roleTargetCollections_;
+	RefList<Collection,TargetData> roleTargetCollections_;
 
 	public:
 	// Set role of this pane
@@ -146,16 +147,16 @@ class ViewPane : public ListItem<ViewPane>
 	void removeRoleTargetPane(ViewPane* pane);
 	// Return whether specified pane is a target
 	bool roleIsTargetPane(ViewPane* pane);
-	// Return first target target pane for role
+	// Return first target pane for role
 	RefListItem<ViewPane,bool>* roleTargetPanes();
 	// Add target collection for role
 	void addRoleTargetCollection(Collection* collection);
 	// Remove target collection for role
 	void removeRoleTargetCollection(Collection* collection);
 	// Return whether specified collection is a target
-	bool roleIsTargetCollection(Collection* collection);
-	// Return target target collection for role
-	RefListItem<Collection,bool>* roleTargetCollections();
+	RefListItem<Collection,TargetData>* roleIsTargetCollection(Collection* collection);
+	// Return first target collection for role
+	RefListItem<Collection,TargetData>* roleTargetCollections();
 	// Process supplied Collection changed/update signal if it is relevant to this pane
 	bool processUpdate(Collection* source, Collection::CollectionSignal signal);
 

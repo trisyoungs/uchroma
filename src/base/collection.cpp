@@ -176,6 +176,12 @@ void Collection::addDataSet(DataSet* source)
 	displayPrimitivesValid_ = false;
 }
 
+// Copy datasets from specified source collection
+void Collection::copyDataSets(Collection* source)
+{
+	for (DataSet* dataSet = source->dataSets(); dataSet != NULL; dataSet = dataSet->next) addDataSet(dataSet);
+}
+
 // Return number of datasets
 int Collection::nDataSets()
 {
@@ -524,9 +530,10 @@ void Collection::getSlice(int axis, int bin)
 		currentSlice_->parent_ = this;
 		currentSlice_->type_ = Collection::CurrentSliceCollection;
 	}
+	currentSlice_->clearDataSets();
 
 	// Are supplied bin and axis valid?
-	if ((bin == -1) || (axis == -1)) currentSlice_->clearDataSets();
+	if ((bin == -1) || (axis == -1)) return;
 	else if (axis == 0)
 	{
 		DataSet* newDataSet = currentSlice_->addDataSet();
@@ -545,9 +552,6 @@ void Collection::getSlice(int axis, int bin)
 		currentSlice_->addDataSet(dataSets_[bin]);
 		currentSlice_->setTitle("Z = " + QString::number(dataSets_[bin]->transformedData().z()));
 	}
-
-	currentSlice_->setDisplayDataInvalid();
-	currentSlice_->setDataChanged();
 }
 
 // Find collection with name specified
@@ -1136,14 +1140,6 @@ PrimitiveList& Collection::displayPrimitives()
 // Update surface data if necessary
 void Collection::updateDisplayData()
 {
-	// Update subcollections first
-	// -- Fit data
-	for (Collection* fit = fitData_.first(); fit != NULL; fit = fit->next) fit->updateDisplayData();
-	// -- Extracted data
-	for (Collection* extract = extractedData_.first(); extract != NULL; extract = extract->next) extract->updateDisplayData();
-	// -- Current slice
-	if (currentSlice_) currentSlice_->updateDisplayData();
-
 	// Is surface reconstruction necessary?
 	if (displayDataValid_) return;
 

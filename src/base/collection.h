@@ -68,6 +68,8 @@ class Collection : public ListItem<Collection>
 	DataSet* addDataSet(double z);
 	// Add slice, copying from supplied data
 	void addDataSet(DataSet* source);
+	// Copy datasets from specified source collection
+	void copyDataSets(Collection* source);
 	// Return number of datasets
 	int nDataSets();
 	// Remove dataset
@@ -173,7 +175,7 @@ class Collection : public ListItem<Collection>
 	// List of slices extracted from parent
 	List<Collection> extractedData_;
 	// Current slice data
-	Collection* currentSlice_;	
+	Collection* currentSlice_;
 
 	private:
 	// Return axis bin value of closest point to supplied value

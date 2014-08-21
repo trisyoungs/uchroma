@@ -254,8 +254,6 @@ class UChromaWindow : public QMainWindow
 	void updateToolBars();
 	// Update title bar
 	void updateTitleBar();
-	// Update display data (used for surfaces) in all collections
-	void updateDisplayData();
 	// Update main display
 	void updateDisplay();
 

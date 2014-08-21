@@ -350,7 +350,8 @@ RefListItem<ViewPane,bool>* ViewPane::roleTargetPanes()
 // Add target collection for role
 void ViewPane::addRoleTargetCollection(Collection* collection)
 {
-	roleTargetCollections_.add(collection);
+	RefListItem<Collection,TargetData>* ri = roleTargetCollections_.add(collection);
+	ri->data.setParent(this);
 
 	setAsModified();
 }
@@ -364,13 +365,13 @@ void ViewPane::removeRoleTargetCollection(Collection* collection)
 }
 
 // Return whether specified collection is a target
-bool ViewPane::roleIsTargetCollection(Collection* collection)
+RefListItem<Collection,TargetData>* ViewPane::roleIsTargetCollection(Collection* collection)
 {
 	return roleTargetCollections_.contains(collection);
 }
 
 // Return target collections for role
-RefListItem<Collection,bool>* ViewPane::roleTargetCollections()
+RefListItem<Collection,TargetData>* ViewPane::roleTargetCollections()
 {
 	return roleTargetCollections_.first();
 }
@@ -378,6 +379,8 @@ RefListItem<Collection,bool>* ViewPane::roleTargetCollections()
 // Process supplied Collection changed/update signal if it is relevant to this pane
 bool ViewPane::processUpdate(Collection* source, Collection::CollectionSignal signal)
 {
+	RefListItem<Collection,TargetData>* ri;
+	Collection* collection;
 	switch (signal)
 	{
 		// Collection Created
@@ -396,6 +399,12 @@ bool ViewPane::processUpdate(Collection* source, Collection::CollectionSignal si
 		// -- Role Relevance : SliceMonitorRole
 		case (Collection::CurrentSliceChangedSignal):
 			if (role_ != ViewPane::SliceMonitorRole) return false;
+			ri = roleIsTargetCollection(source);
+			if (!ri) return false;
+			// Grab slice storage and copy over data 
+			collection = ri->data.addCollectionData(TargetData::SliceData);
+			collection->clearDataSets();
+			collection->copyDataSets(source->currentSlice());
 			// Update axes limits if autoscaling?????? XXX TODO
 			break;
 		// Data Changed
