@@ -26,7 +26,7 @@
 #include "base/dataset.h"
 
 // Forward Declarations
-/* None */
+class UChromaWindow;
 
 class DataImportDialog : public QDialog
 {
@@ -43,12 +43,12 @@ class DataImportDialog : public QDialog
 
 	public:
 	// Constructor / Destructor
-	DataImportDialog(QWidget* parent = 0);
+	DataImportDialog(UChromaWindow& parent);
 	~DataImportDialog();
 	// Main form declaration
 	Ui::DataImportDialog ui;
-	// Finalise widgets (things that we couldn't do in Qt Designer)
-	void finaliseUi();
+	// UChromaWindow reference
+	UChromaWindow& uChroma_;
 
 	protected:
 	// Window close event

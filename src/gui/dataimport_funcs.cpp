@@ -20,10 +20,11 @@
 */
 
 #include "gui/dataimport.h"
+#include "gui/uchroma.h"
 #include <QtGui/QFileDialog>
 
 // Constructor
-DataImportDialog::DataImportDialog(QWidget *parent) : QDialog(parent)
+DataImportDialog::DataImportDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(parent)
 {
 	// Call the main creation function
 	ui.setupUi(this);

@@ -20,10 +20,11 @@
 */
 
 #include "gui/saveimage.h"
+#include "gui/uchroma.h"
 #include <QtGui/QFileDialog>
 
 // Constructor
-SaveImageDialog::SaveImageDialog(QWidget* parent) : QDialog(parent)
+SaveImageDialog::SaveImageDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(parent)
 {
 	ui.setupUi(this);
 	

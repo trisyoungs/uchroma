@@ -28,6 +28,7 @@
 // Static list of interaction modes
 InteractionMode InteractionMode::interactionModes[] = {
 	{ "Fit (select X)",	"<b>Left, click-drag</b> Select X region for fitting" },
+	{ "Fit (select Z)",	"<b>Left, click-drag</b> Select Z region for fitting" },
 	{ "View",		"<b>Right</b> Rotate view, <b>Middle</b> Translate view, <b>Wheel</b> Zoom view" },
 	{ "Zoom",		"<b>Left, click-drag</b> Zoom to selected region" }
 };
@@ -173,10 +174,15 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 	// Finalise interaction type
 	switch (interactionMode_)
 	{
-		case (InteractionMode::FitDialogSelectXInteraction):
-			fitWindow_.ui.SourceXMinSpin->setValue(min(clickedInteractionValue_, currentInteractionValue_));
-			fitWindow_.ui.SourceXMaxSpin->setValue(max(clickedInteractionValue_, currentInteractionValue_));
-			fitWindow_.show();
+		case (InteractionMode::FitSetupSelectXInteraction):
+			fitSetupDialog_.ui.XAbsoluteMinSpin->setValue(min(clickedInteractionValue_, currentInteractionValue_));
+			fitSetupDialog_.ui.XAbsoluteMaxSpin->setValue(max(clickedInteractionValue_, currentInteractionValue_));
+			fitSetupDialog_.show();
+			break;
+		case (InteractionMode::FitSetupSelectZInteraction):
+			fitSetupDialog_.ui.ZAbsoluteMinSpin->setValue(min(clickedInteractionValue_, currentInteractionValue_));
+			fitSetupDialog_.ui.ZAbsoluteMaxSpin->setValue(max(clickedInteractionValue_, currentInteractionValue_));
+			fitSetupDialog_.show();
 			break;
 		case (InteractionMode::ZoomInteraction):
 			// None : Zoom to defined region

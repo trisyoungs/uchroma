@@ -24,6 +24,7 @@
 #include "math/constants.h"
 #include <stdarg.h>
 #include <stdio.h>
+#include <QtGui/QTextBrowser>
 
 // Singleton
 Messenger msg;
@@ -48,6 +49,7 @@ Messenger::Messenger()
 	outputTypes_= 0;
 	callLevel_ = 0;
 	quiet_ = false;
+	textBrowser_ = NULL;
 }
 
 // Add a debug level to the debug output bitvector
@@ -84,6 +86,16 @@ bool Messenger::isQuiet() const
 	return quiet_;
 }
 
+/*
+ * Messaging functions
+ */
+
+// Set target QTextBrowser
+void Messenger::setTextBrowser(QTextBrowser* browser)
+{
+	textBrowser_ = browser;
+}
+
 // Standard message
 void Messenger::print(const char *fmt, ...) const
 {
@@ -96,7 +108,11 @@ void Messenger::print(const char *fmt, ...) const
 	// Parse the argument list (...) and internally write the output string into msgs[]
 	va_start(arguments,fmt);
 	vsprintf(msgs,fmt,arguments);
-	if (!quiet_) printf("%s",msgs);
+	if (!quiet_)
+	{
+		printf("%s",msgs);
+		if (textBrowser_) textBrowser_->append(msgs);
+	}
 	va_end(arguments);
 }
 
@@ -114,7 +130,11 @@ void Messenger::print(Messenger::OutputType ot, const char *fmt, ...) const
 	vsprintf(msgs,fmt,arguments);
 	// Print message to stdout, but only if specified output type is active
 	if (ot == Messenger::Force) printf("%s",msgs);
-	else if (isOutputActive(ot) && (!quiet_)) printf("%s",msgs);
+	else if (isOutputActive(ot) && (!quiet_))
+	{
+		printf("%s",msgs);
+		if (textBrowser_) textBrowser_->append(msgs);
+	}
 	va_end(arguments);
 }
 

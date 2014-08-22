@@ -1,7 +1,7 @@
 /*
-	*** Fit Widget - Simplex Minimiser
-	*** src/gui/fit_simplex.cpp
-	Copyright T. Youngs 2012-2014
+	*** Log Window Functinos
+	*** src/log_funcs.cpp
+	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
 
@@ -19,26 +19,29 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/fit.h"
+#include "gui/log.h"
 #include "gui/uchroma.h"
-#include "templates/simplex.h"
 
-// Simplex Minimise
-bool FitWindow::simplexMinimise(Array<double>& alpha)
+// Constructor
+LogWindow::LogWindow(UChromaWindow& parent) : QWidget(&parent), uChroma_(parent)
 {
-	// Check number of variables to fit
-	if (alpha.nItems() < 2)
-	{
-		ui.OutputEdit->append("ERROR: Can't use Simplex minimiser for this few variables.");
-		return false;
-	}
+	// Call the main creation function
+	ui.setupUi(this);
 
-	// Setup the simplex minimiser 
-	ui.OutputEdit->append("Initialising Simplex minimiser");
-        Simplex<FitWindow> simplex(this, &FitWindow::sosError);
+	QWidget::setWindowFlags(Qt::Tool);
+}
 
-	simplex.initialise(alpha, 0.0, 0.01);
+// Destructor
+LogWindow::~LogWindow()
+{
+}
 
-	// Perform minimisation
-	Array<double> best = simplex.minimise(100, 10, 0.001, 1.0);
+/*
+// Widget Slots
+*/
+
+// Close button pressed
+void LogWindow::on_CloseButton_clicked(bool checked)
+{
+	hide();
 }

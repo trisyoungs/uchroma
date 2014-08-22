@@ -31,14 +31,6 @@ void UChromaWindow::closeEvent(QCloseEvent *event)
 	else event->setAccepted(false);
 }
 
-// Return centre coordinate of main window
-QPoint UChromaWindow::centrePos()
-{
-	QPoint centre = pos();
-	centre += QPoint(width()/2, height()/2);
-	return centre;
-}
-
 /*
  * File Actions
  */
@@ -357,9 +349,9 @@ void UChromaWindow::on_actionWindowsCreate_triggered(bool checked)
 
 void UChromaWindow::on_actionWindowsFit_triggered(bool checked)
 {
-	if (refreshing_) return;
-	if (checked) fitWindow_.updateAndShow();
-	else fitWindow_.hide();
+// 	if (refreshing_) return;
+// 	if (checked) fitWindow_.updateAndShow();
+// 	else fitWindow_.hide();
 }
 
 void UChromaWindow::on_actionWindowsLayout_triggered(bool checked)

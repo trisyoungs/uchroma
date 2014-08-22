@@ -906,6 +906,9 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/uchroma/icons/windows_fit.svg</normaloff>:/uchroma/icons/windows_fit.svg</iconset>

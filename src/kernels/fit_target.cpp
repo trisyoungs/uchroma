@@ -19,8 +19,8 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/fit.h"
-#include <base/collection.h>
+#include "kernels/fit.h"
+#include "base/collection.h"
 
 // Constructor
 FitTarget::FitTarget() : ListItem<FitTarget>()
@@ -129,7 +129,7 @@ double FitTarget::zEnd()
 }
 
 // Calculate 'fitted' values from specified equation
-bool FitTarget::calculateY(Tree& equation, Variable* xVariable, Variable* zVariable, Variable* referenceYVariable, int referenceYIndex)
+bool FitTarget::calculateY(Tree& equation, Variable* xVariable, Variable* zVariable)
 {
 	// Generate fitted data over all targetted datasets / abscissa values
 	int sliceIndex;
@@ -137,8 +137,7 @@ bool FitTarget::calculateY(Tree& equation, Variable* xVariable, Variable* zVaria
 	DisplayDataSet* dataSet;
 	Data2D* calcY = calculatedY_.first();
 
-	// Grab abscissa and reference Y data
-	const Array<double>& referenceY = dataSets[referenceYIndex]->y();
+	// Grab abscissa data
 	const Array<double>& x = collection_->displayAbscissa();
 
 	// Loop over datasets
@@ -164,9 +163,6 @@ bool FitTarget::calculateY(Tree& equation, Variable* xVariable, Variable* zVaria
 		{
 			// Nothing to do if this point does not exist...
 			if (yType.value(i+abscissaStart_) == DisplayDataSet::NoPoint) continue;
-
-			// Set reference y variable value
-			referenceYVariable->set(referenceY.value(i+abscissaStart_));
 
 			// Set x variable value	
 			xVariable->set(x.value(i+abscissaStart_));

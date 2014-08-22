@@ -36,10 +36,12 @@ class SaveImageDialog : public QDialog
 
 	public:
 	// Constructor / Destructor
-	SaveImageDialog(QWidget* parent);
+	SaveImageDialog(UChromaWindow& parent);
 	~SaveImageDialog();
 	// Main form declaration
 	Ui::SaveImageDialog ui;
+	// UChromaWindow reference
+	UChromaWindow& uChroma_;
 
 	private:
 	// Current directory for image filename

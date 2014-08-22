@@ -20,7 +20,7 @@
 */
 
 #include "gui/axes.h"
-#include "uchroma.h"
+#include "gui/uchroma.h"
 #include "templates/reflist.h"
 #include <limits>
 

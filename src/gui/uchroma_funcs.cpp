@@ -27,9 +27,10 @@
 
 // Constructor
 UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
-	axesWindow_(*this), createWindow_(*this), dataWindow_(*this), fitWindow_(*this),
-	layoutWindow_(*this), styleWindow_(*this), transformWindow_(*this),
-	viewWindow_(*this), saveImageDialog_(this), dataImportDialog_(this), viewLayout_(*this)
+	axesWindow_(*this), createWindow_(*this), dataWindow_(*this), layoutWindow_(*this),
+	logWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this),
+	dataImportDialog_(*this), fitSetupDialog_(*this), saveImageDialog_(*this),
+	viewLayout_(*this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -91,7 +92,6 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	connect(&axesWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsAxes, SLOT(setChecked(bool)));
 	connect(&createWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsCreate, SLOT(setChecked(bool)));
 	connect(&dataWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsData, SLOT(setChecked(bool)));
-	connect(&fitWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsFit, SLOT(setChecked(bool)));
 	connect(&layoutWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsLayout, SLOT(setChecked(bool)));
 	connect(&styleWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsStyle, SLOT(setChecked(bool)));
 	connect(&transformWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsTransform, SLOT(setChecked(bool)));
@@ -115,6 +115,24 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 // Destructor
 UChromaWindow::~UChromaWindow()
 {
+}
+
+/*
+ * Window Functions
+ */
+
+// Return centre coordinate of main window
+QPoint UChromaWindow::centrePos()
+{
+	QPoint centre = pos();
+	centre += QPoint(width()/2, height()/2);
+	return centre;
+}
+
+// Return QTextBrowser used in LogWindow
+QTextBrowser* UChromaWindow::logWindowBrowser()
+{
+	return logWindow_.ui.LogBrowser;
 }
 
 // Load settings
@@ -162,7 +180,6 @@ void UChromaWindow::updateSubWindows()
 
 	axesWindow_.updateControls();
 	dataWindow_.updateControls();
-	fitWindow_.updateControls();
 	styleWindow_.updateControls();
 	transformWindow_.updateControls();
 	viewWindow_.updateControls();

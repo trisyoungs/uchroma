@@ -26,14 +26,11 @@ create_funcs.cpp
 data_funcs.cpp
 dataimport_funcs.cpp
 dataimport_seqxy.cpp
+log_funcs.cpp
 saveimage_funcs.cpp
 colourbutton_funcs.cpp
 equationselect_funcs.cpp
-fit_funcs.cpp
-fit_main.cpp
-fit_sd.cpp
-fit_simplex.cpp
-fit_target.cpp
+fitsetup_funcs.cpp
 gradientbar_funcs.cpp
 layout_funcs.cpp
 paneorganiser_funcs.cpp
@@ -58,8 +55,9 @@ SET(pro_MOC_HDRS
   data.h
   dataimport.h
   equationselect.h
-  fit.h
+  fitsetup.h
   layout.h
+  log.h
   saveimage.h
   style.h
   targetselect.h
@@ -80,7 +78,8 @@ SET(pro_UIS
   data.ui
   dataimport.ui
   equationselect.ui
-  fit.ui
+  fitsetup.ui
+  log.ui
   saveimage.ui
   style.ui
   targetselect.ui

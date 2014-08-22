@@ -19,11 +19,10 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/fit.h"
-#include "gui/uchroma.h"
+#include "kernels/fit.h"
 
 // Steepest Descent Minimise
-bool FitWindow::sdMinimise(Array<double>& alpha, double tolerance, int maxSteps)
+bool FitKernel::sdMinimise(Array<double>& alpha, double tolerance, int maxSteps)
 {
 	// Control variables
 	double gradientDelta = 0.01;
@@ -45,7 +44,7 @@ bool FitWindow::sdMinimise(Array<double>& alpha, double tolerance, int maxSteps)
 
 	// Get initial cost
 	double oldRMSE = rmsError(alpha);
-	printMessage("Initial RMSE = %e", oldRMSE);
+	msg.print("Initial RMSE = %e", oldRMSE);
 
 	// Do some iterations
 	int n;
@@ -65,13 +64,10 @@ bool FitWindow::sdMinimise(Array<double>& alpha, double tolerance, int maxSteps)
 		} while (deltaRMSE > 0.0);
 		alpha = tempAlpha;
 
-		// Update
-		updateMainView();
-
 		// Check on convergence tolerance
 		if (fabs(deltaRMSE) < tolerance)
 		{
-			printMessage("SD converged (tolerance = %e, delta(RMSE) = %e)", tolerance, deltaRMSE);
+			msg.print("SD converged (tolerance = %e, delta(RMSE) = %e)", tolerance, deltaRMSE);
 			break;
 		}
 
@@ -90,7 +86,7 @@ bool FitWindow::sdMinimise(Array<double>& alpha, double tolerance, int maxSteps)
 	}
 
 	// Get final cost
-	printMessage("Final RMSE = %e", rmsError(alpha));
+	msg.print("Final RMSE = %e", rmsError(alpha));
 	
 	return true;
 }

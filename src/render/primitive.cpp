@@ -19,8 +19,10 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/messenger.h"
 #include "render/glextensions.h"
 #include "render/primitive.h"
+
 #include <string.h>
 
 // Constructor

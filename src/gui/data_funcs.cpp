@@ -20,7 +20,7 @@
 */
 
 #include "gui/data.h"
-#include "uchroma.h"
+#include "gui/uchroma.h"
 #include "templates/reflist.h"
 
 /*

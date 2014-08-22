@@ -159,11 +159,11 @@ void Matrix::setIdentity()
 // Print matrix
 void Matrix::print() const
 {
-	msg.print("CMaj   [0123]    [4567]    [8901] Translate\n");
-	msg.print("        %8.4f %8.4f %8.4f %8.4f\n", matrix_[0], matrix_[4], matrix_[8], matrix_[12]);
-	msg.print("        %8.4f %8.4f %8.4f %8.4f\n", matrix_[1], matrix_[5], matrix_[9], matrix_[13]);
-	msg.print("        %8.4f %8.4f %8.4f %8.4f\n", matrix_[2], matrix_[6], matrix_[10], matrix_[14]);
-	msg.print("Scale   %8.4f %8.4f %8.4f %8.4f\n", matrix_[3], matrix_[7], matrix_[11], matrix_[15]);
+	printf("CMaj   [0123]    [4567]    [8901] Translate\n");
+	printf("        %8.4f %8.4f %8.4f %8.4f\n", matrix_[0], matrix_[4], matrix_[8], matrix_[12]);
+	printf("        %8.4f %8.4f %8.4f %8.4f\n", matrix_[1], matrix_[5], matrix_[9], matrix_[13]);
+	printf("        %8.4f %8.4f %8.4f %8.4f\n", matrix_[2], matrix_[6], matrix_[10], matrix_[14]);
+	printf("Scale   %8.4f %8.4f %8.4f %8.4f\n", matrix_[3], matrix_[7], matrix_[11], matrix_[15]);
 }
 
 // Set zero matrix
@@ -231,7 +231,6 @@ double Matrix::determinant()
 // Invert matrix
 void Matrix::invert()
 {
-	msg.enter("Matrix::invert");
 	// Gauss-Jordan Inversion
 	// Invert the supplied matrix using Gauss-Jordan elimination
 	int pivotrows[4], pivotcols[4], pivotrow = 0, pivotcol = 0;
@@ -308,7 +307,6 @@ void Matrix::invert()
 			matrix_[m*4+pivotcols[n]] = element;
 		}
 	}
-	msg.exit("Matrix::invert");
 }
 
 /*

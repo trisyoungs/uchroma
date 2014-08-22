@@ -27,6 +27,7 @@
 // Forward Declarations
 class UChromaWindow;
 
+// Data Window
 class DataWindow : public QWidget
 {
 	// All Qt declarations must include this macro

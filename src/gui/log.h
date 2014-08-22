@@ -1,6 +1,6 @@
 /*
-	*** uChroma version information
-	*** src/version.h
+	*** Log Window
+	*** src/log.h
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,11 +19,39 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_VERSION_H
-#define UCHROMA_VERSION_H
+#ifndef UCHROMA_LOG_H
+#define UCHROMA_LOG_H
 
-#define UCHROMAREVISION "115"
-#define UCHROMADATE "Fri 22 Aug 2014 - 17:33"
-#define UCHROMAURL "http://www.projectaten.net/uchroma"
+#include "ui_log.h"
+
+// Forward Declarations
+class UChromaWindow;
+
+class LogWindow : public QWidget
+{
+	// All Qt declarations must include this macro
+	Q_OBJECT
+
+
+	/*
+	// Window Functions
+	*/
+	public:
+	// Constructor / Destructor
+	LogWindow(UChromaWindow& parent);
+	~LogWindow();
+	// Main form declaration
+	Ui::LogWindow ui;
+	// UChromaWindow reference
+	UChromaWindow& uChroma_;
+
+
+	/*
+	// Widget Slots
+	*/
+	private slots:
+	// Close button
+	void on_CloseButton_clicked(bool checked);
+};
 
 #endif

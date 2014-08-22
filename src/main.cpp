@@ -43,6 +43,9 @@ int main(int argc, char *argv[])
 	/* Create the main window */
 	UChromaWindow mainWindow;
 
+	/* Direct Messenger to the LogWindow */
+	msg.setTextBrowser(mainWindow.logWindowBrowser());
+
 	/* Was an input file supplied? */
 	if (argc == 2)
 	{

@@ -22,6 +22,9 @@
 #ifndef UCHROMA_MESSENGER_H
 #define UCHROMA_MESSENGER_H
 
+// Forward Declarations
+class QTextBrowser;
+
 // Global messaging and program output levels
 class Messenger
 {
@@ -35,9 +38,10 @@ class Messenger
 	// Convert debug mode to text string
 	static const char *outputType(OutputType ot);
 
+
 	/*
-	// Output Modes
-	*/
+	 * Output Modes
+	 */
 	private:
 	// Bit-vector of active output levels
 	int outputTypes_;
@@ -58,10 +62,17 @@ class Messenger
 	// Return status of quiet mode
 	bool isQuiet() const;
 
+
 	/*
-	// Messaging functions
-	*/
+	 * Messaging functions
+	 */
+	private:
+	// Target QTextBrowser (if any)
+	QTextBrowser* textBrowser_;
+
 	public:
+	// Set target QTextBrowser
+	void setTextBrowser(QTextBrowser* browser);
 	// Print normal message
 	void print(const char*, ...) const;
 	// Print message in specific output level

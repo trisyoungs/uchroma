@@ -22,7 +22,6 @@
 #ifndef UCHROMA_VECTOR3_H
 #define UCHROMA_VECTOR3_H
 
-#include "base/messenger.h"
 #include "math/constants.h"
 #include "math/mathfunc.h"
 #include <stdio.h>

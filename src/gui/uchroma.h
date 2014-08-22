@@ -26,8 +26,9 @@
 #include "gui/axes.h"
 #include "gui/create.h"
 #include "gui/data.h"
-#include "gui/fit.h"
+#include "gui/fitsetup.h"
 #include "gui/layout.h"
+#include "gui/log.h"
 #include "gui/style.h"
 #include "gui/transform.h"
 #include "gui/view.h"
@@ -50,7 +51,8 @@ class InteractionMode
 	// Interaction Modes
 	enum Mode
 	{
-		FitDialogSelectXInteraction,
+		FitSetupSelectXInteraction,
+		FitSetupSelectZInteraction,
 		ViewInteraction,
 		ZoomInteraction,
 		nInteractionModes
@@ -90,20 +92,22 @@ class UChromaWindow : public QMainWindow
 	CreateWindow createWindow_;
 	// Data Window
 	DataWindow dataWindow_;
-	// Fit Window
-	FitWindow fitWindow_;
 	// Layout Window
 	LayoutWindow layoutWindow_;
+	// Log Window
+	LogWindow logWindow_;
 	// Style Window
 	StyleWindow styleWindow_;
 	// Transform Window
 	TransformWindow transformWindow_;
 	// View Window
 	ViewWindow viewWindow_;
-	// Save Image Dialog
-	SaveImageDialog saveImageDialog_;
 	// Data Import Dialog
 	DataImportDialog dataImportDialog_;
+	// Fit Window
+	FitSetupDialog fitSetupDialog_;
+	// Save Image Dialog
+	SaveImageDialog saveImageDialog_;
 	// Statusbar info line label
 	QLabel* statusBarInfoLabel_;
 
@@ -115,6 +119,8 @@ class UChromaWindow : public QMainWindow
 	Ui::UChromaWindow ui;
 	// Return centre coordinate of main window
 	QPoint centrePos();
+	// Return QTextBrowser used in LogWindow
+	QTextBrowser* logWindowBrowser();
 
 	protected:
 	// Window close event
