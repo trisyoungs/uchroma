@@ -30,6 +30,7 @@
 
 // Forward Declarations
 class ViewPane;
+class FitKernel;
 
 class Collection : public ListItem<Collection>
 {
@@ -170,12 +171,14 @@ class Collection : public ListItem<Collection>
 	Collection* parent_;
 	// Type of this collection
 	CollectionType type_;
-	// List of fits made to parent
-	List<Collection> fitData_;
-	// List of slices extracted from parent
-	List<Collection> extractedData_;
+	// List of fits
+	List<Collection> fits_;
+	// List of extracted slices
+	List<Collection> slices_;
 	// Current slice data
 	Collection* currentSlice_;
+	// FitKernel (if a FitCollection)
+	FitKernel* fitKernel_;
 
 	private:
 	// Return axis bin value of closest point to supplied value
@@ -196,24 +199,28 @@ class Collection : public ListItem<Collection>
 	Collection* parent();
 	// Return type of this collection
 	CollectionType type();
-	// Add fit data to Collection
-	Collection* addFitData(QString title = QString());
-	// Remove specified fitdata from list
-	void removeFitData(Collection* collection);
-	// Return fit data in Collection
-	Collection* fitData();
-	// Add extracted data to Collection
-	Collection* addExtractedData(QString title = QString());
-	// Return extracted data in Collection
-	Collection* extractedData();
-	// Remove specified extracted data from list
-	void removeExtractedData(Collection* collection);
+	// Add fit to Collection
+	Collection* addFit(QString title = QString());
+	// Remove specified fit from list
+	void removeFit(Collection* collection);
+	// Return fit data
+	Collection* fits();
+	// Add slice to Collection
+	Collection* addSlice(QString title = QString());
+	// Remove specified slice
+	void removeSlice(Collection* collection);
+	// Return slices
+	Collection* slices();
 	// Update current slice based on specified axis and bin
 	void updateCurrentSlice(int axis, double axisValue);
 	// Extract current slice based on specified axis and bin
 	void extractCurrentSlice(int axis, double axisValue);
 	// Return current slice
 	Collection* currentSlice();
+	// Add FitKernel, if one does not exist
+	void addFitKernel();
+	// Return FitKernel
+	FitKernel* fitKernel();
 
 
 	/*

@@ -21,6 +21,7 @@
 
 #include "gui/uchroma.h"
 #include "gui/keywords.h"
+#include "kernels/fit.h"
 #include "base/lineparser.h"
 
 // Parse AxisBlock keywords
@@ -205,13 +206,19 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 			case (Keywords::EndCollectionKeyword):
 				return true;
 				break;
-			// Extracted data block
-			case (Keywords::ExtractedDataBlockKeyword):
-				if (!readCollectionBlock(parser, collection->addExtractedData(parser.argc(1)))) return false;
-				break;
 			// Fit data block
 			case (Keywords::FitBlockKeyword):
-				if (!readCollectionBlock(parser, collection->addFitData(parser.argc(1)))) return false;
+				if (!readCollectionBlock(parser, collection->addFit(parser.argc(1)))) return false;
+				break;
+			// Fit parameters block
+			case (Keywords::FitParametersBlockKeyword):
+				// Check that a FitKernel exists in the current collection
+				if (!collection->fitKernel())
+				{
+					msg.print("Warning: No FitKernel exists in the collection '%s', but a FitParameters block was found.\nCreating a new one...\n", qPrintable(collection->title()));
+					collection->addFitKernel();
+				}
+				if (!readFitParametersBlock(parser, collection->fitKernel())) return false;
 				break;
 			// Interpolate flags
 			case (Keywords::InterpolateKeyword):
@@ -227,6 +234,10 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 			case (Keywords::InterpolateStepKeyword):
 				collection->setInterpolationStep(0, parser.argd(1));
 				collection->setInterpolationStep(2, parser.argd(2));
+				break;
+			// Slice data block
+			case (Keywords::SliceBlockKeyword):
+				if (!readCollectionBlock(parser, collection->addSlice(parser.argc(1)))) return false;
 				break;
 			// Display style
 			case (Keywords::StyleKeyword):
@@ -328,6 +339,95 @@ bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Colle
 		}
 	}
 	msg.print("Error : Unterminated 'DataSet' block.\n");
+	return false;
+}
+
+// Read FitParametersBlock keywords
+bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKernel)
+{
+	FitKernel::RangeType rangeType;
+	EquationVariable* eqVar;
+	while (!parser.eofOrBlank())
+	{
+		// Get line from file
+		parser.getArgsDelim(LineParser::UseQuotes + LineParser::SkipBlanks);
+
+		// Get keyword and check number of arguments provided
+		Keywords::FitParametersKeyword fitParamsKwd = Keywords::fitParametersKeyword(parser.argc(0));
+		if ((fitParamsKwd != Keywords::nFitParametersKeywords) && (Keywords::fitParametersKeywordNArguments(fitParamsKwd) > (parser.nArgs()-1)))
+		{
+			msg.print("Error : FitParameters keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::fitParametersKeyword(fitParamsKwd), Keywords::fitParametersKeywordNArguments(fitParamsKwd), parser.nArgs()-1);
+			return false;
+		}
+		switch (fitParamsKwd)
+		{
+			case (Keywords::EndFitParametersKeyword):
+				return true;
+				break;
+			case (Keywords::EquationKeyword):
+				fitKernel->setEquation(parser.argc(1));
+				break;
+			case (Keywords::GlobalKeyword):
+				fitKernel->setGlobal(parser.argb(1));
+				break;
+			case (Keywords::LimitStrengthKeyword):
+				fitKernel->setLimitStrength(parser.argd(1));
+				break;
+			case (Keywords::OrthogonalKeyword):
+				fitKernel->setOrthogonal(parser.argb(1));
+				break;
+			case (Keywords::VariableKeyword):
+				// First, see if named variable exists
+				eqVar = fitKernel->variable(parser.argc(1));
+				Variable A1 True 4.5567 -10000 10000 False False
+				break;
+			case (Keywords::XRangeTypeKeyword):
+				rangeType = FitKernel::rangeType(parser.argc(1));
+				if (rangeType == FitKernel::nRangeTypes)
+				{
+					msg.print("Error: Unrecognised range type '%s' given for X in fit.\n", parser.argc(1));
+					return false;
+				}
+				fitKernel->setXRange(rangeType);
+				break;
+			case (Keywords::XRangeAbsoluteKeyword):
+				fitKernel->setAbsoluteXMin(parser.argd(1));
+				fitKernel->setAbsoluteXMax(parser.argd(2));
+				break;
+			case (Keywords::XRangeIndexKeyword):
+				fitKernel->setIndexXMin(parser.argi(1));
+				fitKernel->setIndexXMax(parser.argi(2));
+				break;
+			case (Keywords::XRangeIndexSingleKeyword):
+				fitKernel->setIndexXSingle(parser.argi(1));
+				break;
+			case (Keywords::ZRangeTypeKeyword):
+				rangeType = FitKernel::rangeType(parser.argc(1));
+				if (rangeType == FitKernel::nRangeTypes)
+				{
+					msg.print("Error: Unrecognised range type '%s' given for Z in fit.\n", parser.argc(1));
+					return false;
+				}
+				fitKernel->setZRange(rangeType);
+				break;
+			case (Keywords::ZRangeAbsoluteKeyword):
+				fitKernel->setAbsoluteZMin(parser.argd(1));
+				fitKernel->setAbsoluteZMax(parser.argd(2));
+				break;
+			case (Keywords::ZRangeIndexKeyword):
+				fitKernel->setIndexZMin(parser.argi(1));
+				fitKernel->setIndexZMax(parser.argi(2));
+				break;
+			case (Keywords::ZRangeIndexSingleKeyword):
+				fitKernel->setIndexZSingle(parser.argi(1));
+				break;
+			// Unrecognised Keyword
+			default:
+				msg.print("Error : Unrecognised FitParameters keyword: %s\n", parser.argc(0));
+				return false;
+		}
+	}
+	msg.print("Error : Unterminated 'FitParameters' block.\n");
 	return false;
 }
 

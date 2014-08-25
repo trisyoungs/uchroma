@@ -104,11 +104,12 @@ class Keywords
 		DataDirectoryKeyword,
 		DataSetDefinitionKeyword,
 		EndCollectionKeyword,
-		ExtractedDataBlockKeyword,
 		FitBlockKeyword,
+		FitParametersBlockKeyword,
 		InterpolateKeyword,
 		InterpolateConstrainKeyword,
 		InterpolateStepKeyword,
+		SliceBlockKeyword,
 		StyleKeyword,
 		TransformXKeyword,
 		TransformYKeyword,
@@ -143,6 +144,37 @@ class Keywords
 	static const char* dataSetKeyword(DataSetKeyword kwd);
 	// Return minimum number of expected arguments
 	static int dataSetKeywordNArguments(DataSetKeyword kwd);
+
+
+	/*
+	 * FitParameters Block Keywords
+	 */
+	public:
+	// FitParameters Block Keyword Enum
+	enum FitParametersKeyword
+	{
+		EndFitParametersKeyword,
+		EquationKeyword,
+		GlobalKeyword,
+		LimitStrengthKeyword,
+		OrthogonalKeyword,
+		VariableKeyword,
+		XRangeTypeKeyword,
+		XRangeAbsoluteKeyword,
+		XRangeIndexKeyword,
+		XRangeIndexSingleKeyword,
+		ZRangeTypeKeyword,
+		ZRangeAbsoluteKeyword,
+		ZRangeIndexKeyword,
+		ZRangeIndexSingleKeyword,
+		nFitParametersKeywords
+	};
+	// Convert text string to FitParametersKeyword
+	static FitParametersKeyword fitParametersKeyword(const char* s);
+	// Convert FitParametersKeyword to text string
+	static const char* fitParametersKeyword(FitParametersKeyword kwd);
+	// Return minimum number of expected arguments
+	static int fitParametersKeywordNArguments(FitParametersKeyword kwd);
 
 
 	/*

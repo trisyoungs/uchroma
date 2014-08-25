@@ -70,7 +70,7 @@ bool UChromaWindow::writeCollectionBlock(LineParser& parser, Collection* collect
 
 	if (type == Collection::MasterCollection) parser.writeLineF("%s%s '%s'\n", indent, Keywords::inputBlock(Keywords::CollectionBlock), qPrintable(collection->title()));
 	else if (type == Collection::FitCollection) parser.writeLineF("%s%s '%s'\n", indent, Keywords::collectionKeyword(Keywords::FitBlockKeyword), qPrintable(collection->title()));
-	else if (type == Collection::ExtractedCollection) parser.writeLineF("%s%s '%s'\n", indent, Keywords::collectionKeyword(Keywords::ExtractedDataBlockKeyword), qPrintable(collection->title()));
+	else if (type == Collection::ExtractedCollection) parser.writeLineF("%s%s '%s'\n", indent, Keywords::collectionKeyword(Keywords::SliceBlockKeyword), qPrintable(collection->title()));
 	parser.writeLineF("%s  %s \"%s\"\n", indent, Keywords::collectionKeyword(Keywords::DataDirectoryKeyword), qPrintable(collection->dataFileDirectory().absolutePath()));
 
 	// -- Transforms
@@ -121,11 +121,14 @@ bool UChromaWindow::writeCollectionBlock(LineParser& parser, Collection* collect
 	// Loop over datasets
 	for (DataSet* dataSet = collection->dataSets(); dataSet != NULL; dataSet = dataSet->next) writeDataSetBlock(parser, dataSet, indentLevel);
 
+	// Write FitKernel data if present
+	if (collection->fitKernel()) writeFitParametersBlock(parser, collection->fitKernel(), indentLevel+1);
+
 	// Additional data
 	// -- Fits
-	for (Collection* fit = collection->fitData(); fit != NULL; fit = fit->next) writeCollectionBlock(parser, fit, Collection::FitCollection, indentLevel+1);
+	for (Collection* fit = collection->fits(); fit != NULL; fit = fit->next) writeCollectionBlock(parser, fit, Collection::FitCollection, indentLevel+1);
 	// -- Extracted Data
-	for (Collection* extract = collection->extractedData(); extract != NULL; extract = extract->next) writeCollectionBlock(parser, extract, Collection::ExtractedCollection, indentLevel+1);
+	for (Collection* extract = collection->slices(); extract != NULL; extract = extract->next) writeCollectionBlock(parser, extract, Collection::ExtractedCollection, indentLevel+1);
 
 	parser.writeLineF("%s%s\n", indent, Keywords::collectionKeyword(Keywords::EndCollectionKeyword));
 

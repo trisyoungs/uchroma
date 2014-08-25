@@ -35,5 +35,5 @@ void UChromaWindow::updateCoordinateInfo()
 // Update text of renderTimeLabel_ in statusbar
 void UChromaWindow::updateRenderTimeLabel(QString text)
 {
-	ui.InfoRenderingTimeLabel->setText(text);
+	statusBarRenderingTimeLabel_->setText(text);
 }

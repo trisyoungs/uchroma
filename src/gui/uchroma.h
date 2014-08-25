@@ -110,6 +110,8 @@ class UChromaWindow : public QMainWindow
 	SaveImageDialog saveImageDialog_;
 	// Statusbar info line label
 	QLabel* statusBarInfoLabel_;
+	// Statusbar rendering time label
+	QLabel* statusBarRenderingTimeLabel_;
 
 	public:
 	// Constructor / Destructor
@@ -137,10 +139,11 @@ class UChromaWindow : public QMainWindow
 	 * File Actions
 	 */
 	private slots:
-	void on_actionFileNew_triggered(bool checked);
-	void on_actionFileLoad_triggered(bool checked);
-	void on_actionFileSave_triggered(bool checked);
-	void on_actionFileSaveAs_triggered(bool checked);
+	void on_actionFileNewSession_triggered(bool checked);
+	void on_actionFileLoadSession_triggered(bool checked);
+	void on_actionFileSaveSession_triggered(bool checked);
+	void on_actionFileSaveSessionAs_triggered(bool checked);
+	void on_actionFilePrint_triggered(bool checked);
 	void on_actionFileExportImage_triggered(bool checked);
 	void on_actionFileQuit_triggered(bool checked);
 
@@ -157,15 +160,23 @@ class UChromaWindow : public QMainWindow
 	void on_actionViewReset_triggered(bool checked);
 	void on_actionViewShowAll_triggered(bool checked);
 	void on_actionView2D_triggered(bool checked);
+	void on_actionViewAutostretch3D_triggered(bool checked);
+	void on_actionViewAxes_triggered(bool checked);
+	void on_actionViewLayout_triggered(bool checked);
 
 
 	/*
 	 * Collections Actions
 	 */
 	private slots:
-	void on_actionCollectionsNew_triggered(bool checked);
-	void on_actionCollectionsFocusNext_triggered(bool checked);
-	void on_actionCollectionsFocusPrevious_triggered(bool checked);
+	void on_actionCollectionList_triggered(bool checked);
+	void on_actionCollectionFocusNext_triggered(bool checked);
+	void on_actionCollectionFocusPrevious_triggered(bool checked);
+	void on_actionCollectionNew_triggered(bool checked);
+	void on_actionCollectionCreate_triggered(bool checked);
+	void on_actionCollectionStyle_triggered(bool checked);
+	void on_actionCollectionTransform_triggered(bool checked);
+	void on_actionCollectionDelete_triggered(bool checked);
 
 
 	/*
@@ -174,6 +185,8 @@ class UChromaWindow : public QMainWindow
 	private slots:
 	void on_actionDataLoadXY_triggered(bool checked);
 	void on_actionDataImport_triggered(bool checked);
+	void on_actionDataReload_triggered(bool checked);
+	void on_actionDataView_triggered(bool checked);
 
 
 	/*
@@ -191,18 +204,10 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * Windows Actions
+	 * Analyse Actions
 	 */
 	private slots:
-	void on_actionWindowsCollections_triggered(bool checked);
-	void on_actionWindowsData_triggered(bool checked);
-	void on_actionWindowsStyle_triggered(bool checked);
-	void on_actionWindowsTransform_triggered(bool checked);
-	void on_actionWindowsView_triggered(bool checked);
-	void on_actionWindowsAxes_triggered(bool checked);
-	void on_actionWindowsCreate_triggered(bool checked);
-	void on_actionWindowsFit_triggered(bool checked);
-	void on_actionWindowsLayout_triggered(bool checked);
+	void on_actionAnalyseFit_triggered(bool checked);
 
 
 	/*
@@ -282,6 +287,8 @@ class UChromaWindow : public QMainWindow
 	bool readCollectionBlock(LineParser& parser, Collection* collection);
 	// Read DataSetBlock keywords
 	bool readDataSetBlock(LineParser& parser, DataSet* dataSet, Collection* collection);
+	// Read FitParametersBlock keywords
+	bool readFitParametersBlock(LineParser& parser, FitKernel* fitKernel);
 	// Read SettingsBlock keywords
 	bool readSettingsBlock(LineParser& parser);
 	// Read ViewBlock keywords
@@ -294,6 +301,8 @@ class UChromaWindow : public QMainWindow
 	bool writeCollectionBlock(LineParser& parser, Collection* collection, Collection::CollectionType type = Collection::MasterCollection, int indentLevel = 0);
 	// Write DataSetBlock keywords
 	bool writeDataSetBlock(LineParser& parser, DataSet* dataSet, int indentLevel = 0);
+	// Write FitParametersBlock keywords
+	bool writeFitParametersBlock(LineParser& parser, FitKernel* fitKernel, int indentLevel = 0);
 	// Write SettingsBlock keywords
 	bool writeSettingsBlock(LineParser& parser);
 	// Write ViewBlock keywords

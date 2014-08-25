@@ -89,12 +89,12 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	connect(&layoutWindow_, SIGNAL(updateMainDisplay()), this, SLOT(updateDisplay()));
 
 	// Connect sub-window closed signal to toggle buttons / menu items in uChroma's main window
-	connect(&axesWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsAxes, SLOT(setChecked(bool)));
-	connect(&createWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsCreate, SLOT(setChecked(bool)));
-	connect(&dataWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsData, SLOT(setChecked(bool)));
-	connect(&layoutWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsLayout, SLOT(setChecked(bool)));
-	connect(&styleWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsStyle, SLOT(setChecked(bool)));
-	connect(&transformWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsTransform, SLOT(setChecked(bool)));
+	connect(&axesWindow_, SIGNAL(windowClosed(bool)), ui.actionViewAxes, SLOT(setChecked(bool)));
+	connect(&createWindow_, SIGNAL(windowClosed(bool)), ui.actionCollectionCreate, SLOT(setChecked(bool)));
+	connect(&dataWindow_, SIGNAL(windowClosed(bool)), ui.actionDataView, SLOT(setChecked(bool)));
+	connect(&layoutWindow_, SIGNAL(windowClosed(bool)), ui.actionViewLayout, SLOT(setChecked(bool)));
+	connect(&styleWindow_, SIGNAL(windowClosed(bool)), ui.actionCollectionStyle, SLOT(setChecked(bool)));
+	connect(&transformWindow_, SIGNAL(windowClosed(bool)), ui.actionCollectionTransform, SLOT(setChecked(bool)));
 	connect(&viewWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsView, SLOT(setChecked(bool)));
 
 	// Create an action group for the axis interact buttons
@@ -107,6 +107,9 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	// Add QLabel as a normal widget to the status bar
 	statusBarInfoLabel_ = new QLabel(this);
 	ui.StatusBar->addWidget(statusBarInfoLabel_);
+	statusBarRenderingTimeLabel_ = new QLabel(this);
+	ui.StatusBar->addPermanentWidget(statusBarRenderingTimeLabel_);	
+
 
 	// Set initial interaction mode
 	setInteractionMode(InteractionMode::ViewInteraction, -1);

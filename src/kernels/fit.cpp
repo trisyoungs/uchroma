@@ -158,6 +158,14 @@ RefListItem<EquationVariable,bool>* FitKernel::fitVariables()
 	return fitVariables_.first();
 }
 
+// Return named variable, if it exists
+EquationVariable* FitKernel::variable(QString name)
+{
+	// Search list of variables for name provided
+	for (EquationVariable* eqVar = equationVariables_.first(); eqVar != NULL; eqVar = eqVar->next) if (name == eqVar->name()) return eqVar;
+	return NULL;
+}
+
 // Set strength of variable limits
 void FitKernel::setLimitStrength(double strength)
 {
@@ -368,6 +376,18 @@ void FitKernel::setSourceCollection(Collection* collection)
 Collection* FitKernel::sourceCollection()
 {
 	return sourceCollection_;
+}
+
+// Set destination collection for fitted data
+void FitKernel::setDestinationCollection(Collection* collection)
+{
+	destinationCollection_ = collection;
+}
+
+// Return destination collection for fitted data
+Collection* FitKernel::destinationCollection()
+{
+	return destinationCollection_;
 }
 
 /*

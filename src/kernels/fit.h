@@ -1,6 +1,6 @@
 /*
 	*** Fit Widget
-	*** src/gui/fit.h
+	*** src/kernels/fit.h
 	Copyright T. Youngs 2012-2014.
 
 	This file is part of uChroma.
@@ -152,6 +152,8 @@ class FitKernel
 	EquationVariable* equationVariables();
 	// Return first variable used in equation
 	RefListItem<EquationVariable,bool>* fitVariables();
+	// Return named variable, if it exists
+	EquationVariable* variable(QString name);
 	// Set strength of variable limits
 	void setLimitStrength(double strength);
 	// Return strength of variable limits
@@ -256,6 +258,10 @@ class FitKernel
 	void setSourceCollection(Collection* collection);
 	// Return source collection
 	Collection* sourceCollection();
+	// Set destination collection for fitted data
+	void setDestinationCollection(Collection* collection);
+	// Return destination collection for fitted data
+	Collection* destinationCollection();
 
 
 	/*

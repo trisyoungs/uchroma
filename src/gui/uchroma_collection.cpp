@@ -134,8 +134,8 @@ void UChromaWindow::addCollectionsToTree(Collection* collection, QTreeWidgetItem
 	item->setExpanded(true);
 
 	// Add any additional data
-	for (Collection* fit = collection->fitData(); fit != NULL; fit = fit->next) addCollectionsToTree(fit, item);
-	for (Collection* extract = collection->extractedData(); extract != NULL; extract = extract->next) addCollectionsToTree(extract, item);
+	for (Collection* fit = collection->fits(); fit != NULL; fit = fit->next) addCollectionsToTree(fit, item);
+	for (Collection* extract = collection->slices(); extract != NULL; extract = extract->next) addCollectionsToTree(extract, item);
 }
 
 /*
@@ -146,6 +146,12 @@ void UChromaWindow::addCollectionsToTree(Collection* collection, QTreeWidgetItem
 void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 {
 	// Build the context menu to display
+	QMenu contextMenu;
+	// -- Main 'edit' functions
+	QAction* deleteAction = contextMenu.addAction("&Delete");
+	QAction* duplicateAction = contextMenu.addAction("Du&plicate");
+	// -- "Move to..." pane menu
+	contextMenu.addSeparator();
 	QMenu paneMenu;
 	QList<QAction*> paneActions;
 	for (ViewPane* pane = viewLayout_.panes(); pane != NULL; pane = pane->next)
@@ -154,16 +160,25 @@ void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 		action->setData(VariantPointer<ViewPane>(pane));
 		paneActions << action;
 	}
-
-	QMenu contextMenu;
 	QAction* sendToPaneMenuAction = contextMenu.addMenu(&paneMenu);
-	sendToPaneMenuAction->setText("Send to pane");
+	sendToPaneMenuAction->setText("Move to...");
+	// -- Analysis
+	contextMenu.addSeparator();
+	QAction* fitAction = contextMenu.addAction("New &Fit Equation");
+	QAction* reFitAction = contextMenu.addAction("Edit Fit E&quation");
 
 	// Show it
 	QAction* menuResult = contextMenu.exec(QCursor::pos());
 
 	// What was clicked?
-	if (paneActions.contains(menuResult))
+	if (menuResult == deleteAction)
+	{
+		if (QMessageBox::question(this, "Confirm Delete", "Are you sure you want to delete the collection '" + currentCollection_->title() + "'?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) removeCollection(currentCollection_);
+	}
+	else if (menuResult == duplicateAction)
+	{
+	}
+	else if (paneActions.contains(menuResult))
 	{
 		// Check current display pane - if it is non-null we must remove it from that pane first
 		if (currentCollection_->displayPane()) currentCollection_->displayPane()->removeCollection(currentCollection_);
@@ -175,7 +190,13 @@ void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 
 		updateDisplay();
 	}
-
+	else if (menuResult == fitAction)
+	{
+		on_actionAnalyseFit_triggered(false);
+	}
+	else if (menuResult == reFitAction)
+	{
+	}
 }
 
 // Refresh collection list

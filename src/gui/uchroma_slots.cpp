@@ -35,7 +35,7 @@ void UChromaWindow::closeEvent(QCloseEvent *event)
  * File Actions
  */
 
-void UChromaWindow::on_actionFileNew_triggered(bool checked)
+void UChromaWindow::on_actionFileNewSession_triggered(bool checked)
 {
 	if (modified_)
 	{
@@ -44,7 +44,7 @@ void UChromaWindow::on_actionFileNew_triggered(bool checked)
 		else if (button == QMessageBox::Yes)
 		{
 			// Save file, and check modified_ status to make sure it wasn't cancelled.
-			on_actionFileSave_triggered(false);
+			on_actionFileSaveSession_triggered(false);
 			if (modified_) return;
 		}
 	}
@@ -57,7 +57,7 @@ void UChromaWindow::on_actionFileNew_triggered(bool checked)
 	updateGUI();
 }
 
-void UChromaWindow::on_actionFileLoad_triggered(bool checked)
+void UChromaWindow::on_actionFileLoadSession_triggered(bool checked)
 {
 	if (modified_)
 	{
@@ -66,7 +66,7 @@ void UChromaWindow::on_actionFileLoad_triggered(bool checked)
 		else if (button == QMessageBox::Yes)
 		{
 			// Save file, and check modified_ status to make sure it wasn't cancelled.
-			on_actionFileSave_triggered(false);
+			on_actionFileSaveSession_triggered(false);
 			if (modified_) return;
 		}
 	}
@@ -83,7 +83,7 @@ void UChromaWindow::on_actionFileLoad_triggered(bool checked)
 	updateGUI();
 }
 
-void UChromaWindow::on_actionFileSave_triggered(bool checked)
+void UChromaWindow::on_actionFileSaveSession_triggered(bool checked)
 {
 	// Has an input filename already been chosen?
 	if (inputFile_.isEmpty())
@@ -103,7 +103,7 @@ void UChromaWindow::on_actionFileSave_triggered(bool checked)
 	updateTitleBar();
 }
 
-void UChromaWindow::on_actionFileSaveAs_triggered(bool checked)
+void UChromaWindow::on_actionFileSaveSessionAs_triggered(bool checked)
 {
 	// Get a filename from the user
 	QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", inputFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
@@ -150,7 +150,7 @@ bool UChromaWindow::checkBeforeClose()
 		else if (button == QMessageBox::Yes)
 		{
 			// Save file, and check modified_ status to make sure it wasn't cancelled.
-			on_actionFileSave_triggered(false);
+			on_actionFileSaveSession_triggered(false);
 			if (modified_) return false;
 		}
 	}
@@ -189,25 +189,66 @@ void UChromaWindow::on_actionView2D_triggered(bool checked)
 	ui.MainView->update();
 }
 
+void UChromaWindow::on_actionViewAxes_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) axesWindow_.updateAndShow();
+	else axesWindow_.hide();
+}
+
+void UChromaWindow::on_actionViewLayout_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) layoutWindow_.updateAndShow();
+	else layoutWindow_.hide();
+}
+
 /*
- * Collections
+ * Collection Actions
  */
 
-void UChromaWindow::on_actionCollectionsNew_triggered(bool checked)
+void UChromaWindow::on_actionCollectionList_triggered(bool checked)
+{
+	if (refreshing_) return;
+	ui.LeftWidgetsWidget->setVisible(checked);
+}
+
+void UChromaWindow::on_actionCollectionFocusNext_triggered(bool checked)
+{
+	focusNextCollection();
+}
+
+void UChromaWindow::on_actionCollectionFocusPrevious_triggered(bool checked)
+{
+	focusPreviousCollection();
+}
+
+void UChromaWindow::on_actionCollectionNew_triggered(bool checked)
 {
 	addCollection();
 
 	updateGUI();
 }
 
-void UChromaWindow::on_actionCollectionsFocusNext_triggered(bool checked)
+void UChromaWindow::on_actionCollectionCreate_triggered(bool checked)
 {
-	focusNextCollection();
+	if (refreshing_) return;
+	if (checked) createWindow_.updateAndShow();
+	else createWindow_.hide();
 }
 
-void UChromaWindow::on_actionCollectionsFocusPrevious_triggered(bool checked)
+void UChromaWindow::on_actionCollectionStyle_triggered(bool checked)
 {
-	focusPreviousCollection();
+	if (refreshing_) return;
+	if (checked) styleWindow_.updateAndShow();
+	else styleWindow_.hide();
+}
+
+void UChromaWindow::on_actionCollectionTransform_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) transformWindow_.updateAndShow();
+	else transformWindow_.hide();
 }
 
 /*
@@ -243,8 +284,28 @@ void UChromaWindow::on_actionDataImport_triggered(bool checked)
 	updateDisplay();
 }
 
+void UChromaWindow::on_actionDataView_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) dataWindow_.updateAndShow();
+	else dataWindow_.hide();
+}
+
 /*
- * Axes Actions
+ * Analyse Actions
+ */
+
+void UChromaWindow::on_actionAnalyseFit_triggered(bool checked)
+{
+	if (!currentCollection_) return;
+
+	// Add a new fit collection to the current collection
+	Collection* newFit = currentCollection_->addFit();
+	// TODO XXX
+}
+
+/*
+ * Interact Actions
  */
 
 // Change interaction axis target
@@ -293,72 +354,6 @@ void UChromaWindow::on_actionInteractNone_triggered(bool checked)
 	if (refreshing_) return;
 
 	interactionActionTriggered(-1);
-}
-
-/*
- * Windows Actions
- */
-
-void UChromaWindow::on_actionWindowsCollections_triggered(bool checked)
-{
-	if (refreshing_) return;
-	ui.LeftWidgetsWidget->setVisible(checked);
-}
-
-void UChromaWindow::on_actionWindowsData_triggered(bool checked)
-{
-	if (refreshing_) return;
-	if (checked) dataWindow_.updateAndShow();
-	else dataWindow_.hide();
-}
-
-void UChromaWindow::on_actionWindowsStyle_triggered(bool checked)
-{
-	if (refreshing_) return;
-	if (checked) styleWindow_.updateAndShow();
-	else styleWindow_.hide();
-}
-
-void UChromaWindow::on_actionWindowsTransform_triggered(bool checked)
-{
-	if (refreshing_) return;
-	if (checked) transformWindow_.updateAndShow();
-	else transformWindow_.hide();
-}
-
-void UChromaWindow::on_actionWindowsView_triggered(bool checked)
-{
-	if (refreshing_) return;
-	if (checked) viewWindow_.updateAndShow();
-	else viewWindow_.hide();
-}
-
-void UChromaWindow::on_actionWindowsAxes_triggered(bool checked)
-{
-	if (refreshing_) return;
-	if (checked) axesWindow_.updateAndShow();
-	else axesWindow_.hide();
-}
-
-void UChromaWindow::on_actionWindowsCreate_triggered(bool checked)
-{
-	if (refreshing_) return;
-	if (checked) createWindow_.updateAndShow();
-	else createWindow_.hide();
-}
-
-void UChromaWindow::on_actionWindowsFit_triggered(bool checked)
-{
-// 	if (refreshing_) return;
-// 	if (checked) fitWindow_.updateAndShow();
-// 	else fitWindow_.hide();
-}
-
-void UChromaWindow::on_actionWindowsLayout_triggered(bool checked)
-{
-	if (refreshing_) return;
-	if (checked) layoutWindow_.updateAndShow();
-	else layoutWindow_.hide();
 }
 
 /*

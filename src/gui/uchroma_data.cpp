@@ -75,7 +75,7 @@ void UChromaWindow::removeCollection(Collection* collection)
 			if (currentCollection_ == NULL) currentCollection_ = collection->parent();
 
 			// Remove master collection
-			collection->parent()->removeFitData(collection);
+			collection->parent()->removeFit(collection);
 		}
 		else
 		{
@@ -85,7 +85,7 @@ void UChromaWindow::removeCollection(Collection* collection)
 			if (currentCollection_ == NULL) currentCollection_ = collection->parent();
 
 			// Remove master collection
-			collection->parent()->removeExtractedData(collection);
+			collection->parent()->removeSlice(collection);
 		}
 	}
 

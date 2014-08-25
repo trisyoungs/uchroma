@@ -21,6 +21,7 @@
 
 #include "base/collection.h"
 #include "base/viewpane.h"
+#include "kernels/fit.h"
 #include <limits>
 
 // Static Members
@@ -69,6 +70,7 @@ Collection::Collection() : ListItem<Collection>()
 	parent_ = NULL;
 	type_ = Collection::MasterCollection;
 	currentSlice_ = NULL;
+	fitKernel_ = NULL;
 
 	// Display
 	visible_ = true;
@@ -84,6 +86,7 @@ Collection::~Collection()
 {
 	// Ensure that the collection is removed from the pane it is being displayed in
 	if (displayPane_) displayPane_->removeCollection(this);
+	if (fitKernel_) delete fitKernel_;
 }
 
 // Copy constructor
@@ -561,14 +564,14 @@ Collection* Collection::findCollection(QString name)
 	if (title_ == name) return this;
 
 	// Check fit data
-	for (Collection* fit = fitData_.first(); fit != NULL; fit = fit->next)
+	for (Collection* fit = fits_.first(); fit != NULL; fit = fit->next)
 	{
 		Collection* result = fit->findCollection(name);
 		if (result) return result;
 	}
 
 	// Check extracted data
-	for (Collection* extract = extractedData_.first(); extract != NULL; extract = extract->next)
+	for (Collection* extract = slices_.first(); extract != NULL; extract = extract->next)
 	{
 		Collection* result = extract->findCollection(name);
 		if (result) return result;
@@ -582,8 +585,8 @@ Collection* Collection::findCollection(QString name)
 Collection* Collection::nextCollection(bool descend)
 {
 	// If the current collection contains additional data, return that
-	if (descend && fitData_.first()) return fitData_.first();
-	else if (descend && extractedData_.first()) return extractedData_.first();
+	if (descend && fits_.first()) return fits_.first();
+	else if (descend && slices_.first()) return slices_.first();
 
 	// If there is a next item in the current collection's list (whatever it is) move on to that
 	if (next) return next;
@@ -593,7 +596,7 @@ Collection* Collection::nextCollection(bool descend)
 	else if (type_ == Collection::FitCollection)
 	{
 		// No more fitData - check extracted data in parent. If nothing there, then we must ascend to the next item in the parent's list
-		if (parent_->extractedData_.nItems() != 0) return parent_->extractedData();
+		if (parent_->slices_.nItems() != 0) return parent_->slices();
 		else return parent_->nextCollection(false);
 	}
 	else if (type_ == Collection::ExtractedCollection) return parent_->nextCollection(false);
@@ -605,8 +608,8 @@ Collection* Collection::nextCollection(bool descend)
 Collection* Collection::previousCollection(bool descend)
 {
 	// If the current collection contains additional data, return that
-	if (descend && extractedData_.last()) return extractedData_.last()->previousCollection(true);
-	else if (descend && fitData_.last()) return fitData_.last()->previousCollection(true);
+	if (descend && slices_.last()) return slices_.last()->previousCollection(true);
+	else if (descend && fits_.last()) return fits_.last()->previousCollection(true);
 	else if (descend) return this;
 
 	// If there is a previous item in the current collection's list (whatever it is) move on to that
@@ -617,7 +620,7 @@ Collection* Collection::previousCollection(bool descend)
 	else if (type_ == Collection::ExtractedCollection)
 	{
 		// No more extractedData - check fit data in parent. If nothing there, then we must ascend to the previous item in the parent's list
-		if (parent_->fitData_.nItems() != 0) return parent_->fitData_.last()->previousCollection(true);
+		if (parent_->fits_.nItems() != 0) return parent_->fits_.last()->previousCollection(true);
 		else return parent_->previousCollection(true);
 	}
 	else if (type_ == Collection::FitCollection) return parent_;
@@ -643,10 +646,10 @@ Collection::CollectionType Collection::type()
 	return type_;
 }
 
-// Add fit data to Collection
-Collection* Collection::addFitData(QString title)
+// Add fit to Collection
+Collection* Collection::addFit(QString title)
 {
-	Collection* newFit = fitData_.add();
+	Collection* newFit = fits_.add();
 	newFit->setTitle(title);
 	newFit->type_ = Collection::FitCollection;
 	newFit->setParent(this);
@@ -654,39 +657,39 @@ Collection* Collection::addFitData(QString title)
 	return newFit;
 }
 
-// Remove specified fit data from list
-void Collection::removeFitData(Collection* collection)
+// Remove specified fit from list
+void Collection::removeFit(Collection* collection)
 {
-	fitData_.remove(collection);
+	fits_.remove(collection);
 }
 
-// Return fit data in Collection
-Collection* Collection::fitData()
+// Return fits in Collection
+Collection* Collection::fits()
 {
-	return fitData_.first();
+	return fits_.first();
 }
 
-// Add extracted data to Collection
-Collection* Collection::addExtractedData(QString title)
+// Add slice to Collection
+Collection* Collection::addSlice(QString title)
 {
-	Collection* newExtract = extractedData_.add();
-	newExtract->setTitle(title);
-	newExtract->type_ = Collection::ExtractedCollection;
-	newExtract->setParent(this);
+	Collection* newSlice = slices_.add();
+	newSlice->setTitle(title);
+	newSlice->type_ = Collection::ExtractedCollection;
+	newSlice->setParent(this);
 
-	return newExtract;
+	return newSlice;
 }
 
-// Remove specified extracted data from list
-void Collection::removeExtractedData(Collection* collection)
+// Remove specified slice from list
+void Collection::removeSlice(Collection* collection)
 {
-	extractedData_.remove(collection);
+	slices_.remove(collection);
 }
 
-// Return extracted data in Collection
-Collection* Collection::extractedData()
+// Return slices in Collection
+Collection* Collection::slices()
 {
-	return extractedData_.first();
+	return slices_.first();
 }
 
 // Update current slice based on specified axis and value
@@ -702,10 +705,10 @@ void Collection::extractCurrentSlice(int axis, double axisValue)
 {
 	getSlice(axis, closestBin(axis, axisValue));
 
-	Collection* newExtractedData = addExtractedData(currentSlice_->title());
-	newExtractedData->addDataSet(currentSlice_->dataSets());
+	Collection* newSlice = addSlice(currentSlice_->title());
+	newSlice->addDataSet(currentSlice_->dataSets());
 
-	notifyDependents(newExtractedData, Collection::CollectionCreatedSignal);
+	notifyDependents(newSlice, Collection::CollectionCreatedSignal);
 	notifyDependents(this, Collection::ExtractedDataAddedSignal);
 }
 
@@ -714,12 +717,28 @@ Collection* Collection::currentSlice()
 {
 	return currentSlice_;
 }
-	
+
+// Add FitKernel, if one does not exist
+void Collection::addFitKernel()
+{
+	if (fitKernel_)	msg.print("Warning: Attempted to add a new FitKernel to collection '%s', but one already exists.\n", qPrintable(title_));
+	else fitKernel_ = new FitKernel;
+	fitKernel_->setSourceCollection(parent_);
+	fitKernel_->setDestinationCollection(this);
+}
+
+// Return FitKernel
+FitKernel* Collection::fitKernel()
+{
+	return fitKernel_;
+}
+
 /*
  * Dependent Data / Signalling
  */
 
 // Notify dependents that something in this collection has changed
+// TODO Rename This
 void Collection::notifyDependents(Collection* source, Collection::CollectionSignal signal)
 {
 	// Add signal to list
@@ -1110,9 +1129,9 @@ void Collection::setDisplayDataInvalid()
 {
 	// Update subcollections first
 	// -- Fit data
-	for (Collection* fit = fitData_.first(); fit != NULL; fit = fit->next) fit->setDisplayDataInvalid();
+	for (Collection* fit = fits_.first(); fit != NULL; fit = fit->next) fit->setDisplayDataInvalid();
 	// -- Extracted data
-	for (Collection* extract = extractedData_.first(); extract != NULL; extract = extract->next) extract->setDisplayDataInvalid();
+	for (Collection* extract = slices_.first(); extract != NULL; extract = extract->next) extract->setDisplayDataInvalid();
 	// -- Current slice
 	if (currentSlice_) currentSlice_->setDisplayDataInvalid();
 

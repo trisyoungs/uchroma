@@ -88,7 +88,7 @@ int Keywords::axisKeywordNArguments(Keywords::AxisKeyword kwd)
 */
 
 // Collection Block Keywords
-const char* CollectionBlockKeywords[] = { "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearRGBA", "ColourLinearRGBB", "ColourLinearHSVA", "ColourLinearHSVB", "ColourSingle", "ColourSource", "DataDirectory", "DataSet", "EndCollection", "ExtractedData", "Fit", "Interpolate", "InterpolateConstrain", "InterpolateStep", "Style", "TransformX", "TransformY", "TransformZ", "Visible" };
+const char* CollectionBlockKeywords[] = { "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearRGBA", "ColourLinearRGBB", "ColourLinearHSVA", "ColourLinearHSVB", "ColourSingle", "ColourSource", "DataDirectory", "DataSet", "EndCollection", "Fit", "FitParameters", "Interpolate", "InterpolateConstrain", "InterpolateStep", "Slice", "Style", "TransformX", "TransformY", "TransformZ", "Visible" };
 
 // Collection Block NArguments
 int CollectionKeywordNArguments[] = { 1, 1, 5, 5, 5, 5, 5, 4, 1, 1, 1, 0, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1 };
@@ -119,8 +119,27 @@ int Keywords::collectionKeywordNArguments(Keywords::CollectionKeyword kwd)
 }
 
 /*
-// Settings Keywords
-*/
+ * FitParameters Keywords
+ */
+
+// FitParameters Block Keywords
+const char* FitParametersBlockKeywords[] = { "EndFitParameters", "Equation", "Global", "LimitStrength", "Orthogonal", "Variable", "XRangeType", "XRangeAbsolute", "XRangeIndex", "XRangeSingle", "ZRangeType", "ZRangeAbsolute", "ZRangeIndex", "ZRangeSingle" };
+
+// FitParameters Block NArguments
+int FitParametersKeywordNArguments[] = { 0, 1, 1, 1, 1, 7, 1, 2, 2, 1, 1, 2, 2, 1 };
+
+/*!
+ * \brief Convert text string to FitParametersKeyword
+ */
+Keywords::FitParametersKeyword Keywords::fitParametersKeyword(const char* s)
+{
+	for (int n=0; n<nFitParametersKeywords; ++n) if (strcmp(s,FitParametersBlockKeywords[n]) == 0) return (Keywords::FitParametersKeyword) n;
+	return nFitParametersKeywords;
+}
+
+/*
+ * Settings Keywords
+ */
 
 // Settings Block Keywords
 const char* SettingsBlockKeywords[] = { "EndSettings", "ImageExport" };
