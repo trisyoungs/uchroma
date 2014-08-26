@@ -84,14 +84,14 @@ int Keywords::axisKeywordNArguments(Keywords::AxisKeyword kwd)
 }
 
 /*
-// Collection Keywords
-*/
+ * Collection Keywords
+ */
 
 // Collection Block Keywords
 const char* CollectionBlockKeywords[] = { "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearRGBA", "ColourLinearRGBB", "ColourLinearHSVA", "ColourLinearHSVB", "ColourSingle", "ColourSource", "DataDirectory", "DataSet", "EndCollection", "Fit", "FitParameters", "Interpolate", "InterpolateConstrain", "InterpolateStep", "Slice", "Style", "TransformX", "TransformY", "TransformZ", "Visible" };
 
 // Collection Block NArguments
-int CollectionKeywordNArguments[] = { 1, 1, 5, 5, 5, 5, 5, 4, 1, 1, 1, 0, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1 };
+int CollectionKeywordNArguments[] = { 1, 1, 5, 5, 5, 5, 5, 4, 1, 1, 1, 0, 1, 0, 2, 2, 2, 2, 1, 2, 2, 2, 1 };
 
 /*!
  * \brief Convert text string to CollectionKeyword
@@ -137,6 +137,22 @@ Keywords::FitParametersKeyword Keywords::fitParametersKeyword(const char* s)
 	return nFitParametersKeywords;
 }
 
+/*!
+ * \brief Convert FitParametersKeyword to text string
+ */
+const char* Keywords::fitParametersKeyword(Keywords::FitParametersKeyword kwd)
+{
+	return FitParametersBlockKeywords[kwd];
+}
+
+/*!
+ * \brief Return minimum number of expected arguments
+ */
+int Keywords::fitParametersKeywordNArguments(Keywords::FitParametersKeyword kwd)
+{
+	return FitParametersKeywordNArguments[kwd];
+}
+
 /*
  * Settings Keywords
  */
@@ -173,8 +189,8 @@ int Keywords::settingsKeywordNArguments(Keywords::SettingsKeyword kwd)
 }
 
 /*
-// DataSet Keywords
-*/
+ * DataSet Keywords
+ */
 
 // DataSet Block Keywords
 const char* DataSetBlockKeywords[] = { "Data", "EndDataSet", "Source", "Z" };
@@ -208,8 +224,8 @@ int Keywords::dataSetKeywordNArguments(Keywords::DataSetKeyword kwd)
 }
 
 /*
-// View Keywords
-*/
+ * View Keywords
+ */
 
 // View Block Keywords
 const char* ViewBlockKeywords[] = { "EndView", "Grid", "LabelFaceViewer", "ViewPane" };
@@ -243,14 +259,14 @@ int Keywords::viewKeywordNArguments(Keywords::ViewKeyword kwd)
 }
 
 /*
-// ViewPane Keywords
-*/
+ * ViewPane Keywords
+ */
 
 // ViewPane Block Keywords
-const char* ViewPaneBlockKeywords[] = { "Axis", "BoundingBox", "BoundingBoxPlaneY", "Collection", "EndViewPane", "Geometry", "LabelPointSize", "MatrixX", "MatrixY", "MatrixZ", "MatrixW", "Perspective", "Role", "RoleTargetCollection", "RoleTargetPane", "TitlePointSize", "TwoDimensional" };
+const char* ViewPaneBlockKeywords[] = { "AutoScale", "AutoStretch3D", "Axis", "BoundingBox", "BoundingBoxPlaneY", "Collection", "EndViewPane", "Geometry", "LabelPointSize", "MatrixX", "MatrixY", "MatrixZ", "MatrixW", "Perspective", "Role", "RoleTargetCollection", "RoleTargetPane", "TitlePointSize", "TwoDimensional" };
 
 // ViewPane Block NArguments
-int ViewPaneKeywordNArguments[] = { 1, 1, 1, 1, 0, 4, 1, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1 };
+int ViewPaneKeywordNArguments[] = { 1, 1, 1, 1, 1, 1, 0, 4, 1, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1 };
 
 /*!
  * \brief Convert text string to ViewPaneKeyword

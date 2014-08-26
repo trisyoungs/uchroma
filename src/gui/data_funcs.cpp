@@ -21,6 +21,7 @@
 
 #include "gui/data.h"
 #include "gui/uchroma.h"
+#include "base/currentproject.h"
 #include "templates/reflist.h"
 
 /*
@@ -52,12 +53,8 @@ void DataWindow::closeEvent(QCloseEvent* event)
  * Convenience Functions
  */
 
-/*
- * Slots
- */
-
-// Select source directory
-void DataWindow::on_SourceDirSelectButton_clicked(bool checked)
+// Reload datasets from their associated files
+void DataWindow::reloadDataSets()
 {
 	// Check for valid collection
 	Collection* currentCollection = uChroma_.currentCollection();
@@ -81,8 +78,18 @@ void DataWindow::on_SourceDirSelectButton_clicked(bool checked)
 	progress.setValue(currentCollection->nDataSets());
 
 	// Need to update GUI
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateGUI();
+}
+
+/*
+ * Slots
+ */
+
+// Select source directory
+void DataWindow::on_SourceDirSelectButton_clicked(bool checked)
+{
+	reloadDataSets();
 }
 
 // Add files button clicked
@@ -112,8 +119,11 @@ void DataWindow::on_AddFilesButton_clicked(bool checked)
 		progress.setValue(count);
 		if (progress.wasCanceled()) break;
 
+		// Get FileInfo for fileName
+		QFileInfo fileInfo(fileName);
+
 		DataSet* dataSet = currentCollection->addDataSet(z);
-		dataSet->setTitle(fileName);
+		dataSet->setTitle(fileInfo.fileName());
 		dataSet->setDataSource(DataSet::FileSource);
 		dataSet->setSourceFileName(currentCollection->dataFileDirectory().relativeFilePath(fileName));
 		currentCollection->setDataSetZ(dataSet, z);
@@ -136,7 +146,7 @@ void DataWindow::on_AddFilesButton_clicked(bool checked)
 	}
 
 	// Need to update GUI
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateGUI();
 }
 
@@ -155,7 +165,7 @@ void DataWindow::on_RemoveFilesButton_clicked(bool checked)
 	for (RefListItem<DataSet,int>* ri = slicesToRemove.first(); ri != NULL; ri = ri->next) currentCollection->removeDataSet(ri->item);
 
 	// Need to update GUI
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateGUI();
 }
 
@@ -185,7 +195,7 @@ void DataWindow::on_SourceFilesTable_cellChanged(int row, int column)
 		currentCollection->setDataSetZ(dataSet, item->text().toDouble());
 
 		// Need to update now
-		uChroma_.setAsModified();
+		CurrentProject::setAsModified();
 		uChroma_.updateGUI();
 	}
 }
@@ -234,7 +244,7 @@ void DataWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 	currentCollection->setDisplayDataInvalid();
 
 	// Need to update now
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateGUI();
 }
 
@@ -274,7 +284,7 @@ void DataWindow::on_ReloadFilesButton_clicked(bool checked)
 	}
 
 	// Need to update GUI
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateGUI();
 }
 

@@ -51,8 +51,8 @@ class ViewLayout : public ListItem<ViewLayout>
 	UChromaWindow& parent_;
 
 	public:
-	// Set as modified (call parent routine)
-	void setAsModified(ViewPane* caller = NULL);
+	// Pane has changed
+	void paneChanged(ViewPane* caller = NULL);
 
 
 	/*

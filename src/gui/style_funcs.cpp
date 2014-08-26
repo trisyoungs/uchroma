@@ -21,6 +21,7 @@
 
 #include "gui/style.h"
 #include "gui/uchroma.h"
+#include "base/currentproject.h"
 #include "templates/reflist.h"
 
 /*
@@ -79,7 +80,7 @@ void StyleWindow::on_StyleCombo_currentIndexChanged(int index)
 	currentCollection->setDisplayStyle( (Collection::DisplayStyle) index );
 
 	// Update display
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 	uChroma_.updateCollectionInfo();
 }
@@ -96,7 +97,7 @@ void StyleWindow::on_ColourSingleColourRadio_clicked(bool checked)
 
 	// Update gradient bar and display
 	updateGradientBar();
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -112,7 +113,7 @@ void StyleWindow::on_ColourSingleColourButton_clicked(bool checked)
 
 		// Update gradient bar and display
 		updateGradientBar();
-		uChroma_.setAsModified();
+		CurrentProject::setAsModified();
 		uChroma_.updateDisplay();
 	}
 }
@@ -129,7 +130,7 @@ void StyleWindow::on_ColourRGBGradientRadio_clicked(bool checked)
 
 	// Update gradient bar and display
 	updateGradientBar();
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -145,7 +146,7 @@ void StyleWindow::on_ColourRGBGradientAButton_clicked(bool checked)
 
 		// Update gradient bar and display
 		updateGradientBar();
-		uChroma_.setAsModified();
+		CurrentProject::setAsModified();
 		uChroma_.updateDisplay();
 	}
 }
@@ -160,7 +161,7 @@ void StyleWindow::on_ColourRGBGradientASpin_valueChanged(double value)
 
 	// Update gradient bar and display
 	updateGradientBar();
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -196,7 +197,7 @@ void StyleWindow::on_ColourRGBGradientBButton_clicked(bool checked)
 
 		// Update gradient bar and display
 		updateGradientBar();
-		uChroma_.setAsModified();
+		CurrentProject::setAsModified();
 		uChroma_.updateDisplay();
 	}
 }
@@ -211,7 +212,7 @@ void StyleWindow::on_ColourRGBGradientBSpin_valueChanged(double value)
 
 	// Update gradient bar and display
 	updateGradientBar();
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -247,7 +248,7 @@ void StyleWindow::on_ColourHSVGradientRadio_clicked(bool checked)
 
 	// Update gradient bar and display
 	updateGradientBar();
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -263,7 +264,7 @@ void StyleWindow::on_ColourHSVGradientAButton_clicked(bool checked)
 
 		// Update gradient bar and display
 		updateGradientBar();
-		uChroma_.setAsModified();
+		CurrentProject::setAsModified();
 		uChroma_.updateDisplay();
 	}
 }
@@ -278,7 +279,7 @@ void StyleWindow::on_ColourHSVGradientASpin_valueChanged(double value)
 
 	// Update gradient bar and display
 	updateGradientBar();
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -314,7 +315,7 @@ void StyleWindow::on_ColourHSVGradientBButton_clicked(bool checked)
 
 		// Update gradient bar and display
 		updateGradientBar();
-		uChroma_.setAsModified();
+		CurrentProject::setAsModified();
 		uChroma_.updateDisplay();
 	}
 }
@@ -329,7 +330,7 @@ void StyleWindow::on_ColourHSVGradientBSpin_valueChanged(double value)
 
 	// Update gradient bar and display
 	updateGradientBar();
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -365,7 +366,7 @@ void StyleWindow::on_ColourCustomGradientRadio_clicked(bool checked)
 
 	// Update gradient bar and display
 	updateGradientBar();
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -402,7 +403,7 @@ void StyleWindow::on_ColourCustomGradientTable_cellDoubleClicked(int row, int co
 
 	// Update gradient bar and display
 	updateGradientBar();
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -426,7 +427,7 @@ void StyleWindow::on_ColourCustomGradientTable_cellChanged(int row, int column)
 
 	// Update gradient bar and display
 	updateGradientBar();
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -440,7 +441,7 @@ void StyleWindow::on_ColourCustomGradientAddButton_clicked(bool checked)
 
 	// Update gradient bar and display
 	updateGradientBar();
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -469,7 +470,7 @@ void StyleWindow::on_ColourCustomGradientRemoveButton_clicked(bool checked)
 
 	// Update gradient bar and display
 	updateGradientBar();
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -484,7 +485,7 @@ void StyleWindow::on_ColourAlphaOwnAlphaRadio_clicked(bool checked)
 	currentCollection->setAlphaControl(Collection::OwnAlpha);
 
 	// Update display
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -497,7 +498,7 @@ void StyleWindow::on_ColourAlphaFixedAlphaRadio_clicked(bool checked)
 	currentCollection->setAlphaControl(Collection::FixedAlpha);
 
 	// Update display
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -510,7 +511,7 @@ void StyleWindow::on_ColourAlphaFixedAlphaSpin_valueChanged(double value)
 	currentCollection->setFixedAlpha(value);
 
 	// Update display
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 

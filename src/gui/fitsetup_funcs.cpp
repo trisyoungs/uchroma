@@ -55,6 +55,7 @@ void FitSetupDialog::closeEvent(QCloseEvent* event)
 
 void FitSetupDialog::on_CloseButton_clicked(bool checked)
 {
+	fitKernel_ = NULL;
 	accept();
 }
 
@@ -73,6 +74,7 @@ bool FitSetupDialog::setFitKernel(FitKernel* fitKernel)
 	}
 
 	fitKernel_ = fitKernel;
+	fitKernel_->checkRanges();
 }
 
 /*
@@ -102,12 +104,6 @@ void FitSetupDialog::on_SelectEquationButton_clicked(bool checked)
 	EquationSelectDialog selectDialog(this);
 	if (selectDialog.exec()) ui.EquationEdit->setText(selectDialog.selectedEquation().equationText);
 }
-
-// void FitSetupDialog::on_FitButton_clicked(bool checked)
-// {
-// 	if (doFitting()) uChroma_.setAsModified();
-// 	uChroma_.updateGUI();
-// }
 
 /*
  * Variables Group
@@ -181,7 +177,7 @@ void FitSetupDialog::on_VariablesTable_cellChanged(int row, int column)
 {
 	if (refreshing_) return;
 
-	// The index of the associated FirVariable will have been stored as the item's data
+	// The index of the associated FitVariable will have been stored as the item's data
 	QTableWidgetItem* item = ui.VariablesTable->item(row, column);
 	if (!item) return;
 
@@ -211,16 +207,15 @@ void FitSetupDialog::on_VariablesTable_cellChanged(int row, int column)
 	}
 }
 
-void FitSetupDialog::on_VariablesLimitStrengthSpin_valueChanged(double value)
+void FitSetupDialog::on_VariableAddReferenceButton_clicked(bool checked)
 {
-	if (refreshing_ || (!fitKernel_)) return;
-
-	fitKernel_->setLimitStrength(value);
+	// TODO
 }
 
 /*
  * Source Data
  */
+
 void FitSetupDialog::on_DataNormalFitRadio_clicked(bool checked)
 {
 	if (refreshing_ || (!fitKernel_)) return;
@@ -235,7 +230,7 @@ void FitSetupDialog::on_DataOrthogonalFitRadio_clicked(bool checked)
 	fitKernel_->setOrthogonal(checked);
 }
 
-void FitSetupDialog::on_DataGlobalFit_clicked(bool checked)
+void FitSetupDialog::on_DataGlobalFitCheck_clicked(bool checked)
 {
 	if (refreshing_ || (!fitKernel_)) return;
 
@@ -243,8 +238,227 @@ void FitSetupDialog::on_DataGlobalFit_clicked(bool checked)
 }
 
 /*
+ * Source X
+ */
+
+void FitSetupDialog::on_XSourceAbsoluteRadio_clicked(bool checked)
+{
+	if (!checked) return;
+
+	ui.XAbsoluteMinSpin->setEnabled(true);
+	ui.XAbsoluteMaxSpin->setEnabled(true);
+	ui.XPointSingleSpin->setEnabled(false);
+	ui.XPointMaxSpin->setEnabled(false);
+	ui.XPointMinSpin->setEnabled(false);
+	ui.XPointSingleLabel->setEnabled(false);
+	ui.XPointMaxLabel->setEnabled(false);
+	ui.XPointMinLabel->setEnabled(false);
+
+	if (refreshing_ || (!fitKernel_)) return;
+
+	fitKernel_->setXRange(FitKernel::AbsoluteRange);
+}
+
+void FitSetupDialog::on_XAbsoluteMinSpin_valueChanged(double value)
+{
+	if (refreshing_ || (!fitKernel_)) return;
+
+	fitKernel_->setAbsoluteXMin(value);
+
+	updateLabels();
+}
+
+void FitSetupDialog::on_XAbsoluteMaxSpin_valueChanged(double value)
+{
+	if (refreshing_ || (!fitKernel_)) return;
+
+	fitKernel_->setAbsoluteXMax(value);
+
+	updateLabels();
+}
+
+void FitSetupDialog::on_XAbsoluteSelectButton_clicked(bool checked)
+{
+	uChroma_.setInteractionMode(InteractionMode::FitSetupSelectXInteraction, 0);
+	reject();
+}
+
+void FitSetupDialog::on_XSourceSinglePointRadio_clicked(bool checked)
+{
+	if (!checked) return;
+
+	ui.XAbsoluteMinSpin->setEnabled(false);
+	ui.XAbsoluteMaxSpin->setEnabled(false);
+	ui.XPointSingleSpin->setEnabled(true);
+	ui.XPointMaxSpin->setEnabled(false);
+	ui.XPointMinSpin->setEnabled(false);
+	ui.XPointSingleLabel->setEnabled(true);
+	ui.XPointMaxLabel->setEnabled(false);
+	ui.XPointMinLabel->setEnabled(false);
+
+	if (refreshing_ || (!fitKernel_)) return;
+
+	fitKernel_->setXRange(FitKernel::SinglePointRange);
+}
+
+void FitSetupDialog::on_XPointSingleSpin_valueChanged(int value)
+{
+	if (refreshing_ || (!fitKernel_)) return;
+
+	fitKernel_->setIndexXSingle(value);
+
+	updateLabels();
+}
+
+void FitSetupDialog::on_XSourcePointRangeRadio_clicked(bool checked)
+{
+	if (!checked) return;
+
+	ui.XAbsoluteMinSpin->setEnabled(false);
+	ui.XAbsoluteMaxSpin->setEnabled(false);
+	ui.XPointSingleSpin->setEnabled(false);
+	ui.XPointMaxSpin->setEnabled(true);
+	ui.XPointMinSpin->setEnabled(true);
+	ui.XPointSingleLabel->setEnabled(false);
+	ui.XPointMaxLabel->setEnabled(true);
+	ui.XPointMinLabel->setEnabled(true);
+
+	if (refreshing_ || (!fitKernel_)) return;
+
+	fitKernel_->setXRange(FitKernel::IndexRange);
+}
+
+void FitSetupDialog::on_XPointMinSpin_valueChanged(int value)
+{
+	if (refreshing_ || (!fitKernel_)) return;
+
+	fitKernel_->setAbsoluteXMax(value);
+
+	updateLabels();
+}
+
+void FitSetupDialog::on_XPointMaxSpin_valueChanged(int value)
+{
+	if (refreshing_ || (!fitKernel_)) return;
+
+	fitKernel_->setAbsoluteXMax(value);
+
+	updateLabels();
+}
+
+/*
+ * Source Z
+ */
+
+void FitSetupDialog::on_ZSourceAbsoluteRadio_clicked(bool checked)
+{
+	if (!checked) return;
+
+	ui.ZAbsoluteMinSpin->setEnabled(true);
+	ui.ZAbsoluteMaxSpin->setEnabled(true);
+	ui.ZDataSetCombo->setEnabled(false);
+	ui.ZDataSetMaxSpin->setEnabled(false);
+	ui.ZDataSetMinSpin->setEnabled(false);
+	ui.ZDataSetSingleLabel->setEnabled(false);
+	ui.ZDataSetMaxLabel->setEnabled(false);
+	ui.ZDataSetMinLabel->setEnabled(false);
+
+	if (refreshing_ || (!fitKernel_)) return;
+
+	fitKernel_->setZRange(FitKernel::AbsoluteRange);
+}
+
+void FitSetupDialog::on_ZAbsoluteMinSpin_valueChanged(double value)
+{
+	if (refreshing_ || (!fitKernel_)) return;
+
+	fitKernel_->setAbsoluteZMin(value);
+
+	updateLabels();
+}
+
+void FitSetupDialog::on_ZAbsoluteMaxSpin_valueChanged(double value)
+{
+	if (refreshing_ || (!fitKernel_)) return;
+
+	fitKernel_->setAbsoluteZMax(value);
+
+	updateLabels();
+}
+
+void FitSetupDialog::on_ZAbsoluteSelectButton_clicked(bool checked)
+{
+	uChroma_.setInteractionMode(InteractionMode::FitSetupSelectZInteraction, 2);
+	reject();
+}
+
+void FitSetupDialog::on_ZSourceSingleDataSetRadio_clicked(bool checked)
+{
+	if (!checked) return;
+
+	ui.ZAbsoluteMinSpin->setEnabled(false);
+	ui.ZAbsoluteMaxSpin->setEnabled(false);
+	ui.ZDataSetCombo->setEnabled(true);
+	ui.ZDataSetMaxSpin->setEnabled(false);
+	ui.ZDataSetMinSpin->setEnabled(false);
+	ui.ZDataSetSingleLabel->setEnabled(true);
+	ui.ZDataSetMaxLabel->setEnabled(false);
+	ui.ZDataSetMinLabel->setEnabled(false);
+
+	if (refreshing_ || (!fitKernel_)) return;
+
+	fitKernel_->setZRange(FitKernel::SinglePointRange);
+}
+
+void FitSetupDialog::on_ZDataSetCombo_currentIndexChanged(int index)
+{
+	if (refreshing_ || (!fitKernel_)) return;
+
+	fitKernel_->setIndexZSingle(index);
+
+	updateLabels();
+}
+
+void FitSetupDialog::on_ZSourceDataSetRangeRadio_clicked(bool checked)
+{
+	if (!checked) return;
+
+	ui.ZAbsoluteMinSpin->setEnabled(false);
+	ui.ZAbsoluteMaxSpin->setEnabled(false);
+	ui.ZDataSetCombo->setEnabled(false);
+	ui.ZDataSetMaxSpin->setEnabled(true);
+	ui.ZDataSetMinSpin->setEnabled(true);
+	ui.ZDataSetSingleLabel->setEnabled(false);
+	ui.ZDataSetMaxLabel->setEnabled(true);
+	ui.ZDataSetMinLabel->setEnabled(true);
+
+	if (refreshing_ || (!fitKernel_)) return;
+
+	fitKernel_->setZRange(FitKernel::IndexRange);
+}
+
+void FitSetupDialog::on_ZDataSetMinSpin_valueChanged(int value)
+{
+	if (refreshing_ || (!fitKernel_)) return;
+
+	fitKernel_->setIndexZMin(value);
+
+	updateLabels();
+}
+
+void FitSetupDialog::on_ZDataSetMaxSpin_valueChanged(int value)
+{
+	if (refreshing_ || (!fitKernel_)) return;
+
+	fitKernel_->setIndexZMax(value);
+
+	updateLabels();
+}
+
+/*
  * Minimisation
  */
+
 void FitSetupDialog::on_MinimisationMethodCombo_currentIndexChanged(int index)
 {
 	if (refreshing_ || (!fitKernel_)) return;
@@ -266,202 +480,30 @@ void FitSetupDialog::on_MinimisationMaxStepsSpin_valueChanged(int value)
 	fitKernel_->setMaxSteps(value);
 }
 
-/*
- * Source X
- */
-
-void FitSetupDialog::on_XSourceAbsoluteRadio_clicked(bool checked)
-{
-	if (!checked) return;
-
-	ui.XAbsoluteMinSpin->setEnabled(true);
-	ui.XAbsoluteMaxSpin->setEnabled(true);
-	ui.XPointSingleSpin->setEnabled(false);
-	ui.XPointMaxSpin->setEnabled(false);
-	ui.XPointMinSpin->setEnabled(false);
-
-	if (refreshing_ || (!fitKernel_)) return;
-
-	fitKernel_->setXRange(FitKernel::AbsoluteRange);
-}
-
-void FitSetupDialog::on_XAbsoluteMinSpin_valueChanged(double value)
+void FitSetupDialog::on_MinimisationLimitStrengthSpin_valueChanged(double value)
 {
 	if (refreshing_ || (!fitKernel_)) return;
 
-	fitKernel_->setAbsoluteXMin(value);
-}
-
-void FitSetupDialog::on_XAbsoluteMaxSpin_valueChanged(double value)
-{
-	if (refreshing_ || (!fitKernel_)) return;
-
-	fitKernel_->setAbsoluteXMax(value);
-}
-
-void FitSetupDialog::on_XAbsoluteSelectButton_clicked(bool checked)
-{
-	uChroma_.setInteractionMode(InteractionMode::FitSetupSelectXInteraction, 0);
-	hide();
-}
-
-void FitSetupDialog::on_XSourceSinglePointRadio_clicked(bool checked)
-{
-	if (!checked) return;
-
-	ui.XAbsoluteMinSpin->setEnabled(false);
-	ui.XAbsoluteMaxSpin->setEnabled(false);
-	ui.XPointSingleSpin->setEnabled(true);
-	ui.XPointMaxSpin->setEnabled(false);
-	ui.XPointMinSpin->setEnabled(false);
-
-	if (refreshing_ || (!fitKernel_)) return;
-
-	fitKernel_->setXRange(FitKernel::SinglePointRange);
-}
-
-void FitSetupDialog::on_XPointSingleSpin_valueChanged(int value)
-{
-	if (refreshing_ || (!fitKernel_)) return;
-
-	fitKernel_->setIndexXSingle(value);
-}
-
-void FitSetupDialog::on_XSourcePointRangeRadio_clicked(bool checked)
-{
-	if (!checked) return;
-
-	ui.XAbsoluteMinSpin->setEnabled(false);
-	ui.XAbsoluteMaxSpin->setEnabled(false);
-	ui.XPointSingleSpin->setEnabled(false);
-	ui.XPointMaxSpin->setEnabled(true);
-	ui.XPointMinSpin->setEnabled(true);
-
-	if (refreshing_ || (!fitKernel_)) return;
-
-	fitKernel_->setXRange(FitKernel::IndexRange);
-}
-
-void FitSetupDialog::on_XPointMinSpin_valueChanged(int value)
-{
-	if (refreshing_ || (!fitKernel_)) return;
-
-	fitKernel_->setAbsoluteXMax(value);
-}
-
-void FitSetupDialog::on_XPointMaxSpin_valueChanged(int value)
-{
-	if (refreshing_ || (!fitKernel_)) return;
-
-	fitKernel_->setAbsoluteXMax(value);
-}
-
-/*
- * Source Z
- */
-void FitSetupDialog::on_ZSourceAbsoluteRadio_clicked(bool checked)
-{
-	if (!checked) return;
-
-	ui.ZAbsoluteMinSpin->setEnabled(true);
-	ui.ZAbsoluteMaxSpin->setEnabled(true);
-	ui.ZDataSetCombo->setEnabled(false);
-	ui.ZDataSetMaxSpin->setEnabled(false);
-	ui.ZDataSetMinSpin->setEnabled(false);
-
-	if (refreshing_ || (!fitKernel_)) return;
-
-	fitKernel_->setZRange(FitKernel::AbsoluteRange);
-}
-
-void FitSetupDialog::on_ZAbsoluteMinSpin_valueChanged(double value)
-{
-	if (refreshing_ || (!fitKernel_)) return;
-
-	fitKernel_->setAbsoluteZMin(value);
-}
-
-void FitSetupDialog::on_ZAbsoluteMaxSpin_valueChanged(double value)
-{
-	if (refreshing_ || (!fitKernel_)) return;
-
-	fitKernel_->setAbsoluteZMax(value);
-}
-
-void FitSetupDialog::on_ZAbsoluteSelectButton_clicked(bool checked)
-{
-	uChroma_.setInteractionMode(InteractionMode::FitSetupSelectZInteraction, 2);
-	hide();
-}
-
-void FitSetupDialog::on_ZSourceSingleDataSetRadio_clicked(bool checked)
-{
-	if (!checked) return;
-
-	ui.ZAbsoluteMinSpin->setEnabled(false);
-	ui.ZAbsoluteMaxSpin->setEnabled(false);
-	ui.ZDataSetCombo->setEnabled(true);
-	ui.ZDataSetMaxSpin->setEnabled(false);
-	ui.ZDataSetMinSpin->setEnabled(false);
-
-	if (refreshing_ || (!fitKernel_)) return;
-
-	fitKernel_->setZRange(FitKernel::SinglePointRange);
-}
-
-void FitSetupDialog::on_ZDataSetCombo_currentIndexChanged(int index)
-{
-	if (refreshing_ || (!fitKernel_)) return;
-
-	fitKernel_->setIndexZSingle(index);
-}
-
-void FitSetupDialog::on_ZSourceDataSetRangeRadio_clicked(bool checked)
-{
-	if (!checked) return;
-
-	ui.ZAbsoluteMinSpin->setEnabled(false);
-	ui.ZAbsoluteMaxSpin->setEnabled(false);
-	ui.ZDataSetCombo->setEnabled(false);
-	ui.ZDataSetMaxSpin->setEnabled(true);
-	ui.ZDataSetMinSpin->setEnabled(true);
-
-	if (refreshing_ || (!fitKernel_)) return;
-
-	fitKernel_->setZRange(FitKernel::IndexRange);
-}
-
-void FitSetupDialog::on_ZDataSetMinSpin_valueChanged(int value)
-{
-	if (refreshing_ || (!fitKernel_)) return;
-
-	fitKernel_->setIndexZMin(value);
-}
-
-void FitSetupDialog::on_ZDataSetMaxSpin_valueChanged(int value)
-{
-	if (refreshing_ || (!fitKernel_)) return;
-
-	fitKernel_->setIndexZMax(value);
+	fitKernel_->setLimitStrength(value);
 }
 
 /*
  * Update Functions
  */
 
-// Update controls and show window
-void FitSetupDialog::updateAndShow()
+// Update controls and execute dialog
+int FitSetupDialog::updateAndExec()
 {
-	updateControls();
-	show();
+	updateControls(true);
 	move(uChroma_.centrePos() - QPoint(width()/2, height()/2));
+	return exec();
 }
 
 // Update controls
 void FitSetupDialog::updateControls(bool force)
 {
 	// If the window isn't visible, do nothing...
-	if (!isVisible()) return;
+	if (!isVisible() && (!force)) return;
 
 	Collection* sourceCollection = fitKernel_->sourceCollection();
 	if (!sourceCollection) return;
@@ -471,21 +513,17 @@ void FitSetupDialog::updateControls(bool force)
 	// Source Collection Group
 	ui.SourceCollectionLabel->setText(sourceCollection->title());
 
+	// Destination Collection Group
+	if (fitKernel_->destinationCollection()) ui.DestinationCollectionLabel->setText(fitKernel_->destinationCollection()->title());
+	else ui.DestinationCollectionLabel->setText("<None>");
+
 	// Equation Group
 	ui.EquationEdit->setText(fitKernel_->equationText());
 
-	// Variables Group
-	ui.VariablesLimitStrengthSpin->setValue(fitKernel_->limitStrength());
-	
 	// Source Data Group
 	if (fitKernel_->orthogonal()) ui.DataOrthogonalFitRadio->setChecked(true);
 	else ui.DataNormalFitRadio->setChecked(true);
 	ui.DataGlobalFitCheck->setChecked(fitKernel_->global());
-
-	// Minimisation Group
-	ui.MinimisationMethodCombo->setCurrentIndex(fitKernel_->method());
-	ui.MinimisationToleranceSpin->setValue(fitKernel_->tolerance());
-	ui.MinimisationMaxStepsSpin->setValue(fitKernel_->maxSteps());
 
 	// Source X
 	if (fitKernel_->xRange() == FitKernel::AbsoluteRange) ui.XSourceAbsoluteRadio->setChecked(true);
@@ -512,15 +550,17 @@ void FitSetupDialog::updateControls(bool force)
 	ui.ZAbsoluteMaxSpin->setRange(true, sourceCollection->transformMin().z, true, sourceCollection->transformMax().z);
 	ui.ZDataSetCombo->clear();
 	for (DataSet* dataSet = sourceCollection->dataSets(); dataSet != NULL; dataSet = dataSet->next) ui.ZDataSetCombo->addItem(dataSet->title());
-	ui.ZDataSetCombo->setCurrentIndex(fitKernel_->indexZSingle()+1);
+	ui.ZDataSetCombo->setCurrentIndex(fitKernel_->indexZSingle());
 	ui.ZDataSetMinSpin->setValue(fitKernel_->indexZMin()+1);
 	ui.ZDataSetMinSpin->setRange(1, sourceCollection->nDataSets());
 	ui.ZDataSetMaxSpin->setValue(fitKernel_->indexZMax()+1);
 	ui.ZDataSetMaxSpin->setRange(1, sourceCollection->nDataSets());
 
-	// Populate reference Y combo  TODO??
-// 	ui.SourceReferenceYCombo->clear();
-// 	for (DataSet* dataSet = sourceCollection->dataSets(); dataSet != NULL; dataSet = dataSet->next) ui.SourceReferenceYCombo->addItem(dataSet->title() + " (Z = " + QString::number(dataSet->data().z()) + ")");
+	// Minimisation Group
+	ui.MinimisationMethodCombo->setCurrentIndex(fitKernel_->method());
+	ui.MinimisationToleranceSpin->setValue(fitKernel_->tolerance());
+	ui.MinimisationMaxStepsSpin->setValue(fitKernel_->maxSteps());
+	ui.MinimisationLimitStrengthSpin->setValue(fitKernel_->limitStrength());
 
 	refreshing_ = false;
 
@@ -544,10 +584,10 @@ void FitSetupDialog::updateLabels()
 	ui.XPointMaxLabel->setText("(X = " + QString::number(abscissa.value(ui.XPointMaxSpin->value())) + ")");
 
 	// Z Source
-	DataSet* dataSet = sourceCollection->nDataSets() == 0 ? NULL : sourceCollection->dataSet(ui.ZDataSetCombo->currentIndex()-1);
-	ui.ZDataSetSingleLabel->setText("(Z = " + (dataSet ? QString::number(dataSet->data().z()) + ")" : "???)"));
+	DataSet* dataSet = sourceCollection->nDataSets() == 0 ? NULL : sourceCollection->dataSet(ui.ZDataSetCombo->currentIndex());
+	ui.ZDataSetSingleLabel->setText("(Z = " + (dataSet ? QString::number(dataSet->data().z()) + ")" : "?)"));
 	dataSet = sourceCollection->nDataSets() == 0 ? NULL : sourceCollection->dataSet(ui.ZDataSetMinSpin->value()-1);
-	ui.ZDataSetMinLabel->setText("(Z = " + (dataSet ? QString::number(dataSet->data().z()) + ")" : "???)"));
+	ui.ZDataSetMinLabel->setText("(Z = " + (dataSet ? QString::number(dataSet->data().z()) + ")" : "?)"));
 	dataSet = sourceCollection->nDataSets() == 0 ? NULL : sourceCollection->dataSet(ui.ZDataSetMaxSpin->value()-1);
-	ui.ZDataSetMaxLabel->setText("(Z = " + (dataSet ? QString::number(dataSet->data().z()) + ")" : "???)"));
+	ui.ZDataSetMaxLabel->setText("(Z = " + (dataSet ? QString::number(dataSet->data().z()) + ")" : "?)"));
 }

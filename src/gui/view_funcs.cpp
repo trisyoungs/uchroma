@@ -21,6 +21,7 @@
 
 #include "gui/view.h"
 #include "gui/uchroma.h"
+#include "base/currentproject.h"
 #include "templates/reflist.h"
 
 /*
@@ -63,7 +64,7 @@ void ViewWindow::on_ViewBoundingBoxNoneRadio_clicked(bool checked)
 	uChroma_.currentViewPane()->setBoundingBox(ViewPane::NoBox);
 
 	// Update display
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -74,7 +75,7 @@ void ViewWindow::on_ViewBoundingBoxPlaneRadio_clicked(bool checked)
 	uChroma_.currentViewPane()->setBoundingBox(ViewPane::PlaneBox);
 
 	// Update display
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -85,7 +86,7 @@ void ViewWindow::on_ViewBoundingBoxCubeRadio_clicked(bool checked)
 	uChroma_.currentViewPane()->setBoundingBox(ViewPane::CubeBox);
 
 	// Update display
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -96,7 +97,7 @@ void ViewWindow::on_ViewBoundingBoxPlaneYSpin_valueChanged(double value)
 	uChroma_.currentViewPane()->setBoundingBoxPlaneY(value);
 
 	// Update display
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -128,7 +129,7 @@ void ViewWindow::on_ViewLabelsFaceViewerCheck_clicked(bool checked)
 	uChroma_.setLabelFaceViewer(checked);
 
 	// Update display
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -139,7 +140,7 @@ void ViewWindow::on_ViewLabelPointSizeSpin_valueChanged(double value)
 	uChroma_.currentViewPane()->setLabelPointSize(value);
 
 	// Update display
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -150,7 +151,7 @@ void ViewWindow::on_ViewTitlePointSizeSpin_valueChanged(double value)
 	uChroma_.currentViewPane()->setTitlePointSize(value);
 
 	// Update display
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 }
 

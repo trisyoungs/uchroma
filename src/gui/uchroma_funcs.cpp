@@ -21,15 +21,16 @@
 
 #include "gui/uchroma.h"
 #include "render/fontinstance.h"
+#include "base/currentproject.h"
 #include "templates/reflist.h"
 #include "templates/variantpointer.h"
 #include "version.h"
 
 // Constructor
 UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
-	axesWindow_(*this), createWindow_(*this), dataWindow_(*this), layoutWindow_(*this),
+	axesWindow_(*this), dataWindow_(*this), layoutWindow_(*this),
 	logWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this),
-	dataImportDialog_(*this), fitSetupDialog_(*this), saveImageDialog_(*this),
+	createCollectionDialog_(*this), dataImportDialog_(*this), fitSetupDialog_(*this), saveImageDialog_(*this),
 	viewLayout_(*this)
 {
 	// Initialise the icon resource
@@ -38,7 +39,11 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	// Call the main creation function
 	ui.setupUi(this);
 
+	// Set pointer in CurrentProject
+	CurrentProject::setMainWindow(this);
+
 	// Set variable defaults
+	hardIOFail_ = false;
 	inputFileDirectory_ = getenv("PWD");
 #ifdef WIN32
 	viewerFont_ = QDir::current().absoluteFilePath("bin/wright.ttf");
@@ -81,6 +86,9 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	// Set a static pointer to the main viewer in PrimitiveList
 	PrimitiveList::setViewer(ui.MainView);
 
+	// Hide CollectionList initially
+	ui.LeftWidgetsWidget->setVisible(false);
+
 	// Connect CollectionTree context menu signal
 	connect(ui.CollectionTree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(collectionTreeContextMenuRequested(QPoint)));
 
@@ -90,7 +98,6 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 
 	// Connect sub-window closed signal to toggle buttons / menu items in uChroma's main window
 	connect(&axesWindow_, SIGNAL(windowClosed(bool)), ui.actionViewAxes, SLOT(setChecked(bool)));
-	connect(&createWindow_, SIGNAL(windowClosed(bool)), ui.actionCollectionCreate, SLOT(setChecked(bool)));
 	connect(&dataWindow_, SIGNAL(windowClosed(bool)), ui.actionDataView, SLOT(setChecked(bool)));
 	connect(&layoutWindow_, SIGNAL(windowClosed(bool)), ui.actionViewLayout, SLOT(setChecked(bool)));
 	connect(&styleWindow_, SIGNAL(windowClosed(bool)), ui.actionCollectionStyle, SLOT(setChecked(bool)));
@@ -109,7 +116,6 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	ui.StatusBar->addWidget(statusBarInfoLabel_);
 	statusBarRenderingTimeLabel_ = new QLabel(this);
 	ui.StatusBar->addPermanentWidget(statusBarRenderingTimeLabel_);	
-
 
 	// Set initial interaction mode
 	setInteractionMode(InteractionMode::ViewInteraction, -1);
@@ -169,7 +175,6 @@ void UChromaWindow::updateGUI()
 	
 	updateToolBars();
 	updateSubWindows();
-	updateTitleBar();
 	updateDisplay();
 
 	refreshing_ = false;
@@ -195,13 +200,6 @@ void UChromaWindow::updateSubWindows()
 		transformWindow_.setWindowTitle("Transform (" + currentCollection_->title() + ")");
 		viewWindow_.setWindowTitle("View (" + currentCollection_->title() + ")");
 	}
-}
-
-// Update title bar
-void UChromaWindow::updateTitleBar()
-{
-	if (modified_) setWindowTitle("uChroma v" + QString(UCHROMAREVISION) + " - " + inputFile_ + " (modified) ");
-	else setWindowTitle("uChroma v" + QString(UCHROMAREVISION) + " - " + inputFile_);
 }
 
 // Update tool bars

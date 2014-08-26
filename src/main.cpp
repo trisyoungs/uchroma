@@ -46,10 +46,54 @@ int main(int argc, char *argv[])
 	/* Direct Messenger to the LogWindow */
 	msg.setTextBrowser(mainWindow.logWindowBrowser());
 
-	/* Was an input file supplied? */
-	if (argc == 2)
+	/* Do we have CLI options? */
+	if (argc > 1)
 	{
-		if (!mainWindow.loadInputFile(argv[1])) return 1;
+		int n = 1;
+		while (n < argc)
+		{
+			if (argv[n][0] != '-')
+			{
+				// Must be an input file to load....
+				if (!mainWindow.loadInputFile(argv[n])) return 1;
+				++n;
+				continue;
+			}
+
+			bool missingArg = false;
+
+			// Command-line switch
+			switch (argv[n][1])
+			{
+				case ('h'):
+					printf("UChroma revision %s, %s\n\nAvailable CLI options are:\n\n", UCHROMAREVISION, UCHROMADATE);
+					printf("\t-h\t\tShow this help\n");
+					printf("\t-a\tForce warnings generated during input file read to be treated as errors.\n");
+					printf("\t-v\tShow version information.\n");
+					return 1;
+					break;
+				case ('a'):
+					mainWindow.setHardIOFail(true);
+					break;
+				case ('v'):
+					msg.print("Version %s, %s.\n", UCHROMAREVISION, UCHROMADATE);
+					break;
+				default:
+					msg.print("Unrecognised command-line switch '%s'.\n", argv[n]);
+					msg.print("Run with -h to see available switches.\n");
+					return 1;
+					break;
+			}
+
+			// Check for missing argument flag
+			if (missingArg)
+			{
+				msg.print("Error: Argument expected but none was given for switch '%s'\n", argv[n]);
+				return 1;
+			}
+
+			++n;
+		}
 	}
 
 	/* Update main window */
@@ -57,9 +101,6 @@ int main(int argc, char *argv[])
 
 	/* Show the main window */
 	mainWindow.show();
-
-	/* Set status to not modified, if we did not load a file */
-	if (argc != 2) mainWindow.setAsModified(false);
 
 	/* Enter Qt's main events loop */
 	return app.exec();

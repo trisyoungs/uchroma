@@ -21,6 +21,7 @@
 
 #include "gui/transform.h"
 #include "gui/uchroma.h"
+#include "base/currentproject.h"
 #include "templates/reflist.h"
 
 /*
@@ -66,7 +67,7 @@ bool TransformWindow::transformEnabledChanged(int axis, bool enabled)
 	currentCollection->setTransformEnabled(axis, enabled);
 
 	// Update GUI
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateGUI();
 
 	return true;
@@ -81,7 +82,7 @@ bool TransformWindow::transformEquationChanged(int axis, QString equation)
 	currentCollection->setTransformEquation(axis, equation);
 
 	// Update GUI
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateGUI();
 
 	return true;
@@ -96,7 +97,7 @@ bool TransformWindow::transformInterpolateChanged(int axis, bool checked)
 	currentCollection->setInterpolate(axis, checked);
 
 	// Update display
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 
 	return true;
@@ -111,7 +112,7 @@ bool TransformWindow::transformInterpolateStepChanged(int axis, double step)
 	currentCollection->setInterpolationStep(axis, step);
 
 	// Update display
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 
 	return true;
@@ -126,7 +127,7 @@ bool TransformWindow::transformInterpolateConstrainChanged(int axis, bool checke
 	currentCollection->setInterpolateConstrained(axis, checked);
 
 	// Update display
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 	uChroma_.updateDisplay();
 
 	return true;

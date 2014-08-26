@@ -19,14 +19,13 @@ SUFFIXES: .ui .uih .qrc
 	rm $*.cpp
 
 clean-local:
-	-rm -f ui_* colourbutton.cpp gradientbar.cpp icons.cpp plotwidget.cpp texponentialspin.cpp viewer.cpp 
+	-rm -f ui_* colourbutton.cpp gradientbar.cpp icons.cpp texponentialspin.cpp viewer.cpp 
 
 libgui_a_SOURCES = icons.qrc texponentialspin.uih
 libgui_a_SOURCES += texponentialspin.uih texponentialspin_funcs.cpp
 libgui_a_SOURCES += axes.ui create.ui data.ui dataimport.ui equationselect.ui fitsetup.ui layout.ui saveimage.ui log.ui style.ui targetselect.ui transform.ui view.ui
 libgui_a_SOURCES += uchroma.ui uchroma_collection.cpp uchroma_data.cpp uchroma_funcs.cpp uchroma_info.cpp uchroma_interaction.cpp uchroma_slots.cpp uchroma_view.cpp
 libgui_a_SOURCES += io_load.cpp io_save.cpp keywords.cpp
-libgui_a_SOURCES += plotwidget.uih plotwidget_data.cpp plotwidget_funcs.cpp plotwidget_paintevent.cpp
 libgui_a_SOURCES += axes_funcs.cpp create_funcs.cpp data_funcs.cpp dataimport_funcs.cpp dataimport_seqxy.cpp equationselect_funcs.cpp fitsetup_funcs.cpp layout_funcs.cpp log_funcs.cpp saveimage_funcs.cpp style_funcs.cpp targetselect_funcs.cpp transform_funcs.cpp view_funcs.cpp
 libgui_a_SOURCES += colourbutton.uih colourbutton_funcs.cpp
 libgui_a_SOURCES += gradientbar.uih gradientbar_funcs.cpp

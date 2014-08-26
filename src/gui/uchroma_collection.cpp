@@ -23,6 +23,22 @@
 #include "templates/reflist.h"
 #include "templates/variantpointer.h"
 
+void UChromaWindow::on_CollectionListButton_clicked(bool checked)
+{
+	if (refreshing_) return;
+	ui.LeftWidgetsWidget->setVisible(checked);
+}
+
+void UChromaWindow::on_CollectionFocusNextButton_clicked(bool checked)
+{
+	focusNextCollection();
+}
+
+void UChromaWindow::on_CollectionFocusPreviousButton_clicked(bool checked)
+{
+	focusPreviousCollection();
+}
+
 void UChromaWindow::on_CollectionTree_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous)
 {
 	// Check current item
@@ -165,19 +181,15 @@ void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 	// -- Analysis
 	contextMenu.addSeparator();
 	QAction* fitAction = contextMenu.addAction("New &Fit Equation");
-	QAction* reFitAction = contextMenu.addAction("Edit Fit E&quation");
+	QAction* editFitAction = contextMenu.addAction("&Edit Fit E&quation");
+	QAction* updateFitAction = contextMenu.addAction("&Update/Continue Fit");
 
 	// Show it
 	QAction* menuResult = contextMenu.exec(QCursor::pos());
 
 	// What was clicked?
-	if (menuResult == deleteAction)
-	{
-		if (QMessageBox::question(this, "Confirm Delete", "Are you sure you want to delete the collection '" + currentCollection_->title() + "'?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) removeCollection(currentCollection_);
-	}
-	else if (menuResult == duplicateAction)
-	{
-	}
+	if (menuResult == deleteAction) on_actionCollectionDelete_triggered(false);
+	else if (menuResult == duplicateAction) on_actionCollectionDuplicate_triggered(false);
 	else if (paneActions.contains(menuResult))
 	{
 		// Check current display pane - if it is non-null we must remove it from that pane first
@@ -190,20 +202,20 @@ void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 
 		updateDisplay();
 	}
-	else if (menuResult == fitAction)
-	{
-		on_actionAnalyseFit_triggered(false);
-	}
-	else if (menuResult == reFitAction)
-	{
-	}
+	else if (menuResult == fitAction) on_actionAnalyseNewFit_triggered(false);
+	else if (menuResult == editFitAction) on_actionAnalyseEditFit_triggered(false);
+	else if (menuResult == updateFitAction) on_actionAnalyseUpdateFit_triggered(false);
 }
 
 // Refresh collection list
 void UChromaWindow::refreshCollections()
 {
+	refreshing_ = true;
+
 	ui.CollectionTree->clear();
 	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next) addCollectionsToTree(collection, NULL);
+
+	refreshing_ = false;
 
 	// Update associated info
 	updateCollectionInfo();

@@ -233,8 +233,8 @@ class Collection : public ListItem<Collection>
 	private:
 	// List of notifications over all collections
 	static RefList<Collection,CollectionSignal> collectionSignals_;
-	// Notify dependents that something in this collection has changed
-	void notifyDependents(Collection* source, Collection::CollectionSignal signal);
+	// Register that something in this collection has changed
+	void registerChange(Collection* source, Collection::CollectionSignal signal);
 
 	public:
 	// Return first signal in lists
@@ -253,10 +253,6 @@ class Collection : public ListItem<Collection>
 	private:
 	// Update data limits and transform data
 	void updateLimitsAndTransforms();
-
-	public:
-	// Flag that slice data has been changed
-	void setDataChanged();
 
 
 	/*

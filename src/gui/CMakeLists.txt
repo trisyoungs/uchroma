@@ -34,9 +34,6 @@ fitsetup_funcs.cpp
 gradientbar_funcs.cpp
 layout_funcs.cpp
 paneorganiser_funcs.cpp
-plotwidget_data.cpp
-plotwidget_funcs.cpp
-plotwidget_paintevent.cpp
 style_funcs.cpp
 targetselect_funcs.cpp
 texponentialspin_funcs.cpp
@@ -66,7 +63,6 @@ SET(pro_MOC_HDRS
   colourbutton.uih
   gradientbar.uih
   paneorganiser.uih
-  plotwidget.uih
   texponentialspin.uih
   viewer.uih
 )

@@ -21,14 +21,14 @@
 
 #include "gui/create.h"
 #include "gui/uchroma.h"
+#include "gui/equationselect.h"
 #include "parser/scopenode.h"
+#include "base/currentproject.h"
 
 // Constructor
-CreateWindow::CreateWindow(UChromaWindow& parent) : QWidget(&parent), uChroma_(parent)
+CreateCollectionDialog::CreateCollectionDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(parent)
 {
 	ui.setupUi(this);
-
-	QWidget::setWindowFlags(Qt::Tool);
 
 	// Set default values in some widgets
 	ui.GridSpecifyXMinSpin->setValue(0.0);
@@ -48,14 +48,14 @@ CreateWindow::CreateWindow(UChromaWindow& parent) : QWidget(&parent), uChroma_(p
 }
 
 // Destructor
-CreateWindow::~CreateWindow()
+CreateCollectionDialog::~CreateCollectionDialog()
 {
 }
 
 // Window close event
-void CreateWindow::closeEvent(QCloseEvent* event)
+void CreateCollectionDialog::closeEvent(QCloseEvent* event)
 {
-	emit(windowClosed(false));
+	reject();
 }
 
 /*
@@ -63,7 +63,7 @@ void CreateWindow::closeEvent(QCloseEvent* event)
  */
 
 // Update data in window
-void CreateWindow::updateAndShow()
+void CreateCollectionDialog::updateAndShow()
 {
 	updateGridGroup();
 	updateVariableTable();
@@ -76,7 +76,7 @@ void CreateWindow::updateAndShow()
  */
 
 // Reset equation
-void CreateWindow::resetEquation()
+void CreateCollectionDialog::resetEquation()
 {
 	equation_.clear();
 	xVariable_ = equation_.addGlobalVariable("x");
@@ -86,7 +86,7 @@ void CreateWindow::resetEquation()
 }
 
 // Update variables list
-void CreateWindow::updateVariables()
+void CreateCollectionDialog::updateVariables()
 {
 	// First, clear all 'used' flags
 	EquationVariable* eqVar;
@@ -124,7 +124,7 @@ void CreateWindow::updateVariables()
 }
 
 // Create data
-void CreateWindow::createData(Collection* target)
+void CreateCollectionDialog::createData(Collection* target)
 {
 	// First, check equation status
 	if (!equationValid_) return;
@@ -132,7 +132,7 @@ void CreateWindow::createData(Collection* target)
 	// Second, check destination collection
 	if (target == NULL)
 	{
-		msg.print("Internal Error: No valid destination collection pointer in CreateWindow::updateCreatedData().\n");
+		msg.print("Internal Error: No valid destination collection pointer in CreateCollectionDialog::updateCreatedData().\n");
 		return;
 	}
 
@@ -175,16 +175,14 @@ void CreateWindow::createData(Collection* target)
  * Widgets / Slots / Reimplementations
  */
 
-void CreateWindow::on_CloseButton_clicked(bool checked)
+void CreateCollectionDialog::on_CloseButton_clicked(bool checked)
 {
 	uChroma_.updateSubWindows();
 
-	emit(windowClosed(false));
-
-	hide();
+	reject();
 }
 
-void CreateWindow::on_CreateButton_clicked(bool checked)
+void CreateCollectionDialog::on_CreateButton_clicked(bool checked)
 {
 	// Create a new collection
 	Collection* target = uChroma_.addCollection(ui.EquationEdit->text());
@@ -193,7 +191,7 @@ void CreateWindow::on_CreateButton_clicked(bool checked)
 	// Make sure the data is up to date
 	createData(target);
 
-	uChroma_.setAsModified();
+	CurrentProject::setAsModified();
 
 	uChroma_.updateGUI();
 }
@@ -202,7 +200,7 @@ void CreateWindow::on_CreateButton_clicked(bool checked)
  * Equations Group
  */
 
-void CreateWindow::on_EquationEdit_textChanged(QString text)
+void CreateCollectionDialog::on_EquationEdit_textChanged(QString text)
 {
 	resetEquation();
 	equationValid_ = equation_.setCommands(text);
@@ -224,8 +222,10 @@ void CreateWindow::on_EquationEdit_textChanged(QString text)
 	updateVariableTable();
 }
 
-void CreateWindow::on_SelectEquationButton_clicked(bool checked)
+void CreateCollectionDialog::on_EquationSelectButton_clicked(bool checked)
 {
+	EquationSelectDialog selectDialog(this);
+	if (selectDialog.exec()) ui.EquationEdit->setText(selectDialog.selectedEquation().equationText);
 }
 
 /*
@@ -233,7 +233,7 @@ void CreateWindow::on_SelectEquationButton_clicked(bool checked)
  */
 
 // Update grid data group
-void CreateWindow::updateGridGroup(bool refreshList)
+void CreateCollectionDialog::updateGridGroup(bool refreshList)
 {
 	refreshing_ = true;
 
@@ -268,43 +268,43 @@ void CreateWindow::updateGridGroup(bool refreshList)
 	refreshing_ = false;
 }
 
-void CreateWindow::on_GridSpecifyXMinSpin_valueChanged(double value)
+void CreateCollectionDialog::on_GridSpecifyXMinSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateWindow::on_GridSpecifyXMaxSpin_valueChanged(double value)
+void CreateCollectionDialog::on_GridSpecifyXMaxSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateWindow::on_GridSpecifyXDeltaSpin_valueChanged(double value)
+void CreateCollectionDialog::on_GridSpecifyXDeltaSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateWindow::on_GridSpecifyZMinSpin_valueChanged(double value)
+void CreateCollectionDialog::on_GridSpecifyZMinSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateWindow::on_GridSpecifyZMaxSpin_valueChanged(double value)
+void CreateCollectionDialog::on_GridSpecifyZMaxSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateWindow::on_GridSpecifyZDeltaSpin_valueChanged(double value)
+void CreateCollectionDialog::on_GridSpecifyZDeltaSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
 }
 
-void CreateWindow::on_GridTakeFromCollectionCombo_currentIndexChanged(int index)
+void CreateCollectionDialog::on_GridTakeFromCollectionCombo_currentIndexChanged(int index)
 {
 	if (refreshing_) return;
 	updateGridGroup(false);
@@ -315,7 +315,7 @@ void CreateWindow::on_GridTakeFromCollectionCombo_currentIndexChanged(int index)
  */
 
 // Update variable table
-void CreateWindow::updateVariableTable()
+void CreateCollectionDialog::updateVariableTable()
 {
 	refreshing_ = true;
 
@@ -364,7 +364,7 @@ void CreateWindow::updateVariableTable()
 	refreshing_ = false;
 }
 
-void CreateWindow::on_VariablesTable_cellChanged(int row, int column)
+void CreateCollectionDialog::on_VariablesTable_cellChanged(int row, int column)
 {
 	if (refreshing_) return;
 

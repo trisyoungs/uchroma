@@ -21,6 +21,7 @@
 
 #include "gui/uchroma.h"
 #include "gui/keywords.h"
+#include "kernels/fit.h"
 #include "base/lineparser.h"
 
 // Return boolean string based on integer value
@@ -144,13 +145,44 @@ bool UChromaWindow::writeDataSetBlock(LineParser& parser, DataSet* dataSet, int 
 	indent[indentLevel*2] = '\0';
 
 	parser.writeLineF("%s  %s '%s'\n", indent, Keywords::collectionKeyword(Keywords::DataSetDefinitionKeyword), qPrintable(dataSet->title()));
-	if (dataSet->dataSource() == DataSet::FileSource) parser.writeLineF("%s    %s  %s  '%s'\n", indent, Keywords::dataSetKeyword(Keywords::SourceKeyword), DataSet::dataSource(dataSet->dataSource()), qPrintable(dataSet->sourceFileName()));
-	else parser.writeLineF("%s    %s  %s\n", indent, Keywords::dataSetKeyword(Keywords::SourceKeyword), DataSet::dataSource(dataSet->dataSource()));
-	parser.writeLineF("%s    %s  %f\n", indent, Keywords::dataSetKeyword(Keywords::ZKeyword), dataSet->data().z());
+	if (dataSet->dataSource() == DataSet::FileSource) parser.writeLineF("%s    %s %s '%s'\n", indent, Keywords::dataSetKeyword(Keywords::SourceKeyword), DataSet::dataSource(dataSet->dataSource()), qPrintable(dataSet->sourceFileName()));
+	else parser.writeLineF("%s    %s %s\n", indent, Keywords::dataSetKeyword(Keywords::SourceKeyword), DataSet::dataSource(dataSet->dataSource()));
+	parser.writeLineF("%s    %s %f\n", indent, Keywords::dataSetKeyword(Keywords::ZKeyword), dataSet->data().z());
 	parser.writeLineF("%s    %s\n", indent, Keywords::dataSetKeyword(Keywords::DataKeyword));
 	for (int n=0; n< dataSet->data().nPoints(); ++n) parser.writeLineF("%s      %f  %f\n", indent, dataSet->data().x(n), dataSet->data().y(n));
 	parser.writeLineF("%s    End%s\n", indent, Keywords::dataSetKeyword(Keywords::DataKeyword));
 	parser.writeLineF("%s  %s\n", indent, Keywords::dataSetKeyword(Keywords::EndDataSetKeyword));
+
+	return true;
+}
+
+// Write FitParametersBlock keywords
+bool UChromaWindow::writeFitParametersBlock(LineParser& parser, FitKernel* fitKernel, int indentLevel)
+{
+	// Construct indent string
+	char* indent = new char[indentLevel*2+1];
+	for (int n=0; n<indentLevel*2; ++n) indent[n] = ' ';
+	indent[indentLevel*2] = '\0';
+
+	parser.writeLineF("%s  %s\n", indent, Keywords::collectionKeyword(Keywords::FitParametersBlockKeyword));
+	parser.writeLineF("%s    %s '%s'\n", indent, Keywords::fitParametersKeyword(Keywords::EquationKeyword), qPrintable(fitKernel->equationText()));
+	parser.writeLineF("%s    %s %s\n", indent, Keywords::fitParametersKeyword(Keywords::GlobalKeyword), stringBool(fitKernel->global()));
+	parser.writeLineF("%s    %s %s\n", indent, Keywords::fitParametersKeyword(Keywords::OrthogonalKeyword), stringBool(fitKernel->orthogonal()));
+	parser.writeLineF("%s    %s %f\n", indent, Keywords::fitParametersKeyword(Keywords::LimitStrengthKeyword), fitKernel->limitStrength());
+	for (RefListItem<EquationVariable,bool>* ri = fitKernel->fitVariables(); ri != NULL; ri = ri->next)
+	{
+		EquationVariable* eqVar = ri->item;
+		parser.writeLineF("%s    %s %s %s %f %s %f %s %f\n", indent, Keywords::fitParametersKeyword(Keywords::VariableKeyword), qPrintable(eqVar->name()), stringBool(eqVar->fit()), eqVar->value(), stringBool(eqVar->maximumLimitEnabled()), eqVar->minimumLimit(), stringBool(eqVar->maximumLimitEnabled()), eqVar->maximumLimit());
+	}
+	parser.writeLineF("%s    %s %s\n", indent, Keywords::fitParametersKeyword(Keywords::XRangeTypeKeyword), FitKernel::rangeType(fitKernel->xRange()));
+	parser.writeLineF("%s    %s %f %f\n", indent, Keywords::fitParametersKeyword(Keywords::XRangeAbsoluteKeyword), fitKernel->absoluteXMin(), fitKernel->absoluteXMax());
+	parser.writeLineF("%s    %s %i %i\n", indent, Keywords::fitParametersKeyword(Keywords::XRangeIndexKeyword), fitKernel->indexXMin()+1, fitKernel->indexXMax()+1);
+	parser.writeLineF("%s    %s %i\n", indent, Keywords::fitParametersKeyword(Keywords::XRangeIndexSingleKeyword), fitKernel->indexXSingle()+1);
+	parser.writeLineF("%s    %s %s\n", indent, Keywords::fitParametersKeyword(Keywords::ZRangeTypeKeyword), FitKernel::rangeType(fitKernel->zRange()));
+	parser.writeLineF("%s    %s %f %f\n", indent, Keywords::fitParametersKeyword(Keywords::ZRangeAbsoluteKeyword), fitKernel->absoluteZMin(), fitKernel->absoluteZMax());
+	parser.writeLineF("%s    %s %i %i\n", indent, Keywords::fitParametersKeyword(Keywords::ZRangeIndexKeyword), fitKernel->indexZMin()+1, fitKernel->indexZMax()+1);
+	parser.writeLineF("%s    %s %i\n", indent, Keywords::fitParametersKeyword(Keywords::ZRangeIndexSingleKeyword), fitKernel->indexZSingle()+1);
+	parser.writeLineF("%s  %s\n", indent, Keywords::fitParametersKeyword(Keywords::EndFitParametersKeyword));
 
 	return true;
 }
@@ -185,9 +217,11 @@ bool UChromaWindow::writeViewPaneBlock(LineParser& parser, ViewPane* pane)
 {
 	parser.writeLineF("  %s '%s'\n", Keywords::viewKeyword(Keywords::ViewPaneBlockKeyword), qPrintable(pane->name()));
 	parser.writeLineF("    %s %i %i %i %i\n", Keywords::viewPaneKeyword(Keywords::GeometryKeyword), pane->bottomEdge(), pane->leftEdge(), pane->width(), pane->height()); 
-	for (RefListItem<Collection,bool>* ri = pane->collections(); ri != NULL; ri = ri->next) parser.writeLineF("  %s '%s'\n", Keywords::viewPaneKeyword(Keywords::CollectionAssociatedKeyword), qPrintable(ri->item->title())); 
+	for (RefListItem<Collection,bool>* ri = pane->collections(); ri != NULL; ri = ri->next) parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::CollectionAssociatedKeyword), qPrintable(ri->item->title())); 
 	for (int axis=0; axis < 3; ++axis) writeAxisBlock(parser, pane->axes(), axis);
+	parser.writeLineF("    %s %s\n", Keywords::viewPaneKeyword(Keywords::AutoScaleKeyword), ViewPane::autoScaleMethod(pane->autoScale()));
 	parser.writeLineF("    %s %s\n", Keywords::viewPaneKeyword(Keywords::TwoDimensionalKeyword), stringBool(pane->twoDimensional()));
+	parser.writeLineF("    %s %s\n", Keywords::viewPaneKeyword(Keywords::AutoStretch3DKeyword), stringBool(pane->autoStretch3D()));
 	parser.writeLineF("    %s %f\n", Keywords::viewPaneKeyword(Keywords::LabelPointSizeKeyword), pane->labelPointSize());
 	parser.writeLineF("    %s %f\n", Keywords::viewPaneKeyword(Keywords::TitlePointSizeKeyword), pane->titlePointSize());
 	parser.writeLineF("    %s %i\n", Keywords::viewPaneKeyword(Keywords::BoundingBoxKeyword), pane->boundingBox());
@@ -228,11 +262,4 @@ bool UChromaWindow::saveInputFile(QString fileName)
 
 	parser.closeFiles();
 	return true;
-}
-
-// Flag data as modified, and update titlebar
-void UChromaWindow::setAsModified(bool isModified)
-{
-	modified_ = isModified;
-	updateTitleBar();
 }

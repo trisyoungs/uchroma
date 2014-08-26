@@ -22,7 +22,7 @@
 #ifndef UCHROMA_CREATE_H
 #define UCHROMA_CREATE_H
 
-#include <QtGui/QWidget>
+#include <QtGui/QDialog>
 #include <QtCore/QObject>
 #include "gui/ui_create.h"
 #include "base/dnchar.h"
@@ -38,29 +38,25 @@ class DataSet;
 class Variable;
 
 /*
- * Create Window
+ * Create Collection Dialog
  */
-class CreateWindow : public QWidget
+class CreateCollectionDialog : public QDialog
 {
 	Q_OBJECT
 
 	public:
 	// Constructor
-	CreateWindow(UChromaWindow& parent);
+	CreateCollectionDialog(UChromaWindow& parent);
 	// Destructor
-	~CreateWindow();
+	~CreateCollectionDialog();
 	// Main form declaration
-	Ui::CreateWindow ui;
+	Ui::CreateCollectionDialog ui;
 	// UChromaWindow reference
 	UChromaWindow& uChroma_;
 
 	protected:
 	// Window close event
 	void closeEvent(QCloseEvent* event);
-
-	signals:
-	// Window closed signal
-	void windowClosed(bool);
 
 
 	/*
@@ -107,14 +103,16 @@ class CreateWindow : public QWidget
 	 */
 	public slots:
 	void on_CloseButton_clicked(bool checked);
+	void on_CreateButton_clicked(bool checked);
+
 
 	/*
 	 * Equation Group
 	 */
 	public slots:
 	void on_EquationEdit_textChanged(QString text);
-	void on_SelectEquationButton_clicked(bool checked);
-	void on_CreateButton_clicked(bool checked);
+	void on_EquationSelectButton_clicked(bool checked);
+
 
 	/*
 	 * Grid Group

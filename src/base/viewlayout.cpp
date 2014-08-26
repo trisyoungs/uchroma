@@ -20,6 +20,7 @@
 */
 
 #include "base/viewlayout.h"
+#include "base/currentproject.h"
 #include "gui/uchroma.h"
 
 // Constructor
@@ -60,12 +61,12 @@ void ViewLayout::operator=(const ViewLayout& source)
  * Parent
  */
 
-// Set as modified (call parent routine)
-void ViewLayout::setAsModified(ViewPane* caller)
+// Pane has changed
+void ViewLayout::paneChanged(ViewPane* caller)
 {
 	if (caller) caller->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
 
-	parent_.setAsModified();
+	CurrentProject::setAsModified();
 }
 
 /*
@@ -145,7 +146,7 @@ ViewPane* ViewLayout::addPane(QString name, int left, int top, int width, int he
 
 	pane->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
 
-	setAsModified();
+	CurrentProject::setAsModified();
 
 	return pane;
 }

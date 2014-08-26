@@ -19,10 +19,12 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/currentproject.h"
 #include "gui/uchroma.h"
 #include "render/fontinstance.h"
 #include "templates/reflist.h"
 #include "version.h"
+#include <kernels/fit.h>
 
 // Window close event
 void UChromaWindow::closeEvent(QCloseEvent *event)
@@ -37,15 +39,15 @@ void UChromaWindow::closeEvent(QCloseEvent *event)
 
 void UChromaWindow::on_actionFileNewSession_triggered(bool checked)
 {
-	if (modified_)
+	if (CurrentProject::isModified())
 	{
 		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No, QMessageBox::Cancel);
 		if (button == QMessageBox::Cancel) return;
 		else if (button == QMessageBox::Yes)
 		{
-			// Save file, and check modified_ status to make sure it wasn't cancelled.
+			// Save file, and check CurrentProject::isModified() status to make sure it wasn't cancelled.
 			on_actionFileSaveSession_triggered(false);
-			if (modified_) return;
+			if (CurrentProject::isModified()) return;
 		}
 	}
 
@@ -59,15 +61,15 @@ void UChromaWindow::on_actionFileNewSession_triggered(bool checked)
 
 void UChromaWindow::on_actionFileLoadSession_triggered(bool checked)
 {
-	if (modified_)
+	if (CurrentProject::isModified())
 	{
 		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No, QMessageBox::Cancel);
 		if (button == QMessageBox::Cancel) return;
 		else if (button == QMessageBox::Yes)
 		{
-			// Save file, and check modified_ status to make sure it wasn't cancelled.
+			// Save file, and check CurrentProject::isModified() status to make sure it wasn't cancelled.
 			on_actionFileSaveSession_triggered(false);
-			if (modified_) return;
+			if (CurrentProject::isModified()) return;
 		}
 	}
 
@@ -86,21 +88,18 @@ void UChromaWindow::on_actionFileLoadSession_triggered(bool checked)
 void UChromaWindow::on_actionFileSaveSession_triggered(bool checked)
 {
 	// Has an input filename already been chosen?
-	if (inputFile_.isEmpty())
+	if (CurrentProject::inputFile().isEmpty())
 	{
 		QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", inputFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
 		if (fileName.isEmpty()) return;
-		inputFile_ = fileName;
 
 		// Make sure the file has the right extension
-		QFileInfo fileInfo(inputFile_);
-		if (fileInfo.suffix() != "ucr") inputFile_ += ".ucr";
+		QFileInfo fileInfo(fileName);
+		if (fileInfo.suffix() != "ucr") fileName += ".ucr";
+		CurrentProject::setInputFile(fileName);
 	}
 
-	if (saveInputFile(inputFile_)) modified_ = false;
-
-	// Update title bar
-	updateTitleBar();
+	if (saveInputFile(CurrentProject::inputFile())) CurrentProject::setAsNotModified();
 }
 
 void UChromaWindow::on_actionFileSaveSessionAs_triggered(bool checked)
@@ -108,18 +107,19 @@ void UChromaWindow::on_actionFileSaveSessionAs_triggered(bool checked)
 	// Get a filename from the user
 	QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", inputFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
 	if (fileName.isEmpty()) return;
-	inputFile_ = fileName;
 
 	// Make sure the file has the right extension
-	QFileInfo fileInfo(inputFile_);
-	if (fileInfo.suffix() != "ucr") inputFile_ += ".ucr";
+	QFileInfo fileInfo(fileName);
+	if (fileInfo.suffix() != "ucr") fileName += ".ucr";
+	CurrentProject::setInputFile(fileName);
 
-	if (saveInputFile(inputFile_)) modified_ = false;
-
-	// Update title bar
-	updateTitleBar();
+	if (saveInputFile(CurrentProject::inputFile())) CurrentProject::setAsNotModified();
 }
 
+void UChromaWindow::on_actionFilePrint_triggered(bool checked)
+{
+	// TODO
+}
 
 void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 {
@@ -143,15 +143,15 @@ void UChromaWindow::on_actionFileQuit_triggered(bool checked)
 // Check for modified data before closing
 bool UChromaWindow::checkBeforeClose()
 {
-	if (modified_)
+	if (CurrentProject::isModified())
 	{
 		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No, QMessageBox::Cancel);
 		if (button == QMessageBox::Cancel) return false;
 		else if (button == QMessageBox::Yes)
 		{
-			// Save file, and check modified_ status to make sure it wasn't cancelled.
+			// Save file, and check CurrentProject::isModified() status to make sure it wasn't cancelled.
 			on_actionFileSaveSession_triggered(false);
-			if (modified_) return false;
+			if (CurrentProject::isModified()) return false;
 		}
 	}
 	return true;
@@ -189,6 +189,16 @@ void UChromaWindow::on_actionView2D_triggered(bool checked)
 	ui.MainView->update();
 }
 
+void UChromaWindow::on_actionViewAutostretch3D_triggered(bool checked)
+{
+	if (refreshing_) return;
+
+	currentViewPane_->setAutoStretch3D(checked);
+	if (checked) axesWindow_.updateAndShow();
+
+	ui.MainView->update();
+}
+
 void UChromaWindow::on_actionViewAxes_triggered(bool checked)
 {
 	if (refreshing_) return;
@@ -206,12 +216,6 @@ void UChromaWindow::on_actionViewLayout_triggered(bool checked)
 /*
  * Collection Actions
  */
-
-void UChromaWindow::on_actionCollectionList_triggered(bool checked)
-{
-	if (refreshing_) return;
-	ui.LeftWidgetsWidget->setVisible(checked);
-}
 
 void UChromaWindow::on_actionCollectionFocusNext_triggered(bool checked)
 {
@@ -232,9 +236,12 @@ void UChromaWindow::on_actionCollectionNew_triggered(bool checked)
 
 void UChromaWindow::on_actionCollectionCreate_triggered(bool checked)
 {
-	if (refreshing_) return;
-	if (checked) createWindow_.updateAndShow();
-	else createWindow_.hide();
+	createCollectionDialog_.updateAndShow();
+}
+
+void UChromaWindow::on_actionCollectionDuplicate_triggered(bool checked)
+{
+	// TODO XXX
 }
 
 void UChromaWindow::on_actionCollectionStyle_triggered(bool checked)
@@ -249,6 +256,18 @@ void UChromaWindow::on_actionCollectionTransform_triggered(bool checked)
 	if (refreshing_) return;
 	if (checked) transformWindow_.updateAndShow();
 	else transformWindow_.hide();
+}
+
+void UChromaWindow::on_actionCollectionDelete_triggered(bool checked)
+{
+	if (!currentCollection_) return;
+
+	if (QMessageBox::question(this, "Confirm Delete", "Are you sure you want to delete collection '"+currentCollection_->title()+"' and all of its associated data?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
+	{
+		removeCollection(currentCollection_);
+		
+		updateGUI();
+	}
 }
 
 /*
@@ -269,7 +288,6 @@ void UChromaWindow::on_actionDataImport_triggered(bool checked)
 	if (!currentCollection_) return;
 
 	// Raise the Data Import dialog
-	bool fitData = currentCollection_->nDataSets() == 0;
 	bool result = dataImportDialog_.import();
 	if (!result) return;
 
@@ -278,10 +296,14 @@ void UChromaWindow::on_actionDataImport_triggered(bool checked)
 
 	// Update subwindows
 	updateSubWindows();
-	setAsModified();
 	
 	// Need to update display
 	updateDisplay();
+}
+
+void UChromaWindow::on_actionDataReload_triggered(bool checked)
+{
+	dataWindow_.reloadDataSets();
 }
 
 void UChromaWindow::on_actionDataView_triggered(bool checked)
@@ -295,13 +317,50 @@ void UChromaWindow::on_actionDataView_triggered(bool checked)
  * Analyse Actions
  */
 
-void UChromaWindow::on_actionAnalyseFit_triggered(bool checked)
+void UChromaWindow::on_actionAnalyseNewFit_triggered(bool checked)
 {
 	if (!currentCollection_) return;
 
 	// Add a new fit collection to the current collection
 	Collection* newFit = currentCollection_->addFit();
-	// TODO XXX
+
+	refreshCollections();
+
+	fitSetupDialog_.setFitKernel(newFit->fitKernel());
+	if (fitSetupDialog_.updateAndExec())
+	{
+		if (newFit->fitKernel()->fit()) updateGUI();
+	}
+}
+
+void UChromaWindow::on_actionAnalyseEditFit_triggered(bool checked)
+{
+	if (!currentCollection_) return;
+
+	if (currentCollection_->fitKernel())
+	{
+		fitSetupDialog_.setFitKernel(currentCollection_->fitKernel());
+		if (fitSetupDialog_.updateAndExec())
+		{
+			if (currentCollection_->fitKernel()->fit()) updateGUI();
+		}
+	}
+	else on_actionAnalyseNewFit_triggered(false);
+}
+
+void UChromaWindow::on_actionAnalyseUpdateFit_triggered(bool checked)
+{
+	if (!currentCollection_) return;
+
+	if (currentCollection_->fitKernel())
+	{
+		if (currentCollection_->fitKernel()->fit()) updateGUI();
+	}
+	else
+	{
+		msg.print("Error: Current collection '%s' has no associated fit data.\n", qPrintable(currentCollection_->title()));
+		ui.StatusBar->showMessage("Current collection '%s' has no associated fit data!", 3000);
+	}
 }
 
 /*

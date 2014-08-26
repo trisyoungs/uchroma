@@ -57,8 +57,8 @@ class ViewPane : public ListItem<ViewPane>
 	ViewLayout& parent_;
 
 	public:
-	// Set as modified (call parent routine)
-	void setAsModified();
+	// Notify parent that this pane has been changed
+	void paneChanged();
 
 
 	/*
@@ -121,12 +121,22 @@ class ViewPane : public ListItem<ViewPane>
 	static PaneRole paneRole(const char* s);
 	// Convert InputBlock to text string
 	static const char* paneRole(PaneRole role);
+	// Autoscaling for 2D plots
+	enum AutoScaleMethod { NoAutoScale, ExpandingAutoScale, FullAutoScale, nAutoScaleMethods };
+	// Convert text string to AutoScale2D
+	static AutoScaleMethod autoScaleMethod(const char* s);
+	// Convert InputBlock to text string
+	static const char* autoScaleMethod(AutoScaleMethod scale);
 
 	private:
 	// Role of this pane
 	PaneRole role_;
+	// Autoscaling method employed
+	AutoScaleMethod autoScale_;
 	// Whether this pane is a 2D plot
 	bool twoDimensional_;
+	// Whether autostretching of 3D axes is enabled for this pane
+	bool autoStretch3D_;
 	// Target target pane for role, if relevant
 	RefList<ViewPane,bool> roleTargetPanes_;
 	// Target target collection for role, if relevant
@@ -137,10 +147,18 @@ class ViewPane : public ListItem<ViewPane>
 	void setRole(PaneRole role);
 	// Return role of this pane
 	PaneRole role();
+	// Set autoscaling method employed
+	void setAutoScale(ViewPane::AutoScaleMethod method);
+	// Return autoscaling method employed
+	ViewPane::AutoScaleMethod autoScale();
 	// Set whether this pane is a 2D plot
 	void setTwoDimensional(bool b);
 	// Return whether this pane is a 2D plot
 	bool twoDimensional();
+	// Set whether autostretching of 3D axes is enabled for this pane
+	void setAutoStretch3D(bool b);
+	// Return whether autostretching of 3D axes is enabled for this pane
+	bool autoStretch3D();
 	// Add target pane for role
 	void addRoleTargetPane(ViewPane* pane);
 	// Remove target pane for role

@@ -223,6 +223,8 @@ class Keywords
 	// ViewPane Block Keyword Enum
 	enum ViewPaneKeyword
 	{
+		AutoScaleKeyword,
+		AutoStretch3DKeyword,
 		AxisBlockKeyword,
 		BoundingBoxKeyword,
 		BoundingBoxPlaneYKeyword,

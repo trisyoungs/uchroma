@@ -21,6 +21,7 @@
 
 #include "base/collection.h"
 #include "base/viewpane.h"
+#include "base/currentproject.h"
 #include "kernels/fit.h"
 #include <limits>
 
@@ -156,6 +157,9 @@ DataSet* Collection::addDataSet()
 
 	dataChanged_ = true;
 	displayDataValid_ = false;
+
+	CurrentProject::setAsModified();
+
 	return dataSet;
 }
 
@@ -164,6 +168,9 @@ DataSet* Collection::addDataSet(double z)
 {
 	DataSet* dataSet = dataSets_.add();
 	setDataSetZ(dataSet, z);
+
+	CurrentProject::setAsModified();
+
 	return dataSet;
 }
 
@@ -177,6 +184,8 @@ void Collection::addDataSet(DataSet* source)
 	dataChanged_ = true;
 	displayDataValid_ = false;
 	displayPrimitivesValid_ = false;
+
+	CurrentProject::setAsModified();
 }
 
 // Copy datasets from specified source collection
@@ -195,7 +204,10 @@ int Collection::nDataSets()
 void Collection::removeDataSet(DataSet* dataSet)
 {
 	dataSets_.remove(dataSet);
+
 	displayDataValid_ = false;
+
+	CurrentProject::setAsModified();
 }
 
 // Set z value of specified dataset
@@ -239,6 +251,8 @@ void Collection::setDataSetZ(DataSet* target, double z)
 	dataChanged_ = true;
 	displayDataValid_ = false;
 	displayPrimitivesValid_ = false;
+
+	CurrentProject::setAsModified();
 }
 
 // Set data of specified dataset
@@ -256,6 +270,8 @@ void Collection::setDataSetData(DataSet* target, Data2D* newData)
 	dataChanged_ = true;
 	displayDataValid_ = false;
 	displayPrimitivesValid_ = false;
+
+	CurrentProject::setAsModified();
 }
 
 // Return first dataset in list
@@ -293,6 +309,8 @@ void Collection::clearDataSets()
 	dataChanged_ = true;
 	displayDataValid_ = false;
 	displayPrimitivesValid_ = false;
+
+	CurrentProject::setAsModified();
 }
 
 // Return total number of points across all datasets
@@ -307,6 +325,8 @@ int Collection::nDataPoints()
 void Collection::setDataFileDirectory(QDir directory)
 {
 	dataFileDirectory_ = directory;
+
+	CurrentProject::setAsModified();
 }
 
 // Return root directory for datafiles
@@ -319,7 +339,9 @@ QDir Collection::dataFileDirectory()
 bool Collection::loadDataSet(DataSet* dataSet)
 {
 	if (!dataSet) return false;
-	dataChanged_ = true;
+
+	CurrentProject::setAsModified();
+
 	return dataSet->loadData(dataFileDirectory_);
 }
 
@@ -328,6 +350,9 @@ int Collection::loadAllDataSets()
 {
 	int nFailed = 0;
 	for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next) if (!dataSet->loadData(dataFileDirectory_)) ++nFailed;
+
+	CurrentProject::setAsModified();
+
 	return nFailed;
 }
 
@@ -402,6 +427,8 @@ void Collection::setTransformEquation(int axis, QString transformEquation)
 	}
 
 	displayDataValid_ = false;
+
+	CurrentProject::setAsModified();
 }
 
 // Return transform equation for data
@@ -429,6 +456,8 @@ void Collection::setTransformEnabled(int axis, bool enabled)
 	}
 
 	displayDataValid_ = false;
+
+	CurrentProject::setAsModified();
 }
 
 // Return whether specified transform is enabled
@@ -441,6 +470,8 @@ bool Collection::transformEnabled(int axis)
 void Collection::setInterpolate(int axis, bool enabled)
 {
 	interpolate_[axis] = enabled;
+
+	CurrentProject::setAsModified();
 }
 
 // Return whether interpolation is enabled
@@ -453,6 +484,8 @@ bool Collection::interpolate(int axis)
 void Collection::setInterpolateConstrained(int axis, bool enabled)
 {
 	interpolateConstrained_[axis] = enabled;
+
+	CurrentProject::setAsModified();
 }
 
 // Return whether interpolation is constrained
@@ -465,6 +498,8 @@ bool Collection::interpolateConstrained(int axis)
 void Collection::setInterpolationStep(int axis, double step)
 {
 	interpolationStep_[axis] = step;
+
+	CurrentProject::setAsModified();
 }
 
 // Return interpolation step size
@@ -653,6 +688,9 @@ Collection* Collection::addFit(QString title)
 	newFit->setTitle(title);
 	newFit->type_ = Collection::FitCollection;
 	newFit->setParent(this);
+	newFit->addFitKernel();
+
+	CurrentProject::setAsModified();
 
 	return newFit;
 }
@@ -661,6 +699,8 @@ Collection* Collection::addFit(QString title)
 void Collection::removeFit(Collection* collection)
 {
 	fits_.remove(collection);
+
+	CurrentProject::setAsModified();
 }
 
 // Return fits in Collection
@@ -676,6 +716,9 @@ Collection* Collection::addSlice(QString title)
 	newSlice->setTitle(title);
 	newSlice->type_ = Collection::ExtractedCollection;
 	newSlice->setParent(this);
+	newSlice->addFitKernel();
+
+	CurrentProject::setAsModified();
 
 	return newSlice;
 }
@@ -684,6 +727,8 @@ Collection* Collection::addSlice(QString title)
 void Collection::removeSlice(Collection* collection)
 {
 	slices_.remove(collection);
+
+	CurrentProject::setAsModified();
 }
 
 // Return slices in Collection
@@ -697,7 +742,7 @@ void Collection::updateCurrentSlice(int axis, double axisValue)
 {
 	getSlice(axis, closestBin(axis, axisValue));
 
-	notifyDependents(this, Collection::CurrentSliceChangedSignal);
+	registerChange(this, Collection::CurrentSliceChangedSignal);
 }
 
 // Extract current slice based on specified axis and value
@@ -708,8 +753,8 @@ void Collection::extractCurrentSlice(int axis, double axisValue)
 	Collection* newSlice = addSlice(currentSlice_->title());
 	newSlice->addDataSet(currentSlice_->dataSets());
 
-	notifyDependents(newSlice, Collection::CollectionCreatedSignal);
-	notifyDependents(this, Collection::ExtractedDataAddedSignal);
+	registerChange(newSlice, Collection::CollectionCreatedSignal);
+	registerChange(this, Collection::ExtractedDataAddedSignal);
 }
 
 // Return current slice
@@ -725,6 +770,8 @@ void Collection::addFitKernel()
 	else fitKernel_ = new FitKernel;
 	fitKernel_->setSourceCollection(parent_);
 	fitKernel_->setDestinationCollection(this);
+
+	CurrentProject::setAsModified();
 }
 
 // Return FitKernel
@@ -737,9 +784,8 @@ FitKernel* Collection::fitKernel()
  * Dependent Data / Signalling
  */
 
-// Notify dependents that something in this collection has changed
-// TODO Rename This
-void Collection::notifyDependents(Collection* source, Collection::CollectionSignal signal)
+// Register that something in this collection has changed
+void Collection::registerChange(Collection* source, Collection::CollectionSignal signal)
 {
 	// Add signal to list
 	collectionSignals_.add(source, signal);
@@ -856,12 +902,6 @@ void Collection::updateLimitsAndTransforms()
 
 	// Reset flag
 	dataChanged_ = false;
-}
-
-// Flag that one or more datasets have changed
-void Collection::setDataChanged()
-{
-	dataChanged_ = true;
 }
 
 /*

@@ -19,14 +19,8 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/currentproject.h"
 #include "gui/uchroma.h"
-
-// Flag all primitive data for regeneration
-void UChromaWindow::setRegeneratePrimitives()
-{
-	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next) collection->setDisplayDataInvalid();
-// 	TODO regenerateAxes_ = true;
-}
 
 // Add new collection
 Collection* UChromaWindow::addCollection(QString title)
@@ -43,7 +37,7 @@ Collection* UChromaWindow::addCollection(QString title)
 	if (title.isEmpty()) currentCollection_->setTitle("Empty Collection " + QString::number(collectionCount++));
 	else currentCollection_->setTitle(title);
 
-	setAsModified();
+	CurrentProject::setAsModified();
 
 	return currentCollection_;
 }
@@ -89,7 +83,7 @@ void UChromaWindow::removeCollection(Collection* collection)
 		}
 	}
 
-	setAsModified();
+	CurrentProject::setAsModified();
 }
 
 // Move collection focus to next in list
@@ -149,10 +143,6 @@ void UChromaWindow::clearData(bool resetLayout)
 	// Collections
 	collections_.clear();
 
-	// Data
-	modified_ = false;
-	inputFile_ = "";
-
 	// Layout
 	if (resetLayout)
 	{
@@ -170,4 +160,8 @@ void UChromaWindow::clearData(bool resetLayout)
 	labelFaceViewer_ = false;
 	labelCorrectOrientation_ = true;
 	ui.actionViewPerspective->setChecked(false);
+
+	// Set current project data
+	CurrentProject::setAsNotModified();
+	CurrentProject::setInputFile(QString());
 }

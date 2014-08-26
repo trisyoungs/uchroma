@@ -130,8 +130,6 @@ class FitKernel
 	Variable* referenceYVariable_;
 	// List of variables targetted in fit process
 	RefList<EquationVariable,bool> fitVariables_;
-	// Strength of variable limits
-	double limitStrength_;
 
 	private:
 	// Update variables list
@@ -154,10 +152,6 @@ class FitKernel
 	RefListItem<EquationVariable,bool>* fitVariables();
 	// Return named variable, if it exists
 	EquationVariable* variable(QString name);
-	// Set strength of variable limits
-	void setLimitStrength(double strength);
-	// Return strength of variable limits
-	double limitStrength();
 
 
 	/*
@@ -262,6 +256,8 @@ class FitKernel
 	void setDestinationCollection(Collection* collection);
 	// Return destination collection for fitted data
 	Collection* destinationCollection();
+	// Update ranges to ensure sensible limits for current collection
+	void checkRanges();
 
 
 	/*
@@ -282,6 +278,9 @@ class FitKernel
 	double tolerance_;
 	// Maximum steps to use in minimisation
 	int maxSteps_;
+	// Strength of variable limits
+	double limitStrength_;
+
 
 	private:
 	// Update destination with current fitted data
@@ -290,8 +289,6 @@ class FitKernel
 	double sosError(Array<double>& alpha);
 	// Calculate RMS error for current targets
 	double rmsError(Array<double>& alpha);
-	// Perform fitting with current settings
-	bool doFitting();
 	// Simplex minimise
 	bool simplexMinimise(Array<double>& alpha);
 	// Steepest Descent minimise
@@ -312,6 +309,12 @@ class FitKernel
 	void setMaxSteps(int nSteps);
 	// Return maximum steps to use in minimisation
 	int maxSteps();
+	// Set strength of variable limits
+	void setLimitStrength(double strength);
+	// Return strength of variable limits
+	double limitStrength();
+	// Perform fitting with current settings
+	bool fit();
 };
 
 #endif

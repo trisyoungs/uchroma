@@ -62,7 +62,9 @@ class DataWindow : public QWidget
 	/*
 	 * Convenience Functions
 	 */
-	private:
+	public:
+	// Reload datasets from their associated files
+	void reloadDataSets();
 
 
 	/*

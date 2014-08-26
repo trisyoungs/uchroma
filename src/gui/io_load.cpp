@@ -23,6 +23,9 @@
 #include "gui/keywords.h"
 #include "kernels/fit.h"
 #include "base/lineparser.h"
+#include "base/currentproject.h"
+
+#define CHECKIOFAIL if (hardIOFail_) { return false; } else { break; }
 
 // Parse AxisBlock keywords
 bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
@@ -379,14 +382,22 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 			case (Keywords::VariableKeyword):
 				// First, see if named variable exists
 				eqVar = fitKernel->variable(parser.argc(1));
-				Variable A1 True 4.5567 -10000 10000 False False
+				if (!eqVar)
+				{
+					msg.print("Warning: Variable '%s' is not in fit equation, so will ignore settings in FitParameters.\n");
+					CHECKIOFAIL
+				}
+				eqVar->setFit(parser.argb(2));
+				eqVar->setValue(parser.argd(3));
+				eqVar->setMinimumLimit(parser.argb(4), parser.argd(5));
+				eqVar->setMaximumLimit(parser.argb(6), parser.argd(7));
 				break;
 			case (Keywords::XRangeTypeKeyword):
 				rangeType = FitKernel::rangeType(parser.argc(1));
 				if (rangeType == FitKernel::nRangeTypes)
 				{
-					msg.print("Error: Unrecognised range type '%s' given for X in fit.\n", parser.argc(1));
-					return false;
+					msg.print("Warning: Unrecognised range type '%s' given for X in fit. Defaulting to '%s'\n", parser.argc(1), FitKernel::rangeType(FitKernel::AbsoluteRange));
+					CHECKIOFAIL
 				}
 				fitKernel->setXRange(rangeType);
 				break;
@@ -395,18 +406,18 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 				fitKernel->setAbsoluteXMax(parser.argd(2));
 				break;
 			case (Keywords::XRangeIndexKeyword):
-				fitKernel->setIndexXMin(parser.argi(1));
-				fitKernel->setIndexXMax(parser.argi(2));
+				fitKernel->setIndexXMin(parser.argi(1)-1);
+				fitKernel->setIndexXMax(parser.argi(2)-1);
 				break;
 			case (Keywords::XRangeIndexSingleKeyword):
-				fitKernel->setIndexXSingle(parser.argi(1));
+				fitKernel->setIndexXSingle(parser.argi(1)-1);
 				break;
 			case (Keywords::ZRangeTypeKeyword):
 				rangeType = FitKernel::rangeType(parser.argc(1));
 				if (rangeType == FitKernel::nRangeTypes)
 				{
-					msg.print("Error: Unrecognised range type '%s' given for Z in fit.\n", parser.argc(1));
-					return false;
+					msg.print("Warning: Unrecognised range type '%s' given for Z in fit. Defaulting to '%s'\n", parser.argc(1), FitKernel::rangeType(FitKernel::AbsoluteRange));
+					CHECKIOFAIL
 				}
 				fitKernel->setZRange(rangeType);
 				break;
@@ -415,11 +426,11 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 				fitKernel->setAbsoluteZMax(parser.argd(2));
 				break;
 			case (Keywords::ZRangeIndexKeyword):
-				fitKernel->setIndexZMin(parser.argi(1));
-				fitKernel->setIndexZMax(parser.argi(2));
+				fitKernel->setIndexZMin(parser.argi(1)-1);
+				fitKernel->setIndexZMax(parser.argi(2)-1);
 				break;
 			case (Keywords::ZRangeIndexSingleKeyword):
-				fitKernel->setIndexZSingle(parser.argi(1));
+				fitKernel->setIndexZSingle(parser.argi(1)-1);
 				break;
 			// Unrecognised Keyword
 			default:
@@ -525,6 +536,7 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 	Matrix mat;
 	ViewPane* associatedPane;
 	ViewPane::PaneRole role;
+	ViewPane::AutoScaleMethod as;
 	while (!parser.eofOrBlank())
 	{
 		// Get line from file
@@ -539,20 +551,38 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 		}
 		switch (viewPaneKwd)
 		{
+			// Autoscale method
+			case (Keywords::AutoScaleKeyword):
+				as = ViewPane::autoScaleMethod(parser.argc(1));
+				if (as == ViewPane::nAutoScaleMethods)
+				{
+					msg.print("Warning: Unrecognised autoscale method '%s'.\n", parser.argc(1));
+					CHECKIOFAIL
+				}
+				pane->setAutoScale(as);
+				break;
+			// Auto stretch 3D 
+			case (Keywords::AutoStretch3DKeyword):
+				pane->setAutoStretch3D(parser.argb(1));
+				break;
 			// Axis block
 			case (Keywords::AxisBlockKeyword):
 				// Get target axis...
 				axis = parser.argi(1);
 				if ((axis < 0) || (axis > 2))
 				{
-					QMessageBox::warning(this, "Error", "Axis index is out of range in input file.");
-					return false;
+					msg.print("Warning: Axis index is out of range in input file. Defaults will be used.\n");
+					CHECKIOFAIL
 				}
 				if (!readAxisBlock(parser, pane->axes(), axis)) return false;
 				break;
 			// Bounding Box
 			case (Keywords::BoundingBoxKeyword):
-				if ((parser.argi(1) < 0) || (parser.argi(1) >= ViewPane::nBoundingBoxes)) msg.print("Value is out of range for %s keyword.\n", Keywords::viewPaneKeyword(viewPaneKwd));
+				if ((parser.argi(1) < 0) || (parser.argi(1) >= ViewPane::nBoundingBoxes))
+				{
+					msg.print("Warning: Value is out of range for %s keyword.\n", Keywords::viewPaneKeyword(viewPaneKwd));
+					CHECKIOFAIL
+				}
 				pane->setBoundingBox((ViewPane::BoundingBox) parser.argi(1));
 				break;
 			// Bounding Box plane y intercept
@@ -563,7 +593,11 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 			case (Keywords::CollectionAssociatedKeyword):
 				// Find named collection
 				collection = findCollection(parser.argc(1));
-				if (collection == NULL) msg.print("Warning - Collection '%s' is listed in ViewPane '%s', but no collection by this name exists.\n", parser.argc(1), qPrintable(pane->name()));
+				if (collection == NULL)
+				{
+					msg.print("Warning - Collection '%s' is listed in ViewPane '%s', but no collection by this name exists.\n", parser.argc(1), qPrintable(pane->name()));
+					CHECKIOFAIL
+				}
 				else pane->addCollection(collection);
 				break;
 			// End input block
@@ -596,8 +630,8 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				role = ViewPane::paneRole(parser.argc(1));
 				if (role == ViewPane::nPaneRoles)
 				{
-					msg.print("Error: Unrecognised role '%s' for pane '%s'.\n", parser.argc(1), qPrintable(pane->name()));
-					return false;
+					msg.print("Warning: Unrecognised role '%s' for pane '%s'. Defaulting to '%s'.\n", parser.argc(1), qPrintable(pane->name()), ViewPane::paneRole(ViewPane::StandardRole));
+					CHECKIOFAIL
 				}
 				pane->setRole(role);
 				break;
@@ -606,8 +640,8 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				collection = findCollection(parser.argc(1));
 				if (!collection)
 				{
-					msg.print("Error: Collection '%s' not found, and can't be associated to pane '%s'.\n", parser.argc(1), qPrintable(pane->name()));
-					return false;
+					msg.print("Warning: Collection '%s' not found, and can't be associated to pane '%s'.\n", parser.argc(1), qPrintable(pane->name()));
+					CHECKIOFAIL
 				}
 				pane->addRoleTargetCollection(collection);
 				break;
@@ -627,12 +661,18 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				break;
 			// Unrecognised Keyword
 			default:
-				msg.print("Error : Unrecognised view keyword: %s\n", parser.argc(0));
+				msg.print("Error : Unrecognised ViewPane keyword: %s\n", parser.argc(0));
 				return false;
 		}
 	}
-	msg.print("Error : Unterminated 'View' block.\n");
+	msg.print("Error : Unterminated 'ViewPane' block.\n");
 	return false;
+}
+
+// Set whether to enforce hard fail on input file error
+void UChromaWindow::setHardIOFail(bool hardFail)
+{
+	hardIOFail_ = hardFail;
 }
 
 // Load data from file specified
@@ -703,7 +743,10 @@ bool UChromaWindow::loadInputFile(QString fileName)
 
 	// Set necessary variables
 	currentViewPane_ = viewLayout_.panes();
-	inputFile_ = fileName;
-	modified_ = false;
+
+	// Set current project data
+	CurrentProject::setInputFile(fileName);
+	CurrentProject::setAsNotModified();
+
 	return true;
 }

@@ -46,6 +46,7 @@ ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), parent_(parent), 
 	// Role
 	role_ = ViewPane::StandardRole;
 	twoDimensional_ = false;
+	autoStretch3D_ = true;
 
 	// Style
 	boundingBox_ = ViewPane::NoBox;
@@ -106,10 +107,10 @@ void ViewPane::operator=(const ViewPane& source)
  */
 
 // Set as modified (call parent routine)
-void ViewPane::setAsModified()
+void ViewPane::paneChanged()
 {
 	// Pass the modification notification upwards
-	parent_.setAsModified(this);
+	parent_.paneChanged(this);
 }
 
 /*
@@ -121,7 +122,7 @@ void ViewPane::setName(QString name)
 {
 	name_ = name;
 
-	setAsModified();
+	paneChanged();
 }
 
 // Return name of pane
@@ -136,7 +137,7 @@ void ViewPane::setBottomLeft(int bottom, int left)
 	bottomEdge_ = bottom;
 	leftEdge_ = left;
 
-	setAsModified();
+	paneChanged();
 }
 
 // Return bottom edge of pane
@@ -157,7 +158,7 @@ void ViewPane::setSize(int w, int h)
 	width_ = w;
 	height_ = h;
 
-	setAsModified();
+	paneChanged();
 }
 
 // Return width of pane (in columns)
@@ -181,7 +182,7 @@ void ViewPane::moveHandle(PaneHandle handle, int deltaX, int deltaY)
 	width_ = newGeometry.z;
 	height_ = newGeometry.w;
 
-	setAsModified();
+	paneChanged();
 }
 
 // Return geometry that would result after moving the specified handle
@@ -288,18 +289,48 @@ const char* ViewPane::paneRole(ViewPane::PaneRole role)
 	return RoleKeywords[role];
 }
 
+// AutoScale methods
+const char* AutoScaleKeywords[ViewPane::nAutoScaleMethods] = { "None", "Expanding", "Full" };
+
+// Convert text string to AutoScale2D
+ViewPane::AutoScaleMethod ViewPane::autoScaleMethod(const char* s)
+{
+	for (int n=0; n<ViewPane::nAutoScaleMethods; ++n) if (strcmp(s,AutoScaleKeywords[n]) == 0) return (ViewPane::AutoScaleMethod) n;
+	return ViewPane::nAutoScaleMethods;
+}
+
+// Convert InputBlock to text string
+const char* ViewPane::autoScaleMethod(ViewPane::AutoScaleMethod scale)
+{
+	return AutoScaleKeywords[scale];
+}
+
 // Set role of this pane
 void ViewPane::setRole(ViewPane::PaneRole role)
 {
 	role_ = role;
 
-	setAsModified();
+	paneChanged();
 }
 
 // Return role of this pane
 ViewPane::PaneRole ViewPane::role()
 {
 	return role_;
+}
+
+// Set autoscaling method employed
+void ViewPane::setAutoScale(ViewPane::AutoScaleMethod method)
+{
+	autoScale_ = method;
+
+	paneChanged();
+}
+
+// Return autoscaling method employed
+ViewPane::AutoScaleMethod ViewPane::autoScale()
+{
+	return autoScale_;
 }
 
 // Set whether this pane is a 2D plot
@@ -310,7 +341,7 @@ void ViewPane::setTwoDimensional(bool b)
 	// Recalculate viewmatrix
 	resetView();
 
-	setAsModified();
+	paneChanged();
 }
 
 // Return whether this pane is a 2D plot
@@ -319,12 +350,26 @@ bool ViewPane::twoDimensional()
 	return twoDimensional_;
 }
 
+// Set whether autostretching of 3D axes is enabled for this pane
+void ViewPane::setAutoStretch3D(bool b)
+{
+	autoStretch3D_ = b;
+	
+	paneChanged();
+}
+
+// Return whether autostretching of 3D axes is enabled for this pane
+bool ViewPane::autoStretch3D()
+{
+	return autoStretch3D_;
+}
+
 // Add target pane for role
 void ViewPane::addRoleTargetPane(ViewPane* pane)
 {
 	roleTargetPanes_.add(pane);
 
-	setAsModified();
+	paneChanged();
 }
 
 // Remove target pane for role
@@ -332,7 +377,7 @@ void ViewPane::removeRoleTargetPane(ViewPane* pane)
 {
 	roleTargetPanes_.remove(pane);
 
-	setAsModified();
+	paneChanged();
 }
 
 // Return whether specified pane is a target
@@ -353,7 +398,7 @@ void ViewPane::addRoleTargetCollection(Collection* collection)
 	RefListItem<Collection,TargetData>* ri = roleTargetCollections_.add(collection);
 	ri->data.setParent(this);
 
-	setAsModified();
+	paneChanged();
 }
 
 // Remove target collection for role
@@ -361,7 +406,7 @@ void ViewPane::removeRoleTargetCollection(Collection* collection)
 {
 	roleTargetCollections_.remove(collection);
 
-	setAsModified();
+	paneChanged();
 }
 
 // Return whether specified collection is a target

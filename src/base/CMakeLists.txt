@@ -2,6 +2,7 @@ add_library(base
   axes.cpp
   collection.cpp
   colourscale.cpp
+  currentproject.cpp
   data2d.cpp
   dataset.cpp
   displaydataset.cpp
@@ -18,6 +19,7 @@ add_library(base
   axes.h
   collection.h
   colourscale.h
+  currentproject.h
   data2d.h
   dataset.h
   displaydataset.h

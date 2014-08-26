@@ -88,8 +88,6 @@ class UChromaWindow : public QMainWindow
 	bool refreshing_;
 	// Axes Window
 	AxesWindow axesWindow_;
-	// Create Window
-	CreateWindow createWindow_;
 	// Data Window
 	DataWindow dataWindow_;
 	// Layout Window
@@ -102,6 +100,8 @@ class UChromaWindow : public QMainWindow
 	TransformWindow transformWindow_;
 	// View Window
 	ViewWindow viewWindow_;
+	// Create Collection Dialog
+	CreateCollectionDialog createCollectionDialog_;
 	// Data Import Dialog
 	DataImportDialog dataImportDialog_;
 	// Fit Window
@@ -169,15 +169,14 @@ class UChromaWindow : public QMainWindow
 	 * Collections Actions
 	 */
 	private slots:
-	void on_actionCollectionList_triggered(bool checked);
 	void on_actionCollectionFocusNext_triggered(bool checked);
 	void on_actionCollectionFocusPrevious_triggered(bool checked);
 	void on_actionCollectionNew_triggered(bool checked);
 	void on_actionCollectionCreate_triggered(bool checked);
+	void on_actionCollectionDuplicate_triggered(bool checked);
 	void on_actionCollectionStyle_triggered(bool checked);
 	void on_actionCollectionTransform_triggered(bool checked);
 	void on_actionCollectionDelete_triggered(bool checked);
-
 
 	/*
 	 * Data Actions
@@ -207,7 +206,9 @@ class UChromaWindow : public QMainWindow
 	 * Analyse Actions
 	 */
 	private slots:
-	void on_actionAnalyseFit_triggered(bool checked);
+	void on_actionAnalyseNewFit_triggered(bool checked);
+	void on_actionAnalyseEditFit_triggered(bool checked);
+	void on_actionAnalyseUpdateFit_triggered(bool checked);
 
 
 	/*
@@ -227,6 +228,9 @@ class UChromaWindow : public QMainWindow
 	void addCollectionsToTree(Collection* collection, QTreeWidgetItem* parent);
 
 	private slots:
+	void on_CollectionListButton_clicked(bool checked);
+	void on_CollectionFocusNextButton_clicked(bool checked);
+	void on_CollectionFocusPreviousButton_clicked(bool checked);
 	void on_CollectionTree_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
 	void on_CollectionTree_itemClicked(QTreeWidgetItem* item, int column);
 	void on_CollectionTree_itemDoubleClicked(QTreeWidgetItem* item, int column);
@@ -263,8 +267,6 @@ class UChromaWindow : public QMainWindow
 	void updateSubWindows();
 	// Update tool bars
 	void updateToolBars();
-	// Update title bar
-	void updateTitleBar();
 	// Update main display
 	void updateDisplay();
 
@@ -273,12 +275,10 @@ class UChromaWindow : public QMainWindow
 	 * Input File
 	 */
 	private:
-	// Whether current data has been modified
-	bool modified_;
 	// Current input file directory
 	QDir inputFileDirectory_;
-	// Current input filename
-	QString inputFile_;
+	// Whether to enforce hard fail on input file error
+	bool hardIOFail_;
 
 	private:
 	// Read AxisBlock keywords
@@ -311,12 +311,12 @@ class UChromaWindow : public QMainWindow
 	bool writeViewPaneBlock(LineParser& parser, ViewPane* pane);
 	
 	public:
+	// Set whether to enforce hard fail on input file error
+	void setHardIOFail(bool hardFail);
 	// Load input from file specified
 	bool loadInputFile(QString fileName);
 	// Save current input to file specified
 	bool saveInputFile(QString fileName);
-	// Flag data as (not) modified and update titlebar
-	void setAsModified(bool isModified = true);
 
 
 	/*
@@ -339,8 +339,6 @@ class UChromaWindow : public QMainWindow
 	Collection* currentCollection_;
 
 	private:
-	// Flag all primitive data for regeneration
-	void setRegeneratePrimitives();
 	// Recalculate tick deltas for specified axis
 	void calculateTickDeltas(int axis);
 

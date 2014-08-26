@@ -101,7 +101,7 @@ class FitSetupDialog : public QDialog
 
 	public slots:
 	void on_VariablesTable_cellChanged(int row, int column);
-	void on_VariablesLimitStrengthSpin_valueChanged(double value);
+	void on_VariableAddReferenceButton_clicked(bool checked);
 
 
 	/*
@@ -110,7 +110,7 @@ class FitSetupDialog : public QDialog
 	public slots:
 	void on_DataNormalFitRadio_clicked(bool checked);
 	void on_DataOrthogonalFitRadio_clicked(bool checked);
-	void on_DataGlobalFit_clicked(bool checked);
+	void on_DataGlobalFitCheck_clicked(bool checked);
 
 
 	/*
@@ -120,6 +120,7 @@ class FitSetupDialog : public QDialog
 	void on_MinimisationMethodCombo_currentIndexChanged(int index);
 	void on_MinimisationToleranceSpin_valueChanged(double value);
 	void on_MinimisationMaxStepsSpin_valueChanged(int value);
+	void on_MinimisationLimitStrengthSpin_valueChanged(double value);
 
 
 	/*
@@ -156,8 +157,8 @@ class FitSetupDialog : public QDialog
 	 * Update Functions
 	 */
 	public:
-	// Update controls and show window
-	void updateAndShow();
+	// Update controls and execute dialog
+	int updateAndExec();
 	// Update controls
 	void updateControls(bool force = false);
 	// Update labels
