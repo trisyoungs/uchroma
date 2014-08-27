@@ -54,10 +54,6 @@ class CreateCollectionDialog : public QDialog
 	// UChromaWindow reference
 	UChromaWindow& uChroma_;
 
-	protected:
-	// Window close event
-	void closeEvent(QCloseEvent* event);
-
 
 	/*
 	 * Window Functions
@@ -65,7 +61,6 @@ class CreateCollectionDialog : public QDialog
 	private:
 	// Whether the window is refreshing / updating its controls
 	bool refreshing_;
-
 
 	public:
 	// Update data and show window
@@ -102,7 +97,7 @@ class CreateCollectionDialog : public QDialog
 	 * Slots / Reimplementations
 	 */
 	public slots:
-	void on_CloseButton_clicked(bool checked);
+	void on_CancelButton_clicked(bool checked);
 	void on_CreateButton_clicked(bool checked);
 
 

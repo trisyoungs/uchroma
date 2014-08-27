@@ -93,7 +93,7 @@ class EquationSelectDialog : public QDialog
 	public slots:
 	void on_EquationList_currentRowChanged(int index);
 	void on_EquationList_itemDoubleClicked(QListWidgetItem* item);
-	void on_CloseButton_clicked(bool checked);
+	void on_CancelButton_clicked(bool checked);
 	void on_SelectButton_clicked(bool checked);
 };
 

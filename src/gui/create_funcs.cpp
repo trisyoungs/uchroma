@@ -53,12 +53,6 @@ CreateCollectionDialog::~CreateCollectionDialog()
 {
 }
 
-// Window close event
-void CreateCollectionDialog::closeEvent(QCloseEvent* event)
-{
-	reject();
-}
-
 /*
  * Window Functions
  */
@@ -176,7 +170,7 @@ void CreateCollectionDialog::createData(Collection* target)
  * Widgets / Slots / Reimplementations
  */
 
-void CreateCollectionDialog::on_CloseButton_clicked(bool checked)
+void CreateCollectionDialog::on_CancelButton_clicked(bool checked)
 {
 	uChroma_.updateSubWindows();
 

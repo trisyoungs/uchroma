@@ -9,9 +9,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>467</width>
-    <height>332</height>
+    <width>421</width>
+    <height>315</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>Select Equation</string>
@@ -98,7 +103,7 @@
           <item row="2" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>Description</string>
+             <string>Description  </string>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -154,9 +159,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="CloseButton">
+      <widget class="QPushButton" name="CancelButton">
        <property name="text">
-        <string>Close</string>
+        <string>&amp;Cancel</string>
        </property>
       </widget>
      </item>
@@ -169,7 +174,10 @@
         </font>
        </property>
        <property name="text">
-        <string>Select</string>
+        <string>&amp;Select</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

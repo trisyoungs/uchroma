@@ -6,9 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>507</width>
+    <width>536</width>
     <height>372</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>Create Collection</string>
@@ -391,7 +396,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="CloseButton">
+      <widget class="QPushButton" name="CancelButton">
        <property name="font">
         <font>
          <weight>50</weight>
@@ -399,7 +404,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Close</string>
+        <string>&amp;Cancel</string>
        </property>
        <property name="autoDefault">
         <bool>false</bool>
@@ -415,7 +420,10 @@
         </font>
        </property>
        <property name="text">
-        <string>Create</string>
+        <string>C&amp;reate</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

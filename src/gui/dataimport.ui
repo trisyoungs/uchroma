@@ -6,9 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>819</width>
-    <height>523</height>
+    <width>695</width>
+    <height>383</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
@@ -339,14 +344,17 @@
      <item>
       <widget class="QPushButton" name="CancelButton">
        <property name="text">
-        <string>Cancel</string>
+        <string>&amp;Cancel</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="ImportButton">
        <property name="text">
-        <string>Import</string>
+        <string>&amp;Import</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

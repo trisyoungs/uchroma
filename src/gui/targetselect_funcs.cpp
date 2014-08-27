@@ -97,7 +97,7 @@ void TargetSelectDialog::on_AvailableCollectionsList_itemDoubleClicked(QListWidg
 	accept();
 }
 
-void TargetSelectDialog::on_CloseButton_clicked(bool checked)
+void TargetSelectDialog::on_CancelButton_clicked(bool checked)
 {
 	reject();
 }

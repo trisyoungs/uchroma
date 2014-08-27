@@ -6,9 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>518</width>
-    <height>586</height>
+    <width>524</width>
+    <height>608</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>Fit Setup</string>
@@ -1032,9 +1037,25 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="CloseButton">
+      <widget class="QPushButton" name="CancelButton">
        <property name="text">
-        <string>Close</string>
+        <string>Cancel</string>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="OKButton">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>OK</string>
        </property>
        <property name="default">
         <bool>true</bool>

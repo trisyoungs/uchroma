@@ -65,7 +65,7 @@ class TargetSelectDialog : public QDialog
 	public slots:
 	void on_AvailablePanesList_itemDoubleClicked(QListWidgetItem* item);
 	void on_AvailableCollectionsList_itemDoubleClicked(QListWidgetItem* item);
-	void on_CloseButton_clicked(bool checked);
+	void on_CancelButton_clicked(bool checked);
 	void on_SelectButton_clicked(bool checked);
 };
 

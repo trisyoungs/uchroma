@@ -27,6 +27,7 @@ data_funcs.cpp
 dataimport_funcs.cpp
 dataimport_seqxy.cpp
 log_funcs.cpp
+referencedialog_funcs.cpp
 saveimage_funcs.cpp
 colourbutton_funcs.cpp
 equationselect_funcs.cpp
@@ -55,6 +56,7 @@ SET(pro_MOC_HDRS
   fitsetup.h
   layout.h
   log.h
+  referencedialog.h
   saveimage.h
   style.h
   targetselect.h
@@ -76,6 +78,7 @@ SET(pro_UIS
   equationselect.ui
   fitsetup.ui
   log.ui
+  referencedialog.ui
   saveimage.ui
   style.ui
   targetselect.ui

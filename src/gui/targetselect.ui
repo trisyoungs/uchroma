@@ -13,6 +13,11 @@
     <height>372</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Select Targets</string>
   </property>
@@ -107,9 +112,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="CloseButton">
+      <widget class="QPushButton" name="CancelButton">
        <property name="text">
-        <string>Close</string>
+        <string>Cancel</string>
        </property>
       </widget>
      </item>

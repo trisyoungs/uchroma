@@ -1,6 +1,6 @@
 /*
-	*** uChroma version information
-	*** src/version.h
+	*** Reference Setup Dialog
+	*** src/gui/referencedialog_funcs.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,11 +19,17 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_VERSION_H
-#define UCHROMA_VERSION_H
+#include "gui/referencedialog.h"
+#include "gui/uchroma.h"
 
-#define UCHROMAREVISION "119"
-#define UCHROMADATE "Wed 27 Aug 2014 - 22:51"
-#define UCHROMAURL "http://www.projectaten.net/uchroma"
+// Constructor
+ReferenceSetupDialog::ReferenceSetupDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(parent)
+{
+	ui.setupUi(this);
+}
 
-#endif
+// Destructor
+ReferenceSetupDialog::~ReferenceSetupDialog()
+{
+}
+

@@ -83,7 +83,7 @@ void EquationSelectDialog::on_EquationList_itemDoubleClicked(QListWidgetItem* it
 	accept();
 }
 
-void EquationSelectDialog::on_CloseButton_clicked(bool checked)
+void EquationSelectDialog::on_CancelButton_clicked(bool checked)
 {
 	reject();
 }
