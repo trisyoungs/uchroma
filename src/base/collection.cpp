@@ -256,7 +256,7 @@ void Collection::setDataSetZ(DataSet* target, double z)
 }
 
 // Set data of specified dataset
-void Collection::setDataSetData(DataSet* target, Data2D* newData)
+void Collection::setDataSetData(DataSet* target, const Array<double>& x, const Array<double>& y)
 {
 	// Check that this DataSet is owned by the collection
 	if (!dataSets_.contains(target))
@@ -265,7 +265,8 @@ void Collection::setDataSetData(DataSet* target, Data2D* newData)
 		return;
 	}
 
-	target->data() = (*newData);
+	target->data().clear();
+	for (int n=0; n<x.nItems(); ++n) target->data().addPoint(x.value(n), y.value(n));
 
 	dataChanged_ = true;
 	displayDataValid_ = false;
@@ -290,6 +291,20 @@ DataSet* Collection::lastDataSet()
 DataSet* Collection::dataSet(int index)
 {
 	return dataSets_[index];
+}
+
+// Return index of specified dataset
+int Collection::dataSetIndex(const char* name)
+{
+	int index = 0;
+	for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next, ++index) if (dataSet->title() == name) return index;
+	return -1;
+}
+
+// Return unique name based on supplied dataset
+QString Collection::uniqueDataSetName(const char* name)
+{
+	// TODO
 }
 
 // Return number of slices with no data present
@@ -679,6 +694,23 @@ Collection* Collection::parent()
 Collection::CollectionType Collection::type()
 {
 	return type_;
+}
+
+// Return icon string reflecting this Collection's type / status
+QString Collection::iconString()
+{
+	QString iconName;
+
+	// Get base icon name
+	if (type_ == Collection::MasterCollection) iconName = ":/uchroma/icons/collection_collection";
+	else if (type_ == Collection::FitCollection) iconName = ":/uchroma/icons/collection_fit";
+	else if (type_ == Collection::ExtractedCollection) iconName = ":/uchroma/icons/collection_extracted";
+
+	// If display pane is invalid, tweak icon name
+	if (displayPane_ == NULL) iconName += "_nopane";
+	iconName += ".svg";
+	
+	return iconName;
 }
 
 // Add fit to Collection

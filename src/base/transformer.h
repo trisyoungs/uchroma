@@ -26,7 +26,7 @@
 #include "templates/array.h"
 
 // Forward Declarations
-/* None */
+class DoubleVariable;
 
 // Transformer
 class Transformer
@@ -54,11 +54,11 @@ class Transformer
 	// Whether current equation is valid
 	bool valid_;
 	// X variable in equation
-	Variable* x_;
+	DoubleVariable* x_;
 	// Y variable in equation
-	Variable* y_;
+	DoubleVariable* y_;
 	// Z variable in equation
-	Variable* z_;
+	DoubleVariable* z_;
 
 	public:
 	// Set whether transform is enabled

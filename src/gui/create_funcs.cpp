@@ -23,6 +23,7 @@
 #include "gui/uchroma.h"
 #include "gui/equationselect.h"
 #include "parser/scopenode.h"
+#include "parser/double.h"
 #include "base/currentproject.h"
 
 // Constructor
@@ -156,8 +157,8 @@ void CreateCollectionDialog::createData(Collection* target)
 			while (x <= ui.GridSpecifyXMaxSpin->value())
 			{
 				// Set equation variables
-				xVariable_->set(x);
-				zVariable_->set(z);
+				xVariable_->setValue(x);
+				zVariable_->setValue(z);
 				newData.addPoint(x, equation_.execute());
 
 				x += ui.GridSpecifyXDeltaSpin->value();

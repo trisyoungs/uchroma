@@ -20,6 +20,7 @@
 */
 
 #include "base/transformer.h"
+#include "parser/double.h"
 #include "templates/array.h"
 
 // Constructor
@@ -93,9 +94,9 @@ double Transformer::transform(double x, double y, double z)
 		return 0.0;
 	}
 
-	x_->set(ReturnValue(x));
-	y_->set(ReturnValue(y));
-	z_->set(ReturnValue(z));
+	x_->setValue(x);
+	y_->setValue(y);
+	z_->setValue(z);
 	return equation_.execute();
 }
 

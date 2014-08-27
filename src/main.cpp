@@ -69,14 +69,14 @@ int main(int argc, char *argv[])
 					printf("UChroma revision %s, %s\n\nAvailable CLI options are:\n\n", UCHROMAREVISION, UCHROMADATE);
 					printf("\t-h\t\tShow this help\n");
 					printf("\t-a\tForce warnings generated during input file read to be treated as errors.\n");
-					printf("\t-v\tShow version information.\n");
+					printf("\t-v\tEnable verbosity (for debugging purposes).\n");
 					return 1;
 					break;
 				case ('a'):
 					mainWindow.setHardIOFail(true);
 					break;
 				case ('v'):
-					msg.print("Version %s, %s.\n", UCHROMAREVISION, UCHROMADATE);
+					msg.addOutputType(Messenger::Verbose);
 					break;
 				default:
 					msg.print("Unrecognised command-line switch '%s'.\n", argv[n]);

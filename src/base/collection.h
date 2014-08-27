@@ -65,9 +65,9 @@ class Collection : public ListItem<Collection>
 	QString title();
 	// Add dataset
 	DataSet* addDataSet();
-	// Add slice at specified z
+	// Add dataset at specified z
 	DataSet* addDataSet(double z);
-	// Add slice, copying from supplied data
+	// Add dataset, copying from supplied data
 	void addDataSet(DataSet* source);
 	// Copy datasets from specified source collection
 	void copyDataSets(Collection* source);
@@ -75,19 +75,23 @@ class Collection : public ListItem<Collection>
 	int nDataSets();
 	// Remove dataset
 	void removeDataSet(DataSet* dataSet);
-	// Set z value of specified slice
+	// Set z value of specified dataset
 	void setDataSetZ(DataSet* target, double z);
-	// Set data for specified slice
-	void setDataSetData(DataSet* target, Data2D* newData);
-	// Return first slice in list
+	// Set data for specified dataset
+	void setDataSetData(DataSet* target, const Array<double>& x, const Array<double>& y);
+	// Return first dataset in list
 	DataSet* dataSets() const;
-	// Return last slice in list
+	// Return last dataset in list
 	DataSet* lastDataSet();
-	// Return nth slice in list
+	// Return nth dataset in list
 	DataSet* dataSet(int index);
+	// Return index of specified dataset
+	int dataSetIndex(const char* name);
+	// Return unique name based on supplied dataset
+	QString uniqueDataSetName(const char* name);
 	// Return number of dataset with no data present
 	int nEmptyDataSets();
-	// Clear slice data from collection
+	// Clear dataset data from collection
 	void clearDataSets();
 	// Return total number of points across all dataset
 	int nDataPoints();
@@ -199,6 +203,8 @@ class Collection : public ListItem<Collection>
 	Collection* parent();
 	// Return type of this collection
 	CollectionType type();
+	// Return icon string reflecting this Collection's type / status
+	QString iconString();
 	// Add fit to Collection
 	Collection* addFit(QString title = QString());
 	// Remove specified fit from list

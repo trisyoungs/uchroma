@@ -1,6 +1,6 @@
 /*
 	*** Command Functions
-	*** src/parser/commands.h
+	*** src/command/commands.h
 	Copyright T. Youngs 2010-2014
 
 	This file is part of uChroma.

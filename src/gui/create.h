@@ -35,7 +35,7 @@
 class UChromaWindow;
 class Collection;
 class DataSet;
-class Variable;
+class DoubleVariable;
 
 /*
  * Create Collection Dialog
@@ -85,7 +85,7 @@ class CreateCollectionDialog : public QDialog
 	// Whether current equation is valid
 	bool equationValid_;
 	// Standard x and z variables
-	Variable* xVariable_, *zVariable_;
+	DoubleVariable* xVariable_, *zVariable_;
 	// List of variables targetted in create process
 	RefList<EquationVariable,bool> usedVariables_;
 

@@ -169,7 +169,7 @@ bool UChromaWindow::writeFitParametersBlock(LineParser& parser, FitKernel* fitKe
 	parser.writeLineF("%s    %s %s\n", indent, Keywords::fitParametersKeyword(Keywords::GlobalKeyword), stringBool(fitKernel->global()));
 	parser.writeLineF("%s    %s %s\n", indent, Keywords::fitParametersKeyword(Keywords::OrthogonalKeyword), stringBool(fitKernel->orthogonal()));
 	parser.writeLineF("%s    %s %f\n", indent, Keywords::fitParametersKeyword(Keywords::LimitStrengthKeyword), fitKernel->limitStrength());
-	for (RefListItem<EquationVariable,bool>* ri = fitKernel->fitVariables(); ri != NULL; ri = ri->next)
+	for (RefListItem<EquationVariable,bool>* ri = fitKernel->usedVariables(); ri != NULL; ri = ri->next)
 	{
 		EquationVariable* eqVar = ri->item;
 		parser.writeLineF("%s    %s %s %s %f %s %f %s %f\n", indent, Keywords::fitParametersKeyword(Keywords::VariableKeyword), qPrintable(eqVar->name()), stringBool(eqVar->fit()), eqVar->value(), stringBool(eqVar->maximumLimitEnabled()), eqVar->minimumLimit(), stringBool(eqVar->maximumLimitEnabled()), eqVar->maximumLimit());

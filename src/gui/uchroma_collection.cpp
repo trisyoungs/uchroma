@@ -123,14 +123,7 @@ void UChromaWindow::updateCollectionTreeItem(QTreeWidgetItem* item)
 	item->setCheckState(0, collection->visible() ? Qt::Checked : Qt::Unchecked);
 
 	// Set icon
-	QString iconName;
-	// -- Get base name
-	if (collection->type() == Collection::MasterCollection) iconName = ":/uchroma/icons/collection_collection";
-	else if (collection->type() == Collection::FitCollection) iconName = ":/uchroma/icons/collection_fit";
-	else if (collection->type() == Collection::ExtractedCollection) iconName = ":/uchroma/icons/collection_extracted";
-	// -- If display pane is invalid, tweak icon name
-	if (collection->displayPane() == NULL) iconName += "_nopane";
-	item->setIcon(0, QIcon(iconName+".svg"));
+	item->setIcon(0, QIcon(collection->iconString()));
 
 	// If this is the current collection, select it
 	if (collection == currentCollection_) item->setSelected(true);
@@ -244,6 +237,10 @@ void UChromaWindow::updateCollectionInfo()
 	}
 
 	// Update collection info label
-	if (currentCollection_) ui.InfoCurrentCollectionLabel->setText(currentCollection_->title());
+	if (currentCollection_)
+	{
+		ui.InfoCurrentCollectionLabel->setText(currentCollection_->title());
+		ui.InfoCurrentCollectionIconLabel->setPixmap(QPixmap(currentCollection_->iconString()));
+	}
 	else ui.InfoCurrentCollectionLabel->setText("<No Current Collection>");
 }

@@ -182,7 +182,7 @@ CommandData Command::data[Command::nCommands] = {
 		"Return square root of number" },
 	{ "tan",		"N",		VTypes::DoubleData,
 		"double degrees",
-		"Return tangent of specified angle (supplied in degrees)" },
+		"Return tangent of specified angle (supplied in degrees)" }
 };
 
 // Return enumerated command from string

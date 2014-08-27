@@ -41,8 +41,8 @@ class CommandNode : public TreeNode
 	~CommandNode();
 
 	/*
-	// Command Data
-	*/
+	 * Command Data
+	 */
 	protected:
 	// Command that this node performs
 	Command::Function function_;

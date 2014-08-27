@@ -23,6 +23,7 @@
 #include "gui/equationselect.h"
 #include "gui/uchroma.h"
 #include "base/collection.h"
+#include "parser/double.h"
 #include "kernels/fit.h"
 #include "templates/variantpointer.h"
 #include <QtGui/QMessageBox>
@@ -127,7 +128,7 @@ void FitSetupDialog::updateVariableTable()
 	bool status, isXYZ;
 	ReturnValue rv;
 	int count = 0;
-	for (RefListItem<EquationVariable,bool>* ri = fitKernel_->fitVariables(); ri != NULL; ri = ri->next)
+	for (RefListItem<EquationVariable,bool>* ri = fitKernel_->usedVariables(); ri != NULL; ri = ri->next)
 	{
 		// Grab the fit variable and see if it's used in the current equation?
 		EquationVariable* eqVar = ri->item;
@@ -207,9 +208,18 @@ void FitSetupDialog::on_VariablesTable_cellChanged(int row, int column)
 	}
 }
 
+void FitSetupDialog::updateReferencesTable()
+{
+	ui.VariableReferenceList->clear();
+	for (ReferenceVariable* refVar = fitKernel_->references(); refVar != NULL; refVar = refVar->next) ui.VariableReferenceList->addItem(refVar->name());
+}
+
 void FitSetupDialog::on_VariableAddReferenceButton_clicked(bool checked)
 {
-	// TODO
+	// TEST
+	fitKernel_->addReference("R");
+
+	updateReferencesTable();
 }
 
 /*
@@ -564,8 +574,9 @@ void FitSetupDialog::updateControls(bool force)
 
 	refreshing_ = false;
 
-	// Update variables table
+	// Update variables and references tables
 	updateVariableTable();
+	updateReferencesTable();
 
 	// Update labels
 	updateLabels();
@@ -574,6 +585,8 @@ void FitSetupDialog::updateControls(bool force)
 // Update labels
 void FitSetupDialog::updateLabels()
 {
+	if (refreshing_) return;
+
 	Collection* sourceCollection = fitKernel_->sourceCollection();
 	if (!sourceCollection) return;
 
@@ -584,6 +597,7 @@ void FitSetupDialog::updateLabels()
 	ui.XPointMaxLabel->setText("(X = " + QString::number(abscissa.value(ui.XPointMaxSpin->value())) + ")");
 
 	// Z Source
+	printf("Ui %i\n", ui.ZDataSetCombo->currentIndex());
 	DataSet* dataSet = sourceCollection->nDataSets() == 0 ? NULL : sourceCollection->dataSet(ui.ZDataSetCombo->currentIndex());
 	ui.ZDataSetSingleLabel->setText("(Z = " + (dataSet ? QString::number(dataSet->data().z()) + ")" : "?)"));
 	dataSet = sourceCollection->nDataSets() == 0 ? NULL : sourceCollection->dataSet(ui.ZDataSetMinSpin->value()-1);

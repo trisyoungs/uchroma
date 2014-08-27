@@ -44,7 +44,7 @@ bool FitKernel::sdMinimise(Array<double>& alpha, double tolerance, int maxSteps)
 
 	// Get initial cost
 	double oldRMSE = rmsError(alpha);
-	msg.print("Initial RMSE = %e", oldRMSE);
+	msg.print("Initial RMSE = %e\n", oldRMSE);
 
 	// Do some iterations
 	int n;
@@ -67,7 +67,7 @@ bool FitKernel::sdMinimise(Array<double>& alpha, double tolerance, int maxSteps)
 		// Check on convergence tolerance
 		if (fabs(deltaRMSE) < tolerance)
 		{
-			msg.print("SD converged (tolerance = %e, delta(RMSE) = %e)", tolerance, deltaRMSE);
+			msg.print("SD converged (tolerance = %e, delta(RMSE) = %e)\n", tolerance, deltaRMSE);
 			break;
 		}
 
@@ -86,7 +86,7 @@ bool FitKernel::sdMinimise(Array<double>& alpha, double tolerance, int maxSteps)
 	}
 
 	// Get final cost
-	msg.print("Final RMSE = %e", rmsError(alpha));
+	msg.print("Final RMSE = %e\n", rmsError(alpha));
 	
 	return true;
 }

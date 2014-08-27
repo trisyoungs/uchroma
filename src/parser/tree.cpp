@@ -98,12 +98,13 @@ void Tree::reset()
 }
 
 // Clear contents of tree
-void Tree::clear()
+void Tree::clear(bool keepGlobalVariables)
 {
 	nodes_.clear();
 	statements_.clear();
 	scopeStack_.clear();
 	rootNode_ = NULL;
+	if (!keepGlobalVariables) globalScope_.variables.clear();
 
 	// Create new root ScopNode
 	rootNode_ = new ScopeNode(Command::NoFunction);
@@ -132,9 +133,11 @@ bool Tree::setCommands(QString commands)
 }
 
 // Add variable to global Tree scope
-Variable* Tree::addGlobalVariable(const char* name)
+DoubleVariable* Tree::addGlobalVariable(const char* name)
 {
-	Variable* var = rootNode_->variables.create(VTypes::DoubleData, name);
+	DoubleVariable* var = new DoubleVariable();
+	var->setName(name);
+	globalScope_.variables.take(var);
 	return var;
 }
 
@@ -391,7 +394,7 @@ TreeNode *Tree::addConstant(double d)
 }
 
 // Add variable to topmost scope
-TreeNode *Tree::addVariable(VTypes::DataType type, Dnchar *name, TreeNode *initialValue)
+Variable *Tree::addVariable(VTypes::DataType type, Dnchar *name, TreeNode *initialValue)
 {
 	msg.print(Messenger::Verbose, "A new variable '%s' is being created with type %s.\n", name->get(), VTypes::dataType(type));
 	// Get topmost scopenode
@@ -420,8 +423,12 @@ Variable *Tree::findVariableInScope(const char *name, int &scopelevel)
 	Variable *result = NULL;
 	scopelevel = 0;
 	msg.print(Messenger::Verbose, "Searching scope for variable '%s'...\n", name);
-	// Search the current ScopeNode list for the variable name requested
-	for (RefListItem<ScopeNode,int> *ri = scopeStack_.last(); ri != NULL; ri = ri->prev)
+
+	// Search global scope first
+	result = globalScope_.variables.find(name);
+
+	// If not in global scope, search the current ScopeNode list for the variable name requested
+	if (!result) for (RefListItem<ScopeNode,int> *ri = scopeStack_.last(); ri != NULL; ri = ri->prev)
 	{
 		msg.print(Messenger::Verbose, " ... scopenode %p...\n", ri->item);
 		result = ri->item->variables.find(name);
@@ -533,4 +540,10 @@ bool Tree::expandPath(Dnchar *name, TreeNode *arglist)
 RefListItem<ScopeNode,int> *Tree::scopeNodes()
 {
 	return scopeStack_.first();
+}
+
+// Return global scope
+ScopeNode* Tree::globalScope()
+{
+	return &globalScope_;
 }

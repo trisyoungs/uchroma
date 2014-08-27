@@ -28,7 +28,7 @@
 */
 
 // Constructor
-IntegerVariable::IntegerVariable(int i, bool constant) : integerData_(i)
+IntegerVariable::IntegerVariable(int i, bool constant) : Variable(), integerData_(i)
 {
 	// Private variables
 	returnType_ = VTypes::IntegerData;

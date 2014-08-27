@@ -22,6 +22,7 @@
 #include "kernels/fit.h"
 #include "base/collection.h"
 #include "base/currentproject.h"
+#include "parser/double.h"
 #include "parser/scopenode.h"
 #include "templates/variantpointer.h"
 
@@ -31,10 +32,11 @@ FitKernel::FitKernel()
 	// Equation and Variable Data
 	nVariablesUsed_ = 0;
 	equationValid_ = false;
-	xVariable_ = NULL;
-	zVariable_ = NULL;
-	referenceYVariable_ = NULL;
+	xVariable_ = equation_.addGlobalVariable("x");
+	zVariable_ = equation_.addGlobalVariable("z");
+	equation_.setGenerateMissingVariables(true);
 
+	// Fit Range
 	xRange_ = FitKernel::AbsoluteRange;
 	absoluteXMin_ = 0.0;
 	absoluteXMax_ = 0.0;
@@ -49,12 +51,13 @@ FitKernel::FitKernel()
 	indexZMax_ = 0;
 	orthogonal_ = false;
 	global_ = false;
-	currentFitTarget_ = NULL;
+	currentFitRange_ = NULL;
 	sourceCollection_ = NULL;
 	destinationCollection_ = NULL;
 
 	// Minimisation Setup
 	method_ = FitKernel::SteepestDescentMethod;
+	maxSteps_ = 100;
 	limitStrength_ = 1.0e3;
 	tolerance_ = 1.0e-3;
 }
@@ -73,13 +76,14 @@ void FitKernel::updateVariables()
 {
 	// First, clear all 'used' flags
 	EquationVariable* eqVar;
-	for (eqVar = equationVariables_.first(); eqVar != NULL; eqVar = eqVar->next)
+	for (eqVar = variables_.first(); eqVar != NULL; eqVar = eqVar->next)
 	{
 		eqVar->setVariable(NULL);
 		eqVar->setUsed(false);
 	}
 	nVariablesUsed_ = 0;
-	fitVariables_.clear();
+	usedVariables_.clear();
+	usedReferences_.clear();
 
 	// Now, loop over current variables in the equation_
 	// Ignore 'x' and 'z' if they exist
@@ -88,20 +92,31 @@ void FitKernel::updateVariables()
 	ScopeNode* rootNode = equation_.rootNode();
 	for (Variable* var = rootNode->variables.variables(); var != NULL; var = var->next)
 	{
-		// Is this variable one of 'x', 'z', or 'refy'?
-		if ((strcmp(var->name(),"x") == 0) || (strcmp(var->name(),"z") == 0) || (strcmp(var->name(),"refy") == 0)) continue;
+		// Is this variable one of 'x' or 'z'?
+		if ((strcmp(var->name(),"x") == 0) || (strcmp(var->name(),"z") == 0)) continue;
 
-		for (eqVar = equationVariables_.first(); eqVar != NULL; eqVar = eqVar->next) if (eqVar->name() == var->name()) break;
+		// Is it one of the reference variables that we created?
+		ReferenceVariable* refVar;
+		for (refVar = references_.first(); refVar != NULL; refVar = refVar->next) if (refVar->name() == var->name()) break;
+		if (refVar != NULL)
+		{
+			msg.print("Found reference variable '%s' in our list...\n", var->name());
+			usedReferences_.add(refVar);
+			continue;
+		}
+
+		// Must be a normal variable - search the EquationVariable list to see if it's already in there... if not, add it.
+		eqVar = variable(var->name());
 		if (eqVar == NULL)
 		{
-			eqVar = equationVariables_.add();
+			eqVar = variables_.add();
 			eqVar->setName(var->name());
 		}
 
 		// Update variable pointer
 		eqVar->setVariable(var);
 		eqVar->setUsed(true);
-		fitVariables_.add(eqVar);
+		usedVariables_.add(eqVar);
 		++nVariablesUsed_;
 	}
 }
@@ -109,12 +124,8 @@ void FitKernel::updateVariables()
 // Reset equation
 void FitKernel::resetEquation()
 {
-	equation_.clear();
+	equation_.clear(true);
 	equationText_ = QString();
-	xVariable_ = equation_.addGlobalVariable("x");
-	zVariable_ = equation_.addGlobalVariable("z");
-	referenceYVariable_ = equation_.addGlobalVariable("refy");
-	equation_.setGenerateMissingVariables(true);
 	equationValid_ = false;
 }
 
@@ -150,23 +161,46 @@ int FitKernel::nVariablesUsed()
 }
 
 // Return first variable in list
-EquationVariable* FitKernel::equationVariables()
+EquationVariable* FitKernel::variables()
 {
-	return equationVariables_.first();
+	return variables_.first();
 }
 
 // Return first variable used in equation
-RefListItem<EquationVariable,bool>* FitKernel::fitVariables()
+RefListItem<EquationVariable,bool>* FitKernel::usedVariables()
 {
-	return fitVariables_.first();
+	return usedVariables_.first();
 }
 
 // Return named variable, if it exists
 EquationVariable* FitKernel::variable(QString name)
 {
 	// Search list of variables for name provided
-	for (EquationVariable* eqVar = equationVariables_.first(); eqVar != NULL; eqVar = eqVar->next) if (name == eqVar->name()) return eqVar;
+	for (EquationVariable* eqVar = variables_.first(); eqVar != NULL; eqVar = eqVar->next) if (name == eqVar->name()) return eqVar;
 	return NULL;
+}
+
+// Add reference variable to our list, and the Tree's global scope
+ReferenceVariable* FitKernel::addReference(QString name)
+{
+	ReferenceVariable* refVar = references_.add();
+	refVar->setName(name);
+	DoubleVariable* var = equation_.addGlobalVariable(qPrintable(name));
+	refVar->setVariable(var);
+
+	return refVar;
+}
+
+// Return first reference variable in list
+ReferenceVariable* FitKernel::references()
+{
+	return references_.first();
+}
+
+// Return first data reference used in fit
+RefListItem<ReferenceVariable,bool>* FitKernel::usedReferences()
+{
+	return usedReferences_.first();
 }
 
 /*
@@ -470,7 +504,7 @@ void FitKernel::updateFittedData()
 	destinationCollection_->clearDataSets();
 
 	// Copy all slice data over
-	for (FitTarget* fitTarget = fitTargets_.first(); fitTarget != NULL; fitTarget = fitTarget->next) fitTarget->copyCalculatedY(destinationCollection_);
+	fitSpace_.copy(destinationCollection_);
 }
 
 // Generate SOS error for current targets
@@ -478,19 +512,19 @@ double FitKernel::sosError(Array<double>& alpha)
 {
 	// Poke current values back into the equation variables
 	int n = 0;
-	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next) ri->item->variable()->set(alpha[n++]);
+	for (RefListItem<EquationVariable,bool>* ri = usedVariables_.first(); ri != NULL; ri = ri->next) ri->item->variable()->set(alpha[n++]);
 	
 	// Generate new data from current variable values
-	currentFitTarget_->calculateY(equation_, xVariable_, zVariable_);
+	currentFitRange_->calculateValues(equation_, xVariable_, zVariable_);
 
 	// Get sos error from current fit target
-	double sos = currentFitTarget_->sosError();
+	double sos = currentFitRange_->sosError();
 
 	// Calculate penalty from variables outside of their allowable ranges
 	double penalty = 1.0;
 	n = 0;
 	EquationVariable* fitVar;
-	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next, ++n)
+	for (RefListItem<EquationVariable,bool>* ri = usedVariables_.first(); ri != NULL; ri = ri->next, ++n)
 	{
 		// Grab variable from reflist item
 		fitVar = ri->item;
@@ -509,7 +543,7 @@ double FitKernel::rmsError(Array<double>& alpha)
 	double rms = sosError(alpha);
 
 	// Normalise  to number of data points, and take sqrt
-	int nPoints = currentFitTarget_->nDataSets() * currentFitTarget_->nPoints();
+	int nPoints = currentFitRange_->nDataSets() * currentFitRange_->nPoints();
 
 	return sqrt(rms/nPoints);
 }
@@ -519,7 +553,7 @@ bool FitKernel::minimise()
 {
 	// Construct alpha array (variables to fit) to pass to minimiser
 	Array<double> alpha;
-	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next)
+	for (RefListItem<EquationVariable,bool>* ri = usedVariables_.first(); ri != NULL; ri = ri->next)
 	{
 		// Grab variable pointer from FitVariable
 		EquationVariable* var = ri->item;
@@ -543,12 +577,12 @@ bool FitKernel::minimise()
 	// Print results...
 	msg.print("Final, fitted parameters are:\n");
 	int n = 0;
-	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next)
+	for (RefListItem<EquationVariable,bool>* ri = usedVariables_.first(); ri != NULL; ri = ri->next)
 	{
 		// Grab variable pointer from FitVariable
 		EquationVariable* var = ri->item;
 
-		msg.print("\t%s\t=\t%e", qPrintable(var->name()), alpha[n]);
+		msg.print("\t%s\t=\t%e\n", qPrintable(var->name()), alpha[n]);
 
 		++n;
 	}
@@ -608,7 +642,7 @@ double FitKernel::limitStrength()
 bool FitKernel::fit()
 {
 	// Check number of variables to fit
-	if (fitVariables_.nItems() == 0)
+	if (usedVariables_.nItems() == 0)
 	{
 		msg.print("Error: No variables to fit!\n");
 		return false;
@@ -620,10 +654,6 @@ bool FitKernel::fit()
 		msg.print("Internal Error: No sourceCollection_ pointer set.\n");
 		return false;
 	}
-	
-	// Construct a list of data to fit, obeying all defined data limits
-	fitTargets_.clear();
-	currentFitTarget_ = NULL;
 
 	// Determine X bin index range
 	int firstXPoint, lastXPoint;
@@ -635,13 +665,13 @@ bool FitKernel::fit()
 	}
 	else if (xRange_ == FitKernel::SinglePointRange)
 	{
-		firstXPoint = indexXSingle_ - 1;
+		firstXPoint = indexXSingle_;
 		lastXPoint = firstXPoint;
 	}
 	else
 	{
-		firstXPoint = indexXMin_ - 1;
-		lastXPoint = indexXMax_ - 1;
+		firstXPoint = indexXMin_;
+		lastXPoint = indexXMax_;
 	}
 
 	// Determine Z (dataset) bin index range
@@ -653,40 +683,17 @@ bool FitKernel::fit()
 	}
 	else if (zRange_ == FitKernel::SinglePointRange)
 	{
-		firstZPoint = indexZSingle_ - 1;
+		firstZPoint = indexZSingle_;
 		lastZPoint = firstZPoint;
 	}
 	else
 	{
-		firstZPoint = indexZMin_ - 1;
-		lastZPoint = indexZMax_ - 1;
+		firstZPoint = indexZMin_;
+		lastZPoint = indexZMax_;
 	}
 
 	// Construct source data
-	if (orthogonal_)
-	{
-		// Source data will be slices in the ZY plane
-		msg.print("Setting up orthogonal (ZY) data over %e < x < %e and %e < z < %e\n", abscissa.value(firstXPoint), abscissa.value(lastXPoint), sourceCollection_->dataSet(firstZPoint)->data().z(), sourceCollection_->dataSet(lastZPoint)->data().z());
-
-		if (global_)
-		{
-			FitTarget* target = fitTargets_.add();
-			target->set(sourceCollection_, firstZPoint, lastZPoint, firstXPoint, lastXPoint);
-		}
-		else for (int n= firstXPoint; n<= lastXPoint; ++n) fitTargets_.add()->set(sourceCollection_, firstZPoint, lastZPoint, n, n);
-	}
-	else
-	{
-		// Source data is normal XY slices from the current collection
-		msg.print("Setting up normal (XY) data over %e < x < %e and %e < z < %e\n", abscissa.value(firstXPoint), abscissa.value(lastXPoint), sourceCollection_->dataSet(firstZPoint)->data().z(), sourceCollection_->dataSet(lastZPoint)->data().z());
-
-		if (global_)
-		{
-			FitTarget* target = fitTargets_.add();
-			target->set(sourceCollection_, firstZPoint, lastZPoint, firstXPoint, lastXPoint);
-		}
-		else for (int n = firstZPoint; n<= lastZPoint; ++n) fitTargets_.add()->set(sourceCollection_, n, n, firstXPoint, lastXPoint);
-	}
+	if (!fitSpace_.initialise(sourceCollection_, firstXPoint, lastXPoint, firstZPoint, lastZPoint, orthogonal_, global_)) return false;
 
 	// Set up destination collection
 	if (destinationCollection_ == NULL)
@@ -696,11 +703,11 @@ bool FitKernel::fit()
 	}
 	destinationCollection_->clearDataSets();
 
-	// Loop over defined FitTargets (global fit has already been accounted for)
+	// Loop over defined DataRanges (global fit has already been accounted for)
 	bool result;
-	for (currentFitTarget_ = fitTargets_.first(); currentFitTarget_ != NULL; currentFitTarget_ = currentFitTarget_->next)
+	for (currentFitRange_ = fitSpace_.ranges(); currentFitRange_ != NULL; currentFitRange_ = currentFitRange_->next)
 	{
-		msg.print("Fitting %i dataset(s) at %e < z < %e\n", currentFitTarget_->nDataSets(), currentFitTarget_->zStart(), currentFitTarget_->zEnd());
+		msg.print("Fitting range (%e < x < %e) (%e < z < %e)\n", currentFitRange_->xStart(), currentFitRange_->xEnd(), currentFitRange_->zStart(), currentFitRange_->zEnd());
 
 		// Call the minimiser
 		result = minimise();

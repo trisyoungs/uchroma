@@ -225,7 +225,7 @@ template <class A> class Array : public ListItem< Array<A> >
 	Array<A> operator*(const double value) { Array<A> result = *this; result *= value; return result; }
 	Array<A> operator*(const int value) { Array<A> result = *this; result *= value; return result; }
 	// Return first value in array
-	A first()
+	A first() const
 	{
 		if (nItems_ == 0)
 		{
@@ -235,7 +235,7 @@ template <class A> class Array : public ListItem< Array<A> >
 		return array_[0];
 	}
 	// Return last value in array
-	A last()
+	A last() const
 	{
 		if (nItems_ == 0)
 		{

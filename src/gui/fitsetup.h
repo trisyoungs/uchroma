@@ -98,6 +98,8 @@ class FitSetupDialog : public QDialog
 	private:
 	// Update variable table
 	void updateVariableTable();
+	// Update references table
+	void updateReferencesTable();
 
 	public slots:
 	void on_VariablesTable_cellChanged(int row, int column);

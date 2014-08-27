@@ -22,10 +22,10 @@
 #ifndef UCHROMA_FIT_H
 #define UCHROMA_FIT_H
 
-#include "base/dnchar.h"
-#include "base/data2d.h"
 #include "base/equationvariable.h"
+#include "base/referencevariable.h"
 #include "parser/tree.h"
+#include "base/dataspace.h"
 #include "templates/array.h"
 #include "templates/list.h"
 
@@ -33,70 +33,7 @@
 class UChromaWindow;
 class Collection;
 class DataSet;
-class Variable;
-
-/*
- * Fit Target
- */
-class FitTarget : public ListItem<FitTarget>
-{
-	public:
-	// Constructor / Destructor
-	FitTarget();
-	~FitTarget();
-
-
-	/* 
-	 * Target Data
-	 */
-	private:
-	// Source Collection
-	Collection* collection_;
-	// Indices of first and last DisplayDataSet to use in fitting
-	int displayDataSetStart_, displayDataSetEnd_;
-	// Number of sequential DisplayDataSet to use in fitting
-	int nDataSets_;
-	// First and last abscissa indices to use in fitting
-	int abscissaStart_, abscissaEnd_;
-	// Number of sequential abscissa values to use in fitting
-	int nPoints_;
-
-	public:
-	// Set target information
-	void set(Collection* collection, int firstDataSet, int lastDataSet, int abscissaFirst, int abscissaLast);
-	// Return index of first DisplayDataSet to be fit
-	int displayDataSetStart();
-	// Return index of last DisplayDataSet to be fit
-	int displayDataSetEnd();
-	// Return number of sequential DisplayDataSets to use in fitting
-	int nDataSets();
-	// Return first abscissa index to use in fitting
-	int abscissaStart();
-	// Return last abscissa index to use in fitting
-	int abscissaEnd();
-	// Return number of sequential abscissa values to use in fitting
-	int nPoints();
-	// Return z value of first dataset used in fitting
-	double zStart();
-	// Return z value of last dataset used in fitting
-	double zEnd();
-
-
-	/*
-	 * Fitting
-	 */
-	private:
-	// Fitted/calculated values for target
-	List<Data2D> calculatedY_;
-
-	public:
-	// Calculate 'fitted' values from specified equation
-	bool calculateY(Tree& equation, Variable* xVariable, Variable* zVariable);
-	// Return sos error between calculated and original y values
-	double sosError();
-	// Copy calculated Y data to specified Collection
-	void copyCalculatedY(Collection* target);
-};
+class DoubleVariable;
 
 /*
  * Fit Kernel
@@ -115,7 +52,7 @@ class FitKernel
 	 */
 	private:
 	// Local list of variables use in equations, including limits
-	List<EquationVariable> equationVariables_;
+	List<EquationVariable> variables_;
 	// Number of variables which are used in the current equation
 	int nVariablesUsed_;
 	// Original text passed for last equation
@@ -125,11 +62,13 @@ class FitKernel
 	// Whether current equation is valid
 	bool equationValid_;
 	// Standard x and z variables
-	Variable* xVariable_, *zVariable_;
-	// Slice reference variables
-	Variable* referenceYVariable_;
+	DoubleVariable* xVariable_, *zVariable_;
 	// List of variables targetted in fit process
-	RefList<EquationVariable,bool> fitVariables_;
+	RefList<EquationVariable,bool> usedVariables_;
+	// List of data references available
+	List<ReferenceVariable> references_;
+	// List of data reference used in fit
+	RefList<ReferenceVariable,bool> usedReferences_;
 
 	private:
 	// Update variables list
@@ -147,15 +86,21 @@ class FitKernel
 	// Return number of variables used in equation
 	int nVariablesUsed();
 	// Return first variable in list
-	EquationVariable* equationVariables();
+	EquationVariable* variables();
 	// Return first variable used in equation
-	RefListItem<EquationVariable,bool>* fitVariables();
+	RefListItem<EquationVariable,bool>* usedVariables();
 	// Return named variable, if it exists
 	EquationVariable* variable(QString name);
+	// Add reference variable to our list, and the relevant Tree scope
+	ReferenceVariable* addReference(QString name);
+	// Return first reference variable in list
+	ReferenceVariable* references();
+	// Return first data reference used in fit
+	RefListItem<ReferenceVariable,bool>* usedReferences();
 
 
 	/*
-	 * Fit Targets
+	 * Fit Range
 	 */
 	public:
 	// Range Type enum
@@ -182,10 +127,10 @@ class FitKernel
 	bool orthogonal_;
 	// Whether all available datasets are to be fit simultaneously
 	bool global_;
-	// Data targets to fit, generated from specified ranges
-	List<FitTarget> fitTargets_;
-	// Current target for fitting
-	FitTarget* currentFitTarget_;
+	// Data space to use in fit
+	DataSpace fitSpace_;
+	// Current data range for fitting
+	DataSpaceRange* currentFitRange_;
 	// Source collection for fitting
 	Collection* sourceCollection_;
 	// Destination collection for fitted data

@@ -52,6 +52,10 @@ class DoubleVariable : public Variable
 	double doubleData_;
 	// Print node contents
 	void nodePrint(int offset, const char *prefix = "");
+
+	public:
+	// Set value for return
+	void setValue(double d);
 };
 
 #endif

@@ -5,12 +5,16 @@ add_library(base
   currentproject.cpp
   data2d.cpp
   dataset.cpp
+  dataspace.cpp
+  dataspacedata.cpp
+  dataspacerange.cpp
   displaydataset.cpp
   dnchar.cpp
   equationvariable.cpp
   lineparser.cpp
   messenger.cpp
   nxs.cpp
+  referencevariable.cpp
   sysfunc.cpp
   targetdata.cpp
   transformer.cpp
@@ -22,12 +26,16 @@ add_library(base
   currentproject.h
   data2d.h
   dataset.h
+  dataspace.h
+  dataspacedata.h
+  dataspacerange.h
   displaydataset.h
   dnchar.h
   equationvariable.h
   lineparser.h
   messenger.h
   nxs.h
+  referencevariable.h
   sysfunc.h
   targetdata.h
   transformer.h

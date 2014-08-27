@@ -76,7 +76,7 @@ class Data2D : public ListItem<Data2D>
 	// Return x value specified
 	double x(int index) const;
 	// Return x Array
-	Array< double >& arrayX();
+	Array<double>& arrayX();
 	// Set y value
 	void setY(int index, double y);
 	// Add to y value

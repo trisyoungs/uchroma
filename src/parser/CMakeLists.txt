@@ -1,35 +1,35 @@
 add_library(parser
-commandnode.cpp
-double.cpp
-grammar.cc
-integer.cpp
-parser.cpp
-parser_lexer.cpp
-parser_tree.cpp
-returnvalue.cpp
-scopenode.cpp
-stepnode.cpp
-tree.cpp
-tree_opcheck.cpp
-treenode.cpp
-variable.cpp
-variablelist.cpp
-variablenode.cpp
-vtypes.cpp
-accessor.h
-commandnode.h
-double.h
-integer.h
-parser.h
-returnvalue.h
-scopenode.h
-stepnode.h
-tree.h
-treenode.h
-variable.h
-variablelist.h
-variablenode.h
-vtypes.h
+  commandnode.cpp
+  double.cpp
+  grammar.cc
+  integer.cpp
+  parser.cpp
+  parser_lexer.cpp
+  parser_tree.cpp
+  returnvalue.cpp
+  scopenode.cpp
+  stepnode.cpp
+  tree.cpp
+  tree_opcheck.cpp
+  treenode.cpp
+  variable.cpp
+  variablelist.cpp
+  variablenode.cpp
+  vtypes.cpp
+  accessor.h
+  commandnode.h
+  double.h
+  integer.h
+  parser.h
+  returnvalue.h
+  scopenode.h
+  stepnode.h
+  tree.h
+  treenode.h
+  variable.h
+  variablelist.h
+  variablenode.h
+  vtypes.h
 )
 
 include_directories(

@@ -2,7 +2,6 @@ add_library(kernels
   fit.cpp
   fit_sd.cpp
   fit_simplex.cpp
-  fit_target.cpp
   fit.h
 )
 

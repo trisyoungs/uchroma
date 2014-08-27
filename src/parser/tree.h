@@ -23,6 +23,7 @@
 #define UCHROMA_TREE_H
 
 #include <iostream>
+#include "parser/scopenode.h"
 #include "parser/returnvalue.h"
 #include "parser/variable.h"
 #include "command/commands.h"
@@ -33,9 +34,9 @@
 
 // Forward declarations
 class TreeNode;
-class ScopeNode;
 class VariableNode;
 class StepNode;
+class DataSetReference;
 
 // Tree
 class Tree
@@ -43,13 +44,13 @@ class Tree
 	public:
 	// Constructor / Destructor
 	Tree();
-	Tree(const char *commands);
+	Tree(const char* commands);
 	~Tree();
 
 
 	/*
-	// Tree Character
-	*/
+	 * Tree Character
+	 */
 	private:
 	// Return type (used if defined as a function)
 	VTypes::DataType returnType_;
@@ -70,13 +71,11 @@ class Tree
 	// Flag to specify that missing variables should be generated
 	bool generateMissingVariables_;
 	
-	private:
+	public:
 	// Reset Tree, ready for new statement(s) to be added
 	void reset();
-
-	public:
 	// Clear all data contained in the Tree
-	void clear();
+	void clear(bool keepGlobalVariables = false);
 	// Set whether missing variables should be generated
 	void setGenerateMissingVariables(bool generate);
 	// Return whether missing variables will be generated
@@ -84,7 +83,7 @@ class Tree
 	// Set commands in Tree
 	bool setCommands(QString commands);
 	// Add variable to global Tree scope
-	Variable* addGlobalVariable(const char* name);
+	DoubleVariable* addGlobalVariable(const char* name);
 	// Set function for accepted fail
 	void setAcceptedFail(Command::Function func);
 	// Return function for accepted fail
@@ -94,9 +93,11 @@ class Tree
 
 
 	/*
-	// Node Data
-	*/
+	 * Node Data
+	 */
 	private:
+	// Permanent global ScopeNode
+	ScopeNode globalScope_;
 	// Root ScopeNode
 	ScopeNode* rootNode_;
 	// Node list - a disordered list of all nodes owned by the Tree
@@ -105,6 +106,8 @@ class Tree
 	RefList<TreeNode,int> statements_;
 	// Stack of ScopeNodes
 	RefList<ScopeNode,int> scopeStack_;
+	// Reflist of DataSet References
+	RefList<DataSetReference,int> referenceStack_;
 	// Stack of variable paths (and last added stepnode)
 	RefList<VariableNode,TreeNode*> pathStack_;
 	// Number of syntactic errors encountered
@@ -129,11 +132,13 @@ class Tree
 	TreeNode *args() const;
 	// Return first in stack of scopenodes
 	RefListItem<ScopeNode,int> *scopeNodes();
+	// Return global scope
+	ScopeNode* globalScope();
 	
 
 	/*
-	// Statement / Command Addition
-	*/
+	 * Statement / Command Addition
+	 */
 	public:
 	// Add a node representing a whole statement to the execution list
 	bool addStatement(TreeNode *leaf);
@@ -158,8 +163,8 @@ class Tree
 
 
 	/*
-	// Variables / Constants
-	*/
+	 * Variables / Constants
+	 */
 	public:
 	// Add constant value to tompost scope
 	TreeNode *addConstant(VTypes::DataType type, Dnchar *token);
@@ -168,7 +173,7 @@ class Tree
 	// Add double constant
 	TreeNode *addConstant(double d);
 	// Add variable to topmost ScopeNode
-	TreeNode *addVariable(VTypes::DataType type, Dnchar *name, TreeNode *initialValue = NULL);
+	Variable *addVariable(VTypes::DataType type, Dnchar* name, TreeNode* initialValue = 0);
 	// Search for variable in current scope
 	Variable *findVariableInScope(const char *name, int &scopelevel);
 	// Wrap named variable (and array index)

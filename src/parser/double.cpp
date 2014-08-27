@@ -30,7 +30,7 @@
 */
 
 // Constructor
-DoubleVariable::DoubleVariable(double d, bool constant) : doubleData_(d)
+DoubleVariable::DoubleVariable(double d, bool constant) : Variable(), doubleData_(d)
 {
 	// Private variables
 	returnType_ = VTypes::DoubleData;
@@ -84,4 +84,10 @@ void DoubleVariable::nodePrint(int offset, const char *prefix)
 	// Output node data
 	if (readOnly_) printf("[C]%s%f (constant value)\n", tab.get(), doubleData_);
 	else printf("[V]%s%f (variable, name=%s)\n", tab.get(), doubleData_, name_.get());
+}
+
+// Set value for return
+void DoubleVariable::setValue(double d)
+{
+	doubleData_ = d;
 }
