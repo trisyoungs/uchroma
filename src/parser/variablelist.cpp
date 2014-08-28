@@ -37,6 +37,19 @@ void VariableList::take(Variable *v, bool forcevariable)
 	else variables_.own(v);
 }
 
+// Remove specified variable from the list
+bool VariableList::remove(Variable* v)
+{
+	if (variables_.contains(v))
+	{
+		variables_.remove(v);
+		return true;
+	}
+
+	printf("Tried to remove a variable that didn't exist in the VariableList.\n");
+	return false;
+}
+
 // Retrieve a named variable from the list
 Variable *VariableList::find(const char *name) const
 {
@@ -82,12 +95,6 @@ Variable *VariableList::create(VTypes::DataType type, const char *name, TreeNode
 	Variable *v = makeVariable(type, name, initialValue);
 	if (v != NULL) variables_.own(v);
 	return v;
-}
-
-// Create variable without owning it
-Variable *VariableList::createFree(VTypes::DataType type, const char *name, TreeNode *initialValue)
-{
-	return makeVariable(type, name, initialValue);
 }
 
 // Return the number of variables (not constants) contained in the list

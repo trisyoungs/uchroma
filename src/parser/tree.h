@@ -84,6 +84,8 @@ class Tree
 	bool setCommands(QString commands);
 	// Add variable to global Tree scope
 	DoubleVariable* addGlobalVariable(const char* name);
+	// Remove variable from global Tree scope
+	void removeGlobalVariable(Variable* var);
 	// Set function for accepted fail
 	void setAcceptedFail(Command::Function func);
 	// Return function for accepted fail

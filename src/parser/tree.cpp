@@ -141,6 +141,12 @@ DoubleVariable* Tree::addGlobalVariable(const char* name)
 	return var;
 }
 
+// Remove variable from global Tree scope
+void Tree::removeGlobalVariable(Variable* var)
+{
+	globalScope_.variables.remove(var);
+}
+
 // Set function for accepted fail
 void Tree::setAcceptedFail(Command::Function func)
 {

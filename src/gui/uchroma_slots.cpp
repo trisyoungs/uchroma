@@ -324,13 +324,11 @@ void UChromaWindow::on_actionAnalyseNewFit_triggered(bool checked)
 	// Add a new fit collection to the current collection
 	Collection* newFit = currentCollection_->addFit();
 
-	refreshCollections();
-
 	fitSetupDialog_.setFitKernel(newFit->fitKernel());
-	if (fitSetupDialog_.updateAndExec())
-	{
-		if (newFit->fitKernel()->fit()) updateGUI();
-	}
+	if (fitSetupDialog_.updateAndExec()) newFit->fitKernel()->fit();
+	else currentCollection_->removeFit(newFit);
+
+	updateGUI();
 }
 
 void UChromaWindow::on_actionAnalyseEditFit_triggered(bool checked)

@@ -165,6 +165,11 @@ bool UChromaWindow::writeFitParametersBlock(LineParser& parser, FitKernel* fitKe
 	indent[indentLevel*2] = '\0';
 
 	parser.writeLineF("%s  %s\n", indent, Keywords::collectionKeyword(Keywords::FitParametersBlockKeyword));
+	for (RefListItem<ReferenceVariable,bool>* ri = fitKernel->usedReferences(); ri != NULL; ri = ri->next)
+	{
+		ReferenceVariable* refVar = ri->item;
+		parser.writeLineF("%s    %s %s %i %i %s %i %i '%s'\n", indent, Keywords::fitParametersKeyword(Keywords::ReferenceKeyword), qPrintable(refVar->name()), ReferenceVariable::referenceType(refVar->xType()), refVar->xIndex(), refVar->xOffset(), ReferenceVariable::referenceType(refVar->zType()), refVar->zIndex(), refVar->zOffset(), qPrintable(refVar->zDataSetName()));
+	}
 	parser.writeLineF("%s    %s '%s'\n", indent, Keywords::fitParametersKeyword(Keywords::EquationKeyword), qPrintable(fitKernel->equationText()));
 	parser.writeLineF("%s    %s %s\n", indent, Keywords::fitParametersKeyword(Keywords::GlobalKeyword), stringBool(fitKernel->global()));
 	parser.writeLineF("%s    %s %s\n", indent, Keywords::fitParametersKeyword(Keywords::OrthogonalKeyword), stringBool(fitKernel->orthogonal()));

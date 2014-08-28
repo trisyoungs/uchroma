@@ -83,6 +83,8 @@ class FitKernel
 	QString equationText();
 	// Return whether equation is valid
 	bool equationValid();
+	// Set equation as invalid
+	void setEquationInvalid();
 	// Return number of variables used in equation
 	int nVariablesUsed();
 	// Return first variable in list
@@ -93,8 +95,14 @@ class FitKernel
 	EquationVariable* variable(QString name);
 	// Add reference variable to our list, and the relevant Tree scope
 	ReferenceVariable* addReference(QString name);
+	// Remove reference variable from the list, and the relevant Tree scope
+	void removeReference(ReferenceVariable* refVar);
+	// Return unique reference name based on the supplied string
+	QString uniqueReferenceName(QString baseName);
 	// Return first reference variable in list
 	ReferenceVariable* references();
+	// Return named reference, if it exists
+	ReferenceVariable* reference(QString name);
 	// Return first data reference used in fit
 	RefListItem<ReferenceVariable,bool>* usedReferences();
 

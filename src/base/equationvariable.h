@@ -63,6 +63,8 @@ class EquationVariable : public ListItem<EquationVariable>
 	QString name();
 	// Set variable target
 	void setVariable(Variable* variable);
+	// Reset variable target (to NULL) and usage status
+	void resetVariable();
 	// Return variable target
 	Variable* variable();
 	// Set value

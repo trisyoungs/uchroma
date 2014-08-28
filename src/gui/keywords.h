@@ -158,6 +158,7 @@ class Keywords
 		GlobalKeyword,
 		LimitStrengthKeyword,
 		OrthogonalKeyword,
+		ReferenceKeyword,
 		VariableKeyword,
 		XRangeTypeKeyword,
 		XRangeAbsoluteKeyword,

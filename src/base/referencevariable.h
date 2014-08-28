@@ -23,7 +23,6 @@
 #define UCHROMA_REFERENCEVARIABLE_H
 
 #include "base/dataspace.h"
-#include "templates/list.h"
 #include <QtCore/QString>
 
 // Forward Declarations
@@ -36,6 +35,16 @@ class ReferenceVariable : public ListItem<ReferenceVariable>
 	// Constructor / Destructor
 	ReferenceVariable();
 	~ReferenceVariable();
+	// Copy constructor
+	ReferenceVariable(const ReferenceVariable& source);
+	// Assignment operator
+	void operator=(const ReferenceVariable& source);
+	// Reference Type
+	enum ReferenceType { NormalReference, FixedReference, RelativeReference, nReferenceTypes };
+	// Convert text string to ReferenceType
+	static ReferenceType referenceType(const char* s);
+	// Convert ReferenceType to text string
+	static const char* referenceType(ReferenceType id);
 
 
 	/*
@@ -56,8 +65,12 @@ class ReferenceVariable : public ListItem<ReferenceVariable>
 	QString name();
 	// Set variable target
 	void setVariable(DoubleVariable* variable);
+	// Reset variable target (to NULL) and usage status
+	void resetVariable();
 	// Return variable target
 	DoubleVariable* variable();
+	// Update associated variable to reflect name of ReferenceVariable
+	bool updateVariable();
 	// Set whether this variable is used in the current equation
 	void setUsed(bool used);
 	// Return whether this variable is used in the current equation
@@ -65,15 +78,61 @@ class ReferenceVariable : public ListItem<ReferenceVariable>
 
 
 	/*
-	 * Reference Source
+	 * Reference Definition
 	 */
 	private:
-	// Source DataSet name
-	// TODO
+	// Source collection
+	Collection* sourceCollection_;
+	// X index type
+	ReferenceType xType_;
+	// X index (for absolute type)
+	int xIndex_;
+	// X offset (for relative type)
+	int xOffset_;
+	// Z index type
+	ReferenceType zType_;
+	// Z index (for absolute type)
+	int zIndex_;
+	// Z offset (for relative type)
+	int zOffset_;
+	// Z DataSet name
+	QString zDataSetName_;
 	// Reference data
 	DataSpace referenceSpace_;
 
 	public:
+	// Set source collection
+	void setSourceCollection(Collection* source);
+	// Return source collection
+	Collection* sourceCollection();
+	// Set X index type
+	void setXType(ReferenceVariable::ReferenceType type);
+	// Return X index type
+	ReferenceVariable::ReferenceType xType();
+	// Set X index
+	void setXIndex(int index);
+	// Return X index
+	int xIndex();
+	// Set X offset
+	void setXOffset(int offset);
+	// Return X offset
+	int xOffset();
+	// Set Z index type
+	void setZType(ReferenceVariable::ReferenceType type);
+	// Return Z index type
+	ReferenceVariable::ReferenceType zType();
+	// Set Z index
+	void setZIndex(int index);
+	// Return Z index
+	int zIndex();
+	// Set Z offset
+	void setZOffset(int offset);
+	// Return Z offset
+	int zOffset();
+	// Set Z DataSet name
+	void setZDataSetName(QString name);
+	// Return Z DataSet name
+	QString zDataSetName();
 };
 
 #endif

@@ -123,10 +123,10 @@ int Keywords::collectionKeywordNArguments(Keywords::CollectionKeyword kwd)
  */
 
 // FitParameters Block Keywords
-const char* FitParametersBlockKeywords[] = { "EndFitParameters", "Equation", "Global", "LimitStrength", "Orthogonal", "Variable", "XRangeType", "XRangeAbsolute", "XRangeIndex", "XRangeSingle", "ZRangeType", "ZRangeAbsolute", "ZRangeIndex", "ZRangeSingle" };
+const char* FitParametersBlockKeywords[] = { "EndFitParameters", "Equation", "Global", "LimitStrength", "Orthogonal", "Reference", "Variable", "XRangeType", "XRangeAbsolute", "XRangeIndex", "XRangeSingle", "ZRangeType", "ZRangeAbsolute", "ZRangeIndex", "ZRangeSingle" };
 
 // FitParameters Block NArguments
-int FitParametersKeywordNArguments[] = { 0, 1, 1, 1, 1, 7, 1, 2, 2, 1, 1, 2, 2, 1 };
+int FitParametersKeywordNArguments[] = { 0, 1, 1, 1, 1, 7, 7, 1, 2, 2, 1, 1, 2, 2, 1 };
 
 /*!
  * \brief Convert text string to FitParametersKeyword

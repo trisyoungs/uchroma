@@ -23,10 +23,11 @@
 #define UCHROMA_REFERENCEDIALOG_H
 
 #include "gui/ui_referencedialog.h"
+#include "base/referencevariable.h"
 #include <QtGui/QDialog>
 
 // Forward Declarations
-class UChromaWindow;
+class FitKernel;
 
 class ReferenceSetupDialog : public QDialog
 {
@@ -35,27 +36,61 @@ class ReferenceSetupDialog : public QDialog
 
 	public:
 	// Constructor / Destructor
-	ReferenceSetupDialog(UChromaWindow& parent);
+	ReferenceSetupDialog(QWidget *parent);
 	~ReferenceSetupDialog();
 	// Main form declaration
 	Ui::ReferenceSetupDialog ui;
-	// UChromaWindow reference
-	UChromaWindow& uChroma_;
+
+
+	/*
+	 * Window Functions
+	 */
+	private:
+	// Whether the window is refreshing / updating its controls
+	bool refreshing_;
+
+	protected:
+	// Window close event
+	void closeEvent(QCloseEvent* event);
 
 	private:
+	// Parent FitKernel
+	FitKernel* referenceParent_;
+	// Target reference pointer
+	ReferenceVariable* referenceTarget_;
+	// Backup copy of reference (in case the dialog is cancelled)
+	ReferenceVariable referenceBackup_;
+
+	public slots:
+	void reject();
+	void on_OKButton_clicked(bool checked);
+	void on_CancelButton_clicked(bool checked);
 
 	public:
+	// Call dialog to edit specified reference
+	bool call(ReferenceVariable* target, FitKernel* parentKernel);
 
 
 	/*
 	 * Slots
 	 */
 	private slots:
-	void on_SelectFileNameButton_clicked(bool checked);
-	void on_ImageWidthSpin_valueChanged(int value);
-	void on_MaintainAspectRatioCheck_toggled(bool checked);
-	void on_SaveImageButton_clicked(bool checked);
-	void on_CancelButton_clicked(bool checked);
+	void on_NameEdit_textChanged(QString text);
+	void on_XNormalRadio_clicked(bool checked);
+	void on_XFixedRadio_clicked(bool checked);
+	void on_XRelativeRadio_clicked(bool checked);
+	void on_XFixedSpin_valueChanged(int value);
+	void on_XRelativeSpin_valueChanged(int value);
+	void on_ZNormalRadio_clicked(bool checked);
+	void on_ZFixedRadio_clicked(bool checked);
+	void on_ZRelativeRadio_clicked(bool checked);
+	void on_ZRelativeSpin_valueChanged(int value);	
+	void on_ZDataSetCombo_currentIndexChanged(int index);
+
+
+	private:
+	// Update labels
+	void updateLabels();
 };
 
 #endif

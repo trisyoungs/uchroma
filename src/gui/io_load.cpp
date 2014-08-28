@@ -349,7 +349,9 @@ bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Colle
 bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKernel)
 {
 	FitKernel::RangeType rangeType;
+	ReferenceVariable::ReferenceType refType;
 	EquationVariable* eqVar;
+	ReferenceVariable* refVar;
 	while (!parser.eofOrBlank())
 	{
 		// Get line from file
@@ -378,6 +380,30 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 				break;
 			case (Keywords::OrthogonalKeyword):
 				fitKernel->setOrthogonal(parser.argb(1));
+				break;
+			case (Keywords::ReferenceKeyword):
+				// Create new reference with this name
+				refVar = fitKernel->addReference(parser.argc(1));
+				if (!refVar) CHECKIOFAIL
+				refType = ReferenceVariable::referenceType(parser.argc(2));
+				if (refType == ReferenceVariable::nReferenceTypes)
+				{
+					msg.print("Warning: Unrecognised type '%s' for reference '%s' - defaulting to 'Normal'.\n", parser.argc(2), parser.argc(1));
+					CHECKIOFAIL
+				}
+				refVar->setXType(refType);
+				refVar->setXIndex(parser.argi(3));
+				refVar->setXOffset(parser.argi(4));
+				refType = ReferenceVariable::referenceType(parser.argc(5));
+				if (refType == ReferenceVariable::nReferenceTypes)
+				{
+					msg.print("Warning: Unrecognised type '%s' for reference '%s' - defaulting to 'Normal'.\n", parser.argc(5), parser.argc(1));
+					CHECKIOFAIL
+				}
+				refVar->setZType(refType);
+				refVar->setZIndex(parser.argi(6));
+				refVar->setZOffset(parser.argi(7));
+				refVar->setZDataSetName(parser.argc(8));
 				break;
 			case (Keywords::VariableKeyword):
 				// First, see if named variable exists

@@ -21,6 +21,7 @@
 
 #include "gui/fitsetup.h"
 #include "gui/equationselect.h"
+#include "gui/referencedialog.h"
 #include "gui/uchroma.h"
 #include "base/collection.h"
 #include "parser/double.h"
@@ -50,13 +51,24 @@ FitSetupDialog::~FitSetupDialog()
 // Window close event
 void FitSetupDialog::closeEvent(QCloseEvent* event)
 {
-	fitKernel_ = NULL;
 	reject();
 }
 
-void FitSetupDialog::on_CloseButton_clicked(bool checked)
+void FitSetupDialog::reject()
 {
 	fitKernel_ = NULL;
+	setResult(QDialog::Rejected);
+	hide();
+}
+
+void FitSetupDialog::on_CancelButton_clicked(bool checked)
+{
+	reject();
+}
+
+void FitSetupDialog::on_OKButton_clicked(bool checked)
+{
+	fitKernel_= NULL;
 	accept();
 }
 
@@ -84,6 +96,8 @@ bool FitSetupDialog::setFitKernel(FitKernel* fitKernel)
 
 void FitSetupDialog::on_EquationEdit_textChanged(QString text)
 {
+	if (refreshing_ || (!fitKernel_)) return;
+
 	fitKernel_->resetEquation();
 	if (fitKernel_->setEquation(text))
 	{
@@ -211,15 +225,54 @@ void FitSetupDialog::on_VariablesTable_cellChanged(int row, int column)
 void FitSetupDialog::updateReferencesTable()
 {
 	ui.VariableReferenceList->clear();
-	for (ReferenceVariable* refVar = fitKernel_->references(); refVar != NULL; refVar = refVar->next) ui.VariableReferenceList->addItem(refVar->name());
+	for (ReferenceVariable* refVar = fitKernel_->references(); refVar != NULL; refVar = refVar->next)
+	{
+		QListWidgetItem* item = new QListWidgetItem;
+		QString s = refVar->name();
+		if (refVar->xType() == ReferenceVariable::NormalReference) s += " [X=norm,";
+		else if (refVar->xType() == ReferenceVariable::FixedReference) s += " [X=fixed("+QString::number(refVar->xIndex()+1)+"),";
+		else if (refVar->xType() == ReferenceVariable::RelativeReference) s += " [X=rel("+QString::number(refVar->xOffset())+"),";
+		if (refVar->zType() == ReferenceVariable::NormalReference) s += "Z=norm]";
+		else if (refVar->zType() == ReferenceVariable::FixedReference) s += "Z=fixed("+QString::number(refVar->zIndex()+1)+")]";
+		else if (refVar->zType() == ReferenceVariable::RelativeReference) s += "Z=rel("+QString::number(refVar->zOffset())+")]";
+		item->setText(s);
+		item->setData(Qt::UserRole, VariantPointer<ReferenceVariable>(refVar));
+		ui.VariableReferenceList->addItem(item);
+	}
 }
 
 void FitSetupDialog::on_VariableAddReferenceButton_clicked(bool checked)
 {
-	// TEST
-	fitKernel_->addReference("R");
+	// Create a new reference variable
+	ReferenceVariable* refVar = fitKernel_->addReference(fitKernel_->uniqueReferenceName("y"));
 
-	updateReferencesTable();
+	// Create a ReferenceSetupDialog
+	ReferenceSetupDialog referenceSetup(this);
+	if (!referenceSetup.call(refVar, fitKernel_)) fitKernel_->removeReference(refVar);
+	else
+	{
+		// If the name of the reference was changed we will have to flag the equation as invalid...
+		if (refVar->updateVariable() && (refVar->used())) fitKernel_->setEquationInvalid();
+
+		updateControls();
+	}
+}
+
+void FitSetupDialog::on_VariableReferenceList_itemDoubleClicked(QListWidgetItem* item)
+{
+	if (!item) return;
+	ReferenceVariable* refVar = VariantPointer<ReferenceVariable>(item->data(Qt::UserRole));
+	if (!refVar) return;
+
+	// Create a ReferenceSetupDialog
+	ReferenceSetupDialog referenceSetup(this);
+	if (referenceSetup.call(refVar, fitKernel_))
+	{
+		// If the name of the reference was changed we will have to flag the equation as invalid...
+		if (refVar->updateVariable() && (refVar->used())) fitKernel_->setEquationInvalid();
+
+		updateControls();
+	}
 }
 
 /*
@@ -251,7 +304,7 @@ void FitSetupDialog::on_DataGlobalFitCheck_clicked(bool checked)
  * Source X
  */
 
-void FitSetupDialog::on_XSourceAbsoluteRadio_clicked(bool checked)
+void FitSetupDialog::on_XSourceAbsoluteRadio_toggled(bool checked)
 {
 	if (!checked) return;
 
@@ -273,6 +326,7 @@ void FitSetupDialog::on_XAbsoluteMinSpin_valueChanged(double value)
 {
 	if (refreshing_ || (!fitKernel_)) return;
 
+	printf("kjhljklj\n");
 	fitKernel_->setAbsoluteXMin(value);
 
 	updateLabels();
@@ -293,7 +347,7 @@ void FitSetupDialog::on_XAbsoluteSelectButton_clicked(bool checked)
 	reject();
 }
 
-void FitSetupDialog::on_XSourceSinglePointRadio_clicked(bool checked)
+void FitSetupDialog::on_XSourceSinglePointRadio_toggled(bool checked)
 {
 	if (!checked) return;
 
@@ -320,7 +374,7 @@ void FitSetupDialog::on_XPointSingleSpin_valueChanged(int value)
 	updateLabels();
 }
 
-void FitSetupDialog::on_XSourcePointRangeRadio_clicked(bool checked)
+void FitSetupDialog::on_XSourcePointRangeRadio_toggled(bool checked)
 {
 	if (!checked) return;
 
@@ -522,6 +576,7 @@ void FitSetupDialog::updateControls(bool force)
 
 	// Source Collection Group
 	ui.SourceCollectionLabel->setText(sourceCollection->title());
+	
 
 	// Destination Collection Group
 	if (fitKernel_->destinationCollection()) ui.DestinationCollectionLabel->setText(fitKernel_->destinationCollection()->title());
@@ -597,7 +652,6 @@ void FitSetupDialog::updateLabels()
 	ui.XPointMaxLabel->setText("(X = " + QString::number(abscissa.value(ui.XPointMaxSpin->value())) + ")");
 
 	// Z Source
-	printf("Ui %i\n", ui.ZDataSetCombo->currentIndex());
 	DataSet* dataSet = sourceCollection->nDataSets() == 0 ? NULL : sourceCollection->dataSet(ui.ZDataSetCombo->currentIndex());
 	ui.ZDataSetSingleLabel->setText("(Z = " + (dataSet ? QString::number(dataSet->data().z()) + ")" : "?)"));
 	dataSet = sourceCollection->nDataSets() == 0 ? NULL : sourceCollection->dataSet(ui.ZDataSetMinSpin->value()-1);

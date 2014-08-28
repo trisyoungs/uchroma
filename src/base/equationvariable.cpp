@@ -59,6 +59,13 @@ void EquationVariable::setVariable(Variable* variable)
 	variable_ = variable;
 }
 
+// Reset variable target (to NULL) and usage status
+void EquationVariable::resetVariable()
+{
+	variable_ = NULL;
+	used_ = false;
+}
+
 // Return variable target
 Variable* EquationVariable::variable()
 {

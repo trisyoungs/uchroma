@@ -47,6 +47,7 @@ ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), parent_(parent), 
 	role_ = ViewPane::StandardRole;
 	twoDimensional_ = false;
 	autoStretch3D_ = true;
+	autoScale_ = ViewPane::NoAutoScale;
 
 	// Style
 	boundingBox_ = ViewPane::NoBox;

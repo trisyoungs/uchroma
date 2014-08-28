@@ -51,12 +51,12 @@ class VariableList
 	public:
 	// Pass a newly-created variable / constant to the list for it to take ownership of
 	void take(Variable *v, bool forcevariable = false);
+	// Remove specified variable from the list
+	bool remove(Variable* v);
 	// Retrieve a named variable from the list
 	Variable *find(const char *name) const;
-	// Create a new variable in the list
+	// Create a new DoubleVariable in the list
 	Variable *create(VTypes::DataType type, const char *name, TreeNode *initialValue = NULL);
-	// Create a new variable (static function, so we don't take ownership of it).
-	Variable *createFree(VTypes::DataType type, const char *name, TreeNode *initialValue = NULL);
 	// Return the number of variables (not constants) contained in the list
 	int nVariables() const;
 	// Return first variable in the list

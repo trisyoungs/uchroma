@@ -76,15 +76,13 @@ void FitKernel::updateVariables()
 {
 	// First, clear all 'used' flags
 	EquationVariable* eqVar;
-	for (eqVar = variables_.first(); eqVar != NULL; eqVar = eqVar->next)
-	{
-		eqVar->setVariable(NULL);
-		eqVar->setUsed(false);
-	}
+	ReferenceVariable* refVar;
+	for (eqVar = variables_.first(); eqVar != NULL; eqVar = eqVar->next) eqVar->resetVariable();
 	nVariablesUsed_ = 0;
+	for (refVar = references_.first(); refVar != NULL; refVar = refVar->next) refVar->resetVariable();
 	usedVariables_.clear();
 	usedReferences_.clear();
-
+XXX
 	// Now, loop over current variables in the equation_
 	// Ignore 'x' and 'z' if they exist
 	// If a variable already exists in equationVariables_, set it's 'used' status to true.
@@ -96,8 +94,7 @@ void FitKernel::updateVariables()
 		if ((strcmp(var->name(),"x") == 0) || (strcmp(var->name(),"z") == 0)) continue;
 
 		// Is it one of the reference variables that we created?
-		ReferenceVariable* refVar;
-		for (refVar = references_.first(); refVar != NULL; refVar = refVar->next) if (refVar->name() == var->name()) break;
+		ReferenceVariable* refVar = reference(var->name());
 		if (refVar != NULL)
 		{
 			msg.print("Found reference variable '%s' in our list...\n", var->name());
@@ -154,6 +151,12 @@ bool FitKernel::equationValid()
 	return equationValid_;
 }
 
+// Set equation as invalid
+void FitKernel::setEquationInvalid()
+{
+	equationValid_ = false;
+}
+
 // Return number of variables used in equation
 int FitKernel::nVariablesUsed()
 {
@@ -180,21 +183,69 @@ EquationVariable* FitKernel::variable(QString name)
 	return NULL;
 }
 
-// Add reference variable to our list, and the Tree's global scope
+// Add reference variable to our list
 ReferenceVariable* FitKernel::addReference(QString name)
 {
+	// Check that a reference of this name doesn't already exist
+	if (reference(name))
+	{
+		msg.print("Error: Tried to add a reference with the same name ('%s') as one that already exists.\n", qPrintable(name));
+		return NULL;
+	}
+
 	ReferenceVariable* refVar = references_.add();
+	refVar->setSourceCollection(sourceCollection_);
 	refVar->setName(name);
-	DoubleVariable* var = equation_.addGlobalVariable(qPrintable(name));
-	refVar->setVariable(var);
 
 	return refVar;
+}
+
+// Remove reference variable from the list, and our Tree's global scope
+void FitKernel::removeReference(ReferenceVariable* refVar)
+{
+	if (!references_.contains(refVar))
+	{
+		msg.print("Internal Error: Tried to remove a ReferenceVariable (%p) from a list that didn't own it.\n", refVar);
+		return;
+	}
+
+	// Remove any associated variable first
+	if (refVar->used())
+	{
+		equationValid_ = false;
+		equation_.clear();
+	}
+
+	// Remove the variable
+	references_.remove(refVar);
+}
+
+// Return unique reference name based on the supplied string
+QString FitKernel::uniqueReferenceName(QString baseName)
+{
+	QString testName = baseName, suffix;
+	int index = 0;
+	do
+	{
+		// Add on suffix (if index > 0)
+		if (index > 0) testName = baseName + "_"+QString::number(index);
+		++index;
+	} while (reference(testName));
+
+	return testName;
 }
 
 // Return first reference variable in list
 ReferenceVariable* FitKernel::references()
 {
 	return references_.first();
+}
+
+// Return named reference, if it exists
+ReferenceVariable* FitKernel::reference(QString name)
+{
+	for (ReferenceVariable* refVar = references_.first(); refVar != NULL; refVar = refVar->next) if (refVar->name() == name) return refVar;
+	return NULL;
 }
 
 // Return first data reference used in fit
@@ -213,7 +264,7 @@ const char* RangeTypeKeywords[] = { "Absolute", "SingleIndex", "IndexRange" };
 // Convert text string to RangeType
 FitKernel::RangeType FitKernel::rangeType(const char* s)
 {
-	for (int n=0; n<nRangeTypes; ++n) if (strcmp(RangeTypeKeywords[n],s)) return (FitKernel::RangeType) n;
+	for (int n=0; n<FitKernel::nRangeTypes; ++n) if (strcmp(RangeTypeKeywords[n],s) == 0) return (FitKernel::RangeType) n;
 	return FitKernel::nRangeTypes;
 }
 
@@ -226,6 +277,7 @@ const char* FitKernel::rangeType(FitKernel::RangeType id)
 // Set type of x source range
 void FitKernel::setXRange(FitKernel::RangeType range)
 {
+	printf("Set xrange to %i\n", range);
 	xRange_ = range;
 
 	CurrentProject::setAsModified();
@@ -480,7 +532,7 @@ const char* MinimisationMethodKeywords[] = { "SteepestDescent", "Simplex" };
 // Convert text string to MinimisationMethod
 FitKernel::MinimisationMethod FitKernel::minimisationMethod(const char* s)
 {
-	for (int n=0; n<nMinimisationMethods; ++n) if (strcmp(MinimisationMethodKeywords[n],s)) return (FitKernel::MinimisationMethod) n;
+	for (int n=0; n<nMinimisationMethods; ++n) if (strcmp(MinimisationMethodKeywords[n],s) == 0) return (FitKernel::MinimisationMethod) n;
 	return FitKernel::nMinimisationMethods;
 }
 

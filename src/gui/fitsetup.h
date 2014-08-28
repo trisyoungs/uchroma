@@ -69,7 +69,9 @@ class FitSetupDialog : public QDialog
 	void closeEvent(QCloseEvent* event);
 
 	public slots:
-	void on_CloseButton_clicked(bool checked);
+	void reject();
+	void on_CancelButton_clicked(bool checked);
+	void on_OKButton_clicked(bool checked);
 
 
 	/*
@@ -104,6 +106,7 @@ class FitSetupDialog : public QDialog
 	public slots:
 	void on_VariablesTable_cellChanged(int row, int column);
 	void on_VariableAddReferenceButton_clicked(bool checked);
+	void on_VariableReferenceList_itemDoubleClicked(QListWidgetItem* item);
 
 
 	/*
@@ -129,13 +132,13 @@ class FitSetupDialog : public QDialog
 	 * Source X
 	 */
 	public slots:
-	void on_XSourceAbsoluteRadio_clicked(bool checked);
+	void on_XSourceAbsoluteRadio_toggled(bool checked);
 	void on_XAbsoluteMinSpin_valueChanged(double value);
 	void on_XAbsoluteMaxSpin_valueChanged(double value);
 	void on_XAbsoluteSelectButton_clicked(bool checked);
-	void on_XSourceSinglePointRadio_clicked(bool checked);
+	void on_XSourceSinglePointRadio_toggled(bool checked);
 	void on_XPointSingleSpin_valueChanged(int value);
-	void on_XSourcePointRangeRadio_clicked(bool checked);
+	void on_XSourcePointRangeRadio_toggled(bool checked);
 	void on_XPointMinSpin_valueChanged(int value);
 	void on_XPointMaxSpin_valueChanged(int value);
 
