@@ -25,8 +25,8 @@
    <string>Save Image</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>:/uchroma/icons/uchroma.svg</normaloff>:/uchroma/icons/uchroma.svg</iconset>
+   <iconset resource="icons.qrc">
+    <normaloff>:/uchroma/icons/uchroma.png</normaloff>:/uchroma/icons/uchroma.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">

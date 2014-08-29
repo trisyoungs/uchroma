@@ -835,8 +835,11 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionViewReset"/>
-   <addaction name="actionViewPerspective"/>
    <addaction name="actionViewShowAll"/>
+   <addaction name="separator"/>
+   <addaction name="actionViewPerspective"/>
+   <addaction name="actionView2D"/>
+   <addaction name="actionViewAutostretch3D"/>
   </widget>
   <widget class="QToolBar" name="InteractToolBar">
    <property name="windowTitle">
@@ -1150,7 +1153,7 @@
   </action>
   <action name="actionViewShowAll">
    <property name="icon">
-    <iconset resource="icons.qrc">
+    <iconset>
      <normaloff>:/uchroma/icons/axes_showall.svg</normaloff>:/uchroma/icons/axes_showall.svg</iconset>
    </property>
    <property name="text">

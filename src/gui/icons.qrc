@@ -1,7 +1,8 @@
 <RCC>
   <qresource prefix="/uchroma">
-    <file>icons/collection_collection_nopane.svg</file>
+    <file>icons/view_showall.svg</file>
     <file>icons/windows_fit.svg</file>
+    <file>icons/collection_collection_nopane.svg</file>
     <file>icons/windows_layout.svg</file>
     <file>icons/collection_collection.svg</file>
     <file>icons/collection_extracted_nopane.svg</file>
@@ -11,7 +12,6 @@
     <file>icons/collection_fit.svg</file>
     <file>icons/collection_extracted.svg</file>
     <file>icons/info_interaction.svg</file>
-    <file>icons/axes_showall.svg</file>
     <file>icons/interact_none.svg</file>
     <file>icons/interact_x.svg</file>
     <file>icons/interact_y.svg</file>
