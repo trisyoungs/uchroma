@@ -20,16 +20,16 @@
 */
 
 #include "base/transformer.h"
-#include "parser/double.h"
+#include "expression/variable.h"
 #include "templates/array.h"
 
 // Constructor
 Transformer::Transformer()
 {
-	// Add variable trio to Tree's root ScopeNode
-	x_ = equation_.addGlobalVariable("x");
-	y_ = equation_.addGlobalVariable("y");
-	z_ = equation_.addGlobalVariable("z");
+	// Add permanent variable trio to equation
+	x_ = equation_.createVariable("x", NULL, true);
+	y_ = equation_.createVariable("y", NULL, true);
+	z_ = equation_.createVariable("z", NULL, true);
 	valid_ = false;
 }
 
@@ -47,7 +47,7 @@ Transformer::Transformer(const Transformer& source)
 // Assignment operator
 void Transformer::operator=(const Transformer& source)
 {
-	// Set equation from old tree
+	// Set equation from old expression
 	setEquation(source.text_);
 	enabled_ = source.enabled_;
 }
@@ -68,7 +68,7 @@ bool Transformer::enabled()
 bool Transformer::setEquation(QString equation)
 {
 	text_ = equation;
-	valid_ = equation_.setCommands(equation);
+	valid_ = equation_.generate(qPrintable(equation), true);
 	return valid_;
 }
 
@@ -94,9 +94,10 @@ double Transformer::transform(double x, double y, double z)
 		return 0.0;
 	}
 
-	x_->setValue(x);
-	y_->setValue(y);
-	z_->setValue(z);
+	x_->set(x);
+	y_->set(y);
+	z_->set(z);
+
 	return equation_.execute();
 }
 
@@ -122,17 +123,13 @@ Array<double> Transformer::transformArray(Array<double> sourceX, Array<double> s
 	// Create new array, and create reference to target array
 	Array<double> newArray(sourceX.nItems());
 
-	// Reusable ReturnValues
-	ReturnValue rv[3];
-	rv[2] = z;
+	z_->set(z);
+	// Loop over x points
 	for (int n=0; n<sourceX.nItems(); ++n)
 	{
-		// Set values in equation
-		rv[0] = sourceX[n];
-		rv[1] = sourceY[n];
-		x_->set(rv[0]);
-		y_->set(rv[1]);
-		z_->set(rv[2]);
+		// Set x and y values in equation
+		x_->set(sourceX[n]);
+		y_->set(sourceY[n]);
 		newArray[n] = equation_.execute();
 	}
 

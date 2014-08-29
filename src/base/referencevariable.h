@@ -26,7 +26,7 @@
 #include <QtCore/QString>
 
 // Forward Declarations
-class DoubleVariable;
+class Variable;
 
 // Reference Variable
 class ReferenceVariable : public ListItem<ReferenceVariable>
@@ -54,7 +54,7 @@ class ReferenceVariable : public ListItem<ReferenceVariable>
 	// Name of target variable
 	QString name_;
 	// Target Variable pointer
-	DoubleVariable* variable_;
+	Variable* variable_;
 	// Whether the variable is used in the current equation
 	bool used_;
 
@@ -64,11 +64,11 @@ class ReferenceVariable : public ListItem<ReferenceVariable>
 	// Return name
 	QString name();
 	// Set variable target
-	void setVariable(DoubleVariable* variable);
+	void setVariable(Variable* variable);
 	// Reset variable target (to NULL) and usage status
 	void resetVariable();
 	// Return variable target
-	DoubleVariable* variable();
+	Variable* variable();
 	// Update associated variable to reflect name of ReferenceVariable
 	bool updateVariable();
 	// Set whether this variable is used in the current equation

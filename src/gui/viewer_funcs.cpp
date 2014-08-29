@@ -30,23 +30,23 @@
  */
 
 // Available image export formats
-const char *imageFormatFilters[Viewer::nImageFormats] = { "Windows Image (*.bmp)", "Joint Photographic Experts Group (*.jpg)", "Portable Network Graphics (*.png)", "Portable Pixmap (*.ppm)", "X11 Bitmap (*.xbm)", "X11 Pixmap (*.xpm)" };
-const char *imageFormatExtensions[Viewer::nImageFormats] = { "bmp", "jpg", "png", "ppm", "xbm", "xpm" };
-Viewer::ImageFormat Viewer::imageFormat(const char *s)
+const char* imageFormatFilters[Viewer::nImageFormats] = { "Windows Image (*.bmp)", "Joint Photographic Experts Group (*.jpg)", "Portable Network Graphics (*.png)", "Portable Pixmap (*.ppm)", "X11 Bitmap (*.xbm)", "X11 Pixmap (*.xpm)" };
+const char* imageFormatExtensions[Viewer::nImageFormats] = { "bmp", "jpg", "png", "ppm", "xbm", "xpm" };
+Viewer::ImageFormat Viewer::imageFormat(const char* s)
 {
 	for (int n=0; n<Viewer::nImageFormats; ++n) if (strcmp(s, imageFormatExtensions[n]) == 0) return (Viewer::ImageFormat) n;
 	return Viewer::nImageFormats;
 }
-Viewer::ImageFormat Viewer::imageFormatFromFilter(const char *s)
+Viewer::ImageFormat Viewer::imageFormatFromFilter(const char* s)
 {
 	for (int n=0; n<Viewer::nImageFormats; ++n) if (strcmp(s, imageFormatFilters[n]) == 0) return (Viewer::ImageFormat) n;
 	return Viewer::nImageFormats;
 }
-const char *Viewer::imageFormatFilter(Viewer::ImageFormat bf)
+const char* Viewer::imageFormatFilter(Viewer::ImageFormat bf)
 {
         return imageFormatFilters[bf];
 }
-const char *Viewer::imageFormatExtension(Viewer::ImageFormat bf)
+const char* Viewer::imageFormatExtension(Viewer::ImageFormat bf)
 {
         return imageFormatExtensions[bf];
 }

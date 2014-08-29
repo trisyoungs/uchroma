@@ -1,7 +1,7 @@
 /*
-	*** Tree Node
-	*** src/parser/treenode.h
-	Copyright T. Youngs 2010-2013
+	*** General Node for Expression
+	*** src/expression/node.h
+	Copyright T. Youngs 2014
 
 	This file is part of uChroma.
 
@@ -19,35 +19,28 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_TREENODE_H
-#define UCHROMA_TREENODE_H
+#ifndef UCHROMA_NODE_H
+#define UCHROMA_NODE_H
 
-#include "parser/returnvalue.h"
 #include "templates/list.h"
 #include "templates/reflist.h"
-#include "templates/vector3.h"
-#include "parser/vtypes.h"
 
 // Forward declarations
-class ScopeNode;
-class StepNode;
-class Tree;
+class Expression;
 
 // Tree Node
-class TreeNode : public ListItem<TreeNode>
+class Node : public ListItem<Node>
 {
 	public:
 	// Constructor / Destructor
-	TreeNode();
-	virtual ~TreeNode();
+	Node();
+	virtual ~Node();
 	// List pointers (for argument list)
-	TreeNode *nextArgument, *prevArgument;
+	Node* nextArgument, *prevArgument;
 	// Node Types
-	enum NodeType { BasicNode, CmdNode, ScopedNode, VarNode, VarWrapperNode, SteppedNode, UserCmdNode, nNodeTypes };
+	enum NodeType { BasicNode, FuncNode, VarNode, VarWrapperNode, nNodeTypes };
 	// Copy data
-	void copy(TreeNode *source);
-	// List pointers (old style - need to keep these here and not subclass ListItem since Variable needs to subclass this)
-// 	TreeNode* prev, *next;
+	void copy(Node* source);
 
 
 	/*
@@ -56,72 +49,70 @@ class TreeNode : public ListItem<TreeNode>
 	protected:
 	// Type of node
 	NodeType nodeType_;
-	// Pointer to parent tree
-	Tree *parent_;
+	// Pointer to parent expression
+	Expression* parent_;
 
 	public:
 	// Retrieve node type
 	NodeType nodeType() const;
 	// Set parent 
-	void setParent(Tree *parent);
+	void setParent(Expression* parent);
 	// Retrieve parent
-	Tree *parent() const;
+	Expression* parent() const;
 
 
 	/*
-	// Argument Data
-	*/
+	 * Argument Data
+	 */
 	protected:
 	// Arguments (if any) to leaf node operation
-	RefList<TreeNode,int> args_;
+	RefList<Node,int> args_;
 
 	public:
 	// Return number of arguments currently assigned to node
 	int nArgs() const;
-	// Return datatype of nth argument
-	VTypes::DataType argType(int i);
-	// Add list of arguments formas as a plain List<TreeNode>, beginning from supplied list head
-	void addListArguments(TreeNode *leaf);
+	// Return if nth argument is numeric
+	bool isArgNumeric(int i);
+	// Add list of arguments formas as a plain List<Node>, beginning from supplied list head
+	void addListArguments(Node* leaf);
 	// Add list of arguments joined by parser, probably with list tail supplied
-	void addJoinedArguments(TreeNode *args);
+	void addJoinedArguments(Node* args);
 	// Add multiple arguments to node
 	void addArguments(int nargs, ...);
 	// Add multiple arguments to node
-	void addArgument(TreeNode *arg);
+	void addArgument(Node* arg);
 	// Check arguments stored in argument list
-	bool checkArguments(const char *arglist, const char *funcname);
+	bool checkArguments(const char* arglist, const char* funcname);
 	// Return (execute) argument specified
-	bool arg(int i, ReturnValue &rv);
+	bool arg(int i, double& rv);
 	// Return (execute) argument specified as a bool
 	bool argb(int i);
 	// Return (execute) argument specified as an integer
 	int argi(int i);
 	// Return (execute) argument specified as a double
 	double argd(int i);
-	// Return (execute) argument specified as a character
-	const char *argc(int i);
-	// Return the TreeNode corresponding to the argument, rather than executing it
-	TreeNode *argNode(int i);
-	// Set argument specified from ReturnValue
-	bool setArg(int i, ReturnValue &rv);
+	// Return the Node corresponding to the argument, rather than executing it
+	Node* argNode(int i);
+	// Set argument specified
+	bool setArg(int i, double& rv);
 	// Return whether argument i was given
 	bool hasArg(int i);
 
 
 	/*
-	// Node Character
-	*/
+	 * Node Character
+	 */
 	protected:
-	// Node return value datatype
-	VTypes::DataType returnType_;
+	// Whether node returns a number
+	bool returnsNumber_;
 	// Whether node is read-only
 	bool readOnly_;
 
 	public:
-	// Sets the content type of the variable
-	void setReturnType(VTypes::DataType dt);
-	// Returns content type of the variable
-	VTypes::DataType returnType() const;
+	// Set whether node returns a number
+	void setReturnsNumber(bool b);
+	// Return whether node returns a number
+	bool returnsNumber();
 	// Set the readonly status of the node to true
 	void setReadOnly();
 	// Return the readonly status of the node
@@ -129,19 +120,17 @@ class TreeNode : public ListItem<TreeNode>
 
 
 	/*
-	// Node Data Set / Get / Execute
-	*/
+	 * Node Data Set / Get / Execute
+	 */
 	public:
-	// Set from returnvalue node
-	virtual bool set(ReturnValue rv) = 0;
+	// Set from value
+	virtual bool set(double rv) = 0;
 	// Get reduced value of node
-	virtual bool execute(ReturnValue& rv) = 0;
+	virtual bool execute(double& rv) = 0;
 	// Print layout of current node
-	virtual void nodePrint(int offset, const char *prefix = "") = 0;
+	virtual void nodePrint(int offset, const char* prefix = "") = 0;
 	// Reset node
 	virtual bool initialise() = 0;
-	// Search accessors (if any) available for node
-	virtual StepNode *findAccessor(const char *s, TreeNode *arglist = NULL);
 };
 
 #endif

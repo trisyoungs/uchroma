@@ -21,7 +21,7 @@
 
 #include "base/referencevariable.h"
 #include "base/messenger.h"
-#include "parser/double.h"
+#include "expression//variable.h"
 
 // ReferenceType Keywords
 const char* ReferenceTypeKeywords[] = { "Normal", "Fixed", "Relative" };
@@ -34,7 +34,7 @@ ReferenceVariable::ReferenceType ReferenceVariable::referenceType(const char* s)
 }
 
 // Convert ReferenceType to text string
-const char *ReferenceVariable::referenceType(ReferenceVariable::ReferenceType rt)
+const char* ReferenceVariable::referenceType(ReferenceVariable::ReferenceType rt)
 {
 	return ReferenceTypeKeywords[rt];
 }
@@ -89,7 +89,7 @@ void ReferenceVariable::operator=(const ReferenceVariable& source)
 // Set name
 void ReferenceVariable::setName(QString name)
 {
-	// We do not update the associated DoubleVariable's name here - it is up to the calling function to check this using updateVariable()
+	// We do not update the associated Variable's name here - it is up to the calling function to check this using updateVariable()
 	name_ = name;
 }
 
@@ -100,7 +100,7 @@ QString ReferenceVariable::name()
 }
 
 // Set variable target
-void ReferenceVariable::setVariable(DoubleVariable* variable)
+void ReferenceVariable::setVariable(Variable* variable)
 {
 	variable_ = variable;
 }
@@ -113,7 +113,7 @@ void ReferenceVariable::resetVariable()
 }
 
 // Return variable target
-DoubleVariable* ReferenceVariable::variable()
+Variable* ReferenceVariable::variable()
 {
 	return variable_;
 }

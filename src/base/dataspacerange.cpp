@@ -21,7 +21,8 @@
 
 #include "base/dataspace.h"
 #include "base/collection.h"
-#include "parser/double.h"
+#include "expression/expression.h"
+#include "expression/variable.h"
 
 // Constructor
 DataSpaceRange::DataSpaceRange(DataSpace& parent) : ListItem<DataSpaceRange>(), parent_(parent)
@@ -156,7 +157,7 @@ double DataSpaceRange::zEnd()
 }
 
 // Calculate values from specified equation
-bool DataSpaceRange::calculateValues(Tree& equation, DoubleVariable* xVariable, DoubleVariable* zVariable)
+bool DataSpaceRange::calculateValues(Expression& equation, Variable* xVariable, Variable* zVariable)
 {
 	// Generate fitted data over all targetted datasets / abscissa values
 	DataSpaceData* values = values_.first();
@@ -171,7 +172,7 @@ bool DataSpaceRange::calculateValues(Tree& equation, DoubleVariable* xVariable, 
 		const Array<DisplayDataSet::DataPointType>& yType = values->yType();
 
 		// Set z variable value
-		zVariable->setValue(values->z());
+		zVariable->set(values->z());
 		
 		// Loop over abscissa values
 		for (int i=0; i<nPoints_; ++i)
@@ -180,7 +181,7 @@ bool DataSpaceRange::calculateValues(Tree& equation, DoubleVariable* xVariable, 
 			if (yType.value(i) == DisplayDataSet::NoPoint) continue;
 
 			// Set x variable value	
-			xVariable->setValue(x.value(i));
+			xVariable->set(x.value(i));
 
 			// Calculate and store y value
 			values->setCalculatedY(i, equation.execute());

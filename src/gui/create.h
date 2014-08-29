@@ -27,7 +27,7 @@
 #include "gui/ui_create.h"
 #include "base/dnchar.h"
 #include "base/equationvariable.h"
-#include "parser/tree.h"
+#include "expression/expression.h"
 #include "templates/array.h"
 #include "templates/list.h"
 
@@ -75,12 +75,12 @@ class CreateCollectionDialog : public QDialog
 	List<EquationVariable> equationVariables_;
 	// Number of variables which are used in the current equation
 	int nVariablesUsed_;
-	// Tree containing equation to use for fitting
-	Tree equation_;
+	// Fit equation
+	Expression equation_;
 	// Whether current equation is valid
 	bool equationValid_;
 	// Standard x and z variables
-	DoubleVariable* xVariable_, *zVariable_;
+	Variable* xVariable_, *zVariable_;
 	// List of variables targetted in create process
 	RefList<EquationVariable,bool> usedVariables_;
 

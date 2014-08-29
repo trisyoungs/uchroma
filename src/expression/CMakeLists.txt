@@ -1,0 +1,25 @@
+add_library(parser
+  expression.cpp
+  expression_lexer.cpp
+  functionnode.cpp
+  functions.cpp
+  grammar.cc
+  node.cpp
+  variable.cpp
+  variablenode.cpp
+  expression.h
+  functionnode.h
+  functions.h
+  node.h
+  variable.h
+  variablenode.h
+)
+
+include_directories(
+../
+${QT_INCLUDE_DIR}
+${CMAKE_SOURCE_DIR}
+${CMAKE_BINARY_DIR}
+${CMAKE_BINARY_DIR}/src
+${CMAKE_SOURCE_DIR}/src/gui
+)

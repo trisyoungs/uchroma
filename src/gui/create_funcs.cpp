@@ -22,8 +22,7 @@
 #include "gui/create.h"
 #include "gui/uchroma.h"
 #include "gui/equationselect.h"
-#include "parser/scopenode.h"
-#include "parser/double.h"
+#include "expression/variable.h"
 #include "base/currentproject.h"
 
 // Constructor
@@ -44,7 +43,7 @@ CreateCollectionDialog::CreateCollectionDialog(UChromaWindow& parent) : QDialog(
 	refreshing_ = false;
 	resetEquation();
 	ui.EquationEdit->setText("cos(x)*A");
-	equationValid_ = equation_.setCommands("cos(x)*A");
+	equationValid_ = equation_.generate("cos(x)*A");
 	updateVariables();
 }
 
@@ -74,8 +73,8 @@ void CreateCollectionDialog::updateAndShow()
 void CreateCollectionDialog::resetEquation()
 {
 	equation_.clear();
-	xVariable_ = equation_.addGlobalVariable("x");
-	zVariable_ = equation_.addGlobalVariable("z");
+	xVariable_ = equation_.createVariable("x", NULL, true);
+	zVariable_ = equation_.createVariable("z", NULL, true);
 	equation_.setGenerateMissingVariables(true);
 	equationValid_ = false;
 }
@@ -97,9 +96,10 @@ void CreateCollectionDialog::updateVariables()
 	// Ignore 'x' and 'z' if they exist
 	// If a variable already exists in equationVariables_, set it's 'used' status to true.
 	// If it doesn't, create it and set it's 'used' status to true
-	ScopeNode* rootNode = equation_.rootNode();
-	for (Variable* var = rootNode->variables.variables(); var != NULL; var = var->next)
+	for (RefListItem<Variable,bool>* ri = equation_.variables(); ri != NULL; ri = ri->next)
 	{
+		Variable* var = ri->item;
+
 		// Is this variable one of 'x' or 'z'?
 		if ((strcmp(var->name(),"x") == 0) || (strcmp(var->name(),"z") == 0)) continue;
 
@@ -151,8 +151,8 @@ void CreateCollectionDialog::createData(Collection* target)
 			while (x <= ui.GridSpecifyXMaxSpin->value())
 			{
 				// Set equation variables
-				xVariable_->setValue(x);
-				zVariable_->setValue(z);
+				xVariable_->set(x);
+				zVariable_->set(z);
 				newData.addPoint(x, equation_.execute());
 
 				x += ui.GridSpecifyXDeltaSpin->value();
@@ -198,7 +198,7 @@ void CreateCollectionDialog::on_CreateButton_clicked(bool checked)
 void CreateCollectionDialog::on_EquationEdit_textChanged(QString text)
 {
 	resetEquation();
-	equationValid_ = equation_.setCommands(text);
+	equationValid_ = equation_.generate(qPrintable(text), true);
 	if (equationValid_)
 	{
 		ui.EquationEdit->setPalette(ui.EquationGroup->palette());
@@ -314,9 +314,6 @@ void CreateCollectionDialog::updateVariableTable()
 {
 	refreshing_ = true;
 
-	// Get rootnode of the equation
-	ScopeNode* rootNode = equation_.rootNode();
-
 	// Clear table, but don't display anything if equation is not valid
 	ui.VariablesTable->clearContents();
 	if (!equationValid_)
@@ -328,7 +325,6 @@ void CreateCollectionDialog::updateVariableTable()
 
 	QTableWidgetItem* item;
 	bool status, isXYZ;
-	ReturnValue rv;
 	int count = 0, n;
 	for (int n=0; n<equationVariables_.nItems(); ++n)
 	{

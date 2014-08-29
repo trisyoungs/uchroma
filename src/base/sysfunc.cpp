@@ -29,7 +29,7 @@
 using namespace std;
 
 // Return full, absolute filename including path
-const char *absoluteFilePath(const char *s)
+const char* absoluteFilePath(const char* s)
 {
 	QFileInfo info(s);
 	static Dnchar result;
@@ -38,7 +38,7 @@ const char *absoluteFilePath(const char *s)
 }
 
 // Remove path in front of filename
-const char *removePath(const char *s)
+const char* removePath(const char* s)
 {
 	QFileInfo info(s);
 	static Dnchar result;
@@ -47,7 +47,7 @@ const char *removePath(const char *s)
 }
 
 // Convert string to uppercase
-const char *upperCase(const char *s)
+const char* upperCase(const char* s)
 {
 	static Dnchar result(1024);
 	result.clear();
@@ -56,7 +56,7 @@ const char *upperCase(const char *s)
 }
 
 // Convert string to lowercase
-const char *lowerCase(const char *s)
+const char* lowerCase(const char* s)
 {
 	static Dnchar result(1024);
 	result.clear();
@@ -65,7 +65,7 @@ const char *lowerCase(const char *s)
 }
 
 // Get characters before first occurrence of designated character
-const char *beforeChar(const char *s, char delim)
+const char* beforeChar(const char* s, char delim)
 {
 	static Dnchar result(1024);
 	result.clear();
@@ -78,7 +78,7 @@ const char *beforeChar(const char *s, char delim)
 }
 
 // Get characters after first occurrence of designated character
-const char *afterChar(const char *s, char delim)
+const char* afterChar(const char* s, char delim)
 {
 	static Dnchar result(1024);
 	result.clear();
@@ -92,18 +92,18 @@ const char *afterChar(const char *s, char delim)
 }
 
 // Get characters after last occurrence of designated character
-const char *afterLastChar(const char *s, char delim)
+const char* afterLastChar(const char* s, char delim)
 {
 	static Dnchar result;
 	result.clear();
-	const char *c, *d = NULL;
+	const char* c, *d = NULL;
 	for (c = &s[0]; *c != '\0'; ++c) if (*c == delim) d = c;
 	if (d != NULL) result = ++d;
 	return result;
 }
 
 // Get characters before first occurrence of designated string
-const char *beforeStr(const char *s, const char *search)
+const char* beforeStr(const char* s, const char* search)
 {
 	// Search for first occurrence of string
 	static char result[8096];
@@ -115,11 +115,11 @@ const char *beforeStr(const char *s, const char *search)
 }
 
 // Get characters after first occurrence of designated character
-const char *afterStr(const char *s, const char *search)
+const char* afterStr(const char* s, const char* search)
 {
-	const char *c = strstr(s, search);
+	const char* c = strstr(s, search);
 	if (c == NULL) return "";
-	for (const char *d = &search[0]; *d != '\0'; ++d) c++;
+	for (const char* d = &search[0]; *d != '\0'; ++d) c++;
 	return c;
 }
 
@@ -161,10 +161,10 @@ void removeComments(char *s)
 }
 
 // Return whether string consists of empty whitespace characters only
-bool isEmpty(const char *s)
+bool isEmpty(const char* s)
 {
 	if (s == NULL) return TRUE;
-	for (const char *c = s; *c != '\0'; ++c)
+	for (const char* c = s; *c != '\0'; ++c)
 	{
 		printf("%p\n", c);
 		printf("%c\n", *c);
@@ -183,7 +183,7 @@ bool isEmpty(const char *s)
 }
 
 // Search enum list for text
-int enumSearch(const char *name, int maxn, const char **itemlist, const char *query, bool reportError)
+int enumSearch(const char* name, int maxn, const char* *itemlist, const char* query, bool reportError)
 {
 	static Dnchar lowerq, lowers;
 	int result = maxn, i;
@@ -202,7 +202,7 @@ int enumSearch(const char *name, int maxn, const char **itemlist, const char *qu
 }
 
 // Print valid enum values
-void enumPrintValid(int nitems, const char **list)
+void enumPrintValid(int nitems, const char* *list)
 {
 	msg.print("Valid values are:\n    ");
 	for (int i=0; i < nitems; i++)
@@ -214,7 +214,7 @@ void enumPrintValid(int nitems, const char **list)
 }
 
 // Convert the number 'n' to a string representation.
-const char *itoa(int n)
+const char* itoa(int n)
 {
 	static Dnchar result;
 	result.sprintf("%i",n);
@@ -222,7 +222,7 @@ const char *itoa(int n)
 }
 
 // Convert the real number 'f' to a string representation
-const char *ftoa(double f)
+const char* ftoa(double f)
 {
 	static Dnchar result;
 	result.sprintf("%f",f);
@@ -230,7 +230,7 @@ const char *ftoa(double f)
 }
 
 // Convert the real number 'f' to a string representation with supplied format
-const char *ftoa(double f,const char *fmt)
+const char* ftoa(double f,const char* fmt)
 {
 	static Dnchar result;
 	result.sprintf(fmt,f);
@@ -238,7 +238,7 @@ const char *ftoa(double f,const char *fmt)
 }
 
 // Strip trailing whitespace from string
-const char *stripTrailing(const char *s)
+const char* stripTrailing(const char* s)
 {
 	int n;
 	static char result[1024];
@@ -250,7 +250,7 @@ const char *stripTrailing(const char *s)
 }
 
 // Replace all of the supplied characters in the source string
-const char *replaceChars(const char *s, const char *charstoreplace, char r)
+const char* replaceChars(const char* s, const char* charstoreplace, char r)
 {
 	static Dnchar result;
 	bool found;
@@ -274,7 +274,7 @@ const char *replaceChars(const char *s, const char *charstoreplace, char r)
 }
 
 // Strip all of the supplied characters from the source string
-const char *stripChars(const char *s, const char *charstostrip)
+const char* stripChars(const char* s, const char* charstostrip)
 {
 	static Dnchar result;
 	char const *c1, *c2;
@@ -297,7 +297,7 @@ const char *stripChars(const char *s, const char *charstostrip)
 }
 
 // Count number of times that supplied characters occur in supplied string
-int countChars(const char *s, const char *chars, int offset)
+int countChars(const char* s, const char* chars, int offset)
 {
 	int total = 0, n, count = 0;
 	while (*s != '\0')
@@ -313,7 +313,7 @@ int countChars(const char *s, const char *chars, int offset)
 }
 
 // Return whether file exists
-bool fileExists(const char *filename)
+bool fileExists(const char* filename)
 {
 	fstream f(filename,ios::in);
 	if (f.is_open())

@@ -1,6 +1,6 @@
 bin_PROGRAMS = uchroma
 
-SUBDIRS = gui templates base math parser kernels command render
+SUBDIRS = gui templates base math expression kernels render
 
 noinst_HEADERS = version.h
 
@@ -10,4 +10,4 @@ uchroma_SOURCES = main.cpp
 
 INCLUDES = -I../ @GUI_CFLAGS@
 
-uchroma_LDADD = gui/libgui.a base/libbase.a render/librender.a parser/libparser.a command/libcommand.a kernels/libkernels.a math/libmath.a @MAC_LIBS@ @GUI_LDLIBS@
+uchroma_LDADD = gui/libgui.a base/libbase.a render/librender.a expression/libexpression.a kernels/libkernels.a math/libmath.a @MAC_LIBS@ @GUI_LDLIBS@

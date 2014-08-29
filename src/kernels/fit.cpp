@@ -20,10 +20,9 @@
 */
 
 #include "kernels/fit.h"
+#include "expression/variable.h"
 #include "base/collection.h"
 #include "base/currentproject.h"
-#include "parser/double.h"
-#include "parser/scopenode.h"
 #include "templates/variantpointer.h"
 
 // Constructor
@@ -32,8 +31,8 @@ FitKernel::FitKernel()
 	// Equation and Variable Data
 	nVariablesUsed_ = 0;
 	equationValid_ = false;
-	xVariable_ = equation_.addGlobalVariable("x");
-	zVariable_ = equation_.addGlobalVariable("z");
+	xVariable_ = equation_.createVariable("x", NULL, true);
+	zVariable_ = equation_.createVariable("z", NULL, true);
 	equation_.setGenerateMissingVariables(true);
 
 	// Fit Range
@@ -82,15 +81,16 @@ void FitKernel::updateVariables()
 	for (refVar = references_.first(); refVar != NULL; refVar = refVar->next) refVar->resetVariable();
 	usedVariables_.clear();
 	usedReferences_.clear();
-XXX
+
 	// Now, loop over current variables in the equation_
 	// Ignore 'x' and 'z' if they exist
 	// If a variable already exists in equationVariables_, set it's 'used' status to true.
 	// If it doesn't, create it and set it's 'used' status to true
-	ScopeNode* rootNode = equation_.rootNode();
-	for (Variable* var = rootNode->variables.variables(); var != NULL; var = var->next)
+	for (RefListItem<Variable,bool>* ri = equation_.variables(); ri != NULL; ri = ri->next)
 	{
-		// Is this variable one of 'x' or 'z'?
+		Variable* var = ri->item;
+
+		// Is this variable one of 'x' or 'z'? Must compare by name since the pointers are not permanent...
 		if ((strcmp(var->name(),"x") == 0) || (strcmp(var->name(),"z") == 0)) continue;
 
 		// Is it one of the reference variables that we created?
@@ -121,7 +121,7 @@ XXX
 // Reset equation
 void FitKernel::resetEquation()
 {
-	equation_.clear(true);
+	equation_.clear();
 	equationText_ = QString();
 	equationValid_ = false;
 }
@@ -130,7 +130,7 @@ void FitKernel::resetEquation()
 bool FitKernel::setEquation(QString equation)
 {
 	equationText_ = equation;
-	equationValid_ = equation_.setCommands(equationText_);
+	equationValid_ = equation_.generate(qPrintable(equationText_), true);
 
 	updateVariables();
 

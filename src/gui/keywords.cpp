@@ -29,7 +29,7 @@
 */
 
 // Input File Block Keywords
-const char *InputBlockKeywords[] = { "Collection", "Settings", "View" };
+const char* InputBlockKeywords[] = { "Collection", "Settings", "View" };
 
 /*!
  * \brief Convert text string to InputBlock

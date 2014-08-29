@@ -24,7 +24,7 @@
 #include "gui/referencedialog.h"
 #include "gui/uchroma.h"
 #include "base/collection.h"
-#include "parser/double.h"
+#include "expression//variable.h"
 #include "kernels/fit.h"
 #include "templates/variantpointer.h"
 #include <QtGui/QMessageBox>
@@ -140,7 +140,6 @@ void FitSetupDialog::updateVariableTable()
 
 	QTableWidgetItem* item;
 	bool status, isXYZ;
-	ReturnValue rv;
 	int count = 0;
 	for (RefListItem<EquationVariable,bool>* ri = fitKernel_->usedVariables(); ri != NULL; ri = ri->next)
 	{

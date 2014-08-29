@@ -34,9 +34,9 @@ class Messenger
 	// Messaging output types
 	enum OutputType { All, Calls, Force, Verbose, nOutputTypes };
 	// Convert text string to debug mode
-	static OutputType outputType(const char *name, bool reportError = 0);
+	static OutputType outputType(const char* name, bool reportError = 0);
 	// Convert debug mode to text string
-	static const char *outputType(OutputType ot);
+	static const char* outputType(OutputType ot);
 
 
 	/*
@@ -78,8 +78,8 @@ class Messenger
 	// Print message in specific output level
 	void print(Messenger::OutputType, const char*, ...) const;
 	// Entrances / exits to / from subroutines
-	void enter(const char *callname);
-	void exit(const char *callname);
+	void enter(const char* callname);
+	void exit(const char* callname);
 };
 
 extern Messenger msg;

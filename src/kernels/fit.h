@@ -24,7 +24,7 @@
 
 #include "base/equationvariable.h"
 #include "base/referencevariable.h"
-#include "parser/tree.h"
+#include "expression/expression.h"
 #include "base/dataspace.h"
 #include "templates/array.h"
 #include "templates/list.h"
@@ -33,7 +33,7 @@
 class UChromaWindow;
 class Collection;
 class DataSet;
-class DoubleVariable;
+class Variable;
 
 /*
  * Fit Kernel
@@ -57,12 +57,12 @@ class FitKernel
 	int nVariablesUsed_;
 	// Original text passed for last equation
 	QString equationText_;
-	// Tree containing equation to use for fitting
-	Tree equation_;
+	// Fit equation
+	Expression equation_;
 	// Whether current equation is valid
 	bool equationValid_;
 	// Standard x and z variables
-	DoubleVariable* xVariable_, *zVariable_;
+	Variable* xVariable_, *zVariable_;
 	// List of variables targetted in fit process
 	RefList<EquationVariable,bool> usedVariables_;
 	// List of data references available

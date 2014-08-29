@@ -1,7 +1,7 @@
 /*
-	*** Variable
-	*** src/parser/variable.h
-	Copyright T. Youngs 2010-2013
+	*** Expression Variable
+	*** src/expression/variable.h
+	Copyright T. Youngs 2014
 
 	This file is part of uChroma.
 
@@ -22,50 +22,56 @@
 #ifndef UCHROMA_VARIABLE_H
 #define UCHROMA_VARIABLE_H
 
-#include "parser/treenode.h"
+#include "expression/node.h"
 #include "base/dnchar.h"
-#include "templates/vector3.h"
-#include <stdlib.h>
 
 // Variable
-class Variable :  public TreeNode
+class Variable : public Node
 {
 	public:
 	// Constructor / Destructor
-	Variable();
-	virtual ~Variable();
-	// List pointers (old style - need to keep these here and not subclass ListItem since Variable needs to subclass this)
-	Variable* prev, *next;
+	Variable(double value = 0.0, bool readOnly = false);
+	~Variable();
 
 
 	/*
-	// Variable Character
-	*/
+	 * Variable Data
+	 */
 	protected:
 	// Name of the variable
 	Dnchar name_;
+	// Value of variable
+	double value_;
 	// Initial value of new variable
-	TreeNode *initialValue_;
+	Node* initialValue_;
 
 	public:
 	// Set name of variable
 	void setName(const char* s);
 	// Get name of variable
-	const char *name() const;
+	const char* name() const;
 	// Set initial value expression
-	bool setInitialValue(TreeNode *node);
-	// Return TreeNode corresponding to initial value
-	TreeNode *initialValue() const;
-	// Reset variable
-	virtual void reset() = 0;
-	// Search accessors (if any) available for node
-	virtual StepNode *findAccessor(const char* s, TreeNode* arglist = 0);
+	bool setInitialValue(Node* node);
+	// Return Node corresponding to initial value
+	Node* initialValue() const;
 
 
 	/*
-	// Inherited Virtuals
-	*/
+	 * Set / Get
+	 */
 	public:
+	// Return value of node
+	bool execute(double& rv);
+	// Set value of node
+	bool set(double rv);
+
+
+	/*
+	 * Inherited Virtuals
+	 */
+	public:
+	// Print node contents
+	void nodePrint(int offset, const char* prefix = "");
 	// Initialise node
 	bool initialise();
 };

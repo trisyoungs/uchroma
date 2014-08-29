@@ -30,14 +30,14 @@
 Messenger msg;
 
 // Message output types
-const char *OutputTypeKeywords[] = { "all", "calls", "_ERROR_", "verbose" };
-Messenger::OutputType Messenger::outputType(const char *s, bool reportError)
+const char* OutputTypeKeywords[] = { "all", "calls", "_ERROR_", "verbose" };
+Messenger::OutputType Messenger::outputType(const char* s, bool reportError)
 {
 	Messenger::OutputType ot = (Messenger::OutputType) enumSearch("output type",Messenger::nOutputTypes,OutputTypeKeywords,s);
 	if ((ot == Messenger::nOutputTypes) && reportError) enumPrintValid(Messenger::nOutputTypes,OutputTypeKeywords);
 	return ot;
 }
-const char *Messenger::outputType(Messenger::OutputType ot)
+const char* Messenger::outputType(Messenger::OutputType ot)
 {
 	return OutputTypeKeywords[ot];
 }
@@ -97,7 +97,7 @@ void Messenger::setTextBrowser(QTextBrowser* browser)
 }
 
 // Standard message
-void Messenger::print(const char *fmt, ...) const
+void Messenger::print(const char* fmt, ...) const
 {
 	// Print to the text view in the main window if it has been initialised.
 	// If program is in quiet mode, don't print anything to stdout
@@ -117,7 +117,7 @@ void Messenger::print(const char *fmt, ...) const
 }
 
 // Standard message in specific output level
-void Messenger::print(Messenger::OutputType ot, const char *fmt, ...) const
+void Messenger::print(Messenger::OutputType ot, const char* fmt, ...) const
 {
 	// Print to the text view in the main window if it has been initialised.
 	// If program is in quiet mode, don't print anything except Messenger::Force calls
@@ -139,7 +139,7 @@ void Messenger::print(Messenger::OutputType ot, const char *fmt, ...) const
 }
 
 // Function enter
-void Messenger::enter(const char *callname)
+void Messenger::enter(const char* callname)
 {
 	if (!isOutputActive(Messenger::Calls)) return;
 	// Debug Messaging - Enter Function
@@ -150,7 +150,7 @@ void Messenger::enter(const char *callname)
 }
 
 // Function leave
-void Messenger::exit(const char *callname)
+void Messenger::exit(const char* callname)
 {
 	if (!isOutputActive(Messenger::Calls)) return;
 	// Debug Messaging - Leave Function

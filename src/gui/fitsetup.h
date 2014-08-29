@@ -28,7 +28,7 @@
 #include "base/dnchar.h"
 #include "base/data2d.h"
 #include "base/equationvariable.h"
-#include "parser/tree.h"
+#include "expression/expression.h"
 #include "templates/array.h"
 #include "templates/list.h"
 

@@ -48,9 +48,9 @@ class NexusHelper
 
 	public:
 	// Iterator callback for HDF5 (group access)
-	static herr_t nexusGroupIterator(hid_t loc_id, const char *name, const H5L_info_t *info, void *operator_data);
+	static herr_t nexusGroupIterator(hid_t loc_id, const char* name, const H5L_info_t *info, void *operator_data);
 	// Iterator for block data
-	static herr_t nexusBlockIterator(hid_t loc_id, const char *name, const H5L_info_t *info, void *operator_data);
+	static herr_t nexusBlockIterator(hid_t loc_id, const char* name, const H5L_info_t *info, void *operator_data);
 	// Parse Nexus file
 // 	static bool parseNexusFile(RunData* runData, QString fileName);
 	// Load slice data from NXS file

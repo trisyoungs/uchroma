@@ -24,7 +24,7 @@
 
 int main(int argc, char *argv[])
 {
-	// Uncomment here for extra debug output
+	/* Uncomment here for extra debug output */
 // 	msg.addOutputType(Messenger::Verbose);
 
 	/* Create the main QApplication */

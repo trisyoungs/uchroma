@@ -24,7 +24,7 @@
 #include <hdf5.h>
 
 // Iterator callback for HDF5 (group access)
-herr_t NexusHelper::nexusGroupIterator(hid_t loc_id, const char *name, const H5L_info_t *info, void *operator_data)
+herr_t NexusHelper::nexusGroupIterator(hid_t loc_id, const char* name, const H5L_info_t *info, void *operator_data)
 {
 	// Get type of object - if it is not a Group then I don't care
 	H5O_info_t infobuf;
@@ -44,7 +44,7 @@ herr_t NexusHelper::nexusGroupIterator(hid_t loc_id, const char *name, const H5L
 }
 
 // Iterator for block data
-herr_t NexusHelper::nexusBlockIterator(hid_t loc_id, const char *name, const H5L_info_t *info, void *operator_data)
+herr_t NexusHelper::nexusBlockIterator(hid_t loc_id, const char* name, const H5L_info_t *info, void *operator_data)
 {
 	H5O_info_t infobuf;
 	herr_t status = H5Oget_info_by_name(loc_id, name, &infobuf, H5P_DEFAULT);

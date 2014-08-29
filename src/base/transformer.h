@@ -22,11 +22,11 @@
 #ifndef UCHROMA_TRANSFORMER_H
 #define UCHROMA_TRANSFORMER_H
 
-#include "parser/tree.h"
+#include "expression/expression.h"
 #include "templates/array.h"
 
 // Forward Declarations
-class DoubleVariable;
+class Variable;
 
 // Transformer
 class Transformer
@@ -47,18 +47,18 @@ class Transformer
 	private:
 	// Whether transform is enabled
 	bool enabled_;
-	// Tree containing equation
-	Tree equation_;
+	// Transform equation
+	Expression equation_;
 	// Text used to generate last equation_
 	QString text_;
 	// Whether current equation is valid
 	bool valid_;
 	// X variable in equation
-	DoubleVariable* x_;
+	Variable* x_;
 	// Y variable in equation
-	DoubleVariable* y_;
+	Variable* y_;
 	// Z variable in equation
-	DoubleVariable* z_;
+	Variable* z_;
 
 	public:
 	// Set whether transform is enabled

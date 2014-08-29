@@ -30,14 +30,14 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_COMMANDPARSER_GRAMMAR_HH_INCLUDED
-# define YY_COMMANDPARSER_GRAMMAR_HH_INCLUDED
+#ifndef YY_EXPRESSIONPARSER_GRAMMAR_HH_INCLUDED
+# define YY_EXPRESSIONPARSER_GRAMMAR_HH_INCLUDED
 /* Enabling traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
 #endif
 #if YYDEBUG
-extern int CommandParser_debug;
+extern int ExpressionParser_debug;
 #endif
 
 /* Tokens.  */
@@ -46,67 +46,35 @@ extern int CommandParser_debug;
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     INTCONST = 258,
-     DOUBLECONST = 259,
-     NEWTOKEN = 260,
-     STEPTOKEN = 261,
-     VAR = 262,
-     LOCALVAR = 263,
-     FUNCCALL = 264,
-     VTYPE = 265,
-     UCHROMA_DO = 266,
-     UCHROMA_WHILE = 267,
-     UCHROMA_FOR = 268,
-     UCHROMA_IF = 269,
-     UCHROMA_RETURN = 270,
-     UCHROMA_CONTINUE = 271,
-     UCHROMA_BREAK = 272,
-     UCHROMA_ELSE = 273,
-     OR = 274,
-     AND = 275,
-     DEQ = 276,
-     TEQ = 277,
-     MEQ = 278,
-     PEQ = 279,
-     NEQ = 280,
-     EQ = 281,
-     LEQ = 282,
-     GEQ = 283,
-     UMINUS = 284,
-     MINUSMINUS = 285,
-     PLUSPLUS = 286
+     CONSTANT = 258,
+     NEWTOKEN = 259,
+     VAR = 260,
+     FUNCCALL = 261,
+     UCHROMA_IF = 262,
+     UCHROMA_ELSE = 263,
+     OR = 264,
+     AND = 265,
+     NEQ = 266,
+     EQ = 267,
+     LEQ = 268,
+     GEQ = 269,
+     UMINUS = 270
    };
 #endif
 /* Tokens.  */
-#define INTCONST 258
-#define DOUBLECONST 259
-#define NEWTOKEN 260
-#define STEPTOKEN 261
-#define VAR 262
-#define LOCALVAR 263
-#define FUNCCALL 264
-#define VTYPE 265
-#define UCHROMA_DO 266
-#define UCHROMA_WHILE 267
-#define UCHROMA_FOR 268
-#define UCHROMA_IF 269
-#define UCHROMA_RETURN 270
-#define UCHROMA_CONTINUE 271
-#define UCHROMA_BREAK 272
-#define UCHROMA_ELSE 273
-#define OR 274
-#define AND 275
-#define DEQ 276
-#define TEQ 277
-#define MEQ 278
-#define PEQ 279
-#define NEQ 280
-#define EQ 281
-#define LEQ 282
-#define GEQ 283
-#define UMINUS 284
-#define MINUSMINUS 285
-#define PLUSPLUS 286
+#define CONSTANT 258
+#define NEWTOKEN 259
+#define VAR 260
+#define FUNCCALL 261
+#define UCHROMA_IF 262
+#define UCHROMA_ELSE 263
+#define OR 264
+#define AND 265
+#define NEQ 266
+#define EQ 267
+#define LEQ 268
+#define GEQ 269
+#define UMINUS 270
 
 
 
@@ -114,40 +82,37 @@ extern int CommandParser_debug;
 typedef union YYSTYPE
 {
 /* Line 2058 of yacc.c  */
-#line 31 "grammar.yy"
+#line 25 "grammar.yy"
 
 	int functionId;			/* Function enum id */
-	Dnchar *name;			/* character pointer for names */
-	TreeNode *node;			/* node pointer */
-	Variable *variable;		/* variable pointer */
-	Tree *tree;			/* function (tree) pointer */
-	VTypes::DataType vtype;		/* variable type for next declarations */
-	int intconst;			/* integer constant value */
-	double doubleconst;		/* double constant value */
+	Dnchar* name;			/* Character pointer for names */
+	Node* node;			/* node pointer */
+	Variable* variable;		/* variable pointer */
+	double doubleConst;		/* double constant value */
 
 
 /* Line 2058 of yacc.c  */
-#line 131 "grammar.hh"
+#line 96 "grammar.hh"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
-extern YYSTYPE CommandParser_lval;
+extern YYSTYPE ExpressionParser_lval;
 
 #ifdef YYPARSE_PARAM
 #if defined __STDC__ || defined __cplusplus
-int CommandParser_parse (void *YYPARSE_PARAM);
+int ExpressionParser_parse (void *YYPARSE_PARAM);
 #else
-int CommandParser_parse ();
+int ExpressionParser_parse ();
 #endif
 #else /* ! YYPARSE_PARAM */
 #if defined __STDC__ || defined __cplusplus
-int CommandParser_parse (void);
+int ExpressionParser_parse (void);
 #else
-int CommandParser_parse ();
+int ExpressionParser_parse ();
 #endif
 #endif /* ! YYPARSE_PARAM */
 
-#endif /* !YY_COMMANDPARSER_GRAMMAR_HH_INCLUDED  */
+#endif /* !YY_EXPRESSIONPARSER_GRAMMAR_HH_INCLUDED  */

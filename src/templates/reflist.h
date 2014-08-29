@@ -115,6 +115,8 @@ template <class T, class D> class RefList
 	void remove(RefListItem<T,D>* item);
 	// Delete the reference containing specified item from the list
 	void remove(T* item);
+	// Remove all items that match specified data value
+	void removeIfData(D value);
 	// Remove the first item in the list
 	void removeFirst();
 	// Remove the last item in the list
@@ -416,6 +418,21 @@ template <class T, class D> void RefList<T,D>::remove(RefListItem<T,D>* xitem)
 	delete xitem;
 	nItems_ --;
 	regenerate_ = 1;
+}
+
+/*!
+ * \brief Remove all items that match specified data value
+ */
+template <class T, class D> void RefList<T,D>::removeIfData(D value)
+{
+	RefListItem<T,D>* ri = listHead_, *next;
+	while (ri)
+	{
+		// Store next pointer, in case we delete the current item
+		next = ri->next;
+		if (ri->data == value) remove(ri);
+		ri = next;
+	}
 }
 
 /*!

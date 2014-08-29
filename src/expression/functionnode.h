@@ -1,7 +1,7 @@
 /*
-	*** Scoped Command Node
-	*** src/parser/scopenode.h
-	Copyright T. Youngs 2010-2013
+	*** Expression Function Node
+	*** src/expression/functionnode.h
+	Copyright T. Youngs 2014
 
 	This file is part of uChroma.
 
@@ -19,40 +19,43 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_SCOPENODE_H
-#define UCHROMA_SCOPENODE_H
+#ifndef UCHROMA_FUNCTIONNODE_H
+#define UCHROMA_FUNCTIONNODE_H
 
-#include "parser/commandnode.h"
-#include "parser/variablelist.h"
+#include "expression/functions.h"
+#include "expression/node.h"
 
-// Scoped Command Node
-class ScopeNode : public CommandNode
+// Forward Declarations
+/* none */
+
+// Function Node
+class FunctionNode : public Node
 {
 	public:
-	// Constructor / Destructor
-	ScopeNode(Command::Function func = Command::NoFunction);
-	~ScopeNode();
+	// Constructors / Destructor
+	FunctionNode(Functions::Function func = Functions::NoFunction);
+	FunctionNode(Node* source);
+	~FunctionNode();
+
 
 	/*
-	// Variables
-	*/
+	 * Function Data
+	 */
+	protected:
+	// Function that this node performs
+	Functions::Function function_;
+	
 	public:
-	// List of variables (and constants) owned by this scope
-	VariableList variables;
-
-	/*
-	// Set / Get / Execute
-	*/
-	public:
+	// Get command function
+	Functions::Function function();
 	// Execute command
-	bool execute(ReturnValue &rv);
+	bool execute(double& rv);
+	// Print node contents
+	void nodePrint(int offset, const char* prefix = "");
 	// Set from returnvalue node
-	bool set(ReturnValue &rv);
+	bool set(double rv);
 	// Initialise node
 	bool initialise();
-	// Print layout of current node
-	void nodePrint(int offset, const char *prefix = "");
-
 };
 
 #endif

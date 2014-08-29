@@ -521,7 +521,7 @@ void Data2D::operator/=(const double factor)
 */
 
 // Window Function keywords
-const char *WindowFunctionKeywords[] = { "None", "Bartlett", "Gaussian", "Lanczos", "Nuttall", "Sine" };
+const char* WindowFunctionKeywords[] = { "None", "Bartlett", "Gaussian", "Lanczos", "Nuttall", "Sine" };
 
 /*!
  * \brief Convert text string to WindowFunction

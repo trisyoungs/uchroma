@@ -21,7 +21,7 @@
 
 #include "base/equationvariable.h"
 #include "base/messenger.h"
-#include <parser/variable.h>
+#include "expression/variable.h"
 
 // Constructor
 EquationVariable::EquationVariable() : ListItem<EquationVariable>()

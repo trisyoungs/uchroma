@@ -1,7 +1,7 @@
 /*
-	*** Variable Node
-	*** src/parser/variablenode.h
-	Copyright T. Youngs 2010-2013
+	*** Expression Variable Node
+	*** src/expression/variablenode.h
+	Copyright T. Youngs 2014
 
 	This file is part of uChroma.
 
@@ -22,50 +22,48 @@
 #ifndef UCHROMA_VARIABLENODE_H
 #define UCHROMA_VARIABLENODE_H
 
-#include "parser/treenode.h"
+#include "expression/node.h"
 
 // Forward Declarations
 class Variable;
 
 // Variable Node
-class VariableNode : public TreeNode
+class VariableNode : public Node
 {
 	public:
 	// Constructor / Destructor
-	VariableNode(Variable *v = NULL);
+	VariableNode(Variable* var = 0);
 	~VariableNode();
 
+
 	/*
-	// Variable Data
-	*/
+	 * Variable Data
+	 */
 	private:
 	// Variable that this node links to
 	Variable* variable_;
 	
 	public:
 	// Set variable target
-	void setVariable(Variable *v);
+	void setVariable(Variable* v);
 	// Get variable target
 	Variable* variable();
 	// Return name of variable target
-	const char *name();
-	// Finalise variable path (if there is one)
-	void finalisePath();
+	const char* name();
+
 
 	/*
-	// Inherited Virtuals
-	*/
+	 * Inherited Virtuals
+	 */
 	public:
 	// Execute node
-	bool execute(ReturnValue &rv);
+	bool execute(double& rv);
 	// Print node contents
-	void nodePrint(int offset, const char *prefix = "");
+	void nodePrint(int offset, const char* prefix = "");
 	// Set from returnvalue node
-	bool set(ReturnValue setrv);
+	bool set(double value);
 	// Initialise node
 	bool initialise();
-	// Search accessors (if any) available for linked variable
-	StepNode *findAccessor(const char *s, TreeNode *arglist = NULL);
 };
 
 #endif

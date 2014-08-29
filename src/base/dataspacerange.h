@@ -28,8 +28,8 @@
 // Forward Declarations
 class Collection;
 class DataSpace;
-class Tree;
-class DoubleVariable;
+class Expression;
+class Variable;
 
 /*
  * DataSpaceRange
@@ -93,7 +93,7 @@ class DataSpaceRange : public ListItem<DataSpaceRange>
 
 	public:
 	// Calculate values from specified equation
-	bool calculateValues(Tree& equation, DoubleVariable* xVariable, DoubleVariable* zVariable);
+	bool calculateValues(Expression& equation, Variable* xVariable, Variable* zVariable);
 	// Return sos error between stored and referenced values
 	double sosError();
 	// Copy values to specified Collection

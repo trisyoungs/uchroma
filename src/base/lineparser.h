@@ -74,21 +74,21 @@ class LineParser
 	// Reset data
 	void reset();
 	// Return filename of current inputFile (if any)
-	const char *inputFilename() const;
+	const char* inputFilename() const;
 	// Return filename of current outputFile (if any)
-	const char *outputFilename() const;
+	const char* outputFilename() const;
 	// Return pointer to start of current line
-	const char *line() const;
+	const char* line() const;
 	// Set line target
-	void setLine(const char *s);
+	void setLine(const char* s);
 	// Return integer line number of last read line
 	int lastLineNo() const;
 	// Return read-only status of file
 	bool isFileReadOnly() const;
 	// Open new file for reading
-	bool openInput(const char *filename);
+	bool openInput(const char* filename);
 	// Open new stream for writing
-	bool openOutput(const char *filename, bool directOutput);
+	bool openOutput(const char* filename, bool directOutput);
 	// Close file(s)
 	void closeFiles();
 	// Return whether current file source is good for reading
@@ -128,7 +128,7 @@ class LineParser
 	// Get rest of line starting at next delimited part
 	bool getRestDelim(Dnchar *destarg = NULL);
 	// Set line and parse using delimiters
-	void getArgsDelim(int optionMask, const char *s);
+	void getArgsDelim(int optionMask, const char* s);
 	// Get next delimited chunk from file (not line)
 	bool getCharsDelim(Dnchar *destarg = NULL);
 	// Get next delimited chunk from string, removing grabbed part
@@ -140,7 +140,7 @@ class LineParser
 	// Get next delimited argument from internal line
 	bool getArgDelim(int optionMask, Dnchar *destarg);
 	// Return a number of characters from the input stream
-	const char *getChars(int nchars, bool skipeol = true);
+	const char* getChars(int nchars, bool skipeol = true);
 	// Skip a number of characters from the input stream
 	void skipChars(int nchars);
 	// Return an integer value from reading 'n' chars of an (unformatted) input file
@@ -152,9 +152,9 @@ class LineParser
 	// Fill an array of double values from reading of an (unformatted) input file
 	int getDoubleArray(double *array, int count);
 	// Write line to file
-	bool writeLine(const char *s);
+	bool writeLine(const char* s);
 	// Write formatter line to file
-	bool writeLineF(const char *fmt, ...);
+	bool writeLineF(const char* fmt, ...);
 	// Commit cached output stream to actual output file
 	bool commitCache();
 
@@ -174,7 +174,7 @@ class LineParser
 	// Returns number of arguments grabbed from last parse
 	int nArgs() const;
 	// Returns the specified argument as a character string
-	const char *argc(int i);
+	const char* argc(int i);
 	// Returns the specified argument as an integer
 	int argi(int i);
 	// Returns the specified argument as a double

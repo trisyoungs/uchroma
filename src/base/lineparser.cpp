@@ -26,8 +26,8 @@
 #include <stdarg.h>
 
 // Parse options
-const char *ParseOptionKeywords[LineParser::nParseOptions] = { "_defaults", "stripcomments", "usequotes", "skipblanks", "stripbrackets", "noescapes", "usecurlies", "normalcommas", "_dummy_" };
-LineParser::ParseOption LineParser::parseOption(const char *s)
+const char* ParseOptionKeywords[LineParser::nParseOptions] = { "_defaults", "stripcomments", "usequotes", "skipblanks", "stripbrackets", "noescapes", "usecurlies", "normalcommas", "_dummy_" };
+LineParser::ParseOption LineParser::parseOption(const char* s)
 {
 	return (LineParser::ParseOption) (1 << enumSearch("line parser option", LineParser::nParseOptions, ParseOptionKeywords, s));
 }
@@ -66,25 +66,25 @@ void LineParser::reset()
 */
 
 // Return filename of current input file (if any)
-const char *LineParser::inputFilename() const
+const char* LineParser::inputFilename() const
 {
 	return inputFilename_.get();
 }
 
 // Return filename of current output file (if any)
-const char *LineParser::outputFilename() const
+const char* LineParser::outputFilename() const
 {
 	return outputFilename_.get();
 }
 
 // Return pointer to current line
-const char *LineParser::line() const
+const char* LineParser::line() const
 {
 	return line_;
 }
 
 // Set line target
-void LineParser::setLine(const char *s)
+void LineParser::setLine(const char* s)
 {
 	strncpy(line_, s, MAXLINELENGTH);
 	lineLength_ = strlen(line_);
@@ -98,7 +98,7 @@ int LineParser::lastLineNo() const
 }
 
 // Open new file for reading
-bool LineParser::openInput(const char *filename)
+bool LineParser::openInput(const char* filename)
 {
 	msg.enter("LineParser::openInput");
 	// Check existing input file
@@ -126,7 +126,7 @@ bool LineParser::openInput(const char *filename)
 }
 
 // Open new stream for writing
-bool LineParser::openOutput(const char *filename, bool directOutput)
+bool LineParser::openOutput(const char* filename, bool directOutput)
 {
 	msg.enter("LineParser::openOutput");
 	// Check existing input file
@@ -770,7 +770,7 @@ bool LineParser::getCharsDelim(int optionMask, Dnchar *source, Dnchar *destarg)
 }
 
 // Return a number of characters from the input stream
-const char *LineParser::getChars(int nchars, bool skipeol)
+const char* LineParser::getChars(int nchars, bool skipeol)
 {
 	char c;
 	// Check number of characters requested
@@ -910,7 +910,7 @@ int LineParser::getDoubleArray(double *array, int count)
 }
 
 // Write line to file
-bool LineParser::writeLine(const char *s)
+bool LineParser::writeLine(const char* s)
 {
 	msg.enter("LineParser::writeLine");
 	if (!directOutput_)
@@ -935,7 +935,7 @@ bool LineParser::writeLine(const char *s)
 }
 
 // Write formatter line to file
-bool LineParser::writeLineF(const char *fmt, ...)
+bool LineParser::writeLineF(const char* fmt, ...)
 {
 	msg.enter("LineParser::writeLine");
 	if (!directOutput_)
@@ -1020,7 +1020,7 @@ int LineParser::nArgs() const
 }
 
 // Returns the specified argument as a character string
-const char *LineParser::argc(int i)
+const char* LineParser::argc(int i)
 {
 	if ((i < 0) || (i >= nArgs()))
 	{
