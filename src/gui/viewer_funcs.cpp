@@ -215,15 +215,12 @@ void Viewer::paintGL()
 		// Set modelview matrix as target for the remainder of the routine
 		glMatrixMode(GL_MODELVIEW);
 
-		// Set up our transformation matrix
-		Vec3<double> centreTranslation = -pane->axes().axesCoordCentre();
-		Matrix A, viewMatrix = pane->viewMatrix();
-		A.setIdentity();
-		A.setTranslation(centreTranslation);
-		A = viewMatrix * A;
-		
+		// Get the main view matrix and centre coordinate translation
+		Vec3<double> centreTranslation;
+		Matrix viewMatrix = pane->viewMatrix();
+
 		// Send axis primitives to the display first
-		glLoadMatrixd(A.matrix());
+		glLoadMatrixd(viewMatrix.matrix());
 		glEnable(GL_MULTISAMPLE);
 		glEnable(GL_BLEND);
 		GLfloat colourBlack[4] = { 0.0, 0.0, 0.0, 1.0 };
@@ -234,12 +231,12 @@ void Viewer::paintGL()
 		if (FontInstance::fontOK())
 		{
 			FontInstance::font()->FaceSize(1);
-			for (int n=0; n<maxAxis; ++n) if (pane->axes().axisVisible(n)) pane->axes().axisTextPrimitive(n).renderAll(viewMatrix, centreTranslation, FontInstance::font(), uChroma_->labelCorrectOrientation(), pane->textZScale());
+			for (int n=0; n<maxAxis; ++n) if (pane->axes().axisVisible(n)) pane->axes().axisTextPrimitive(n).renderAll(viewMatrix, uChroma_->labelCorrectOrientation(), pane->textZScale());
 		}
 
 		// -- Render axis lines
 		glEnable(GL_LINE_SMOOTH);
-		glLoadMatrixd(A.matrix());
+		glLoadMatrixd(viewMatrix.matrix());
 		glLineWidth(lineWidth_);
 		glDisable(GL_LIGHTING);
 		for (int axis=0; axis<maxAxis; ++axis) if (pane->axes().axisVisible(axis)) pane->axes().axisPrimitive(axis).sendToGL();
@@ -250,7 +247,7 @@ void Viewer::paintGL()
 		pane->boundingBoxPrimitive().sendToGL();
 
 		// Render current selection marker
-		glLoadMatrixd(A.matrix());
+		glLoadMatrixd(viewMatrix.matrix());
 		int sliceAxis = uChroma_->interactionAxis();
 		if ((pane == uChroma_->currentViewPane()) && (sliceAxis != -1))
 		{
@@ -276,7 +273,7 @@ void Viewer::paintGL()
 		}
 
 		// Setup clip planes to enforce Y-axis limits
-		glLoadMatrixd(A.matrix());
+		glLoadMatrixd(viewMatrix.matrix());
 		glPushMatrix();
 		glTranslated(0.0, pane->axes().clipPlaneYMin(), 0.0);
 		glClipPlane(GL_CLIP_PLANE0, clipPlaneBottom);

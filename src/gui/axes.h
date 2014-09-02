@@ -81,7 +81,7 @@ class AxesWindow : public QWidget
 	bool axisMinorTicksChanged(int axis, int value);
 	bool axisTitleChanged(int axis, QString& title);
 	bool axisTitleOrientationChanged(int axis, int component, double value);
-	bool axisTitleAlignmentChanged(int axis, Axes::AxisAnchor anchor);
+	bool axisAnchorChanged(int axis, bool titleAnchor, TextPrimitive::TextAnchor anchor);
 
 
 	/*
@@ -117,6 +117,7 @@ class AxesWindow : public QWidget
 	void on_AxisXTickDirectionXSpin_valueChanged(double value);
 	void on_AxisXTickDirectionYSpin_valueChanged(double value);
 	void on_AxisXTickDirectionZSpin_valueChanged(double value);
+	void on_AxisXLabelAnchorCombo_currentIndexChanged(int index);
 	void on_AxisXLabelAxialRotationSlider_valueChanged(int value);
 	void on_AxisXLabelAxialRotationSpin_valueChanged(int value);
 	void on_AxisXLabelInPlaneRotationSlider_valueChanged(int value);
@@ -161,6 +162,7 @@ class AxesWindow : public QWidget
 	void on_AxisYTickDirectionXSpin_valueChanged(double value);
 	void on_AxisYTickDirectionYSpin_valueChanged(double value);
 	void on_AxisYTickDirectionZSpin_valueChanged(double value);
+	void on_AxisYLabelAnchorCombo_currentIndexChanged(int index);
 	void on_AxisYLabelAxialRotationSlider_valueChanged(int value);
 	void on_AxisYLabelAxialRotationSpin_valueChanged(int value);
 	void on_AxisYLabelInPlaneRotationSlider_valueChanged(int value);
@@ -205,6 +207,7 @@ class AxesWindow : public QWidget
 	void on_AxisZTickDirectionXSpin_valueChanged(double value);
 	void on_AxisZTickDirectionYSpin_valueChanged(double value);
 	void on_AxisZTickDirectionZSpin_valueChanged(double value);
+	void on_AxisZLabelAnchorCombo_currentIndexChanged(int index);
 	void on_AxisZLabelAxialRotationSlider_valueChanged(int value);
 	void on_AxisZLabelAxialRotationSpin_valueChanged(int value);
 	void on_AxisZLabelInPlaneRotationSlider_valueChanged(int value);

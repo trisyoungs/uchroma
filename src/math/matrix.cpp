@@ -36,25 +36,44 @@ Matrix Matrix::operator*(const Matrix &B) const
 {
 	// [ row(A|this).column(B) ]
 	Matrix AB;
-	AB.matrix_[0] = matrix_[0]*B.matrix_[0] + matrix_[4]*B.matrix_[1] + matrix_[8]*B.matrix_[2] + matrix_[12]*B.matrix_[3];
-	AB.matrix_[1] = matrix_[1]*B.matrix_[0] + matrix_[5]*B.matrix_[1] + matrix_[9]*B.matrix_[2] + matrix_[13]*B.matrix_[3];
-	AB.matrix_[2] = matrix_[2]*B.matrix_[0] + matrix_[6]*B.matrix_[1] + matrix_[10]*B.matrix_[2] + matrix_[14]*B.matrix_[3];
-	AB.matrix_[3] = matrix_[3]*B.matrix_[0] + matrix_[7]*B.matrix_[1] + matrix_[11]*B.matrix_[2] + matrix_[15]*B.matrix_[3];
+// 	AB.matrix_[0] = matrix_[0]*B.matrix_[0] + matrix_[4]*B.matrix_[1] + matrix_[8]*B.matrix_[2] + matrix_[12]*B.matrix_[3];
+// 	AB.matrix_[1] = matrix_[1]*B.matrix_[0] + matrix_[5]*B.matrix_[1] + matrix_[9]*B.matrix_[2] + matrix_[13]*B.matrix_[3];
+// 	AB.matrix_[2] = matrix_[2]*B.matrix_[0] + matrix_[6]*B.matrix_[1] + matrix_[10]*B.matrix_[2] + matrix_[14]*B.matrix_[3];
+// 	AB.matrix_[3] = matrix_[3]*B.matrix_[0] + matrix_[7]*B.matrix_[1] + matrix_[11]*B.matrix_[2] + matrix_[15]*B.matrix_[3];
+// 
+// 	AB.matrix_[4] = matrix_[0]*B.matrix_[4] + matrix_[4]*B.matrix_[5] + matrix_[8]*B.matrix_[6] + matrix_[12]*B.matrix_[7];
+// 	AB.matrix_[5] = matrix_[1]*B.matrix_[4] + matrix_[5]*B.matrix_[5] + matrix_[9]*B.matrix_[6] + matrix_[13]*B.matrix_[7];
+// 	AB.matrix_[6] = matrix_[2]*B.matrix_[4] + matrix_[6]*B.matrix_[5] + matrix_[10]*B.matrix_[6] + matrix_[14]*B.matrix_[7];
+// 	AB.matrix_[7] = matrix_[3]*B.matrix_[4] + matrix_[7]*B.matrix_[5] + matrix_[11]*B.matrix_[6] + matrix_[15]*B.matrix_[7];
+// 
+// 	AB.matrix_[8] = matrix_[0]*B.matrix_[8] + matrix_[4]*B.matrix_[9] + matrix_[8]*B.matrix_[10] + matrix_[12]*B.matrix_[11];
+// 	AB.matrix_[9] = matrix_[1]*B.matrix_[8] + matrix_[5]*B.matrix_[9] + matrix_[9]*B.matrix_[10] + matrix_[13]*B.matrix_[11];
+// 	AB.matrix_[10] = matrix_[2]*B.matrix_[8] + matrix_[6]*B.matrix_[9] + matrix_[10]*B.matrix_[10] + matrix_[14]*B.matrix_[11];
+// 	AB.matrix_[11] = matrix_[3]*B.matrix_[8] + matrix_[7]*B.matrix_[9] + matrix_[11]*B.matrix_[10] + matrix_[15]*B.matrix_[11];
+// 
+// 	AB.matrix_[12] = matrix_[0]*B.matrix_[12] + matrix_[4]*B.matrix_[13] + matrix_[8]*B.matrix_[14] + matrix_[12]*B.matrix_[15];
+// 	AB.matrix_[13] = matrix_[1]*B.matrix_[12] + matrix_[5]*B.matrix_[13] + matrix_[9]*B.matrix_[14] + matrix_[13]*B.matrix_[15];
+// 	AB.matrix_[14] = matrix_[2]*B.matrix_[12] + matrix_[6]*B.matrix_[13] + matrix_[10]*B.matrix_[14] + matrix_[14]*B.matrix_[15];
+// 	AB.matrix_[15] = matrix_[3]*B.matrix_[12] + matrix_[7]*B.matrix_[13] + matrix_[11]*B.matrix_[14] + matrix_[15]*B.matrix_[15];
+	AB.matrix_[0] = matrix_[0]*B.matrix_[0] + matrix_[1]*B.matrix_[4] + matrix_[2]*B.matrix_[8] + matrix_[3]*B.matrix_[12];
+	AB.matrix_[1] = matrix_[0]*B.matrix_[1] + matrix_[1]*B.matrix_[5] + matrix_[2]*B.matrix_[9] + matrix_[3]*B.matrix_[13];
+	AB.matrix_[2] = matrix_[0]*B.matrix_[2] + matrix_[1]*B.matrix_[6] + matrix_[2]*B.matrix_[10] + matrix_[3]*B.matrix_[14];
+	AB.matrix_[3] = matrix_[0]*B.matrix_[3] + matrix_[1]*B.matrix_[7] + matrix_[2]*B.matrix_[11] + matrix_[3]*B.matrix_[15];
 
-	AB.matrix_[4] = matrix_[0]*B.matrix_[4] + matrix_[4]*B.matrix_[5] + matrix_[8]*B.matrix_[6] + matrix_[12]*B.matrix_[7];
-	AB.matrix_[5] = matrix_[1]*B.matrix_[4] + matrix_[5]*B.matrix_[5] + matrix_[9]*B.matrix_[6] + matrix_[13]*B.matrix_[7];
-	AB.matrix_[6] = matrix_[2]*B.matrix_[4] + matrix_[6]*B.matrix_[5] + matrix_[10]*B.matrix_[6] + matrix_[14]*B.matrix_[7];
-	AB.matrix_[7] = matrix_[3]*B.matrix_[4] + matrix_[7]*B.matrix_[5] + matrix_[11]*B.matrix_[6] + matrix_[15]*B.matrix_[7];
+	AB.matrix_[4] = matrix_[4]*B.matrix_[0] + matrix_[5]*B.matrix_[4] + matrix_[6]*B.matrix_[8] + matrix_[7]*B.matrix_[12];
+	AB.matrix_[5] = matrix_[4]*B.matrix_[1] + matrix_[5]*B.matrix_[5] + matrix_[6]*B.matrix_[9] + matrix_[7]*B.matrix_[13];
+	AB.matrix_[6] = matrix_[4]*B.matrix_[2] + matrix_[5]*B.matrix_[6] + matrix_[6]*B.matrix_[10] + matrix_[7]*B.matrix_[14];
+	AB.matrix_[7] = matrix_[4]*B.matrix_[3] + matrix_[5]*B.matrix_[7] + matrix_[6]*B.matrix_[11] + matrix_[7]*B.matrix_[15];
 
-	AB.matrix_[8] = matrix_[0]*B.matrix_[8] + matrix_[4]*B.matrix_[9] + matrix_[8]*B.matrix_[10] + matrix_[12]*B.matrix_[11];
-	AB.matrix_[9] = matrix_[1]*B.matrix_[8] + matrix_[5]*B.matrix_[9] + matrix_[9]*B.matrix_[10] + matrix_[13]*B.matrix_[11];
-	AB.matrix_[10] = matrix_[2]*B.matrix_[8] + matrix_[6]*B.matrix_[9] + matrix_[10]*B.matrix_[10] + matrix_[14]*B.matrix_[11];
-	AB.matrix_[11] = matrix_[3]*B.matrix_[8] + matrix_[7]*B.matrix_[9] + matrix_[11]*B.matrix_[10] + matrix_[15]*B.matrix_[11];
+	AB.matrix_[8] = matrix_[8]*B.matrix_[0] + matrix_[9]*B.matrix_[4] + matrix_[10]*B.matrix_[8] + matrix_[11]*B.matrix_[12];
+	AB.matrix_[9] = matrix_[8]*B.matrix_[1] + matrix_[9]*B.matrix_[5] + matrix_[10]*B.matrix_[9] + matrix_[11]*B.matrix_[13];
+	AB.matrix_[10] = matrix_[8]*B.matrix_[2] + matrix_[9]*B.matrix_[6] + matrix_[10]*B.matrix_[10] + matrix_[11]*B.matrix_[14];
+	AB.matrix_[11] = matrix_[8]*B.matrix_[3] + matrix_[9]*B.matrix_[7] + matrix_[10]*B.matrix_[11] + matrix_[11]*B.matrix_[15];
 
-	AB.matrix_[12] = matrix_[0]*B.matrix_[12] + matrix_[4]*B.matrix_[13] + matrix_[8]*B.matrix_[14] + matrix_[12]*B.matrix_[15];
-	AB.matrix_[13] = matrix_[1]*B.matrix_[12] + matrix_[5]*B.matrix_[13] + matrix_[9]*B.matrix_[14] + matrix_[13]*B.matrix_[15];
-	AB.matrix_[14] = matrix_[2]*B.matrix_[12] + matrix_[6]*B.matrix_[13] + matrix_[10]*B.matrix_[14] + matrix_[14]*B.matrix_[15];
-	AB.matrix_[15] = matrix_[3]*B.matrix_[12] + matrix_[7]*B.matrix_[13] + matrix_[11]*B.matrix_[14] + matrix_[15]*B.matrix_[15];
+	AB.matrix_[12] = matrix_[12]*B.matrix_[0] + matrix_[13]*B.matrix_[4] + matrix_[14]*B.matrix_[8] + matrix_[15]*B.matrix_[12];
+	AB.matrix_[13] = matrix_[12]*B.matrix_[1] + matrix_[13]*B.matrix_[5] + matrix_[14]*B.matrix_[9] + matrix_[15]*B.matrix_[13];
+	AB.matrix_[14] = matrix_[12]*B.matrix_[2] + matrix_[13]*B.matrix_[6] + matrix_[14]*B.matrix_[10] + matrix_[15]*B.matrix_[14];
+	AB.matrix_[15] = matrix_[12]*B.matrix_[3] + matrix_[13]*B.matrix_[7] + matrix_[14]*B.matrix_[11] + matrix_[15]*B.matrix_[15];
 	return AB;
 }
 
@@ -103,25 +122,25 @@ Matrix &Matrix::operator*=(const Matrix &B)
 {
 	// [ row(A|this).column(B) ]
 	Matrix AB;
-	AB.matrix_[0] = matrix_[0]*B.matrix_[0] + matrix_[4]*B.matrix_[1] + matrix_[8]*B.matrix_[2] + matrix_[12]*B.matrix_[3];
-	AB.matrix_[1] = matrix_[1]*B.matrix_[0] + matrix_[5]*B.matrix_[1] + matrix_[9]*B.matrix_[2] + matrix_[13]*B.matrix_[3];
-	AB.matrix_[2] = matrix_[2]*B.matrix_[0] + matrix_[6]*B.matrix_[1] + matrix_[10]*B.matrix_[2] + matrix_[14]*B.matrix_[3];
-	AB.matrix_[3] = matrix_[3]*B.matrix_[0] + matrix_[7]*B.matrix_[1] + matrix_[11]*B.matrix_[2] + matrix_[15]*B.matrix_[3];
+	AB.matrix_[0] = matrix_[0]*B.matrix_[0] + matrix_[1]*B.matrix_[4] + matrix_[2]*B.matrix_[8] + matrix_[3]*B.matrix_[12];
+	AB.matrix_[1] = matrix_[0]*B.matrix_[1] + matrix_[1]*B.matrix_[5] + matrix_[2]*B.matrix_[9] + matrix_[3]*B.matrix_[13];
+	AB.matrix_[2] = matrix_[0]*B.matrix_[2] + matrix_[1]*B.matrix_[6] + matrix_[2]*B.matrix_[10] + matrix_[3]*B.matrix_[14];
+	AB.matrix_[3] = matrix_[0]*B.matrix_[3] + matrix_[1]*B.matrix_[7] + matrix_[2]*B.matrix_[11] + matrix_[3]*B.matrix_[15];
 
-	AB.matrix_[4] = matrix_[0]*B.matrix_[4] + matrix_[4]*B.matrix_[5] + matrix_[8]*B.matrix_[6] + matrix_[12]*B.matrix_[7];
-	AB.matrix_[5] = matrix_[1]*B.matrix_[4] + matrix_[5]*B.matrix_[5] + matrix_[9]*B.matrix_[6] + matrix_[13]*B.matrix_[7];
-	AB.matrix_[6] = matrix_[2]*B.matrix_[4] + matrix_[6]*B.matrix_[5] + matrix_[10]*B.matrix_[6] + matrix_[14]*B.matrix_[7];
-	AB.matrix_[7] = matrix_[3]*B.matrix_[4] + matrix_[7]*B.matrix_[5] + matrix_[11]*B.matrix_[6] + matrix_[15]*B.matrix_[7];
+	AB.matrix_[4] = matrix_[4]*B.matrix_[0] + matrix_[5]*B.matrix_[4] + matrix_[6]*B.matrix_[8] + matrix_[7]*B.matrix_[12];
+	AB.matrix_[5] = matrix_[4]*B.matrix_[1] + matrix_[5]*B.matrix_[5] + matrix_[6]*B.matrix_[9] + matrix_[7]*B.matrix_[13];
+	AB.matrix_[6] = matrix_[4]*B.matrix_[2] + matrix_[5]*B.matrix_[6] + matrix_[6]*B.matrix_[10] + matrix_[7]*B.matrix_[14];
+	AB.matrix_[7] = matrix_[4]*B.matrix_[3] + matrix_[5]*B.matrix_[7] + matrix_[6]*B.matrix_[11] + matrix_[7]*B.matrix_[15];
 
-	AB.matrix_[8] = matrix_[0]*B.matrix_[8] + matrix_[4]*B.matrix_[9] + matrix_[8]*B.matrix_[10] + matrix_[12]*B.matrix_[11];
-	AB.matrix_[9] = matrix_[1]*B.matrix_[8] + matrix_[5]*B.matrix_[9] + matrix_[9]*B.matrix_[10] + matrix_[13]*B.matrix_[11];
-	AB.matrix_[10] = matrix_[2]*B.matrix_[8] + matrix_[6]*B.matrix_[9] + matrix_[10]*B.matrix_[10] + matrix_[14]*B.matrix_[11];
-	AB.matrix_[11] = matrix_[3]*B.matrix_[8] + matrix_[7]*B.matrix_[9] + matrix_[11]*B.matrix_[10] + matrix_[15]*B.matrix_[11];
+	AB.matrix_[8] = matrix_[8]*B.matrix_[0] + matrix_[9]*B.matrix_[4] + matrix_[10]*B.matrix_[8] + matrix_[11]*B.matrix_[12];
+	AB.matrix_[9] = matrix_[8]*B.matrix_[1] + matrix_[9]*B.matrix_[5] + matrix_[10]*B.matrix_[9] + matrix_[11]*B.matrix_[13];
+	AB.matrix_[10] = matrix_[8]*B.matrix_[2] + matrix_[9]*B.matrix_[6] + matrix_[10]*B.matrix_[10] + matrix_[11]*B.matrix_[14];
+	AB.matrix_[11] = matrix_[8]*B.matrix_[3] + matrix_[9]*B.matrix_[7] + matrix_[10]*B.matrix_[11] + matrix_[11]*B.matrix_[15];
 
-	AB.matrix_[12] = matrix_[0]*B.matrix_[12] + matrix_[4]*B.matrix_[13] + matrix_[8]*B.matrix_[14] + matrix_[12]*B.matrix_[15];
-	AB.matrix_[13] = matrix_[1]*B.matrix_[12] + matrix_[5]*B.matrix_[13] + matrix_[9]*B.matrix_[14] + matrix_[13]*B.matrix_[15];
-	AB.matrix_[14] = matrix_[2]*B.matrix_[12] + matrix_[6]*B.matrix_[13] + matrix_[10]*B.matrix_[14] + matrix_[14]*B.matrix_[15];
-	AB.matrix_[15] = matrix_[3]*B.matrix_[12] + matrix_[7]*B.matrix_[13] + matrix_[11]*B.matrix_[14] + matrix_[15]*B.matrix_[15];
+	AB.matrix_[12] = matrix_[12]*B.matrix_[0] + matrix_[13]*B.matrix_[4] + matrix_[14]*B.matrix_[8] + matrix_[15]*B.matrix_[12];
+	AB.matrix_[13] = matrix_[12]*B.matrix_[1] + matrix_[13]*B.matrix_[5] + matrix_[14]*B.matrix_[9] + matrix_[15]*B.matrix_[13];
+	AB.matrix_[14] = matrix_[12]*B.matrix_[2] + matrix_[13]*B.matrix_[6] + matrix_[14]*B.matrix_[10] + matrix_[15]*B.matrix_[14];
+	AB.matrix_[15] = matrix_[12]*B.matrix_[3] + matrix_[13]*B.matrix_[7] + matrix_[14]*B.matrix_[11] + matrix_[15]*B.matrix_[15];
 	*this = AB;
 	return *this;
 }
@@ -195,7 +214,7 @@ double *Matrix::matrix()
 }
 
 // Return transpose of current matrix
-Matrix &Matrix::transpose()
+Matrix& Matrix::transpose()
 {
 	static Matrix A;
 	A.matrix_[0] = matrix_[0];
@@ -746,44 +765,36 @@ void Matrix::createTranslation(double dx, double dy, double dz)
 	matrix_[15] = 1.0;
 }
 
+// Create a translation to the matrix (as glTranslated would do)
+void Matrix::createTranslation(Vec3<double> vec)
+{
+	createTranslation(vec.x, vec.y, vec.z);
+}
+
 // Apply a translation to the matrix (as glTranslated would do)
 void Matrix::applyTranslation(double dx, double dy, double dz)
 {
-	matrix_[12] += matrix_[0]*dx + matrix_[4]*dy + matrix_[8]*dz;
-	matrix_[13] += matrix_[1]*dx + matrix_[5]*dy + matrix_[9]*dz;
-	matrix_[14] += matrix_[2]*dx + matrix_[6]*dy + matrix_[10]*dz;
+	matrix_[0] += dx*matrix_[3];
+	matrix_[1] += dy*matrix_[3];
+	matrix_[2] += dz*matrix_[3];
+
+	matrix_[4] += dx*matrix_[7];
+	matrix_[5] += dy*matrix_[7];
+	matrix_[6] += dz*matrix_[7];
+
+	matrix_[8] += dx*matrix_[11];
+	matrix_[9] += dy*matrix_[11];
+	matrix_[10] += dz*matrix_[11];
+
+	matrix_[12] += dx;
+	matrix_[13] += dy;
+	matrix_[14] += dz;
 }
 
 // Apply a translation to the matrix (as glTranslated would to)
 void Matrix::applyTranslation(Vec3<double> vec)
 {
-	matrix_[12] += matrix_[0]*vec.x + matrix_[4]*vec.y + matrix_[8]*vec.z;
-	matrix_[13] += matrix_[1]*vec.x + matrix_[5]*vec.y + matrix_[9]*vec.z;
-	matrix_[14] += matrix_[2]*vec.x + matrix_[6]*vec.y + matrix_[10]*vec.z;
-}
-
-// Apply an X-translation to the matrix (as glTranslated would do)
-void Matrix::applyTranslationX(double dx)
-{
-	matrix_[12] += matrix_[0]*dx;
-	matrix_[13] += matrix_[1]*dx;
-	matrix_[14] += matrix_[2]*dx;
-}
-
-// Apply an Y-translation to the matrix (as glTranslated would do)
-void Matrix::applyTranslationY(double dy)
-{
-	matrix_[12] += matrix_[4]*dy;
-	matrix_[13] += matrix_[5]*dy;
-	matrix_[14] += matrix_[6]*dy;
-}
-
-// Apply an Z-translation to the matrix (as glTranslated would do)
-void Matrix::applyTranslationZ(double dz)
-{
-	matrix_[12] += matrix_[8]*dz;
-	matrix_[13] += matrix_[9]*dz;
-	matrix_[14] += matrix_[10]*dz;
+	applyTranslation(vec.x, vec.y, vec.z);
 }
 
 // Add a translation to the matrix

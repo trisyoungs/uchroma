@@ -125,8 +125,8 @@ class ViewLayout : public ListItem<ViewLayout>
 	ViewPane* paneAtGrid(int gridX, int gridY);
 	// Translate pane by the amount specified
 	void translatePane(ViewPane* pane, int deltaX, int deltaY);
-	// Reset view of all panes
-	void resetView();
+	// Reset view matrix of all panes
+	void resetViewMatrix();
 	// Update interaction primitives for all panes
 	void updateInteractionPrimitives(int axis);
 

@@ -25,6 +25,7 @@
 QString FontInstance::fontFile_ = "";
 FTFont* FontInstance::font_ = NULL;
 double FontInstance::fontBaseHeight_ = 0.0;
+double FontInstance::fontFullHeight_ = 0.0;
 
 // Setup font specified
 bool FontInstance::setupFont(QString fontName)
@@ -39,6 +40,7 @@ bool FontInstance::setupFont(QString fontName)
 	FTPolygonFont* newFont = new FTPolygonFont(qPrintable(fontName));
 	if (newFont->Error())
 	{
+		printf("Error generating font.\n");
 		delete newFont;
 		fontBaseHeight_ = 1.0;
 		return false;
@@ -49,8 +51,10 @@ bool FontInstance::setupFont(QString fontName)
 // 		font_->Depth(3.0);
 // 		font_->Outset(-.5, 1.5);
 		font_->FaceSize(1);
-		FTBBox boundingBox = font_->BBox("ABCDEfghijKLMNOpqrstUVWXYz");
+		FTBBox boundingBox = font_->BBox("0123456789");
 		fontBaseHeight_ = boundingBox.Upper().Yf() - boundingBox.Lower().Yf();
+		boundingBox = font_->BBox("ABCDEfghijKLMNOpqrstUVWXYz");
+		fontFullHeight_ = boundingBox.Upper().Yf() - boundingBox.Lower().Yf();
 	}
 
 	return (font_ != NULL);
@@ -79,4 +83,13 @@ FTBBox FontInstance::boundingBox(QString text)
 {
 	if (font_) return font_->BBox(qPrintable(text));
 	else return FTBBox();
+}
+
+// Calculate bounding box for specified string
+void FontInstance::boundingBox(QString text, Vec3<double>& lowerLeft, Vec3<double>& upperRight)
+{
+	FTBBox box;
+	if (font_) box = font_->BBox(qPrintable(text));
+	lowerLeft.set(box.Lower().X(), box.Lower().Y(), box.Lower().Z());
+	upperRight.set(box.Upper().X(), box.Upper().Y(), box.Upper().Z());
 }

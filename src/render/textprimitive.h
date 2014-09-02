@@ -31,32 +31,40 @@
 #define TEXTCHUNKSIZE 100
 
 // Forward Declarations
-/* none */
+class ViewPane;
 
 // Text Primitive
 class TextPrimitive
 {
+	public:
+	// Text Anchors
+	enum TextAnchor { TopLeftAnchor, TopMiddleAnchor, TopRightAnchor, MiddleLeftAnchor, CentralAnchor, MiddleRightAnchor, BottomLeftAnchor, BottomMiddleAnchor, BottomRightAnchor, nTextAnchors };
+	// Convert text string to TextAnchor
+	static TextAnchor textAnchor(const char* s);
+	// Convert TextAnchor to text string
+	static const char* textAnchor(TextAnchor anchor);
+
 	private:
+	// Coordinates of anchorpoint of text
+	Vec3<double> anchorPoint_;
+	// Location of anchorpoint on text bounding box
+	TextAnchor anchorPosition_;
+	// Vector by which to adjust position of text
+	Vec3<double> adjustmentVector_;
 	// Local transform matrix for the text
-	Matrix localTransform_;
-	// Origin of text
-	Vec3<double> origin_;
-	// Centre (anchor) of text
-	FTPoint centre_;
+	Matrix localRotation_;
+	// Text size
+	double textSize_;
 	// Text to render
 	QString text_;
 
 	public:
 	// Set data
-	void set(QString text, Vec3<double> origin, Vec3<double> centre, Matrix& transform);
-	// Return local transform 
-	Matrix& localTransform();
-	// Return text origin
-	Vec3<double> origin();
-	// Return text centre
-	FTPoint centre();
+	void set(QString text, Vec3<double> anchorPoint, TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize);
 	// Return text to render
 	QString& text();
+	// Return transformation matrix to use when rendering the text
+	Matrix transformationMatrix(double baseFontSize);
 };
 
 // Text Primitive Chunk
@@ -80,9 +88,13 @@ class TextPrimitiveChunk
 	// Return whether array is full
 	bool full();
 	// Add primitive to list
-	void add(QString text, Vec3<double> origin, Vec3<double> centre, Matrix& transform);
+	void add(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize);
+	// Return number of primitives in the list
+	int nPrimitives();
+	// Calculate global bounding box for all text primitives in the chunk
+	void boundingBox(ViewPane& pane, Vec4<double>& boundingBox, Matrix viewMatrix, bool correctOrientation, double baseFontSize);
 	// Render all primitives in chunk
-	void renderAll(Matrix viewMatrix, Vec3<double> globalCenter, FTFont* font, bool correctOrientation, double scaling);
+	void renderAll(Matrix viewMatrix, bool correctOrientation, double baseFontSize);
 };
 
 // Text Primitive List
@@ -102,9 +114,13 @@ class TextPrimitiveList
 	// Forget all text primitives, but keeping lists intact
 	void forgetAll();
 	// Add primitive to list
-	void add(QString text, Vec3<double> origin, Vec3<double> centre, Matrix& transform);
+	void add(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize);
+	// Return number of primitives in the list
+	int nPrimitives();
+	// Calculate global bounding box for all text primitives in the list
+	Vec4<double> boundingBox(ViewPane& pane, Matrix viewMatrix, bool correctOrientation, double baseFontSize);
 	// Render all primitives in list
-	void renderAll(Matrix viewMatrix, Vec3<double> globalCenter, FTFont* font, bool correctOrientation, double scaling);
+	void renderAll(Matrix viewMatrix, bool correctOrientation, double baseFontSize);
 };
 
 #endif

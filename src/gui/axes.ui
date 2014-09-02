@@ -44,7 +44,7 @@
       </sizepolicy>
      </property>
      <property name="toolTip">
-      <string>Set to maximum source data value</string>
+      <string/>
      </property>
      <property name="currentIndex">
       <number>0</number>
@@ -865,6 +865,9 @@
                 </item>
                 <item row="2" column="3">
                  <widget class="QSlider" name="AxisXLabelInPlaneRotationSlider">
+                  <property name="toolTip">
+                   <string>Change the in-plane rotation (about Z) of the labels</string>
+                  </property>
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -875,6 +878,9 @@
                 </item>
                 <item row="2" column="2">
                  <widget class="QSpinBox" name="AxisXLabelAxialRotationSpin">
+                  <property name="toolTip">
+                   <string>Change the axial rotation (along X) of the labels</string>
+                  </property>
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -882,6 +888,9 @@
                 </item>
                 <item row="2" column="4">
                  <widget class="QSpinBox" name="AxisXLabelInPlaneRotationSpin">
+                  <property name="toolTip">
+                   <string>Change the in-plane rotation (about Z) of the labels</string>
+                  </property>
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -899,6 +908,9 @@
                 </item>
                 <item row="2" column="1">
                  <widget class="QSlider" name="AxisXLabelAxialRotationSlider">
+                  <property name="toolTip">
+                   <string>Change the axial rotation (along X) of the labels</string>
+                  </property>
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -924,6 +936,23 @@
                   </property>
                   <property name="singleStep">
                    <double>0.100000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="3">
+                 <widget class="QComboBox" name="AxisXLabelAnchorCombo">
+                  <property name="toolTip">
+                   <string>Text anchor position for axis title</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="4">
+                 <widget class="QLabel" name="LabelD_24">
+                  <property name="text">
+                   <string>Anchor</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -1067,21 +1096,6 @@
                   <property name="toolTip">
                    <string>Text anchor position for axis title</string>
                   </property>
-                  <item>
-                   <property name="text">
-                    <string>Left</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Centre</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Right</string>
-                   </property>
-                  </item>
                  </widget>
                 </item>
                </layout>
@@ -1987,6 +2001,9 @@
                 </item>
                 <item row="2" column="3">
                  <widget class="QSlider" name="AxisYLabelInPlaneRotationSlider">
+                  <property name="toolTip">
+                   <string>Change the in-plane rotation (about Z) of the labels</string>
+                  </property>
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -1997,6 +2014,9 @@
                 </item>
                 <item row="2" column="2">
                  <widget class="QSpinBox" name="AxisYLabelAxialRotationSpin">
+                  <property name="toolTip">
+                   <string>Change the axial rotation (along X) of the labels</string>
+                  </property>
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -2004,6 +2024,9 @@
                 </item>
                 <item row="2" column="4">
                  <widget class="QSpinBox" name="AxisYLabelInPlaneRotationSpin">
+                  <property name="toolTip">
+                   <string>Change the in-plane rotation (about Z) of the labels</string>
+                  </property>
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -2021,6 +2044,9 @@
                 </item>
                 <item row="2" column="1">
                  <widget class="QSlider" name="AxisYLabelAxialRotationSlider">
+                  <property name="toolTip">
+                   <string>Change the axial rotation (along X) of the labels</string>
+                  </property>
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -2046,6 +2072,23 @@
                   </property>
                   <property name="singleStep">
                    <double>0.100000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="3">
+                 <widget class="QComboBox" name="AxisYLabelAnchorCombo">
+                  <property name="toolTip">
+                   <string>Text anchor position for axis title</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="4">
+                 <widget class="QLabel" name="Labelage1_4">
+                  <property name="text">
+                   <string>Anchor</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -3109,6 +3152,9 @@
                 </item>
                 <item row="2" column="3">
                  <widget class="QSlider" name="AxisZLabelInPlaneRotationSlider">
+                  <property name="toolTip">
+                   <string>Change the in-plane rotation (about Z) of the labels</string>
+                  </property>
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -3119,6 +3165,9 @@
                 </item>
                 <item row="2" column="2">
                  <widget class="QSpinBox" name="AxisZLabelAxialRotationSpin">
+                  <property name="toolTip">
+                   <string>Change the axial rotation (along X) of the labels</string>
+                  </property>
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -3126,6 +3175,9 @@
                 </item>
                 <item row="2" column="4">
                  <widget class="QSpinBox" name="AxisZLabelInPlaneRotationSpin">
+                  <property name="toolTip">
+                   <string>Change the in-plane rotation (about Z) of the labels</string>
+                  </property>
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -3143,6 +3195,9 @@
                 </item>
                 <item row="2" column="1">
                  <widget class="QSlider" name="AxisZLabelAxialRotationSlider">
+                  <property name="toolTip">
+                   <string>Change the axial rotation (along X) of the labels</string>
+                  </property>
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -3168,6 +3223,23 @@
                   </property>
                   <property name="singleStep">
                    <double>0.100000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="3">
+                 <widget class="QComboBox" name="AxisZLabelAnchorCombo">
+                  <property name="toolTip">
+                   <string>Text anchor position for axis title</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="4">
+                 <widget class="QLabel" name="Labelage1_3">
+                  <property name="text">
+                   <string>Anchor</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -3311,21 +3383,6 @@
                   <property name="toolTip">
                    <string>Text anchor position for axis title</string>
                   </property>
-                  <item>
-                   <property name="text">
-                    <string>Left</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Centre</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Right</string>
-                   </property>
-                  </item>
                  </widget>
                 </item>
                </layout>

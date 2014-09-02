@@ -47,28 +47,32 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	axisCoordMax_[0].zero();
 	axisCoordMax_[1].zero();
 	axisCoordMax_[2].zero();
+	axesCoordCentre_.set(5.0, 5.0, 5.0);
 	axisStretch_.set(1.0, 1.0, 1.0);
 
 	// Ticks / Labels
 	axisTickDirection_[0].set(0.0, -1.0, 0.0);
 	axisTickDirection_[1].set(-1.0, 0.0, 0.0);
-	axisTickDirection_[2].set(1.0, 0.0, 0.0);
+	axisTickDirection_[2].set(-1.0, 0.0, 0.0);
 	axisFirstTick_.zero();
 	axisTickDelta_.set(1.0,1.0,1.0);
 	axisAutoTicks_.set(true, true, true);
 	axisMinorTicks_.set(1,1,1);
+	axisLabelAnchor_[0] = TextPrimitive::TopMiddleAnchor;
+	axisLabelAnchor_[1] = TextPrimitive::MiddleRightAnchor;
+	axisLabelAnchor_[2] = TextPrimitive::MiddleRightAnchor;
 	axisLabelOrientation_[0].set(0.0, 0.0, 0.2);
 	axisLabelOrientation_[1].set(0.0, 0.0, 0.2);
-	axisLabelOrientation_[2].set(0.0, 180.0, 0.2);
+	axisLabelOrientation_[2].set(90.0, 0.0, 0.2);
 	axisTitle_[0] = "X Axis";
 	axisTitle_[1] = "Y Axis";
 	axisTitle_[2] = "Z Axis";
-	axisTitleOrientation_[0].set(0.0, 0.0, 0.2, 0.5);
-	axisTitleOrientation_[1].set(0.0, 0.0, 0.2, 0.5);
-	axisTitleOrientation_[2].set(0.0, 0.0, 0.2, 0.5);
-	axisTitleAnchor_[0] = AnchorCentre;
-	axisTitleAnchor_[1] = AnchorCentre;
-	axisTitleAnchor_[2] = AnchorCentre;
+	axisTitleOrientation_[0].set(0.0, 0.0, 1.2, 0.5);
+	axisTitleOrientation_[1].set(0.0, 270.0, 1.2, 0.5);
+	axisTitleOrientation_[2].set(90.0, 90.0, 1.2, 0.5);
+	axisTitleAnchor_[0] = TextPrimitive::TopMiddleAnchor;
+	axisTitleAnchor_[1] = TextPrimitive::BottomMiddleAnchor;
+	axisTitleAnchor_[2] = TextPrimitive::TopMiddleAnchor;
 
 	// GL
 	for (int n=0; n<3; ++n)
@@ -148,6 +152,17 @@ void Axes::operator=(const Axes& source)
  * Definition
  */
 
+// Recalculate centre coordinate of axes
+void Axes::calculateAxesCoordCentre()
+{
+	// Determine central coordinate within current axes and the Y clip limits
+	for (int n=0; n<3; ++n)
+	{
+		if (axisLogarithmic_[n]) axesCoordCentre_[n] = (axisInverted_[n] ? log10(axisMax_[n]/axisMin_[n]) : log10(axisMax_[n]*axisMin_[n])) * 0.5 * axisStretch_[n];
+		else axesCoordCentre_[n] = (axisMax_[n]+axisMin_[n]) * 0.5 * axisStretch_[n];
+	}
+}
+
 // Clamp axis position and min/max to current limits if necessary
 void Axes::clampAxis(int axis)
 {
@@ -180,6 +195,8 @@ void Axes::setAxisMin(int axis, double value)
 {
 	axisMin_[axis] = value;
 
+	calculateAxesCoordCentre();
+
 	primitivesValid_ = false;
 	parent_.paneChanged();
 	parent_.flagCollectionDataInvalid();
@@ -195,6 +212,8 @@ double Axes::axisMin(int axis)
 void Axes::setAxisMax(int axis, double value)
 {
 	axisMax_[axis] = value;
+
+	calculateAxesCoordCentre();
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
@@ -292,6 +311,7 @@ void Axes::setAxisLogarithmic(int axis, bool b)
 
 	// Update and clamp axis values according to data
 	clampAxis(axis);
+	calculateAxesCoordCentre();
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
@@ -321,8 +341,9 @@ void Axes::setAxisStretch(int axis, double value)
 {
 	axisStretch_[axis] = value;
 
+	calculateAxesCoordCentre();
+
 	primitivesValid_ = false;
-	parent_.paneChanged();
 	parent_.flagCollectionDataInvalid();
 }
 
@@ -539,6 +560,21 @@ Vec3<double> Axes::axisLabelOrientation(int axis)
 	return axisLabelOrientation_[axis];
 }
 
+// Set axis label text anchor position for specified axis
+void Axes::setAxisLabelAnchor(int axis, TextPrimitive::TextAnchor anchor)
+{
+	axisLabelAnchor_[axis] = anchor;
+
+	primitivesValid_ = false;
+	parent_.paneChanged();
+}
+
+// Return axis label text anchor position for specified axis
+TextPrimitive::TextAnchor Axes::axisLabelAnchor(int axis)
+{
+	return axisLabelAnchor_[axis];
+}
+
 // Set title for specified axis
 void Axes::setAxisTitle(int axis, QString title)
 {
@@ -570,7 +606,7 @@ Vec4<double> Axes::axisTitleOrientation(int axis)
 }
 
 // Set axis title text anchor position for specified axis
-void Axes::setAxisTitleAnchor(int axis, Axes::AxisAnchor anchor)
+void Axes::setAxisTitleAnchor(int axis, TextPrimitive::TextAnchor anchor)
 {
 	axisTitleAnchor_[axis] = anchor;
 
@@ -579,7 +615,7 @@ void Axes::setAxisTitleAnchor(int axis, Axes::AxisAnchor anchor)
 }
 
 // Return axis title text anchor position for specified axis
-Axes::AxisAnchor Axes::axisTitleAnchor(int axis)
+TextPrimitive::TextAnchor Axes::axisTitleAnchor(int axis)
 {
 	return axisTitleAnchor_[axis];
 }
@@ -593,21 +629,6 @@ void Axes::addPrimitiveLine(int axis, Vec3<double> v1, Vec3<double> v2)
 {
 	axisPrimitives_[axis].defineVertex(v1.x, v1.y, v1.z, 1.0, 0.0, 0.0);
 	axisPrimitives_[axis].defineVertex(v2.x, v2.y, v2.z, 1.0, 0.0, 0.0);
-}
-
-// Add entry to axis text primitive
-void Axes::addPrimitiveText(int axis, QString text, Vec3<double> origin, Matrix transform, Axes::AxisAnchor anchor)
-{
-	FTBBox boundingBox = FontInstance::boundingBox(text);
-	double textWidth = fabs(boundingBox.Upper().X() - boundingBox.Lower().X());
-
-	// Construct final centre coordinate based on alignment requested
-	Vec3<double> textCentre(0.0, -FontInstance::fontBaseHeight()*0.5, 0.0);
-	if (anchor == Axes::AnchorLeft) textCentre.x = 0.0;
-	else if (anchor == Axes::AnchorRight) textCentre.x = -textWidth;
-	else textCentre.x = -textWidth*0.5;
-
-	axisTextPrimitives_[axis].add(text, origin, textCentre, transform);
 }
 
 // Update axes primitives
@@ -667,27 +688,20 @@ void Axes::updateAxisPrimitives()
 		// Normalise tickDirection
 		tickDir = axisTickDirection_[axis];
 		tickDir.normalise();
-// 		tickDir *= parent_.labelScale();
 
 		// Create tick label transformation matrix
 		labelTransform.setIdentity();
-		// 1) Apply axial rotation along X axis (left-to-right direction)
+		// -- 1) Apply axial rotation along X axis (left-to-right direction)
 		labelTransform.applyRotationX(axisLabelOrientation_[axis].x);
-		// 2) Translate to 'end of tick' position
-		labelTransform.applyTranslation(tickDir * axisLabelOrientation_[axis].z);
-		// 3) Perform in-plane rotation
+		// -- 2) Perform in-plane rotation
 		labelTransform.applyRotationZ(axisLabelOrientation_[axis].y);
-		labelTransform.applyScaling(parent_.labelPointSize(), parent_.labelPointSize(), parent_.labelPointSize());
 
 		// Create axis title transformation matrix
 		titleTransform.setIdentity();
-		// 1) Apply axial rotation along X axis (left-to-right direction)
+		// -- 1) Apply axial rotation along X axis (left-to-right direction)
 		titleTransform.applyRotationX(axisTitleOrientation_[axis].x);
-		// 2) Translate to 'end of tick' position
-		titleTransform.applyTranslation(tickDir * axisTitleOrientation_[axis].z);
-		// 3) Perform in-plane rotation
+		// -- 2) Perform in-plane rotation
 		titleTransform.applyRotationZ(axisTitleOrientation_[axis].y);
-		titleTransform.applyScaling(parent_.titlePointSize(), parent_.titlePointSize(), parent_.titlePointSize());
 
 		if (axisLogarithmic_[axis])
 		{
@@ -731,10 +745,11 @@ void Axes::updateAxisPrimitives()
 					if (count == 0)
 					{
 						// Create text, accounting for zero-roundoff, and add a text primitive
+						// TODO This is crap - what if number format is exponential?
 						if (fabs(value) < pow(10,power-5)) s = "0";
 						else s = QString::number(value);
 
-						addPrimitiveText(axis, s, u, labelTransform);
+						axisTextPrimitives_[axis].add(s, u+tickDir*(count == 0 ? 1.0 : 0.5), axisLabelAnchor_[axis], tickDir * axisLabelOrientation_[axis].z, labelTransform, parent_.labelPointSize());
 					}
 				}
 
@@ -753,8 +768,7 @@ void Axes::updateAxisPrimitives()
 			u = axisCoordMin_[axis];
 			value = axisMin_[axis] + (axisMax_[axis] - axisMin_[axis]) * axisTitleOrientation_[axis].w;
 			u.set(axis, (axisInverted_[axis] ? log10(axisMax_[axis]/value) : log10(value)) * axisStretch_[axis]);
-			u += tickDir * axisTitleOrientation_[axis].z;
-			addPrimitiveText(axis, axisTitle_[axis], u, titleTransform, axisTitleAnchor_[axis]);
+			axisTextPrimitives_[axis].add(axisTitle_[axis], u, axisTitleAnchor_[axis], tickDir * axisTitleOrientation_[axis].z, titleTransform, parent_.titlePointSize());
 		}
 		else
 		{
@@ -790,7 +804,7 @@ void Axes::updateAxisPrimitives()
 						if (fabs(value) < axisTickDelta_[axis]*1.0e-10) s = "0";
 						else s = QString::number(value);
 
-						addPrimitiveText(axis, s, u, labelTransform);
+						axisTextPrimitives_[axis].add(s, u+tickDir*0.1, axisLabelAnchor_[axis], tickDir * axisLabelOrientation_[axis].z, labelTransform, parent_.labelPointSize());
 						
 						count = 0;
 					}
@@ -805,8 +819,7 @@ void Axes::updateAxisPrimitives()
 			u = axisCoordMin_[axis];
 			value = axisMin_[axis] + (axisMax_[axis] - axisMin_[axis]) * axisTitleOrientation_[axis].w;
 			u.set(axis, (axisInverted_[axis] ? (axisMax_[axis] - value) + axisMin_[axis]: value) * axisStretch_[axis]);
-			u += tickDir * axisTitleOrientation_[axis].z;
-			addPrimitiveText(axis, axisTitle_[axis], u, titleTransform, axisTitleAnchor_[axis]);
+			axisTextPrimitives_[axis].add(axisTitle_[axis], u, axisTitleAnchor_[axis], tickDir * axisTitleOrientation_[axis].z, titleTransform, parent_.titlePointSize());
 		}
 	}
 

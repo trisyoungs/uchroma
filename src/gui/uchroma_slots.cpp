@@ -170,32 +170,43 @@ void UChromaWindow::on_actionViewPerspective_triggered(bool checked)
 
 void UChromaWindow::on_actionViewReset_triggered(bool checked)
 {
-	if (currentViewPane_) currentViewPane_->resetView();
+	if (!currentViewPane_) return;
+
+	currentViewPane_->resetViewMatrix();
+	currentViewPane_->recalculateView();
 
 	ui.MainView->update();
 }
 
 void UChromaWindow::on_actionViewShowAll_triggered(bool checked)
 {
+	if (!currentViewPane_) return;
+
 	currentViewPane_->showAllData();
+	currentViewPane_->recalculateView();
 
 	updateGUI();
 }
 
 void UChromaWindow::on_actionView2D_triggered(bool checked)
 {
-	currentViewPane_->setTwoDimensional(checked);
+	if (refreshing_ || (!currentViewPane_)) return;
 
+	currentViewPane_->setTwoDimensional(checked);
+	currentViewPane_->recalculateView();
+
+	axesWindow_.updateControls();
 	ui.MainView->update();
 }
 
 void UChromaWindow::on_actionViewAutostretch3D_triggered(bool checked)
 {
-	if (refreshing_) return;
+	if (refreshing_ || (!currentViewPane_)) return;
 
 	currentViewPane_->setAutoStretch3D(checked);
-	if (checked) axesWindow_.updateAndShow();
+	currentViewPane_->recalculateView();
 
+	axesWindow_.updateControls();
 	ui.MainView->update();
 }
 
@@ -428,4 +439,12 @@ void UChromaWindow::on_actionSettingsChooseFont_triggered(bool checked)
 		else if (!FontInstance::setupFont(viewerFont_)) QMessageBox::warning(this, "Font Error", "Failed to create a font from the specified font file '" + viewerFont_ +"'.");
 		saveSettings();
 	}
+}
+
+// TODO TEMPORARY
+void UChromaWindow::on_actionWindowsView_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) viewWindow_.updateAndShow();
+	else viewWindow_.hide();
 }

@@ -216,7 +216,8 @@ class UChromaWindow : public QMainWindow
 	 */
 	private slots:
 	void on_actionSettingsChooseFont_triggered(bool checked);
-
+	void on_actionWindowsView_triggered(bool checked);
+	
 
 	/*
 	 * Collections

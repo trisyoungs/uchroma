@@ -45,7 +45,8 @@ bool UChromaWindow::writeAxisBlock(LineParser& parser, Axes& axes, int axis)
 	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::FractionalPositioningKeyword), stringBool(axes.axisPositionIsFractional(axis)));
 	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::TickDeltaKeyword), axes.axisTickDelta(axis));
 	parser.writeLineF("      %s %i\n", Keywords::axisKeyword(Keywords::MinorTicksKeyword), axes.axisMinorTicks(axis));
-	parser.writeLineF("      %s %i\n", Keywords::axisKeyword(Keywords::TitleAnchorKeyword), axes.axisTitleAnchor(axis));
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::LabelAnchorKeyword), TextPrimitive::textAnchor(axes.axisLabelAnchor(axis)));
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::TitleAnchorKeyword), TextPrimitive::textAnchor(axes.axisTitleAnchor(axis)));
 	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionFractionalKeyword), axes.axisPositionFractional(axis).x, axes.axisPositionFractional(axis).y, axes.axisPositionFractional(axis).z);
 	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionRealKeyword), axes.axisPositionReal(axis).x, axes.axisPositionReal(axis).y, axes.axisPositionReal(axis).z);
 	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::LabelOrientationKeyword), axes.axisLabelOrientation(axis).x, axes.axisLabelOrientation(axis).y, axes.axisLabelOrientation(axis).z);
@@ -231,11 +232,12 @@ bool UChromaWindow::writeViewPaneBlock(LineParser& parser, ViewPane* pane)
 	parser.writeLineF("    %s %f\n", Keywords::viewPaneKeyword(Keywords::TitlePointSizeKeyword), pane->titlePointSize());
 	parser.writeLineF("    %s %i\n", Keywords::viewPaneKeyword(Keywords::BoundingBoxKeyword), pane->boundingBox());
 	parser.writeLineF("    %s %f\n", Keywords::viewPaneKeyword(Keywords::BoundingBoxPlaneYKeyword), pane->boundingBoxPlaneY());
-	Matrix mat = pane->viewMatrix();
-	parser.writeLineF("    %s %f %f %f %f\n", Keywords::viewPaneKeyword(Keywords::MatrixXKeyword), mat[0], mat[1], mat[2], mat[3]);
-	parser.writeLineF("    %s %f %f %f %f\n", Keywords::viewPaneKeyword(Keywords::MatrixYKeyword), mat[4], mat[5], mat[6], mat[7]);
-	parser.writeLineF("    %s %f %f %f %f\n", Keywords::viewPaneKeyword(Keywords::MatrixZKeyword), mat[8], mat[9], mat[10], mat[11]);
-	parser.writeLineF("    %s %f %f %f %f\n", Keywords::viewPaneKeyword(Keywords::MatrixWKeyword), mat[12], mat[13], mat[14], mat[15]);
+	Matrix mat = pane->viewRotation();
+	Vec3<double> trans = pane->viewTranslation();
+	parser.writeLineF("    %s %f %f %f\n", Keywords::viewPaneKeyword(Keywords::RotationXKeyword), mat[0], mat[1], mat[2]);
+	parser.writeLineF("    %s %f %f %f\n", Keywords::viewPaneKeyword(Keywords::RotationYKeyword), mat[4], mat[5], mat[6]);
+	parser.writeLineF("    %s %f %f %f\n", Keywords::viewPaneKeyword(Keywords::RotationZKeyword), mat[8], mat[9], mat[10]);
+	parser.writeLineF("    %s %f %f %f\n", Keywords::viewPaneKeyword(Keywords::TranslationKeyword), trans.x, trans.y, trans.z);
 	if (pane->hasPerspective()) parser.writeLineF("  %s\n", Keywords::viewPaneKeyword(Keywords::PerspectiveKeyword));
 	parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::RoleKeyword), ViewPane::paneRole(pane->role()));
 	for (RefListItem<Collection,TargetData>* ri = pane->roleTargetCollections(); ri != NULL; ri = ri->next) parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::RoleTargetCollectionKeyword), qPrintable(ri->item->title()));

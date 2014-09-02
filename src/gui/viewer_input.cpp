@@ -71,7 +71,6 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
 void Viewer::mouseMoveEvent(QMouseEvent *event)
 {
 	Vec3<double> delta;
-	Matrix A;
 
 	// Get event information and position delta
 	Qt::KeyboardModifiers km = event->modifiers();

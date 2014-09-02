@@ -35,6 +35,8 @@ AxesWindow::AxesWindow(UChromaWindow& parent) : QWidget(&parent), uChroma_(paren
 
 	QWidget::setWindowFlags(Qt::Tool);
 
+	refreshing_ = true;
+
 	// Set limits / deltas for fractional axis position
 	ui.AxisXPositionYFractionalSpin->setRange(true, 0.0, true, 1.0);
 	ui.AxisXPositionZFractionalSpin->setRange(true, 0.0, true, 1.0);
@@ -49,6 +51,17 @@ AxesWindow::AxesWindow(UChromaWindow& parent) : QWidget(&parent), uChroma_(paren
 	ui.AxisZPositionYFractionalSpin->setSingleStep(0.1);
 	ui.AxisZPositionYFractionalSpin->setSingleStep(0.1);
 
+	// Add anchor types on to combo boxes
+	for (int n=0; n<TextPrimitive::nTextAnchors; ++n)
+	{
+		ui.AxisXTitleAnchorCombo->addItem(TextPrimitive::textAnchor( (TextPrimitive::TextAnchor) n));
+		ui.AxisXLabelAnchorCombo->addItem(TextPrimitive::textAnchor( (TextPrimitive::TextAnchor) n));
+		ui.AxisYTitleAnchorCombo->addItem(TextPrimitive::textAnchor( (TextPrimitive::TextAnchor) n));
+		ui.AxisYLabelAnchorCombo->addItem(TextPrimitive::textAnchor( (TextPrimitive::TextAnchor) n));
+		ui.AxisZTitleAnchorCombo->addItem(TextPrimitive::textAnchor( (TextPrimitive::TextAnchor) n));
+		ui.AxisZLabelAnchorCombo->addItem(TextPrimitive::textAnchor( (TextPrimitive::TextAnchor) n));
+	}
+	
 	refreshing_ = false;
 }
 
@@ -330,11 +343,12 @@ bool AxesWindow::axisTitleChanged(int axis, QString& title)
 	return true;
 }
 
-bool AxesWindow::axisTitleAlignmentChanged(int axis, Axes::AxisAnchor anchor)
+bool AxesWindow::axisAnchorChanged(int axis, bool titleAnchor, TextPrimitive::TextAnchor anchor)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
-	currentAxes().setAxisTitleAnchor(axis, anchor);
+	if (titleAnchor) currentAxes().setAxisTitleAnchor(axis, anchor);
+	else currentAxes().setAxisLabelAnchor(axis, anchor);
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -488,23 +502,32 @@ void AxesWindow::on_AxisXTickDirectionZSpin_valueChanged(double value)
 	axisTickOrientationChanged(0, 2, value);
 }
 
+void AxesWindow::on_AxisXLabelAnchorCombo_currentIndexChanged(int index)
+{
+	axisAnchorChanged(0, false, (TextPrimitive::TextAnchor) index);
+}
+
 void AxesWindow::on_AxisXLabelAxialRotationSlider_valueChanged(int value)
 {
+	ui.AxisXLabelAxialRotationSpin->setValue(value);
 	axisLabelOrientationChanged(0, 0, value);
 }
 
 void AxesWindow::on_AxisXLabelAxialRotationSpin_valueChanged(int value)
 {
+	ui.AxisXLabelAxialRotationSlider->setValue(value);
 	axisLabelOrientationChanged(0, 0, value);
 }
 
 void AxesWindow::on_AxisXLabelInPlaneRotationSlider_valueChanged(int value)
 {
+	ui.AxisXLabelInPlaneRotationSpin->setValue(value);
 	axisLabelOrientationChanged(0, 1, value);
 }
 
 void AxesWindow::on_AxisXLabelInPlaneRotationSpin_valueChanged(int value)
 {
+	ui.AxisXLabelInPlaneRotationSlider->setValue(value);
 	axisLabelOrientationChanged(0, 1, value);
 }
 
@@ -538,26 +561,30 @@ void AxesWindow::on_AxisXTitleHOffsetRightButton_clicked(bool checked)
 
 void AxesWindow::on_AxisXTitleAnchorCombo_currentIndexChanged(int index)
 {
-	axisTitleAlignmentChanged(0, (Axes::AxisAnchor) index);
+	axisAnchorChanged(0, true, (TextPrimitive::TextAnchor) index);
 }
 
 void AxesWindow::on_AxisXTitleAxialRotationSlider_valueChanged(int value)
 {
+	ui.AxisXTitleAxialRotationSpin->setValue(value);
 	axisTitleOrientationChanged(0, 0, value);
 }
 
 void AxesWindow::on_AxisXTitleAxialRotationSpin_valueChanged(int value)
 {
+	ui.AxisXTitleAxialRotationSlider->setValue(value);
 	axisTitleOrientationChanged(0, 0, value);
 }
 
 void AxesWindow::on_AxisXTitleInPlaneRotationSlider_valueChanged(int value)
 {
+	ui.AxisXTitleInPlaneRotationSpin->setValue(value);
 	axisTitleOrientationChanged(0, 1, value);
 }
 
 void AxesWindow::on_AxisXTitleInPlaneRotationSpin_valueChanged(int value)
 {
+	ui.AxisXTitleInPlaneRotationSlider->setValue(value);
 	axisTitleOrientationChanged(0, 1, value);
 }
 
@@ -708,23 +735,32 @@ void AxesWindow::on_AxisYTickDirectionZSpin_valueChanged(double value)
 	axisTickOrientationChanged(1, 2, value);
 }
 
+void AxesWindow::on_AxisYLabelAnchorCombo_currentIndexChanged(int index)
+{
+	axisAnchorChanged(1, false, (TextPrimitive::TextAnchor) index);
+}
+
 void AxesWindow::on_AxisYLabelAxialRotationSlider_valueChanged(int value)
 {
+	ui.AxisYLabelAxialRotationSpin->setValue(value);
 	axisLabelOrientationChanged(1, 0, value);
 }
 
 void AxesWindow::on_AxisYLabelAxialRotationSpin_valueChanged(int value)
 {
+	ui.AxisYLabelAxialRotationSlider->setValue(value);
 	axisLabelOrientationChanged(1, 0, value);
 }
 
 void AxesWindow::on_AxisYLabelInPlaneRotationSlider_valueChanged(int value)
 {
+	ui.AxisYLabelInPlaneRotationSpin->setValue(value);
 	axisLabelOrientationChanged(1, 1, value);
 }
 
 void AxesWindow::on_AxisYLabelInPlaneRotationSpin_valueChanged(int value)
 {
+	ui.AxisYLabelInPlaneRotationSlider->setValue(value);
 	axisLabelOrientationChanged(1, 1, value);
 }
 
@@ -758,26 +794,30 @@ void AxesWindow::on_AxisYTitleHOffsetRightButton_clicked(bool checked)
 
 void AxesWindow::on_AxisYTitleAnchorCombo_currentIndexChanged(int index)
 {
-	axisTitleAlignmentChanged(1, (Axes::AxisAnchor) index);
+	axisAnchorChanged(1, true, (TextPrimitive::TextAnchor) index);
 }
 
 void AxesWindow::on_AxisYTitleAxialRotationSlider_valueChanged(int value)
 {
+	ui.AxisYTitleAxialRotationSpin->setValue(value);
 	axisTitleOrientationChanged(1, 0, value);
 }
 
 void AxesWindow::on_AxisYTitleAxialRotationSpin_valueChanged(int value)
 {
+	ui.AxisYTitleAxialRotationSlider->setValue(value);
 	axisTitleOrientationChanged(1, 0, value);
 }
 
 void AxesWindow::on_AxisYTitleInPlaneRotationSlider_valueChanged(int value)
 {
+	ui.AxisYTitleInPlaneRotationSpin->setValue(value);
 	axisTitleOrientationChanged(1, 1, value);
 }
 
 void AxesWindow::on_AxisYTitleInPlaneRotationSpin_valueChanged(int value)
 {
+	ui.AxisYTitleInPlaneRotationSlider->setValue(value);
 	axisTitleOrientationChanged(1, 1, value);
 }
 
@@ -928,23 +968,32 @@ void AxesWindow::on_AxisZTickDirectionZSpin_valueChanged(double value)
 	axisTickOrientationChanged(2, 2, value);
 }
 
+void AxesWindow::on_AxisZLabelAnchorCombo_currentIndexChanged(int index)
+{
+	axisAnchorChanged(2, false, (TextPrimitive::TextAnchor) index);
+}
+
 void AxesWindow::on_AxisZLabelAxialRotationSlider_valueChanged(int value)
 {
+	ui.AxisZLabelAxialRotationSpin->setValue(value);
 	axisLabelOrientationChanged(2, 0, value);
 }
 
 void AxesWindow::on_AxisZLabelAxialRotationSpin_valueChanged(int value)
 {
+	ui.AxisZLabelAxialRotationSlider->setValue(value);
 	axisLabelOrientationChanged(2, 0, value);
 }
 
 void AxesWindow::on_AxisZLabelInPlaneRotationSlider_valueChanged(int value)
 {
+	ui.AxisZLabelInPlaneRotationSpin->setValue(value);
 	axisLabelOrientationChanged(2, 1, value);
 }
 
 void AxesWindow::on_AxisZLabelInPlaneRotationSpin_valueChanged(int value)
 {
+	ui.AxisZLabelInPlaneRotationSlider->setValue(value);
 	axisLabelOrientationChanged(2, 1, value);
 }
 
@@ -978,26 +1027,30 @@ void AxesWindow::on_AxisZTitleHOffsetRightButton_clicked(bool checked)
 
 void AxesWindow::on_AxisZTitleAnchorCombo_currentIndexChanged(int index)
 {
-	axisTitleAlignmentChanged(2, (Axes::AxisAnchor) index);
+	axisAnchorChanged(2, true, (TextPrimitive::TextAnchor) index);
 }
 
 void AxesWindow::on_AxisZTitleAxialRotationSlider_valueChanged(int value)
 {
+	ui.AxisZTitleAxialRotationSpin->setValue(value);
 	axisTitleOrientationChanged(2, 0, value);
 }
 
 void AxesWindow::on_AxisZTitleAxialRotationSpin_valueChanged(int value)
 {
+	ui.AxisZTitleAxialRotationSlider->setValue(value);
 	axisTitleOrientationChanged(2, 0, value);
 }
 
 void AxesWindow::on_AxisZTitleInPlaneRotationSlider_valueChanged(int value)
 {
+	ui.AxisZTitleInPlaneRotationSpin->setValue(value);
 	axisTitleOrientationChanged(2, 1, value);
 }
 
 void AxesWindow::on_AxisZTitleInPlaneRotationSpin_valueChanged(int value)
 {
+	ui.AxisZTitleInPlaneRotationSlider->setValue(value);
 	axisTitleOrientationChanged(2, 1, value);
 }
 
@@ -1054,9 +1107,13 @@ void AxesWindow::updateControls(bool force)
 	ui.AxisZTitleEdit->setText(axes.axisTitle(2));
 
 	// Axis Stretch factors
+	bool stretchOff = (pane->twoDimensional() || pane->autoStretch3D());
 	ui.AxisXStretchSpin->setValue(axes.axisStretch(0));
+	ui.AxisXStretchSpin->setDisabled(stretchOff);
 	ui.AxisYStretchSpin->setValue(axes.axisStretch(1));
+	ui.AxisYStretchSpin->setDisabled(stretchOff);
 	ui.AxisZStretchSpin->setValue(axes.axisStretch(2));
+	ui.AxisZStretchSpin->setDisabled(stretchOff);
 
 	// Axis Min/Max Limits
 	ui.AxisXMinSpin->setRange(axes.axisLogarithmic(0), axes.axisLimitMin(0), false, 0.0);
@@ -1148,6 +1205,7 @@ void AxesWindow::updateControls(bool force)
 
 	// Text Orientation
 	// -- X
+	ui.AxisXLabelAnchorCombo->setCurrentIndex(axes.axisLabelAnchor(0));
 	ui.AxisXLabelAxialRotationSlider->setValue(axes.axisLabelOrientation(0).x);
 	ui.AxisXLabelAxialRotationSpin->setValue(axes.axisLabelOrientation(0).x);
 	ui.AxisXLabelInPlaneRotationSlider->setValue(axes.axisLabelOrientation(0).y);
@@ -1161,6 +1219,7 @@ void AxesWindow::updateControls(bool force)
 	ui.AxisXTitleInPlaneRotationSpin->setValue(axes.axisTitleOrientation(0).y);
 	ui.AxisXTitleDistanceSpin->setValue(axes.axisTitleOrientation(0).z);
 	// -- Y
+	ui.AxisYLabelAnchorCombo->setCurrentIndex(axes.axisLabelAnchor(1));
 	ui.AxisYLabelAxialRotationSlider->setValue(axes.axisLabelOrientation(1).x);
 	ui.AxisYLabelAxialRotationSpin->setValue(axes.axisLabelOrientation(1).x);
 	ui.AxisYLabelInPlaneRotationSlider->setValue(axes.axisLabelOrientation(1).y);
@@ -1174,6 +1233,7 @@ void AxesWindow::updateControls(bool force)
 	ui.AxisYTitleInPlaneRotationSpin->setValue(axes.axisTitleOrientation(1).y);
 	ui.AxisYTitleDistanceSpin->setValue(axes.axisTitleOrientation(1).z);
 	// -- Z
+	ui.AxisZLabelAnchorCombo->setCurrentIndex(axes.axisLabelAnchor(2));
 	ui.AxisZLabelAxialRotationSlider->setValue(axes.axisLabelOrientation(2).x);
 	ui.AxisZLabelAxialRotationSpin->setValue(axes.axisLabelOrientation(2).x);
 	ui.AxisZLabelInPlaneRotationSlider->setValue(axes.axisLabelOrientation(2).y);

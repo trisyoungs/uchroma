@@ -30,6 +30,7 @@
 // Parse AxisBlock keywords
 bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 {
+	TextPrimitive::TextAnchor anchor;
 	while (!parser.eofOrBlank())
 	{
 		// Get line from file
@@ -63,6 +64,17 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 			// Invert
 			case (Keywords::InvertKeyword):
 				axes.setAxisInverted(axis, parser.argb(1));
+				break;
+			// Axis label anchor
+			case (Keywords::LabelAnchorKeyword):
+				anchor = TextPrimitive::textAnchor(parser.argc(1));
+				if (anchor == TextPrimitive::nTextAnchors)
+				{
+					msg.print("Warning: Unrecognised text anchor '%s'. Defaulting to 'TopMiddle'.\n");
+					anchor = TextPrimitive::TopMiddleAnchor;
+					CHECKIOFAIL
+				}
+				axes.setAxisLabelAnchor(axis, anchor);
 				break;
 			// Axis label orientation
 			case (Keywords::LabelOrientationKeyword):
@@ -107,9 +119,16 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 			case (Keywords::TitleKeyword):
 				axes.setAxisTitle(axis, parser.argc(1));
 				break;
-			// Axis title anchors
+			// Axis title anchor
 			case (Keywords::TitleAnchorKeyword):
-				axes.setAxisTitleAnchor(axis, (Axes::AxisAnchor) parser.argi(1));
+				anchor = TextPrimitive::textAnchor(parser.argc(1));
+				if (anchor == TextPrimitive::nTextAnchors)
+				{
+					msg.print("Warning: Unrecognised text anchor '%s'. Defaulting to 'TopMiddle'.\n");
+					anchor = TextPrimitive::TopMiddleAnchor;
+					CHECKIOFAIL
+				}
+				axes.setAxisTitleAnchor(axis, anchor);
 				break;
 			// Axis title orientation
 			case (Keywords::TitleOrientationKeyword):
@@ -423,6 +442,7 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 				if (rangeType == FitKernel::nRangeTypes)
 				{
 					msg.print("Warning: Unrecognised range type '%s' given for X in fit. Defaulting to '%s'\n", parser.argc(1), FitKernel::rangeType(FitKernel::AbsoluteRange));
+					rangeType = FitKernel::AbsoluteRange;
 					CHECKIOFAIL
 				}
 				fitKernel->setXRange(rangeType);
@@ -443,6 +463,7 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 				if (rangeType == FitKernel::nRangeTypes)
 				{
 					msg.print("Warning: Unrecognised range type '%s' given for Z in fit. Defaulting to '%s'\n", parser.argc(1), FitKernel::rangeType(FitKernel::AbsoluteRange));
+					rangeType = FitKernel::AbsoluteRange;
 					CHECKIOFAIL
 				}
 				fitKernel->setZRange(rangeType);
@@ -557,7 +578,7 @@ bool UChromaWindow::readViewBlock(LineParser& parser)
 // Read ViewPane keywords
 bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 {
-	int xyzw, axis;
+	int xyz, axis;
 	Collection* collection;
 	Matrix mat;
 	ViewPane* associatedPane;
@@ -639,13 +660,12 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 			case (Keywords::LabelPointSizeKeyword):
 				pane->setLabelPointSize(parser.argd(1));
 				break;
-			// View Matrix
-			case (Keywords::MatrixXKeyword):
-			case (Keywords::MatrixYKeyword):
-			case (Keywords::MatrixZKeyword):
-			case (Keywords::MatrixWKeyword):
-				xyzw = viewPaneKwd - Keywords::MatrixXKeyword;
-				pane->setViewMatrixColumn(xyzw, parser.argd(1), parser.argd(2), parser.argd(3), parser.argd(4));
+			// Rotation
+			case (Keywords::RotationXKeyword):
+			case (Keywords::RotationYKeyword):
+			case (Keywords::RotationZKeyword):
+				xyz = viewPaneKwd - Keywords::RotationXKeyword;
+				pane->setViewRotationColumn(xyz, parser.argd(1), parser.argd(2), parser.argd(3));
 				break;
 			// Perspective
 			case (Keywords::PerspectiveKeyword):
@@ -657,6 +677,7 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				if (role == ViewPane::nPaneRoles)
 				{
 					msg.print("Warning: Unrecognised role '%s' for pane '%s'. Defaulting to '%s'.\n", parser.argc(1), qPrintable(pane->name()), ViewPane::paneRole(ViewPane::StandardRole));
+					role = ViewPane::StandardRole;
 					CHECKIOFAIL
 				}
 				pane->setRole(role);
@@ -680,6 +701,10 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 			// Title scale
 			case (Keywords::TitlePointSizeKeyword):
 				pane->setTitlePointSize(parser.argd(1));
+				break;
+			// Translation
+			case (Keywords::TranslationKeyword):
+				pane->setViewTranslation(parser.argd(1), parser.argd(2), parser.argd(3));
 				break;
 			// Two Dimensional flag
 			case (Keywords::TwoDimensionalKeyword):

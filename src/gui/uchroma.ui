@@ -1153,8 +1153,8 @@
   </action>
   <action name="actionViewShowAll">
    <property name="icon">
-    <iconset>
-     <normaloff>:/uchroma/icons/axes_showall.svg</normaloff>:/uchroma/icons/axes_showall.svg</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/view_showall.svg</normaloff>:/uchroma/icons/view_showall.svg</iconset>
    </property>
    <property name="text">
     <string>Show &amp;All</string>

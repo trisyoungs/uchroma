@@ -218,10 +218,10 @@ void ViewLayout::translatePane(ViewPane* pane, int deltaX, int deltaY)
 }
 
 // Reset view of all panes
-void ViewLayout::resetView()
+void ViewLayout::resetViewMatrix()
 {
 	// Loop over view panes
-	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next) pane->resetView();
+	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next) pane->resetViewMatrix();
 }
 
 // Update interaction primitives for all panes

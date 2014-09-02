@@ -42,8 +42,6 @@ class Axes
 	Axes(const Axes& source);
 	// Assignment operator
 	void operator=(const Axes& source);
-	// Anchor enum
-	enum AxisAnchor { AnchorLeft=0, AnchorCentre=1, AnchorRight=2 };
 
 
 	/*
@@ -82,6 +80,8 @@ class Axes
 	Vec3<double> axisPositionFractional_[3];
 
 	private:
+	// Recalculate centre coordinate of axes
+	void calculateAxesCoordCentre();
 	// Clamp axis position and min/max to current limits
 	void clampAxis(int axis);
 
@@ -160,12 +160,14 @@ class Axes
 	Vec3<int> axisMinorTicks_;
 	// Orientation of axis labels (axial rot, in-plane rot, distance)
 	Vec3<double> axisLabelOrientation_[3];
+	// Axis laberl text anchor positions
+	TextPrimitive::TextAnchor axisLabelAnchor_[3];
 	// Axis titles
 	QString axisTitle_[3];
 	// Orientation of axis titles (axial rot, in-plane rot, distance, h-offset)
 	Vec4<double> axisTitleOrientation_[3];
 	// Axis title text anchor positions
-	AxisAnchor axisTitleAnchor_[3];
+	TextPrimitive::TextAnchor axisTitleAnchor_[3];
 
 	public:
 	// Set axis tick direction
@@ -194,6 +196,10 @@ class Axes
 	void setAxisLabelOrientation(int axis, int component, double value);
 	// Return orientation of labels for specified axis
 	Vec3<double> axisLabelOrientation(int axis);
+	// Set axis label text anchor position for specified axis
+	void setAxisLabelAnchor(int axis, TextPrimitive::TextAnchor anchor);
+	// Return axis label text anchor position for specified axis
+	TextPrimitive::TextAnchor axisLabelAnchor(int axis);
 	// Set title for specified axis
 	void setAxisTitle(int axis, QString title);
 	// Return title for specified axis
@@ -203,9 +209,9 @@ class Axes
 	// Return orientation of titles for specified axis
 	Vec4<double> axisTitleOrientation(int axis);
 	// Set axis title text anchor position for specified axis
-	void setAxisTitleAnchor(int axis, AxisAnchor anchor);
+	void setAxisTitleAnchor(int axis, TextPrimitive::TextAnchor anchor);
 	// Return axis title text anchor position for specified axis
-	AxisAnchor axisTitleAnchor(int axis);
+	TextPrimitive::TextAnchor axisTitleAnchor(int axis);
 
 
 	/*
@@ -224,8 +230,6 @@ class Axes
 	private:
 	// Add line to axis primitive
 	void addPrimitiveLine(int axis, Vec3<double> v1, Vec3<double> v2);
-	// Add entry to axis text primitive
-	void addPrimitiveText(int axis, QString text, Vec3<double> origin, Matrix transform, AxisAnchor anchor = Axes::AnchorCentre);
 	// Update primitives for axis
 	void updateAxisPrimitives();
 

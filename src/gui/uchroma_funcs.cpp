@@ -210,6 +210,7 @@ void UChromaWindow::updateToolBars()
 
 	ui.actionViewPerspective->setChecked(currentViewPane_->hasPerspective());
 	ui.actionView2D->setChecked(currentViewPane_->twoDimensional());
+	ui.actionViewAutostretch3D->setChecked(currentViewPane_->autoStretch3D());
 }
 
 // Update display

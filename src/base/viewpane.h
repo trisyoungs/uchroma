@@ -190,11 +190,15 @@ class ViewPane : public ListItem<ViewPane>
 	// Field of view angle used in projectionMatrix_ when using perspective
 	double perspectiveFieldOfView_;
 	// View matrix for GL
-	Matrix viewMatrix_;
-	// View matrix inverse
-	Matrix viewMatrixInverse_;
+	Matrix viewRotation_;
+	// Current translation of view
+	Vec3<double> viewTranslation_;
+	// Standard zOffset for translation matrix
+	const double zOffset_;
 
 	private:
+	// Calculate font scaling factor
+	void calculateFontScaling();
 	// Return calculated projection matrix
 	Matrix calculateProjectionMatrix(double zoom);
 
@@ -206,25 +210,35 @@ class ViewPane : public ListItem<ViewPane>
 	// Return whether this pane uses perspective
 	bool hasPerspective();
 	// Update view matrix
-	void setViewMatrix(Matrix& mat);
+	void setViewRotation(Matrix& mat);
 	// Update single column of view matrix
-	void setViewMatrixColumn(int column, double x, double y, double z, double w);
+	void setViewRotationColumn(int column, double x, double y, double z);
 	// Rotate view matrix about x and y by amounts specified
 	void rotateView(double dx, double dy);
+	// Return view rotation
+	Matrix viewRotation();
+	// Set view translation
+	void setViewTranslation(double x, double y, double z);
 	// Translate view matrix by amounts specified
 	void translateView(double dx, double dy, double dz);
-	// Return view matrix
+	// Return current view translation
+	Vec3<double> viewTranslation();
+	// Return full view matrix (rotation + translation)
 	Matrix viewMatrix();
 	// Project given model coordinates into world coordinates
 	Vec3<double> modelToWorld(Vec3<double> modelr);
 	// Project given model coordinates into screen coordinates
 	Vec4<double> modelToScreen(Vec3<double> modelr, double screenradius = -1.0);
+	// Project given model coordinates into screen coordinates using supplied rotation matrix and translation vector
+	Vec4<double> modelToScreen(Vec3<double> modelr, Matrix rotationMatrix, Vec3<double> translation = Vec3<double>());
 	// Return zoom level, assuming orthogonally-aligned view matrix, to display coordinates supplied
 	double calculateRequiredZoom(double xExtent, double yExtent, double fraction);
 	// Convert screen coordinates into model space coordinates
 	Vec3<double> screenToModel(int x, int y, double z);
-	// Reset current view
-	void resetView();
+	// Recalculate current view parameters (e.g. for 2D, autostretched 3D etc.)
+	void recalculateView();
+	// Reset view matrix to face XY plane
+	void resetViewMatrix();
 	// Set display limits to show all available data
 	void showAllData();
 
