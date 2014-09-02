@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="/uchroma">
+    <file>icons/view_2D.svg</file>
+    <file>icons/view_autostretch.svg</file>
     <file>icons/view_showall.svg</file>
     <file>icons/windows_fit.svg</file>
     <file>icons/collection_collection_nopane.svg</file>

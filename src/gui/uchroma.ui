@@ -716,7 +716,7 @@
      <x>0</x>
      <y>0</y>
      <width>947</width>
-     <height>23</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1306,6 +1306,10 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/view_2D.svg</normaloff>:/uchroma/icons/view_2D.svg</iconset>
+   </property>
    <property name="text">
     <string>&amp;Two-Dimensional</string>
    </property>
@@ -1335,6 +1339,10 @@
   <action name="actionViewAutostretch3D">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/view_autostretch.svg</normaloff>:/uchroma/icons/view_autostretch.svg</iconset>
    </property>
    <property name="text">
     <string>Autostretch &amp;3D</string>
