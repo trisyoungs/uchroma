@@ -48,18 +48,16 @@ class ReferenceSetupDialog : public QDialog
 	private:
 	// Whether the window is refreshing / updating its controls
 	bool refreshing_;
-
-	protected:
-	// Window close event
-	void closeEvent(QCloseEvent* event);
-
-	private:
 	// Parent FitKernel
 	FitKernel* referenceParent_;
 	// Target reference pointer
 	ReferenceVariable* referenceTarget_;
 	// Backup copy of reference (in case the dialog is cancelled)
 	ReferenceVariable referenceBackup_;
+
+	protected:
+	// Window close event
+	void closeEvent(QCloseEvent* event);
 
 	public slots:
 	void reject();

@@ -22,9 +22,15 @@
 #include "gui/uchroma.h"
 
 // Return curreent view layout
-ViewLayout* UChromaWindow::viewLayout()
+ViewLayout& UChromaWindow::viewLayout()
 {
-	return &viewLayout_;
+	return viewLayout_;
+}
+
+// Set view layout
+void UChromaWindow::setViewLayout(ViewLayout& source)
+{
+	viewLayout_ = source;
 }
 
 // Recalculate layout pane positions / sizes (after context resize etc.)

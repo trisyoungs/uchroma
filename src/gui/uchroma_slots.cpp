@@ -212,16 +212,12 @@ void UChromaWindow::on_actionViewAutostretch3D_triggered(bool checked)
 
 void UChromaWindow::on_actionViewAxes_triggered(bool checked)
 {
-	if (refreshing_) return;
-	if (checked) axesWindow_.updateAndShow();
-	else axesWindow_.hide();
+	ui.actionWindowAxes->trigger();
 }
 
-void UChromaWindow::on_actionViewLayout_triggered(bool checked)
+void UChromaWindow::on_actionViewChangeLayout_triggered(bool checked)
 {
-	if (refreshing_) return;
-	if (checked) layoutWindow_.updateAndShow();
-	else layoutWindow_.hide();
+	layoutDialog_.updateAndShow();
 }
 
 /*
@@ -257,16 +253,12 @@ void UChromaWindow::on_actionCollectionDuplicate_triggered(bool checked)
 
 void UChromaWindow::on_actionCollectionStyle_triggered(bool checked)
 {
-	if (refreshing_) return;
-	if (checked) styleWindow_.updateAndShow();
-	else styleWindow_.hide();
+	ui.actionWindowStyle->trigger();
 }
 
 void UChromaWindow::on_actionCollectionTransform_triggered(bool checked)
 {
-	if (refreshing_) return;
-	if (checked) transformWindow_.updateAndShow();
-	else transformWindow_.hide();
+	ui.actionWindowTransform->trigger();
 }
 
 void UChromaWindow::on_actionCollectionDelete_triggered(bool checked)
@@ -441,8 +433,40 @@ void UChromaWindow::on_actionSettingsChooseFont_triggered(bool checked)
 	}
 }
 
-// TODO TEMPORARY
-void UChromaWindow::on_actionWindowsView_triggered(bool checked)
+
+/*
+ * Window Actions
+ */
+
+void UChromaWindow::on_actionWindowAxes_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) axesWindow_.updateAndShow();
+	else axesWindow_.hide();
+}
+
+void UChromaWindow::on_actionWindowLog_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) logWindow_.show();
+	else logWindow_.hide();
+}
+
+void UChromaWindow::on_actionWindowStyle_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) styleWindow_.updateAndShow();
+	else styleWindow_.hide();
+}
+
+void UChromaWindow::on_actionWindowTransform_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) transformWindow_.show();
+	else transformWindow_.hide();
+}
+
+void UChromaWindow::on_actionWindowView_triggered(bool checked)
 {
 	if (refreshing_) return;
 	if (checked) viewWindow_.updateAndShow();

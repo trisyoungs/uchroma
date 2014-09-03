@@ -716,7 +716,7 @@
      <x>0</x>
      <y>0</y>
      <width>947</width>
-     <height>29</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -745,9 +745,9 @@
     <addaction name="actionViewPerspective"/>
     <addaction name="actionView2D"/>
     <addaction name="actionViewAutostretch3D"/>
-    <addaction name="separator"/>
     <addaction name="actionViewAxes"/>
-    <addaction name="actionViewLayout"/>
+    <addaction name="separator"/>
+    <addaction name="actionViewChangeLayout"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -793,8 +793,8 @@
    <addaction name="menuView"/>
    <addaction name="menuCollections"/>
    <addaction name="menuData"/>
-   <addaction name="menuSettings"/>
    <addaction name="menuAnalyse"/>
+   <addaction name="menuSettings"/>
   </widget>
   <widget class="QStatusBar" name="StatusBar"/>
   <widget class="QToolBar" name="FileToolBar">
@@ -845,6 +845,12 @@
    <property name="windowTitle">
     <string>toolBar_3</string>
    </property>
+   <property name="iconSize">
+    <size>
+     <width>20</width>
+     <height>20</height>
+    </size>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -855,7 +861,29 @@
    <addaction name="actionInteractX"/>
    <addaction name="actionInteractY"/>
    <addaction name="actionInteractZ"/>
-   <addaction name="actionWindowsView"/>
+  </widget>
+  <widget class="QToolBar" name="WindowToolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>20</width>
+     <height>20</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionWindowAxes"/>
+   <addaction name="actionWindowData"/>
+   <addaction name="actionWindowLog"/>
+   <addaction name="actionWindowStyle"/>
+   <addaction name="actionWindowTransform"/>
+   <addaction name="actionWindowView"/>
   </widget>
   <action name="actionFileQuit">
    <property name="text">
@@ -988,16 +1016,13 @@
      <normaloff>:/uchroma/icons/windows_fit.svg</normaloff>:/uchroma/icons/windows_fit.svg</iconset>
    </property>
    <property name="text">
-    <string>New &amp;Fit Equation</string>
+    <string>New &amp;Fit Equation...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
    </property>
   </action>
   <action name="actionViewAxes">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -1006,7 +1031,7 @@
      <normaloff>:/uchroma/icons/windows_axes.svg</normaloff>:/uchroma/icons/windows_axes.svg</iconset>
    </property>
    <property name="text">
-    <string>Edit &amp;Axes</string>
+    <string>Edit &amp;Axes...</string>
    </property>
    <property name="toolTip">
     <string>Adjust axis limits and axis style</string>
@@ -1019,15 +1044,12 @@
    </property>
   </action>
   <action name="actionCollectionStyle">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/uchroma/icons/windows_style.svg</normaloff>:/uchroma/icons/windows_style.svg</iconset>
    </property>
    <property name="text">
-    <string>Change &amp;Style</string>
+    <string>Change &amp;Style...</string>
    </property>
    <property name="toolTip">
     <string>Set colour and visual style of current collection</string>
@@ -1037,15 +1059,12 @@
    </property>
   </action>
   <action name="actionCollectionTransform">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/uchroma/icons/windows_transform.svg</normaloff>:/uchroma/icons/windows_transform.svg</iconset>
    </property>
    <property name="text">
-    <string>Set Global &amp;Transform</string>
+    <string>Set Global &amp;Transform...</string>
    </property>
    <property name="toolTip">
     <string>Set x, y, and z data transforms for current collection</string>
@@ -1055,15 +1074,12 @@
    </property>
   </action>
   <action name="actionDataView">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/uchroma/icons/windows_data.svg</normaloff>:/uchroma/icons/windows_data.svg</iconset>
    </property>
    <property name="text">
-    <string>&amp;View DataSets</string>
+    <string>&amp;View DataSets...</string>
    </property>
    <property name="toolTip">
     <string>Add/remove data slices in current collection</string>
@@ -1072,7 +1088,7 @@
     <string>Ctrl+Shift+D</string>
    </property>
   </action>
-  <action name="actionWindowsView">
+  <action name="actionWindowView">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -1082,24 +1098,6 @@
    </property>
    <property name="text">
     <string>&amp;View</string>
-   </property>
-  </action>
-  <action name="actionWindowsCollections">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/uchroma/icons/windows_collections.svg</normaloff>:/uchroma/icons/windows_collections.svg</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Collections</string>
-   </property>
-   <property name="toolTip">
-    <string>Show list of all data collections</string>
    </property>
   </action>
   <action name="actionCollectionNew">
@@ -1278,22 +1276,19 @@
      <normaloff>:/uchroma/icons/windows_create.svg</normaloff>:/uchroma/icons/windows_create.svg</iconset>
    </property>
    <property name="text">
-    <string>&amp;Create From Equation</string>
+    <string>&amp;Create From Equation...</string>
    </property>
    <property name="toolTip">
     <string>Create new collections from scratch</string>
    </property>
   </action>
-  <action name="actionViewLayout">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
+  <action name="actionViewChangeLayout">
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/uchroma/icons/windows_layout.svg</normaloff>:/uchroma/icons/windows_layout.svg</iconset>
    </property>
    <property name="text">
-    <string>Edit &amp;Layout</string>
+    <string>Change &amp;Layout...</string>
    </property>
    <property name="toolTip">
     <string>Adjust / modify pane number and layout</string>
@@ -1360,7 +1355,7 @@
   </action>
   <action name="actionAnalyseEditFit">
    <property name="text">
-    <string>&amp;Edit Fit Equation</string>
+    <string>&amp;Edit Fit Equation...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+F</string>
@@ -1372,6 +1367,93 @@
    </property>
    <property name="shortcut">
     <string>F9</string>
+   </property>
+  </action>
+  <action name="actionWindowStyle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/windows_style.svg</normaloff>:/uchroma/icons/windows_style.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle Style Window</string>
+   </property>
+   <property name="toolTip">
+    <string>Change colour and visual style of collections</string>
+   </property>
+  </action>
+  <action name="actionWindowAxes">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/windows_axes.svg</normaloff>:/uchroma/icons/windows_axes.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Show Axes Window</string>
+   </property>
+   <property name="toolTip">
+    <string>Adjust axis limits and axis style</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+  </action>
+  <action name="actionWindowLog">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/up.svg</normaloff>:/uchroma/icons/up.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle Log Window</string>
+   </property>
+   <property name="toolTip">
+    <string>Show log window</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+  </action>
+  <action name="actionWindowTransform">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/windows_transform.svg</normaloff>:/uchroma/icons/windows_transform.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle Global &amp;Transform Window</string>
+   </property>
+   <property name="toolTip">
+    <string>Set x, y, and z data transforms for collections</string>
+   </property>
+  </action>
+  <action name="actionWindowData">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/windows_data.svg</normaloff>:/uchroma/icons/windows_data.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle DataSets Window</string>
+   </property>
+   <property name="toolTip">
+    <string>View/edit data in the current collection</string>
    </property>
   </action>
  </widget>

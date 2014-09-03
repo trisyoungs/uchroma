@@ -128,6 +128,8 @@ template <class T> class List
 	// Operators
 	*/
 	public:
+	// Assignment operator
+	void operator=(const List< T >& source);
 	// Element access operator
 	T *operator[](int);
 
@@ -733,6 +735,27 @@ template <class T> void List<T>::moveAfter(T *item, T *reference)
 */
 
 /*!
+ * \brief Assignment operator =
+ */
+template <class T> void List<T>::operator=(const List<T>& source)
+{
+	// Clear any current data in the list...
+	clear();
+	T *newitem, *olditem;
+	for (olditem = source.first(); olditem != NULL; olditem = olditem->next)
+	{
+		// To ensure that we don't mess around with the pointers of the old list, copy the object and then own it
+		newitem = new T;
+		*newitem = *olditem;
+		newitem->prev = NULL;
+		newitem->next = NULL;
+		own(newitem);
+	}
+	// Don't deep-copy the static list, just flag that it must be regenerated if required.
+	regenerate_ = 1;
+}
+
+/*!
  * \brief Element access operator
  */
 template <class T> T *List<T>::operator[](int index)
@@ -759,6 +782,24 @@ template <class T, class P> class ParentList : public List<T>
 		T *newitem = new T(parent);
 		List<T>::own(newitem);
 		return newitem;
+	}
+	// Override the assignment operator
+	void operator=(const ParentList<T,P>& source)
+	{
+		// Clear any current data in the list...
+		List<T>::clear();
+		T *newitem, *olditem;
+		for (olditem = source.first(); olditem != NULL; olditem = olditem->next)
+		{
+			// To ensure that we don't mess around with the pointers of the old list, copy the object and then own it
+			newitem = new T(olditem->parent());
+			*newitem = *olditem;
+			newitem->prev = NULL;
+			newitem->next = NULL;
+			List<T>::own(newitem);
+		}
+		// Don't deep-copy the static list, just flag that it must be regenerated if required.
+		List<T>::regenerate_ = 1;
 	}
 };
 

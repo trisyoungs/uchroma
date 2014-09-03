@@ -90,8 +90,6 @@ class UChromaWindow : public QMainWindow
 	AxesWindow axesWindow_;
 	// Data Window
 	DataWindow dataWindow_;
-	// Layout Window
-	LayoutWindow layoutWindow_;
 	// Log Window
 	LogWindow logWindow_;
 	// Style Window
@@ -106,6 +104,8 @@ class UChromaWindow : public QMainWindow
 	DataImportDialog dataImportDialog_;
 	// Fit Window
 	FitSetupDialog fitSetupDialog_;
+	// Layout Dialog
+	LayoutDialog layoutDialog_;
 	// Save Image Dialog
 	SaveImageDialog saveImageDialog_;
 	// Statusbar info line label
@@ -162,7 +162,7 @@ class UChromaWindow : public QMainWindow
 	void on_actionView2D_triggered(bool checked);
 	void on_actionViewAutostretch3D_triggered(bool checked);
 	void on_actionViewAxes_triggered(bool checked);
-	void on_actionViewLayout_triggered(bool checked);
+	void on_actionViewChangeLayout_triggered(bool checked);
 
 
 	/*
@@ -216,8 +216,18 @@ class UChromaWindow : public QMainWindow
 	 */
 	private slots:
 	void on_actionSettingsChooseFont_triggered(bool checked);
-	void on_actionWindowsView_triggered(bool checked);
-	
+
+
+	/*
+	 * Window Actions
+	 */
+	public slots:
+	void on_actionWindowAxes_triggered(bool checked);
+	void on_actionWindowLog_triggered(bool checked);
+	void on_actionWindowStyle_triggered(bool checked);
+	void on_actionWindowTransform_triggered(bool checked);
+	void on_actionWindowView_triggered(bool checked);
+
 
 	/*
 	 * Collections
@@ -377,7 +387,9 @@ class UChromaWindow : public QMainWindow
 
 	public:
 	// Return curreent view layout
-	ViewLayout* viewLayout();
+	ViewLayout& viewLayout();
+	// Set view layout
+	void setViewLayout(ViewLayout& source);
 	// Recalculate layout pane positions / sizes (after context resize etc.)
 	void recalculateViewLayout(int contextWidth, int contextHeight);
 	// Set current view pane to the one under the specified screen coordinates

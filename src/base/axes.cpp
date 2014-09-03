@@ -54,6 +54,7 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	axisTickDirection_[0].set(0.0, -1.0, 0.0);
 	axisTickDirection_[1].set(-1.0, 0.0, 0.0);
 	axisTickDirection_[2].set(-1.0, 0.0, 0.0);
+	axisTickSize_.set(0.2, 0.2, 0.2);
 	axisFirstTick_.zero();
 	axisTickDelta_.set(1.0,1.0,1.0);
 	axisAutoTicks_.set(true, true, true);
@@ -428,6 +429,21 @@ Vec3<double> Axes::axisTickDirection(int axis)
 	return axisTickDirection_[axis];
 }
 
+// Set axis tick size (relative to font size)
+void Axes::setAxisTickSize(int axis, double size)
+{
+	axisTickSize_[axis] = size;
+
+	primitivesValid_ = false;
+	parent_.paneChanged();
+}
+
+// Return axis tick size (relative to font size)
+double Axes::axisTickSize(int axis)
+{
+	return axisTickSize_[axis];
+}
+
 // Set position of first tick delta on axes
 void Axes::setAxisFirstTick(int axis, double value)
 {
@@ -739,7 +755,7 @@ void Axes::updateAxisPrimitives()
 				if (log10(value) >= axisMin)
 				{
 					// Tick mark
-					addPrimitiveLine(axis, u, u+tickDir*(count == 0 ? 1.0 : 0.5));
+					addPrimitiveLine(axis, u, u+tickDir*axisTickSize_[axis]*(count == 0 ? 1.0 : 0.5));
 
 					// Tick label
 					if (count == 0)
@@ -749,7 +765,7 @@ void Axes::updateAxisPrimitives()
 						if (fabs(value) < pow(10,power-5)) s = "0";
 						else s = QString::number(value);
 
-						axisTextPrimitives_[axis].add(s, u+tickDir*(count == 0 ? 1.0 : 0.5), axisLabelAnchor_[axis], tickDir * axisLabelOrientation_[axis].z, labelTransform, parent_.labelPointSize());
+						axisTextPrimitives_[axis].add(s, u+tickDir*axisTickSize_[axis], axisLabelAnchor_[axis], tickDir * (axisTickSize_[axis]+axisLabelOrientation_[axis].z), labelTransform, parent_.labelPointSize());
 					}
 				}
 
@@ -766,8 +782,8 @@ void Axes::updateAxisPrimitives()
 
 			// Add axis title
 			u = axisCoordMin_[axis];
-			value = axisMin_[axis] + (axisMax_[axis] - axisMin_[axis]) * axisTitleOrientation_[axis].w;
-			u.set(axis, (axisInverted_[axis] ? log10(axisMax_[axis]/value) : log10(value)) * axisStretch_[axis]);
+			value = log10(axisMin_[axis]) + log10(axisMax_[axis]/axisMin_[axis]) * axisTitleOrientation_[axis].w;
+			u.set(axis, (axisInverted_[axis] ? log10(axisMax_[axis])-value : value) * axisStretch_[axis]);
 			axisTextPrimitives_[axis].add(axisTitle_[axis], u, axisTitleAnchor_[axis], tickDir * axisTitleOrientation_[axis].z, titleTransform, parent_.titlePointSize());
 		}
 		else
@@ -798,17 +814,17 @@ void Axes::updateAxisPrimitives()
 				{
 					if (count %(axisMinorTicks_[axis]+1) == 0)
 					{
-						addPrimitiveLine(axis, u, u + tickDir*0.1);
+						addPrimitiveLine(axis, u, u + tickDir*axisTickSize_[axis]);
 						
 						// Get formatted label text, acounting for roundoff error
 						if (fabs(value) < axisTickDelta_[axis]*1.0e-10) s = "0";
 						else s = QString::number(value);
 
-						axisTextPrimitives_[axis].add(s, u+tickDir*0.1, axisLabelAnchor_[axis], tickDir * axisLabelOrientation_[axis].z, labelTransform, parent_.labelPointSize());
+						axisTextPrimitives_[axis].add(s, u+tickDir*axisTickSize_[axis], axisLabelAnchor_[axis], tickDir * (axisTickSize_[axis] + axisLabelOrientation_[axis].z), labelTransform, parent_.labelPointSize());
 						
 						count = 0;
 					}
-					else addPrimitiveLine(axis, u, u + tickDir*0.05);
+					else addPrimitiveLine(axis, u, u + tickDir*axisTickSize_[axis]*0.5);
 				}
 				u.add(axis, delta * (axisInverted_[axis] ? -axisStretch_[axis] : axisStretch_[axis]));
 				value += delta;

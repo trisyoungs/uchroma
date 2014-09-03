@@ -283,6 +283,7 @@ bool AxesWindow::axisTicksChanged(int axis, bool start, double value)
 	return true;
 }
 
+
 bool AxesWindow::axisTickOrientationChanged(int axis, int dir, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
@@ -300,6 +301,18 @@ bool AxesWindow::axisLabelOrientationChanged(int axis, int component, double val
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
 	currentAxes().setAxisLabelOrientation(axis, component, value);
+
+	// Update relevant parts of gui
+	uChroma_.updateDisplay();
+
+	return true;
+}
+
+bool AxesWindow::axisTickSizeChanged(int axis, double value)
+{
+	if (refreshing_ || (!haveCurrentAxes())) return false;
+
+	currentAxes().setAxisTickSize(axis, value);
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -500,6 +513,11 @@ void AxesWindow::on_AxisXTickDirectionYSpin_valueChanged(double value)
 void AxesWindow::on_AxisXTickDirectionZSpin_valueChanged(double value)
 {
 	axisTickOrientationChanged(0, 2, value);
+}
+
+void AxesWindow::on_AxisXTickSizeSpin_valueChanged(double value)
+{
+	axisTickSizeChanged(0, value);
 }
 
 void AxesWindow::on_AxisXLabelAnchorCombo_currentIndexChanged(int index)
@@ -735,6 +753,11 @@ void AxesWindow::on_AxisYTickDirectionZSpin_valueChanged(double value)
 	axisTickOrientationChanged(1, 2, value);
 }
 
+void AxesWindow::on_AxisYTickSizeSpin_valueChanged(double value)
+{
+	axisTickSizeChanged(1, value);
+}
+
 void AxesWindow::on_AxisYLabelAnchorCombo_currentIndexChanged(int index)
 {
 	axisAnchorChanged(1, false, (TextPrimitive::TextAnchor) index);
@@ -968,6 +991,11 @@ void AxesWindow::on_AxisZTickDirectionZSpin_valueChanged(double value)
 	axisTickOrientationChanged(2, 2, value);
 }
 
+void AxesWindow::on_AxisZTickSizeSpin_valueChanged(double value)
+{
+	axisTickSizeChanged(2, value);
+}
+
 void AxesWindow::on_AxisZLabelAnchorCombo_currentIndexChanged(int index)
 {
 	axisAnchorChanged(2, false, (TextPrimitive::TextAnchor) index);
@@ -1182,6 +1210,7 @@ void AxesWindow::updateControls(bool force)
 	ui.AxisXTickDirectionXSpin->setValue(axes.axisTickDirection(0).x);
 	ui.AxisXTickDirectionYSpin->setValue(axes.axisTickDirection(0).y);
 	ui.AxisXTickDirectionZSpin->setValue(axes.axisTickDirection(0).z);
+	ui.AxisXTickSizeSpin->setValue(axes.axisTickSize(0));
 	// -- Y
 	ui.AxisYAutoTicksCheck->setChecked(axes.axisAutoTicks(1));
 	ui.AxisYTicksStartSpin->setValue(axes.axisFirstTick(1));

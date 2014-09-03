@@ -150,6 +150,8 @@ class Axes
 	private:
 	// Axis tick direction
 	Vec3<double> axisTickDirection_[3];
+	// Axis tick size (relative to font size)
+	Vec3<double> axisTickSize_;
 	// Position of first tick delta on axes
 	Vec3<double> axisFirstTick_;
 	// Tick delta for axes
@@ -174,6 +176,10 @@ class Axes
 	void setAxisTickDirection(int axis, int dir, double value);
 	// Return axis tick direction for specified axis
 	Vec3<double> axisTickDirection(int axis);
+	// Set axis tick size (relative to font size)
+	void setAxisTickSize(int axis, double size);
+	// Return axis tick size (relative to font size)
+	double axisTickSize(int axis);
 	// Set position of first tick delta on specified axis
 	void setAxisFirstTick(int axis, double value);
 	// Return position of first tick delta on specified axis

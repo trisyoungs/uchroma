@@ -19,43 +19,47 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_LAYOUTWINDOW_H
-#define UCHROMA_LAYOUTWINDOW_H
+#ifndef UCHROMA_LAYOUTDIALOG_H
+#define UCHROMA_LAYOUTDIALOG_H
 
 #include "gui/ui_layout.h"
+#include "base/viewlayout.h"
 
 // Forward Declarations
 class UChromaWindow;
 
-class LayoutWindow : public QWidget
+class LayoutDialog : public QDialog
 {
 	// All Qt declarations must include this macro
 	Q_OBJECT
 
 
+	public:
+	// Constructor / Destructor
+	LayoutDialog(UChromaWindow& parent);
+	~LayoutDialog();
+	// Main form declaration
+	Ui::LayoutDialog ui;
+	// UChromaWindow reference
+	UChromaWindow& uChroma_;
+
 	/*
-	// Window Functions
-	*/
+	 * Window Functions
+	 */
 	private:
 	// Whether the window is refreshing / updating its controls
 	bool refreshing_;
-
-	public:
-	// Constructor / Destructor
-	LayoutWindow(UChromaWindow& parent);
-	~LayoutWindow();
-	// Main form declaration
-	Ui::LayoutWindow ui;
-	// UChromaWindow reference
-	UChromaWindow& uChroma_;
+	// Backup copy of layout
+	ViewLayout layoutBackup_;
 
 	protected:
 	// Window close event
 	void closeEvent(QCloseEvent *event);
 
-	signals:
-	// Window closed signal
-	void windowClosed(bool);
+	public slots:
+	void reject();
+	void on_OKButton_clicked(bool checked);
+	void on_CancelButton_clicked(bool checked);
 
 
 	/*

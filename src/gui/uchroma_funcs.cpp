@@ -28,9 +28,8 @@
 
 // Constructor
 UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
-	axesWindow_(*this), dataWindow_(*this), layoutWindow_(*this),
-	logWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this),
-	createCollectionDialog_(*this), dataImportDialog_(*this), fitSetupDialog_(*this), saveImageDialog_(*this),
+	axesWindow_(*this), dataWindow_(*this), logWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this),
+	createCollectionDialog_(*this), dataImportDialog_(*this), fitSetupDialog_(*this), layoutDialog_(*this), saveImageDialog_(*this),
 	viewLayout_(*this)
 {
 	// Initialise the icon resource
@@ -63,7 +62,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 
 	// Set basic view layout, and give pointer to PaneOrganiser in LayoutWindow
 	currentViewPane_ = viewLayout_.setDefault();
-	layoutWindow_.ui.Organiser->setViewLayout(&viewLayout_);
+	layoutDialog_.ui.Organiser->setViewLayout(&viewLayout_);
 
 	// Add an empty collection, and add it to the current view pane
 	currentViewPane_->addCollection(addCollection());
@@ -93,16 +92,15 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	connect(ui.CollectionTree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(collectionTreeContextMenuRequested(QPoint)));
 
 	// Connect LayoutWindow and PaneOrganiser update signals
-	connect(layoutWindow_.ui.Organiser, SIGNAL(updateMainDisplay()), this, SLOT(updateDisplay()));
-	connect(&layoutWindow_, SIGNAL(updateMainDisplay()), this, SLOT(updateDisplay()));
+	connect(layoutDialog_.ui.Organiser, SIGNAL(updateMainDisplay()), this, SLOT(updateDisplay()));
+	connect(&layoutDialog_, SIGNAL(updateMainDisplay()), this, SLOT(updateDisplay()));
 
 	// Connect sub-window closed signal to toggle buttons / menu items in uChroma's main window
-	connect(&axesWindow_, SIGNAL(windowClosed(bool)), ui.actionViewAxes, SLOT(setChecked(bool)));
-	connect(&dataWindow_, SIGNAL(windowClosed(bool)), ui.actionDataView, SLOT(setChecked(bool)));
-	connect(&layoutWindow_, SIGNAL(windowClosed(bool)), ui.actionViewLayout, SLOT(setChecked(bool)));
-	connect(&styleWindow_, SIGNAL(windowClosed(bool)), ui.actionCollectionStyle, SLOT(setChecked(bool)));
-	connect(&transformWindow_, SIGNAL(windowClosed(bool)), ui.actionCollectionTransform, SLOT(setChecked(bool)));
-	connect(&viewWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowsView, SLOT(setChecked(bool)));
+	connect(&axesWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowAxes, SLOT(setChecked(bool)));
+	connect(&dataWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowData, SLOT(setChecked(bool)));
+	connect(&styleWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowStyle, SLOT(setChecked(bool)));
+	connect(&transformWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowTransform, SLOT(setChecked(bool)));
+	connect(&viewWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowView, SLOT(setChecked(bool)));
 
 	// Create an action group for the axis interact buttons
 	QActionGroup* actionGroup = new QActionGroup(this);

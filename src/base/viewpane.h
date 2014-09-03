@@ -57,6 +57,8 @@ class ViewPane : public ListItem<ViewPane>
 	ViewLayout& parent_;
 
 	public:
+	// Return parent
+	ViewLayout& parent();
 	// Notify parent that this pane has been changed
 	void paneChanged();
 
@@ -197,8 +199,6 @@ class ViewPane : public ListItem<ViewPane>
 	const double zOffset_;
 
 	private:
-	// Calculate font scaling factor
-	void calculateFontScaling();
 	// Return calculated projection matrix
 	Matrix calculateProjectionMatrix(double zoom);
 
@@ -231,8 +231,8 @@ class ViewPane : public ListItem<ViewPane>
 	Vec4<double> modelToScreen(Vec3<double> modelr, double screenradius = -1.0);
 	// Project given model coordinates into screen coordinates using supplied rotation matrix and translation vector
 	Vec4<double> modelToScreen(Vec3<double> modelr, Matrix rotationMatrix, Vec3<double> translation = Vec3<double>());
-	// Return zoom level, assuming orthogonally-aligned view matrix, to display coordinates supplied
-	double calculateRequiredZoom(double xExtent, double yExtent, double fraction);
+	// Return z translation necessary to display coordinates supplied, assuming the identity view matrix
+	double calculateRequiredZoom(double xMax, double yMax, double fraction);
 	// Convert screen coordinates into model space coordinates
 	Vec3<double> screenToModel(int x, int y, double z);
 	// Recalculate current view parameters (e.g. for 2D, autostretched 3D etc.)
@@ -295,6 +295,10 @@ class ViewPane : public ListItem<ViewPane>
 	double titlePointSize_;
 	// Text z scaling factor
 	double textZScale_;
+
+	private:
+	// Calculate font scaling factor
+	void calculateFontScaling();
 
 	public:
 	// Set current bounding box type

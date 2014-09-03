@@ -35,8 +35,8 @@ class AxesWindow : public QWidget
 
 
 	/*
-	// Window Functions
-	*/
+	 * Window Functions
+	 */
 	private:
 	// Whether the window is refreshing / updating its controls
 	bool refreshing_;
@@ -77,6 +77,7 @@ class AxesWindow : public QWidget
 	bool axisAutoTicksChanged(int axis, bool enabled);
 	bool axisTicksChanged(int axis, bool start, double value);
 	bool axisTickOrientationChanged(int axis, int dir, double value);
+	bool axisTickSizeChanged(int axis, double value);
 	bool axisLabelOrientationChanged(int axis, int component, double value);
 	bool axisMinorTicksChanged(int axis, int value);
 	bool axisTitleChanged(int axis, QString& title);
@@ -117,6 +118,7 @@ class AxesWindow : public QWidget
 	void on_AxisXTickDirectionXSpin_valueChanged(double value);
 	void on_AxisXTickDirectionYSpin_valueChanged(double value);
 	void on_AxisXTickDirectionZSpin_valueChanged(double value);
+	void on_AxisXTickSizeSpin_valueChanged(double value);
 	void on_AxisXLabelAnchorCombo_currentIndexChanged(int index);
 	void on_AxisXLabelAxialRotationSlider_valueChanged(int value);
 	void on_AxisXLabelAxialRotationSpin_valueChanged(int value);
@@ -162,6 +164,7 @@ class AxesWindow : public QWidget
 	void on_AxisYTickDirectionXSpin_valueChanged(double value);
 	void on_AxisYTickDirectionYSpin_valueChanged(double value);
 	void on_AxisYTickDirectionZSpin_valueChanged(double value);
+	void on_AxisYTickSizeSpin_valueChanged(double value);
 	void on_AxisYLabelAnchorCombo_currentIndexChanged(int index);
 	void on_AxisYLabelAxialRotationSlider_valueChanged(int value);
 	void on_AxisYLabelAxialRotationSpin_valueChanged(int value);
@@ -207,6 +210,7 @@ class AxesWindow : public QWidget
 	void on_AxisZTickDirectionXSpin_valueChanged(double value);
 	void on_AxisZTickDirectionYSpin_valueChanged(double value);
 	void on_AxisZTickDirectionZSpin_valueChanged(double value);
+	void on_AxisZTickSizeSpin_valueChanged(double value);
 	void on_AxisZLabelAnchorCombo_currentIndexChanged(int index);
 	void on_AxisZLabelAxialRotationSlider_valueChanged(int value);
 	void on_AxisZLabelAxialRotationSpin_valueChanged(int value);

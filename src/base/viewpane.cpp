@@ -79,6 +79,7 @@ ViewPane::ViewPane(const ViewPane& source) : parent_(parent_), axes_(*this), zOf
 void ViewPane::operator=(const ViewPane& source)
 {
 	// Geometry / position
+	name_ = source.name_;
 	bottomEdge_ = source.bottomEdge_;
 	leftEdge_ = source.leftEdge_;
 	height_ = source.height_;
@@ -94,19 +95,36 @@ void ViewPane::operator=(const ViewPane& source)
 	viewRotation_ = source.viewRotation_;
 	viewTranslation_ = source.viewTranslation_;
 
-	// Axes
+	// Collection / Axes
 	axes_ = source.axes_;
+	collections_ = source.collections_;
 
 	// Style
 	boundingBox_ = source.boundingBox_;
 	boundingBoxPlaneY_ = source.boundingBoxPlaneY_;
 	labelPointSize_ = source.labelPointSize_;
 	titlePointSize_ = source.titlePointSize_;
+	textZScale_ = source.textZScale_;
+
+	// Role
+	role_ = source.role_;
+	autoScale_ = source.autoScale_;
+	twoDimensional_ = source.twoDimensional_;
+	autoStretch3D_ = source.autoStretch3D_;
+// 	RefList<ViewPane,bool> roleTargetPanes_;
+	roleTargetCollections_ = source.roleTargetCollections_;
+
 }
 
 /*
  * Parent
  */
+
+// Return parent
+ViewLayout& ViewPane::parent()
+{
+	return parent_;
+}
 
 // Set as modified (call parent routine)
 void ViewPane::paneChanged()
@@ -474,15 +492,6 @@ bool ViewPane::processUpdate(Collection* source, Collection::CollectionSignal si
  * Projection / View
  */
 
-// Calculate font scaling factor
-void ViewPane::calculateFontScaling()
-{
-	// Calculate text scaling factor
-	Vec4<double> unit = modelToScreen(Vec3<double>(0.0, 1.0, 0.0), Matrix(), Vec3<double>(0.0, 0.0, zOffset_));
-	unit.y -= viewportMatrix_[1] + viewportMatrix_[3]*0.5;
-	textZScale_ = unit.y;
-}
-
 // Return calculated projection matrix
 Matrix ViewPane::calculateProjectionMatrix(double orthoZoom)
 {
@@ -710,17 +719,17 @@ Vec4<double> ViewPane::modelToScreen(Vec3<double> modelr, Matrix rotationMatrix,
 	return screenr;
 }
 
-// Return zoom level, assuming orthogonally-aligned view matrix, to display coordinates supplied
-double ViewPane::calculateRequiredZoom(double xExtent, double yExtent, double fraction)
+// Return z translation necessary to display coordinates supplied, assuming the identity view matrix
+double ViewPane::calculateRequiredZoom(double xMax, double yMax, double fraction)
 {
 	// The supplied x and y extents should indicate the number of units in those directions
 	// from the origin that are to be displaye on-screen. The 'fraction' indicates how much of the
 	// available range on-screen to use, allowing a margin to be added. A value of '1.0' would
 	// put the extent with the highest units on the very edge of the display.
 
-	Vec4<double> rScreen, rProjected;
-	Vec4<double> worldr;
-	Vec4<double> pos;
+	Matrix viewMatrix, projectionMatrix = calculateProjectionMatrix(zOffset_);
+	Vec4<double> rScreen, rWorld, rModel(xMax, yMax, 0.0, 1.0);
+	Vec3<double> translation(0.0, 0.0, -1.0);
 
 	// Sanity check
 	if (viewportMatrix_[2] == 0) return 1.0;
@@ -729,46 +738,33 @@ double ViewPane::calculateRequiredZoom(double xExtent, double yExtent, double fr
 	// Calculate target screen coordinate
 	int targetX = (1.0 + fraction) * viewportMatrix_[2] * 0.5;
 	int targetY = (1.0 + fraction) * viewportMatrix_[3] * 0.5;
-	int screenX = targetX, screenY = targetY;
 
-	double zoom = 0.0;
 	int count = 0;
 	do
 	{
+		// If not using perspective, must recalculate the projection matrix
+		if (!hasPerspective_) projectionMatrix = calculateProjectionMatrix(translation.z);
+
+		// Project the point : worldr = P x M x modelr
+		viewMatrix.setIdentity();
+		viewMatrix.applyTranslation(translation);
+		rWorld = viewMatrix * rModel;
+		rScreen = projectionMatrix * rWorld;
+		rScreen.x /= rScreen.w;
+		rScreen.y /= rScreen.w;
+		rScreen.x = viewportMatrix_[0] + viewportMatrix_[2]*(rScreen.x+1)*0.5;
+		rScreen.y = viewportMatrix_[1] + viewportMatrix_[3]*(rScreen.y+1)*0.5;
+		rScreen.z = rScreen.z / rScreen.w;
+
 		// Increase zoom distance
-		zoom -= std::max( std::max(screenX / targetX, screenY / targetY), 1);
+		translation.z -= std::max( std::max(rScreen.x / targetX, rScreen.y/ targetY), 1.0);
 
-		// Get the world coordinates of the point - viewmatrix is assumed to be the identity matrix, plus the zoom factor in array index [14]
-		worldr.x = xExtent;
-		worldr.y = yExtent;
-		worldr.z = 0.0;
-
-		// Get projection matrix for this zoom level (orthogonal projection only)
-		Matrix projectionMatrix = calculateProjectionMatrix(zoom);
-
-// 		rProjected = projectionMatrix * worldr;
-
-		// Multiply by view matrix to get screen coordinates
-// 		rScreen.x = viewportMatrix_[0] + viewportMatrix_[2]*((rProjected.x / rProjected.w)+1)*0.5;
-// 		rScreen.y = viewportMatrix_[1] + viewportMatrix_[3]*((rProjected.y / rProjected.w)+1)*0.5;
-
-		// Calculate screen X coordinate
-		screenX = viewportMatrix_[0] + viewportMatrix_[2]*((
-			(worldr.x * projectionMatrix[0] + worldr.z * projectionMatrix[8])
-			/ 
-			(worldr.x * projectionMatrix[3] + worldr.z * projectionMatrix[11] + projectionMatrix[15])
-			)+1)*0.5;
-		screenY = viewportMatrix_[1] + viewportMatrix_[3]*((
-			(worldr.y * projectionMatrix[5] + worldr.z * projectionMatrix[8])
-			/ 
-			(worldr.y * projectionMatrix[7] + worldr.z * projectionMatrix[11] + projectionMatrix[15])
-			)+1)*0.5;
 
 		// Limit the number of iterations so we can never get into an infinite loop
-		if (++count == 20) break;
+		if (++count == 100) break;
 
-	} while ((screenX > targetX) || (screenY > targetY));
-	return zoom;
+	} while ((rScreen.x > targetX) || (rScreen.y> targetY));
+	return translation.z;
 }
 
 // Convert screen coordinates into model space coordinates
@@ -829,9 +825,16 @@ void ViewPane::recalculateView()
 	unit.x -= viewportMatrix_[0] + viewportMatrix_[2]/2.0;
 	unit.y -= viewportMatrix_[1] + viewportMatrix_[3]/2.0;
 
+	// Get axis min/max, accounting for logarithmic axes
+	Vec3<double> axisMin, axisMax;
+	axisMin.x = axes_.axisLogarithmic(0) ? log10(axes_.axisMin(0)) : axes_.axisMin(0);
+	axisMin.y = axes_.axisLogarithmic(1) ? log10(axes_.axisMin(1)) : axes_.axisMin(1);
+	axisMax.x = axes_.axisLogarithmic(0) ? log10(axes_.axisMax(0)) : axes_.axisMax(0);
+	axisMax.y = axes_.axisLogarithmic(1) ? log10(axes_.axisMax(1)) : axes_.axisMax(1);
+
 	// Set axis stretch factors to fill available pixel width/height
-	axes_.setAxisStretch(0, viewportMatrix_[2] / (unit.x * axes_.axisRange(0)));
-	axes_.setAxisStretch(1, viewportMatrix_[3] / (unit.y * axes_.axisRange(1)));
+	axes_.setAxisStretch(0, viewportMatrix_[2] / (unit.x * (axisMax.x - axisMin.x)));
+	axes_.setAxisStretch(1, viewportMatrix_[3] / (unit.y * (axisMax.y - axisMin.y)));
 // 	printf("Initial stretches = %f %f\n", viewportMatrix_[2] / (unit.x * axes_.axisRange(0)), viewportMatrix_[3] / (unit.y * axes_.axisRange(1)));
 
 	// We will now calculate more accurate stretch factors to apply to the X and Y axes.
@@ -840,10 +843,10 @@ void ViewPane::recalculateView()
 	// calculated for the axes labels, to see what the absolute pixel overlaps are
 	Matrix viewMat;
 	viewMat.applyTranslation(-axes().axesCoordCentre());
-	Vec4<double> xAxisLimitMin = modelToScreen(Vec3<double>( axes_.axisMin(0)*axes_.axisStretch(0), 0.0, 0.0), viewMat);
-	Vec4<double> xAxisLimitMax = modelToScreen(Vec3<double>( axes_.axisMax(0)*axes_.axisStretch(0), 0.0, 0.0), viewMat);
-	Vec4<double> yAxisLimitMin = modelToScreen(Vec3<double>( 0.0, axes_.axisMin(1)*axes_.axisStretch(1), 0.0), viewMat);
-	Vec4<double> yAxisLimitMax = modelToScreen(Vec3<double>( 0.0, axes_.axisMax(1)*axes_.axisStretch(1), 0.0), viewMat);
+	Vec4<double> xAxisLimitMin = modelToScreen(Vec3<double>( axisMin.x*axes_.axisStretch(0), 0.0, 0.0), viewMat);
+	Vec4<double> xAxisLimitMax = modelToScreen(Vec3<double>( axisMax.x*axes_.axisStretch(0), 0.0, 0.0), viewMat);
+	Vec4<double> yAxisLimitMin = modelToScreen(Vec3<double>( 0.0, axisMin.y*axes_.axisStretch(1), 0.0), viewMat);
+	Vec4<double> yAxisLimitMax = modelToScreen(Vec3<double>( 0.0, axisMax.y*axes_.axisStretch(1), 0.0), viewMat);
 	Vec4<double> xLabelBounds = axes_.axisTextPrimitive(0).boundingBox(*this, viewMat, false, textZScale_);
 	Vec4<double> yLabelBounds = axes_.axisTextPrimitive(1).boundingBox(*this, viewMat, false, textZScale_);
 // 	printf("COORDS: XAxXMin = %f, YAxXMin = %f, XLabXMin = %f, YLabXMin = %f\n", xAxisLimitMin.x, yAxisLimitMin.x, xLabelBounds.x, yLabelBounds.x);
@@ -878,8 +881,8 @@ void ViewPane::recalculateView()
 	unit.y -= viewportMatrix_[1] + 0.5*viewportMatrix_[3];
 
 	// Set axis stretch factors to fill available pixel width/height
-	axes_.setAxisStretch(0, availableWidth / (unit.x * axes_.axisRange(0)));
-	axes_.setAxisStretch(1, availableHeight / (unit.y * axes_.axisRange(1)));
+	axes_.setAxisStretch(0, availableWidth / (unit.x * (axisMax.x - axisMin.x)));
+	axes_.setAxisStretch(1, availableHeight / (unit.y * (axisMax.y - axisMin.y)));
 // 	printf("Final stretch values are %f %f\n", availableWidth / (unit.x * axes_.axisRange(0)), availableHeight / (unit.y * axes_.axisRange(1)));
 
 	// Set a translation in order to set the margins as requested
@@ -897,7 +900,7 @@ void ViewPane::resetViewMatrix()
 	viewTranslation_.set(0.0, 0.0, zOffset_);
 
 	// Calculate zoom to show all data
-	if (!twoDimensional_) viewTranslation_.z = calculateRequiredZoom((axes_.axisMax(0) - axes_.axisMin(0))*0.5, (axes_.axisMax(1) - axes_.axisMin(1))*0.5, 0.9);
+	if (!twoDimensional_) viewTranslation_.z = calculateRequiredZoom(axes_.axisRange(0)*0.5, axes_.axisRange(1)*0.5, 0.9);
 
 	// Recalculate projection matrix
 	projectionMatrix_ = calculateProjectionMatrix(viewTranslation_.z);
@@ -1064,6 +1067,15 @@ void ViewPane::collectionsUpdateCurrentSlices(int axis, double axisValue)
 /*
  * Style
  */
+
+// Calculate font scaling factor
+void ViewPane::calculateFontScaling()
+{
+	// Calculate text scaling factor
+	Vec4<double> unit = modelToScreen(Vec3<double>(0.0, 1.0, 0.0), Matrix(), Vec3<double>(0.0, 0.0, zOffset_));
+	unit.y -= viewportMatrix_[1] + viewportMatrix_[3]*0.5;
+	textZScale_ = unit.y;
+}
 
 // Set current bounding box type
 void ViewPane::setBoundingBox(ViewPane::BoundingBox type)
