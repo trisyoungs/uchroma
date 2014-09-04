@@ -1,4 +1,4 @@
-add_library(parser
+add_library(expression
   expression.cpp
   expression_lexer.cpp
   functionnode.cpp

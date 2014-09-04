@@ -22,7 +22,7 @@
 #ifndef UCHROMA_LOG_H
 #define UCHROMA_LOG_H
 
-#include "ui_log.h"
+#include "gui/ui_log.h"
 
 // Forward Declarations
 class UChromaWindow;

@@ -22,19 +22,19 @@ io_load.cpp
 io_save.cpp
 keywords.cpp
 axes_funcs.cpp
+colourbutton_funcs.cpp
 create_funcs.cpp
 data_funcs.cpp
 dataimport_funcs.cpp
 dataimport_seqxy.cpp
-log_funcs.cpp
-referencedialog_funcs.cpp
-saveimage_funcs.cpp
-colourbutton_funcs.cpp
 equationselect_funcs.cpp
 fitsetup_funcs.cpp
 gradientbar_funcs.cpp
 layout_funcs.cpp
+log_funcs.cpp
 paneorganiser_funcs.cpp
+referencedialog_funcs.cpp
+saveimage_funcs.cpp
 style_funcs.cpp
 targetselect_funcs.cpp
 texponentialspin_funcs.cpp
@@ -77,6 +77,7 @@ SET(pro_UIS
   dataimport.ui
   equationselect.ui
   fitsetup.ui
+  layout.ui
   log.ui
   referencedialog.ui
   saveimage.ui
