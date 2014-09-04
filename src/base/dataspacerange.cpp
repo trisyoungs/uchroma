@@ -64,9 +64,9 @@ void DataSpaceRange::set(Collection* collection, int abscissaFirst, int abscissa
 
 	// Grab stretch factors from the source collection's viewpane axes
 	// We need this since, because we are working with the Collection::displayData_ arrays, all X and Y values will have been scaled by these factors
-	double xStretch = collection->displayPane()->axes().axisStretch(0);
-	double yStretch = collection->displayPane()->axes().axisStretch(1);
-	double zStretch = collection->displayPane()->axes().axisStretch(2);
+	double xStretch = collection->displayPane()->axes().stretch(0);
+	double yStretch = collection->displayPane()->axes().stretch(1);
+	double zStretch = collection->displayPane()->axes().stretch(2);
 
 	// Setup data arrays
 	values_.clear();

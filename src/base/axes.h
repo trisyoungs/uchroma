@@ -57,167 +57,186 @@ class Axes
 	 */
 	private:
 	// Data limits for surface generation
-	Vec3<double> axisMin_, axisMax_;
+	Vec3<double> min_, max_;
 	// Limiting values for axis limits (accounting for data, log scales etc.)
-	Vec3<double> axisLimitMin_, axisLimitMax_;
+	Vec3<double> limitMin_, limitMax_;
 	// Axis extreme coordinates
-	Vec3<double> axisCoordMin_[3], axisCoordMax_[3];
+	Vec3<double> coordMin_[3], coordMax_[3];
 	// Central coordinate of current axes
-	Vec3<double> axesCoordCentre_;
+	Vec3<double> coordCentre_;
 	// Whether to invert axes
-	Vec3<bool> axisInverted_;
+	Vec3<bool> inverted_;
 	// Whether axes should be plotted as logarithms
-	Vec3<bool> axisLogarithmic_;
+	Vec3<bool> logarithmic_;
 	// Axis visibility
-	Vec3<bool> axisVisible_;
+	Vec3<bool> visible_;
 	// Stretch factors to apply to axes
-	Vec3<double> axisStretch_;
+	Vec3<double> stretch_;
 	// Whether axis position is fractional or absolute
-	Vec3<bool> axisPositionIsFractional_;
+	Vec3<bool> positionIsFractional_;
 	// Axis position in real or surface-space coordinates
-	Vec3<double> axisPositionReal_[3];
+	Vec3<double> positionReal_[3];
 	// Axis position in fractional axis coordinates
-	Vec3<double> axisPositionFractional_[3];
+	Vec3<double> positionFractional_[3];
 
 	private:
 	// Recalculate centre coordinate of axes
-	void calculateAxesCoordCentre();
+	void calculateCoordCentre();
 	// Clamp axis position and min/max to current limits
-	void clampAxis(int axis);
+	void clamp(int axis);
 
 	public:
 	// Set minimum value for specified axis
-	void setAxisMin(int axis, double value);
+	void setMin(int axis, double value);
 	// Return minimum value for specified axis
-	double axisMin(int axis);
+	double min(int axis);
 	// Set maximum value for specified axis
-	void setAxisMax(int axis, double value);
+	void setMax(int axis, double value);
 	// Return maximum value for specified axis
-	double axisMax(int axis);
+	double max(int axis);
 	// Return axis range
-	double axisRange(int axis);
+	double range(int axis);
 	// Set axis to extreme limit
-	void setAxisToLimit(int axis, bool minLim);
+	void setToLimit(int axis, bool minLim);
 	// Set axis minimum limit for specified axis
-	void setAxisLimitMin(int axis, double limit);
+	void setLimitMin(int axis, double limit);
 	// Return axis minimum limit for specified axis
-	double axisLimitMin(int axis);
+	double limitMin(int axis);
 	// Set axis maximum limit for specified axis
-	void setAxisLimitMax(int axis, double limit);
+	void setLimitMax(int axis, double limit);
 	// Return axis maximum limit for specified axis
-	double axisLimitMax(int axis);
+	double limitMax(int axis);
 	// Return coordinate at centre of axes
-	Vec3<double> axesCoordCentre();
+	Vec3<double> coordCentre();
 	// Return coordinate at minimum of specified axis
-	Vec3<double> axisCoordMin(int axis);
+	Vec3<double> coordMin(int axis);
 	// Return coordinate at maximum of specified axis
-	Vec3<double> axisCoordMax(int axis);
+	Vec3<double> coordMax(int axis);
 	// Set whether axis is inverted
-	void setAxisInverted(int axis, bool b);
+	void setInverted(int axis, bool b);
 	// Return whether axis is inverted
-	bool axisInverted(int axis);
+	bool inverted(int axis);
 	// Set whether axis is logarithmic
-	void setAxisLogarithmic(int axis, bool b);
+	void setLogarithmic(int axis, bool b);
 	// Return whether axis is logarithmic
-	bool axisLogarithmic(int axis);
+	bool logarithmic(int axis);
 	// Set whether axis is visible
-	void setAxisVisible(int axis, bool b);
+	void setVisible(int axis, bool b);
 	// Return whether specified axis is visible
-	bool axisVisible(int axis);
+	bool visible(int axis);
 	// Set stretch factor for axis
-	void setAxisStretch(int axis, double value);
+	void setStretch(int axis, double value);
 	// Return stretch factor for axis
-	double axisStretch(int axis);
+	double stretch(int axis);
 	// Set fractional position flag for axis
-	void setAxisPositionIsFractional(int axis, bool value);
+	void setPositionIsFractional(int axis, bool value);
 	// Return fractional position flag for axis
-	bool axisPositionIsFractional(int axis);
+	bool positionIsFractional(int axis);
 	// Set axis position (in real surface-space coordinates)
-	void setAxisPositionReal(int axis, int dir, double value);
+	void setPositionReal(int axis, int dir, double value);
 	// Set axis position to axis limit (in real surface-space coordinates)
-	void setAxisPositionRealToLimit(int axis, int dir, bool minLim);
+	void setPositionRealToLimit(int axis, int dir, bool minLim);
 	// Return axis position (in real surface-space coordinates)
-	Vec3<double> axisPositionReal(int axis);
+	Vec3<double> positionReal(int axis);
 	// Set axis position (in fractional axis coordinates)
-	void setAxisPositionFractional(int axis, int dir, double value);
+	void setPositionFractional(int axis, int dir, double value);
 	// Return axis position (in fractional axis coordinates)
-	Vec3<double> axisPositionFractional(int axis);
+	Vec3<double> positionFractional(int axis);
 
 
 	/*
-	 * Ticks / Labels
+	 * Ticks
 	 */
 	private:
 	// Axis tick direction
-	Vec3<double> axisTickDirection_[3];
+	Vec3<double> tickDirection_[3];
 	// Axis tick size (relative to font size)
-	Vec3<double> axisTickSize_;
+	Vec3<double> tickSize_;
 	// Position of first tick delta on axes
-	Vec3<double> axisFirstTick_;
+	Vec3<double> tickFirst_;
 	// Tick delta for axes
-	Vec3<double> axisTickDelta_;
+	Vec3<double> tickDelta_;
 	// Whether to calculate ticks automatically
-	Vec3<bool> axisAutoTicks_;
+	Vec3<bool> autoTicks_;
 	// Number of minor ticks in major tick intervals
-	Vec3<int> axisMinorTicks_;
-	// Orientation of axis labels (axial rot, in-plane rot, distance)
-	Vec3<double> axisLabelOrientation_[3];
-	// Axis laberl text anchor positions
-	TextPrimitive::TextAnchor axisLabelAnchor_[3];
-	// Axis titles
-	QString axisTitle_[3];
-	// Orientation of axis titles (axial rot, in-plane rot, distance, h-offset)
-	Vec4<double> axisTitleOrientation_[3];
-	// Axis title text anchor positions
-	TextPrimitive::TextAnchor axisTitleAnchor_[3];
+	Vec3<int> minorTicks_;
+
+	private:
+	// Recalculate tick deltas for specified axis
+	void calculateTickDeltas(int axis);
 
 	public:
 	// Set axis tick direction
-	void setAxisTickDirection(int axis, int dir, double value);
+	void setTickDirection(int axis, int dir, double value);
 	// Return axis tick direction for specified axis
-	Vec3<double> axisTickDirection(int axis);
+	Vec3<double> tickDirection(int axis);
 	// Set axis tick size (relative to font size)
-	void setAxisTickSize(int axis, double size);
+	void setTickSize(int axis, double size);
 	// Return axis tick size (relative to font size)
-	double axisTickSize(int axis);
+	double tickSize(int axis);
 	// Set position of first tick delta on specified axis
-	void setAxisFirstTick(int axis, double value);
+	void setFirstTick(int axis, double value);
 	// Return position of first tick delta on specified axis
-	double axisFirstTick(int axis);
+	double tickFirst(int axis);
 	// Set tick delta for specified axis
-	void setAxisTickDelta(int axis, double value);
+	void setTickDelta(int axis, double value);
 	// Return tick delta for specified axis
-	double axisTickDelta(int axis);
+	double tickDelta(int axis);
 	// Set whether to calculate ticks automatically for specified axis
-	void setAxisAutoTicks(int axis, bool b);
+	void setAutoTicks(int axis, bool b);
 	// Return whether to calculate ticks automatically for specified axis
-	bool axisAutoTicks(int axis);
+	bool autoTicks(int axis);
 	// Set number of minor ticks in major tick intervals for specified axis
-	void setAxisMinorTicks(int axis, int value);
+	void setMinorTicks(int axis, int value);
 	// Return number of minor ticks in major tick intervals for specified axis
-	int axisMinorTicks(int axis);
-	// Recalculate tick deltas for specified axis
-	void calculateTickDeltas(int axis);
+	int minorTicks(int axis);
+
+
+	/*
+	 * Labels
+	 */
+	private:
+	// Orientation of axis labels (axial rot, in-plane rot, distance)
+	Vec3<double> labelOrientation_[3];
+	// Axis label text anchor positions
+	TextPrimitive::TextAnchor labelAnchor_[3];
+	// Axis titles
+	QString title_[3];
+	// Orientation of axis titles (axial rot, in-plane rot, distance, h-offset)
+	Vec4<double> titleOrientation_[3];
+	// Axis title text anchor positions
+	TextPrimitive::TextAnchor titleAnchor_[3];
+
+	public:
 	// Set orientation of labels for specified axis
-	void setAxisLabelOrientation(int axis, int component, double value);
+	void setLabelOrientation(int axis, int component, double value);
 	// Return orientation of labels for specified axis
-	Vec3<double> axisLabelOrientation(int axis);
+	Vec3<double> labelOrientation(int axis);
 	// Set axis label text anchor position for specified axis
-	void setAxisLabelAnchor(int axis, TextPrimitive::TextAnchor anchor);
+	void setLabelAnchor(int axis, TextPrimitive::TextAnchor anchor);
 	// Return axis label text anchor position for specified axis
-	TextPrimitive::TextAnchor axisLabelAnchor(int axis);
+	TextPrimitive::TextAnchor labelAnchor(int axis);
 	// Set title for specified axis
-	void setAxisTitle(int axis, QString title);
+	void setTitle(int axis, QString title);
 	// Return title for specified axis
-	QString axisTitle(int axis);
+	QString title(int axis);
 	// Set orientation of titles for specified axis
-	void setAxisTitleOrientation(int axis, int component, double value);
+	void setTitleOrientation(int axis, int component, double value);
 	// Return orientation of titles for specified axis
-	Vec4<double> axisTitleOrientation(int axis);
+	Vec4<double> titleOrientation(int axis);
 	// Set axis title text anchor position for specified axis
-	void setAxisTitleAnchor(int axis, TextPrimitive::TextAnchor anchor);
+	void setTitleAnchor(int axis, TextPrimitive::TextAnchor anchor);
 	// Return axis title text anchor position for specified axis
-	TextPrimitive::TextAnchor axisTitleAnchor(int axis);
+	TextPrimitive::TextAnchor titleAnchor(int axis);
+
+
+	/*
+	 * GridLines
+	 */
+	private:
+	// Whether gridLines are active
+	Vec3<bool> gridLinesEnabled_;
+
 
 
 	/*
@@ -229,13 +248,17 @@ class Axes
 	// Display primitives
 	Primitive axisPrimitives_[3];
 	// Axis text primitives
-	TextPrimitiveList axisTextPrimitives_[3];
+	TextPrimitiveList labelPrimitives_[3];
+	// Axis title primitives
+	TextPrimitiveList titlePrimitives_[3];
+	// Gridline primitives
+	Primitive gridLinePrimitives_[3];
 	// Whether axis primitives are valid
 	bool primitivesValid_;
 
 	private:
 	// Add line to axis primitive
-	void addPrimitiveLine(int axis, Vec3<double> v1, Vec3<double> v2);
+	void addAxisPrimitiveLine(int axis, Vec3<double> v1, Vec3<double> v2);
 	// Update primitives for axis
 	void updateAxisPrimitives();
 
@@ -248,8 +271,12 @@ class Axes
 	void setPrimitivesInvalid();
 	// Return axis primitive for axis specified
 	Primitive& axisPrimitive(int axis);
-	// Return axis text primitive list for axis specified
-	TextPrimitiveList& axisTextPrimitive(int axis);
+	// Return axis label primitive list for axis specified
+	TextPrimitiveList& labelPrimitive(int axis);
+	// Return axis title primitive list for axis specified
+	TextPrimitiveList& titlePrimitive(int axis);
+	// Return gridline primitive for axis specified
+	Primitive& gridLinePrimitive(int axis);
 };
 
 #endif

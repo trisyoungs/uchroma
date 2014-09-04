@@ -47,7 +47,7 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 		{
 			// Auto ticks
 			case (Keywords::AutoTicksKeyword):
-				axes.setAxisAutoTicks(axis, parser.argb(1));
+				axes.setAutoTicks(axis, parser.argb(1));
 				break;
 			// End input block
 			case (Keywords::EndAxisKeyword):
@@ -55,15 +55,15 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 				break;
 			// First ticks
 			case (Keywords::FirstTickKeyword):
-				axes.setAxisFirstTick(axis, parser.argd(1));
+				axes.setFirstTick(axis, parser.argd(1));
 				break;
 			// Fractional positioning flag
 			case (Keywords::FractionalPositioningKeyword):
-				axes.setAxisPositionIsFractional(axis, parser.argb(1));
+				axes.setPositionIsFractional(axis, parser.argb(1));
 				break;
 			// Invert
 			case (Keywords::InvertKeyword):
-				axes.setAxisInverted(axis, parser.argb(1));
+				axes.setInverted(axis, parser.argb(1));
 				break;
 			// Axis label anchor
 			case (Keywords::LabelAnchorKeyword):
@@ -74,50 +74,50 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 					anchor = TextPrimitive::TopMiddleAnchor;
 					CHECKIOFAIL
 				}
-				axes.setAxisLabelAnchor(axis, anchor);
+				axes.setLabelAnchor(axis, anchor);
 				break;
 			// Axis label orientation
 			case (Keywords::LabelOrientationKeyword):
-				axes.setAxisLabelOrientation(axis, 0, parser.argd(1));
-				axes.setAxisLabelOrientation(axis, 1, parser.argd(2));
-				axes.setAxisLabelOrientation(axis, 2, parser.argd(3));
+				axes.setLabelOrientation(axis, 0, parser.argd(1));
+				axes.setLabelOrientation(axis, 1, parser.argd(2));
+				axes.setLabelOrientation(axis, 2, parser.argd(3));
 				break;
 			// Limits
 			case (Keywords::LimitsKeyword):
-				axes.setAxisMin(axis, parser.argd(1));
-				axes.setAxisMax(axis, parser.argd(2));
+				axes.setMin(axis, parser.argd(1));
+				axes.setMax(axis, parser.argd(2));
 				break;
 			// Axis logarithmic flag
 			case (Keywords::LogarithmicKeyword):
-				axes.setAxisLogarithmic(axis, parser.argb(1));
+				axes.setLogarithmic(axis, parser.argb(1));
 				break;
 			// Axis minor ticks
 			case (Keywords::MinorTicksKeyword):
-				axes.setAxisMinorTicks(axis, parser.argi(1));
+				axes.setMinorTicks(axis, parser.argi(1));
 				break;
 			// Axis position (in fractional axis coordinates)
 			case (Keywords::PositionFractionalKeyword):
-				axes.setAxisPositionFractional(axis, 0, parser.argd(1));
-				axes.setAxisPositionFractional(axis, 1, parser.argd(2));
-				axes.setAxisPositionFractional(axis, 2, parser.argd(3));
+				axes.setPositionFractional(axis, 0, parser.argd(1));
+				axes.setPositionFractional(axis, 1, parser.argd(2));
+				axes.setPositionFractional(axis, 2, parser.argd(3));
 				break;
 			// Axis position (in real surface-space coordinates)
 			case (Keywords::PositionRealKeyword):
-				axes.setAxisPositionReal(axis, 0, parser.argd(1));
-				axes.setAxisPositionReal(axis, 1, parser.argd(2));
-				axes.setAxisPositionReal(axis, 2, parser.argd(3));
+				axes.setPositionReal(axis, 0, parser.argd(1));
+				axes.setPositionReal(axis, 1, parser.argd(2));
+				axes.setPositionReal(axis, 2, parser.argd(3));
 				break;
 			// Axis stretch factors
 			case (Keywords::StretchKeyword):
-				axes.setAxisStretch(axis, parser.argd(1));
+				axes.setStretch(axis, parser.argd(1));
 				break;
 			// Axis tick deltas
 			case (Keywords::TickDeltaKeyword):
-				axes.setAxisTickDelta(axis, parser.argd(1));
+				axes.setTickDelta(axis, parser.argd(1));
 				break;
 			// Axis title
 			case (Keywords::TitleKeyword):
-				axes.setAxisTitle(axis, parser.argc(1));
+				axes.setTitle(axis, parser.argc(1));
 				break;
 			// Axis title anchor
 			case (Keywords::TitleAnchorKeyword):
@@ -128,18 +128,18 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 					anchor = TextPrimitive::TopMiddleAnchor;
 					CHECKIOFAIL
 				}
-				axes.setAxisTitleAnchor(axis, anchor);
+				axes.setTitleAnchor(axis, anchor);
 				break;
 			// Axis title orientation
 			case (Keywords::TitleOrientationKeyword):
-				axes.setAxisTitleOrientation(axis, 0, parser.argd(1));
-				axes.setAxisTitleOrientation(axis, 1, parser.argd(2));
-				axes.setAxisTitleOrientation(axis, 2, parser.argd(3));
-				axes.setAxisTitleOrientation(axis, 3, parser.argd(4));
+				axes.setTitleOrientation(axis, 0, parser.argd(1));
+				axes.setTitleOrientation(axis, 1, parser.argd(2));
+				axes.setTitleOrientation(axis, 2, parser.argd(3));
+				axes.setTitleOrientation(axis, 3, parser.argd(4));
 				break;
 			// Axis visibility
 			case (Keywords::VisibleAxisKeyword):
-				axes.setAxisVisible(axis, parser.argb(1));
+				axes.setVisible(axis, parser.argb(1));
 				break;
 			// Unrecognised keyword
 			default:

@@ -632,7 +632,7 @@ Matrix ViewPane::viewMatrix()
 	Matrix viewMatrix;
 
 	// Apply translation to centre of axes coordinates
-	viewMatrix.createTranslation(-axes().axesCoordCentre());
+	viewMatrix.createTranslation(-axes().coordCentre());
 
 	// Apply rotation matrix about this local centre
 	viewMatrix *= viewRotation_;
@@ -830,14 +830,14 @@ void ViewPane::recalculateView()
 
 	// Get axis min/max, accounting for logarithmic axes
 	Vec3<double> axisMin, axisMax;
-	axisMin.x = axes_.axisLogarithmic(0) ? log10(axes_.axisMin(0)) : axes_.axisMin(0);
-	axisMin.y = axes_.axisLogarithmic(1) ? log10(axes_.axisMin(1)) : axes_.axisMin(1);
-	axisMax.x = axes_.axisLogarithmic(0) ? log10(axes_.axisMax(0)) : axes_.axisMax(0);
-	axisMax.y = axes_.axisLogarithmic(1) ? log10(axes_.axisMax(1)) : axes_.axisMax(1);
+	axisMin.x = axes_.logarithmic(0) ? log10(axes_.min(0)) : axes_.min(0);
+	axisMin.y = axes_.logarithmic(1) ? log10(axes_.min(1)) : axes_.min(1);
+	axisMax.x = axes_.logarithmic(0) ? log10(axes_.max(0)) : axes_.max(0);
+	axisMax.y = axes_.logarithmic(1) ? log10(axes_.max(1)) : axes_.max(1);
 
 	// Set axis stretch factors to fill available pixel width/height
-	axes_.setAxisStretch(0, viewportMatrix_[2] / (unit.x * (axisMax.x - axisMin.x)));
-	axes_.setAxisStretch(1, viewportMatrix_[3] / (unit.y * (axisMax.y - axisMin.y)));
+	axes_.setStretch(0, viewportMatrix_[2] / (unit.x * (axisMax.x - axisMin.x)));
+	axes_.setStretch(1, viewportMatrix_[3] / (unit.y * (axisMax.y - axisMin.y)));
 // 	printf("Initial stretches = %f %f\n", viewportMatrix_[2] / (unit.x * axes_.axisRange(0)), viewportMatrix_[3] / (unit.y * axes_.axisRange(1)));
 
 	// We will now calculate more accurate stretch factors to apply to the X and Y axes.
@@ -845,13 +845,17 @@ void ViewPane::recalculateView()
 	// We don't care if the projected coordinates are on-screen or not - we only need them to compare with the bounding box
 	// calculated for the axes labels, to see what the absolute pixel overlaps are
 	Matrix viewMat;
-	viewMat.applyTranslation(-axes().axesCoordCentre());
-	Vec4<double> xAxisLimitMin = modelToScreen(Vec3<double>( axisMin.x*axes_.axisStretch(0), 0.0, 0.0), viewMat);
-	Vec4<double> xAxisLimitMax = modelToScreen(Vec3<double>( axisMax.x*axes_.axisStretch(0), 0.0, 0.0), viewMat);
-	Vec4<double> yAxisLimitMin = modelToScreen(Vec3<double>( 0.0, axisMin.y*axes_.axisStretch(1), 0.0), viewMat);
-	Vec4<double> yAxisLimitMax = modelToScreen(Vec3<double>( 0.0, axisMax.y*axes_.axisStretch(1), 0.0), viewMat);
-	Vec4<double> xLabelBounds = axes_.axisTextPrimitive(0).boundingBox(*this, viewMat, false, textZScale_);
-	Vec4<double> yLabelBounds = axes_.axisTextPrimitive(1).boundingBox(*this, viewMat, false, textZScale_);
+	viewMat.applyTranslation(-axes().coordCentre());
+	Vec4<double> xAxisLimitMin = modelToScreen(Vec3<double>( axisMin.x*axes_.stretch(0), 0.0, 0.0), viewMat);
+	Vec4<double> xAxisLimitMax = modelToScreen(Vec3<double>( axisMax.x*axes_.stretch(0), 0.0, 0.0), viewMat);
+	Vec4<double> yAxisLimitMin = modelToScreen(Vec3<double>( 0.0, axisMin.y*axes_.stretch(1), 0.0), viewMat);
+	Vec4<double> yAxisLimitMax = modelToScreen(Vec3<double>( 0.0, axisMax.y*axes_.stretch(1), 0.0), viewMat);
+	Vec4<double> xA = axes_.labelPrimitive(0).boundingBox(*this, viewMat, false, textZScale_);
+	Vec4<double> xB = axes_.titlePrimitive(0).boundingBox(*this, viewMat, false, textZScale_);
+	Vec4<double> xTextBounds(std::min(xA.x,xB.x), std::min(xA.y,xB.y), std::min(xA.z,xB.z), std::min(xA.w,xB.w));
+	Vec4<double> yA = axes_.labelPrimitive(1).boundingBox(*this, viewMat, false, textZScale_);
+	Vec4<double> yB = axes_.labelPrimitive(1).boundingBox(*this, viewMat, false, textZScale_);
+	Vec4<double> yTextBounds(std::min(yA.x,yB.x), std::min(yA.y,yB.y), std::min(yA.z,yB.z), std::min(yA.w,yB.w));
 // 	printf("COORDS: XAxXMin = %f, YAxXMin = %f, XLabXMin = %f, YLabXMin = %f\n", xAxisLimitMin.x, yAxisLimitMin.x, xLabelBounds.x, yLabelBounds.x);
 // 	printf("XAXLIMMIN: "); xAxisLimitMin.print();
 // 	printf("XAXLIMMAX: "); xAxisLimitMax.print();
@@ -865,13 +869,13 @@ void ViewPane::recalculateView()
 	const double margin = 10.0;
 	// -- Compare axes coordinate limit with label coordinate limits, and adjust margins by any pixel difference which would shrink the graph area
 	xMin = margin;
-	if (std::min(xAxisLimitMin.x,yAxisLimitMin.x) > std::min(xLabelBounds.x,yLabelBounds.x)) xMin += std::min(xAxisLimitMin.x,yAxisLimitMin.x) - std::min(xLabelBounds.x,yLabelBounds.x);
+	if (std::min(xAxisLimitMin.x,yAxisLimitMin.x) > std::min(xTextBounds.x,yTextBounds.x)) xMin += std::min(xAxisLimitMin.x,yAxisLimitMin.x) - std::min(xTextBounds.x,yTextBounds.x);
 	xMax = viewportMatrix_[2] - margin;
-	if (std::max(xAxisLimitMax.x,yAxisLimitMin.x) < std::max(xLabelBounds.z,yLabelBounds.x)) xMax += std::max(xAxisLimitMax.x,yAxisLimitMin.x) - std::max(xLabelBounds.z,yLabelBounds.x);
+	if (std::max(xAxisLimitMax.x,yAxisLimitMin.x) < std::max(xTextBounds.z,yTextBounds.x)) xMax += std::max(xAxisLimitMax.x,yAxisLimitMin.x) - std::max(xTextBounds.z,yTextBounds.x);
 	yMin = margin;
-	if (std::min(xAxisLimitMin.y,yAxisLimitMin.y) > std::min(xLabelBounds.y,yLabelBounds.y)) yMin += std::min(xAxisLimitMin.y,yAxisLimitMin.y) - std::min(xLabelBounds.y,yLabelBounds.y);
+	if (std::min(xAxisLimitMin.y,yAxisLimitMin.y) > std::min(xTextBounds.y,yTextBounds.y)) yMin += std::min(xAxisLimitMin.y,yAxisLimitMin.y) - std::min(xTextBounds.y,yTextBounds.y);
 	yMax = viewportMatrix_[3] - margin;
-	if (std::max(xAxisLimitMin.y,yAxisLimitMax.y) < std::max(xLabelBounds.y,yLabelBounds.w)) yMax += std::max(xAxisLimitMin.y,yAxisLimitMax.y) - std::max(xLabelBounds.y,yLabelBounds.w);
+	if (std::max(xAxisLimitMin.y,yAxisLimitMax.y) < std::max(xTextBounds.y,yTextBounds.w)) yMax += std::max(xAxisLimitMin.y,yAxisLimitMax.y) - std::max(xTextBounds.y,yTextBounds.w);
 // 	printf("VIEWP : %i %i %i %i\n", viewportMatrix_[0], viewportMatrix_[1], viewportMatrix_[2], viewportMatrix_[3]);
 // 	printf("LIMITS : X=%f,%f Y=%f,%f\n", xMin,xMax,yMin,yMax);
 	// -- Set available pixels for axes, accounting for margins
@@ -884,8 +888,8 @@ void ViewPane::recalculateView()
 	unit.y -= viewportMatrix_[1] + 0.5*viewportMatrix_[3];
 
 	// Set axis stretch factors to fill available pixel width/height
-	axes_.setAxisStretch(0, availableWidth / (unit.x * (axisMax.x - axisMin.x)));
-	axes_.setAxisStretch(1, availableHeight / (unit.y * (axisMax.y - axisMin.y)));
+	axes_.setStretch(0, availableWidth / (unit.x * (axisMax.x - axisMin.x)));
+	axes_.setStretch(1, availableHeight / (unit.y * (axisMax.y - axisMin.y)));
 // 	printf("Final stretch values are %f %f\n", availableWidth / (unit.x * axes_.axisRange(0)), availableHeight / (unit.y * axes_.axisRange(1)));
 
 	// Set a translation in order to set the margins as requested
@@ -903,7 +907,7 @@ void ViewPane::resetViewMatrix()
 	viewTranslation_.set(0.0, 0.0, zOffset_);
 
 	// Calculate zoom to show all data
-	if (!twoDimensional_) viewTranslation_.z = calculateRequiredZoom(axes_.axisRange(0)*0.5, axes_.axisRange(1)*0.5, 0.9);
+	if (!twoDimensional_) viewTranslation_.z = calculateRequiredZoom(axes_.range(0)*0.5, axes_.range(1)*0.5, 0.9);
 
 	// Recalculate projection matrix
 	projectionMatrix_ = calculateProjectionMatrix(viewTranslation_.z);
@@ -917,8 +921,8 @@ void ViewPane::showAllData()
 
 	for (int axis = 0; axis < 3; ++axis)
 	{
-		axes_.setAxisToLimit(axis, true);
-		axes_.setAxisToLimit(axis, false);
+		axes_.setToLimit(axis, true);
+		axes_.setToLimit(axis, false);
 	}
 
 	// Flag that all surfaces and axes should be regenerated (data and primitive)
@@ -1048,15 +1052,15 @@ void ViewPane::updateAxisLimits()
 	for (int axis = 0; axis < 3; ++axis)
 	{
 		// Set allowable range to avoid negative numbers if axis is now logarithmic
-		if (axes_.axisLogarithmic(axis))
+		if (axes_.logarithmic(axis))
 		{
-			axes_.setAxisLimitMin(axis, dataMinPositive[axis]);
-			axes_.setAxisLimitMax(axis, dataMaxPositive[axis]);
+			axes_.setLimitMin(axis, dataMinPositive[axis]);
+			axes_.setLimitMax(axis, dataMaxPositive[axis]);
 		}
 		else
 		{
-			axes_.setAxisLimitMin(axis, dataMin[axis]);
-			axes_.setAxisLimitMax(axis, dataMax[axis]);
+			axes_.setLimitMin(axis, dataMin[axis]);
+			axes_.setLimitMax(axis, dataMax[axis]);
 		}
 	}
 }
@@ -1179,10 +1183,10 @@ void ViewPane::updateInteractionPrimitive(int axis)
 
 	// Grab axes, and knock out values in the supplied vectors which correspond to the activated axis
 	Vec3<double> axisMinA, axisMinB, axisMaxA, axisMaxB;
-	axisMinA[(axis+1)%3] = axes_.axisCoordMin((axis+1)%3)[(axis+1)%3];
-	axisMaxA[(axis+1)%3] = axes_.axisCoordMax((axis+1)%3)[(axis+1)%3];
-	axisMinB[(axis+2)%3] = axes_.axisCoordMin((axis+2)%3)[(axis+2)%3];
-	axisMaxB[(axis+2)%3] = axes_.axisCoordMax((axis+2)%3)[(axis+2)%3];
+	axisMinA[(axis+1)%3] = axes_.coordMin((axis+1)%3)[(axis+1)%3];
+	axisMaxA[(axis+1)%3] = axes_.coordMax((axis+1)%3)[(axis+1)%3];
+	axisMinB[(axis+2)%3] = axes_.coordMin((axis+2)%3)[(axis+2)%3];
+	axisMaxB[(axis+2)%3] = axes_.coordMax((axis+2)%3)[(axis+2)%3];
 	axisMinA[axis] = 0.0;
 	axisMaxA[axis] = 0.0;
 	axisMinB[axis] = 0.0;

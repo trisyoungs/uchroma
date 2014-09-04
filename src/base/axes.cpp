@@ -27,59 +27,61 @@
 Axes::Axes(ViewPane& parent) : parent_(parent)
 {
 	// Definition
-	axisLimitMin_.zero();
-	axisLimitMax_.set(10.0, 10.0, 10.0);
-	axisMin_.zero();
-	axisMax_.set(10.0, 10.0, 10.0);
-	axisInverted_.set(false, false, false);
-	axisLogarithmic_.set(false, false, false);
-	axisVisible_.set(true, true, true);
-	axisPositionIsFractional_.set(true, true, true);
-	axisPositionReal_[0].zero();
-	axisPositionReal_[1].zero();
-	axisPositionReal_[2].zero();
-	axisPositionFractional_[0].zero();
-	axisPositionFractional_[1].zero();
-	axisPositionFractional_[2].zero();
-	axisCoordMin_[0].zero();
-	axisCoordMin_[1].zero();
-	axisCoordMin_[2].zero();
-	axisCoordMax_[0].zero();
-	axisCoordMax_[1].zero();
-	axisCoordMax_[2].zero();
-	axesCoordCentre_.set(5.0, 5.0, 5.0);
-	axisStretch_.set(1.0, 1.0, 1.0);
+	limitMin_.zero();
+	limitMax_.set(10.0, 10.0, 10.0);
+	min_.zero();
+	max_.set(10.0, 10.0, 10.0);
+	inverted_.set(false, false, false);
+	logarithmic_.set(false, false, false);
+	visible_.set(true, true, true);
+	positionIsFractional_.set(true, true, true);
+	positionReal_[0].zero();
+	positionReal_[1].zero();
+	positionReal_[2].zero();
+	positionFractional_[0].zero();
+	positionFractional_[1].zero();
+	positionFractional_[2].zero();
+	coordMin_[0].zero();
+	coordMin_[1].zero();
+	coordMin_[2].zero();
+	coordMax_[0].zero();
+	coordMax_[1].zero();
+	coordMax_[2].zero();
+	coordCentre_.set(5.0, 5.0, 5.0);
+	stretch_.set(1.0, 1.0, 1.0);
 
 	// Ticks / Labels
-	axisTickDirection_[0].set(0.0, -1.0, 0.0);
-	axisTickDirection_[1].set(-1.0, 0.0, 0.0);
-	axisTickDirection_[2].set(-1.0, 0.0, 0.0);
-	axisTickSize_.set(0.2, 0.2, 0.2);
-	axisFirstTick_.zero();
-	axisTickDelta_.set(1.0,1.0,1.0);
-	axisAutoTicks_.set(true, true, true);
-	axisMinorTicks_.set(1,1,1);
-	axisLabelAnchor_[0] = TextPrimitive::TopMiddleAnchor;
-	axisLabelAnchor_[1] = TextPrimitive::MiddleRightAnchor;
-	axisLabelAnchor_[2] = TextPrimitive::MiddleRightAnchor;
-	axisLabelOrientation_[0].set(0.0, 0.0, 0.2);
-	axisLabelOrientation_[1].set(0.0, 0.0, 0.2);
-	axisLabelOrientation_[2].set(90.0, 0.0, 0.2);
-	axisTitle_[0] = "X Axis";
-	axisTitle_[1] = "Y Axis";
-	axisTitle_[2] = "Z Axis";
-	axisTitleOrientation_[0].set(0.0, 0.0, 1.2, 0.5);
-	axisTitleOrientation_[1].set(0.0, 270.0, 1.2, 0.5);
-	axisTitleOrientation_[2].set(90.0, 90.0, 1.2, 0.5);
-	axisTitleAnchor_[0] = TextPrimitive::TopMiddleAnchor;
-	axisTitleAnchor_[1] = TextPrimitive::BottomMiddleAnchor;
-	axisTitleAnchor_[2] = TextPrimitive::TopMiddleAnchor;
+	tickDirection_[0].set(0.0, -1.0, 0.0);
+	tickDirection_[1].set(-1.0, 0.0, 0.0);
+	tickDirection_[2].set(-1.0, 0.0, 0.0);
+	tickSize_.set(0.2, 0.2, 0.2);
+	tickFirst_.zero();
+	tickDelta_.set(1.0,1.0,1.0);
+	autoTicks_.set(true, true, true);
+	minorTicks_.set(1,1,1);
+	labelAnchor_[0] = TextPrimitive::TopMiddleAnchor;
+	labelAnchor_[1] = TextPrimitive::MiddleRightAnchor;
+	labelAnchor_[2] = TextPrimitive::MiddleRightAnchor;
+	labelOrientation_[0].set(0.0, 0.0, 0.2);
+	labelOrientation_[1].set(0.0, 0.0, 0.2);
+	labelOrientation_[2].set(90.0, 0.0, 0.2);
+	title_[0] = "X Axis";
+	title_[1] = "Y Axis";
+	title_[2] = "Z Axis";
+	titleOrientation_[0].set(0.0, 0.0, 1.2, 0.5);
+	titleOrientation_[1].set(0.0, 270.0, 1.2, 0.5);
+	titleOrientation_[2].set(90.0, 90.0, 1.2, 0.5);
+	titleAnchor_[0] = TextPrimitive::TopMiddleAnchor;
+	titleAnchor_[1] = TextPrimitive::BottomMiddleAnchor;
+	titleAnchor_[2] = TextPrimitive::TopMiddleAnchor;
 
 	// GL
 	for (int n=0; n<3; ++n)
 	{
 		axisPrimitives_[n].initialise(1020, 0, GL_LINES, false);
 		axisPrimitives_[n].setNoInstances();
+		gridLinePrimitives_[n].initialise(1020, 0, GL_LINES, false);
+		gridLinePrimitives_[n].setNoInstances();
 	}
 	clipPlaneYMin_ = 0.0;
 	clipPlaneYMax_ = 0.0;
@@ -101,46 +103,46 @@ Axes::Axes(const Axes& source) : parent_(parent_)
 void Axes::operator=(const Axes& source)
 {
 	// Definition
-	axisMin_ = source.axisMin_;
-	axisMax_ = source.axisMax_;
-	axisInverted_ = source.axisInverted_;
-	axisLogarithmic_ = source.axisLogarithmic_;
-	axisVisible_ = source.axisVisible_;
-	axisPositionIsFractional_ = source.axisPositionIsFractional_;
-	axisPositionReal_[0] = source.axisPositionReal_[0];
-	axisPositionReal_[1] = source.axisPositionReal_[1];
-	axisPositionReal_[2] = source.axisPositionReal_[2];
-	axisPositionFractional_[0] = source.axisPositionFractional_[0];
-	axisPositionFractional_[1] = source.axisPositionFractional_[1];
-	axisPositionFractional_[2] = source.axisPositionFractional_[2];
-	axisCoordMin_[0] = source.axisCoordMin_[0];
-	axisCoordMin_[1] = source.axisCoordMin_[1];
-	axisCoordMin_[2] = source.axisCoordMin_[2];
-	axisCoordMax_[0] = source.axisCoordMax_[0];
-	axisCoordMax_[1] = source.axisCoordMax_[1];
-	axisCoordMax_[2] = source.axisCoordMax_[2];
-	axisStretch_ = source.axisStretch_;
+	min_ = source.min_;
+	max_ = source.max_;
+	inverted_ = source.inverted_;
+	logarithmic_ = source.logarithmic_;
+	visible_ = source.visible_;
+	positionIsFractional_ = source.positionIsFractional_;
+	positionReal_[0] = source.positionReal_[0];
+	positionReal_[1] = source.positionReal_[1];
+	positionReal_[2] = source.positionReal_[2];
+	positionFractional_[0] = source.positionFractional_[0];
+	positionFractional_[1] = source.positionFractional_[1];
+	positionFractional_[2] = source.positionFractional_[2];
+	coordMin_[0] = source.coordMin_[0];
+	coordMin_[1] = source.coordMin_[1];
+	coordMin_[2] = source.coordMin_[2];
+	coordMax_[0] = source.coordMax_[0];
+	coordMax_[1] = source.coordMax_[1];
+	coordMax_[2] = source.coordMax_[2];
+	stretch_ = source.stretch_;
 
 	// Ticks / Labels
-	axisTickDirection_[0] = source.axisTickDirection_[0];
-	axisTickDirection_[1] = source.axisTickDirection_[1];
-	axisTickDirection_[2] = source.axisTickDirection_[2];
-	axisFirstTick_ = source.axisFirstTick_;
-	axisTickDelta_ = source.axisTickDelta_;
-	axisAutoTicks_ = source.axisAutoTicks_;
-	axisMinorTicks_ = source.axisMinorTicks_;
-	axisLabelOrientation_[0] = source.axisLabelOrientation_[0];
-	axisLabelOrientation_[1] = source.axisLabelOrientation_[1];
-	axisLabelOrientation_[2] = source.axisLabelOrientation_[2];
-	axisTitle_[0] = source.axisTitle_[0];
-	axisTitle_[1] = source.axisTitle_[1];
-	axisTitle_[2] = source.axisTitle_[2];
-	axisTitleOrientation_[0] = source.axisTitleOrientation_[0];
-	axisTitleOrientation_[1] = source.axisTitleOrientation_[1];
-	axisTitleOrientation_[2] = source.axisTitleOrientation_[2];
-	axisTitleAnchor_[0] = source.axisTitleAnchor_[0];
-	axisTitleAnchor_[1] = source.axisTitleAnchor_[1];
-	axisTitleAnchor_[2] = source.axisTitleAnchor_[2];
+	tickDirection_[0] = source.tickDirection_[0];
+	tickDirection_[1] = source.tickDirection_[1];
+	tickDirection_[2] = source.tickDirection_[2];
+	tickFirst_ = source.tickFirst_;
+	tickDelta_ = source.tickDelta_;
+	autoTicks_ = source.autoTicks_;
+	minorTicks_ = source.minorTicks_;
+	labelOrientation_[0] = source.labelOrientation_[0];
+	labelOrientation_[1] = source.labelOrientation_[1];
+	labelOrientation_[2] = source.labelOrientation_[2];
+	title_[0] = source.title_[0];
+	title_[1] = source.title_[1];
+	title_[2] = source.title_[2];
+	titleOrientation_[0] = source.titleOrientation_[0];
+	titleOrientation_[1] = source.titleOrientation_[1];
+	titleOrientation_[2] = source.titleOrientation_[2];
+	titleAnchor_[0] = source.titleAnchor_[0];
+	titleAnchor_[1] = source.titleAnchor_[1];
+	titleAnchor_[2] = source.titleAnchor_[2];
 
 	// GL
 	clipPlaneYMin_ = 0.0;
@@ -154,37 +156,37 @@ void Axes::operator=(const Axes& source)
  */
 
 // Recalculate centre coordinate of axes
-void Axes::calculateAxesCoordCentre()
+void Axes::calculateCoordCentre()
 {
 	// Determine central coordinate within current axes and the Y clip limits
 	for (int n=0; n<3; ++n)
 	{
-		if (axisLogarithmic_[n]) axesCoordCentre_[n] = (axisInverted_[n] ? log10(axisMax_[n]/axisMin_[n]) : log10(axisMax_[n]*axisMin_[n])) * 0.5 * axisStretch_[n];
-		else axesCoordCentre_[n] = (axisMax_[n]+axisMin_[n]) * 0.5 * axisStretch_[n];
+		if (logarithmic_[n]) coordCentre_[n] = (inverted_[n] ? log10(max_[n]/min_[n]) : log10(max_[n]*min_[n])) * 0.5 * stretch_[n];
+		else coordCentre_[n] = (max_[n]+min_[n]) * 0.5 * stretch_[n];
 	}
 }
 
 // Clamp axis position and min/max to current limits if necessary
-void Axes::clampAxis(int axis)
+void Axes::clamp(int axis)
 {
-	if (axisLogarithmic_[axis])
+	if (logarithmic_[axis])
 	{
-		if (axisMin_[axis] < axisLimitMin_[axis]) setAxisToLimit(axis, true);
-// 		if (axisMax_[axis] > axisLimitMax_[axis]) setAxisToLimit(axis, false);
+		if (min_[axis] < limitMin_[axis]) setToLimit(axis, true);
+// 		if (max_[axis] > limitMax_[axis]) setToLimit(axis, false);
 	}
 
 // 	// Clamp axis position point values if necessary
 // 	for (int axis=0; axis < 3; ++axis)
 // 	{
-// 		if (axisPositionReal_[axis][(axis+1)%3] < axisLimitMin_[(axis+1)%3])
+// 		if (positionReal_[axis][(axis+1)%3] < limitMin_[(axis+1)%3])
 // 		{
-// 			axisPositionReal_[axis].set((axis+1)%3, axisLimitMin_[(axis+1)%3]);
+// 			positionReal_[axis].set((axis+1)%3, limitMin_[(axis+1)%3]);
 // 			primitivesValid_ = false;
 // 			parent_.paneChanged();
 // 		}
-// 		if (axisPositionReal_[axis][(axis+2)%3] < axisLimitMin_[(axis+2)%3])
+// 		if (positionReal_[axis][(axis+2)%3] < limitMin_[(axis+2)%3])
 // 		{
-// 			axisPositionReal_[axis].set((axis+2)%3, axisLimitMin_[(axis+2)%3]);
+// 			positionReal_[axis].set((axis+2)%3, limitMin_[(axis+2)%3]);
 // 			primitivesValid_ = false;
 // 			parent_.paneChanged();
 // 		}
@@ -192,11 +194,11 @@ void Axes::clampAxis(int axis)
 }
 
 // Set minimum value for specified axis
-void Axes::setAxisMin(int axis, double value)
+void Axes::setMin(int axis, double value)
 {
-	axisMin_[axis] = value;
+	min_[axis] = value;
 
-	calculateAxesCoordCentre();
+	calculateCoordCentre();
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
@@ -204,17 +206,17 @@ void Axes::setAxisMin(int axis, double value)
 }
 
 // Return minimum value for specified axis
-double Axes::axisMin(int axis)
+double Axes::min(int axis)
 {
-	return axisMin_[axis];
+	return min_[axis];
 }
 
 // Set maximum value for specified axis
-void Axes::setAxisMax(int axis, double value)
+void Axes::setMax(int axis, double value)
 {
-	axisMax_[axis] = value;
+	max_[axis] = value;
 
-	calculateAxesCoordCentre();
+	calculateCoordCentre();
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
@@ -222,77 +224,77 @@ void Axes::setAxisMax(int axis, double value)
 }
 
 // Return maximum value for specified axis
-double Axes::axisMax(int axis)
+double Axes::max(int axis)
 {
-	return axisMax_[axis];
+	return max_[axis];
 }
 
 // Return axis range
-double Axes::axisRange(int axis)
+double Axes::range(int axis)
 {
-	return axisMax_[axis] - axisMin_[axis];
+	return max_[axis] - min_[axis];
 }
 
 // Set axis to extreme limit
-void Axes::setAxisToLimit(int axis, bool minLim)
+void Axes::setToLimit(int axis, bool minLim)
 {
-	if (minLim) axisMin_[axis] = axisLimitMin_[axis];
-	else axisMax_[axis] = axisLimitMax_[axis];
+	if (minLim) min_[axis] = limitMin_[axis];
+	else max_[axis] = limitMax_[axis];
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
 }
 
 // Set axis minimum limit for specified axis
-void Axes::setAxisLimitMin(int axis, double limit)
+void Axes::setLimitMin(int axis, double limit)
 {
-	axisLimitMin_[axis] = limit;
+	limitMin_[axis] = limit;
 	
-	clampAxis(axis);
+	clamp(axis);
 }
 
 // Return axis minimum limit for specified axis
-double Axes::axisLimitMin(int axis)
+double Axes::limitMin(int axis)
 {
-	return axisLimitMin_[axis];
+	return limitMin_[axis];
 }
 
 // Set axis maximum limit for specified axis
-void Axes::setAxisLimitMax(int axis, double limit)
+void Axes::setLimitMax(int axis, double limit)
 {
-	axisLimitMax_[axis] = limit;
+	limitMax_[axis] = limit;
 	
-	clampAxis(axis);
+	clamp(axis);
 }
 
 // Return axis maximum limit for specified axis
-double Axes::axisLimitMax(int axis)
+double Axes::limitMax(int axis)
 {
-	return axisLimitMax_[axis];
+	return limitMax_[axis];
 }
 
 // Return coordinate at centre of current axes
-Vec3<double> Axes::axesCoordCentre()
+Vec3<double> Axes::coordCentre()
 {
-	return axesCoordCentre_;
+	return coordCentre_;
 }
 
 // Return coordinate at minimum of specified axis
-Vec3<double> Axes::axisCoordMin(int axis)
+Vec3<double> Axes::coordMin(int axis)
 {
-	return axisCoordMin_[axis];
+	return coordMin_[axis];
 }
 
 // Return coordinate at maximum of specified axis
-Vec3<double> Axes::axisCoordMax(int axis)
+Vec3<double> Axes::coordMax(int axis)
 {
-	return axisCoordMax_[axis];
+	return coordMax_[axis];
 }
 
 // Set whether axis is inverted
-void Axes::setAxisInverted(int axis, bool b)
+void Axes::setInverted(int axis, bool b)
 {
-	axisInverted_[axis] = b;
+	inverted_[axis] = b;
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
@@ -300,19 +302,19 @@ void Axes::setAxisInverted(int axis, bool b)
 }
 
 // Return whether axis is inverted
-bool Axes::axisInverted(int axis)
+bool Axes::inverted(int axis)
 {
-	return axisInverted_[axis];
+	return inverted_[axis];
 }
 
 // Set whether axis is logarithmic
-void Axes::setAxisLogarithmic(int axis, bool b)
+void Axes::setLogarithmic(int axis, bool b)
 {
-	axisLogarithmic_[axis] = b;
+	logarithmic_[axis] = b;
 
 	// Update and clamp axis values according to data
-	clampAxis(axis);
-	calculateAxesCoordCentre();
+	clamp(axis);
+	calculateCoordCentre();
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
@@ -320,190 +322,103 @@ void Axes::setAxisLogarithmic(int axis, bool b)
 }
 
 // Return whether axis is logarithmic
-bool Axes::axisLogarithmic(int axis)
+bool Axes::logarithmic(int axis)
 {
-	return axisLogarithmic_[axis];
+	return logarithmic_[axis];
 }
 
 // Set whether axis is visible
-void Axes::setAxisVisible(int axis, bool b)
+void Axes::setVisible(int axis, bool b)
 {
-	axisVisible_[axis] = b;
+	visible_[axis] = b;
 }
 
 // Return whether specified axis is visible
-bool Axes::axisVisible(int axis)
+bool Axes::visible(int axis)
 {
-	return axisVisible_[axis];
+	return visible_[axis];
 }
 
 // Set stretch factor for axis
-void Axes::setAxisStretch(int axis, double value)
+void Axes::setStretch(int axis, double value)
 {
-	axisStretch_[axis] = value;
+	stretch_[axis] = value;
 
-	calculateAxesCoordCentre();
+	calculateCoordCentre();
 
 	primitivesValid_ = false;
 	parent_.flagCollectionDataInvalid();
 }
 
 // Return stretch factor for axis
-double Axes::axisStretch(int axis)
+double Axes::stretch(int axis)
 {
-	return axisStretch_[axis];
+	return stretch_[axis];
 }
 
 // Set fractional position flag for axis
-void Axes::setAxisPositionIsFractional(int axis, bool b)
+void Axes::setPositionIsFractional(int axis, bool b)
 {
-	axisPositionIsFractional_[axis] = b;
+	positionIsFractional_[axis] = b;
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
 }
 
 // Return fractional position flag for axis
-bool Axes::axisPositionIsFractional(int axis)
+bool Axes::positionIsFractional(int axis)
 {
-	return axisPositionIsFractional_[axis];
+	return positionIsFractional_[axis];
 }
 
 // Set axis position (in real surface-space coordinates)
-void Axes::setAxisPositionReal(int axis, int dir, double value)
+void Axes::setPositionReal(int axis, int dir, double value)
 {
 	// Clamp range to limits
-	if (value > axisLimitMax_[dir]) value = axisLimitMax_[dir];
-	else if (value < axisLimitMin_[dir]) value = axisLimitMin_[dir];
-	axisPositionReal_[axis].set(dir, value);
+	if (value > limitMax_[dir]) value = limitMax_[dir];
+	else if (value < limitMin_[dir]) value = limitMin_[dir];
+	positionReal_[axis].set(dir, value);
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
 }
 
 // Set axis position to axis limit (in real surface-space coordinates)
-void Axes::setAxisPositionRealToLimit(int axis, int dir, bool minLim)
+void Axes::setPositionRealToLimit(int axis, int dir, bool minLim)
 {
-	axisPositionReal_[axis].set(dir, minLim ? axisLimitMin_[dir] : axisLimitMax_[dir]);
+	positionReal_[axis].set(dir, minLim ? limitMin_[dir] : limitMax_[dir]);
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
 }
 
 // Return axis position (in real surface-space coordinates)
-Vec3<double> Axes::axisPositionReal(int axis)
+Vec3<double> Axes::positionReal(int axis)
 {
-	return axisPositionReal_[axis];
+	return positionReal_[axis];
 }
 
 // Set axis position (in fractional axis coordinates)
-void Axes::setAxisPositionFractional(int axis, int dir, double value)
+void Axes::setPositionFractional(int axis, int dir, double value)
 {
 	// Clamp range to limits
 	if (value > 1.0) value = 1.0;
 	else if (value < 0.0) value = 0.0;
-	axisPositionFractional_[axis].set(dir, value);
+	positionFractional_[axis].set(dir, value);
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
 }
 
 // Return axis position (in fractional axis coordinates)
-Vec3<double> Axes::axisPositionFractional(int axis)
+Vec3<double> Axes::positionFractional(int axis)
 {
-	return axisPositionFractional_[axis];
+	return positionFractional_[axis];
 }
 
-// Set axis tick direction
-void Axes::setAxisTickDirection(int axis, int dir, double value)
-{
-	axisTickDirection_[axis].set(dir, value);
-
-	primitivesValid_ = false;
-	parent_.paneChanged();
-}
-
-// Return axis tick direction
-Vec3<double> Axes::axisTickDirection(int axis)
-{
-	return axisTickDirection_[axis];
-}
-
-// Set axis tick size (relative to font size)
-void Axes::setAxisTickSize(int axis, double size)
-{
-	axisTickSize_[axis] = size;
-
-	primitivesValid_ = false;
-	parent_.paneChanged();
-}
-
-// Return axis tick size (relative to font size)
-double Axes::axisTickSize(int axis)
-{
-	return axisTickSize_[axis];
-}
-
-// Set position of first tick delta on axes
-void Axes::setAxisFirstTick(int axis, double value)
-{
-	axisFirstTick_[axis] = value;
-
-	primitivesValid_ = false;
-	parent_.paneChanged();
-
-}
-
-// Return position of first tick delta on axes
-double Axes::axisFirstTick(int axis)
-{
-	return axisFirstTick_[axis];
-}
-
-// Set tick delta for axes
-void Axes::setAxisTickDelta(int axis, double value)
-{
-	axisTickDelta_[axis] = value;
-
-	primitivesValid_ = false;
-	parent_.paneChanged();
-}
-
-// Return tick delta for axes
-double Axes::axisTickDelta(int axis)
-{
-	return axisTickDelta_[axis];
-}
-
-// Set whether to calculate ticks automatically
-void Axes::setAxisAutoTicks(int axis, bool b)
-{
-	axisAutoTicks_[axis] = b;
-
-	primitivesValid_ = false;
-	parent_.paneChanged();
-}
-
-// Return whether to calculate ticks automatically
-bool Axes::axisAutoTicks(int axis)
-{
-	return axisAutoTicks_[axis];
-}
-
-// Set number of minor ticks in major tick intervals
-void Axes::setAxisMinorTicks(int axis, int value)
-{
-	axisMinorTicks_[axis] = value;
-
-	primitivesValid_ = false;
-	parent_.paneChanged();
-}
-
-// Return number of minor ticks in major tick intervals
-int Axes::axisMinorTicks(int axis)
-{
-	return axisMinorTicks_[axis];
-}
+/*
+ * Ticks / Labels / Gridlines
+ */
 
 // Recalculate tick deltas for specified axis
 void Axes::calculateTickDeltas(int axis)
@@ -513,23 +428,23 @@ void Axes::calculateTickDeltas(int axis)
 	double clampedStartValue;
 
 	baseValueIndex = 0;
-	power = int(log10((axisMax_[axis]-axisMin_[axis]) / maxTicks) - 1);
+	power = int(log10((max_[axis]-min_[axis]) / maxTicks) - 1);
 	iteration = 0;
 
-	if ((axisMax_[axis] - axisMin_[axis]) > 1.0e-10)
+	if ((max_[axis] - min_[axis]) > 1.0e-10)
 	{
 		do
 		{
 			// Calculate current tickDelta
-			axisTickDelta_[axis] = baseValues[baseValueIndex]*pow(10.0,power);
+			tickDelta_[axis] = baseValues[baseValueIndex]*pow(10.0,power);
 
 			// Get first tickmark value
-			axisFirstTick_[axis] = int(axisMin_[axis] / axisTickDelta_[axis]) * axisTickDelta_[axis];
-			clampedStartValue = (axisFirstTick_[axis] < axisMin_[axis] ? axisFirstTick_[axis] + axisTickDelta_[axis] : axisFirstTick_[axis]);
+			tickFirst_[axis] = int(min_[axis] / tickDelta_[axis]) * tickDelta_[axis];
+			clampedStartValue = (tickFirst_[axis] < min_[axis] ? tickFirst_[axis] + tickDelta_[axis] : tickFirst_[axis]);
 
 			// How many ticks now fit between the firstTick and max value?
 			// Add 1 to get total ticks for this delta (i.e. including firstTick)
-			nTicks = int((axisMax_[axis]-axisMin_[axis]) / axisTickDelta_[axis]);
+			nTicks = int((max_[axis]-min_[axis]) / tickDelta_[axis]);
 			++nTicks;
 
 			// Check n...
@@ -556,92 +471,192 @@ void Axes::calculateTickDeltas(int axis)
 	}
 	else
 	{
-		axisFirstTick_[axis] = axisMin_[axis];
-		axisTickDelta_[axis] = 1.0;
+		tickFirst_[axis] = min_[axis];
+		tickDelta_[axis] = 1.0;
 	}
 }
 
-// Set orientation of labels for specified axis
-void Axes::setAxisLabelOrientation(int axis, int component, double value)
+// Set axis tick direction
+void Axes::setTickDirection(int axis, int dir, double value)
 {
-	axisLabelOrientation_[axis].set(component, value);
+	tickDirection_[axis].set(dir, value);
+
+	primitivesValid_ = false;
+	parent_.paneChanged();
+}
+
+// Return axis tick direction
+Vec3<double> Axes::tickDirection(int axis)
+{
+	return tickDirection_[axis];
+}
+
+// Set axis tick size (relative to font size)
+void Axes::setTickSize(int axis, double size)
+{
+	tickSize_[axis] = size;
+
+	primitivesValid_ = false;
+	parent_.paneChanged();
+}
+
+// Return axis tick size (relative to font size)
+double Axes::tickSize(int axis)
+{
+	return tickSize_[axis];
+}
+
+// Set position of first tick delta on axes
+void Axes::setFirstTick(int axis, double value)
+{
+	tickFirst_[axis] = value;
+
+	primitivesValid_ = false;
+	parent_.paneChanged();
+
+}
+
+// Return position of first tick delta on axes
+double Axes::tickFirst(int axis)
+{
+	return tickFirst_[axis];
+}
+
+// Set tick delta for axes
+void Axes::setTickDelta(int axis, double value)
+{
+	tickDelta_[axis] = value;
+
+	primitivesValid_ = false;
+	parent_.paneChanged();
+}
+
+// Return tick delta for axes
+double Axes::tickDelta(int axis)
+{
+	return tickDelta_[axis];
+}
+
+// Set whether to calculate ticks automatically
+void Axes::setAutoTicks(int axis, bool b)
+{
+	autoTicks_[axis] = b;
+
+	primitivesValid_ = false;
+	parent_.paneChanged();
+}
+
+// Return whether to calculate ticks automatically
+bool Axes::autoTicks(int axis)
+{
+	return autoTicks_[axis];
+}
+
+// Set number of minor ticks in major tick intervals
+void Axes::setMinorTicks(int axis, int value)
+{
+	minorTicks_[axis] = value;
+
+	primitivesValid_ = false;
+	parent_.paneChanged();
+}
+
+// Return number of minor ticks in major tick intervals
+int Axes::minorTicks(int axis)
+{
+	return minorTicks_[axis];
+}
+
+/*
+ * Labels
+ */
+
+// Set orientation of labels for specified axis
+void Axes::setLabelOrientation(int axis, int component, double value)
+{
+	labelOrientation_[axis].set(component, value);
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
 }
 
 // Return orientation of labels for specified axis
-Vec3<double> Axes::axisLabelOrientation(int axis)
+Vec3<double> Axes::labelOrientation(int axis)
 {
-	return axisLabelOrientation_[axis];
+	return labelOrientation_[axis];
 }
 
 // Set axis label text anchor position for specified axis
-void Axes::setAxisLabelAnchor(int axis, TextPrimitive::TextAnchor anchor)
+void Axes::setLabelAnchor(int axis, TextPrimitive::TextAnchor anchor)
 {
-	axisLabelAnchor_[axis] = anchor;
+	labelAnchor_[axis] = anchor;
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
 }
 
 // Return axis label text anchor position for specified axis
-TextPrimitive::TextAnchor Axes::axisLabelAnchor(int axis)
+TextPrimitive::TextAnchor Axes::labelAnchor(int axis)
 {
-	return axisLabelAnchor_[axis];
+	return labelAnchor_[axis];
 }
 
 // Set title for specified axis
-void Axes::setAxisTitle(int axis, QString title)
+void Axes::setTitle(int axis, QString title)
 {
-	axisTitle_[axis] = title;
+	title_[axis] = title;
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
 }
 
 // Return title for specified axis
-QString Axes::axisTitle(int axis)
+QString Axes::title(int axis)
 {
-	return axisTitle_[axis];
+	return title_[axis];
 }
 
 // Set orientation of titles for specified axis
-void Axes::setAxisTitleOrientation(int axis, int component, double value)
+void Axes::setTitleOrientation(int axis, int component, double value)
 {
-	axisTitleOrientation_[axis].set(component, value);
+	titleOrientation_[axis].set(component, value);
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
 }
 
 // Return orientation of titles for specified axis
-Vec4<double> Axes::axisTitleOrientation(int axis)
+Vec4<double> Axes::titleOrientation(int axis)
 {
-	return axisTitleOrientation_[axis];
+	return titleOrientation_[axis];
 }
 
 // Set axis title text anchor position for specified axis
-void Axes::setAxisTitleAnchor(int axis, TextPrimitive::TextAnchor anchor)
+void Axes::setTitleAnchor(int axis, TextPrimitive::TextAnchor anchor)
 {
-	axisTitleAnchor_[axis] = anchor;
+	titleAnchor_[axis] = anchor;
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
 }
 
 // Return axis title text anchor position for specified axis
-TextPrimitive::TextAnchor Axes::axisTitleAnchor(int axis)
+TextPrimitive::TextAnchor Axes::titleAnchor(int axis)
 {
-	return axisTitleAnchor_[axis];
+	return titleAnchor_[axis];
 }
+
+/*
+ * GridLines
+ */
+
 
 /*
  * GL
  */
 
 // Add line to axis primitive
-void Axes::addPrimitiveLine(int axis, Vec3<double> v1, Vec3<double> v2)
+void Axes::addAxisPrimitiveLine(int axis, Vec3<double> v1, Vec3<double> v2)
 {
 	axisPrimitives_[axis].defineVertex(v1.x, v1.y, v1.z, 1.0, 0.0, 0.0);
 	axisPrimitives_[axis].defineVertex(v2.x, v2.y, v2.z, 1.0, 0.0, 0.0);
@@ -664,34 +679,34 @@ void Axes::updateAxisPrimitives()
 	// Determine central coordinate within current axes and the Y clip limits
 	for (int n=0; n<3; ++n)
 	{
-		if (axisLogarithmic_[n]) axesCoordCentre_[n] = (axisInverted_[n] ? log10(axisMax_[n]/axisMin_[n]) : log10(axisMax_[n]*axisMin_[n])) * 0.5 * axisStretch_[n];
-		else axesCoordCentre_[n] = (axisMax_[n]+axisMin_[n]) * 0.5 * axisStretch_[n];
+		if (logarithmic_[n]) coordCentre_[n] = (inverted_[n] ? log10(max_[n]/min_[n]) : log10(max_[n]*min_[n])) * 0.5 * stretch_[n];
+		else coordCentre_[n] = (max_[n]+min_[n]) * 0.5 * stretch_[n];
 	}
 
 	// Set Y clip
-	if (axisLogarithmic_.y)
+	if (logarithmic_.y)
 	{
-		clipPlaneYMin_ = (log10(axisMin_.y) * axisStretch_.y) - clipPlaneDelta;
-		clipPlaneYMax_ = (log10(axisMax_.y) * axisStretch_.y) + clipPlaneDelta;
+		clipPlaneYMin_ = (log10(min_.y) * stretch_.y) - clipPlaneDelta;
+		clipPlaneYMax_ = (log10(max_.y) * stretch_.y) + clipPlaneDelta;
 	}
 	else
 	{
-		clipPlaneYMin_ = (axisMin_.y * axisStretch_.y) - clipPlaneDelta;
-		clipPlaneYMax_ = (axisMax_.y * axisStretch_.y) + clipPlaneDelta;
+		clipPlaneYMin_ = (min_.y * stretch_.y) - clipPlaneDelta;
+		clipPlaneYMax_ = (max_.y * stretch_.y) + clipPlaneDelta;
 	}
 	
 	// Set basic extreme coordinates for axes - actual limits on axes will be set in following loop
 	for (int axis=0; axis < 3; ++axis)
 	{
-		double axisPosition;
+		double position;
 		for (int n=0; n<3; ++n)
 		{
 			// Get axis position
-			axisPosition = (axisPositionIsFractional_[axis] ? axisPositionFractional_[axis][n]*(axisMax_[n]-axisMin_[n])+axisMin_[n] : axisPositionReal_[axis][n]);
-			if (axisLogarithmic_[n]) axisCoordMin_[axis].set(n, (axisInverted_[n] ? log10(axisMax_[n]/axisPosition) : log10(axisPosition)) * axisStretch_[n]);
-			else axisCoordMin_[axis].set(n, (axisInverted_[n] ? axisMax_[n] - axisPosition : axisPosition) * axisStretch_[n]);
+			position = (positionIsFractional_[axis] ? positionFractional_[axis][n]*(max_[n]-min_[n])+min_[n] : positionReal_[axis][n]);
+			if (logarithmic_[n]) coordMin_[axis].set(n, (inverted_[n] ? log10(max_[n]/position) : log10(position)) * stretch_[n]);
+			else coordMin_[axis].set(n, (inverted_[n] ? max_[n] - position : position) * stretch_[n]);
 		}
-		axisCoordMax_[axis] = axisCoordMin_[axis];
+		coordMax_[axis] = coordMin_[axis];
 	}
 
 	// Construct axes
@@ -699,63 +714,64 @@ void Axes::updateAxisPrimitives()
 	{
 		// Clear old axis primitives
 		axisPrimitives_[axis].forgetAll();
-		axisTextPrimitives_[axis].forgetAll();
+		labelPrimitives_[axis].forgetAll();
+		titlePrimitives_[axis].forgetAll();
 
 		// Normalise tickDirection
-		tickDir = axisTickDirection_[axis];
+		tickDir = tickDirection_[axis];
 		tickDir.normalise();
 
 		// Create tick label transformation matrix
 		labelTransform.setIdentity();
 		// -- 1) Apply axial rotation along X axis (left-to-right direction)
-		labelTransform.applyRotationX(axisLabelOrientation_[axis].x);
+		labelTransform.applyRotationX(labelOrientation_[axis].x);
 		// -- 2) Perform in-plane rotation
-		labelTransform.applyRotationZ(axisLabelOrientation_[axis].y);
+		labelTransform.applyRotationZ(labelOrientation_[axis].y);
 
 		// Create axis title transformation matrix
 		titleTransform.setIdentity();
 		// -- 1) Apply axial rotation along X axis (left-to-right direction)
-		titleTransform.applyRotationX(axisTitleOrientation_[axis].x);
+		titleTransform.applyRotationX(titleOrientation_[axis].x);
 		// -- 2) Perform in-plane rotation
-		titleTransform.applyRotationZ(axisTitleOrientation_[axis].y);
+		titleTransform.applyRotationZ(titleOrientation_[axis].y);
 
-		if (axisLogarithmic_[axis])
+		if (logarithmic_[axis])
 		{
 			// Set axis min/max coordinates
-			axisCoordMin_[axis].set(axis, (axisInverted_[axis] ? log10(axisMax_[axis] / axisMin_[axis]) : log10(axisMin_[axis])) * axisStretch_[axis]);
-			axisCoordMax_[axis].set(axis, (axisInverted_[axis] ? log10(axisMax_[axis] / axisMax_[axis]) : log10(axisMax_[axis])) * axisStretch_[axis]);
+			coordMin_[axis].set(axis, (inverted_[axis] ? log10(max_[axis] / min_[axis]) : log10(min_[axis])) * stretch_[axis]);
+			coordMax_[axis].set(axis, (inverted_[axis] ? log10(max_[axis] / max_[axis]) : log10(max_[axis])) * stretch_[axis]);
 
 			// For the log axis, the associated surface data coordinate will already be in log form
-			if (axisMax_[axis] < 0.0)
+			if (max_[axis] < 0.0)
 			{
-				msg.print("Axis range is inappropriate for a log scale (%f < x < %f). Axis will not be drawn.\n", axisMin_[axis], axisMax_[axis]);
+				msg.print("Axis range is inappropriate for a log scale (%f < x < %f). Axis will not be drawn.\n", min_[axis], max_[axis]);
 				return;
 			}
 
-			// Draw a line from min to max range, passing through the defined axisPosition
-			addPrimitiveLine(axis, axisCoordMin_[axis], axisCoordMax_[axis]);
+			// Draw a line from min to max range, passing through the defined position
+			addAxisPrimitiveLine(axis, coordMin_[axis], coordMax_[axis]);
 
 			// Grab logged min/max values for convenience, enforcing sensible minimum
-			double axisMin = log10(axisMin_[axis] <= 0.0 ? 1.0e-10 : axisMin_[axis]);
-			double axisMax = log10(axisMax_[axis]);
+			double min = log10(min_[axis] <= 0.0 ? 1.0e-10 : min_[axis]);
+			double max = log10(max_[axis]);
 
 			// Plot tickmarks - Start at floored (ceiling'd) integer of logAxisMin (logAxisMax), and go from there.
-			int nMinorTicks = axisMinorTicks_[axis] > 8 ? 8 : axisMinorTicks_[axis];
+			int nMinorTicks = minorTicks_[axis] > 8 ? 8 : minorTicks_[axis];
 			int count = 0;
-			double power = floor(axisMin);
+			double power = floor(min);
 			double value = pow(10,power);
-			Vec3<double> u = axisCoordMin_[axis];
+			Vec3<double> u = coordMin_[axis];
 			while (true)
 			{
 				// Check break condition
-				if (value > axisMax_[axis]) break;
+				if (value > max_[axis]) break;
 
 				// If the current value is in range, plot a tick
-				u[axis] = (axisInverted_[axis] ? log10(axisMax_[axis]/value): log10(value)) * axisStretch_[axis];
-				if (log10(value) >= axisMin)
+				u[axis] = (inverted_[axis] ? log10(max_[axis]/value): log10(value)) * stretch_[axis];
+				if (log10(value) >= min)
 				{
 					// Tick mark
-					addPrimitiveLine(axis, u, u+tickDir*axisTickSize_[axis]*(count == 0 ? 1.0 : 0.5));
+					addAxisPrimitiveLine(axis, u, u+tickDir*tickSize_[axis]*(count == 0 ? 1.0 : 0.5));
 
 					// Tick label
 					if (count == 0)
@@ -765,7 +781,7 @@ void Axes::updateAxisPrimitives()
 						if (fabs(value) < pow(10,power-5)) s = "0";
 						else s = QString::number(value);
 
-						axisTextPrimitives_[axis].add(s, u+tickDir*axisTickSize_[axis], axisLabelAnchor_[axis], tickDir * (axisTickSize_[axis]+axisLabelOrientation_[axis].z), labelTransform, parent_.labelPointSize());
+						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor_[axis], tickDir * (tickSize_[axis]+labelOrientation_[axis].z), labelTransform, parent_.labelPointSize());
 					}
 				}
 
@@ -781,61 +797,61 @@ void Axes::updateAxisPrimitives()
 			}
 
 			// Add axis title
-			u = axisCoordMin_[axis];
-			value = log10(axisMin_[axis]) + log10(axisMax_[axis]/axisMin_[axis]) * axisTitleOrientation_[axis].w;
-			u.set(axis, (axisInverted_[axis] ? log10(axisMax_[axis])-value : value) * axisStretch_[axis]);
-			axisTextPrimitives_[axis].add(axisTitle_[axis], u, axisTitleAnchor_[axis], tickDir * axisTitleOrientation_[axis].z, titleTransform, parent_.titlePointSize());
+			u = coordMin_[axis];
+			value = log10(min_[axis]) + log10(max_[axis]/min_[axis]) * titleOrientation_[axis].w;
+			u.set(axis, (inverted_[axis] ? log10(max_[axis])-value : value) * stretch_[axis]);
+			titlePrimitives_[axis].add(title_[axis], u, titleAnchor_[axis], tickDir * titleOrientation_[axis].z, titleTransform, parent_.titlePointSize());
 		}
 		else
 		{
 			// Set axis min/max coordinates
-			axisCoordMin_[axis].set(axis, (axisInverted_[axis] ? axisMax_[axis] : axisMin_[axis]) * axisStretch_[axis]);
-			axisCoordMax_[axis].set(axis, (axisInverted_[axis] ? axisMin_[axis] : axisMax_[axis]) * axisStretch_[axis]);
+			coordMin_[axis].set(axis, (inverted_[axis] ? max_[axis] : min_[axis]) * stretch_[axis]);
+			coordMax_[axis].set(axis, (inverted_[axis] ? min_[axis] : max_[axis]) * stretch_[axis]);
 		
 			// Calculate autoticks if necessary
-			if (axisAutoTicks_[axis]) calculateTickDeltas(axis);
+			if (autoTicks_[axis]) calculateTickDeltas(axis);
 
-			// Draw a line from min to max limits, passing through the defined axisPosition
-			addPrimitiveLine(axis, axisCoordMin_[axis], axisCoordMax_[axis]);
+			// Draw a line from min to max limits, passing through the defined position
+			addAxisPrimitiveLine(axis, coordMin_[axis], coordMax_[axis]);
 
 			// Check tickDelta
-			if (((axisMax_[axis]-axisMin_[axis]) / axisTickDelta_[axis]) > 1e6) return;
+			if (((max_[axis]-min_[axis]) / tickDelta_[axis]) > 1e6) return;
 
 			// Plot tickmarks - maximum of 100 minor tickmarks between major lines
 			int count = 0;
-			delta = axisTickDelta_[axis] / (axisMinorTicks_[axis]+1);
-			value = axisFirstTick_[axis];
-			u = axisCoordMin_[axis];
-			u.set(axis, (axisInverted_[axis] ? (axisMax_[axis] - axisFirstTick_[axis]) + axisMin_[axis]: axisFirstTick_[axis]) * axisStretch_[axis]);
-			while (value <= axisMax_[axis])
+			delta = tickDelta_[axis] / (minorTicks_[axis]+1);
+			value = tickFirst_[axis];
+			u = coordMin_[axis];
+			u.set(axis, (inverted_[axis] ? (max_[axis] - tickFirst_[axis]) + min_[axis]: tickFirst_[axis]) * stretch_[axis]);
+			while (value <= max_[axis])
 			{
-				// Draw tick here, only if value >= axisMin_
-				if (value >= axisMin_[axis])
+				// Draw tick here, only if value >= min_
+				if (value >= min_[axis])
 				{
-					if (count %(axisMinorTicks_[axis]+1) == 0)
+					if (count %(minorTicks_[axis]+1) == 0)
 					{
-						addPrimitiveLine(axis, u, u + tickDir*axisTickSize_[axis]);
+						addAxisPrimitiveLine(axis, u, u + tickDir*tickSize_[axis]);
 						
 						// Get formatted label text, acounting for roundoff error
-						if (fabs(value) < axisTickDelta_[axis]*1.0e-10) s = "0";
+						if (fabs(value) < tickDelta_[axis]*1.0e-10) s = "0";
 						else s = QString::number(value);
 
-						axisTextPrimitives_[axis].add(s, u+tickDir*axisTickSize_[axis], axisLabelAnchor_[axis], tickDir * (axisTickSize_[axis] + axisLabelOrientation_[axis].z), labelTransform, parent_.labelPointSize());
+						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor_[axis], tickDir * (tickSize_[axis] + labelOrientation_[axis].z), labelTransform, parent_.labelPointSize());
 						
 						count = 0;
 					}
-					else addPrimitiveLine(axis, u, u + tickDir*axisTickSize_[axis]*0.5);
+					else addAxisPrimitiveLine(axis, u, u + tickDir*tickSize_[axis]*0.5);
 				}
-				u.add(axis, delta * (axisInverted_[axis] ? -axisStretch_[axis] : axisStretch_[axis]));
+				u.add(axis, delta * (inverted_[axis] ? -stretch_[axis] : stretch_[axis]));
 				value += delta;
 				++count;
 			}
 
 			// Add axis title
-			u = axisCoordMin_[axis];
-			value = axisMin_[axis] + (axisMax_[axis] - axisMin_[axis]) * axisTitleOrientation_[axis].w;
-			u.set(axis, (axisInverted_[axis] ? (axisMax_[axis] - value) + axisMin_[axis]: value) * axisStretch_[axis]);
-			axisTextPrimitives_[axis].add(axisTitle_[axis], u, axisTitleAnchor_[axis], tickDir * axisTitleOrientation_[axis].z, titleTransform, parent_.titlePointSize());
+			u = coordMin_[axis];
+			value = min_[axis] + (max_[axis] - min_[axis]) * titleOrientation_[axis].w;
+			u.set(axis, (inverted_[axis] ? (max_[axis] - value) + min_[axis]: value) * stretch_[axis]);
+			titlePrimitives_[axis].add(title_[axis], u, titleAnchor_[axis], tickDir * titleOrientation_[axis].z, titleTransform, parent_.titlePointSize());
 		}
 	}
 
@@ -873,11 +889,29 @@ Primitive& Axes::axisPrimitive(int axis)
 	return axisPrimitives_[axis];
 }
 
-// Return axis text primitive list for axis specified
-TextPrimitiveList& Axes::axisTextPrimitive(int axis)
+// Return axis label primitive list for axis specified
+TextPrimitiveList& Axes::labelPrimitive(int axis)
 {
 	// Make sure primitives are up to date first...
 	updateAxisPrimitives();
 
-	return axisTextPrimitives_[axis];
+	return labelPrimitives_[axis];
+}
+
+// Return axis title primitive list for axis specified
+TextPrimitiveList& Axes::titlePrimitive(int axis)
+{
+	// Make sure primitives are up to date first...
+	updateAxisPrimitives();
+
+	return titlePrimitives_[axis];
+}
+
+// Return gridline primitive for axis specified
+Primitive& Axes::gridLinePrimitive(int axis)
+{
+	// Make sure primitives are up to date first...
+	updateAxisPrimitives();
+
+	return gridLinePrimitives_[axis];
 }

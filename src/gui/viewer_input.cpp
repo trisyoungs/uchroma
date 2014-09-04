@@ -125,7 +125,7 @@ void Viewer::wheelEvent(QWheelEvent *event)
 	// Perform camera zoom
 	if (uChroma_->currentViewPane())
 	{
-		double zrange = uChroma_->currentViewPane()->axes().axisStretch(2) * uChroma_->currentViewPane()->axes().axisRange(2);
+		double zrange = uChroma_->currentViewPane()->axes().stretch(2) * uChroma_->currentViewPane()->axes().range(2);
 		if (zrange < 1.0) zrange = 1.0;
 		uChroma_->currentViewPane()->translateView(0.0, 0.0, 0.5*zrange*(scrollup ? -1.0 : 1.0));
 	}

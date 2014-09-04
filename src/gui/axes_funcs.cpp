@@ -98,7 +98,7 @@ bool AxesWindow::axisInvertChanged(int axis, bool checked)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 	
-	if (haveCurrentAxes()) currentAxes().setAxisInverted(axis, checked);
+	if (haveCurrentAxes()) currentAxes().setInverted(axis, checked);
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -110,7 +110,7 @@ bool AxesWindow::axisLogarithmicChanged(int axis, bool checked)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 	
-	currentAxes().setAxisLogarithmic(axis, checked);
+	currentAxes().setLogarithmic(axis, checked);
 
 	// Update relevant parts of gui
 	updateControls();
@@ -123,7 +123,7 @@ bool AxesWindow::axisVisibleChanged(int axis, bool checked)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 	
-	currentAxes().setAxisVisible(axis, checked);
+	currentAxes().setVisible(axis, checked);
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -135,7 +135,7 @@ bool AxesWindow::axisStretchChanged(int axis, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
-	currentAxes().setAxisStretch(axis, value);
+	currentAxes().setStretch(axis, value);
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -147,8 +147,8 @@ bool AxesWindow::axisLimitChanged(int axis, bool minLim, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 	
-	if (minLim) currentAxes().setAxisMin(axis, value);
-	else currentAxes().setAxisMax(axis, value);
+	if (minLim) currentAxes().setMin(axis, value);
+	else currentAxes().setMax(axis, value);
 
 	// Update relevant parts of gui
 	updateControls();
@@ -161,7 +161,7 @@ bool AxesWindow::axisLimitSetExtreme(int axis, bool minLim)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 	
-	currentAxes().setAxisToLimit(axis, minLim);
+	currentAxes().setToLimit(axis, minLim);
 
 	// Update relevant parts of gui
 	updateControls();
@@ -210,7 +210,7 @@ bool AxesWindow::axisPositionIsFractionalChanged(int axis, bool fractional)
 	// Don't do anything else if we are currently refreshing
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
-	currentAxes().setAxisPositionIsFractional(axis, fractional);
+	currentAxes().setPositionIsFractional(axis, fractional);
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -222,8 +222,8 @@ bool AxesWindow::axisPositionChanged(bool real, int axis, int dir, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
-	if (real) currentAxes().setAxisPositionReal(axis, dir, value);
-	else currentAxes().setAxisPositionFractional(axis, dir, value);
+	if (real) currentAxes().setPositionReal(axis, dir, value);
+	else currentAxes().setPositionFractional(axis, dir, value);
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -237,16 +237,16 @@ bool AxesWindow::axisPositionSet(bool real, int axis, int dir, int type)
 
 	if (real)
 	{
-		if (type == -1) currentAxes().setAxisPositionRealToLimit(axis, dir, true);
-		else if (type == 0) currentAxes().setAxisPositionReal(axis, dir, 0.0);
-		else if (type == 1) currentAxes().setAxisPositionRealToLimit(axis, dir, false);
+		if (type == -1) currentAxes().setPositionRealToLimit(axis, dir, true);
+		else if (type == 0) currentAxes().setPositionReal(axis, dir, 0.0);
+		else if (type == 1) currentAxes().setPositionRealToLimit(axis, dir, false);
 		else return false;
 	}
 	else
 	{
-		if (type == -1) currentAxes().setAxisPositionFractional(axis, dir, 0.0);
-		else if (type == 0) currentAxes().setAxisPositionFractional(axis, dir, 0.5);
-		else if (type == 1) currentAxes().setAxisPositionFractional(axis, dir, 1.0);
+		if (type == -1) currentAxes().setPositionFractional(axis, dir, 0.0);
+		else if (type == 0) currentAxes().setPositionFractional(axis, dir, 0.5);
+		else if (type == 1) currentAxes().setPositionFractional(axis, dir, 1.0);
 		else return false;
 	}
 
@@ -261,7 +261,7 @@ bool AxesWindow::axisAutoTicksChanged(int axis, bool enabled)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
-	currentAxes().setAxisAutoTicks(axis, enabled);
+	currentAxes().setAutoTicks(axis, enabled);
 
 	// Update relevant parts of gui
 	updateControls();
@@ -274,8 +274,8 @@ bool AxesWindow::axisTicksChanged(int axis, bool start, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
-	if (start) currentAxes().setAxisFirstTick(axis, value);
-	else currentAxes().setAxisTickDelta(axis, value);
+	if (start) currentAxes().setFirstTick(axis, value);
+	else currentAxes().setTickDelta(axis, value);
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -288,7 +288,7 @@ bool AxesWindow::axisTickOrientationChanged(int axis, int dir, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
-	currentAxes().setAxisTickDirection(axis, dir, value);
+	currentAxes().setTickDirection(axis, dir, value);
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -300,7 +300,7 @@ bool AxesWindow::axisLabelOrientationChanged(int axis, int component, double val
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
-	currentAxes().setAxisLabelOrientation(axis, component, value);
+	currentAxes().setLabelOrientation(axis, component, value);
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -312,7 +312,7 @@ bool AxesWindow::axisTickSizeChanged(int axis, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
-	currentAxes().setAxisTickSize(axis, value);
+	currentAxes().setTickSize(axis, value);
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -324,7 +324,7 @@ bool AxesWindow::axisTitleOrientationChanged(int axis, int component, double val
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
-	currentAxes().setAxisTitleOrientation(axis, component, value);
+	currentAxes().setTitleOrientation(axis, component, value);
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -336,7 +336,7 @@ bool AxesWindow::axisMinorTicksChanged(int axis, int value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
-	currentAxes().setAxisMinorTicks(axis, value);
+	currentAxes().setMinorTicks(axis, value);
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -348,7 +348,7 @@ bool AxesWindow::axisTitleChanged(int axis, QString& title)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
-	currentAxes().setAxisTitle(axis, title);
+	currentAxes().setTitle(axis, title);
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -360,8 +360,8 @@ bool AxesWindow::axisAnchorChanged(int axis, bool titleAnchor, TextPrimitive::Te
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
-	if (titleAnchor) currentAxes().setAxisTitleAnchor(axis, anchor);
-	else currentAxes().setAxisLabelAnchor(axis, anchor);
+	if (titleAnchor) currentAxes().setTitleAnchor(axis, anchor);
+	else currentAxes().setLabelAnchor(axis, anchor);
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -1113,168 +1113,168 @@ void AxesWindow::updateControls(bool force)
 	refreshing_ = true;
 
 	// Invert / Visible / Logarithmic
-	ui.AxisXInvertCheck->setChecked(axes.axisInverted(0));
-	ui.AxisYInvertCheck->setChecked(axes.axisInverted(1));
-	ui.AxisZInvertCheck->setChecked(axes.axisInverted(2));
-	ui.AxisXVisibleCheck->setChecked(axes.axisVisible(0));
-	ui.AxisYVisibleCheck->setChecked(axes.axisVisible(1));
-	ui.AxisZVisibleCheck->setChecked(axes.axisVisible(2));
-	ui.AxisXLogarithmicCheck->setChecked(axes.axisLogarithmic(0));
-	ui.AxisYLogarithmicCheck->setChecked(axes.axisLogarithmic(1));
-	ui.AxisZLogarithmicCheck->setChecked(axes.axisLogarithmic(2));
-	ui.AxisXTicksDeltaSpin->setDisabled(axes.axisLogarithmic(0));
-	ui.AxisYTicksDeltaSpin->setDisabled(axes.axisLogarithmic(1));
-	ui.AxisZTicksDeltaSpin->setDisabled(axes.axisLogarithmic(2));
-	ui.AxisXAutoTicksCheck->setDisabled(axes.axisLogarithmic(0));
-	ui.AxisYAutoTicksCheck->setDisabled(axes.axisLogarithmic(1));
-	ui.AxisZAutoTicksCheck->setDisabled(axes.axisLogarithmic(2));
+	ui.AxisXInvertCheck->setChecked(axes.inverted(0));
+	ui.AxisYInvertCheck->setChecked(axes.inverted(1));
+	ui.AxisZInvertCheck->setChecked(axes.inverted(2));
+	ui.AxisXVisibleCheck->setChecked(axes.visible(0));
+	ui.AxisYVisibleCheck->setChecked(axes.visible(1));
+	ui.AxisZVisibleCheck->setChecked(axes.visible(2));
+	ui.AxisXLogarithmicCheck->setChecked(axes.logarithmic(0));
+	ui.AxisYLogarithmicCheck->setChecked(axes.logarithmic(1));
+	ui.AxisZLogarithmicCheck->setChecked(axes.logarithmic(2));
+	ui.AxisXTicksDeltaSpin->setDisabled(axes.logarithmic(0));
+	ui.AxisYTicksDeltaSpin->setDisabled(axes.logarithmic(1));
+	ui.AxisZTicksDeltaSpin->setDisabled(axes.logarithmic(2));
+	ui.AxisXAutoTicksCheck->setDisabled(axes.logarithmic(0));
+	ui.AxisYAutoTicksCheck->setDisabled(axes.logarithmic(1));
+	ui.AxisZAutoTicksCheck->setDisabled(axes.logarithmic(2));
 
 	// Axis titles
-	ui.AxisXTitleEdit->setText(axes.axisTitle(0));
-	ui.AxisYTitleEdit->setText(axes.axisTitle(1));
-	ui.AxisZTitleEdit->setText(axes.axisTitle(2));
+	ui.AxisXTitleEdit->setText(axes.title(0));
+	ui.AxisYTitleEdit->setText(axes.title(1));
+	ui.AxisZTitleEdit->setText(axes.title(2));
 
 	// Axis Stretch factors
 	bool stretchOff = (pane->twoDimensional() || pane->autoStretch3D());
-	ui.AxisXStretchSpin->setValue(axes.axisStretch(0));
+	ui.AxisXStretchSpin->setValue(axes.stretch(0));
 	ui.AxisXStretchSpin->setDisabled(stretchOff);
-	ui.AxisYStretchSpin->setValue(axes.axisStretch(1));
+	ui.AxisYStretchSpin->setValue(axes.stretch(1));
 	ui.AxisYStretchSpin->setDisabled(stretchOff);
-	ui.AxisZStretchSpin->setValue(axes.axisStretch(2));
+	ui.AxisZStretchSpin->setValue(axes.stretch(2));
 	ui.AxisZStretchSpin->setDisabled(stretchOff);
 
 	// Axis Min/Max Limits
-	ui.AxisXMinSpin->setRange(axes.axisLogarithmic(0), axes.axisLimitMin(0), false, 0.0);
-	ui.AxisYMinSpin->setRange(axes.axisLogarithmic(1), axes.axisLimitMin(1), false, 0.0);
-	ui.AxisZMinSpin->setRange(axes.axisLogarithmic(2), axes.axisLimitMin(2), false, 0.0);
-	ui.AxisXMinSpin->setSingleStep(max((axes.axisLimitMax(0)-axes.axisLimitMin(0))*0.01, 1.0));
-	ui.AxisYMinSpin->setSingleStep(max((axes.axisLimitMax(1)-axes.axisLimitMin(1))*0.01, 1.0));
-	ui.AxisZMinSpin->setSingleStep(max((axes.axisLimitMax(2)-axes.axisLimitMin(2))*0.01, 1.0));
+	ui.AxisXMinSpin->setRange(axes.logarithmic(0), axes.limitMin(0), false, 0.0);
+	ui.AxisYMinSpin->setRange(axes.logarithmic(1), axes.limitMin(1), false, 0.0);
+	ui.AxisZMinSpin->setRange(axes.logarithmic(2), axes.limitMin(2), false, 0.0);
+	ui.AxisXMinSpin->setSingleStep(max((axes.limitMax(0)-axes.limitMin(0))*0.01, 1.0));
+	ui.AxisYMinSpin->setSingleStep(max((axes.limitMax(1)-axes.limitMin(1))*0.01, 1.0));
+	ui.AxisZMinSpin->setSingleStep(max((axes.limitMax(2)-axes.limitMin(2))*0.01, 1.0));
 
-	ui.AxisXMaxSpin->setRange(axes.axisLogarithmic(0), axes.axisLimitMin(0), false, 0.0);
-	ui.AxisYMaxSpin->setRange(axes.axisLogarithmic(1), axes.axisLimitMin(1), false, 0.0);
-	ui.AxisZMaxSpin->setRange(axes.axisLogarithmic(2), axes.axisLimitMin(2), false, 0.0);
-	ui.AxisXMaxSpin->setSingleStep(max((axes.axisLimitMax(0)-axes.axisLimitMin(0))*0.01, 1.0));
-	ui.AxisYMaxSpin->setSingleStep(max((axes.axisLimitMax(1)-axes.axisLimitMin(1))*0.01, 1.0));
-	ui.AxisZMaxSpin->setSingleStep(max((axes.axisLimitMax(2)-axes.axisLimitMin(2))*0.01, 1.0));
-	ui.AxisXMinSpin->setValue(axes.axisMin(0));
-	ui.AxisYMinSpin->setValue(axes.axisMin(1));
-	ui.AxisZMinSpin->setValue(axes.axisMin(2));
-	ui.AxisXMaxSpin->setValue(axes.axisMax(0));
-	ui.AxisYMaxSpin->setValue(axes.axisMax(1));
-	ui.AxisZMaxSpin->setValue(axes.axisMax(2));
-	ui.AxisXMinLabel->setText("DataMin: " + QString::number(axes.axisLimitMin(0)));
-	ui.AxisXMaxLabel->setText("DataMax: " + QString::number(axes.axisLimitMax(0)));
-	ui.AxisYMinLabel->setText("DataMin: " + QString::number(axes.axisLimitMin(1)));
-	ui.AxisYMaxLabel->setText("DataMax: " + QString::number(axes.axisLimitMax(1)));
-	ui.AxisZMinLabel->setText("DataMin: " + QString::number(axes.axisLimitMin(2)));
-	ui.AxisZMaxLabel->setText("DataMax: " + QString::number(axes.axisLimitMax(2)));
+	ui.AxisXMaxSpin->setRange(axes.logarithmic(0), axes.limitMin(0), false, 0.0);
+	ui.AxisYMaxSpin->setRange(axes.logarithmic(1), axes.limitMin(1), false, 0.0);
+	ui.AxisZMaxSpin->setRange(axes.logarithmic(2), axes.limitMin(2), false, 0.0);
+	ui.AxisXMaxSpin->setSingleStep(max((axes.limitMax(0)-axes.limitMin(0))*0.01, 1.0));
+	ui.AxisYMaxSpin->setSingleStep(max((axes.limitMax(1)-axes.limitMin(1))*0.01, 1.0));
+	ui.AxisZMaxSpin->setSingleStep(max((axes.limitMax(2)-axes.limitMin(2))*0.01, 1.0));
+	ui.AxisXMinSpin->setValue(axes.min(0));
+	ui.AxisYMinSpin->setValue(axes.min(1));
+	ui.AxisZMinSpin->setValue(axes.min(2));
+	ui.AxisXMaxSpin->setValue(axes.max(0));
+	ui.AxisYMaxSpin->setValue(axes.max(1));
+	ui.AxisZMaxSpin->setValue(axes.max(2));
+	ui.AxisXMinLabel->setText("DataMin: " + QString::number(axes.limitMin(0)));
+	ui.AxisXMaxLabel->setText("DataMax: " + QString::number(axes.limitMax(0)));
+	ui.AxisYMinLabel->setText("DataMin: " + QString::number(axes.limitMin(1)));
+	ui.AxisYMaxLabel->setText("DataMax: " + QString::number(axes.limitMax(1)));
+	ui.AxisZMinLabel->setText("DataMin: " + QString::number(axes.limitMin(2)));
+	ui.AxisZMaxLabel->setText("DataMax: " + QString::number(axes.limitMax(2)));
 
 	// Axis positions
 	// -- X
-	ui.AxisXPositionFractionalRadio->setChecked(axes.axisPositionIsFractional(0));
-	axisPositionIsFractionalChanged(0, axes.axisPositionIsFractional(0));
-	ui.AxisXPositionYRealSpin->setRange(axes.axisLogarithmic(1), axes.axisLimitMin(1), false, 0.0);
-	ui.AxisXPositionYRealSpin->setValue(axes.axisPositionReal(0).y);
-	ui.AxisXPositionZRealSpin->setRange(axes.axisLogarithmic(2), axes.axisLimitMin(2), false, 0.0);
-	ui.AxisXPositionZRealSpin->setValue(axes.axisPositionReal(0).z);
-	ui.AxisXPositionYFractionalSpin->setValue(axes.axisPositionFractional(0).y);
-	ui.AxisXPositionZFractionalSpin->setValue(axes.axisPositionFractional(0).z);
+	ui.AxisXPositionFractionalRadio->setChecked(axes.positionIsFractional(0));
+	axisPositionIsFractionalChanged(0, axes.positionIsFractional(0));
+	ui.AxisXPositionYRealSpin->setRange(axes.logarithmic(1), axes.limitMin(1), false, 0.0);
+	ui.AxisXPositionYRealSpin->setValue(axes.positionReal(0).y);
+	ui.AxisXPositionZRealSpin->setRange(axes.logarithmic(2), axes.limitMin(2), false, 0.0);
+	ui.AxisXPositionZRealSpin->setValue(axes.positionReal(0).z);
+	ui.AxisXPositionYFractionalSpin->setValue(axes.positionFractional(0).y);
+	ui.AxisXPositionZFractionalSpin->setValue(axes.positionFractional(0).z);
 	// -- Y
-	ui.AxisYPositionFractionalRadio->setChecked(axes.axisPositionIsFractional(1));
-	axisPositionIsFractionalChanged(1, axes.axisPositionIsFractional(1));
-	ui.AxisYPositionXRealSpin->setRange(axes.axisLogarithmic(0), axes.axisLimitMin(0), false, 0.0);
-	ui.AxisYPositionXRealSpin->setValue(axes.axisPositionReal(1).x);
-	ui.AxisYPositionZRealSpin->setRange(axes.axisLogarithmic(2), axes.axisLimitMin(2), false, 0.0);
-	ui.AxisYPositionZRealSpin->setValue(axes.axisPositionReal(1).z);
-	ui.AxisYPositionXFractionalSpin->setValue(axes.axisPositionFractional(1).x);
-	ui.AxisYPositionZFractionalSpin->setValue(axes.axisPositionFractional(1).z);
+	ui.AxisYPositionFractionalRadio->setChecked(axes.positionIsFractional(1));
+	axisPositionIsFractionalChanged(1, axes.positionIsFractional(1));
+	ui.AxisYPositionXRealSpin->setRange(axes.logarithmic(0), axes.limitMin(0), false, 0.0);
+	ui.AxisYPositionXRealSpin->setValue(axes.positionReal(1).x);
+	ui.AxisYPositionZRealSpin->setRange(axes.logarithmic(2), axes.limitMin(2), false, 0.0);
+	ui.AxisYPositionZRealSpin->setValue(axes.positionReal(1).z);
+	ui.AxisYPositionXFractionalSpin->setValue(axes.positionFractional(1).x);
+	ui.AxisYPositionZFractionalSpin->setValue(axes.positionFractional(1).z);
 	// -- Z
-	ui.AxisZPositionFractionalRadio->setChecked(axes.axisPositionIsFractional(2));
-	axisPositionIsFractionalChanged(2, axes.axisPositionIsFractional(2));
-	ui.AxisZPositionXRealSpin->setRange(axes.axisLogarithmic(0), axes.axisLimitMin(0), false, 0.0);
-	ui.AxisZPositionXRealSpin->setValue(axes.axisPositionReal(2).x);
-	ui.AxisZPositionYRealSpin->setRange(axes.axisLogarithmic(1), axes.axisLimitMin(1), false, 0.0);
-	ui.AxisZPositionYRealSpin->setValue(axes.axisPositionReal(2).y);
-	ui.AxisZPositionXFractionalSpin->setValue(axes.axisPositionFractional(2).x);
-	ui.AxisZPositionYFractionalSpin->setValue(axes.axisPositionFractional(2).y);
+	ui.AxisZPositionFractionalRadio->setChecked(axes.positionIsFractional(2));
+	axisPositionIsFractionalChanged(2, axes.positionIsFractional(2));
+	ui.AxisZPositionXRealSpin->setRange(axes.logarithmic(0), axes.limitMin(0), false, 0.0);
+	ui.AxisZPositionXRealSpin->setValue(axes.positionReal(2).x);
+	ui.AxisZPositionYRealSpin->setRange(axes.logarithmic(1), axes.limitMin(1), false, 0.0);
+	ui.AxisZPositionYRealSpin->setValue(axes.positionReal(2).y);
+	ui.AxisZPositionXFractionalSpin->setValue(axes.positionFractional(2).x);
+	ui.AxisZPositionYFractionalSpin->setValue(axes.positionFractional(2).y);
 
 	// Axis Ticks
 	// -- X
-	ui.AxisXAutoTicksCheck->setChecked(axes.axisAutoTicks(0));
-	ui.AxisXTicksStartSpin->setValue(axes.axisFirstTick(0));
-	ui.AxisXTicksStartSpin->setEnabled(!axes.axisAutoTicks(0));
-	ui.AxisXTicksDeltaSpin->setValue(axes.axisTickDelta(0));
-	ui.AxisXTicksDeltaSpin->setEnabled(!axes.axisAutoTicks(0));
-	ui.AxisXMinorTicksSpin->setValue(axes.axisMinorTicks(0));
-	ui.AxisXTickDirectionXSpin->setValue(axes.axisTickDirection(0).x);
-	ui.AxisXTickDirectionYSpin->setValue(axes.axisTickDirection(0).y);
-	ui.AxisXTickDirectionZSpin->setValue(axes.axisTickDirection(0).z);
-	ui.AxisXTickSizeSpin->setValue(axes.axisTickSize(0));
+	ui.AxisXAutoTicksCheck->setChecked(axes.autoTicks(0));
+	ui.AxisXTicksStartSpin->setValue(axes.tickFirst(0));
+	ui.AxisXTicksStartSpin->setEnabled(!axes.autoTicks(0));
+	ui.AxisXTicksDeltaSpin->setValue(axes.tickDelta(0));
+	ui.AxisXTicksDeltaSpin->setEnabled(!axes.autoTicks(0));
+	ui.AxisXMinorTicksSpin->setValue(axes.minorTicks(0));
+	ui.AxisXTickDirectionXSpin->setValue(axes.tickDirection(0).x);
+	ui.AxisXTickDirectionYSpin->setValue(axes.tickDirection(0).y);
+	ui.AxisXTickDirectionZSpin->setValue(axes.tickDirection(0).z);
+	ui.AxisXTickSizeSpin->setValue(axes.tickSize(0));
 	// -- Y
-	ui.AxisYAutoTicksCheck->setChecked(axes.axisAutoTicks(1));
-	ui.AxisYTicksStartSpin->setValue(axes.axisFirstTick(1));
-	ui.AxisYTicksStartSpin->setEnabled(!axes.axisAutoTicks(1));
-	ui.AxisYTicksDeltaSpin->setValue(axes.axisTickDelta(1));
-	ui.AxisYTicksDeltaSpin->setEnabled(!axes.axisAutoTicks(1));
-	ui.AxisYMinorTicksSpin->setValue(axes.axisMinorTicks(1));
-	ui.AxisYTickDirectionXSpin->setValue(axes.axisTickDirection(1).x);
-	ui.AxisYTickDirectionYSpin->setValue(axes.axisTickDirection(1).y);
-	ui.AxisYTickDirectionZSpin->setValue(axes.axisTickDirection(1).z);
+	ui.AxisYAutoTicksCheck->setChecked(axes.autoTicks(1));
+	ui.AxisYTicksStartSpin->setValue(axes.tickFirst(1));
+	ui.AxisYTicksStartSpin->setEnabled(!axes.autoTicks(1));
+	ui.AxisYTicksDeltaSpin->setValue(axes.tickDelta(1));
+	ui.AxisYTicksDeltaSpin->setEnabled(!axes.autoTicks(1));
+	ui.AxisYMinorTicksSpin->setValue(axes.minorTicks(1));
+	ui.AxisYTickDirectionXSpin->setValue(axes.tickDirection(1).x);
+	ui.AxisYTickDirectionYSpin->setValue(axes.tickDirection(1).y);
+	ui.AxisYTickDirectionZSpin->setValue(axes.tickDirection(1).z);
 	// -- Z
-	ui.AxisZAutoTicksCheck->setChecked(axes.axisAutoTicks(2));
-	ui.AxisZTicksStartSpin->setValue(axes.axisFirstTick(2));
-	ui.AxisZTicksStartSpin->setEnabled(!axes.axisAutoTicks(2));
-	ui.AxisZTicksDeltaSpin->setValue(axes.axisTickDelta(2));
-	ui.AxisZTicksDeltaSpin->setEnabled(!axes.axisAutoTicks(2));
-	ui.AxisZMinorTicksSpin->setValue(axes.axisMinorTicks(2));
-	ui.AxisZTickDirectionXSpin->setValue(axes.axisTickDirection(2).x);
-	ui.AxisZTickDirectionYSpin->setValue(axes.axisTickDirection(2).y);
-	ui.AxisZTickDirectionZSpin->setValue(axes.axisTickDirection(2).z);
+	ui.AxisZAutoTicksCheck->setChecked(axes.autoTicks(2));
+	ui.AxisZTicksStartSpin->setValue(axes.tickFirst(2));
+	ui.AxisZTicksStartSpin->setEnabled(!axes.autoTicks(2));
+	ui.AxisZTicksDeltaSpin->setValue(axes.tickDelta(2));
+	ui.AxisZTicksDeltaSpin->setEnabled(!axes.autoTicks(2));
+	ui.AxisZMinorTicksSpin->setValue(axes.minorTicks(2));
+	ui.AxisZTickDirectionXSpin->setValue(axes.tickDirection(2).x);
+	ui.AxisZTickDirectionYSpin->setValue(axes.tickDirection(2).y);
+	ui.AxisZTickDirectionZSpin->setValue(axes.tickDirection(2).z);
 
 	// Text Orientation
 	// -- X
-	ui.AxisXLabelAnchorCombo->setCurrentIndex(axes.axisLabelAnchor(0));
-	ui.AxisXLabelAxialRotationSlider->setValue(axes.axisLabelOrientation(0).x);
-	ui.AxisXLabelAxialRotationSpin->setValue(axes.axisLabelOrientation(0).x);
-	ui.AxisXLabelInPlaneRotationSlider->setValue(axes.axisLabelOrientation(0).y);
-	ui.AxisXLabelInPlaneRotationSpin->setValue(axes.axisLabelOrientation(0).y);
-	ui.AxisXLabelDistanceSpin->setValue(axes.axisLabelOrientation(0).z);
-	ui.AxisYTitleHOffsetSlider->setValue(axes.axisTitleOrientation(0).w*1000);
-	ui.AxisXTitleAnchorCombo->setCurrentIndex(axes.axisTitleAnchor(0));
-	ui.AxisXTitleAxialRotationSlider->setValue(axes.axisTitleOrientation(0).x);
-	ui.AxisXTitleAxialRotationSpin->setValue(axes.axisTitleOrientation(0).x);
-	ui.AxisXTitleInPlaneRotationSlider->setValue(axes.axisTitleOrientation(0).y);
-	ui.AxisXTitleInPlaneRotationSpin->setValue(axes.axisTitleOrientation(0).y);
-	ui.AxisXTitleDistanceSpin->setValue(axes.axisTitleOrientation(0).z);
+	ui.AxisXLabelAnchorCombo->setCurrentIndex(axes.labelAnchor(0));
+	ui.AxisXLabelAxialRotationSlider->setValue(axes.labelOrientation(0).x);
+	ui.AxisXLabelAxialRotationSpin->setValue(axes.labelOrientation(0).x);
+	ui.AxisXLabelInPlaneRotationSlider->setValue(axes.labelOrientation(0).y);
+	ui.AxisXLabelInPlaneRotationSpin->setValue(axes.labelOrientation(0).y);
+	ui.AxisXLabelDistanceSpin->setValue(axes.labelOrientation(0).z);
+	ui.AxisYTitleHOffsetSlider->setValue(axes.titleOrientation(0).w*1000);
+	ui.AxisXTitleAnchorCombo->setCurrentIndex(axes.titleAnchor(0));
+	ui.AxisXTitleAxialRotationSlider->setValue(axes.titleOrientation(0).x);
+	ui.AxisXTitleAxialRotationSpin->setValue(axes.titleOrientation(0).x);
+	ui.AxisXTitleInPlaneRotationSlider->setValue(axes.titleOrientation(0).y);
+	ui.AxisXTitleInPlaneRotationSpin->setValue(axes.titleOrientation(0).y);
+	ui.AxisXTitleDistanceSpin->setValue(axes.titleOrientation(0).z);
 	// -- Y
-	ui.AxisYLabelAnchorCombo->setCurrentIndex(axes.axisLabelAnchor(1));
-	ui.AxisYLabelAxialRotationSlider->setValue(axes.axisLabelOrientation(1).x);
-	ui.AxisYLabelAxialRotationSpin->setValue(axes.axisLabelOrientation(1).x);
-	ui.AxisYLabelInPlaneRotationSlider->setValue(axes.axisLabelOrientation(1).y);
-	ui.AxisYLabelInPlaneRotationSpin->setValue(axes.axisLabelOrientation(1).y);
-	ui.AxisYLabelDistanceSpin->setValue(axes.axisLabelOrientation(1).z);
-	ui.AxisYTitleHOffsetSlider->setValue(axes.axisTitleOrientation(1).w*1000);
-	ui.AxisYTitleAnchorCombo->setCurrentIndex(axes.axisTitleAnchor(1));
-	ui.AxisYTitleAxialRotationSlider->setValue(axes.axisTitleOrientation(1).x);
-	ui.AxisYTitleAxialRotationSpin->setValue(axes.axisTitleOrientation(1).x);
-	ui.AxisYTitleInPlaneRotationSlider->setValue(axes.axisTitleOrientation(1).y);
-	ui.AxisYTitleInPlaneRotationSpin->setValue(axes.axisTitleOrientation(1).y);
-	ui.AxisYTitleDistanceSpin->setValue(axes.axisTitleOrientation(1).z);
+	ui.AxisYLabelAnchorCombo->setCurrentIndex(axes.labelAnchor(1));
+	ui.AxisYLabelAxialRotationSlider->setValue(axes.labelOrientation(1).x);
+	ui.AxisYLabelAxialRotationSpin->setValue(axes.labelOrientation(1).x);
+	ui.AxisYLabelInPlaneRotationSlider->setValue(axes.labelOrientation(1).y);
+	ui.AxisYLabelInPlaneRotationSpin->setValue(axes.labelOrientation(1).y);
+	ui.AxisYLabelDistanceSpin->setValue(axes.labelOrientation(1).z);
+	ui.AxisYTitleHOffsetSlider->setValue(axes.titleOrientation(1).w*1000);
+	ui.AxisYTitleAnchorCombo->setCurrentIndex(axes.titleAnchor(1));
+	ui.AxisYTitleAxialRotationSlider->setValue(axes.titleOrientation(1).x);
+	ui.AxisYTitleAxialRotationSpin->setValue(axes.titleOrientation(1).x);
+	ui.AxisYTitleInPlaneRotationSlider->setValue(axes.titleOrientation(1).y);
+	ui.AxisYTitleInPlaneRotationSpin->setValue(axes.titleOrientation(1).y);
+	ui.AxisYTitleDistanceSpin->setValue(axes.titleOrientation(1).z);
 	// -- Z
-	ui.AxisZLabelAnchorCombo->setCurrentIndex(axes.axisLabelAnchor(2));
-	ui.AxisZLabelAxialRotationSlider->setValue(axes.axisLabelOrientation(2).x);
-	ui.AxisZLabelAxialRotationSpin->setValue(axes.axisLabelOrientation(2).x);
-	ui.AxisZLabelInPlaneRotationSlider->setValue(axes.axisLabelOrientation(2).y);
-	ui.AxisZLabelInPlaneRotationSpin->setValue(axes.axisLabelOrientation(2).y);
-	ui.AxisZLabelDistanceSpin->setValue(axes.axisLabelOrientation(2).z);
-	ui.AxisZTitleHOffsetSlider->setValue(axes.axisTitleOrientation(2).w*1000);
-	ui.AxisZTitleAnchorCombo->setCurrentIndex(axes.axisTitleAnchor(2));
-	ui.AxisZTitleAxialRotationSlider->setValue(axes.axisTitleOrientation(2).x);
-	ui.AxisZTitleAxialRotationSpin->setValue(axes.axisTitleOrientation(2).x);
-	ui.AxisZTitleInPlaneRotationSlider->setValue(axes.axisTitleOrientation(2).y);
-	ui.AxisZTitleInPlaneRotationSpin->setValue(axes.axisTitleOrientation(2).y);
-	ui.AxisZTitleDistanceSpin->setValue(axes.axisTitleOrientation(2).z);
+	ui.AxisZLabelAnchorCombo->setCurrentIndex(axes.labelAnchor(2));
+	ui.AxisZLabelAxialRotationSlider->setValue(axes.labelOrientation(2).x);
+	ui.AxisZLabelAxialRotationSpin->setValue(axes.labelOrientation(2).x);
+	ui.AxisZLabelInPlaneRotationSlider->setValue(axes.labelOrientation(2).y);
+	ui.AxisZLabelInPlaneRotationSpin->setValue(axes.labelOrientation(2).y);
+	ui.AxisZLabelDistanceSpin->setValue(axes.labelOrientation(2).z);
+	ui.AxisZTitleHOffsetSlider->setValue(axes.titleOrientation(2).w*1000);
+	ui.AxisZTitleAnchorCombo->setCurrentIndex(axes.titleAnchor(2));
+	ui.AxisZTitleAxialRotationSlider->setValue(axes.titleOrientation(2).x);
+	ui.AxisZTitleAxialRotationSpin->setValue(axes.titleOrientation(2).x);
+	ui.AxisZTitleInPlaneRotationSlider->setValue(axes.titleOrientation(2).y);
+	ui.AxisZTitleInPlaneRotationSpin->setValue(axes.titleOrientation(2).y);
+	ui.AxisZTitleDistanceSpin->setValue(axes.titleOrientation(2).z);
 
 	refreshing_ = false;
 }

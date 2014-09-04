@@ -172,7 +172,7 @@ void StyleWindow::on_ColourRGBGradientASetMinimumButton_clicked(bool checked)
 	if (!currentCollection) return;
 	if (!currentCollection->displayPane()) return;
 
-	ui.ColourRGBGradientASpin->setValue(currentCollection->displayPane()->axes().axisLimitMin(1));
+	ui.ColourRGBGradientASpin->setValue(currentCollection->displayPane()->axes().limitMin(1));
 }
 
 void StyleWindow::on_ColourRGBGradientASetMaximumButton_clicked(bool checked)
@@ -182,7 +182,7 @@ void StyleWindow::on_ColourRGBGradientASetMaximumButton_clicked(bool checked)
 	if (!currentCollection) return;
 	if (!currentCollection->displayPane()) return;
 
-	ui.ColourRGBGradientASpin->setValue(currentCollection->displayPane()->axes().axisLimitMax(1));
+	ui.ColourRGBGradientASpin->setValue(currentCollection->displayPane()->axes().limitMax(1));
 }
 
 void StyleWindow::on_ColourRGBGradientBButton_clicked(bool checked)
@@ -223,7 +223,7 @@ void StyleWindow::on_ColourRGBGradientBSetMinimumButton_clicked(bool checked)
 	if (!currentCollection) return;
 	if (!currentCollection->displayPane()) return;
 
-	ui.ColourRGBGradientBSpin->setValue(currentCollection->displayPane()->axes().axisLimitMin(1));
+	ui.ColourRGBGradientBSpin->setValue(currentCollection->displayPane()->axes().limitMin(1));
 }
 
 void StyleWindow::on_ColourRGBGradientBSetMaximumButton_clicked(bool checked)
@@ -233,7 +233,7 @@ void StyleWindow::on_ColourRGBGradientBSetMaximumButton_clicked(bool checked)
 	if (!currentCollection) return;
 	if (!currentCollection->displayPane()) return;
 
-	ui.ColourRGBGradientBSpin->setValue(currentCollection->displayPane()->axes().axisLimitMax(1));
+	ui.ColourRGBGradientBSpin->setValue(currentCollection->displayPane()->axes().limitMax(1));
 }
 
 // HSV Gradient
@@ -290,7 +290,7 @@ void StyleWindow::on_ColourHSVGradientASetMinimumButton_clicked(bool checked)
 	if (!currentCollection) return;
 	if (!currentCollection->displayPane()) return;
 
-	ui.ColourHSVGradientASpin->setValue(currentCollection->displayPane()->axes().axisLimitMin(1));
+	ui.ColourHSVGradientASpin->setValue(currentCollection->displayPane()->axes().limitMin(1));
 }
 
 void StyleWindow::on_ColourHSVGradientASetMaximumButton_clicked(bool checked)
@@ -300,7 +300,7 @@ void StyleWindow::on_ColourHSVGradientASetMaximumButton_clicked(bool checked)
 	if (!currentCollection) return;
 	if (!currentCollection->displayPane()) return;
 
-	ui.ColourHSVGradientASpin->setValue(currentCollection->displayPane()->axes().axisLimitMax(1));
+	ui.ColourHSVGradientASpin->setValue(currentCollection->displayPane()->axes().limitMax(1));
 }
 
 void StyleWindow::on_ColourHSVGradientBButton_clicked(bool checked)
@@ -341,7 +341,7 @@ void StyleWindow::on_ColourHSVGradientBSetMinimumButton_clicked(bool checked)
 	if (!currentCollection) return;
 	if (!currentCollection->displayPane()) return;
 
-	ui.ColourHSVGradientBSpin->setValue(currentCollection->displayPane()->axes().axisLimitMin(1));
+	ui.ColourHSVGradientBSpin->setValue(currentCollection->displayPane()->axes().limitMin(1));
 }
 
 void StyleWindow::on_ColourHSVGradientBSetMaximumButton_clicked(bool checked)
@@ -351,7 +351,7 @@ void StyleWindow::on_ColourHSVGradientBSetMaximumButton_clicked(bool checked)
 	if (!currentCollection) return;
 	if (!currentCollection->displayPane()) return;
 
-	ui.ColourHSVGradientBSpin->setValue(currentCollection->displayPane()->axes().axisLimitMax(1));
+	ui.ColourHSVGradientBSpin->setValue(currentCollection->displayPane()->axes().limitMax(1));
 }
 
 // Custom Gradient

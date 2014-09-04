@@ -41,8 +41,8 @@ bool Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate)
 	if (!collection->displayPane()) return false;
 
 	// Recreate primitive depending on current style
-	double yStretch = collection->displayPane()->axes().axisStretch(1);
-	bool yLogarithmic = collection->displayPane()->axes().axisLogarithmic(1);
+	double yStretch = collection->displayPane()->axes().stretch(1);
+	bool yLogarithmic = collection->displayPane()->axes().logarithmic(1);
 	switch (collection->displayStyle())
 	{
 		case (Collection::LineXYStyle):

@@ -46,12 +46,12 @@ double UChromaWindow::screenToAxis(int axis, int mouseX, int mouseY)
 	// Check for valid interaction pane
 	if (currentViewPane_ == NULL) return 0.0;
 
-// 	printf("Test: min=%f, max=%f\n", axisMin_[0], axisMax_[0]);
+// 	printf("Test: min=%f, max=%f\n", min_[0], max_[0]);
 // 	rMouseLast_.print();
 // 	axisCoordMin_[0].print();
 	// Project axis coordinates to get a screen-based yardstick
-	Vec4<double> axmin = currentViewPane_->modelToScreen(currentViewPane_->axes().axisCoordMin(axis));
-	Vec4<double> axmax = currentViewPane_->modelToScreen(currentViewPane_->axes().axisCoordMax(axis));
+	Vec4<double> axmin = currentViewPane_->modelToScreen(currentViewPane_->axes().coordMin(axis));
+	Vec4<double> axmax = currentViewPane_->modelToScreen(currentViewPane_->axes().coordMax(axis));
 // 	axmin.print();
 // 	axmax.print();
 
@@ -68,13 +68,13 @@ double UChromaWindow::screenToAxis(int axis, int mouseX, int mouseY)
 	// Calculate slice axis value - no need to account for inverted axes here, since this is accounted for in the vectors axmin and axmax
 	Axes& axes = currentViewPane_->axes();
 	double axisValue;
-	if (axes.axisLogarithmic(axis)) axisValue = pow(10, abNorm.dp(amNorm)*ratio * (log10(axes.axisMax(axis)) - log10(axes.axisMin(axis))) + log10(axes.axisMin(axis)));
-	else axisValue = abNorm.dp(amNorm)*ratio * (axes.axisMax(axis) - axes.axisMin(axis)) + axes.axisMin(axis);
+	if (axes.logarithmic(axis)) axisValue = pow(10, abNorm.dp(amNorm)*ratio * (log10(axes.max(axis)) - log10(axes.min(axis))) + log10(axes.min(axis)));
+	else axisValue = abNorm.dp(amNorm)*ratio * (axes.max(axis) - axes.min(axis)) + axes.min(axis);
 //	printf("slicevalue = %f (%f)\n", axisValue, abNorm.dp(amNorm)*ratio);
 
 	// Clamp value to data range
-	if (axisValue < axes.axisMin(axis)) axisValue = axes.axisMin(axis);
-	else if (axisValue > axes.axisMax(axis)) axisValue = axes.axisMax(axis);
+	if (axisValue < axes.min(axis)) axisValue = axes.min(axis);
+	else if (axisValue > axes.max(axis)) axisValue = axes.max(axis);
 // 	printf("ACMAG = %f, X = %f\n", ratio, axisValue);
 
 	return axisValue;
@@ -198,8 +198,8 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 				double newMax = max(clickedInteractionValue_, currentInteractionValue_);
 				if ((newMax-newMin) > 1.0e-10)
 				{
-					currentViewPane_->axes().setAxisMin(interactionAxis_, newMin);
-					currentViewPane_->axes().setAxisMax(interactionAxis_, newMax);
+					currentViewPane_->axes().setMin(interactionAxis_, newMin);
+					currentViewPane_->axes().setMax(interactionAxis_, newMax);
 					axesWindow_.updateControls();
 				}
 			}
@@ -235,8 +235,8 @@ double UChromaWindow::clickedInteractionCoordinate()
 	if (currentViewPane_ == NULL) return 0.0;
 
 	Axes& axes = currentViewPane_->axes();
-	if (axes.axisLogarithmic(interactionAxis_)) return (axes.axisInverted(interactionAxis_) ? log10(axes.axisMax(interactionAxis_)/clickedInteractionValue_) : log10(clickedInteractionValue_));
-	else return (axes.axisInverted(interactionAxis_) ? axes.axisMax(interactionAxis_) - clickedInteractionValue_ : clickedInteractionValue_);
+	if (axes.logarithmic(interactionAxis_)) return (axes.inverted(interactionAxis_) ? log10(axes.max(interactionAxis_)/clickedInteractionValue_) : log10(clickedInteractionValue_));
+	else return (axes.inverted(interactionAxis_) ? axes.max(interactionAxis_) - clickedInteractionValue_ : clickedInteractionValue_);
 }
 
 // Return current interaction coordinate on axis
@@ -249,6 +249,6 @@ double UChromaWindow::currentInteractionCoordinate()
 	if (currentViewPane_ == NULL) return 0.0;
 
 	Axes& axes = currentViewPane_->axes();
-	if (axes.axisLogarithmic(interactionAxis_)) return (axes.axisInverted(interactionAxis_) ? log10(axes.axisMax(interactionAxis_)/currentInteractionValue_) : log10(currentInteractionValue_));
-	else return (axes.axisInverted(interactionAxis_) ? axes.axisMax(interactionAxis_) - currentInteractionValue_ : currentInteractionValue_);
+	if (axes.logarithmic(interactionAxis_)) return (axes.inverted(interactionAxis_) ? log10(axes.max(interactionAxis_)/currentInteractionValue_) : log10(currentInteractionValue_));
+	else return (axes.inverted(interactionAxis_) ? axes.max(interactionAxis_) - currentInteractionValue_ : currentInteractionValue_);
 }

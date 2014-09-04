@@ -106,7 +106,7 @@ void ViewWindow::on_ViewBoundingBoxPlaneYSetMinimumButton_clicked(bool checked)
 	// Check current display pane
 	if (!uChroma_.currentViewPane()) return;
 
-	ui.ViewBoundingBoxPlaneYSpin->setValue(uChroma_.currentViewPane()->axes().axisMin(1));
+	ui.ViewBoundingBoxPlaneYSpin->setValue(uChroma_.currentViewPane()->axes().min(1));
 }
 
 void ViewWindow::on_ViewBoundingBoxPlaneYSetZeroButton_clicked(bool checked)
@@ -119,7 +119,7 @@ void ViewWindow::on_ViewBoundingBoxPlaneYSetMaximumButton_clicked(bool checked)
 	// Check current display pane
 	if (!uChroma_.currentViewPane()) return;
 
-	ui.ViewBoundingBoxPlaneYSpin->setValue(uChroma_.currentViewPane()->axes().axisMax(1));
+	ui.ViewBoundingBoxPlaneYSpin->setValue(uChroma_.currentViewPane()->axes().max(1));
 }
 
 // -- General Options

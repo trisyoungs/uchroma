@@ -231,7 +231,11 @@ void Viewer::paintGL()
 		if (FontInstance::fontOK())
 		{
 			FontInstance::font()->FaceSize(1);
-			for (int n=0; n<maxAxis; ++n) if (pane->axes().axisVisible(n)) pane->axes().axisTextPrimitive(n).renderAll(viewMatrix, uChroma_->labelCorrectOrientation(), pane->textZScale());
+			for (int n=0; n<maxAxis; ++n) if (pane->axes().visible(n))
+			{
+				pane->axes().labelPrimitive(n).renderAll(viewMatrix, uChroma_->labelCorrectOrientation(), pane->textZScale());
+				pane->axes().titlePrimitive(n).renderAll(viewMatrix, uChroma_->labelCorrectOrientation(), pane->textZScale());
+			}
 		}
 
 		// -- Render axis lines
@@ -239,7 +243,7 @@ void Viewer::paintGL()
 		glLoadMatrixd(viewMatrix.matrix());
 		glLineWidth(lineWidth_);
 		glDisable(GL_LIGHTING);
-		for (int axis=0; axis<maxAxis; ++axis) if (pane->axes().axisVisible(axis)) pane->axes().axisPrimitive(axis).sendToGL();
+		for (int axis=0; axis<maxAxis; ++axis) if (pane->axes().visible(axis)) pane->axes().axisPrimitive(axis).sendToGL();
 		glEnable(GL_LIGHTING);
 		glDisable(GL_LINE_SMOOTH);
 
@@ -257,7 +261,7 @@ void Viewer::paintGL()
 			// Draw starting interaction point (if we are interacting)
 			if (uChroma_->interacting())
 			{
-				v[sliceAxis] = uChroma_->clickedInteractionCoordinate() * pane->axes().axisStretch(sliceAxis);
+				v[sliceAxis] = uChroma_->clickedInteractionCoordinate() * pane->axes().stretch(sliceAxis);
 				glTranslated(v.x, v.y, v.z);
 				glColor4d(0.0, 0.0, 1.0, 0.5);
 				pane->interactionPrimitive().sendToGL();
@@ -265,7 +269,7 @@ void Viewer::paintGL()
 			}
 
 			// Draw current selection position
-			v[sliceAxis] = 	uChroma_->currentInteractionCoordinate() * pane->axes().axisStretch(sliceAxis) - v[sliceAxis];
+			v[sliceAxis] = 	uChroma_->currentInteractionCoordinate() * pane->axes().stretch(sliceAxis) - v[sliceAxis];
 			glTranslated(v.x, v.y, v.z);
 			glColor4d(1.0, 0.0, 0.0, 0.5);
 			pane->interactionPrimitive().sendToGL();

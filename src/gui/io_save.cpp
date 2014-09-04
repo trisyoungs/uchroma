@@ -40,23 +40,23 @@ const char* stringBool(bool b)
 bool UChromaWindow::writeAxisBlock(LineParser& parser, Axes& axes, int axis)
 {
 	parser.writeLineF("    %s %i\n", Keywords::viewPaneKeyword(Keywords::AxisBlockKeyword), axis);
-	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::AutoTicksKeyword), stringBool(axes.axisAutoTicks(axis)));
-	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::FirstTickKeyword), axes.axisFirstTick(axis));
-	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::FractionalPositioningKeyword), stringBool(axes.axisPositionIsFractional(axis)));
-	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::TickDeltaKeyword), axes.axisTickDelta(axis));
-	parser.writeLineF("      %s %i\n", Keywords::axisKeyword(Keywords::MinorTicksKeyword), axes.axisMinorTicks(axis));
-	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::LabelAnchorKeyword), TextPrimitive::textAnchor(axes.axisLabelAnchor(axis)));
-	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::TitleAnchorKeyword), TextPrimitive::textAnchor(axes.axisTitleAnchor(axis)));
-	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionFractionalKeyword), axes.axisPositionFractional(axis).x, axes.axisPositionFractional(axis).y, axes.axisPositionFractional(axis).z);
-	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionRealKeyword), axes.axisPositionReal(axis).x, axes.axisPositionReal(axis).y, axes.axisPositionReal(axis).z);
-	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::LabelOrientationKeyword), axes.axisLabelOrientation(axis).x, axes.axisLabelOrientation(axis).y, axes.axisLabelOrientation(axis).z);
-	parser.writeLineF("      %s '%s'\n", Keywords::axisKeyword(Keywords::TitleKeyword), qPrintable(axes.axisTitle(axis)));
-	parser.writeLineF("      %s %f %f %f %f\n", Keywords::axisKeyword(Keywords::TitleOrientationKeyword), axes.axisTitleOrientation(axis).x, axes.axisTitleOrientation(axis).y, axes.axisTitleOrientation(axis).z, axes.axisTitleOrientation(axis).w);
-	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::InvertKeyword), stringBool(axes.axisInverted(axis)));
-	parser.writeLineF("      %s %f %f\n", Keywords::axisKeyword(Keywords::LimitsKeyword), axes.axisMin(axis), axes.axisMax(axis));
-	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::LogarithmicKeyword), stringBool(axes.axisLogarithmic(axis)));
-	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::VisibleAxisKeyword), stringBool(axes.axisVisible(axis)));
-	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::StretchKeyword), axes.axisStretch(axis));
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::AutoTicksKeyword), stringBool(axes.autoTicks(axis)));
+	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::FirstTickKeyword), axes.tickFirst(axis));
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::FractionalPositioningKeyword), stringBool(axes.positionIsFractional(axis)));
+	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::TickDeltaKeyword), axes.tickDelta(axis));
+	parser.writeLineF("      %s %i\n", Keywords::axisKeyword(Keywords::MinorTicksKeyword), axes.minorTicks(axis));
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::LabelAnchorKeyword), TextPrimitive::textAnchor(axes.labelAnchor(axis)));
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::TitleAnchorKeyword), TextPrimitive::textAnchor(axes.titleAnchor(axis)));
+	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionFractionalKeyword), axes.positionFractional(axis).x, axes.positionFractional(axis).y, axes.positionFractional(axis).z);
+	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionRealKeyword), axes.positionReal(axis).x, axes.positionReal(axis).y, axes.positionReal(axis).z);
+	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::LabelOrientationKeyword), axes.labelOrientation(axis).x, axes.labelOrientation(axis).y, axes.labelOrientation(axis).z);
+	parser.writeLineF("      %s '%s'\n", Keywords::axisKeyword(Keywords::TitleKeyword), qPrintable(axes.title(axis)));
+	parser.writeLineF("      %s %f %f %f %f\n", Keywords::axisKeyword(Keywords::TitleOrientationKeyword), axes.titleOrientation(axis).x, axes.titleOrientation(axis).y, axes.titleOrientation(axis).z, axes.titleOrientation(axis).w);
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::InvertKeyword), stringBool(axes.inverted(axis)));
+	parser.writeLineF("      %s %f %f\n", Keywords::axisKeyword(Keywords::LimitsKeyword), axes.min(axis), axes.max(axis));
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::LogarithmicKeyword), stringBool(axes.logarithmic(axis)));
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::VisibleAxisKeyword), stringBool(axes.visible(axis)));
+	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::StretchKeyword), axes.stretch(axis));
 	parser.writeLineF("    %s\n", Keywords::axisKeyword(Keywords::EndAxisKeyword));
 
 	return true;

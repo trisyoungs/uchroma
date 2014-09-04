@@ -1302,8 +1302,8 @@ void Collection::updateDisplayData()
 	updateLimitsAndTransforms();
 
 	// Grab some stuff from the pane's axes
-	Vec3<double> axisMin(displayPane_->axes().axisMin(0), displayPane_->axes().axisMin(1), displayPane_->axes().axisMin(2));
-	Vec3<double> axisMax(displayPane_->axes().axisMax(0), displayPane_->axes().axisMax(1), displayPane_->axes().axisMax(2));
+	Vec3<double> axisMin(displayPane_->axes().min(0), displayPane_->axes().min(1), displayPane_->axes().min(2));
+	Vec3<double> axisMax(displayPane_->axes().max(0), displayPane_->axes().max(1), displayPane_->axes().max(2));
 
 	// Clear old displayData_ and create temporary Data2D list for display data construction
 	List<Data2D> transformedData;
@@ -1311,7 +1311,7 @@ void Collection::updateDisplayData()
 	double x, y;
 
 	// Loop over slices, apply any transforms (X or Y) and check limits
-	DataSet* dataSet = displayPane_->axes().axisInverted(2) ? dataSets_.last() : dataSets_.first();
+	DataSet* dataSet = displayPane_->axes().inverted(2) ? dataSets_.last() : dataSets_.first();
 	while (dataSet)
 	{
 		// Check for slice with no points...
@@ -1323,17 +1323,17 @@ void Collection::updateDisplayData()
 		// -- If the pane is 2D, display all data regardless of z
 		if ((!displayPane_->twoDimensional()) && ((z < axisMin.z) || (z > axisMax.z)))
 		{
-			dataSet = displayPane_->axes().axisInverted(2) ? dataSet->prev : dataSet->next;
+			dataSet = displayPane_->axes().inverted(2) ? dataSet->prev : dataSet->next;
 			continue;
 		}
-		if (displayPane_->axes().axisInverted(2) && displayPane_->axes().axisLogarithmic(2)) z = log10(axisMax.z/z);   // XXX TODO Changed from 'log10(axisMax[n]/z)' which was a bug???
-		else if (displayPane_->axes().axisInverted(2)) z = (axisMax.z - z) + displayPane_->axes().axisMin(2);
-		else if (displayPane_->axes().axisLogarithmic(2)) z = log10(z);
+		if (displayPane_->axes().inverted(2) && displayPane_->axes().logarithmic(2)) z = log10(axisMax.z/z);   // XXX TODO Changed from 'log10(axisMax[n]/z)' which was a bug???
+		else if (displayPane_->axes().inverted(2)) z = (axisMax.z - z) + displayPane_->axes().min(2);
+		else if (displayPane_->axes().logarithmic(2)) z = log10(z);
 
 		// Add new item to transformedData and displayData_ arrays
 		Data2D* surfaceDataSet = transformedData.add();
 		DisplayDataSet* displayDataSet = displayData_.add();
-		displayDataSet->setZ(z * displayPane_->axes().axisStretch(2));
+		displayDataSet->setZ(z * displayPane_->axes().stretch(2));
 
 		// Copy / interpolate raw data arrays
 		Array<double> array[2];
@@ -1355,38 +1355,38 @@ void Collection::updateDisplayData()
 		}
 
 		// Now add data to surfaceDataSet, obeying defined x-limits
-		if (displayPane_->axes().axisInverted(0)) for (int n=array[0].nItems()-1; n >= 0; --n)
+		if (displayPane_->axes().inverted(0)) for (int n=array[0].nItems()-1; n >= 0; --n)
 		{
 			x = array[0].value(n);
 			if ((x < axisMin.x) || (x > axisMax.x)) continue;
-			if (displayPane_->axes().axisLogarithmic(0)) x = log10(axisMax.x / x);
+			if (displayPane_->axes().logarithmic(0)) x = log10(axisMax.x / x);
 			else x = (axisMax.x - x) + axisMin.x;
-			x *= displayPane_->axes().axisStretch(0);
+			x *= displayPane_->axes().stretch(0);
 			y = array[1].value(n);
-			if (displayPane_->axes().axisLogarithmic(1)) y = (displayPane_->axes().axisInverted(1) ? log10(axisMax.y / y) : log10(y));
-			else if (displayPane_->axes().axisInverted(1)) y = (axisMax.y - y) + axisMin.y;
-			y *= displayPane_->axes().axisStretch(1);
+			if (displayPane_->axes().logarithmic(1)) y = (displayPane_->axes().inverted(1) ? log10(axisMax.y / y) : log10(y));
+			else if (displayPane_->axes().inverted(1)) y = (axisMax.y - y) + axisMin.y;
+			y *= displayPane_->axes().stretch(1);
 			surfaceDataSet->addPoint(x, y);
 		}
 		else for (int n=0; n<array[0].nItems(); ++n)
 		{
 			x = array[0].value(n);
 			if ((x < axisMin.x) || (x > axisMax.x)) continue;
-			if (displayPane_->axes().axisLogarithmic(0)) x = log10(x);
-			x *= displayPane_->axes().axisStretch(0);
+			if (displayPane_->axes().logarithmic(0)) x = log10(x);
+			x *= displayPane_->axes().stretch(0);
 			y = array[1].value(n);
-			if (displayPane_->axes().axisLogarithmic(1))
+			if (displayPane_->axes().logarithmic(1))
 			{
 				if (y < 0.0) y = 1.0e-10;
-				else y = (displayPane_->axes().axisInverted(1) ? log10(axisMax.y / y) : log10(y));
+				else y = (displayPane_->axes().inverted(1) ? log10(axisMax.y / y) : log10(y));
 			}
-			else if (displayPane_->axes().axisInverted(1)) y = (axisMax.y - y) + axisMin.y;
-			y *= displayPane_->axes().axisStretch(1);
+			else if (displayPane_->axes().inverted(1)) y = (axisMax.y - y) + axisMin.y;
+			y *= displayPane_->axes().stretch(1);
 			surfaceDataSet->addPoint(x, y);
 		}
 
 		// Move to next Z slice
-		dataSet = displayPane_->axes().axisInverted(2) ? dataSet->prev : dataSet->next;
+		dataSet = displayPane_->axes().inverted(2) ? dataSet->prev : dataSet->next;
 	}
 
 	// Construct common x scale for data, and create y value data
