@@ -66,6 +66,47 @@ FitKernel::~FitKernel()
 {
 }
 
+// Copy Constructor
+FitKernel::FitKernel(const FitKernel& source)
+{
+	(*this) = source;
+}
+
+// Assignment operator
+void FitKernel::operator=(const FitKernel& source)
+{
+	// Fit Range
+	xRange_ = source.xRange_;
+	absoluteXMin_ = source.absoluteXMin_;
+	absoluteXMax_ = source.absoluteXMax_;
+	indexXSingle_ = source.indexXSingle_;
+	indexXMin_ = source.indexXMin_;
+	indexXMax_ = source.indexXMax_;
+	zRange_ = source.zRange_;
+	absoluteZMin_ = source.absoluteZMin_;
+	absoluteZMax_ = source.absoluteZMax_;
+	indexZSingle_ = source.indexZSingle_;
+	indexZMin_ = source.indexZMin_;
+	indexZMax_ = source.indexZMax_;
+	orthogonal_ = source.orthogonal_;
+	global_ = source.global_;
+	sourceCollection_ = source.sourceCollection_;
+	destinationCollection_ = source.destinationCollection_;
+
+	// Minimisation Setup
+	method_ = source.method_;
+	maxSteps_ = source.maxSteps_;
+	limitStrength_ = source.limitStrength_;
+	tolerance_ = source.tolerance_;
+
+	// References
+	references_.clear();
+	references_ = source.references_;
+
+	// Set equation
+	setEquation(source.equationText_);
+}
+
 /*
  * Equation and Variable Data
  */
@@ -97,7 +138,8 @@ void FitKernel::updateVariables()
 		ReferenceVariable* refVar = reference(var->name());
 		if (refVar != NULL)
 		{
-			msg.print("Found reference variable '%s' in our list...\n", var->name());
+			refVar->setVariable(var);
+			refVar->setUsed(true);
 			usedReferences_.add(refVar);
 			continue;
 		}
@@ -228,7 +270,7 @@ QString FitKernel::uniqueReferenceName(QString baseName)
 	do
 	{
 		// Add on suffix (if index > 0)
-		if (index > 0) testName = baseName + "_"+QString::number(index);
+		if (index > 0) testName = baseName + QString::number(index);
 		++index;
 	} while (reference(testName));
 
@@ -277,7 +319,6 @@ const char* FitKernel::rangeType(FitKernel::RangeType id)
 // Set type of x source range
 void FitKernel::setXRange(FitKernel::RangeType range)
 {
-	printf("Set xrange to %i\n", range);
 	xRange_ = range;
 
 	CurrentProject::setAsModified();
@@ -567,7 +608,7 @@ double FitKernel::sosError(Array<double>& alpha)
 	for (RefListItem<EquationVariable,bool>* ri = usedVariables_.first(); ri != NULL; ri = ri->next) ri->item->variable()->set(alpha[n++]);
 	
 	// Generate new data from current variable values
-	currentFitRange_->calculateValues(equation_, xVariable_, zVariable_);
+	if (!currentFitRange_->calculateValues(equation_, xVariable_, zVariable_, usedReferences_)) return -1.0;
 
 	// Get sos error from current fit target
 	double sos = currentFitRange_->sosError();
@@ -608,8 +649,8 @@ bool FitKernel::minimise()
 	for (RefListItem<EquationVariable,bool>* ri = usedVariables_.first(); ri != NULL; ri = ri->next)
 	{
 		// Grab variable pointer from FitVariable
-		EquationVariable* var = ri->item;
-		alpha.add(var->value());
+		EquationVariable* eqVar = ri->item;
+		alpha.add(eqVar->value());
 	}
 
 	// Call the minimiser
@@ -701,11 +742,7 @@ bool FitKernel::fit()
 	}
 
 	// Check source collection
-	if (!sourceCollection_)
-	{
-		msg.print("Internal Error: No sourceCollection_ pointer set.\n");
-		return false;
-	}
+	if (!Collection::objectValid(sourceCollection_, "source collection in FitKernel::fit()")) return false;
 
 	// Determine X bin index range
 	int firstXPoint, lastXPoint;
@@ -748,14 +785,18 @@ bool FitKernel::fit()
 	if (!fitSpace_.initialise(sourceCollection_, firstXPoint, lastXPoint, firstZPoint, lastZPoint, orthogonal_, global_)) return false;
 
 	// Set up destination collection
-	if (destinationCollection_ == NULL)
-	{
-		msg.print("Error: Destination collection has not been set in FitKernel (source collection is '%s'.\n", qPrintable(sourceCollection_->title()));
-		return false;
-	}
+	if (!Collection::objectValid(destinationCollection_, "destination collection in FitKernel::fit()")) return false;
 	destinationCollection_->clearDataSets();
 
-	// Loop over defined DataRanges (global fit has already been accounted for)
+	// Construct reference data
+	for (RefListItem<ReferenceVariable,bool>* ri = usedReferences_.first(); ri != NULL; ri = ri->next)
+	{
+		ReferenceVariable* refVar = ri->item;
+		if (!refVar->initialiseDataSpace(sourceCollection_, fitSpace_)) return false;
+		refVar->resetCurrentDataSpaceRange();
+	}
+
+	// Loop over defined DataSpaceRanges (including those in any reference variables)
 	bool result;
 	for (currentFitRange_ = fitSpace_.ranges(); currentFitRange_ != NULL; currentFitRange_ = currentFitRange_->next)
 	{
@@ -766,6 +807,9 @@ bool FitKernel::fit()
 
 		// Copy final fitted data over to destination collection
 		updateFittedData();
+
+		// Loop DataSpaceRange pointers in reference variable
+		for (RefListItem<ReferenceVariable,bool>* ri = usedReferences_.first(); ri != NULL; ri = ri->next) ri->item->moveToNextDataSpaceRange();
 	}
 
 	return result;

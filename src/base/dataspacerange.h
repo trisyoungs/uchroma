@@ -23,13 +23,16 @@
 #define UCHROMA_DATASPACERANGE_H
 
 #include "base/dataspacedata.h"
+#include "base/indexdata.h"
 #include "templates/list.h"
+#include "templates/reflist.h"
 
 // Forward Declarations
 class Collection;
 class DataSpace;
 class Expression;
 class Variable;
+class ReferenceVariable;
 
 /*
  * DataSpaceRange
@@ -61,7 +64,7 @@ class DataSpaceRange : public ListItem<DataSpaceRange>
 
 	public:
 	// Set target information
-	void set(Collection* collection, int abscissaFirst, int abscissaLast, int firstDataSet, int lastDataSet);
+	void set(Collection* collection, int abscissaFirst, int abscissaLast, int firstDataSet, int lastDataSet, bool referenceDataOnly);
 	// Return index of first DisplayDataSet to be fit
 	int displayDataSetStart();
 	// Return index of last DisplayDataSet to be fit
@@ -85,15 +88,21 @@ class DataSpaceRange : public ListItem<DataSpaceRange>
 
 
 	/*
-	 * Associated Data
+	 * Values
 	 */
 	private:
 	// Associated values for target space
 	List<DataSpaceData> values_;
 
 	public:
+	// Return reference y value specified
+	double referenceY(int xIndex, int zIndex);
+	// Return calculated y value specified
+	double calculatedY(int xIndex, int zIndex);
+	// Copy values from stored source collection, using index data provided
+	bool copyValues(IndexData xIndex, IndexData zIndex);
 	// Calculate values from specified equation
-	bool calculateValues(Expression& equation, Variable* xVariable, Variable* zVariable);
+	bool calculateValues(Expression& equation, Variable* xVariable, Variable* zVariable, const RefList<ReferenceVariable,bool>& usedReferences);
 	// Return sos error between stored and referenced values
 	double sosError();
 	// Copy values to specified Collection

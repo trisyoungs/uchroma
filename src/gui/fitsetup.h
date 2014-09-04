@@ -28,6 +28,7 @@
 #include "base/dnchar.h"
 #include "base/data2d.h"
 #include "base/equationvariable.h"
+#include "kernels/fit.h"
 #include "expression/expression.h"
 #include "templates/array.h"
 #include "templates/list.h"
@@ -37,7 +38,6 @@ class UChromaWindow;
 class Collection;
 class DataSet;
 class Variable;
-class FitKernel;
 
 /*
  * FitSetup Dialog
@@ -63,6 +63,10 @@ class FitSetupDialog : public QDialog
 	private:
 	// Whether the window is refreshing / updating its controls
 	bool refreshing_;
+	// Whether the next reject() call should be treated as soft
+	bool softReject_;
+	// Backup FitKernel data
+	FitKernel fitKernelBackup_;
 
 	protected:
 	// Window close event
@@ -79,7 +83,7 @@ class FitSetupDialog : public QDialog
 	 */
 	private:
 	// FitKernel that we are currently setting up
-	FitKernel* fitKernel_;
+	FitKernel* fitKernelTarget_;
 
 	public:
 	// Set new FitKernel target
@@ -147,13 +151,13 @@ class FitSetupDialog : public QDialog
 	 * Source Z
 	 */
 	public slots:
-	void on_ZSourceAbsoluteRadio_clicked(bool checked);
+	void on_ZSourceAbsoluteRadio_toggled(bool checked);
 	void on_ZAbsoluteMinSpin_valueChanged(double value);
 	void on_ZAbsoluteMaxSpin_valueChanged(double value);
 	void on_ZAbsoluteSelectButton_clicked(bool checked);
-	void on_ZSourceSingleDataSetRadio_clicked(bool checked);
+	void on_ZSourceSingleDataSetRadio_toggled(bool checked);
 	void on_ZDataSetCombo_currentIndexChanged(int index);
-	void on_ZSourceDataSetRangeRadio_clicked(bool checked);
+	void on_ZSourceDataSetRangeRadio_toggled(bool checked);
 	void on_ZDataSetMinSpin_valueChanged(int value);
 	void on_ZDataSetMaxSpin_valueChanged(int value);
 

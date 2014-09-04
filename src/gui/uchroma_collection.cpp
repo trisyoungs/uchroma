@@ -89,8 +89,8 @@ void UChromaWindow::on_CollectionTree_itemChanged(QTreeWidgetItem* item, int col
 	Collection* collection = VariantPointer<Collection>(item->data(0, Qt::UserRole));
 	if (!collection) return;
 
-	// Set title of collection
-	collection->setTitle(item->text(0));
+	// Set name of collection
+	collection->setName(item->text(0));
 }
 
 void UChromaWindow::on_CollectionAddButton_clicked(bool checked)
@@ -118,7 +118,7 @@ void UChromaWindow::updateCollectionTreeItem(QTreeWidgetItem* item)
 	if (collection == NULL) return;
 
 	// Set basic information
-	item->setText(0, collection->title());
+	item->setText(0, collection->name());
 	item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
 	item->setCheckState(0, collection->visible() ? Qt::Checked : Qt::Unchecked);
 
@@ -173,8 +173,8 @@ void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 	sendToPaneMenuAction->setText("Move to...");
 	// -- Analysis
 	contextMenu.addSeparator();
-	QAction* fitAction = contextMenu.addAction("New &Fit Equation");
-	QAction* editFitAction = contextMenu.addAction("&Edit Fit E&quation");
+	QAction* fitAction = contextMenu.addAction("New &Fit Equation...");
+	QAction* editFitAction = contextMenu.addAction("&Edit Fit E&quation...");
 	QAction* updateFitAction = contextMenu.addAction("&Update/Continue Fit");
 
 	// Show it
@@ -239,7 +239,7 @@ void UChromaWindow::updateCollectionInfo()
 	// Update collection info label
 	if (currentCollection_)
 	{
-		ui.InfoCurrentCollectionLabel->setText(currentCollection_->title());
+		ui.InfoCurrentCollectionLabel->setText(currentCollection_->name());
 		ui.InfoCurrentCollectionIconLabel->setPixmap(QPixmap(currentCollection_->iconString()));
 	}
 	else ui.InfoCurrentCollectionLabel->setText("<No Current Collection>");

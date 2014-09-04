@@ -47,7 +47,7 @@ DataSet::DataSet() : ListItem<DataSet>()
 {
 	sourceFileName_ = "";
 	dataSource_ = DataSet::InternalSource;
-	title_ = "";
+	name_ = "New DataSet";
 }
 
 // Destructor
@@ -65,7 +65,7 @@ DataSet::DataSet(const DataSet& source)
 void DataSet::operator=(const DataSet& source)
 {
 	sourceFileName_ = source.sourceFileName_;
-	title_ = source.title_;
+	name_ = source.name_;
 	data_ = source.data_;
 	transformedData_ = source.transformedData_;
 	dataSource_ = source.dataSource_;
@@ -96,15 +96,15 @@ QString DataSet::sourceFileName()
 }
 
 // Set associated data name
-void DataSet::setTitle(QString title)
+void DataSet::setName(QString name)
 {
-	title_ = title;
+	name_ = name;
 }
 
-// Return title
-QString DataSet::title()
+// Return name
+QString DataSet::name()
 {
-	return title_;
+	return name_;
 }
 
 // Load data from file

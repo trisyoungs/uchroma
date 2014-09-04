@@ -23,6 +23,7 @@
 #define UCHROMA_REFERENCEVARIABLE_H
 
 #include "base/dataspace.h"
+#include "base/indexdata.h"
 #include <QtCore/QString>
 
 // Forward Declarations
@@ -39,12 +40,6 @@ class ReferenceVariable : public ListItem<ReferenceVariable>
 	ReferenceVariable(const ReferenceVariable& source);
 	// Assignment operator
 	void operator=(const ReferenceVariable& source);
-	// Reference Type
-	enum ReferenceType { NormalReference, FixedReference, RelativeReference, nReferenceTypes };
-	// Convert text string to ReferenceType
-	static ReferenceType referenceType(const char* s);
-	// Convert ReferenceType to text string
-	static const char* referenceType(ReferenceType id);
 
 
 	/*
@@ -83,56 +78,46 @@ class ReferenceVariable : public ListItem<ReferenceVariable>
 	private:
 	// Source collection
 	Collection* sourceCollection_;
-	// X index type
-	ReferenceType xType_;
-	// X index (for absolute type)
-	int xIndex_;
-	// X offset (for relative type)
-	int xOffset_;
-	// Z index type
-	ReferenceType zType_;
-	// Z index (for absolute type)
-	int zIndex_;
-	// Z offset (for relative type)
-	int zOffset_;
+	// X index
+	IndexData xIndex_;
+	// Z index
+	IndexData zIndex_;
 	// Z DataSet name
 	QString zDataSetName_;
-	// Reference data
-	DataSpace referenceSpace_;
 
 	public:
 	// Set source collection
 	void setSourceCollection(Collection* source);
 	// Return source collection
 	Collection* sourceCollection();
-	// Set X index type
-	void setXType(ReferenceVariable::ReferenceType type);
-	// Return X index type
-	ReferenceVariable::ReferenceType xType();
-	// Set X index
-	void setXIndex(int index);
-	// Return X index
-	int xIndex();
-	// Set X offset
-	void setXOffset(int offset);
-	// Return X offset
-	int xOffset();
-	// Set Z index type
-	void setZType(ReferenceVariable::ReferenceType type);
-	// Return Z index type
-	ReferenceVariable::ReferenceType zType();
-	// Set Z index
-	void setZIndex(int index);
-	// Return Z index
-	int zIndex();
-	// Set Z offset
-	void setZOffset(int offset);
-	// Return Z offset
-	int zOffset();
+	// Return x index data
+	IndexData& xIndex();
+	// Return Z index data
+	IndexData& zIndex();
 	// Set Z DataSet name
 	void setZDataSetName(QString name);
 	// Return Z DataSet name
 	QString zDataSetName();
+
+
+	/*
+	 * Reference Data
+	 */
+	private:
+	// Reference dataspace
+	DataSpace referenceSpace_;
+	// Current range used when updating variable values
+	DataSpaceRange* currentReferenceRange_;
+
+	public:
+	// Generate reference data
+	bool initialiseDataSpace(Collection* fitCollection, DataSpace& fitDataSpace);
+	// Reset current reference DataSpaceRange to the first available
+	void resetCurrentDataSpaceRange();
+	// Set internal pointer to the next available DataSpaceRange
+	void moveToNextDataSpaceRange();
+	// Update value of target variable with DataSpaceRange indices provided
+	bool updateValue(int rangeXIndex, int rangeZIndex);
 };
 
 #endif

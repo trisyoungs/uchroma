@@ -144,7 +144,7 @@ class Expression
 	 */
 	public:
 	// Execute
-	double execute();
+	double execute(bool& success);
 };
 
 #endif

@@ -70,9 +70,9 @@ bool UChromaWindow::writeCollectionBlock(LineParser& parser, Collection* collect
 	for (int n=0; n<indentLevel*2; ++n) indent[n] = ' ';
 	indent[indentLevel*2] = '\0';
 
-	if (type == Collection::MasterCollection) parser.writeLineF("%s%s '%s'\n", indent, Keywords::inputBlock(Keywords::CollectionBlock), qPrintable(collection->title()));
-	else if (type == Collection::FitCollection) parser.writeLineF("%s%s '%s'\n", indent, Keywords::collectionKeyword(Keywords::FitBlockKeyword), qPrintable(collection->title()));
-	else if (type == Collection::ExtractedCollection) parser.writeLineF("%s%s '%s'\n", indent, Keywords::collectionKeyword(Keywords::SliceBlockKeyword), qPrintable(collection->title()));
+	if (type == Collection::MasterCollection) parser.writeLineF("%s%s '%s'\n", indent, Keywords::inputBlock(Keywords::CollectionBlock), qPrintable(collection->name()));
+	else if (type == Collection::FitCollection) parser.writeLineF("%s%s '%s'\n", indent, Keywords::collectionKeyword(Keywords::FitBlockKeyword), qPrintable(collection->name()));
+	else if (type == Collection::ExtractedCollection) parser.writeLineF("%s%s '%s'\n", indent, Keywords::collectionKeyword(Keywords::SliceBlockKeyword), qPrintable(collection->name()));
 	parser.writeLineF("%s  %s \"%s\"\n", indent, Keywords::collectionKeyword(Keywords::DataDirectoryKeyword), qPrintable(collection->dataFileDirectory().absolutePath()));
 
 	// -- Transforms
@@ -145,7 +145,7 @@ bool UChromaWindow::writeDataSetBlock(LineParser& parser, DataSet* dataSet, int 
 	for (int n=0; n<indentLevel*2; ++n) indent[n] = ' ';
 	indent[indentLevel*2] = '\0';
 
-	parser.writeLineF("%s  %s '%s'\n", indent, Keywords::collectionKeyword(Keywords::DataSetDefinitionKeyword), qPrintable(dataSet->title()));
+	parser.writeLineF("%s  %s '%s'\n", indent, Keywords::collectionKeyword(Keywords::DataSetDefinitionKeyword), qPrintable(dataSet->name()));
 	if (dataSet->dataSource() == DataSet::FileSource) parser.writeLineF("%s    %s %s '%s'\n", indent, Keywords::dataSetKeyword(Keywords::SourceKeyword), DataSet::dataSource(dataSet->dataSource()), qPrintable(dataSet->sourceFileName()));
 	else parser.writeLineF("%s    %s %s\n", indent, Keywords::dataSetKeyword(Keywords::SourceKeyword), DataSet::dataSource(dataSet->dataSource()));
 	parser.writeLineF("%s    %s %f\n", indent, Keywords::dataSetKeyword(Keywords::ZKeyword), dataSet->data().z());
@@ -169,7 +169,7 @@ bool UChromaWindow::writeFitParametersBlock(LineParser& parser, FitKernel* fitKe
 	for (RefListItem<ReferenceVariable,bool>* ri = fitKernel->usedReferences(); ri != NULL; ri = ri->next)
 	{
 		ReferenceVariable* refVar = ri->item;
-		parser.writeLineF("%s    %s %s %i %i %s %i %i '%s'\n", indent, Keywords::fitParametersKeyword(Keywords::ReferenceKeyword), qPrintable(refVar->name()), ReferenceVariable::referenceType(refVar->xType()), refVar->xIndex(), refVar->xOffset(), ReferenceVariable::referenceType(refVar->zType()), refVar->zIndex(), refVar->zOffset(), qPrintable(refVar->zDataSetName()));
+		parser.writeLineF("%s    %s %s %s %i %i %s %i %i '%s'\n", indent, Keywords::fitParametersKeyword(Keywords::ReferenceKeyword), qPrintable(refVar->name()), IndexData::indexType(refVar->xIndex().type()), refVar->xIndex().index(), refVar->xIndex().offset(), IndexData::indexType(refVar->zIndex().type()), refVar->zIndex().index(), refVar->zIndex().offset(), qPrintable(refVar->zDataSetName()));
 	}
 	parser.writeLineF("%s    %s '%s'\n", indent, Keywords::fitParametersKeyword(Keywords::EquationKeyword), qPrintable(fitKernel->equationText()));
 	parser.writeLineF("%s    %s %s\n", indent, Keywords::fitParametersKeyword(Keywords::GlobalKeyword), stringBool(fitKernel->global()));
@@ -223,7 +223,7 @@ bool UChromaWindow::writeViewPaneBlock(LineParser& parser, ViewPane* pane)
 {
 	parser.writeLineF("  %s '%s'\n", Keywords::viewKeyword(Keywords::ViewPaneBlockKeyword), qPrintable(pane->name()));
 	parser.writeLineF("    %s %i %i %i %i\n", Keywords::viewPaneKeyword(Keywords::GeometryKeyword), pane->bottomEdge(), pane->leftEdge(), pane->width(), pane->height()); 
-	for (RefListItem<Collection,bool>* ri = pane->collections(); ri != NULL; ri = ri->next) parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::CollectionAssociatedKeyword), qPrintable(ri->item->title())); 
+	for (RefListItem<Collection,bool>* ri = pane->collections(); ri != NULL; ri = ri->next) parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::CollectionAssociatedKeyword), qPrintable(ri->item->name())); 
 	for (int axis=0; axis < 3; ++axis) writeAxisBlock(parser, pane->axes(), axis);
 	parser.writeLineF("    %s %s\n", Keywords::viewPaneKeyword(Keywords::AutoScaleKeyword), ViewPane::autoScaleMethod(pane->autoScale()));
 	parser.writeLineF("    %s %s\n", Keywords::viewPaneKeyword(Keywords::TwoDimensionalKeyword), stringBool(pane->twoDimensional()));
@@ -240,7 +240,7 @@ bool UChromaWindow::writeViewPaneBlock(LineParser& parser, ViewPane* pane)
 	parser.writeLineF("    %s %f %f %f\n", Keywords::viewPaneKeyword(Keywords::TranslationKeyword), trans.x, trans.y, trans.z);
 	if (pane->hasPerspective()) parser.writeLineF("  %s\n", Keywords::viewPaneKeyword(Keywords::PerspectiveKeyword));
 	parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::RoleKeyword), ViewPane::paneRole(pane->role()));
-	for (RefListItem<Collection,TargetData>* ri = pane->roleTargetCollections(); ri != NULL; ri = ri->next) parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::RoleTargetCollectionKeyword), qPrintable(ri->item->title()));
+	for (RefListItem<Collection,TargetData>* ri = pane->roleTargetCollections(); ri != NULL; ri = ri->next) parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::RoleTargetCollectionKeyword), qPrintable(ri->item->name()));
 	for (RefListItem<ViewPane,bool>* ri = pane->roleTargetPanes(); ri != NULL; ri = ri->next) parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::RoleTargetPaneKeyword), qPrintable(ri->item->name()));
 	parser.writeLineF("  %s\n", Keywords::viewPaneKeyword(Keywords::EndViewPaneKeyword));
 

@@ -58,8 +58,10 @@ class DataSpace
 	ParentList<DataSpaceRange,DataSpace> ranges_;
 
 	public:
-	// Initialise ranges
+	// Initialise data space
 	bool initialise(Collection* sourceCollection, int xIndexMin, int xIndexMax, int zIndexMin, int zIndexMax, bool orthogonal, bool global);
+	// Initialise data space, matching size in source DataSpace
+	bool initialise(const DataSpace& source, bool referenceDataOnly);
 	// Return source collection
 	Collection* sourceCollection();
 	// Return range list

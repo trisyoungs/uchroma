@@ -21,6 +21,7 @@
 
 #include "base/dataspace.h"
 #include "base/collection.h"
+#include "base/referencevariable.h"
 #include "expression/expression.h"
 #include "expression/variable.h"
 
@@ -45,7 +46,7 @@ DataSpaceRange::~DataSpaceRange()
  */
 
 // Set target information
-void DataSpaceRange::set(Collection* collection, int abscissaFirst, int abscissaLast, int firstDataSet, int lastDataSet)
+void DataSpaceRange::set(Collection* collection, int abscissaFirst, int abscissaLast, int firstDataSet, int lastDataSet, bool referenceDataOnly)
 {
 	displayDataSetStart_ = firstDataSet;
 	displayDataSetEnd_ = lastDataSet;
@@ -63,7 +64,8 @@ void DataSpaceRange::set(Collection* collection, int abscissaFirst, int abscissa
 		DataSpaceData* data = values_.add();
 		const Array<double>& y = dataSets[n+displayDataSetStart_]->y();
 		const Array<DisplayDataSet::DataPointType>& yType = dataSets[n+displayDataSetStart_]->yType();
-		for (int i=0; i<nPoints_; ++i) data->addPoint(abscissa.value(i+abscissaStart_), y.value(i+abscissaStart_), yType.value(i+abscissaStart_));
+		if (referenceDataOnly) for (int i=0; i<nPoints_; ++i) data->addPoint(abscissa.value(i+abscissaStart_), y.value(i+abscissaStart_));
+		else for (int i=0; i<nPoints_; ++i) data->addPoint(abscissa.value(i+abscissaStart_), y.value(i+abscissaStart_), yType.value(i+abscissaStart_), 0.0);
 		data->setZ(dataSets[n+displayDataSetStart_]->z());
 	}
 }
@@ -156,9 +158,95 @@ double DataSpaceRange::zEnd()
 	return values_.last()->z();
 }
 
-// Calculate values from specified equation
-bool DataSpaceRange::calculateValues(Expression& equation, Variable* xVariable, Variable* zVariable)
+/*
+ * Values
+ */
+
+// Return reference y value specified
+double DataSpaceRange::referenceY(int xIndex, int zIndex)
 {
+	DataSpaceData* data = values_[zIndex];
+	if (data) return data->yReference().value(xIndex);
+	else return 0.0;
+}
+
+// Return calculated y value specified
+double DataSpaceRange::calculatedY(int xIndex, int zIndex)
+{
+	DataSpaceData* data = values_[zIndex];
+	if (data) return data->yCalculated().value(xIndex);
+	else return 0.0;
+}
+
+// Copy values from stored source collection, using index data provided
+bool DataSpaceRange::copyValues(IndexData xIndex, IndexData zIndex)
+{
+	// Grab source abscissa values and display data array
+	int nAbscissaPoints = parent_.sourceCollection()->displayAbscissa().nItems();
+	List<DisplayDataSet>& dataSets = parent_.sourceCollection()->displayData();
+	DisplayDataSet* dataSet;
+	int actualZ, actualX;
+
+	// Loop over z indices defined in range
+	for (int z = 0; z < nDataSets_; ++z)
+	{
+		// Grab the dataSet that we want, taking into account the zIndex definition
+		if (zIndex.type() == IndexData::NormalIndex) dataSet = dataSets[z+displayDataSetStart_];
+		else if (zIndex.type() == IndexData::RelativeIndex)
+		{
+			// Check current index, accounting for offset defined in zIndex
+			actualZ = displayDataSetStart_+z+zIndex.offset();
+			if ((actualZ < 0) || (actualZ >= dataSets.nItems()))
+			{
+				msg.print("Warning: Relative offset defined for Z reference when copying values, and %i is out of range (available indices are 1 through %i).\n", actualZ+1, dataSets.nItems());
+				dataSet = NULL;
+			}
+			else dataSet = dataSets[actualZ];
+		}
+		else if (zIndex.type() == IndexData::FixedIndex)
+		{
+			// Check current index, accounting for offset defined in zIndex
+			actualZ = zIndex.index();
+			if ((actualZ < 0) || (actualZ >= dataSets.nItems()))
+			{
+				msg.print("Warning: Absolute index defined for Z reference when copying values, and %i is out of range (available indices are 1 through %i).\n", actualZ+1, dataSets.nItems());
+				dataSet = NULL;
+			}
+			else dataSet = dataSets[actualZ];
+		}
+
+		// Check validity of dataset - if none is set, zero the relevant values_ entry and move on
+		if (!dataSet)
+		{
+			values_[z]->zeroYReference();
+			continue;
+		}
+
+		// Grab data from dataSet
+		const Array<double>& yRef = dataSet->y();
+
+		// Loop over x indices defined in range
+		if (xIndex.type() == IndexData::FixedIndex) actualX = xIndex.index();
+		for (int x = 0; x<nPoints_; ++x)
+		{
+			// Calculate actual X value to use
+			if (xIndex.type() == IndexData::NormalIndex) actualX = abscissaStart_+x;
+			else if (xIndex.type() == IndexData::RelativeIndex) actualX = abscissaStart_+x+xIndex.offset();
+
+			// Check index of x against valid abscissa range
+			if ((x < 0) || (x >= nAbscissaPoints)) values_[z]->setReferenceY(x, 0.0);
+			else values_[z]->setReferenceY(x, yRef.value(actualX));
+		}
+	}
+
+	return true;
+}
+
+// Calculate values from specified equation
+bool DataSpaceRange::calculateValues(Expression& equation, Variable* xVariable, Variable* zVariable, const RefList<ReferenceVariable,bool>& usedReferences)
+{
+	bool success;
+
 	// Generate fitted data over all targetted datasets / abscissa values
 	DataSpaceData* values = values_.first();
 
@@ -183,8 +271,12 @@ bool DataSpaceRange::calculateValues(Expression& equation, Variable* xVariable, 
 			// Set x variable value	
 			xVariable->set(x.value(i));
 
+			// Generate reference values
+			for (RefListItem<ReferenceVariable,bool>* ri = usedReferences.first(); ri != NULL; ri = ri->next) ri->item->updateValue(i, n);
+
 			// Calculate and store y value
-			values->setCalculatedY(i, equation.execute());
+			values->setCalculatedY(i, equation.execute(success));
+			if (!success) return false;
 		}
 
 		// Move to next calculated data element

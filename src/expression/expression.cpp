@@ -383,23 +383,21 @@ RefListItem<Variable,bool>* Expression::constants()
  */
 
 // Execute expression
-double Expression::execute()
+double Expression::execute(bool& success)
 {
-	msg.enter("Expression::execute");
-	int result = 0;
-	double rv;
+	double expressionResult;
 
 	for (RefListItem<Node,int> *ri = statements_.first(); ri != NULL; ri = ri->next)
 	{
 		msg.print(Messenger::Verbose, "Executing expression statement %p...\n", ri->item);
 // 		ri->item->nodePrint(1);
-		result = ri->item->execute(rv);
-		if (result != 1) break;
+		success = ri->item->execute(expressionResult);
+		if (!success) break;
 	}
 
 	// Print some final verbose output
-	msg.print(Messenger::Verbose, "Final result from expression = %f\n", rv);
-	if (result == 0) msg.print(Messenger::Verbose, "Execution FAILED.\n");
-	msg.exit("Expression::execute");
-	return rv;
+// 	msg.print("Final result from expression = %f\n", expressionResult);
+	if (!success) msg.print("Warning: Execution FAILED.\n");
+
+	return expressionResult;
 }

@@ -45,6 +45,10 @@ class FitKernel
 	FitKernel();
 	// Destructor
 	~FitKernel();
+	// Copy Constructor
+	FitKernel(const FitKernel& source);
+	// Assignment operator
+	void operator=(const FitKernel& source);
 
 
 	/*

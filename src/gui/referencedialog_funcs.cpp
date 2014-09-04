@@ -88,25 +88,25 @@ bool ReferenceSetupDialog::call(ReferenceVariable* target, FitKernel* parentKern
 	// Update widgets
 	// -- Names
 	ui.NameEdit->setText(referenceTarget_->name());
-	ui.SourceCollectionLabel->setText(referenceTarget_->sourceCollection()->title());
+	ui.SourceCollectionLabel->setText(referenceTarget_->sourceCollection()->name());
 	// -- X range
-	if (referenceTarget_->xType() == ReferenceVariable::NormalReference) ui.XNormalRadio->setChecked(true);
-	else if (referenceTarget_->xType() == ReferenceVariable::FixedReference) ui.XFixedRadio->setChecked(true);
-	else if (referenceTarget_->xType() == ReferenceVariable::RelativeReference) ui.XRelativeRadio->setChecked(true);
+	if (referenceTarget_->xIndex().type() == IndexData::NormalIndex) ui.XNormalRadio->setChecked(true);
+	else if (referenceTarget_->xIndex().type() == IndexData::FixedIndex) ui.XFixedRadio->setChecked(true);
+	else if (referenceTarget_->xIndex().type() == IndexData::RelativeIndex) ui.XRelativeRadio->setChecked(true);
 	int nX = referenceTarget_->sourceCollection()->displayAbscissa().nItems();
-	ui.XFixedSpin->setValue(referenceTarget_->xIndex()+1);
+	ui.XFixedSpin->setValue(referenceTarget_->xIndex().index()+1);
 	ui.XFixedSpin->setRange(1, nX);
-	ui.XRelativeSpin->setValue(referenceTarget_->xIndex());
+	ui.XRelativeSpin->setValue(referenceTarget_->xIndex().index());
 	ui.XRelativeSpin->setRange(-nX, nX);
 	// -- X range
-	if (referenceTarget_->zType() == ReferenceVariable::NormalReference) ui.ZNormalRadio->setChecked(true);
-	else if (referenceTarget_->zType() == ReferenceVariable::FixedReference) ui.ZFixedRadio->setChecked(true);
-	else if (referenceTarget_->zType() == ReferenceVariable::RelativeReference) ui.ZRelativeRadio->setChecked(true);
+	if (referenceTarget_->zIndex().type() == IndexData::NormalIndex) ui.ZNormalRadio->setChecked(true);
+	else if (referenceTarget_->zIndex().type() == IndexData::FixedIndex) ui.ZFixedRadio->setChecked(true);
+	else if (referenceTarget_->zIndex().type() == IndexData::RelativeIndex) ui.ZRelativeRadio->setChecked(true);
 	int nZ = referenceTarget_->sourceCollection()->nDataSets();
 	ui.ZDataSetCombo->clear();
-	for (DataSet* dataSet = referenceTarget_->sourceCollection()->dataSets(); dataSet != NULL; dataSet = dataSet->next) ui.ZDataSetCombo->addItem(dataSet->title());
-	ui.ZDataSetCombo->setCurrentIndex(referenceTarget_->zIndex());
-	ui.ZRelativeSpin->setValue(referenceTarget_->zIndex());
+	for (DataSet* dataSet = referenceTarget_->sourceCollection()->dataSets(); dataSet != NULL; dataSet = dataSet->next) ui.ZDataSetCombo->addItem(dataSet->name());
+	ui.ZDataSetCombo->setCurrentIndex(referenceTarget_->zIndex().index());
+	ui.ZRelativeSpin->setValue(referenceTarget_->zIndex().index());
 	ui.ZRelativeSpin->setRange(-nZ, nZ);
 
 	refreshing_ = false;
@@ -129,9 +129,15 @@ void ReferenceSetupDialog::on_NameEdit_textChanged(QString text)
 
 	referenceTarget_->setName(text);
 
-	// Must check name against other references to prevent duplicates...
+	// Must check name against other references and some standard variables to prevent duplicates...
+	bool valid = true;
 	ReferenceVariable* refVar = referenceParent_->reference(text);
-	if ((!refVar) || (refVar == referenceTarget_) && (!text.isEmpty()))
+	if (text == "x") valid = false;
+	else if (text == "z") valid = false;
+	else if (text.isEmpty()) valid = false;
+	else if ((refVar != NULL) && (refVar != referenceTarget_)) valid = false;
+
+	if (valid)
 	{
 		ui.OKButton->setEnabled(true);
 		ui.NameEdit->setPalette(ui.SourceCollectionLabel->palette());
@@ -157,7 +163,7 @@ void ReferenceSetupDialog::on_XNormalRadio_clicked(bool checked)
 
 	if (refreshing_ || (!referenceTarget_)) return;
 
-	referenceTarget_->setXType(ReferenceVariable::NormalReference);
+	referenceTarget_->xIndex().setType(IndexData::NormalIndex);
 }
 
 void ReferenceSetupDialog::on_XFixedRadio_clicked(bool checked)
@@ -172,7 +178,7 @@ void ReferenceSetupDialog::on_XFixedRadio_clicked(bool checked)
 
 	if (refreshing_ || (!referenceTarget_)) return;
 
-	referenceTarget_->setXType(ReferenceVariable::FixedReference);
+	referenceTarget_->xIndex().setType(IndexData::FixedIndex);
 }
 
 void ReferenceSetupDialog::on_XRelativeRadio_clicked(bool checked)
@@ -187,14 +193,14 @@ void ReferenceSetupDialog::on_XRelativeRadio_clicked(bool checked)
 
 	if (refreshing_ || (!referenceTarget_)) return;
 
-	referenceTarget_->setXType(ReferenceVariable::RelativeReference);
+	referenceTarget_->xIndex().setType(IndexData::RelativeIndex);
 }
 
 void ReferenceSetupDialog::on_XFixedSpin_valueChanged(int value)
 {
 	if (refreshing_ || (!referenceTarget_)) return;
 
-	referenceTarget_->setXIndex(value-1);
+	referenceTarget_->xIndex().setIndex(value-1);
 
 	updateLabels();
 }
@@ -203,7 +209,7 @@ void ReferenceSetupDialog::on_XRelativeSpin_valueChanged(int value)
 {
 	if (refreshing_ || (!referenceTarget_)) return;
 
-	referenceTarget_->setXOffset(value-1);
+	referenceTarget_->xIndex().setOffset(value-1);
 
 	updateLabels();
 }
@@ -220,7 +226,7 @@ void ReferenceSetupDialog::on_ZNormalRadio_clicked(bool checked)
 
 	if (refreshing_ || (!referenceTarget_)) return;
 
-	referenceTarget_->setZType(ReferenceVariable::NormalReference);
+	referenceTarget_->zIndex().setType(IndexData::NormalIndex);
 }
 
 void ReferenceSetupDialog::on_ZFixedRadio_clicked(bool checked)
@@ -235,7 +241,7 @@ void ReferenceSetupDialog::on_ZFixedRadio_clicked(bool checked)
 
 	if (refreshing_ || (!referenceTarget_)) return;
 
-	referenceTarget_->setZType(ReferenceVariable::FixedReference);
+	referenceTarget_->zIndex().setType(IndexData::FixedIndex);
 }
 
 void ReferenceSetupDialog::on_ZRelativeRadio_clicked(bool checked)
@@ -250,14 +256,14 @@ void ReferenceSetupDialog::on_ZRelativeRadio_clicked(bool checked)
 
 	if (refreshing_ || (!referenceTarget_)) return;
 
-	referenceTarget_->setZType(ReferenceVariable::RelativeReference);
+	referenceTarget_->zIndex().setType(IndexData::RelativeIndex);
 }
 
 void ReferenceSetupDialog::on_ZDataSetCombo_currentIndexChanged(int index)
 {
 	if (refreshing_ || (!referenceTarget_)) return;
 
-	referenceTarget_->setZIndex(index);
+	referenceTarget_->zIndex().setIndex(index);
 	referenceTarget_->setZDataSetName(ui.ZDataSetCombo->currentText());
 
 	updateLabels();
@@ -267,7 +273,7 @@ void ReferenceSetupDialog::on_ZRelativeSpin_valueChanged(int value)
 {
 	if (refreshing_ || (!referenceTarget_)) return;
 
-	referenceTarget_->setZOffset(value-1);
+	referenceTarget_->zIndex().setOffset(value-1);
 
 	updateLabels();
 }

@@ -23,7 +23,7 @@
 #include "gui/uchroma.h"
 
 // Add new collection
-Collection* UChromaWindow::addCollection(QString title)
+Collection* UChromaWindow::addCollection(QString name)
 {
 	static int collectionCount = 1;
 
@@ -34,8 +34,8 @@ Collection* UChromaWindow::addCollection(QString title)
 	currentCollection_->displayPrimitives().setViewer(ui.MainView);
 
 	// Set the title
-	if (title.isEmpty()) currentCollection_->setTitle("Empty Collection " + QString::number(collectionCount++));
-	else currentCollection_->setTitle(title);
+	if (name.isEmpty()) currentCollection_->setName("Empty Collection " + QString::number(collectionCount++));
+	else currentCollection_->setName(name);
 
 	CurrentProject::setAsModified();
 

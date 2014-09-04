@@ -21,23 +21,7 @@
 
 #include "base/referencevariable.h"
 #include "base/messenger.h"
-#include "expression//variable.h"
-
-// ReferenceType Keywords
-const char* ReferenceTypeKeywords[] = { "Normal", "Fixed", "Relative" };
-
-// Convert text string to ReferenceType
-ReferenceVariable::ReferenceType ReferenceVariable::referenceType(const char* s)
-{
-	for (int n=0; n<ReferenceVariable::nReferenceTypes; ++n) if (strcmp(s,ReferenceTypeKeywords[n]) == 0) return (ReferenceVariable::ReferenceType) n;
-	return ReferenceVariable::nReferenceTypes;
-}
-
-// Convert ReferenceType to text string
-const char* ReferenceVariable::referenceType(ReferenceVariable::ReferenceType rt)
-{
-	return ReferenceTypeKeywords[rt];
-}
+#include "expression/variable.h"
 
 // Constructor
 ReferenceVariable::ReferenceVariable() : ListItem<ReferenceVariable>()
@@ -48,12 +32,7 @@ ReferenceVariable::ReferenceVariable() : ListItem<ReferenceVariable>()
 
 	// Reference Definition
 	sourceCollection_ = NULL;
-	xType_ = ReferenceVariable::NormalReference;
-	xIndex_ = 0;
-	xOffset_ = 0;
-	zType_ = ReferenceVariable::NormalReference;
-	zIndex_ = 0;
-	zOffset_ = 0;
+	currentReferenceRange_ = NULL;
 }
 
 // Destructor
@@ -77,12 +56,8 @@ void ReferenceVariable::operator=(const ReferenceVariable& source)
 	
 	// Reference Definition
 	sourceCollection_ = source.sourceCollection_;
-	xType_ = source.xType_;
 	xIndex_ = source.xIndex_;
-	xOffset_ = source.xOffset_;
-	zType_ = source.zType_;
 	zIndex_ = source.zIndex_;
-	zOffset_ = source.zOffset_;
 	zDataSetName_ = source.zDataSetName_;
 }
 
@@ -155,76 +130,16 @@ Collection* ReferenceVariable::sourceCollection()
 	return sourceCollection_;
 }
 
-// Set X index type
-void ReferenceVariable::setXType(ReferenceVariable::ReferenceType type)
-{
-	xType_ = type;
-}
-
-// Return X index type
-ReferenceVariable::ReferenceType ReferenceVariable::xType()
-{
-	return xType_;
-}
-
-// Set X index
-void ReferenceVariable::setXIndex(int index)
-{
-	xIndex_ = index;
-}
-
-// Return X index
-int ReferenceVariable::xIndex()
+// Return x index data
+IndexData& ReferenceVariable::xIndex()
 {
 	return xIndex_;
 }
 
-// Set X offset
-void ReferenceVariable::setXOffset(int offset)
-{
-	xOffset_ = offset;
-}
-
-// Return X offset
-int ReferenceVariable::xOffset()
-{
-	return xOffset_;
-}
-
-// Set Z index type
-void ReferenceVariable::setZType(ReferenceVariable::ReferenceType type)
-{
-	zType_ = type;
-}
-
-// Return Z index type
-ReferenceVariable::ReferenceType ReferenceVariable::zType()
-{
-	return zType_;
-}
-
-// Set Z index
-void ReferenceVariable::setZIndex(int index)
-{
-	zIndex_ = index;
-}
-
-// Return Z index
-int ReferenceVariable::zIndex()
+// Return Z index data
+IndexData& ReferenceVariable::zIndex()
 {
 	return zIndex_;
-}
-
-// Set Z offset
-void ReferenceVariable::setZOffset(int offset)
-{
-	zOffset_ = offset;
-}
-
-// Return Z offset
-int ReferenceVariable::zOffset()
-{
-	return zOffset_;
 }
 
 // Set Z DataSet name
@@ -237,4 +152,57 @@ void ReferenceVariable::setZDataSetName(QString name)
 QString ReferenceVariable::zDataSetName()
 {
 	return zDataSetName_;
+}
+
+/*
+ * Reference Data
+ */
+
+// Reset current reference DataSpaceRange to the first available
+void ReferenceVariable::resetCurrentDataSpaceRange()
+{
+	currentReferenceRange_ = referenceSpace_.ranges();
+}
+
+// Set internal pointer to the next available DataSpaceRange
+void ReferenceVariable::moveToNextDataSpaceRange()
+{
+	currentReferenceRange_ = currentReferenceRange_->next;
+}
+
+// Generate reference data
+bool ReferenceVariable::initialiseDataSpace(Collection* fitCollection, DataSpace& fitDataSpace)
+{
+	// Check that supplied target fitCollection is the same as the one we have stored
+	if (fitCollection != sourceCollection_)
+	{
+		msg.print("Error: Cannot currently use a reference Collection which is different from the target fit collection.\n");
+		return false;
+	}
+
+	// Create the dataspace, matching that of the fit collection
+	if (!referenceSpace_.initialise(fitDataSpace, true)) return false;
+
+	// Generate values within the dataspace, employing offsets defined in the ReferenceVariable
+	for (DataSpaceRange* range = referenceSpace_.ranges(); range != NULL; range = range->next)
+	{
+		range->copyValues(xIndex_, zIndex_);
+	}
+
+	return true;
+}
+
+// Update value of target variable with DataSpaceRange indices provided
+bool ReferenceVariable::updateValue(int rangeXIndex, int rangeZIndex)
+{
+	// Check target variable
+	if (!variable_) return false;
+
+	// Check current range
+	if (!currentReferenceRange_) return false;
+
+	// Set value
+	variable_->set(currentReferenceRange_->referenceY(rangeXIndex, rangeZIndex));
+	
+	return true;
 }

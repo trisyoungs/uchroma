@@ -36,12 +36,30 @@ LogWindow::~LogWindow()
 {
 }
 
+// Window close event
+void LogWindow::closeEvent(QCloseEvent* event)
+{
+	emit(windowClosed(false));
+}
+
 /*
-// Widget Slots
-*/
+ * Widget Slots
+ */
 
 // Close button pressed
 void LogWindow::on_CloseButton_clicked(bool checked)
 {
 	hide();
+	emit(windowClosed(false));
+}
+
+/*
+ * Update Functions
+ */
+
+// Update controls and show window
+void LogWindow::updateAndShow()
+{
+	show();
+	move(uChroma_.centrePos() - QPoint(width()/2, height()/2));
 }

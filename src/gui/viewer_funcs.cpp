@@ -290,7 +290,7 @@ void Viewer::paintGL()
 		for (RefListItem<Collection,bool>* ri = pane->collections(); ri != NULL; ri = ri->next)
 		{
 			collection = ri->item;
-// 			printf("PANE '%s' : Update and render collection %p ('%s')\n", qPrintable(pane->name()), collection, qPrintable(collection->title()));
+// 			printf("PANE '%s' : Update and render collection %p ('%s')\n", qPrintable(pane->name()), collection, qPrintable(collection->name()));
 			collection->updateDisplayData();
 			if (updateSurfacePrimitive(collection)) ++nSurfacesUpdated;
 

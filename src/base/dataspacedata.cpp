@@ -22,12 +22,19 @@
 #include "base/dataspacedata.h"
 
 // Add point to arrays
-void DataSpaceData::addPoint(double x, double yRef, DisplayDataSet::DataPointType yType)
+void DataSpaceData::addPoint(double x, double yRef, DisplayDataSet::DataPointType yType, double yCalc)
 {
 	x_.add(x);
 	yReference_.add(yRef);
 	yCalculated_.add(0.0);
 	yType_.add(yType);
+}
+
+// Add point to x and yReference only
+void DataSpaceData::addPoint(double x, double yRef)
+{
+	x_.add(x);
+	yReference_.add(yRef);
 }
 
 // Return X array
@@ -40,6 +47,18 @@ const Array<double> DataSpaceData::x()
 const Array<double> DataSpaceData::yReference()
 {
 	return yReference_;
+}
+
+// Set specified reference Y element
+void DataSpaceData::setReferenceY(int index, double value)
+{
+	yReference_[index] = value;
+}
+
+// Zero reference Y array
+void DataSpaceData::zeroYReference()
+{
+	yReference_ = 0.0;
 }
 
 // Set specified calcualted Y element

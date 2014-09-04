@@ -121,6 +121,8 @@ void CreateCollectionDialog::updateVariables()
 // Create data
 void CreateCollectionDialog::createData(Collection* target)
 {
+	bool success;
+
 	// First, check equation status
 	if (!equationValid_) return;
 
@@ -153,7 +155,7 @@ void CreateCollectionDialog::createData(Collection* target)
 				// Set equation variables
 				xVariable_->set(x);
 				zVariable_->set(z);
-				newData.addPoint(x, equation_.execute());
+				newData.addPoint(x, equation_.execute(success));
 
 				x += ui.GridSpecifyXDeltaSpin->value();
 			}
@@ -237,7 +239,7 @@ void CreateCollectionDialog::updateGridGroup(bool refreshList)
 	{
 		int currentIndex = ui.GridTakeFromCollectionCombo->currentIndex();
 		ui.GridTakeFromCollectionCombo->clear();
-		for (Collection* c = uChroma_.collections(); c != NULL; c = c->next) ui.GridTakeFromCollectionCombo->addItem(c->title());
+		for (Collection* c = uChroma_.collections(); c != NULL; c = c->next) ui.GridTakeFromCollectionCombo->addItem(c->name());
 		if ((currentIndex != -1) && (currentIndex < ui.GridTakeFromCollectionCombo->count())) ui.GridTakeFromCollectionCombo->setCurrentIndex(currentIndex);
 		else ui.GridTakeFromCollectionCombo->setCurrentIndex(0);
 	}

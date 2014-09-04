@@ -34,8 +34,8 @@ class LogWindow : public QWidget
 
 
 	/*
-	// Window Functions
-	*/
+	 * Window Functions
+	 */
 	public:
 	// Constructor / Destructor
 	LogWindow(UChromaWindow& parent);
@@ -45,13 +45,29 @@ class LogWindow : public QWidget
 	// UChromaWindow reference
 	UChromaWindow& uChroma_;
 
+	protected:
+	// Window close event
+	void closeEvent(QCloseEvent* event);
+
+	signals:
+	// Window closed signal
+	void windowClosed(bool);
+
 
 	/*
-	// Widget Slots
-	*/
+	 * Widget Slots
+	 */
 	private slots:
 	// Close button
 	void on_CloseButton_clicked(bool checked);
+
+
+	/*
+	 * Update Functions
+	 */
+	public:
+	// Update controls and show window
+	void updateAndShow();
 };
 
 #endif

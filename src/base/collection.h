@@ -27,12 +27,13 @@
 #include "base/transformer.h"
 #include "base/colourscale.h"
 #include "render/primitivelist.h"
+#include "templates/objectlist.h"
 
 // Forward Declarations
 class ViewPane;
 class FitKernel;
 
-class Collection : public ListItem<Collection>
+class Collection : public ListItem<Collection>, public ObjectList<Collection>
 {
 	public:
 	// Constructor
@@ -43,14 +44,14 @@ class Collection : public ListItem<Collection>
 	Collection(const Collection& source);
 	// Assignment operator
 	void operator=(const Collection& source);
-
+	
 
 	/*
 	 * Data
 	 */
 	private:
-	// Title
-	QString title_;
+	// Name of collection
+	QString name_;
 	// List of datasets
 	List<DataSet> dataSets_;
 	// Root directory for datafiles
@@ -59,10 +60,10 @@ class Collection : public ListItem<Collection>
 	Vec3<double> dataMin_, dataMax_;
 
 	public:
-	// Set title
-	void setTitle(QString title);
-	// Return title
-	QString title();
+	// Set name of collection
+	void setName(QString title);
+	// Return name
+	QString name();
 	// Add dataset
 	DataSet* addDataSet();
 	// Add dataset at specified z
@@ -81,6 +82,8 @@ class Collection : public ListItem<Collection>
 	void setDataSetData(DataSet* target, const Array<double>& x, const Array<double>& y);
 	// Return first dataset in list
 	DataSet* dataSets() const;
+	// Return named dataset
+	DataSet* dataSet(QString name);
 	// Return last dataset in list
 	DataSet* lastDataSet();
 	// Return nth dataset in list
@@ -88,7 +91,7 @@ class Collection : public ListItem<Collection>
 	// Return index of specified dataset
 	int dataSetIndex(const char* name);
 	// Return unique name based on supplied dataset
-	QString uniqueDataSetName(const char* name);
+	QString uniqueDataSetName(QString baseName);
 	// Return number of dataset with no data present
 	int nEmptyDataSets();
 	// Clear dataset data from collection
@@ -205,18 +208,26 @@ class Collection : public ListItem<Collection>
 	CollectionType type();
 	// Return icon string reflecting this Collection's type / status
 	QString iconString();
+	// Return locally-unique fit name based on basename provided
+	QString uniqueFitName(QString baseName);
 	// Add fit to Collection
-	Collection* addFit(QString title = QString());
+	Collection* addFit(QString name);
 	// Remove specified fit from list
 	void removeFit(Collection* collection);
 	// Return fit data
 	Collection* fits();
+	// Return fit with name specified
+	Collection* fit(QString name);
+	// Return locally-unique slice name based on basename provided
+	QString uniqueSliceName(QString baseName);
 	// Add slice to Collection
-	Collection* addSlice(QString title = QString());
+	Collection* addSlice(QString name);
 	// Remove specified slice
 	void removeSlice(Collection* collection);
 	// Return slices
 	Collection* slices();
+	// Return slice with name specified
+	Collection* slice(QString name);
 	// Update current slice based on specified axis and bin
 	void updateCurrentSlice(int axis, double axisValue);
 	// Extract current slice based on specified axis and bin
@@ -359,7 +370,7 @@ class Collection : public ListItem<Collection>
 	DisplayStyle displayStyle_;
 	// Line width (for line styles)
 	double displayLineWidth_;
-	// Flag indicating whether display data is valid (and don't need to be regenerated)
+	// Flag indicating whether display data is valid (and doesn't need to be regenerated)
 	bool displayDataValid_;
 	// PrimitiveList containing GL display data
 	PrimitiveList displayPrimitives_;
@@ -395,6 +406,8 @@ class Collection : public ListItem<Collection>
 	PrimitiveList& displayPrimitives();
 	// Update display data and surface if necessary
 	void updateDisplayData();
+	// Return whether display primitives are valid
+	bool displayDataValid();
 	// Set view pane on which this data is being displayed
 	void setDisplayPane(ViewPane* pane);
 	// Return view pane on which this data is being displayed

@@ -65,6 +65,9 @@ bool DataSpace::initialise(Collection* sourceCollection, int xIndexMin, int xInd
 		return false;
 	}
 
+	// Clear old ranges before adding new ones
+	ranges_.clear();
+
 	if (orthogonal)
 	{
 		msg.print("Setting up orthogonal (ZY) data over %e < x < %e and %e < z < %e\n", abscissa.value(abscissaStart_), abscissa.value(abscissaEnd_), sourceCollection_->dataSet(displayDataSetStart_)->data().z(), sourceCollection_->dataSet(displayDataSetEnd_)->data().z());
@@ -72,9 +75,9 @@ bool DataSpace::initialise(Collection* sourceCollection, int xIndexMin, int xInd
 		if (global)
 		{
 			DataSpaceRange* range = ranges_.add(*this);
-			range->set(sourceCollection_, abscissaStart_, abscissaEnd_, displayDataSetStart_, displayDataSetEnd_);
+			range->set(sourceCollection_, abscissaStart_, abscissaEnd_, displayDataSetStart_, displayDataSetEnd_, false);
 		}
-		else for (int n = abscissaStart_; n<= abscissaEnd_; ++n) ranges_.add(*this)->set(sourceCollection_, n, n, displayDataSetStart_, displayDataSetEnd_);
+		else for (int n = abscissaStart_; n<= abscissaEnd_; ++n) ranges_.add(*this)->set(sourceCollection_, n, n, displayDataSetStart_, displayDataSetEnd_, false);
 	}
 	else
 	{
@@ -84,9 +87,44 @@ bool DataSpace::initialise(Collection* sourceCollection, int xIndexMin, int xInd
 		if (global)
 		{
 			DataSpaceRange* range = ranges_.add(*this);
-			range->set(sourceCollection_, abscissaStart_, abscissaEnd_, displayDataSetStart_, displayDataSetEnd_);
+			range->set(sourceCollection_, abscissaStart_, abscissaEnd_, displayDataSetStart_, displayDataSetEnd_, false);
 		}
-		else for (int n = displayDataSetStart_; n<= displayDataSetEnd_; ++n) ranges_.add(*this)->set(sourceCollection_, abscissaStart_, abscissaEnd_, n, n);
+		else for (int n = displayDataSetStart_; n<= displayDataSetEnd_; ++n) ranges_.add(*this)->set(sourceCollection_, abscissaStart_, abscissaEnd_, n, n, false);
+	}
+}
+
+// Initialise data space, matching size in source DataSpace
+bool DataSpace::initialise(const DataSpace& source, bool referenceDataOnly)
+{
+	sourceCollection_ = source.sourceCollection_;
+
+	// Check for a valid source collection before we start...
+	if (!Collection::objectValid(sourceCollection_, "source collection in DataSpace::initialise()")) return false;
+
+	// Store indices and check limits
+	displayDataSetStart_ = source.displayDataSetStart_;
+	displayDataSetEnd_ = source.displayDataSetEnd_;
+	nDataSets_ = (displayDataSetEnd_ - displayDataSetStart_) + 1;
+	if ((displayDataSetStart_ < 0) || (displayDataSetEnd_ >= sourceCollection_->nDataSets()) || (nDataSets_ < 1))
+	{
+		msg.print("Error: Invalid dataset range (from existing DataSpace) used to generate DataSpace data : %i < n < %i (available range= 0 to %i).\n", displayDataSetStart_, displayDataSetEnd_, sourceCollection_->nDataSets()-1); 
+		return false;
+	}
+	const Array<double>& abscissa = sourceCollection_->displayAbscissa();
+	abscissaStart_ = source.abscissaStart_;
+	abscissaEnd_ = source.abscissaEnd_;
+	nPoints_ = (abscissaEnd_ - abscissaStart_) + 1;
+	if ((abscissaStart_ < 0) || (abscissaEnd_ >= abscissa.nItems()) || (nPoints_ < 1))
+	{
+		msg.print("Error: Invalid abscissa range (from existing DataSpace) used to generate DataSpace data : %i < n < %i (available range= 0 to %i).\n", abscissaStart_, abscissaEnd_, abscissa.nItems()-1); 
+		return false;
+	}
+
+	ranges_.clear();
+	for (DataSpaceRange* range = source.ranges_.first(); range != NULL; range = range->next)
+	{
+		DataSpaceRange* newRange = ranges_.add(*this);
+		newRange->set(sourceCollection_, range->abscissaStart(), range->abscissaEnd(), range->displayDataSetStart(), range->displayDataSetEnd(), referenceDataOnly);
 	}
 }
 

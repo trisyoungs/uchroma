@@ -143,8 +143,9 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 				break;
 			// Unrecognised keyword
 			default:
-				msg.print("Error : Unrecognised axis keyword: %s\n", parser.argc(0));
-				return false;
+				msg.print("Warning: Unrecognised axis keyword: %s\n", parser.argc(0));
+				CHECKIOFAIL
+				break;
 		}
 	}
 	msg.print("Error : Unterminated 'Axis' block.\n");
@@ -173,12 +174,13 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 		{
 			// Colour alpha control
 			case (Keywords::ColourAlphaControlKeyword):
+				// TODO Make this an enum
 				if ((parser.argi(1) < 0) || (parser.argi(1) >= Collection::nAlphaControls)) msg.print("Value is out of range for %s keyword.\n", Keywords::collectionKeyword(collectionKwd));
 				else collection->setAlphaControl((Collection::AlphaControl) parser.argi(1));
 				break;
 			// Colour alpha fixed value
 			case (Keywords::ColourAlphaFixedKeyword):
-				if ((parser.argi(1) < 0) || (parser.argi(1) > 255)) msg.print("Value is out of range for %s keyword.\n", Keywords::collectionKeyword(collectionKwd));
+				if ((parser.argi(1) < 0) || (parser.argi(1) > 255)) msg.print("Alpha value is out of range for %s keyword.\n", Keywords::collectionKeyword(collectionKwd));
 				else collection->setFixedAlpha(parser.argi(1));
 				break;
 			// Colour Custom Gradient point definition
@@ -221,7 +223,7 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 			case (Keywords::DataSetDefinitionKeyword):
 				// Create new dataset
 				dataSet = collection->addDataSet();
-				dataSet->setTitle(parser.argc(1));
+				dataSet->setName(parser.argc(1));
 				if (!readDataSetBlock(parser, dataSet, collection)) return false;
 				break;
 			// End input block
@@ -237,7 +239,7 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				// Check that a FitKernel exists in the current collection
 				if (!collection->fitKernel())
 				{
-					msg.print("Warning: No FitKernel exists in the collection '%s', but a FitParameters block was found.\nCreating a new one...\n", qPrintable(collection->title()));
+					msg.print("Warning: No FitKernel exists in the collection '%s', but a FitParameters block was found.\nCreating a new one...\n", qPrintable(collection->name()));
 					collection->addFitKernel();
 				}
 				if (!readFitParametersBlock(parser, collection->fitKernel())) return false;
@@ -266,8 +268,8 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				ds = Collection::displayStyle(parser.argc(1));
 				if (ds == Collection::nDisplayStyles)
 				{
-					msg.print("Unrecognised display style '%s'.\n", parser.argc(1));
-					return false;
+					msg.print("Warning: Unrecognised display style '%s'.\n", parser.argc(1));
+					CHECKIOFAIL
 				}
 				collection->setDisplayStyle(ds);
 				break;
@@ -285,8 +287,9 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				break;
 			// Unrecognised Keyword
 			default:
-				msg.print("Error : Unrecognised collection keyword: %s\n", parser.argc(0));
-				return false;
+				msg.print("Warning: Unrecognised collection keyword: %s\n", parser.argc(0));
+				CHECKIOFAIL
+				break;
 		}
 	}
 	msg.print("Error : Unterminated 'Collection' block.\n");
@@ -325,7 +328,7 @@ bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Colle
 				} while ((!foundEnd) && (!parser.eofOrBlank()));
 				if (!foundEnd)
 				{
-					msg.print("Error : Unterminated 'Data' block in dataSet '%s'.\n", qPrintable(dataSet->title()));
+					msg.print("Error : Unterminated 'Data' block in dataSet '%s'.\n", qPrintable(dataSet->name()));
 					return false;
 				}
 				break;
@@ -336,8 +339,9 @@ bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Colle
 				source = DataSet::dataSource(parser.argc(1));
 				if (source == DataSet::nDataSources)
 				{
-					msg.print("Error :Datasource for dataSet not recognised (%s)\n", parser.argc(1));
-					return false;
+					msg.print("Warning: Datasource for dataSet not recognised (%s)\n", parser.argc(1));
+					CHECKIOFAIL
+					break;
 				}
 				dataSet->setDataSource(source);
 				// Depending on the source, we might expect other data here...
@@ -346,7 +350,7 @@ bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Colle
 					if (parser.hasArg(2)) dataSet->setSourceFileName(parser.argc(2));
 					else
 					{
-						msg.print("Error :Expected data file name after 'Source File' declaration in dataSet '%s'.\n", qPrintable(dataSet->title()));
+						msg.print("Error: Expected data file name after 'Source File' declaration in dataSet '%s'.\n", qPrintable(dataSet->name()));
 						return false;
 					}
 				}
@@ -356,8 +360,9 @@ bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Colle
 				break;
 			// Unrecognised Keyword
 			default:
-				msg.print("Error : Unrecognised DataSet keyword: %s\n", parser.argc(0));
-				return false;
+				msg.print("Warning: Unrecognised DataSet keyword: %s\n", parser.argc(0));
+				CHECKIOFAIL
+				break;
 		}
 	}
 	msg.print("Error : Unterminated 'DataSet' block.\n");
@@ -368,7 +373,7 @@ bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Colle
 bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKernel)
 {
 	FitKernel::RangeType rangeType;
-	ReferenceVariable::ReferenceType refType;
+	IndexData::IndexType indexType;
 	EquationVariable* eqVar;
 	ReferenceVariable* refVar;
 	while (!parser.eofOrBlank())
@@ -404,24 +409,24 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 				// Create new reference with this name
 				refVar = fitKernel->addReference(parser.argc(1));
 				if (!refVar) CHECKIOFAIL
-				refType = ReferenceVariable::referenceType(parser.argc(2));
-				if (refType == ReferenceVariable::nReferenceTypes)
+				indexType = IndexData::indexType(parser.argc(2));
+				if (indexType == IndexData::nIndexTypes)
 				{
 					msg.print("Warning: Unrecognised type '%s' for reference '%s' - defaulting to 'Normal'.\n", parser.argc(2), parser.argc(1));
 					CHECKIOFAIL
 				}
-				refVar->setXType(refType);
-				refVar->setXIndex(parser.argi(3));
-				refVar->setXOffset(parser.argi(4));
-				refType = ReferenceVariable::referenceType(parser.argc(5));
-				if (refType == ReferenceVariable::nReferenceTypes)
+				refVar->xIndex().setType(indexType);
+				refVar->xIndex().setIndex(parser.argi(3));
+				refVar->xIndex().setOffset(parser.argi(4));
+				indexType = IndexData::indexType(parser.argc(5));
+				if (indexType == IndexData::nIndexTypes)
 				{
 					msg.print("Warning: Unrecognised type '%s' for reference '%s' - defaulting to 'Normal'.\n", parser.argc(5), parser.argc(1));
 					CHECKIOFAIL
 				}
-				refVar->setZType(refType);
-				refVar->setZIndex(parser.argi(6));
-				refVar->setZOffset(parser.argi(7));
+				refVar->zIndex().setType(indexType);
+				refVar->zIndex().setIndex(parser.argi(6));
+				refVar->zIndex().setOffset(parser.argi(7));
 				refVar->setZDataSetName(parser.argc(8));
 				break;
 			case (Keywords::VariableKeyword):
@@ -481,8 +486,9 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 				break;
 			// Unrecognised Keyword
 			default:
-				msg.print("Error : Unrecognised FitParameters keyword: %s\n", parser.argc(0));
-				return false;
+				msg.print("Warning: Unrecognised FitParameters keyword: %s\n", parser.argc(0));
+				CHECKIOFAIL
+				break;
 		}
 	}
 	msg.print("Error : Unterminated 'FitParameters' block.\n");
@@ -520,8 +526,9 @@ bool UChromaWindow::readSettingsBlock(LineParser& parser)
 				break;
 			// Unrecognised Keyword
 			default:
-				msg.print("Error : Unrecognised settings keyword: %s\n", parser.argc(0));
-				return false;
+				msg.print("Warning: Unrecognised settings keyword: %s\n", parser.argc(0));
+				CHECKIOFAIL
+				break;
 		}
 	}
 	msg.print("Error : Unterminated 'Settings' block.\n");
@@ -567,8 +574,9 @@ bool UChromaWindow::readViewBlock(LineParser& parser)
 				break;
 			// Unrecognised Keyword
 			default:
-				msg.print("Error : Unrecognised view keyword: %s\n", parser.argc(0));
-				return false;
+				msg.print("Warning: Unrecognised view keyword: %s\n", parser.argc(0));
+				CHECKIOFAIL
+				break;
 		}
 	}
 	msg.print("Error : Unterminated 'View' block.\n");
@@ -712,8 +720,9 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				break;
 			// Unrecognised Keyword
 			default:
-				msg.print("Error : Unrecognised ViewPane keyword: %s\n", parser.argc(0));
-				return false;
+				msg.print("Warning: Unrecognised ViewPane keyword: %s\n", parser.argc(0));
+				CHECKIOFAIL
+				break;
 		}
 	}
 	msg.print("Error : Unterminated 'ViewPane' block.\n");
@@ -764,7 +773,7 @@ bool UChromaWindow::loadInputFile(QString fileName)
 				nEmpty = currentCollection_->nEmptyDataSets();
 				if (nEmpty != 0)
 				{
-					QMessageBox::StandardButton button = QMessageBox::warning(this, "Empty Data", QString("There are ") + QString::number(nEmpty) + " defined slices which contain no data in collection '" + currentCollection_->title() + "'.\nWould you like to reload these now from their source files?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+					QMessageBox::StandardButton button = QMessageBox::warning(this, "Empty Data", QString("There are ") + QString::number(nEmpty) + " defined slices which contain no data in collection '" + currentCollection_->name() + "'.\nWould you like to reload these now from their source files?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 					if (button == QMessageBox::Yes)
 					{
 						nEmpty = currentCollection_->loadAllDataSets();
@@ -785,8 +794,9 @@ bool UChromaWindow::loadInputFile(QString fileName)
 				success = readViewBlock(parser);
 				break;
 			default:
-				msg.print("Error : Unrecognised input block: %s\n", parser.argc(0));
-				return false;
+				msg.print("Warning: Unrecognised input block: %s\n", parser.argc(0));
+				CHECKIOFAIL
+				break;
 		}
 		if (!success) return false;
 	}

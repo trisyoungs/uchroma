@@ -1414,7 +1414,7 @@
    </property>
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/uchroma/icons/up.svg</normaloff>:/uchroma/icons/up.svg</iconset>
+     <normaloff>:/uchroma/icons/windows_log.svg</normaloff>:/uchroma/icons/windows_log.svg</iconset>
    </property>
    <property name="text">
     <string>Toggle Log Window</string>

@@ -265,7 +265,7 @@ void UChromaWindow::on_actionCollectionDelete_triggered(bool checked)
 {
 	if (!currentCollection_) return;
 
-	if (QMessageBox::question(this, "Confirm Delete", "Are you sure you want to delete collection '"+currentCollection_->title()+"' and all of its associated data?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
+	if (QMessageBox::question(this, "Confirm Delete", "Are you sure you want to delete collection '"+currentCollection_->name()+"' and all of its associated data?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
 	{
 		removeCollection(currentCollection_);
 		
@@ -311,9 +311,7 @@ void UChromaWindow::on_actionDataReload_triggered(bool checked)
 
 void UChromaWindow::on_actionDataView_triggered(bool checked)
 {
-	if (refreshing_) return;
-	if (checked) dataWindow_.updateAndShow();
-	else dataWindow_.hide();
+	ui.actionWindowData->trigger();
 }
 
 /*
@@ -324,8 +322,16 @@ void UChromaWindow::on_actionAnalyseNewFit_triggered(bool checked)
 {
 	if (!currentCollection_) return;
 
+	// Ensure that the current collection has had its display data created (otherwise we have nothing to fit!)
+	currentCollection_->updateDisplayData();
+	if (!currentCollection_->displayDataValid())
+	{
+		QMessageBox::critical(this, "Error", "Collection data must be associated to a pane in order to perform fitting.");
+		return;
+	}
+
 	// Add a new fit collection to the current collection
-	Collection* newFit = currentCollection_->addFit();
+	Collection* newFit = currentCollection_->addFit(currentCollection_->uniqueFitName("New Fit"));
 
 	fitSetupDialog_.setFitKernel(newFit->fitKernel());
 	if (fitSetupDialog_.updateAndExec()) newFit->fitKernel()->fit();
@@ -346,7 +352,10 @@ void UChromaWindow::on_actionAnalyseEditFit_triggered(bool checked)
 			if (currentCollection_->fitKernel()->fit()) updateGUI();
 		}
 	}
-	else on_actionAnalyseNewFit_triggered(false);
+	else
+	{
+		if (QMessageBox::question(this, "No Fit to Edit", "The current collection does not contain any fit parameters.\nWould you like to create a new fit?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) on_actionAnalyseNewFit_triggered(false);
+	}
 }
 
 void UChromaWindow::on_actionAnalyseUpdateFit_triggered(bool checked)
@@ -359,7 +368,7 @@ void UChromaWindow::on_actionAnalyseUpdateFit_triggered(bool checked)
 	}
 	else
 	{
-		msg.print("Error: Current collection '%s' has no associated fit data.\n", qPrintable(currentCollection_->title()));
+		msg.print("Error: Current collection '%s' has no associated fit data.\n", qPrintable(currentCollection_->name()));
 		ui.StatusBar->showMessage("Current collection '%s' has no associated fit data!", 3000);
 	}
 }
@@ -433,7 +442,6 @@ void UChromaWindow::on_actionSettingsChooseFont_triggered(bool checked)
 	}
 }
 
-
 /*
  * Window Actions
  */
@@ -445,10 +453,17 @@ void UChromaWindow::on_actionWindowAxes_triggered(bool checked)
 	else axesWindow_.hide();
 }
 
+void UChromaWindow::on_actionWindowData_triggered(bool checked)
+{
+	if (refreshing_) return;
+	if (checked) dataWindow_.updateAndShow();
+	else dataWindow_.hide();
+}
+
 void UChromaWindow::on_actionWindowLog_triggered(bool checked)
 {
 	if (refreshing_) return;
-	if (checked) logWindow_.show();
+	if (checked) logWindow_.updateAndShow();
 	else logWindow_.hide();
 }
 
@@ -462,7 +477,7 @@ void UChromaWindow::on_actionWindowStyle_triggered(bool checked)
 void UChromaWindow::on_actionWindowTransform_triggered(bool checked)
 {
 	if (refreshing_) return;
-	if (checked) transformWindow_.show();
+	if (checked) transformWindow_.updateAndShow();
 	else transformWindow_.hide();
 }
 

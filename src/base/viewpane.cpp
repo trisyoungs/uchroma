@@ -481,7 +481,7 @@ bool ViewPane::processUpdate(Collection* source, Collection::CollectionSignal si
 			return false;
 			break;
 		default:
-			msg.print("ViewPane::processUpdate - Unrecognised signal %i sent from collection '%s'\n", signal, qPrintable(source->title()));
+			msg.print("ViewPane::processUpdate - Unrecognised signal %i sent from collection '%s'\n", signal, qPrintable(source->name()));
 			return false;
 	}
 
@@ -929,7 +929,7 @@ void ViewPane::showAllData()
 // Add reference to collection to be displayed in this pane
 void ViewPane::addCollection(Collection* collection)
 {
-	if (collections_.contains(collection)) msg.print("Internal Error: Pane '%s' already contains collection '%s'\n", qPrintable(name_), qPrintable(collection->title()));
+	if (collections_.contains(collection)) msg.print("Internal Error: Pane '%s' already contains collection '%s'\n", qPrintable(name_), qPrintable(collection->name()));
 	else collections_.add(collection);
 
 	// Tell the collection that we now are displaying it
@@ -942,7 +942,7 @@ void ViewPane::addCollection(Collection* collection)
 // Remove reference to collection
 void ViewPane::removeCollection(Collection* collection)
 {
-	if (!collections_.contains(collection)) msg.print("Internal Error: Pane '%s' does not contain collection '%s'\n", qPrintable(name_), qPrintable(collection->title()));
+	if (!collections_.contains(collection)) msg.print("Internal Error: Pane '%s' does not contain collection '%s'\n", qPrintable(name_), qPrintable(collection->name()));
 	else collections_.remove(collection);
 }
 

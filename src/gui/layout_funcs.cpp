@@ -264,7 +264,7 @@ void LayoutDialog::updateControls(bool force)
 		{
 			QListWidgetItem* item;
 			item = new QListWidgetItem(ui.PaneTargetsList);
-			item->setText("(C) " + ri->item->title());
+			item->setText("(C) " + ri->item->name());
 			item->setData(Qt::UserRole, VariantPointer<Collection>(ri->item));
 		}
 

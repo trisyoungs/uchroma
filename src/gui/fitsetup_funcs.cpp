@@ -34,9 +34,10 @@ FitSetupDialog::FitSetupDialog(UChromaWindow& parent) : QDialog(&parent), uChrom
 {
 	ui.setupUi(this);
 
-	fitKernel_ = NULL;
+	fitKernelTarget_ = NULL;
 
 	refreshing_ = false;
+	softReject_ = false;
 }
 
 // Destructor
@@ -56,7 +57,14 @@ void FitSetupDialog::closeEvent(QCloseEvent* event)
 
 void FitSetupDialog::reject()
 {
-	fitKernel_ = NULL;
+	if (!softReject_)
+	{
+		// Revert to stored data and nullify pointer
+		(*fitKernelTarget_) = fitKernelBackup_;
+		fitKernelTarget_ = NULL;
+	}
+
+	softReject_ = false;
 	setResult(QDialog::Rejected);
 	hide();
 }
@@ -68,7 +76,7 @@ void FitSetupDialog::on_CancelButton_clicked(bool checked)
 
 void FitSetupDialog::on_OKButton_clicked(bool checked)
 {
-	fitKernel_= NULL;
+	fitKernelTarget_ = NULL;
 	accept();
 }
 
@@ -80,14 +88,17 @@ void FitSetupDialog::on_OKButton_clicked(bool checked)
 bool FitSetupDialog::setFitKernel(FitKernel* fitKernel)
 {
 	// Check for presence of existing fitKernel...
-	if (fitKernel_)
+	if (fitKernelTarget_)
 	{
 		QMessageBox::warning(this, "Fit Dialog Busy", "The fit setup dialog is already busy and waiting for input (perhaps waiting for a range to be selected?).");
 		return false;
 	}
 
-	fitKernel_ = fitKernel;
-	fitKernel_->checkRanges();
+	fitKernelTarget_ = fitKernel;
+	fitKernelTarget_->checkRanges();
+
+	// Store backup in case the dialog is 
+	fitKernelBackup_ = (*fitKernelTarget_);
 }
 
 /*
@@ -96,10 +107,10 @@ bool FitSetupDialog::setFitKernel(FitKernel* fitKernel)
 
 void FitSetupDialog::on_EquationEdit_textChanged(QString text)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->resetEquation();
-	if (fitKernel_->setEquation(text))
+	fitKernelTarget_->resetEquation();
+	if (fitKernelTarget_->setEquation(text))
 	{
 		ui.EquationEdit->setPalette(ui.EquationGroup->palette());
 	}
@@ -131,17 +142,17 @@ void FitSetupDialog::updateVariableTable()
 
 	// Clear table, but don't display anything if equation is not valid
 	ui.VariablesTable->clearContents();
-	if (!fitKernel_->equationValid())
+	if (!fitKernelTarget_->equationValid())
 	{
 		refreshing_ = false;
 		return;
 	}
-	ui.VariablesTable->setRowCount(fitKernel_->nVariablesUsed());
+	ui.VariablesTable->setRowCount(fitKernelTarget_->nVariablesUsed());
 
 	QTableWidgetItem* item;
 	bool status, isXYZ;
 	int count = 0;
-	for (RefListItem<EquationVariable,bool>* ri = fitKernel_->usedVariables(); ri != NULL; ri = ri->next)
+	for (RefListItem<EquationVariable,bool>* ri = fitKernelTarget_->usedVariables(); ri != NULL; ri = ri->next)
 	{
 		// Grab the fit variable and see if it's used in the current equation?
 		EquationVariable* eqVar = ri->item;
@@ -224,16 +235,16 @@ void FitSetupDialog::on_VariablesTable_cellChanged(int row, int column)
 void FitSetupDialog::updateReferencesTable()
 {
 	ui.VariableReferenceList->clear();
-	for (ReferenceVariable* refVar = fitKernel_->references(); refVar != NULL; refVar = refVar->next)
+	for (ReferenceVariable* refVar = fitKernelTarget_->references(); refVar != NULL; refVar = refVar->next)
 	{
 		QListWidgetItem* item = new QListWidgetItem;
 		QString s = refVar->name();
-		if (refVar->xType() == ReferenceVariable::NormalReference) s += " [X=norm,";
-		else if (refVar->xType() == ReferenceVariable::FixedReference) s += " [X=fixed("+QString::number(refVar->xIndex()+1)+"),";
-		else if (refVar->xType() == ReferenceVariable::RelativeReference) s += " [X=rel("+QString::number(refVar->xOffset())+"),";
-		if (refVar->zType() == ReferenceVariable::NormalReference) s += "Z=norm]";
-		else if (refVar->zType() == ReferenceVariable::FixedReference) s += "Z=fixed("+QString::number(refVar->zIndex()+1)+")]";
-		else if (refVar->zType() == ReferenceVariable::RelativeReference) s += "Z=rel("+QString::number(refVar->zOffset())+")]";
+		if (refVar->xIndex().type() == IndexData::NormalIndex) s += " [X=norm,";
+		else if (refVar->xIndex().type() == IndexData::FixedIndex) s += " [X=fixed("+QString::number(refVar->xIndex().index()+1)+"),";
+		else if (refVar->xIndex().type() == IndexData::RelativeIndex) s += " [X=rel("+QString::number(refVar->xIndex().offset())+"),";
+		if (refVar->zIndex().type() == IndexData::NormalIndex) s += "Z=norm]";
+		else if (refVar->zIndex().type() == IndexData::FixedIndex) s += "Z=fixed("+QString::number(refVar->zIndex().index()+1)+")]";
+		else if (refVar->zIndex().type() == IndexData::RelativeIndex) s += "Z=rel("+QString::number(refVar->zIndex().offset())+")]";
 		item->setText(s);
 		item->setData(Qt::UserRole, VariantPointer<ReferenceVariable>(refVar));
 		ui.VariableReferenceList->addItem(item);
@@ -243,16 +254,20 @@ void FitSetupDialog::updateReferencesTable()
 void FitSetupDialog::on_VariableAddReferenceButton_clicked(bool checked)
 {
 	// Create a new reference variable
-	ReferenceVariable* refVar = fitKernel_->addReference(fitKernel_->uniqueReferenceName("y"));
+	ReferenceVariable* refVar = fitKernelTarget_->addReference(fitKernelTarget_->uniqueReferenceName("y"));
 
 	// Create a ReferenceSetupDialog
 	ReferenceSetupDialog referenceSetup(this);
-	if (!referenceSetup.call(refVar, fitKernel_)) fitKernel_->removeReference(refVar);
+	if (!referenceSetup.call(refVar, fitKernelTarget_)) fitKernelTarget_->removeReference(refVar);
 	else
 	{
-		// If the name of the reference was changed we will have to flag the equation as invalid...
-		if (refVar->updateVariable() && (refVar->used())) fitKernel_->setEquationInvalid();
-
+		// This is a new reference variable, so let's see if the variable it targets already exists in the equation
+		EquationVariable* var = fitKernelTarget_->variable(refVar->name());
+		if (var)
+		{
+			// Update the equation (just try to set it again) and refresh controls
+			fitKernelTarget_->setEquation(ui.EquationEdit->text());
+		}
 		updateControls();
 	}
 }
@@ -265,10 +280,10 @@ void FitSetupDialog::on_VariableReferenceList_itemDoubleClicked(QListWidgetItem*
 
 	// Create a ReferenceSetupDialog
 	ReferenceSetupDialog referenceSetup(this);
-	if (referenceSetup.call(refVar, fitKernel_))
+	if (referenceSetup.call(refVar, fitKernelTarget_))
 	{
 		// If the name of the reference was changed we will have to flag the equation as invalid...
-		if (refVar->updateVariable() && (refVar->used())) fitKernel_->setEquationInvalid();
+		if (refVar->updateVariable() && (refVar->used())) fitKernelTarget_->setEquationInvalid();
 
 		updateControls();
 	}
@@ -280,23 +295,23 @@ void FitSetupDialog::on_VariableReferenceList_itemDoubleClicked(QListWidgetItem*
 
 void FitSetupDialog::on_DataNormalFitRadio_clicked(bool checked)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setOrthogonal(!checked);
+	fitKernelTarget_->setOrthogonal(!checked);
 }
 
 void FitSetupDialog::on_DataOrthogonalFitRadio_clicked(bool checked)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setOrthogonal(checked);
+	fitKernelTarget_->setOrthogonal(checked);
 }
 
 void FitSetupDialog::on_DataGlobalFitCheck_clicked(bool checked)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setGlobal(checked);
+	fitKernelTarget_->setGlobal(checked);
 }
 
 /*
@@ -316,26 +331,25 @@ void FitSetupDialog::on_XSourceAbsoluteRadio_toggled(bool checked)
 	ui.XPointMaxLabel->setEnabled(false);
 	ui.XPointMinLabel->setEnabled(false);
 
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setXRange(FitKernel::AbsoluteRange);
+	fitKernelTarget_->setXRange(FitKernel::AbsoluteRange);
 }
 
 void FitSetupDialog::on_XAbsoluteMinSpin_valueChanged(double value)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	printf("kjhljklj\n");
-	fitKernel_->setAbsoluteXMin(value);
+	fitKernelTarget_->setAbsoluteXMin(value);
 
 	updateLabels();
 }
 
 void FitSetupDialog::on_XAbsoluteMaxSpin_valueChanged(double value)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setAbsoluteXMax(value);
+	fitKernelTarget_->setAbsoluteXMax(value);
 
 	updateLabels();
 }
@@ -343,6 +357,7 @@ void FitSetupDialog::on_XAbsoluteMaxSpin_valueChanged(double value)
 void FitSetupDialog::on_XAbsoluteSelectButton_clicked(bool checked)
 {
 	uChroma_.setInteractionMode(InteractionMode::FitSetupSelectXInteraction, 0);
+	softReject_ = true;
 	reject();
 }
 
@@ -359,16 +374,16 @@ void FitSetupDialog::on_XSourceSinglePointRadio_toggled(bool checked)
 	ui.XPointMaxLabel->setEnabled(false);
 	ui.XPointMinLabel->setEnabled(false);
 
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setXRange(FitKernel::SinglePointRange);
+	fitKernelTarget_->setXRange(FitKernel::SinglePointRange);
 }
 
 void FitSetupDialog::on_XPointSingleSpin_valueChanged(int value)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setIndexXSingle(value);
+	fitKernelTarget_->setIndexXSingle(value);
 
 	updateLabels();
 }
@@ -386,25 +401,25 @@ void FitSetupDialog::on_XSourcePointRangeRadio_toggled(bool checked)
 	ui.XPointMaxLabel->setEnabled(true);
 	ui.XPointMinLabel->setEnabled(true);
 
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setXRange(FitKernel::IndexRange);
+	fitKernelTarget_->setXRange(FitKernel::IndexRange);
 }
 
 void FitSetupDialog::on_XPointMinSpin_valueChanged(int value)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setAbsoluteXMax(value);
+	fitKernelTarget_->setAbsoluteXMax(value);
 
 	updateLabels();
 }
 
 void FitSetupDialog::on_XPointMaxSpin_valueChanged(int value)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setAbsoluteXMax(value);
+	fitKernelTarget_->setAbsoluteXMax(value);
 
 	updateLabels();
 }
@@ -413,7 +428,7 @@ void FitSetupDialog::on_XPointMaxSpin_valueChanged(int value)
  * Source Z
  */
 
-void FitSetupDialog::on_ZSourceAbsoluteRadio_clicked(bool checked)
+void FitSetupDialog::on_ZSourceAbsoluteRadio_toggled(bool checked)
 {
 	if (!checked) return;
 
@@ -426,25 +441,25 @@ void FitSetupDialog::on_ZSourceAbsoluteRadio_clicked(bool checked)
 	ui.ZDataSetMaxLabel->setEnabled(false);
 	ui.ZDataSetMinLabel->setEnabled(false);
 
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setZRange(FitKernel::AbsoluteRange);
+	fitKernelTarget_->setZRange(FitKernel::AbsoluteRange);
 }
 
 void FitSetupDialog::on_ZAbsoluteMinSpin_valueChanged(double value)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setAbsoluteZMin(value);
+	fitKernelTarget_->setAbsoluteZMin(value);
 
 	updateLabels();
 }
 
 void FitSetupDialog::on_ZAbsoluteMaxSpin_valueChanged(double value)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setAbsoluteZMax(value);
+	fitKernelTarget_->setAbsoluteZMax(value);
 
 	updateLabels();
 }
@@ -452,10 +467,11 @@ void FitSetupDialog::on_ZAbsoluteMaxSpin_valueChanged(double value)
 void FitSetupDialog::on_ZAbsoluteSelectButton_clicked(bool checked)
 {
 	uChroma_.setInteractionMode(InteractionMode::FitSetupSelectZInteraction, 2);
+	softReject_ = true;
 	reject();
 }
 
-void FitSetupDialog::on_ZSourceSingleDataSetRadio_clicked(bool checked)
+void FitSetupDialog::on_ZSourceSingleDataSetRadio_toggled(bool checked)
 {
 	if (!checked) return;
 
@@ -468,21 +484,21 @@ void FitSetupDialog::on_ZSourceSingleDataSetRadio_clicked(bool checked)
 	ui.ZDataSetMaxLabel->setEnabled(false);
 	ui.ZDataSetMinLabel->setEnabled(false);
 
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setZRange(FitKernel::SinglePointRange);
+	fitKernelTarget_->setZRange(FitKernel::SinglePointRange);
 }
 
 void FitSetupDialog::on_ZDataSetCombo_currentIndexChanged(int index)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setIndexZSingle(index);
+	fitKernelTarget_->setIndexZSingle(index);
 
 	updateLabels();
 }
 
-void FitSetupDialog::on_ZSourceDataSetRangeRadio_clicked(bool checked)
+void FitSetupDialog::on_ZSourceDataSetRangeRadio_toggled(bool checked)
 {
 	if (!checked) return;
 
@@ -495,25 +511,25 @@ void FitSetupDialog::on_ZSourceDataSetRangeRadio_clicked(bool checked)
 	ui.ZDataSetMaxLabel->setEnabled(true);
 	ui.ZDataSetMinLabel->setEnabled(true);
 
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setZRange(FitKernel::IndexRange);
+	fitKernelTarget_->setZRange(FitKernel::IndexRange);
 }
 
 void FitSetupDialog::on_ZDataSetMinSpin_valueChanged(int value)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setIndexZMin(value);
+	fitKernelTarget_->setIndexZMin(value);
 
 	updateLabels();
 }
 
 void FitSetupDialog::on_ZDataSetMaxSpin_valueChanged(int value)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setIndexZMax(value);
+	fitKernelTarget_->setIndexZMax(value);
 
 	updateLabels();
 }
@@ -524,30 +540,30 @@ void FitSetupDialog::on_ZDataSetMaxSpin_valueChanged(int value)
 
 void FitSetupDialog::on_MinimisationMethodCombo_currentIndexChanged(int index)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setMethod((FitKernel::MinimisationMethod) index);
+	fitKernelTarget_->setMethod((FitKernel::MinimisationMethod) index);
 }
 
 void FitSetupDialog::on_MinimisationToleranceSpin_valueChanged(double value)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setTolerance(value);
+	fitKernelTarget_->setTolerance(value);
 }
 
 void FitSetupDialog::on_MinimisationMaxStepsSpin_valueChanged(int value)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setMaxSteps(value);
+	fitKernelTarget_->setMaxSteps(value);
 }
 
 void FitSetupDialog::on_MinimisationLimitStrengthSpin_valueChanged(double value)
 {
-	if (refreshing_ || (!fitKernel_)) return;
+	if (refreshing_ || (!fitKernelTarget_)) return;
 
-	fitKernel_->setLimitStrength(value);
+	fitKernelTarget_->setLimitStrength(value);
 }
 
 /*
@@ -568,63 +584,62 @@ void FitSetupDialog::updateControls(bool force)
 	// If the window isn't visible, do nothing...
 	if (!isVisible() && (!force)) return;
 
-	Collection* sourceCollection = fitKernel_->sourceCollection();
+	Collection* sourceCollection = fitKernelTarget_->sourceCollection();
 	if (!sourceCollection) return;
 
 	refreshing_ = true;
 
 	// Source Collection Group
-	ui.SourceCollectionLabel->setText(sourceCollection->title());
-	
+	ui.SourceCollectionLabel->setText(sourceCollection->name());
 
 	// Destination Collection Group
-	if (fitKernel_->destinationCollection()) ui.DestinationCollectionLabel->setText(fitKernel_->destinationCollection()->title());
+	if (fitKernelTarget_->destinationCollection()) ui.DestinationCollectionLabel->setText(fitKernelTarget_->destinationCollection()->name());
 	else ui.DestinationCollectionLabel->setText("<None>");
 
 	// Equation Group
-	ui.EquationEdit->setText(fitKernel_->equationText());
+	ui.EquationEdit->setText(fitKernelTarget_->equationText());
 
 	// Source Data Group
-	if (fitKernel_->orthogonal()) ui.DataOrthogonalFitRadio->setChecked(true);
+	if (fitKernelTarget_->orthogonal()) ui.DataOrthogonalFitRadio->setChecked(true);
 	else ui.DataNormalFitRadio->setChecked(true);
-	ui.DataGlobalFitCheck->setChecked(fitKernel_->global());
+	ui.DataGlobalFitCheck->setChecked(fitKernelTarget_->global());
 
 	// Source X
-	if (fitKernel_->xRange() == FitKernel::AbsoluteRange) ui.XSourceAbsoluteRadio->setChecked(true);
-	else if (fitKernel_->xRange() == FitKernel::SinglePointRange) ui.XSourceSinglePointRadio->setChecked(true);
+	if (fitKernelTarget_->xRange() == FitKernel::AbsoluteRange) ui.XSourceAbsoluteRadio->setChecked(true);
+	else if (fitKernelTarget_->xRange() == FitKernel::SinglePointRange) ui.XSourceSinglePointRadio->setChecked(true);
 	else ui.XSourcePointRangeRadio->setChecked(true);
-	ui.XAbsoluteMinSpin->setValue(fitKernel_->absoluteXMin());
+	ui.XAbsoluteMinSpin->setValue(fitKernelTarget_->absoluteXMin());
 	ui.XAbsoluteMinSpin->setRange(true, sourceCollection->transformMin().x, true, sourceCollection->transformMax().x);
-	ui.XAbsoluteMaxSpin->setValue(fitKernel_->absoluteXMax());
+	ui.XAbsoluteMaxSpin->setValue(fitKernelTarget_->absoluteXMax());
 	ui.XAbsoluteMaxSpin->setRange(true, sourceCollection->transformMin().x, true, sourceCollection->transformMax().x);
-	ui.XPointSingleSpin->setValue(fitKernel_->indexXSingle()+1);
+	ui.XPointSingleSpin->setValue(fitKernelTarget_->indexXSingle()+1);
 	ui.XPointSingleSpin->setRange(1, sourceCollection->displayAbscissa().nItems());
-	ui.XPointMinSpin->setValue(fitKernel_->indexXMin()+1);
+	ui.XPointMinSpin->setValue(fitKernelTarget_->indexXMin()+1);
 	ui.XPointMinSpin->setRange(1, sourceCollection->displayAbscissa().nItems());
-	ui.XPointMaxSpin->setValue(fitKernel_->indexXMax()+1);
+	ui.XPointMaxSpin->setValue(fitKernelTarget_->indexXMax()+1);
 	ui.XPointMaxSpin->setRange(1, sourceCollection->displayAbscissa().nItems());
 
 	// Source Z
-	if (fitKernel_->zRange() == FitKernel::AbsoluteRange) ui.ZSourceAbsoluteRadio->setChecked(true);
-	else if (fitKernel_->zRange() == FitKernel::SinglePointRange) ui.ZSourceSingleDataSetRadio->setChecked(true);
+	if (fitKernelTarget_->zRange() == FitKernel::AbsoluteRange) ui.ZSourceAbsoluteRadio->setChecked(true);
+	else if (fitKernelTarget_->zRange() == FitKernel::SinglePointRange) ui.ZSourceSingleDataSetRadio->setChecked(true);
 	else ui.ZSourceDataSetRangeRadio->setChecked(true);
-	ui.ZAbsoluteMinSpin->setValue(fitKernel_->absoluteZMin());
+	ui.ZAbsoluteMinSpin->setValue(fitKernelTarget_->absoluteZMin());
 	ui.ZAbsoluteMinSpin->setRange(true, sourceCollection->transformMin().z, true, sourceCollection->transformMax().z);
-	ui.ZAbsoluteMaxSpin->setValue(fitKernel_->absoluteZMax());
+	ui.ZAbsoluteMaxSpin->setValue(fitKernelTarget_->absoluteZMax());
 	ui.ZAbsoluteMaxSpin->setRange(true, sourceCollection->transformMin().z, true, sourceCollection->transformMax().z);
 	ui.ZDataSetCombo->clear();
-	for (DataSet* dataSet = sourceCollection->dataSets(); dataSet != NULL; dataSet = dataSet->next) ui.ZDataSetCombo->addItem(dataSet->title());
-	ui.ZDataSetCombo->setCurrentIndex(fitKernel_->indexZSingle());
-	ui.ZDataSetMinSpin->setValue(fitKernel_->indexZMin()+1);
+	for (DataSet* dataSet = sourceCollection->dataSets(); dataSet != NULL; dataSet = dataSet->next) ui.ZDataSetCombo->addItem(dataSet->name());
+	ui.ZDataSetCombo->setCurrentIndex(fitKernelTarget_->indexZSingle());
+	ui.ZDataSetMinSpin->setValue(fitKernelTarget_->indexZMin()+1);
 	ui.ZDataSetMinSpin->setRange(1, sourceCollection->nDataSets());
-	ui.ZDataSetMaxSpin->setValue(fitKernel_->indexZMax()+1);
+	ui.ZDataSetMaxSpin->setValue(fitKernelTarget_->indexZMax()+1);
 	ui.ZDataSetMaxSpin->setRange(1, sourceCollection->nDataSets());
 
 	// Minimisation Group
-	ui.MinimisationMethodCombo->setCurrentIndex(fitKernel_->method());
-	ui.MinimisationToleranceSpin->setValue(fitKernel_->tolerance());
-	ui.MinimisationMaxStepsSpin->setValue(fitKernel_->maxSteps());
-	ui.MinimisationLimitStrengthSpin->setValue(fitKernel_->limitStrength());
+	ui.MinimisationMethodCombo->setCurrentIndex(fitKernelTarget_->method());
+	ui.MinimisationToleranceSpin->setValue(fitKernelTarget_->tolerance());
+	ui.MinimisationMaxStepsSpin->setValue(fitKernelTarget_->maxSteps());
+	ui.MinimisationLimitStrengthSpin->setValue(fitKernelTarget_->limitStrength());
 
 	refreshing_ = false;
 
@@ -641,7 +656,7 @@ void FitSetupDialog::updateLabels()
 {
 	if (refreshing_) return;
 
-	Collection* sourceCollection = fitKernel_->sourceCollection();
+	Collection* sourceCollection = fitKernelTarget_->sourceCollection();
 	if (!sourceCollection) return;
 
 	// X Source

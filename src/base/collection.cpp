@@ -27,14 +27,15 @@
 
 // Static Members
 RefList<Collection,Collection::CollectionSignal> Collection::collectionSignals_;
+template<class Collection> RefList<Collection,bool> ObjectList<Collection>::objects_;
 
 // Constructor
-Collection::Collection() : ListItem<Collection>()
+Collection::Collection() : ListItem<Collection>(), ObjectList<Collection>(this)
 {
 	// Set variable defaults
 	dataSets_.clear();
 	dataFileDirectory_ = getenv("PWD");
-	title_ = "Empty Collection";
+	name_ = "Empty Collection";
 	dataChanged_ = true;
 	dataMin_.zero();
 	dataMax_.set(10.0, 10.0, 10.0);
@@ -91,7 +92,7 @@ Collection::~Collection()
 }
 
 // Copy constructor
-Collection::Collection(const Collection& source)
+Collection::Collection(const Collection& source) : ObjectList<Collection>(NULL)
 {
 	(*this) = source;
 }
@@ -100,7 +101,7 @@ Collection::Collection(const Collection& source)
 void Collection::operator=(const Collection& source)
 {
 	// Basic Data
-	title_ = source.title_;
+	name_ = source.name_;
 	dataSets_ = source.dataSets_;
 	dataFileDirectory_ = source.dataFileDirectory_;
 	dataMin_ = source.dataMin_;
@@ -137,16 +138,16 @@ void Collection::operator=(const Collection& source)
  * Data
  */
 
-// Set title
-void Collection::setTitle(QString title)
+// Set name
+void Collection::setName(QString name)
 {
-	title_ = title;
+	name_ = name;
 }
 
-// Return title
-QString Collection::title()
+// Return name
+QString Collection::name()
 {
-	return title_;
+	return name_;
 }
 
 // Add dataset
@@ -261,7 +262,7 @@ void Collection::setDataSetData(DataSet* target, const Array<double>& x, const A
 	// Check that this DataSet is owned by the collection
 	if (!dataSets_.contains(target))
 	{
-		msg.print("Internal Error : Tried to set the data of a dataset using the wrong collection.\n");
+// 		msg.print("Internal Error : Tried to set the data of a dataset using the wrong collection.\n");
 		return;
 	}
 
@@ -281,6 +282,13 @@ DataSet* Collection::dataSets() const
 	return dataSets_.first();
 }
 
+// Return named dataset
+DataSet* Collection::dataSet(QString name)
+{
+	for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next) if (dataSet->name() == name) return dataSet;
+	return NULL;
+}
+
 // Return last dataset in list
 DataSet* Collection::lastDataSet()
 {
@@ -297,14 +305,23 @@ DataSet* Collection::dataSet(int index)
 int Collection::dataSetIndex(const char* name)
 {
 	int index = 0;
-	for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next, ++index) if (dataSet->title() == name) return index;
+	for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next, ++index) if (dataSet->name() == name) return index;
 	return -1;
 }
 
 // Return unique name based on supplied dataset
-QString Collection::uniqueDataSetName(const char* name)
+QString Collection::uniqueDataSetName(QString baseName)
 {
-	// TODO
+	QString testName = baseName, suffix;
+	int index = 0;
+	do
+	{
+		// Add on suffix (if index > 0)
+		if (index > 0) testName = baseName + " "+QString::number(index);
+		++index;
+	} while (dataSet(testName));
+
+	return testName;
 }
 
 // Return number of slices with no data present
@@ -593,7 +610,7 @@ void Collection::getSlice(int axis, int bin)
 
 		// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated - TODO)
 		for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next) newDataSet->data().addPoint(dataSet->transformedData().z(), dataSet->transformedData().y(bin));
-		currentSlice_->setTitle("X = " + QString::number(dataSets_.first()->transformedData().x(bin)));
+		currentSlice_->setName("X = " + QString::number(dataSets_.first()->transformedData().x(bin)));
 	}
 	else if (axis == 1)
 	{
@@ -603,7 +620,7 @@ void Collection::getSlice(int axis, int bin)
 	{
 		// Slice through Z - i.e. original slice data
 		currentSlice_->addDataSet(dataSets_[bin]);
-		currentSlice_->setTitle("Z = " + QString::number(dataSets_[bin]->transformedData().z()));
+		currentSlice_->setName("Z = " + QString::number(dataSets_[bin]->transformedData().z()));
 	}
 }
 
@@ -611,7 +628,7 @@ void Collection::getSlice(int axis, int bin)
 Collection* Collection::findCollection(QString name)
 {
 	// Does the name of this collection match?
-	if (title_ == name) return this;
+	if (name_ == name) return this;
 
 	// Check fit data
 	for (Collection* fit = fits_.first(); fit != NULL; fit = fit->next)
@@ -713,11 +730,26 @@ QString Collection::iconString()
 	return iconName;
 }
 
+// Return locally-unique fit name based on basename provided
+QString Collection::uniqueFitName(QString baseName)
+{
+	QString testName = baseName, suffix;
+	int index = 0;
+	do
+	{
+		// Add on suffix (if index > 0)
+		if (index > 0) testName = baseName + " "+QString::number(index);
+		++index;
+	} while (fit(testName));
+
+	return testName;
+}
+
 // Add fit to Collection
-Collection* Collection::addFit(QString title)
+Collection* Collection::addFit(QString name)
 {
 	Collection* newFit = fits_.add();
-	newFit->setTitle(title);
+	newFit->setName(name);
 	newFit->type_ = Collection::FitCollection;
 	newFit->setParent(this);
 	newFit->addFitKernel();
@@ -740,12 +772,34 @@ Collection* Collection::fits()
 {
 	return fits_.first();
 }
+	
+// Return fit with name specified
+Collection* Collection::fit(QString name)
+{
+	for (Collection* fit = fits_.first(); fit != NULL; fit = fit->next) if (fit->name() == name) return fit;
+	return NULL;
+}
+
+// Return locally-unique slice name based on basename provided
+QString Collection::uniqueSliceName(QString baseName)
+{
+	QString testName = baseName, suffix;
+	int index = 0;
+	do
+	{
+		// Add on suffix (if index > 0)
+		if (index > 0) testName = baseName + " "+QString::number(index);
+		++index;
+	} while (slice(testName));
+
+	return testName;
+}
 
 // Add slice to Collection
-Collection* Collection::addSlice(QString title)
+Collection* Collection::addSlice(QString name)
 {
 	Collection* newSlice = slices_.add();
-	newSlice->setTitle(title);
+	newSlice->setName(name);
 	newSlice->type_ = Collection::ExtractedCollection;
 	newSlice->setParent(this);
 	newSlice->addFitKernel();
@@ -769,6 +823,13 @@ Collection* Collection::slices()
 	return slices_.first();
 }
 
+// Return slice with name specified
+Collection* Collection::slice(QString name)
+{
+	for (Collection* slice = slices_.first(); slice != NULL; slice = slice->next) if (slice->name() == name) return slice;
+	return NULL;
+}
+
 // Update current slice based on specified axis and value
 void Collection::updateCurrentSlice(int axis, double axisValue)
 {
@@ -782,7 +843,7 @@ void Collection::extractCurrentSlice(int axis, double axisValue)
 {
 	getSlice(axis, closestBin(axis, axisValue));
 
-	Collection* newSlice = addSlice(currentSlice_->title());
+	Collection* newSlice = addSlice(currentSlice_->name());
 	newSlice->addDataSet(currentSlice_->dataSets());
 
 	registerChange(newSlice, Collection::CollectionCreatedSignal);
@@ -798,7 +859,7 @@ Collection* Collection::currentSlice()
 // Add FitKernel, if one does not exist
 void Collection::addFitKernel()
 {
-	if (fitKernel_)	msg.print("Warning: Attempted to add a new FitKernel to collection '%s', but one already exists.\n", qPrintable(title_));
+	if (fitKernel_)	msg.print("Warning: Attempted to add a new FitKernel to collection '%s', but one already exists.\n", qPrintable(name_));
 	else fitKernel_ = new FitKernel;
 	fitKernel_->setSourceCollection(parent_);
 	fitKernel_->setDestinationCollection(this);
@@ -1417,6 +1478,12 @@ void Collection::updateDisplayData()
 	// Data has been updated - surface primitive will need to be reconstructed
 	displayPrimitivesValid_ = false;
 	displayDataValid_ = true;
+}
+
+// Return whether display primitives are valid
+bool Collection::displayDataValid()
+{
+	return displayDataValid_;
 }
 
 // Set view pane on which this data is being displayed

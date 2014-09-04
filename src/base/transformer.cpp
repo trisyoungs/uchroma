@@ -98,7 +98,8 @@ double Transformer::transform(double x, double y, double z)
 	y_->set(y);
 	z_->set(z);
 
-	return equation_.execute();
+	bool success;
+	return equation_.execute(success);
 }
 
 // Transform whole array, including application of pre/post transform shift
@@ -124,13 +125,15 @@ Array<double> Transformer::transformArray(Array<double> sourceX, Array<double> s
 	Array<double> newArray(sourceX.nItems());
 
 	z_->set(z);
+	bool success;
 	// Loop over x points
 	for (int n=0; n<sourceX.nItems(); ++n)
 	{
 		// Set x and y values in equation
 		x_->set(sourceX[n]);
 		y_->set(sourceY[n]);
-		newArray[n] = equation_.execute();
+		newArray[n] = equation_.execute(success);
+		if (!success) break;
 	}
 
 	return newArray;

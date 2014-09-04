@@ -58,8 +58,8 @@ class DataSet: public ListItem<DataSet>
 	DataSource dataSource_;
 	// Source file, if one is specified (not including path)
 	QString sourceFileName_;
-	// Title
-	QString title_;
+	// Name
+	QString name_;
 	// Data
 	Data2D data_;
 	// Transformed data
@@ -74,10 +74,10 @@ class DataSet: public ListItem<DataSet>
 	void setSourceFileName(QString fileName);
 	// Return source filename
 	QString sourceFileName();
-	// Set title
-	void setTitle(QString title);
-	// Return title
-	QString title();
+	// Set name
+	void setName(QString name);
+	// Return name
+	QString name();
 	// Load data from file
 	bool loadData(QDir sourceDir);
 	// Return data

@@ -47,12 +47,18 @@ class DataSpaceData : public ListItem<DataSpaceData>
 	double z_;
 
 	public:
-	// Add point to arrays
-	void addPoint(double x, double yRef, DisplayDataSet::DataPointType yType);
+	// Add point to all arrays
+	void addPoint(double x, double yRef, DisplayDataSet::DataPointType yType, double yCalc = 0.0);
+	// Add point to x and yReference only
+	void addPoint(double x, double yRef);
 	// Return X array
 	const Array<double> x();
 	// Return reference Y array
 	const Array<double> yReference();
+	// Set specified reference Y element
+	void setReferenceY(int index, double value);
+	// Zero reference Y array
+	void zeroYReference();
 	// Set specified calculated Y element
 	void setCalculatedY(int index, double value);
 	// Return calculated Y array

@@ -110,8 +110,13 @@ void Messenger::print(const char* fmt, ...) const
 	vsprintf(msgs,fmt,arguments);
 	if (!quiet_)
 	{
-		printf("%s",msgs);
-		if (textBrowser_) textBrowser_->append(msgs);
+		if (textBrowser_)
+		{
+			int n = strlen(msgs);
+			if ((n > 0) && (msgs[n-1] == '\n')) msgs[n-1] = '\0';
+			textBrowser_->append(msgs);
+		}
+		else printf("%s",msgs);
 	}
 	va_end(arguments);
 }
@@ -132,8 +137,13 @@ void Messenger::print(Messenger::OutputType ot, const char* fmt, ...) const
 	if (ot == Messenger::Force) printf("%s",msgs);
 	else if (isOutputActive(ot) && (!quiet_))
 	{
-		printf("%s",msgs);
-		if (textBrowser_) textBrowser_->append(msgs);
+		if (textBrowser_)
+		{
+			int n = strlen(msgs);
+			if ((n > 0) && (msgs[n-1] == '\n')) msgs[n-1] = '\0';
+			textBrowser_->append(msgs);
+		}
+		else printf("%s",msgs);
 	}
 	va_end(arguments);
 }

@@ -178,6 +178,7 @@ class UChromaWindow : public QMainWindow
 	void on_actionCollectionTransform_triggered(bool checked);
 	void on_actionCollectionDelete_triggered(bool checked);
 
+
 	/*
 	 * Data Actions
 	 */
@@ -223,6 +224,7 @@ class UChromaWindow : public QMainWindow
 	 */
 	public slots:
 	void on_actionWindowAxes_triggered(bool checked);
+	void on_actionWindowData_triggered(bool checked);
 	void on_actionWindowLog_triggered(bool checked);
 	void on_actionWindowStyle_triggered(bool checked);
 	void on_actionWindowTransform_triggered(bool checked);
@@ -355,7 +357,7 @@ class UChromaWindow : public QMainWindow
 
 	public:
 	// Add new collection
-	Collection* addCollection(QString title = QString());
+	Collection* addCollection(QString name = QString());
 	// Remove existing collection
 	void removeCollection(Collection* collection);
 	// Return first collection in list

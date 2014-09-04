@@ -60,7 +60,7 @@ void TargetSelectDialog::populateLists(ViewPane* currentPane, ViewPane* availabl
 		// Don't add this collection if it is already in the current pane's list of targets
 		if (currentPane->roleIsTargetCollection(collection)) continue;
 		item = new QListWidgetItem(ui.AvailableCollectionsList);
-		item->setText(collection->title());
+		item->setText(collection->name());
 		item->setData(Qt::UserRole, VariantPointer<Collection>(collection));
 	}
 }

@@ -11,6 +11,7 @@ add_library(base
   displaydataset.cpp
   dnchar.cpp
   equationvariable.cpp
+  indexdata.cpp
   lineparser.cpp
   messenger.cpp
   nxs.cpp
@@ -32,6 +33,7 @@ add_library(base
   displaydataset.h
   dnchar.h
   equationvariable.h
+  indexdata.h
   lineparser.h
   messenger.h
   nxs.h

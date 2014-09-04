@@ -98,6 +98,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	// Connect sub-window closed signal to toggle buttons / menu items in uChroma's main window
 	connect(&axesWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowAxes, SLOT(setChecked(bool)));
 	connect(&dataWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowData, SLOT(setChecked(bool)));
+	connect(&logWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowLog, SLOT(setChecked(bool)));
 	connect(&styleWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowStyle, SLOT(setChecked(bool)));
 	connect(&transformWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowTransform, SLOT(setChecked(bool)));
 	connect(&viewWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowView, SLOT(setChecked(bool)));
@@ -190,14 +191,15 @@ void UChromaWindow::updateSubWindows()
 	transformWindow_.updateControls();
 	viewWindow_.updateControls();
 
-	// Set titles of each subwindow to reflect current collection
+	// Set titles of each subwindow to reflect current collection and viewpane
 	if (currentCollection_  != NULL)
 	{
-		dataWindow_.setWindowTitle("Data (" + currentCollection_->title() + ")");
-		styleWindow_.setWindowTitle("Style (" + currentCollection_->title() + ")");
-		transformWindow_.setWindowTitle("Transform (" + currentCollection_->title() + ")");
-		viewWindow_.setWindowTitle("View (" + currentCollection_->title() + ")");
+		dataWindow_.setWindowTitle("Data (" + currentCollection_->name() + ")");
+		styleWindow_.setWindowTitle("Style (" + currentCollection_->name() + ")");
+		transformWindow_.setWindowTitle("Transform (" + currentCollection_->name() + ")");
+		viewWindow_.setWindowTitle("View (" + currentCollection_->name() + ")");
 	}
+	axesWindow_.setWindowTitle("Axes (" + currentViewPane_->name() + ")");
 }
 
 // Update tool bars
@@ -218,7 +220,7 @@ void UChromaWindow::updateDisplay()
 	RefListItem<Collection,Collection::CollectionSignal>* ri = Collection::collectionSignals();
 	while (ri)
 	{
-// 		printf("UChromaWindow::updateDisplay() : Collection %p (%s), signal = %i\n", ri->item, qPrintable(ri->item->title()), ri->data);
+// 		printf("UChromaWindow::updateDisplay() : Collection %p (%s), signal = %i\n", ri->item, qPrintable(ri->item->name()), ri->data);
 
 		// Pass this change to the viewLayout_...
 		viewLayout_.processUpdate(ri->item, ri->data);

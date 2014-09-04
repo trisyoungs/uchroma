@@ -1,6 +1,6 @@
 /*
-	*** View Pane
-	*** src/base/viewpane.cpp
+	*** Target Data
+	*** src/base/targetdata.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
