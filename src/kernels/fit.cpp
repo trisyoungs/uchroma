@@ -783,8 +783,8 @@ bool FitKernel::fit()
 
 	// Construct source data
 	if (!fitSpace_.initialise(sourceCollection_, firstXPoint, lastXPoint, firstZPoint, lastZPoint, orthogonal_, global_)) return false;
-
-	// Set up destination collection
+	
+	// Clear existing data in destination collection
 	if (!Collection::objectValid(destinationCollection_, "destination collection in FitKernel::fit()")) return false;
 	destinationCollection_->clearDataSets();
 

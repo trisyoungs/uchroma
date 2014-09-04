@@ -89,10 +89,10 @@ constant:
 variable:
 	VAR						{
 		$$ = Expression::target()->addVariableNode($1);
-		if ($$ == NULL) { printf("Error in variable expression (code 2)\n"); YYABORT; }
+		if ($$ == NULL) YYABORT;
 		}
 	| variable '('					{
-		msg.print("Tried to use a variable as a function.\n");
+		msg.print(Messenger::Verbose, "Tried to use a variable as a function.\n");
 		YYABORT;
 		}
 	;
@@ -105,14 +105,16 @@ variable:
 function:
 	FUNCCALL '(' ')'				{
 		$$ = Expression::target()->addFunctionNode( (Functions::Function) $1);
+		if ($$ == NULL) YYABORT;
 		msg.print(Messenger::Verbose, "PARSER: function : function '%s'\n", functions.data[(Functions::Function) $1].keyword);
 		}
 	| FUNCCALL '(' expressionlist ')'		{
 		$$ = Expression::target()->addFunctionNodeWithArglist( (Functions::Function) $1, $3);
+		if ($$ == NULL) YYABORT;
 		msg.print(Messenger::Verbose, "PARSER: function : function '%s' with exprlist\n", functions.data[(Functions::Function) $1].keyword);
 		}
 	| FUNCCALL error				{
-		msg.print("Error: Missing brackets after function call?\n");
+		msg.print(Messenger::Verbose, "Error: Missing brackets after function call?\n");
 		YYABORT;
 		}
 	;
@@ -143,7 +145,7 @@ expression:
 	| expression OR expression			{ $$ = Expression::target()->addOperator(Functions::OperatorOr, $1, $3); }
 	| '(' expression ')'				{ $$ = $2; }
 	| '!' expression				{ $$ = Expression::target()->addOperator(Functions::OperatorNot, $2); }
-	| NEWTOKEN					{ printf("Error: '%s' has not been declared as a function or a variable.\n", yylval.name->get()); YYABORT; }
+	| NEWTOKEN					{ msg.print(Messenger::Verbose, "Error: '%s' has not been declared as a function or a variable.\n", yylval.name->get()); YYABORT; }
 	;
 
 /* Expression List */
@@ -156,7 +158,7 @@ expressionlist:
 		$$ = Expression::joinArguments($3,$1);
 		}
 	| expressionlist expression			{
-		printf("Error: Missing comma between items.\n");
+		msg.print(Messenger::Verbose, "Error: Missing comma between items.\n");
 		YYABORT;
 		}
 	;

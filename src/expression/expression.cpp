@@ -243,7 +243,7 @@ Node* Expression::addFunctionNodeWithArglist(Functions::Function func, Node* arg
 	// Check that the correct arguments were given to the command and run any prep functions
 	if (!leaf->checkArguments(Functions::data[func].arguments, Functions::data[func].keyword))
 	{
-		msg.print("Error: Function syntax is '%s(%s)'.\n", Functions::data[func].keyword, Functions::data[func].argText);
+		msg.print(Messenger::Verbose, "Error: Function syntax is '%s(%s)'.\n", Functions::data[func].keyword, Functions::data[func].argText);
 		leaf = NULL;
 	}
 	msg.exit("Expression::addFunctionWithArglist");
@@ -270,7 +270,7 @@ Node* Expression::addFunctionNode(Functions::Function func, Node* a1, Node* a2, 
 	// Check that the correct arguments were given to the command and run any prep functions
 	if (!leaf->checkArguments(Functions::data[func].arguments, Functions::data[func].keyword))
 	{
-		msg.print("Error: Function syntax is '%s(%s)'.\n", Functions::data[func].keyword, Functions::data[func].argText);
+		msg.print(Messenger::Verbose, "Error: Function syntax is '%s(%s)'.\n", Functions::data[func].keyword, Functions::data[func].argText);
 		leaf = NULL;
 	}
 

@@ -24,8 +24,11 @@
 #include "base/viewlayout.h"
 #include <algorithm>
 
+// Static Members
+template<class ViewPane> RefList<ViewPane,bool> ObjectList<ViewPane>::objects_;
+
 // Constructor
-ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), parent_(parent), axes_(*this), zOffset_(-10.0)
+ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), parent_(parent), axes_(*this), ObjectList<ViewPane>(this), zOffset_(-10.0)
 {
 	// Geometry / position
 	bottomEdge_ = 0;
@@ -70,7 +73,7 @@ ViewPane::~ViewPane()
 }
 
 // Copy constructor
-ViewPane::ViewPane(const ViewPane& source) : parent_(parent_), axes_(*this), zOffset_(zOffset_)
+ViewPane::ViewPane(const ViewPane& source) : parent_(parent_), axes_(*this), ObjectList<ViewPane>(NULL), zOffset_(zOffset_)
 {
 	(*this) = source;
 }

@@ -30,6 +30,11 @@ CreateCollectionDialog::CreateCollectionDialog(UChromaWindow& parent) : QDialog(
 {
 	ui.setupUi(this);
 
+	// Create static x and z variables
+	xVariable_ = equation_.createVariable("x", NULL, true);
+	zVariable_ = equation_.createVariable("z", NULL, true);
+	equation_.setGenerateMissingVariables(true);
+
 	// Set default values in some widgets
 	ui.GridSpecifyXMinSpin->setValue(0.0);
 	ui.GridSpecifyXMaxSpin->setValue(10.0);
@@ -73,9 +78,6 @@ void CreateCollectionDialog::updateAndShow()
 void CreateCollectionDialog::resetEquation()
 {
 	equation_.clear();
-	xVariable_ = equation_.createVariable("x", NULL, true);
-	zVariable_ = equation_.createVariable("z", NULL, true);
-	equation_.setGenerateMissingVariables(true);
 	equationValid_ = false;
 }
 
@@ -165,6 +167,7 @@ void CreateCollectionDialog::createData(Collection* target)
 	}
 	else
 	{
+		// TODO
 	}
 }
 

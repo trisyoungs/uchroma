@@ -21,6 +21,7 @@
 
 #include "expression/node.h"
 #include "base/sysfunc.h"
+#include "base/messenger.h"
 #include "templates/reflist.h"
 #include <stdarg.h>
 #include <string.h>
@@ -109,7 +110,7 @@ bool Node::isArgNumeric(int i)
 {
 	if ((i < 0) || (i >= args_.nItems()))
 	{
-		printf("Node::argType : Argument index %i is out of range (node = %p).\n", i, this);
+		msg.print(Messenger::Verbose, "Node::argType : Argument index %i is out of range (node = %p).\n", i, this);
 		return false;
 	}
 	return args_[i]->item->returnsNumber();
@@ -120,7 +121,7 @@ bool Node::setArg(int i, double& rv)
 {
 	if ((i < 0) || (i >= args_.nItems()))
 	{
-		printf("Node::setArg : Argument index %i is out of range (node = %p).\n", i, this);
+		msg.print(Messenger::Verbose, "Node::setArg : Argument index %i is out of range (node = %p).\n", i, this);
 		return false;
 	}
 	// Check readonly attribute of argument
@@ -247,7 +248,7 @@ bool Node::checkArguments(const char* arglist, const char* funcname)
 					case ('8'):
 					case ('9'):	repeat = *c - '0'; break;
 					default:
-						printf("BAD CHARACTER (%c) IN COMMAND ARGUMENTS\n", *c);
+						msg.print(Messenger::Verbose, "Error: Bad character (%c) in command arguments\n", *c);
 						break;
 				}
 				c++;
@@ -257,7 +258,7 @@ bool Node::checkArguments(const char* arglist, const char* funcname)
 				// This is the start of a new set of argument specifiers - does the current set of arguments 'fit'?
 				if (args_.nItems() != count)
 				{
-					printf("Number of arguments (%i) doesn't match number in this set (%i) - next!\n", args_.nItems(), count);
+					msg.print(Messenger::Verbose, "Error: Number of arguments (%i) doesn't match number in this set (%i) - next!\n", args_.nItems(), count);
 					reset = true;
 					continue;
 				}
@@ -285,14 +286,14 @@ bool Node::checkArguments(const char* arglist, const char* funcname)
 			{
 				// If an alternative argument list is present, check this before we fail...
 				if (altargs != NULL) { reset = true; continue; }
-				printf("Error: The function '%s' requires argument %i.\n", funcname, count+1);
+				msg.print(Messenger::Verbose, "Error: The function '%s' requires argument %i.\n", funcname, count+1);
 // 				printf("       Command syntax is '%s(%s)'.\n", funcname, Command::data[function_].argText);
 // 				msg.exit("Node::checkArguments");
 				return false;
 			}
 			else if (cluster && (ngroup != 0))
 			{
-				printf("Error: The optional argument %i to function '%s' is part of a group and must be specified.\n", count+1, funcname);
+				msg.print(Messenger::Verbose, "Error: The optional argument %i to function '%s' is part of a group and must be specified.\n", count+1, funcname);
 // 				printf("       Command syntax is '%s(%s)'.\n", funcname, arglist);
 // 				msg.exit("Node::checkArguments");
 				return false;
@@ -313,7 +314,7 @@ bool Node::checkArguments(const char* arglist, const char* funcname)
 				if (!isArgNumeric(count))
 				{
 					if (altargs != NULL) { reset = true; continue; }
-					printf("Argument %i to function '%s' must be a number.\n", count+1, funcname);
+					msg.print(Messenger::Verbose, "Error: Argument %i to function '%s' must be a number.\n", count+1, funcname);
 					result = false;
 				}
 				break;
@@ -322,7 +323,7 @@ bool Node::checkArguments(const char* arglist, const char* funcname)
 		// Was this argument requested to be a modifiable variable value?
 		if (requireVar && argNode(count)->readOnly())
 		{
-			printf("Argument %i to function '%s' must be a variable and not a constant.\n", count+1, funcname);
+			msg.print(Messenger::Verbose, "Error: Argument %i to function '%s' must be a variable and not a constant.\n", count+1, funcname);
 			result = false;
 		}
 
@@ -336,7 +337,7 @@ bool Node::checkArguments(const char* arglist, const char* funcname)
 	// End of the argument specification - do we still have arguments left over in the command?
 	if (result && (args_.nItems() > count))
 	{
-		printf("Error: %i extra arguments given to function '%s'.\n", args_.nItems()-count, funcname);
+		msg.print(Messenger::Verbose, "Error: %i extra arguments given to function '%s'.\n", args_.nItems()-count, funcname);
 // 		msg.exit("Node::checkArguments");
 		return false;
 	}
@@ -349,7 +350,7 @@ bool Node::arg(int i, double& rv)
 {
 	if ((i < 0) || (i >= args_.nItems()))
 	{
-		printf("Node::arg : Argument index %i is out of range (node = %p).\n", i, this);
+		msg.print(Messenger::Verbose, "Node::arg : Argument index %i is out of range (node = %p).\n", i, this);
 		return false;
 	}
 	return args_[i]->item->execute(rv);
@@ -360,12 +361,12 @@ bool Node::argb(int i)
 {
 	if ((i < 0) || (i >= args_.nItems()))
 	{
-		printf("Node::argb : Argument index %i is out of range (node = %p).\n", i, this);
+		msg.print(Messenger::Verbose, "Node::argb : Argument index %i is out of range (node = %p).\n", i, this);
 		return false;
 	}
 	double rv;
 	bool result;
-	if (!args_[i]->item->execute(rv)) printf("Couldn't retrieve argument %i.\n", i+1);
+	if (!args_[i]->item->execute(rv)) msg.print(Messenger::Verbose, "Couldn't retrieve argument %i.\n", i+1);
 	result = (rv > 0);
 	return result;
 }
@@ -375,12 +376,12 @@ int Node::argi(int i)
 {
 	if ((i < 0) || (i >= args_.nItems()))
 	{
-		printf("Node::argi : Argument index %i is out of range (node = %p).\n", i, this);
+		msg.print(Messenger::Verbose, "Node::argi : Argument index %i is out of range (node = %p).\n", i, this);
 		return false;
 	}
 	double rv;
 	int result = 0;
-	if (!args_[i]->item->execute(rv)) printf("Couldn't retrieve argument %i.\n", i+1);
+	if (!args_[i]->item->execute(rv)) msg.print(Messenger::Verbose, "Couldn't retrieve argument %i.\n", i+1);
 	result = (int) rv;
 	return result;
 }
@@ -390,11 +391,11 @@ double Node::argd(int i)
 {
 	if ((i < 0) || (i >= args_.nItems()))
 	{
-		printf("Node::argd : Argument index %i is out of range (node = %p).\n", i, this);
+		msg.print(Messenger::Verbose, "Node::argd : Argument index %i is out of range (node = %p).\n", i, this);
 		return false;
 	}
 	double result = 0.0;
-	if (!args_[i]->item->execute(result)) printf("Couldn't retrieve argument %i.\n", i+1);
+	if (!args_[i]->item->execute(result)) msg.print(Messenger::Verbose, "Couldn't retrieve argument %i.\n", i+1);
 	return result;
 }
 
@@ -403,7 +404,7 @@ Node* Node::argNode(int i)
 {
 	if ((i < 0) || (i > args_.nItems()))
 	{
-		printf("Node::argNode : Argument index %i is out of range for returning the argument node (node = %p).\n", i, this);
+		msg.print(Messenger::Verbose, "Node::argNode : Argument index %i is out of range for returning the argument node (node = %p).\n", i, this);
 		return NULL;
 	}
 	return args_[i]->item;

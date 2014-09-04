@@ -22,6 +22,7 @@
 #include "base/dataspace.h"
 #include "base/collection.h"
 #include "base/referencevariable.h"
+#include "viewpane.h"
 #include "expression/expression.h"
 #include "expression/variable.h"
 
@@ -48,12 +49,24 @@ DataSpaceRange::~DataSpaceRange()
 // Set target information
 void DataSpaceRange::set(Collection* collection, int abscissaFirst, int abscissaLast, int firstDataSet, int lastDataSet, bool referenceDataOnly)
 {
+	// Check for valid collection
+	if (!Collection::objectValid(collection, "collection in DataSpaceRange::set()")) return;
+
+	// Check for valid pane/axes
+	if (!ViewPane::objectValid(collection->displayPane(), "display pane in DataSpaceRange::set()")) return;
+
 	displayDataSetStart_ = firstDataSet;
 	displayDataSetEnd_ = lastDataSet;
 	nDataSets_ = (displayDataSetEnd_ - displayDataSetStart_) + 1;
 	abscissaStart_ = abscissaFirst;
 	abscissaEnd_ = abscissaLast;
 	nPoints_ = (abscissaEnd_ - abscissaStart_) + 1;
+
+	// Grab stretch factors from the source collection's viewpane axes
+	// We need this since, because we are working with the Collection::displayData_ arrays, all X and Y values will have been scaled by these factors
+	double xStretch = collection->displayPane()->axes().axisStretch(0);
+	double yStretch = collection->displayPane()->axes().axisStretch(1);
+	double zStretch = collection->displayPane()->axes().axisStretch(2);
 
 	// Setup data arrays
 	values_.clear();
@@ -64,9 +77,9 @@ void DataSpaceRange::set(Collection* collection, int abscissaFirst, int abscissa
 		DataSpaceData* data = values_.add();
 		const Array<double>& y = dataSets[n+displayDataSetStart_]->y();
 		const Array<DisplayDataSet::DataPointType>& yType = dataSets[n+displayDataSetStart_]->yType();
-		if (referenceDataOnly) for (int i=0; i<nPoints_; ++i) data->addPoint(abscissa.value(i+abscissaStart_), y.value(i+abscissaStart_));
-		else for (int i=0; i<nPoints_; ++i) data->addPoint(abscissa.value(i+abscissaStart_), y.value(i+abscissaStart_), yType.value(i+abscissaStart_), 0.0);
-		data->setZ(dataSets[n+displayDataSetStart_]->z());
+		if (referenceDataOnly) for (int i=0; i<nPoints_; ++i) data->addPoint(abscissa.value(i+abscissaStart_)/xStretch, y.value(i+abscissaStart_)/yStretch);
+		else for (int i=0; i<nPoints_; ++i) data->addPoint(abscissa.value(i+abscissaStart_)/xStretch, y.value(i+abscissaStart_)/yStretch, yType.value(i+abscissaStart_), 0.0);
+		data->setZ(dataSets[n+displayDataSetStart_]->z()/zStretch);
 	}
 }
 

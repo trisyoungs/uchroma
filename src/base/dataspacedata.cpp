@@ -26,7 +26,7 @@ void DataSpaceData::addPoint(double x, double yRef, DisplayDataSet::DataPointTyp
 {
 	x_.add(x);
 	yReference_.add(yRef);
-	yCalculated_.add(0.0);
+	yCalculated_.add(yCalc);
 	yType_.add(yType);
 }
 

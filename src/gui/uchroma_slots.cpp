@@ -193,6 +193,7 @@ void UChromaWindow::on_actionView2D_triggered(bool checked)
 	if (refreshing_ || (!currentViewPane_)) return;
 
 	currentViewPane_->setTwoDimensional(checked);
+	if (checked) currentViewPane_->resetViewMatrix();
 	currentViewPane_->recalculateView();
 
 	axesWindow_.updateControls();

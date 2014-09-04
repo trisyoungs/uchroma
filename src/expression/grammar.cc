@@ -506,10 +506,10 @@ static const yytype_int8 yyrhs[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    60,    60,    61,    66,    69,    79,    90,    94,   106,
-     110,   114,   126,   127,   128,   129,   130,   131,   132,   133,
-     134,   135,   136,   137,   138,   139,   140,   141,   142,   143,
-     144,   145,   146,   151,   155,   158,   170,   171,   176,   179,
-     182,   189,   192,   200,   203,   210,   213,   220,   223
+     111,   116,   128,   129,   130,   131,   132,   133,   134,   135,
+     136,   137,   138,   139,   140,   141,   142,   143,   144,   145,
+     146,   147,   148,   153,   157,   160,   172,   173,   178,   181,
+     184,   191,   194,   202,   205,   212,   215,   222,   225
 };
 #endif
 
@@ -1531,7 +1531,7 @@ yyreduce:
 #line 90 "grammar.yy"
     {
 		(yyval.node) = Expression::target()->addVariableNode((yyvsp[(1) - (1)].variable));
-		if ((yyval.node) == NULL) { printf("Error in variable expression (code 2)\n"); YYABORT; }
+		if ((yyval.node) == NULL) YYABORT;
 		}
     break;
 
@@ -1539,7 +1539,7 @@ yyreduce:
 /* Line 1792 of yacc.c  */
 #line 94 "grammar.yy"
     {
-		msg.print("Tried to use a variable as a function.\n");
+		msg.print(Messenger::Verbose, "Tried to use a variable as a function.\n");
 		YYABORT;
 		}
     break;
@@ -1549,157 +1549,159 @@ yyreduce:
 #line 106 "grammar.yy"
     {
 		(yyval.node) = Expression::target()->addFunctionNode( (Functions::Function) (yyvsp[(1) - (3)].functionId));
+		if ((yyval.node) == NULL) YYABORT;
 		msg.print(Messenger::Verbose, "PARSER: function : function '%s'\n", functions.data[(Functions::Function) (yyvsp[(1) - (3)].functionId)].keyword);
 		}
     break;
 
   case 10:
 /* Line 1792 of yacc.c  */
-#line 110 "grammar.yy"
+#line 111 "grammar.yy"
     {
 		(yyval.node) = Expression::target()->addFunctionNodeWithArglist( (Functions::Function) (yyvsp[(1) - (4)].functionId), (yyvsp[(3) - (4)].node));
+		if ((yyval.node) == NULL) YYABORT;
 		msg.print(Messenger::Verbose, "PARSER: function : function '%s' with exprlist\n", functions.data[(Functions::Function) (yyvsp[(1) - (4)].functionId)].keyword);
 		}
     break;
 
   case 11:
 /* Line 1792 of yacc.c  */
-#line 114 "grammar.yy"
+#line 116 "grammar.yy"
     {
-		msg.print("Error: Missing brackets after function call?\n");
+		msg.print(Messenger::Verbose, "Error: Missing brackets after function call?\n");
 		YYABORT;
 		}
     break;
 
   case 12:
 /* Line 1792 of yacc.c  */
-#line 126 "grammar.yy"
+#line 128 "grammar.yy"
     { (yyval.node) = (yyvsp[(1) - (1)].node); }
     break;
 
   case 13:
 /* Line 1792 of yacc.c  */
-#line 127 "grammar.yy"
+#line 129 "grammar.yy"
     { (yyval.node) = (yyvsp[(1) - (1)].node); }
     break;
 
   case 14:
 /* Line 1792 of yacc.c  */
-#line 128 "grammar.yy"
+#line 130 "grammar.yy"
     { (yyval.node) = Expression::target()->addOperator(Functions::OperatorNegate, (yyvsp[(2) - (2)].node)); }
     break;
 
   case 15:
 /* Line 1792 of yacc.c  */
-#line 129 "grammar.yy"
+#line 131 "grammar.yy"
     { (yyval.node) = (yyvsp[(1) - (1)].node); }
     break;
 
   case 16:
 /* Line 1792 of yacc.c  */
-#line 130 "grammar.yy"
+#line 132 "grammar.yy"
     { (yyval.node) = Expression::target()->addOperator(Functions::OperatorAdd, (yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node)); }
     break;
 
   case 17:
 /* Line 1792 of yacc.c  */
-#line 131 "grammar.yy"
+#line 133 "grammar.yy"
     { (yyval.node) = Expression::target()->addOperator(Functions::OperatorSubtract, (yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node)); }
     break;
 
   case 18:
 /* Line 1792 of yacc.c  */
-#line 132 "grammar.yy"
+#line 134 "grammar.yy"
     { (yyval.node) = Expression::target()->addOperator(Functions::OperatorMultiply, (yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node)); }
     break;
 
   case 19:
 /* Line 1792 of yacc.c  */
-#line 133 "grammar.yy"
+#line 135 "grammar.yy"
     { (yyval.node) = Expression::target()->addOperator(Functions::OperatorDivide, (yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node)); }
     break;
 
   case 20:
 /* Line 1792 of yacc.c  */
-#line 134 "grammar.yy"
+#line 136 "grammar.yy"
     { (yyval.node) = Expression::target()->addOperator(Functions::OperatorPower, (yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node)); }
     break;
 
   case 21:
 /* Line 1792 of yacc.c  */
-#line 135 "grammar.yy"
+#line 137 "grammar.yy"
     { (yyval.node) = Expression::target()->addOperator(Functions::OperatorModulus, (yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node)); }
     break;
 
   case 22:
 /* Line 1792 of yacc.c  */
-#line 136 "grammar.yy"
+#line 138 "grammar.yy"
     { (yyval.node) = Expression::target()->addOperator(Functions::OperatorEqualTo, (yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node)); }
     break;
 
   case 23:
 /* Line 1792 of yacc.c  */
-#line 137 "grammar.yy"
+#line 139 "grammar.yy"
     { (yyval.node) = Expression::target()->addOperator(Functions::OperatorNotEqualTo, (yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node)); }
     break;
 
   case 24:
 /* Line 1792 of yacc.c  */
-#line 138 "grammar.yy"
+#line 140 "grammar.yy"
     { (yyval.node) = Expression::target()->addOperator(Functions::OperatorGreaterThan, (yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node)); }
     break;
 
   case 25:
 /* Line 1792 of yacc.c  */
-#line 139 "grammar.yy"
+#line 141 "grammar.yy"
     { (yyval.node) = Expression::target()->addOperator(Functions::OperatorGreaterThanEqualTo, (yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node)); }
     break;
 
   case 26:
 /* Line 1792 of yacc.c  */
-#line 140 "grammar.yy"
+#line 142 "grammar.yy"
     { (yyval.node) = Expression::target()->addOperator(Functions::OperatorLessThan, (yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node)); }
     break;
 
   case 27:
 /* Line 1792 of yacc.c  */
-#line 141 "grammar.yy"
+#line 143 "grammar.yy"
     { (yyval.node) = Expression::target()->addOperator(Functions::OperatorLessThanEqualTo, (yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node)); }
     break;
 
   case 28:
 /* Line 1792 of yacc.c  */
-#line 142 "grammar.yy"
+#line 144 "grammar.yy"
     { (yyval.node) = Expression::target()->addOperator(Functions::OperatorAnd, (yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node)); }
     break;
 
   case 29:
 /* Line 1792 of yacc.c  */
-#line 143 "grammar.yy"
+#line 145 "grammar.yy"
     { (yyval.node) = Expression::target()->addOperator(Functions::OperatorOr, (yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node)); }
     break;
 
   case 30:
 /* Line 1792 of yacc.c  */
-#line 144 "grammar.yy"
+#line 146 "grammar.yy"
     { (yyval.node) = (yyvsp[(2) - (3)].node); }
     break;
 
   case 31:
 /* Line 1792 of yacc.c  */
-#line 145 "grammar.yy"
+#line 147 "grammar.yy"
     { (yyval.node) = Expression::target()->addOperator(Functions::OperatorNot, (yyvsp[(2) - (2)].node)); }
     break;
 
   case 32:
 /* Line 1792 of yacc.c  */
-#line 146 "grammar.yy"
-    { printf("Error: '%s' has not been declared as a function or a variable.\n", yylval.name->get()); YYABORT; }
+#line 148 "grammar.yy"
+    { msg.print(Messenger::Verbose, "Error: '%s' has not been declared as a function or a variable.\n", yylval.name->get()); YYABORT; }
     break;
 
   case 33:
 /* Line 1792 of yacc.c  */
-#line 151 "grammar.yy"
+#line 153 "grammar.yy"
     {
 		(yyval.node) = (yyvsp[(1) - (1)].node);
 		if ((yyval.node) == NULL) YYABORT;
@@ -1708,7 +1710,7 @@ yyreduce:
 
   case 34:
 /* Line 1792 of yacc.c  */
-#line 155 "grammar.yy"
+#line 157 "grammar.yy"
     {
 		(yyval.node) = Expression::joinArguments((yyvsp[(3) - (3)].node),(yyvsp[(1) - (3)].node));
 		}
@@ -1716,28 +1718,28 @@ yyreduce:
 
   case 35:
 /* Line 1792 of yacc.c  */
-#line 158 "grammar.yy"
+#line 160 "grammar.yy"
     {
-		printf("Error: Missing comma between items.\n");
+		msg.print(Messenger::Verbose, "Error: Missing comma between items.\n");
 		YYABORT;
 		}
     break;
 
   case 36:
 /* Line 1792 of yacc.c  */
-#line 170 "grammar.yy"
+#line 172 "grammar.yy"
     { }
     break;
 
   case 37:
 /* Line 1792 of yacc.c  */
-#line 171 "grammar.yy"
+#line 173 "grammar.yy"
     { }
     break;
 
   case 38:
 /* Line 1792 of yacc.c  */
-#line 176 "grammar.yy"
+#line 178 "grammar.yy"
     {
 		(yyval.node) = (yyvsp[(1) - (2)].node);
 		}
@@ -1745,7 +1747,7 @@ yyreduce:
 
   case 39:
 /* Line 1792 of yacc.c  */
-#line 179 "grammar.yy"
+#line 181 "grammar.yy"
     {
 		(yyval.node) = (yyvsp[(1) - (2)].node);
 		}
@@ -1753,7 +1755,7 @@ yyreduce:
 
   case 40:
 /* Line 1792 of yacc.c  */
-#line 182 "grammar.yy"
+#line 184 "grammar.yy"
     {
 		(yyval.node) = (yyvsp[(1) - (1)].node);
 		}
@@ -1761,7 +1763,7 @@ yyreduce:
 
   case 41:
 /* Line 1792 of yacc.c  */
-#line 189 "grammar.yy"
+#line 191 "grammar.yy"
     {
 		(yyval.node) = (yyvsp[(1) - (1)].node);
 		}
@@ -1769,7 +1771,7 @@ yyreduce:
 
   case 42:
 /* Line 1792 of yacc.c  */
-#line 192 "grammar.yy"
+#line 194 "grammar.yy"
     {
 		if ((yyvsp[(2) - (2)].node) == NULL) (yyval.node) = (yyvsp[(1) - (2)].node);
 		else (yyval.node) = Expression::target()->joinCommands((yyvsp[(1) - (2)].node), (yyvsp[(2) - (2)].node));
@@ -1778,7 +1780,7 @@ yyreduce:
 
   case 43:
 /* Line 1792 of yacc.c  */
-#line 200 "grammar.yy"
+#line 202 "grammar.yy"
     {
 		(yyval.node) = (yyvsp[(2) - (3)].node);
 		}
@@ -1786,7 +1788,7 @@ yyreduce:
 
   case 44:
 /* Line 1792 of yacc.c  */
-#line 203 "grammar.yy"
+#line 205 "grammar.yy"
     {
 		(yyval.node) = Expression::target()->addFunctionNode(Functions::NoFunction);
 		}
@@ -1794,7 +1796,7 @@ yyreduce:
 
   case 45:
 /* Line 1792 of yacc.c  */
-#line 210 "grammar.yy"
+#line 212 "grammar.yy"
     {
 		(yyval.node) = (yyvsp[(1) - (1)].node);
 		}
@@ -1802,7 +1804,7 @@ yyreduce:
 
   case 46:
 /* Line 1792 of yacc.c  */
-#line 213 "grammar.yy"
+#line 215 "grammar.yy"
     {
 		(yyval.node) = (yyvsp[(1) - (1)].node);
 		}
@@ -1810,7 +1812,7 @@ yyreduce:
 
   case 47:
 /* Line 1792 of yacc.c  */
-#line 220 "grammar.yy"
+#line 222 "grammar.yy"
     {
 		(yyval.node) = Expression::target()->addFunctionNode(Functions::If,(yyvsp[(3) - (7)].node),(yyvsp[(5) - (7)].node),(yyvsp[(7) - (7)].node));
 		}
@@ -1818,7 +1820,7 @@ yyreduce:
 
   case 48:
 /* Line 1792 of yacc.c  */
-#line 223 "grammar.yy"
+#line 225 "grammar.yy"
     {
 		(yyval.node) = Expression::target()->addFunctionNode(Functions::If,(yyvsp[(3) - (5)].node),(yyvsp[(5) - (5)].node));
 		}
@@ -1826,7 +1828,7 @@ yyreduce:
 
 
 /* Line 1792 of yacc.c  */
-#line 1830 "grammar.cc"
+#line 1832 "grammar.cc"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2058,7 +2060,7 @@ yyreturn:
 
 
 /* Line 2055 of yacc.c  */
-#line 228 "grammar.yy"
+#line 230 "grammar.yy"
 
 
 void yyerror(char *s)
