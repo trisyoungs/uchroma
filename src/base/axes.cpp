@@ -94,8 +94,12 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	clipPlaneYMin_ = 0.0;
 	clipPlaneYMax_ = 0.0;
 	primitivesValid_ = false;
-	gridLineMajorStyle_[0].set(1.0, LineStipple::NoStipple, 0.0, 0.0, 0.0, 1.0);
-	gridLineMinorStyle_[0].set(0.5, LineStipple::DashStipple, 0.8, 0.8, 0.8, 1.0);
+	gridLineMajorStyle_[0].set(1.0, LineStipple::NoStipple, 0.5, 0.5, 0.5, 1.0);
+	gridLineMinorStyle_[0].set(1.0, LineStipple::QuartedDashStipple, 0.75, 0.75, 0.75, 1.0);
+	gridLineMajorStyle_[1] = gridLineMajorStyle_[0];
+	gridLineMinorStyle_[1] = gridLineMinorStyle_[0];
+	gridLineMajorStyle_[2] = gridLineMajorStyle_[0];
+	gridLineMinorStyle_[2] = gridLineMinorStyle_[0];
 }
 
 // Destructor
@@ -704,7 +708,7 @@ bool Axes::gridLinesMajor(int axis)
 // Set whether gridLines at minor tick intervals are active for specified axis
 void Axes::setGridLinesMinor(int axis, bool on)
 {
-	gridLinesMajor_[axis] = on;
+	gridLinesMinor_[axis] = on;
 
 	primitivesValid_ = false;
 	parent_.paneChanged();
@@ -713,7 +717,7 @@ void Axes::setGridLinesMinor(int axis, bool on)
 // Return whether gridLines at minor tick intervals are active for specified axis
 bool Axes::gridLinesMinor(int axis)
 {
-	return gridLinesMajor_[axis];
+	return gridLinesMinor_[axis];
 }
 
 /*
@@ -937,78 +941,62 @@ void Axes::updateAxisPrimitives()
 	gridLineMinorPrimitives_[2].initialise(tickPositions[0].nItems()*tickPositions[1].nItems()*2, 0, GL_LINES, false);
 	gridLineMajorPrimitives_[2].initialise(tickPositions[0].nItems()*tickPositions[1].nItems()*2, 0, GL_LINES, false);
 
-	// -- XY plane, gridlines along Z, and XZ plane, gridlines along Y
-	for (int i = 0; i<tickPositions[0].nItems(); ++i)
+	// The 'axis' variable indicates the vector we are drawing lines along, and the relevant primitive store them in
+	for (int axis = 0; axis < 3; ++axis)
 	{
-		if (gridLinesMajor_.z || gridLinesMinor_.z)
-		{
-			if (gridLinesFull_.z) for (int j = 0; j<tickPositions[1].nItems(); ++j)
-			{
-				if (tickIsMajor[0][i] && tickIsMajor[1][j])
-				{
-					if (gridLinesMajor_.z) gridLineMajorPrimitives_[2].line(tickPositions[0][i], tickPositions[1][j], coordMin_[2].z, tickPositions[0][i], tickPositions[1][j], coordMax_[2].z);
-				}
-				else if (gridLinesMinor_.z) gridLineMinorPrimitives_[2].line(tickPositions[0][i], tickPositions[1][j], coordMin_[2].z, tickPositions[0][i], tickPositions[1][j], coordMax_[2].z);
-			}
-			else
-			{
-			}
-		}
+		// Check to see if there is anything to draw for this direction
+		if ((!gridLinesMajor_[axis]) && (!gridLinesMinor_[axis])) continue;
 
-		if (gridLinesMajor_.y || gridLinesMinor_.y) for (int k = 0; k<tickPositions[2].nItems(); ++k)
-		{
-			if (tickIsMajor[0][i] && tickIsMajor[2][k])
-			{
-				if (gridLinesMajor_.y) gridLineMajorPrimitives_[1].line(tickPositions[0][i], coordMin_[1].y, tickPositions[2][k], tickPositions[0][i], coordMax_[1].y, tickPositions[2][k]);
-			}
-			else if (gridLinesMinor_.y) gridLineMinorPrimitives_[1].line(tickPositions[0][i], coordMin_[1].y, tickPositions[2][k], tickPositions[0][i], coordMax_[1].y, tickPositions[2][k]);
-		}
-	}
+		// Determine the indices of the remaining two axes to use
+		int ortho1 = (axis+1)%3;
+		int ortho2 = (axis+2)%3;
 
-	// -- YZ plane, gridlines along X
-	if (gridLinesMajor_.x || gridLinesMinor_.x)
-	{
-		
-		if (gridLinesFull_.x) for (int j = 0; j<tickPositions[1].nItems(); ++j)
+		// Double loop now, over the two sets of tickmarks that are orthogonal to 'axis'
+		for (int i1 = 0; i1<tickPositions[ortho1].nItems(); ++i1)
 		{
-			for (int k = 0; k<tickPositions[2].nItems(); ++k)
+			for (int i2 = 0; i2<tickPositions[ortho2].nItems(); ++i2)
 			{
 				// Set basic vector info
-				v1.set(coordMin_[0].x, tickPositions[1][j], tickPositions[2][k]);
-				v2.set(coordMax_[0].x, tickPositions[1][j], tickPositions[2][k]);
+				// The 'axis' will define its own component, with the other two coming from the tickmark positions of the other axes
+				v1[axis] = coordMin_[axis][axis];
+				v1[ortho1] = tickPositions[ortho1][i1];
+				v1[ortho2] = tickPositions[ortho2][i2];
+				v2[axis] = coordMax_[axis][axis];
+				v2[ortho1] = tickPositions[ortho1][i1];
+				v2[ortho2] = tickPositions[ortho2][i2];
+// 				v1.set(coordMin_[0][0], tickPositions[1][j], tickPositions[2][k]);
+// 				v2.set(coordMax_[0][0], tickPositions[1][j], tickPositions[2][k]);
 
 				// If we are only drawing lines in the planes orthogonal to the axis, break if we have moved away from it...
-				if (gridLinesFull_.x)
+				// Otherwise, we change either the i1 or i2 components of v1 and v2 to position the gridline with the axis line itself
+				if (!gridLinesFull_[axis])
 				{
-					if ((j != 0) && (k != 0)) break;
-					// Change z values of vectors...
-					v1.z = coordMin_[0].z;
-					v2.z = coordMin_[0].z;
-					// THERE IS AN ALGORITHM TO BE WRITTEN HERE!!!!
+					// If both values are non-zero, we are done so we can break out of the loop
+					if ((i1 != 0) && (i2 != 0)) break;
+
+					// If the i1 counter is zero, change the values of the ortho1 axis to that of the 'axis' axis, and vice versa
+					if (i1 == 0)
+					{
+						v1[ortho1] = coordMin_[axis][ortho1];
+						v2[ortho1] = coordMax_[axis][ortho1];
+					}
+					else
+					{
+						v1[ortho2] = coordMin_[axis][ortho2];
+						v2[ortho2] = coordMax_[axis][ortho2];
+					}
 				}
-				else 
-				if (tickIsMajor[1][j] && tickIsMajor[2][k])
+
+				// Add line to the relevant primitive
+				if (tickIsMajor[ortho1][i1] && tickIsMajor[ortho2][i2])
 				{
-					if (gridLinesMajor_.x) gridLineMajorPrimitives_[0].line(coordMin_[0].x, tickPositions[1][j], tickPositions[2][k], coordMax_[0].x, tickPositions[1][j], tickPositions[2][k]);
+					if (gridLinesMajor_[axis]) gridLineMajorPrimitives_[axis].line(v1, v2);
 				}
-				else if (gridLinesMinor_.x) gridLineMinorPrimitives_[0].line(coordMin_[0].x, tickPositions[1][j], tickPositions[2][k], coordMax_[0].x, tickPositions[1][j], tickPositions[2][k]);
-			}
-		}
-		else
-		{
-			for (int j = 0; j<tickPositions[1].nItems(); ++j)
-			{
-				if (tickIsMajor[1][j] && gridLinesMajor_.x) gridLineMajorPrimitives_[0].line(coordMin_[0].x, tickPositions[1][j], coordMin_[0].z, coordMax_[0].x, tickPositions[1][j], coordMax_[0].z);
-				else if ((!tickIsMajor[1][j]) && gridLinesMinor_.x) gridLineMinorPrimitives_[0].line(coordMin_[0].x, tickPositions[1][j], coordMin_[1].z, coordMax_[0].x, tickPositions[1][j], coordMax_[1].z);
-			}
-			for (int k = 0; k<tickPositions[2].nItems(); ++k)
-			{
-				if (tickIsMajor[2][k] && gridLinesMajor_.x) gridLineMajorPrimitives_[0].line(coordMin_[0].x, coordMin_[0].y, tickPositions[2][k], coordMax_[0].x, coordMax_[0].y, tickPositions[2][k]);
-				else if ((!tickIsMajor[2][k]) && gridLinesMinor_.x) gridLineMinorPrimitives_[0].line(coordMin_[0].x, coordMin_[2].y, tickPositions[2][k], coordMax_[0].x, coordMax_[2].y, tickPositions[2][k]);
+				else if (gridLinesMinor_[axis]) gridLineMinorPrimitives_[axis].line(v1, v2);
 			}
 		}
 	}
-	
+
 	primitivesValid_ = true;
 
 	// The axes have changed, so all associated collection data also needs to be regenerated

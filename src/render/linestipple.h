@@ -30,6 +30,7 @@
 #else
 #include <GL/gl.h>
 #endif
+#include <QtCore/QVector>
 
 // Forward Declarations
 /* none */
@@ -39,7 +40,7 @@ class LineStipple
 {
 	public:
 	// Line Stipple Types
-	enum StippleType { NoStipple, DashStipple, nStippleTypes };
+	enum StippleType { NoStipple, DotStipple, FineDashStipple, EighthDashStipple, QuartedDashStipple, HalfDashStipple, DotSDash1Stipple, nStippleTypes };
 	// Convert text string to StippleType
 	static LineStipple::StippleType stippleType(const char* s);
 	// Convert InputBlock to text string
@@ -56,6 +57,10 @@ class LineStipple
 	GLushort stipplePattern;
 	// Name of stipple
 	const char* name;
+
+	public:
+	// Return stipple pattern as a Qt-compatible dash pattern
+	QVector<qreal>& dashPattern();
 
 
 	/*

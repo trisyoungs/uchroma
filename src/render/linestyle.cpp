@@ -120,6 +120,7 @@ void LineStyle::apply()
 {
 	// -- Render axis (grid) lines
 	glLineWidth(width_);
+	glEnable(GL_LINE_STIPPLE);
 	LineStipple::stipple[stipple_].apply();
 	GLfloat c[4] = { colour_.redF(), colour_.greenF(), colour_.blueF(), colour_.alphaF() };
 	glColor4fv(c);
@@ -130,6 +131,7 @@ void LineStyle::revert()
 {
 	glLineWidth(1.0);
 	LineStipple::stipple[LineStipple::NoStipple].apply();
+	glDisable(GL_LINE_STIPPLE);
 	GLfloat c[4] = { 0.0, 0.0, 0.0, 1.0 };
 	glColor4fv(c);
 }

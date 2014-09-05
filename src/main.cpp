@@ -23,7 +23,7 @@
 #include "gui/uchroma.h"
 
 int main(int argc, char *argv[])
-{
+{	
 	/* Uncomment here for extra debug output */
 // 	msg.addOutputType(Messenger::Verbose);
 

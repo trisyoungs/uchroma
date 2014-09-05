@@ -964,7 +964,7 @@ void AxesWindow::on_AxisYGridLineMinorCheck_clicked(bool checked)
 
 void AxesWindow::on_AxisYGridLineFullCheck_clicked(bool checked)
 {
-	axisGridFullChanged(0, checked);
+	axisGridFullChanged(1, checked);
 }
 
 void AxesWindow::on_AxisYGridLineMajorStyleButton_clicked(bool checked)
