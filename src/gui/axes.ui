@@ -63,7 +63,7 @@
        <item>
         <widget class="QTabWidget" name="XAxisTabs">
          <property name="currentIndex">
-          <number>0</number>
+          <number>3</number>
          </property>
          <widget class="QWidget" name="XAxisGeneralTab">
           <attribute name="title">
@@ -1205,6 +1205,27 @@
                </spacer>
               </item>
              </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="XAxisLinesTab">
+          <attribute name="title">
+           <string>Lines</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_12">
+           <item>
+            <widget class="QCheckBox" name="AxisXGridLineMajorCheck">
+             <property name="text">
+              <string>Draw lines at major tick intervals</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="AxisXGridLineMinorCheck">
+             <property name="text">
+              <string>Draw lines at minor tick intervals</string>
+             </property>
             </widget>
            </item>
           </layout>

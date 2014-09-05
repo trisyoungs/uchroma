@@ -38,6 +38,10 @@ Primitive::~Primitive()
 {
 }
 
+/*
+ * Data
+ */
+
 // Initialise primitive
 void Primitive::initialise(int maxVertices, int maxIndices, GLenum type, bool colourData)
 {
@@ -81,8 +85,6 @@ void Primitive::setNoInstances()
 {
 	useInstances_ = false;
 }
-
-
 
 // Push instance of primitive
 void Primitive::pushInstance(const QGLContext* context, GLExtensions* extensions)
@@ -242,4 +244,68 @@ void Primitive::sendToGL() const
 		else if (pi->listObject() != 0) glCallList(pi->listObject());
 	}
 	else vertexChunk_.sendToGL();
+}
+
+/*
+ * Vertex / Index Generation
+ */
+
+// Define next vertex and normal
+GLuint Primitive::defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz)
+{
+	return vertexChunk_.defineVertex(x,y,z,nx,ny,nz);
+}
+
+// Define next vertex and normal (as Vec3<double>)
+GLuint Primitive::defineVertex(Vec3<double> vertex, Vec3<double> normal)
+{
+	return defineVertex(vertex.x, vertex.y, vertex.z, normal.x, normal.y, normal.z);
+}
+
+// Define next vertex and normal with colour
+GLuint Primitive::defineVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat nx, GLfloat ny, GLfloat nz, GLfloat r, GLfloat g, GLfloat b, GLfloat a)
+{
+	return vertexChunk_.defineVertex(x,y,z,nx,ny,nz,r,g,b,a);
+}
+
+// Define next vertex and normal with colour (as array)
+GLuint Primitive::defineVertex(GLfloat x, GLfloat y, GLfloat z, Vec3<double>& normal, Vec4<GLfloat>& colour)
+{
+	return vertexChunk_.defineVertex(x,y,z,normal.x,normal.y,normal.z,colour.x,colour.y,colour.z,colour.w);
+}
+
+// Define next vertex, normal, and colour (as Vec3<double>s and array)
+GLuint Primitive::defineVertex(Vec3<double>& v, Vec3<double>& u, Vec4<GLfloat>& colour)
+{
+	return vertexChunk_.defineVertex(v.x,v.y,v.z,u.x,u.y,u.z,colour.x,colour.y,colour.z,colour.w);
+}
+
+// Define next index double
+bool Primitive::defineIndices(GLuint a, GLuint b)
+{
+	return vertexChunk_.defineIndices(a, b);
+}
+
+// Define next index triple
+bool Primitive::defineIndices(GLuint a, GLuint b, GLuint c)
+{
+	return vertexChunk_.defineIndices(a, b, c);
+}
+
+/*
+ * Geometric Primitive Generation
+ */
+
+// Draw line
+void Primitive::line(double x1, double y1, double z1, double x2, double y2, double z2)
+{
+	defineVertex(x1, y1, z1, 1.0, 0.0, 0.0);
+	defineVertex(x2, y2, z2, 1.0, 0.0, 0.0);
+}
+
+// Add line to axis primitive
+void Primitive::line(Vec3<double> v1, Vec3<double> v2)
+{
+	defineVertex(v1.x, v1.y, v1.z, 1.0, 0.0, 0.0);
+	defineVertex(v2.x, v2.y, v2.z, 1.0, 0.0, 0.0);
 }

@@ -50,7 +50,7 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	coordCentre_.set(5.0, 5.0, 5.0);
 	stretch_.set(1.0, 1.0, 1.0);
 
-	// Ticks / Labels
+	// Ticks
 	tickDirection_[0].set(0.0, -1.0, 0.0);
 	tickDirection_[1].set(-1.0, 0.0, 0.0);
 	tickDirection_[2].set(-1.0, 0.0, 0.0);
@@ -59,6 +59,8 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	tickDelta_.set(1.0,1.0,1.0);
 	autoTicks_.set(true, true, true);
 	minorTicks_.set(1,1,1);
+
+	// Labels
 	labelAnchor_[0] = TextPrimitive::TopMiddleAnchor;
 	labelAnchor_[1] = TextPrimitive::MiddleRightAnchor;
 	labelAnchor_[2] = TextPrimitive::MiddleRightAnchor;
@@ -75,17 +77,25 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	titleAnchor_[1] = TextPrimitive::BottomMiddleAnchor;
 	titleAnchor_[2] = TextPrimitive::TopMiddleAnchor;
 
+	// GridLines
+	gridLinesMajor_.set(false, false, false);
+	gridLinesMinor_.set(false, false, false);
+
 	// GL
 	for (int n=0; n<3; ++n)
 	{
 		axisPrimitives_[n].initialise(1020, 0, GL_LINES, false);
 		axisPrimitives_[n].setNoInstances();
-		gridLinePrimitives_[n].initialise(1020, 0, GL_LINES, false);
-		gridLinePrimitives_[n].setNoInstances();
+		majorGridLinePrimitives_[n].initialise(1020, 0, GL_LINES, false);
+		majorGridLinePrimitives_[n].setNoInstances();
+		minorGridLinePrimitives_[n].initialise(1020, 0, GL_LINES, false);
+		minorGridLinePrimitives_[n].setNoInstances();
 	}
 	clipPlaneYMin_ = 0.0;
 	clipPlaneYMax_ = 0.0;
 	primitivesValid_ = false;
+	majorGridLineStyle_.set(0.5, LineStipple::NoStipple, 0.0, 0.0, 0.0, 1.0);
+	minorGridLineStyle_.set(0.5, LineStipple::DashStipple, 0.8, 0.8, 0.8, 1.0);
 }
 
 // Destructor
@@ -650,17 +660,39 @@ TextPrimitive::TextAnchor Axes::titleAnchor(int axis)
  * GridLines
  */
 
+// Set whether gridLines at major tick intervals are active for specified axis
+void Axes::setGridLinesMajor(int axis, bool on)
+{
+	gridLinesMajor_[axis] = on;
+
+	primitivesValid_ = false;
+	parent_.paneChanged();
+}
+
+// Return whether gridLines at major tick intervals are active for specified axis
+bool Axes::gridLinesMajor(int axis)
+{
+	return gridLinesMajor_[axis];
+}
+
+// Set whether gridLines at minor tick intervals are active for specified axis
+void Axes::setGridLinesMinor(int axis, bool on)
+{
+	gridLinesMajor_[axis] = on;
+
+	primitivesValid_ = false;
+	parent_.paneChanged();
+}
+
+// Return whether gridLines at minor tick intervals are active for specified axis
+bool Axes::gridLinesMinor(int axis)
+{
+	return gridLinesMajor_[axis];
+}
 
 /*
  * GL
  */
-
-// Add line to axis primitive
-void Axes::addAxisPrimitiveLine(int axis, Vec3<double> v1, Vec3<double> v2)
-{
-	axisPrimitives_[axis].defineVertex(v1.x, v1.y, v1.z, 1.0, 0.0, 0.0);
-	axisPrimitives_[axis].defineVertex(v2.x, v2.y, v2.z, 1.0, 0.0, 0.0);
-}
 
 // Update axes primitives
 void Axes::updateAxisPrimitives()
@@ -673,8 +705,10 @@ void Axes::updateAxisPrimitives()
 	Vec3<double> centre;
 	double dpX, dpY, textWidth, delta, value, clipPlaneDelta = 0.0001;
 	int n;
-	Vec3<double> u, tickDir;
+	Vec3<double> u, v1, v2, tickDir;
 	Matrix labelTransform, titleTransform;
+	Array<double> tickPositions[3];
+	Array<bool> tickIsMajor[3];
 
 	// Determine central coordinate within current axes and the Y clip limits
 	for (int n=0; n<3; ++n)
@@ -695,7 +729,7 @@ void Axes::updateAxisPrimitives()
 		clipPlaneYMax_ = (max_.y * stretch_.y) + clipPlaneDelta;
 	}
 	
-	// Set basic extreme coordinates for axes - actual limits on axes will be set in following loop
+	// Set basic extreme coordinates for axes
 	for (int axis=0; axis < 3; ++axis)
 	{
 		double position;
@@ -707,6 +741,18 @@ void Axes::updateAxisPrimitives()
 			else coordMin_[axis].set(n, (inverted_[n] ? max_[n] - position : position) * stretch_[n]);
 		}
 		coordMax_[axis] = coordMin_[axis];
+
+		// Set axis min/max coordinates
+		if (logarithmic_[axis])
+		{
+			coordMin_[axis].set(axis, (inverted_[axis] ? log10(max_[axis] / min_[axis]) : log10(min_[axis])) * stretch_[axis]);
+			coordMax_[axis].set(axis, (inverted_[axis] ? log10(max_[axis] / max_[axis]) : log10(max_[axis])) * stretch_[axis]);
+		}
+		else
+		{
+			coordMin_[axis].set(axis, (inverted_[axis] ? max_[axis] : min_[axis]) * stretch_[axis]);
+			coordMax_[axis].set(axis, (inverted_[axis] ? min_[axis] : max_[axis]) * stretch_[axis]);
+		}
 	}
 
 	// Construct axes
@@ -737,10 +783,6 @@ void Axes::updateAxisPrimitives()
 
 		if (logarithmic_[axis])
 		{
-			// Set axis min/max coordinates
-			coordMin_[axis].set(axis, (inverted_[axis] ? log10(max_[axis] / min_[axis]) : log10(min_[axis])) * stretch_[axis]);
-			coordMax_[axis].set(axis, (inverted_[axis] ? log10(max_[axis] / max_[axis]) : log10(max_[axis])) * stretch_[axis]);
-
 			// For the log axis, the associated surface data coordinate will already be in log form
 			if (max_[axis] < 0.0)
 			{
@@ -749,7 +791,7 @@ void Axes::updateAxisPrimitives()
 			}
 
 			// Draw a line from min to max range, passing through the defined position
-			addAxisPrimitiveLine(axis, coordMin_[axis], coordMax_[axis]);
+			axisPrimitives_[axis].line(coordMin_[axis], coordMax_[axis]);
 
 			// Grab logged min/max values for convenience, enforcing sensible minimum
 			double min = log10(min_[axis] <= 0.0 ? 1.0e-10 : min_[axis]);
@@ -761,17 +803,19 @@ void Axes::updateAxisPrimitives()
 			double power = floor(min);
 			double value = pow(10,power);
 			Vec3<double> u = coordMin_[axis];
-			while (true)
+			while (value <= max_[axis])
 			{
 				// Check break condition
-				if (value > max_[axis]) break;
+// 				if (value > max_[axis]) break;
 
 				// If the current value is in range, plot a tick
 				u[axis] = (inverted_[axis] ? log10(max_[axis]/value): log10(value)) * stretch_[axis];
 				if (log10(value) >= min)
 				{
 					// Tick mark
-					addAxisPrimitiveLine(axis, u, u+tickDir*tickSize_[axis]*(count == 0 ? 1.0 : 0.5));
+					axisPrimitives_[axis].line(u, u+tickDir*tickSize_[axis]*(count == 0 ? 1.0 : 0.5));
+					tickPositions[axis].add(u[axis]);
+					tickIsMajor[axis].add(count == 0);
 
 					// Tick label
 					if (count == 0)
@@ -804,20 +848,16 @@ void Axes::updateAxisPrimitives()
 		}
 		else
 		{
-			// Set axis min/max coordinates
-			coordMin_[axis].set(axis, (inverted_[axis] ? max_[axis] : min_[axis]) * stretch_[axis]);
-			coordMax_[axis].set(axis, (inverted_[axis] ? min_[axis] : max_[axis]) * stretch_[axis]);
-		
 			// Calculate autoticks if necessary
 			if (autoTicks_[axis]) calculateTickDeltas(axis);
 
 			// Draw a line from min to max limits, passing through the defined position
-			addAxisPrimitiveLine(axis, coordMin_[axis], coordMax_[axis]);
+			axisPrimitives_[axis].line(coordMin_[axis], coordMax_[axis]);
 
 			// Check tickDelta
 			if (((max_[axis]-min_[axis]) / tickDelta_[axis]) > 1e6) return;
 
-			// Plot tickmarks - maximum of 100 minor tickmarks between major lines
+			// Plot tickmarks
 			int count = 0;
 			delta = tickDelta_[axis] / (minorTicks_[axis]+1);
 			value = tickFirst_[axis];
@@ -828,19 +868,27 @@ void Axes::updateAxisPrimitives()
 				// Draw tick here, only if value >= min_
 				if (value >= min_[axis])
 				{
+					tickPositions[axis].add(u[axis]);
+
 					if (count %(minorTicks_[axis]+1) == 0)
 					{
-						addAxisPrimitiveLine(axis, u, u + tickDir*tickSize_[axis]);
+						axisPrimitives_[axis].line(u, u + tickDir*tickSize_[axis]);
 						
 						// Get formatted label text, acounting for roundoff error
 						if (fabs(value) < tickDelta_[axis]*1.0e-10) s = "0";
 						else s = QString::number(value);
 
 						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor_[axis], tickDir * (tickSize_[axis] + labelOrientation_[axis].z), labelTransform, parent_.labelPointSize());
-						
+
+						tickIsMajor[axis].add(true);
+
 						count = 0;
 					}
-					else addAxisPrimitiveLine(axis, u, u + tickDir*tickSize_[axis]*0.5);
+					else
+					{
+						axisPrimitives_[axis].line(u, u + tickDir*tickSize_[axis]*0.5);
+						tickIsMajor[axis].add(false);
+					}
 				}
 				u.add(axis, delta * (inverted_[axis] ? -stretch_[axis] : stretch_[axis]));
 				value += delta;
@@ -855,9 +903,41 @@ void Axes::updateAxisPrimitives()
 		}
 	}
 
+	// GridLines
+	int i, j, k;
+	int maxVertices = tickPositions[0].nItems() * tickPositions[1].nItems() * tickPositions[2].nItems();
+	for (i=0; i<3; ++i)
+	{
+		minorGridLinePrimitives_[0].initialise(maxVertices*2, 0, GL_LINES, false);
+		minorGridLinePrimitives_[0].forgetAll();
+		majorGridLinePrimitives_[0].initialise(maxVertices*2, 0, GL_LINES, false);
+		majorGridLinePrimitives_[0].forgetAll();
+	}
+
+	for (int i = 0; i<tickPositions[0].nItems(); ++i)
+	{
+		for (int j = 0; j<tickPositions[1].nItems(); ++j)
+		{
+			for (int k = 0; k<tickPositions[2].nItems(); ++k)
+			{
+				// YZ Plane
+// 				if (tickIsMajor[0][i]) majorGridLinePrimitives_[0].line(coordMin_[0].x, tickPositions[1][j], tickPositions[2][k], coordMax_[0].x, tickPositions[1][j], tickPositions[2][k]);
+// 				else minorGridLinePrimitives_[0].line(coordMin_[0].x, tickPositions[1][j], tickPositions[2][k], coordMax_[0].x, tickPositions[1][j], tickPositions[2][k]);
+
+				// XY Plane
+// 				if (tickIsMajor[1][j]) majorGridLinePrimitives_[1].line(tickPositions[0][i], coordMin_[1].y, tickPositions[2][k], tickPositions[0][i], coordMax_[1].y, tickPositions[2][k]);
+// 				else minorGridLinePrimitives_[1].line(tickPositions[0][i], coordMin_[1].y, tickPositions[2][k], tickPositions[0][i], coordMax_[1].y, tickPositions[2][k]);
+
+				// XZ Plane
+// 				if (tickIsMajor[2][k]) majorGridLinePrimitives_[2].line(tickPositions[0][i], tickPositions[1][j], coordMin_[2].z, tickPositions[0][i], tickPositions[1][j], coordMax_[2].z);
+// 				else minorGridLinePrimitives_[2].line(tickPositions[0][i], tickPositions[1][j], coordMin_[2].z, tickPositions[0][i], tickPositions[1][j], coordMax_[2].z);
+			}
+		}
+	}
+	
 	primitivesValid_ = true;
 
-	// The axes have changed, so all associated collection data also neds to be regenerated
+	// The axes have changed, so all associated collection data also needs to be regenerated
 	parent_.flagCollectionDataInvalid();
 }
 
@@ -907,11 +987,32 @@ TextPrimitiveList& Axes::titlePrimitive(int axis)
 	return titlePrimitives_[axis];
 }
 
-// Return gridline primitive for axis specified
-Primitive& Axes::gridLinePrimitive(int axis)
+// Return minor gridline primitive for axis specified
+Primitive& Axes::minorGridLinePrimitive(int axis)
 {
 	// Make sure primitives are up to date first...
 	updateAxisPrimitives();
 
-	return gridLinePrimitives_[axis];
+	return minorGridLinePrimitives_[axis];
+}
+
+// Return major gridline primitive for axis specified
+Primitive& Axes::majorGridLinePrimitive(int axis)
+{
+	// Make sure primitives are up to date first...
+	updateAxisPrimitives();
+
+	return majorGridLinePrimitives_[axis];
+}
+
+// Return major GridLine style
+LineStyle Axes::majorGridLineStyle()
+{
+	return majorGridLineStyle_;
+}
+
+// Return minor GridLine style
+LineStyle Axes::minorGridLineStyle()
+{
+	return minorGridLineStyle_;
 }

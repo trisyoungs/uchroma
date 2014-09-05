@@ -1,5 +1,5 @@
 /*
-	*** ViewLayout
+	*** View Layout
 	*** src/base/viewlayout.h
 	Copyright T. Youngs 2013-2014
 
@@ -136,7 +136,7 @@ class ViewLayout : public ListItem<ViewLayout>
 	 */
 	public:
 	// Process supplied Collection changed/update signal
-	   bool processUpdate(Collection* source, Collection::CollectionSignal signal);
+	bool processUpdate(Collection* source, Collection::CollectionSignal signal);
 };
 
 #endif

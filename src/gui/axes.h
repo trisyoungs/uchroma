@@ -83,6 +83,7 @@ class AxesWindow : public QWidget
 	bool axisTitleChanged(int axis, QString& title);
 	bool axisTitleOrientationChanged(int axis, int component, double value);
 	bool axisAnchorChanged(int axis, bool titleAnchor, TextPrimitive::TextAnchor anchor);
+	bool axisGridLineChanged(int axis, bool major, bool on);
 
 
 	/*
@@ -90,6 +91,7 @@ class AxesWindow : public QWidget
 	 */
 	private slots:
 	// -- X Axis Tab
+	// -- -- General
 	void on_AxisXInvertCheck_clicked(bool checked);
 	void on_AxisXLogarithmicCheck_clicked(bool checked);
 	void on_AxisXVisibleCheck_clicked(bool checked);
@@ -111,6 +113,7 @@ class AxesWindow : public QWidget
 	void on_AxisXPositionZSetMinimumButton_clicked(bool checked);
 	void on_AxisXPositionZSetZeroButton_clicked(bool checked);
 	void on_AxisXPositionZSetMaximumButton_clicked(bool checked);
+	// -- -- Ticks
 	void on_AxisXAutoTicksCheck_clicked(bool checked);
 	void on_AxisXTicksStartSpin_valueChanged(double value);
 	void on_AxisXTicksDeltaSpin_valueChanged(double value);
@@ -119,6 +122,7 @@ class AxesWindow : public QWidget
 	void on_AxisXTickDirectionYSpin_valueChanged(double value);
 	void on_AxisXTickDirectionZSpin_valueChanged(double value);
 	void on_AxisXTickSizeSpin_valueChanged(double value);
+	// -- -- Labels
 	void on_AxisXLabelAnchorCombo_currentIndexChanged(int index);
 	void on_AxisXLabelAxialRotationSlider_valueChanged(int value);
 	void on_AxisXLabelAxialRotationSpin_valueChanged(int value);
@@ -135,6 +139,9 @@ class AxesWindow : public QWidget
 	void on_AxisXTitleInPlaneRotationSlider_valueChanged(int value);
 	void on_AxisXTitleInPlaneRotationSpin_valueChanged(int value);
 	void on_AxisXTitleDistanceSpin_valueChanged(double value);
+	// -- -- GridLines
+	void on_AxisXGridLineMajorCheck_clicked(bool checked);
+	void on_AxisXGridLineMinorCheck_clicked(bool checked);
 	// -- Y Axis Tab
 	void on_AxisYInvertCheck_clicked(bool checked);
 	void on_AxisYLogarithmicCheck_clicked(bool checked);

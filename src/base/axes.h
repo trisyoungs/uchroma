@@ -24,6 +24,7 @@
 
 #include "render/primitive.h"
 #include "render/textprimitive.h"
+#include "render/linestyle.h"
 #include "templates/vector3.h"
 #include "templates/vector4.h"
 #include <QtCore/QString>
@@ -234,9 +235,20 @@ class Axes
 	 * GridLines
 	 */
 	private:
-	// Whether gridLines are active
-	Vec3<bool> gridLinesEnabled_;
+	// Whether gridLines at major tick intervals are active
+	Vec3<bool> gridLinesMajor_;
+	// Whether gridLines at minor tick intervals are active
+	Vec3<bool> gridLinesMinor_;
 
+	public:
+	// Set whether gridLines at major tick intervals are active for specified axis
+	void setGridLinesMajor(int axis, bool on);
+	// Return whether gridLines at major tick intervals are active for specified axis
+	bool gridLinesMajor(int axis);
+	// Set whether gridLines at minor tick intervals are active for specified axis
+	void setGridLinesMinor(int axis, bool on);
+	// Return whether gridLines at minor tick intervals are active for specified axis
+	bool gridLinesMinor(int axis);
 
 
 	/*
@@ -251,14 +263,14 @@ class Axes
 	TextPrimitiveList labelPrimitives_[3];
 	// Axis title primitives
 	TextPrimitiveList titlePrimitives_[3];
-	// Gridline primitives
-	Primitive gridLinePrimitives_[3];
+	// GridLine primitives
+	Primitive majorGridLinePrimitives_[3], minorGridLinePrimitives_[3];
+	// GridLine styles
+	LineStyle majorGridLineStyle_, minorGridLineStyle_;
 	// Whether axis primitives are valid
 	bool primitivesValid_;
 
 	private:
-	// Add line to axis primitive
-	void addAxisPrimitiveLine(int axis, Vec3<double> v1, Vec3<double> v2);
 	// Update primitives for axis
 	void updateAxisPrimitives();
 
@@ -275,8 +287,14 @@ class Axes
 	TextPrimitiveList& labelPrimitive(int axis);
 	// Return axis title primitive list for axis specified
 	TextPrimitiveList& titlePrimitive(int axis);
-	// Return gridline primitive for axis specified
-	Primitive& gridLinePrimitive(int axis);
+	// Return minor gridline primitive for axis specified
+	Primitive& minorGridLinePrimitive(int axis);
+	// Return major gridline primitive for axis specified
+	Primitive& majorGridLinePrimitive(int axis);
+	// Return major GridLine style
+	LineStyle majorGridLineStyle();
+	// Return minor GridLine style
+	LineStyle minorGridLineStyle();
 };
 
 #endif

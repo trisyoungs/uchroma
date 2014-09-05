@@ -1,5 +1,5 @@
 /*
-	*** ViewLayout
+	*** View Layout
 	*** src/base/viewlayout.cpp
 	Copyright T. Youngs 2013-2014
 

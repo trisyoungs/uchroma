@@ -369,11 +369,24 @@ bool AxesWindow::axisAnchorChanged(int axis, bool titleAnchor, TextPrimitive::Te
 	return true;
 }
 
+bool AxesWindow::axisGridLineChanged(int axis, bool major, bool on)
+{
+	if (refreshing_ || (!haveCurrentAxes())) return false;
+
+	if (major) currentAxes().setGridLinesMajor(axis, on);
+	else currentAxes().setGridLinesMinor(axis, on);
+
+	// Update relevant parts of gui
+	uChroma_.updateDisplay();
+
+	return true;
+}
+
 /*
  * Slots
  */
 
-// X Axis
+// X Axis - General
 
 void AxesWindow::on_AxisXInvertCheck_clicked(bool checked)
 {
@@ -480,6 +493,8 @@ void AxesWindow::on_AxisXPositionZSetMaximumButton_clicked(bool checked)
 	axisPositionSet(ui.AxisXPositionRealRadio->isChecked(), 0, 2, 1);
 }
 
+// X Axis - Ticks
+
 void AxesWindow::on_AxisXAutoTicksCheck_clicked(bool checked)
 {
 	axisAutoTicksChanged(0, checked);
@@ -519,6 +534,8 @@ void AxesWindow::on_AxisXTickSizeSpin_valueChanged(double value)
 {
 	axisTickSizeChanged(0, value);
 }
+
+// X Axis - Labels
 
 void AxesWindow::on_AxisXLabelAnchorCombo_currentIndexChanged(int index)
 {
@@ -611,7 +628,19 @@ void AxesWindow::on_AxisXTitleDistanceSpin_valueChanged(double value)
 	axisTitleOrientationChanged(0, 2, value);
 }
 
-// Y Axis
+// X Axis - GridLines
+
+void AxesWindow::on_AxisXGridLineMajorCheck_clicked(bool checked)
+{
+	axisGridLineChanged(0, true, checked);
+}
+
+void AxesWindow::on_AxisXGridLineMinorCheck_clicked(bool checked)
+{
+	axisGridLineChanged(0, false, checked);
+}
+
+// Y Axis - General
 
 void AxesWindow::on_AxisYInvertCheck_clicked(bool checked)
 {

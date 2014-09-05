@@ -10,8 +10,9 @@ ${CMAKE_BINARY_DIR}/src/
 add_library(render
 fontinstance.cpp
 glextensions.cpp
+linestipple.cpp
+linestyle.cpp
 primitive.cpp
-primitive_vertex.cpp
 primitiveinfo.cpp
 primitiveinstance.cpp
 primitivelist.cpp
@@ -24,6 +25,8 @@ textprimitive.cpp
 vertexchunk.cpp
 fontinstance.h
 glextensions.h
+linestipple.h
+linestyle.h
 primitive.h
 primitiveinfo.h
 primitiveinstance.h

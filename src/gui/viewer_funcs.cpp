@@ -238,11 +238,16 @@ void Viewer::paintGL()
 			}
 		}
 
-		// -- Render axis lines
-		glEnable(GL_LINE_SMOOTH);
+		// -- Render axis (grid) lines
+
 		glLoadMatrixd(viewMatrix.matrix());
-		glLineWidth(lineWidth_);
 		glDisable(GL_LIGHTING);
+		glEnable(GL_LINE_SMOOTH);
+		pane->axes().minorGridLineStyle().apply();
+		for (int axis=0; axis<maxAxis; ++axis) if (pane->axes().visible(axis)) pane->axes().minorGridLinePrimitive(axis).sendToGL();
+		pane->axes().majorGridLineStyle().apply();
+		for (int axis=0; axis<maxAxis; ++axis) if (pane->axes().visible(axis)) pane->axes().majorGridLinePrimitive(axis).sendToGL();
+		LineStyle::revert();
 		for (int axis=0; axis<maxAxis; ++axis) if (pane->axes().visible(axis)) pane->axes().axisPrimitive(axis).sendToGL();
 		glEnable(GL_LIGHTING);
 		glDisable(GL_LINE_SMOOTH);

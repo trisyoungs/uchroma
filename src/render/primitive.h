@@ -100,6 +100,16 @@ class Primitive : public ListItem<Primitive>
 	bool defineIndices(GLuint a, GLuint b);
 	// Define next index triple
 	bool defineIndices(GLuint a, GLuint b, GLuint c);
+
+
+	/*
+	 * Geometric Primitive Generation
+	 */
+	public:
+	// Draw line
+	void line(double x1, double y1, double z1, double x2, double y2, double z2);
+	// Draw line
+	void line(Vec3<double> v1, Vec3<double> v2);
 };
 
 #endif
