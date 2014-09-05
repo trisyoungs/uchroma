@@ -21,6 +21,7 @@
 
 #include "gui/axes.h"
 #include "gui/uchroma.h"
+#include "gui/linestyledialog.h"
 #include "templates/reflist.h"
 #include <limits>
 
@@ -382,6 +383,53 @@ bool AxesWindow::axisGridLineChanged(int axis, bool major, bool on)
 	return true;
 }
 
+bool AxesWindow::axisGridFullChanged(int axis, bool full)
+{
+	if (refreshing_ || (!haveCurrentAxes())) return false;
+
+	currentAxes().setGridLinesFull(axis, full);
+
+	// Update relevant parts of gui
+	uChroma_.updateDisplay();
+
+	return true;
+}
+
+bool AxesWindow::axisGridStyleClicked(int axis, bool major)
+{
+	if (refreshing_ || (!haveCurrentAxes())) return false;
+
+	LineStyleDialog dialog(this);
+	bool success = dialog.call(major ? &currentAxes().gridLineMajorStyle(axis) : &currentAxes().gridLineMinorStyle(axis));
+
+	// Update relevant parts of gui
+	if (success)
+	{
+		currentAxes().setPrimitivesInvalid();
+		uChroma_.updateDisplay();
+	}
+
+	return success;
+}
+
+bool AxesWindow::axisGridStyleApplyClicked(int axis)
+{
+	if (refreshing_ || (!haveCurrentAxes())) return false;
+
+	for (int n=0; n<3; ++n)
+	{
+		if (n == axis) continue;
+		currentAxes().gridLineMajorStyle(n) = currentAxes().gridLineMajorStyle(axis);
+		currentAxes().gridLineMinorStyle(n) = currentAxes().gridLineMinorStyle(axis);
+	}
+
+	// Update relevant parts of gui
+	currentAxes().setPrimitivesInvalid();
+	uChroma_.updateDisplay();
+
+	return true;
+}
+
 /*
  * Slots
  */
@@ -640,6 +688,26 @@ void AxesWindow::on_AxisXGridLineMinorCheck_clicked(bool checked)
 	axisGridLineChanged(0, false, checked);
 }
 
+void AxesWindow::on_AxisXGridLineFullCheck_clicked(bool checked)
+{
+	axisGridFullChanged(0, checked);
+}
+
+void AxesWindow::on_AxisXGridLineMajorStyleButton_clicked(bool checked)
+{
+	axisGridStyleClicked(0, true);
+}
+
+void AxesWindow::on_AxisXGridLineMinorStyleButton_clicked(bool checked)
+{
+	axisGridStyleClicked(0, false);
+}
+
+void AxesWindow::on_AxisXGridLineApplyStyleButton_clicked(bool checked)
+{
+	axisGridStyleApplyClicked(0);
+}
+
 // Y Axis - General
 
 void AxesWindow::on_AxisYInvertCheck_clicked(bool checked)
@@ -747,6 +815,8 @@ void AxesWindow::on_AxisYPositionZSetMaximumButton_clicked(bool checked)
 	axisPositionSet(ui.AxisYPositionRealRadio->isChecked(), 1, 2, 1);
 }
 
+// Y Axis - Ticks
+
 void AxesWindow::on_AxisYAutoTicksCheck_clicked(bool checked)
 {
 	axisAutoTicksChanged(1, checked);
@@ -786,6 +856,8 @@ void AxesWindow::on_AxisYTickSizeSpin_valueChanged(double value)
 {
 	axisTickSizeChanged(1, value);
 }
+
+// Y Axis - Labels
 
 void AxesWindow::on_AxisYLabelAnchorCombo_currentIndexChanged(int index)
 {
@@ -878,7 +950,39 @@ void AxesWindow::on_AxisYTitleDistanceSpin_valueChanged(double value)
 	axisTitleOrientationChanged(1, 2, value);
 }
 
-// Z Axis
+// Y Axis - Grid
+
+void AxesWindow::on_AxisYGridLineMajorCheck_clicked(bool checked)
+{
+	axisGridLineChanged(1, true, checked);
+}
+
+void AxesWindow::on_AxisYGridLineMinorCheck_clicked(bool checked)
+{
+	axisGridLineChanged(1, false, checked);
+}
+
+void AxesWindow::on_AxisYGridLineFullCheck_clicked(bool checked)
+{
+	axisGridFullChanged(0, checked);
+}
+
+void AxesWindow::on_AxisYGridLineMajorStyleButton_clicked(bool checked)
+{
+	axisGridStyleClicked(1, true);
+}
+
+void AxesWindow::on_AxisYGridLineMinorStyleButton_clicked(bool checked)
+{
+	axisGridStyleClicked(1, false);
+}
+
+void AxesWindow::on_AxisYGridLineApplyStyleButton_clicked(bool checked)
+{
+	axisGridStyleApplyClicked(1);
+}
+
+// Z Axis - General
 
 void AxesWindow::on_AxisZInvertCheck_clicked(bool checked)
 {
@@ -985,6 +1089,8 @@ void AxesWindow::on_AxisZPositionYSetMaximumButton_clicked(bool checked)
 	axisPositionSet(ui.AxisZPositionRealRadio->isChecked(), 2, 1, 1);
 }
 
+// Z Axis - Ticks
+
 void AxesWindow::on_AxisZAutoTicksCheck_clicked(bool checked)
 {
 	axisAutoTicksChanged(2, checked);
@@ -1024,6 +1130,8 @@ void AxesWindow::on_AxisZTickSizeSpin_valueChanged(double value)
 {
 	axisTickSizeChanged(2, value);
 }
+
+// Z Axis - Labels
 
 void AxesWindow::on_AxisZLabelAnchorCombo_currentIndexChanged(int index)
 {
@@ -1114,6 +1222,38 @@ void AxesWindow::on_AxisZTitleInPlaneRotationSpin_valueChanged(int value)
 void AxesWindow::on_AxisZTitleDistanceSpin_valueChanged(double value)
 {
 	axisTitleOrientationChanged(2, 2, value);
+}
+
+// Z Axis - Grid
+
+void AxesWindow::on_AxisZGridLineMajorCheck_clicked(bool checked)
+{
+	axisGridLineChanged(2, true, checked);
+}
+
+void AxesWindow::on_AxisZGridLineMinorCheck_clicked(bool checked)
+{
+	axisGridLineChanged(2, false, checked);
+}
+
+void AxesWindow::on_AxisZGridLineFullCheck_clicked(bool checked)
+{
+	axisGridFullChanged(2, checked);
+}
+
+void AxesWindow::on_AxisZGridLineMajorStyleButton_clicked(bool checked)
+{
+	axisGridStyleClicked(2, true);
+}
+
+void AxesWindow::on_AxisZGridLineMinorStyleButton_clicked(bool checked)
+{
+	axisGridStyleClicked(2, false);
+}
+
+void AxesWindow::on_AxisZGridLineApplyStyleButton_clicked(bool checked)
+{
+	axisGridStyleApplyClicked(2);
 }
 
 /*
@@ -1304,6 +1444,20 @@ void AxesWindow::updateControls(bool force)
 	ui.AxisZTitleInPlaneRotationSlider->setValue(axes.titleOrientation(2).y);
 	ui.AxisZTitleInPlaneRotationSpin->setValue(axes.titleOrientation(2).y);
 	ui.AxisZTitleDistanceSpin->setValue(axes.titleOrientation(2).z);
+
+	// Grid
+	// -- X
+	ui.AxisXGridLineMajorCheck->setChecked(axes.gridLinesMajor(0));
+	ui.AxisXGridLineMinorCheck->setChecked(axes.gridLinesMinor(0));
+	ui.AxisXGridLineFullCheck->setChecked(axes.gridLinesFull(0));
+	// -- Y
+	ui.AxisYGridLineMajorCheck->setChecked(axes.gridLinesMajor(1));
+	ui.AxisYGridLineMinorCheck->setChecked(axes.gridLinesMinor(1));
+	ui.AxisYGridLineFullCheck->setChecked(axes.gridLinesFull(1));
+	// -- Z
+	ui.AxisZGridLineMajorCheck->setChecked(axes.gridLinesMajor(2));
+	ui.AxisZGridLineMinorCheck->setChecked(axes.gridLinesMinor(2));
+	ui.AxisZGridLineFullCheck->setChecked(axes.gridLinesFull(2));
 
 	refreshing_ = false;
 }

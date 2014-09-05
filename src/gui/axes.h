@@ -84,6 +84,9 @@ class AxesWindow : public QWidget
 	bool axisTitleOrientationChanged(int axis, int component, double value);
 	bool axisAnchorChanged(int axis, bool titleAnchor, TextPrimitive::TextAnchor anchor);
 	bool axisGridLineChanged(int axis, bool major, bool on);
+	bool axisGridFullChanged(int axis, bool full);
+	bool axisGridStyleClicked(int axis, bool major);
+	bool axisGridStyleApplyClicked(int axis);
 
 
 	/*
@@ -142,7 +145,12 @@ class AxesWindow : public QWidget
 	// -- -- GridLines
 	void on_AxisXGridLineMajorCheck_clicked(bool checked);
 	void on_AxisXGridLineMinorCheck_clicked(bool checked);
+	void on_AxisXGridLineFullCheck_clicked(bool checked);
+	void on_AxisXGridLineMajorStyleButton_clicked(bool checked);
+	void on_AxisXGridLineMinorStyleButton_clicked(bool checked);
+	void on_AxisXGridLineApplyStyleButton_clicked(bool checked);
 	// -- Y Axis Tab
+	// -- -- General
 	void on_AxisYInvertCheck_clicked(bool checked);
 	void on_AxisYLogarithmicCheck_clicked(bool checked);
 	void on_AxisYVisibleCheck_clicked(bool checked);
@@ -164,6 +172,7 @@ class AxesWindow : public QWidget
 	void on_AxisYPositionZSetMinimumButton_clicked(bool checked);
 	void on_AxisYPositionZSetZeroButton_clicked(bool checked);
 	void on_AxisYPositionZSetMaximumButton_clicked(bool checked);
+	// -- -- Ticks
 	void on_AxisYAutoTicksCheck_clicked(bool checked);
 	void on_AxisYTicksStartSpin_valueChanged(double value);
 	void on_AxisYTicksDeltaSpin_valueChanged(double value);
@@ -172,6 +181,7 @@ class AxesWindow : public QWidget
 	void on_AxisYTickDirectionYSpin_valueChanged(double value);
 	void on_AxisYTickDirectionZSpin_valueChanged(double value);
 	void on_AxisYTickSizeSpin_valueChanged(double value);
+	// -- -- Labels
 	void on_AxisYLabelAnchorCombo_currentIndexChanged(int index);
 	void on_AxisYLabelAxialRotationSlider_valueChanged(int value);
 	void on_AxisYLabelAxialRotationSpin_valueChanged(int value);
@@ -188,7 +198,15 @@ class AxesWindow : public QWidget
 	void on_AxisYTitleInPlaneRotationSlider_valueChanged(int value);
 	void on_AxisYTitleInPlaneRotationSpin_valueChanged(int value);
 	void on_AxisYTitleDistanceSpin_valueChanged(double value);
+	// -- -- Grid
+	void on_AxisYGridLineMajorCheck_clicked(bool checked);
+	void on_AxisYGridLineMinorCheck_clicked(bool checked);
+	void on_AxisYGridLineFullCheck_clicked(bool checked);
+	void on_AxisYGridLineMajorStyleButton_clicked(bool checked);
+	void on_AxisYGridLineMinorStyleButton_clicked(bool checked);
+	void on_AxisYGridLineApplyStyleButton_clicked(bool checked);
 	// -- Z Axis Tab
+	// -- -- General
 	void on_AxisZInvertCheck_clicked(bool checked);
 	void on_AxisZLogarithmicCheck_clicked(bool checked);
 	void on_AxisZVisibleCheck_clicked(bool checked);
@@ -210,6 +228,7 @@ class AxesWindow : public QWidget
 	void on_AxisZPositionYSetMinimumButton_clicked(bool checked);
 	void on_AxisZPositionYSetZeroButton_clicked(bool checked);
 	void on_AxisZPositionYSetMaximumButton_clicked(bool checked);
+	// -- -- Ticks
 	void on_AxisZAutoTicksCheck_clicked(bool checked);
 	void on_AxisZTicksStartSpin_valueChanged(double value);
 	void on_AxisZTicksDeltaSpin_valueChanged(double value);
@@ -218,6 +237,7 @@ class AxesWindow : public QWidget
 	void on_AxisZTickDirectionYSpin_valueChanged(double value);
 	void on_AxisZTickDirectionZSpin_valueChanged(double value);
 	void on_AxisZTickSizeSpin_valueChanged(double value);
+	// -- -- Labels
 	void on_AxisZLabelAnchorCombo_currentIndexChanged(int index);
 	void on_AxisZLabelAxialRotationSlider_valueChanged(int value);
 	void on_AxisZLabelAxialRotationSpin_valueChanged(int value);
@@ -234,6 +254,13 @@ class AxesWindow : public QWidget
 	void on_AxisZTitleInPlaneRotationSlider_valueChanged(int value);
 	void on_AxisZTitleInPlaneRotationSpin_valueChanged(int value);
 	void on_AxisZTitleDistanceSpin_valueChanged(double value);
+	// -- -- Grid
+	void on_AxisZGridLineMajorCheck_clicked(bool checked);
+	void on_AxisZGridLineMinorCheck_clicked(bool checked);
+	void on_AxisZGridLineFullCheck_clicked(bool checked);
+	void on_AxisZGridLineMajorStyleButton_clicked(bool checked);
+	void on_AxisZGridLineMinorStyleButton_clicked(bool checked);
+	void on_AxisZGridLineApplyStyleButton_clicked(bool checked);
 
 
 	/*

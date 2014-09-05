@@ -27,6 +27,7 @@ LineStyle::LineStyle()
 {
 	width_ = 1.0;
 	colour_.setRgb(0, 0, 0, 255);
+	stipple_ = LineStipple::NoStipple;
 }
 
 // Destructor
@@ -56,7 +57,7 @@ void LineStyle::operator=(const LineStyle& source)
 void LineStyle::set(double width, LineStipple::StippleType stipple, QColor colour)
 {
 	width_ = width;
-	stipple_ = LineStipple::stipple[stipple];
+	stipple_ = stipple;
 	colour_ = colour;
 }
 
@@ -64,7 +65,7 @@ void LineStyle::set(double width, LineStipple::StippleType stipple, QColor colou
 void LineStyle::set(double width, LineStipple::StippleType stipple, double r, double g, double b, double a)
 {
 	width_ = width;
-	stipple_ = LineStipple::stipple[stipple];
+	stipple_ = stipple;
 	colour_.setRgbF(r, g, b, a);
 }
 
@@ -80,8 +81,14 @@ double LineStyle::width()
 	return width_;
 }
 
+// Set line stipple
+void LineStyle::setStipple(LineStipple::StippleType stipple)
+{
+	stipple_ = stipple;
+}
+
 // Return line stipple
-LineStipple LineStyle::stipple()
+LineStipple::StippleType LineStyle::stipple()
 {
 	return stipple_;
 }
@@ -113,7 +120,7 @@ void LineStyle::apply()
 {
 	// -- Render axis (grid) lines
 	glLineWidth(width_);
-	stipple_.apply();
+	LineStipple::stipple[stipple_].apply();
 	GLfloat c[4] = { colour_.redF(), colour_.greenF(), colour_.blueF(), colour_.alphaF() };
 	glColor4fv(c);
 }

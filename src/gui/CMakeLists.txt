@@ -11,39 +11,40 @@ ${CMAKE_BINARY_DIR}/src/
 
 # Source files (not Qt UI files or custom .h [uih])
 SET(qtproject_SRCS
-uchroma_collection.cpp
-uchroma_data.cpp
-uchroma_funcs.cpp
-uchroma_info.cpp
-uchroma_interaction.cpp
-uchroma_slots.cpp
-uchroma_view.cpp
-io_load.cpp
-io_save.cpp
-keywords.cpp
-axes_funcs.cpp
-colourbutton_funcs.cpp
-create_funcs.cpp
-data_funcs.cpp
-dataimport_funcs.cpp
-dataimport_seqxy.cpp
-equationselect_funcs.cpp
-fitsetup_funcs.cpp
-gradientbar_funcs.cpp
-layout_funcs.cpp
-log_funcs.cpp
-paneorganiser_funcs.cpp
-referencedialog_funcs.cpp
-saveimage_funcs.cpp
-style_funcs.cpp
-targetselect_funcs.cpp
-texponentialspin_funcs.cpp
-transform_funcs.cpp 
-view_funcs.cpp
-viewer_funcs.cpp
-viewer_input.cpp
-viewer_prefs.cpp
-viewer_user.cpp
+  uchroma_collection.cpp
+  uchroma_data.cpp
+  uchroma_funcs.cpp
+  uchroma_info.cpp
+  uchroma_interaction.cpp
+  uchroma_slots.cpp
+  uchroma_view.cpp
+  io_load.cpp
+  io_save.cpp
+  keywords.cpp
+  axes_funcs.cpp
+  colourbutton_funcs.cpp
+  create_funcs.cpp
+  data_funcs.cpp
+  dataimport_funcs.cpp
+  dataimport_seqxy.cpp
+  equationselect_funcs.cpp
+  fitsetup_funcs.cpp
+  gradientbar_funcs.cpp
+  layout_funcs.cpp
+  linestyledialog_funcs.cpp
+  log_funcs.cpp
+  paneorganiser_funcs.cpp
+  referencedialog_funcs.cpp
+  saveimage_funcs.cpp
+  style_funcs.cpp
+  targetselect_funcs.cpp
+  texponentialspin_funcs.cpp
+  transform_funcs.cpp 
+  view_funcs.cpp
+  viewer_funcs.cpp
+  viewer_input.cpp
+  viewer_prefs.cpp
+  viewer_user.cpp
 )
 
 SET(pro_MOC_HDRS
@@ -55,6 +56,7 @@ SET(pro_MOC_HDRS
   equationselect.h
   fitsetup.h
   layout.h
+  linestyledialog.h
   log.h
   referencedialog.h
   saveimage.h
@@ -78,6 +80,7 @@ SET(pro_UIS
   equationselect.ui
   fitsetup.ui
   layout.ui
+  linestyledialog.cpp
   log.ui
   referencedialog.ui
   saveimage.ui

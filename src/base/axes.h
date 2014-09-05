@@ -235,12 +235,18 @@ class Axes
 	 * GridLines
 	 */
 	private:
+	// Whether gridlines cover entire volume or just at axis lines
+	Vec3<bool> gridLinesFull_;
 	// Whether gridLines at major tick intervals are active
 	Vec3<bool> gridLinesMajor_;
 	// Whether gridLines at minor tick intervals are active
 	Vec3<bool> gridLinesMinor_;
 
 	public:
+	// Set whether gridlines cover entire volume or just at axis lines
+	void setGridLinesFull(int axis, bool b);
+	// Return whether gridlines cover entire volume or just at axis lines
+	bool gridLinesFull(int axis);
 	// Set whether gridLines at major tick intervals are active for specified axis
 	void setGridLinesMajor(int axis, bool on);
 	// Return whether gridLines at major tick intervals are active for specified axis
@@ -264,9 +270,9 @@ class Axes
 	// Axis title primitives
 	TextPrimitiveList titlePrimitives_[3];
 	// GridLine primitives
-	Primitive majorGridLinePrimitives_[3], minorGridLinePrimitives_[3];
+	Primitive gridLineMajorPrimitives_[3], gridLineMinorPrimitives_[3];
 	// GridLine styles
-	LineStyle majorGridLineStyle_, minorGridLineStyle_;
+	LineStyle gridLineMajorStyle_[3], gridLineMinorStyle_[3];
 	// Whether axis primitives are valid
 	bool primitivesValid_;
 
@@ -288,13 +294,13 @@ class Axes
 	// Return axis title primitive list for axis specified
 	TextPrimitiveList& titlePrimitive(int axis);
 	// Return minor gridline primitive for axis specified
-	Primitive& minorGridLinePrimitive(int axis);
+	Primitive& gridLineMajorPrimitive(int axis);
 	// Return major gridline primitive for axis specified
-	Primitive& majorGridLinePrimitive(int axis);
+	Primitive& gridLineMinorPrimitive(int axis);
 	// Return major GridLine style
-	LineStyle majorGridLineStyle();
+	LineStyle& gridLineMajorStyle(int axis);
 	// Return minor GridLine style
-	LineStyle minorGridLineStyle();
+	LineStyle& gridLineMinorStyle(int axis);
 };
 
 #endif

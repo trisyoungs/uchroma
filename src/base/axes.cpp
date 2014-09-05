@@ -86,16 +86,16 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	{
 		axisPrimitives_[n].initialise(1020, 0, GL_LINES, false);
 		axisPrimitives_[n].setNoInstances();
-		majorGridLinePrimitives_[n].initialise(1020, 0, GL_LINES, false);
-		majorGridLinePrimitives_[n].setNoInstances();
-		minorGridLinePrimitives_[n].initialise(1020, 0, GL_LINES, false);
-		minorGridLinePrimitives_[n].setNoInstances();
+		gridLineMajorPrimitives_[n].initialise(1020, 0, GL_LINES, false);
+		gridLineMajorPrimitives_[n].setNoInstances();
+		gridLineMinorPrimitives_[n].initialise(1020, 0, GL_LINES, false);
+		gridLineMinorPrimitives_[n].setNoInstances();
 	}
 	clipPlaneYMin_ = 0.0;
 	clipPlaneYMax_ = 0.0;
 	primitivesValid_ = false;
-	majorGridLineStyle_.set(0.5, LineStipple::NoStipple, 0.0, 0.0, 0.0, 1.0);
-	minorGridLineStyle_.set(0.5, LineStipple::DashStipple, 0.8, 0.8, 0.8, 1.0);
+	gridLineMajorStyle_[0].set(1.0, LineStipple::NoStipple, 0.0, 0.0, 0.0, 1.0);
+	gridLineMinorStyle_[0].set(0.5, LineStipple::DashStipple, 0.8, 0.8, 0.8, 1.0);
 }
 
 // Destructor
@@ -153,6 +153,17 @@ void Axes::operator=(const Axes& source)
 	titleAnchor_[0] = source.titleAnchor_[0];
 	titleAnchor_[1] = source.titleAnchor_[1];
 	titleAnchor_[2] = source.titleAnchor_[2];
+
+	// Grid
+	gridLinesFull_ = source.gridLinesFull_;
+	gridLinesMajor_ = source.gridLinesMajor_;
+	gridLinesMinor_ = source.gridLinesMinor_;
+	gridLineMajorStyle_[0] = source.gridLineMajorStyle_[0];
+	gridLineMinorStyle_[0] = source.gridLineMinorStyle_[0];
+	gridLineMajorStyle_[1] = source.gridLineMajorStyle_[1];
+	gridLineMinorStyle_[1] = source.gridLineMinorStyle_[1];
+	gridLineMajorStyle_[2] = source.gridLineMajorStyle_[2];
+	gridLineMinorStyle_[2] = source.gridLineMinorStyle_[2];
 
 	// GL
 	clipPlaneYMin_ = 0.0;
@@ -660,6 +671,21 @@ TextPrimitive::TextAnchor Axes::titleAnchor(int axis)
  * GridLines
  */
 
+// Set whether gridlines cover entire volume or just at axis lines
+void Axes::setGridLinesFull(int axis, bool b)
+{
+	gridLinesFull_[axis] = b;
+
+	primitivesValid_ = false;
+	parent_.paneChanged();
+}
+
+// Return whether gridlines cover entire volume or just at axis lines
+bool Axes::gridLinesFull(int axis)
+{
+	return gridLinesFull_[axis];
+}
+
 // Set whether gridLines at major tick intervals are active for specified axis
 void Axes::setGridLinesMajor(int axis, bool on)
 {
@@ -904,33 +930,81 @@ void Axes::updateAxisPrimitives()
 	}
 
 	// GridLines
-	int i, j, k;
-	int maxVertices = tickPositions[0].nItems() * tickPositions[1].nItems() * tickPositions[2].nItems();
-	for (i=0; i<3; ++i)
-	{
-		minorGridLinePrimitives_[0].initialise(maxVertices*2, 0, GL_LINES, false);
-		minorGridLinePrimitives_[0].forgetAll();
-		majorGridLinePrimitives_[0].initialise(maxVertices*2, 0, GL_LINES, false);
-		majorGridLinePrimitives_[0].forgetAll();
-	}
+	gridLineMinorPrimitives_[0].initialise(tickPositions[1].nItems()*tickPositions[2].nItems()*2, 0, GL_LINES, false);
+	gridLineMajorPrimitives_[0].initialise(tickPositions[1].nItems()*tickPositions[2].nItems()*2, 0, GL_LINES, false);
+	gridLineMinorPrimitives_[1].initialise(tickPositions[0].nItems()*tickPositions[2].nItems()*2, 0, GL_LINES, false);
+	gridLineMajorPrimitives_[1].initialise(tickPositions[0].nItems()*tickPositions[2].nItems()*2, 0, GL_LINES, false);
+	gridLineMinorPrimitives_[2].initialise(tickPositions[0].nItems()*tickPositions[1].nItems()*2, 0, GL_LINES, false);
+	gridLineMajorPrimitives_[2].initialise(tickPositions[0].nItems()*tickPositions[1].nItems()*2, 0, GL_LINES, false);
 
+	// -- XY plane, gridlines along Z, and XZ plane, gridlines along Y
 	for (int i = 0; i<tickPositions[0].nItems(); ++i)
 	{
-		for (int j = 0; j<tickPositions[1].nItems(); ++j)
+		if (gridLinesMajor_.z || gridLinesMinor_.z)
+		{
+			if (gridLinesFull_.z) for (int j = 0; j<tickPositions[1].nItems(); ++j)
+			{
+				if (tickIsMajor[0][i] && tickIsMajor[1][j])
+				{
+					if (gridLinesMajor_.z) gridLineMajorPrimitives_[2].line(tickPositions[0][i], tickPositions[1][j], coordMin_[2].z, tickPositions[0][i], tickPositions[1][j], coordMax_[2].z);
+				}
+				else if (gridLinesMinor_.z) gridLineMinorPrimitives_[2].line(tickPositions[0][i], tickPositions[1][j], coordMin_[2].z, tickPositions[0][i], tickPositions[1][j], coordMax_[2].z);
+			}
+			else
+			{
+			}
+		}
+
+		if (gridLinesMajor_.y || gridLinesMinor_.y) for (int k = 0; k<tickPositions[2].nItems(); ++k)
+		{
+			if (tickIsMajor[0][i] && tickIsMajor[2][k])
+			{
+				if (gridLinesMajor_.y) gridLineMajorPrimitives_[1].line(tickPositions[0][i], coordMin_[1].y, tickPositions[2][k], tickPositions[0][i], coordMax_[1].y, tickPositions[2][k]);
+			}
+			else if (gridLinesMinor_.y) gridLineMinorPrimitives_[1].line(tickPositions[0][i], coordMin_[1].y, tickPositions[2][k], tickPositions[0][i], coordMax_[1].y, tickPositions[2][k]);
+		}
+	}
+
+	// -- YZ plane, gridlines along X
+	if (gridLinesMajor_.x || gridLinesMinor_.x)
+	{
+		
+		if (gridLinesFull_.x) for (int j = 0; j<tickPositions[1].nItems(); ++j)
 		{
 			for (int k = 0; k<tickPositions[2].nItems(); ++k)
 			{
-				// YZ Plane
-// 				if (tickIsMajor[0][i]) majorGridLinePrimitives_[0].line(coordMin_[0].x, tickPositions[1][j], tickPositions[2][k], coordMax_[0].x, tickPositions[1][j], tickPositions[2][k]);
-// 				else minorGridLinePrimitives_[0].line(coordMin_[0].x, tickPositions[1][j], tickPositions[2][k], coordMax_[0].x, tickPositions[1][j], tickPositions[2][k]);
+				// Set basic vector info
+				v1.set(coordMin_[0].x, tickPositions[1][j], tickPositions[2][k]);
+				v2.set(coordMax_[0].x, tickPositions[1][j], tickPositions[2][k]);
 
-				// XY Plane
-// 				if (tickIsMajor[1][j]) majorGridLinePrimitives_[1].line(tickPositions[0][i], coordMin_[1].y, tickPositions[2][k], tickPositions[0][i], coordMax_[1].y, tickPositions[2][k]);
-// 				else minorGridLinePrimitives_[1].line(tickPositions[0][i], coordMin_[1].y, tickPositions[2][k], tickPositions[0][i], coordMax_[1].y, tickPositions[2][k]);
-
-				// XZ Plane
-// 				if (tickIsMajor[2][k]) majorGridLinePrimitives_[2].line(tickPositions[0][i], tickPositions[1][j], coordMin_[2].z, tickPositions[0][i], tickPositions[1][j], coordMax_[2].z);
-// 				else minorGridLinePrimitives_[2].line(tickPositions[0][i], tickPositions[1][j], coordMin_[2].z, tickPositions[0][i], tickPositions[1][j], coordMax_[2].z);
+				// If we are only drawing lines in the planes orthogonal to the axis, break if we have moved away from it...
+				if (gridLinesFull_.x)
+				{
+					if ((j != 0) && (k != 0)) break;
+					// Change z values of vectors...
+					v1.z = coordMin_[0].z;
+					v2.z = coordMin_[0].z;
+					// THERE IS AN ALGORITHM TO BE WRITTEN HERE!!!!
+				}
+				else 
+				if (tickIsMajor[1][j] && tickIsMajor[2][k])
+				{
+					if (gridLinesMajor_.x) gridLineMajorPrimitives_[0].line(coordMin_[0].x, tickPositions[1][j], tickPositions[2][k], coordMax_[0].x, tickPositions[1][j], tickPositions[2][k]);
+				}
+				else if (gridLinesMinor_.x) gridLineMinorPrimitives_[0].line(coordMin_[0].x, tickPositions[1][j], tickPositions[2][k], coordMax_[0].x, tickPositions[1][j], tickPositions[2][k]);
+			}
+		}
+		else
+		{
+			for (int j = 0; j<tickPositions[1].nItems(); ++j)
+			{
+				if (tickIsMajor[1][j] && gridLinesMajor_.x) gridLineMajorPrimitives_[0].line(coordMin_[0].x, tickPositions[1][j], coordMin_[0].z, coordMax_[0].x, tickPositions[1][j], coordMax_[0].z);
+				else if ((!tickIsMajor[1][j]) && gridLinesMinor_.x) gridLineMinorPrimitives_[0].line(coordMin_[0].x, tickPositions[1][j], coordMin_[1].z, coordMax_[0].x, tickPositions[1][j], coordMax_[1].z);
+			}
+			for (int k = 0; k<tickPositions[2].nItems(); ++k)
+			{
+				if (tickIsMajor[2][k] && gridLinesMajor_.x) gridLineMajorPrimitives_[0].line(coordMin_[0].x, coordMin_[0].y, tickPositions[2][k], coordMax_[0].x, coordMax_[0].y, tickPositions[2][k]);
+				else if ((!tickIsMajor[2][k]) && gridLinesMinor_.x) gridLineMinorPrimitives_[0].line(coordMin_[0].x, coordMin_[2].y, tickPositions[2][k], coordMax_[0].x, coordMax_[2].y, tickPositions[2][k]);
 			}
 		}
 	}
@@ -988,31 +1062,31 @@ TextPrimitiveList& Axes::titlePrimitive(int axis)
 }
 
 // Return minor gridline primitive for axis specified
-Primitive& Axes::minorGridLinePrimitive(int axis)
+Primitive& Axes::gridLineMinorPrimitive(int axis)
 {
 	// Make sure primitives are up to date first...
 	updateAxisPrimitives();
 
-	return minorGridLinePrimitives_[axis];
+	return gridLineMinorPrimitives_[axis];
 }
 
 // Return major gridline primitive for axis specified
-Primitive& Axes::majorGridLinePrimitive(int axis)
+Primitive& Axes::gridLineMajorPrimitive(int axis)
 {
 	// Make sure primitives are up to date first...
 	updateAxisPrimitives();
 
-	return majorGridLinePrimitives_[axis];
+	return gridLineMajorPrimitives_[axis];
 }
 
 // Return major GridLine style
-LineStyle Axes::majorGridLineStyle()
+LineStyle& Axes::gridLineMajorStyle(int axis)
 {
-	return majorGridLineStyle_;
+	return gridLineMajorStyle_[axis];
 }
 
 // Return minor GridLine style
-LineStyle Axes::minorGridLineStyle()
+LineStyle& Axes::gridLineMinorStyle(int axis)
 {
-	return minorGridLineStyle_;
+	return gridLineMinorStyle_[axis];
 }

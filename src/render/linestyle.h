@@ -48,7 +48,7 @@ class LineStyle
 	// Line width
 	double width_;
 	// Line stipple
-	LineStipple stipple_;
+	LineStipple::StippleType stipple_;
 	// Line colour
 	QColor colour_;
 
@@ -61,8 +61,10 @@ class LineStyle
 	void setWidth(double width);
 	// Return line width
 	double width();
+	// Set line stipple
+	void setStipple(LineStipple::StippleType stipple);
 	// Return line stipple
-	LineStipple stipple();
+	LineStipple::StippleType stipple();
 	// Set line colour
 	void setColour(QColor colour);
 	// Set line colour

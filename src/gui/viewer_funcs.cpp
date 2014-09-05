@@ -238,15 +238,20 @@ void Viewer::paintGL()
 			}
 		}
 
-		// -- Render axis (grid) lines
-
+		// -- Render axis (and grid) lines
 		glLoadMatrixd(viewMatrix.matrix());
 		glDisable(GL_LIGHTING);
 		glEnable(GL_LINE_SMOOTH);
-		pane->axes().minorGridLineStyle().apply();
-		for (int axis=0; axis<maxAxis; ++axis) if (pane->axes().visible(axis)) pane->axes().minorGridLinePrimitive(axis).sendToGL();
-		pane->axes().majorGridLineStyle().apply();
-		for (int axis=0; axis<maxAxis; ++axis) if (pane->axes().visible(axis)) pane->axes().majorGridLinePrimitive(axis).sendToGL();
+		for (int axis=0; axis<maxAxis; ++axis) if (pane->axes().visible(axis))
+		{
+			pane->axes().gridLineMinorStyle(axis).apply();
+			pane->axes().gridLineMinorPrimitive(axis).sendToGL();
+		}
+		for (int axis=0; axis<maxAxis; ++axis) if (pane->axes().visible(axis))
+		{
+			pane->axes().gridLineMajorStyle(axis).apply();
+			pane->axes().gridLineMajorPrimitive(axis).sendToGL();
+		}
 		LineStyle::revert();
 		for (int axis=0; axis<maxAxis; ++axis) if (pane->axes().visible(axis)) pane->axes().axisPrimitive(axis).sendToGL();
 		glEnable(GL_LIGHTING);
