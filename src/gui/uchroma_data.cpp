@@ -34,6 +34,7 @@ Collection* UChromaWindow::addCollection(QString name)
 	currentCollection_->displayPrimitives().setViewer(ui.MainView);
 
 	// Set the title
+	// TODO Generate unique collection name here...
 	if (name.isEmpty()) currentCollection_->setName("Empty Collection " + QString::number(collectionCount++));
 	else currentCollection_->setName(name);
 
@@ -120,7 +121,8 @@ Collection* UChromaWindow::findCollection(QString name)
 	// Loop over main collections
 	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
 	{
-		if (collection->findCollection(name)) return collection;
+		Collection* foundCollection = collection->findCollection(name);
+		if (foundCollection) return foundCollection;
 	}
 	return NULL;
 }

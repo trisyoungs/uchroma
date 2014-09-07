@@ -327,6 +327,7 @@ double DataSpaceRange::sosError()
 void DataSpaceRange::copyCalculatedValues(Collection* target)
 {
 	DataSet* newDataSet;
+	printf("NDataSpaceData to copy = %i\n", values_.nItems());
 	for (DataSpaceData* values = values_.first(); values != NULL; values = values->next)
 	{
 		newDataSet = target->addDataSet();

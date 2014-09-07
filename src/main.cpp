@@ -43,9 +43,6 @@ int main(int argc, char *argv[])
 	/* Create the main window */
 	UChromaWindow mainWindow;
 
-	/* Direct Messenger to the LogWindow */
-	msg.setTextBrowser(mainWindow.logWindowBrowser());
-
 	/* Do we have CLI options? */
 	if (argc > 1)
 	{
@@ -95,6 +92,9 @@ int main(int argc, char *argv[])
 			++n;
 		}
 	}
+
+	/* Direct Messenger to the LogWindow */
+	msg.setTextBrowser(mainWindow.logWindowBrowser());
 
 	/* Update main window */
 	mainWindow.updateGUI();

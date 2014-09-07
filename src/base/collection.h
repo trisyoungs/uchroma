@@ -281,13 +281,13 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	// Convert text string to ColourSource
 	static ColourSource colourSource(const char* s);
 	// Convert ColourSource to text string
-	static const char* colourSource(ColourSource kwd);
+	static const char* colourSource(Collection::ColourSource cs);
 	// Alpha control options
 	enum AlphaControl { OwnAlpha, FixedAlpha, nAlphaControls };
 	// Convert text string to AlphaControl
 	static AlphaControl alphaControl(const char* s);
 	// Convert AlphaControl to text string
-	static const char* alphaControl(AlphaControl kwd);
+	static const char* alphaControl(Collection::AlphaControl as);
 
 	private:
 	// Current colourscale source to use

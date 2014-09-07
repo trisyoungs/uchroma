@@ -31,6 +31,7 @@
 bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 {
 	TextPrimitive::TextAnchor anchor;
+	LineStipple::StippleType stipple;
 	while (!parser.eofOrBlank())
 	{
 		// Get line from file
@@ -60,6 +61,38 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 			// Fractional positioning flag
 			case (Keywords::FractionalPositioningKeyword):
 				axes.setPositionIsFractional(axis, parser.argb(1));
+				break;
+			// GridLines
+			case (Keywords::GridLinesKeyword):
+				axes.setGridLinesMajor(axis, parser.argb(1));
+				axes.setGridLinesMinor(axis, parser.argb(2));
+				axes.setGridLinesFull(axis, parser.argb(3));
+				break;
+			// GridLine major style
+			case (Keywords::GridLineMajorStyleKeyword):
+				axes.gridLineMajorStyle(axis).setWidth(parser.argd(1));
+				stipple = LineStipple::stippleType(parser.argc(2));
+				if (stipple == LineStipple::nStippleTypes)
+				{
+					msg.print("Warning: Unrecognised line stipple type '%s'. Defaulting to 'NoStipple'.\n", parser.argc(2));
+					stipple = LineStipple::NoStipple;
+					CHECKIOFAIL
+				}
+				axes.gridLineMajorStyle(axis).setStipple(stipple);
+				axes.gridLineMajorStyle(axis).setColour(parser.argd(3), parser.argd(4), parser.argd(5), parser.argd(6));
+				break;
+			// GridLine minor style
+			case (Keywords::GridLineMinorStyleKeyword):
+				axes.gridLineMinorStyle(axis).setWidth(parser.argd(1));
+				stipple = LineStipple::stippleType(parser.argc(2));
+				if (stipple == LineStipple::nStippleTypes)
+				{
+					msg.print("Warning: Unrecognised line stipple type '%s'. Defaulting to 'NoStipple'.\n", parser.argc(2));
+					stipple = LineStipple::NoStipple;
+					CHECKIOFAIL
+				}
+				axes.gridLineMinorStyle(axis).setStipple(stipple);
+				axes.gridLineMinorStyle(axis).setColour(parser.argd(3), parser.argd(4), parser.argd(5), parser.argd(6));
 				break;
 			// Invert
 			case (Keywords::InvertKeyword):
@@ -157,6 +190,8 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 {
 	DataSet* dataSet;
 	int xyz;
+	Collection::AlphaControl ac;
+	Collection::ColourSource cs;
 	Collection::DisplayStyle ds;
 	while (!parser.eofOrBlank())
 	{
@@ -167,20 +202,29 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 		Keywords::CollectionKeyword collectionKwd = Keywords::collectionKeyword(parser.argc(0));
 		if ((collectionKwd != Keywords::nCollectionKeywords) && (Keywords::collectionKeywordNArguments(collectionKwd) > (parser.nArgs()-1)))
 		{
-			msg.print("Error : Collection keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::collectionKeyword(collectionKwd), Keywords::collectionKeywordNArguments(collectionKwd), parser.nArgs()-1);
+			msg.print("Error: Collection keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::collectionKeyword(collectionKwd), Keywords::collectionKeywordNArguments(collectionKwd), parser.nArgs()-1);
 			return false;
 		}
 		switch (collectionKwd)
 		{
 			// Colour alpha control
 			case (Keywords::ColourAlphaControlKeyword):
-				// TODO Make this an enum
-				if ((parser.argi(1) < 0) || (parser.argi(1) >= Collection::nAlphaControls)) msg.print("Value is out of range for %s keyword.\n", Keywords::collectionKeyword(collectionKwd));
-				else collection->setAlphaControl((Collection::AlphaControl) parser.argi(1));
+				ac = Collection::alphaControl(parser.argc(1));
+				if (ac == Collection::nAlphaControls)
+				{
+					msg.print("Warning: Unrecognised alpha control type '%s'. Defaulting to '%s'.\n", parser.argc(1), Collection::alphaControl(Collection::OwnAlpha));
+					ac = Collection::OwnAlpha;
+					CHECKIOFAIL
+				}
+				collection->setAlphaControl(ac);
 				break;
 			// Colour alpha fixed value
 			case (Keywords::ColourAlphaFixedKeyword):
-				if ((parser.argi(1) < 0) || (parser.argi(1) > 255)) msg.print("Alpha value is out of range for %s keyword.\n", Keywords::collectionKeyword(collectionKwd));
+				if ((parser.argi(1) < 0) || (parser.argi(1) > 255))
+				{
+					msg.print("Warning: Alpha value is out of range for %s keyword.\n", Keywords::collectionKeyword(collectionKwd));
+					CHECKIOFAIL
+				}
 				else collection->setFixedAlpha(parser.argi(1));
 				break;
 			// Colour Custom Gradient point definition
@@ -203,8 +247,14 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				break;
 			// Colour source
 			case (Keywords::ColourSourceKeyword):
-				if ((parser.argi(1) < 0) || (parser.argi(1) >= Collection::nColourSources)) msg.print("Value is out of range for %s keyword.\n", Keywords::collectionKeyword(collectionKwd));
-				else collection->setColourSource((Collection::ColourSource) parser.argi(1));
+				cs = Collection::colourSource(parser.argc(1));
+				if (cs == Collection::nColourSources)
+				{
+					msg.print("Warning: Unrecognised colour source '%s'. Defaulting to '%s'.\n", parser.argc(1), Collection::colourSource(Collection::SingleColourSource));
+					cs = Collection::SingleColourSource;
+					CHECKIOFAIL
+				}
+				collection->setColourSource(cs);
 				break;
 			// Dataset directory
 			case (Keywords::DataDirectoryKeyword):
@@ -601,7 +651,7 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 		Keywords::ViewPaneKeyword viewPaneKwd = Keywords::viewPaneKeyword(parser.argc(0));
 		if ((viewPaneKwd != Keywords::nViewPaneKeywords) && (Keywords::viewPaneKeywordNArguments(viewPaneKwd) > (parser.nArgs()-1)))
 		{
-			msg.print("Error : ViewPane keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::viewPaneKeyword(viewPaneKwd), Keywords::viewPaneKeywordNArguments(viewPaneKwd), parser.nArgs()-1);
+			msg.print("Error: ViewPane keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::viewPaneKeyword(viewPaneKwd), Keywords::viewPaneKeywordNArguments(viewPaneKwd), parser.nArgs()-1);
 			return false;
 		}
 		switch (viewPaneKwd)
@@ -650,7 +700,7 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				collection = findCollection(parser.argc(1));
 				if (collection == NULL)
 				{
-					msg.print("Warning - Collection '%s' is listed in ViewPane '%s', but no collection by this name exists.\n", parser.argc(1), qPrintable(pane->name()));
+					msg.print("Warning: Collection '%s' is listed in ViewPane '%s', but no collection by this name exists.\n", parser.argc(1), qPrintable(pane->name()));
 					CHECKIOFAIL
 				}
 				else pane->addCollection(collection);

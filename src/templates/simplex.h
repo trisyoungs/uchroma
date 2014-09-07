@@ -24,6 +24,7 @@
 
 #include "templates/array.h"
 #include "templates/list.h"
+#include "math/mathfunc.h"
 
 /*!
  * \brief Simplex Definition

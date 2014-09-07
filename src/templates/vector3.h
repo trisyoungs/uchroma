@@ -23,7 +23,6 @@
 #define UCHROMA_VECTOR3_H
 
 #include "math/constants.h"
-#include "math/mathfunc.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -131,8 +130,6 @@ template <class T> class Vec3
 	void orthogonalise(const Vec3<T> &source1, const Vec3<T> &source2);
 	// Prints the contents of the vector
 	void print() const;
-	// Generate random unit vector
-	void randomUnit();
 	// Convert spherical who,phi,theta coordinates into cartesian x,y,z
 	void toCartesian();
 	// Convert cartesian x,y,z coordinates into spherical (rho,phi/zenith,theta/azimuthal)
@@ -547,16 +544,6 @@ template <class T> void Vec3<T>::orthogonalise(const Vec3<T> &source1, const Vec
 template <class T> void Vec3<T>::print() const
 {
 	printf("%8.4f %8.4f %8.4f\n",(double)x,(double)y,(double)z);
-}
-
-// Generate random unit vector
-template <class T> void Vec3<T>::randomUnit()
-{
-	// Generates a random unit vector
-	x = uChromaMath::random()-0.5;
-	y = uChromaMath::random()-0.5;
-	z = uChromaMath::random()-0.5;
-	normalise();
 }
 
 // Convert to cartesian

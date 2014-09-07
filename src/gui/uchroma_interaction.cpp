@@ -50,8 +50,8 @@ double UChromaWindow::screenToAxis(int axis, int mouseX, int mouseY)
 // 	rMouseLast_.print();
 // 	axisCoordMin_[0].print();
 	// Project axis coordinates to get a screen-based yardstick
-	Vec4<double> axmin = currentViewPane_->modelToScreen(currentViewPane_->axes().coordMin(axis));
-	Vec4<double> axmax = currentViewPane_->modelToScreen(currentViewPane_->axes().coordMax(axis));
+	Vec3<double> axmin = currentViewPane_->modelToScreen(currentViewPane_->axes().coordMin(axis));
+	Vec3<double> axmax = currentViewPane_->modelToScreen(currentViewPane_->axes().coordMax(axis));
 // 	axmin.print();
 // 	axmax.print();
 
@@ -251,4 +251,16 @@ double UChromaWindow::currentInteractionCoordinate()
 	Axes& axes = currentViewPane_->axes();
 	if (axes.logarithmic(interactionAxis_)) return (axes.inverted(interactionAxis_) ? log10(axes.max(interactionAxis_)/currentInteractionValue_) : log10(currentInteractionValue_));
 	else return (axes.inverted(interactionAxis_) ? axes.max(interactionAxis_) - currentInteractionValue_ : currentInteractionValue_);
+}
+
+// Perform relevant double-click action, occurring at specified coordinate
+void UChromaWindow::doubleClickInteraction(int mouseX, int mouseY)
+{
+	// Determine pane that the event occured in
+	ViewPane* pane = viewLayout_.paneAt(mouseX, mouseY);
+	if (pane == NULL) return;
+
+	// Now find out what, if anything, was under the mouse...
+	int axis = pane->axisTitleAt(mouseX, mouseY);
+	if (axis != -1) printf("Here's axis %i\n", axis);
 }

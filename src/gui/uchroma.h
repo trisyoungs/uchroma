@@ -446,10 +446,13 @@ class UChromaWindow : public QMainWindow
 	double currentInteractionCoordinate();
 	// Return current slice data
 	DataSet* currentSlice();
+	// Perform relevant double-click action, occurring at specified coordinate
+	void doubleClickInteraction(int mouseX, int mouseY);
 
 
 	/*
 	 * View
+	 * TODO These should eventually be moved to ViewPane, probably, or ViewLayout?
 	 */
 	private:
 	// Whether axis text labels face the viewer automatically

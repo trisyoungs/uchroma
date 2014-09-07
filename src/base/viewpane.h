@@ -228,9 +228,9 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	// Project given model coordinates into world coordinates
 	Vec3<double> modelToWorld(Vec3<double> modelr);
 	// Project given model coordinates into screen coordinates
-	Vec4<double> modelToScreen(Vec3<double> modelr, double screenradius = -1.0);
+	Vec3<double> modelToScreen(Vec3<double> modelr);
 	// Project given model coordinates into screen coordinates using supplied rotation matrix and translation vector
-	Vec4<double> modelToScreen(Vec3<double> modelr, Matrix rotationMatrix, Vec3<double> translation = Vec3<double>());
+	Vec3<double> modelToScreen(Vec3<double> modelr, Matrix rotationMatrix, Vec3<double> translation = Vec3<double>());
 	// Return z translation necessary to display coordinates supplied, assuming the identity view matrix
 	double calculateRequiredZoom(double xMax, double yMax, double fraction);
 	// Convert screen coordinates into model space coordinates
@@ -319,6 +319,14 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	double titlePointSize();
 	// Return text z scaling factor
 	double textZScale();
+
+
+	/*
+	 * Interaction
+	 */
+	public:
+	// Return axis title at specified coordinates (if any)
+	int axisTitleAt(int screenX, int screenY);
 
 
 	/*

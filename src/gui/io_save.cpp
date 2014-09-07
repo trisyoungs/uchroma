@@ -43,20 +43,25 @@ bool UChromaWindow::writeAxisBlock(LineParser& parser, Axes& axes, int axis)
 	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::AutoTicksKeyword), stringBool(axes.autoTicks(axis)));
 	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::FirstTickKeyword), axes.tickFirst(axis));
 	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::FractionalPositioningKeyword), stringBool(axes.positionIsFractional(axis)));
-	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::TickDeltaKeyword), axes.tickDelta(axis));
-	parser.writeLineF("      %s %i\n", Keywords::axisKeyword(Keywords::MinorTicksKeyword), axes.minorTicks(axis));
-	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::LabelAnchorKeyword), TextPrimitive::textAnchor(axes.labelAnchor(axis)));
-	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::TitleAnchorKeyword), TextPrimitive::textAnchor(axes.titleAnchor(axis)));
-	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionFractionalKeyword), axes.positionFractional(axis).x, axes.positionFractional(axis).y, axes.positionFractional(axis).z);
-	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionRealKeyword), axes.positionReal(axis).x, axes.positionReal(axis).y, axes.positionReal(axis).z);
-	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::LabelOrientationKeyword), axes.labelOrientation(axis).x, axes.labelOrientation(axis).y, axes.labelOrientation(axis).z);
-	parser.writeLineF("      %s '%s'\n", Keywords::axisKeyword(Keywords::TitleKeyword), qPrintable(axes.title(axis)));
-	parser.writeLineF("      %s %f %f %f %f\n", Keywords::axisKeyword(Keywords::TitleOrientationKeyword), axes.titleOrientation(axis).x, axes.titleOrientation(axis).y, axes.titleOrientation(axis).z, axes.titleOrientation(axis).w);
+	parser.writeLineF("      %s %s %s %s\n", Keywords::axisKeyword(Keywords::GridLinesKeyword), stringBool(axes.gridLinesMajor(axis)), stringBool(axes.gridLinesMinor(axis)), stringBool(axes.gridLinesFull(axis)));
+	LineStyle style = axes.gridLineMajorStyle(axis);
+	parser.writeLineF("      %s %f '%s' %f %f %f %f\n", Keywords::axisKeyword(Keywords::GridLineMajorStyleKeyword), style.width(), LineStipple::stipple[style.stipple()].name, style.colour().redF(), style.colour().greenF(), style.colour().blueF(), style.colour().alphaF());
+	style = axes.gridLineMinorStyle(axis);
+	parser.writeLineF("      %s %f '%s' %f %f %f %f\n", Keywords::axisKeyword(Keywords::GridLineMinorStyleKeyword), style.width(), LineStipple::stipple[style.stipple()].name, style.colour().redF(), style.colour().greenF(), style.colour().blueF(), style.colour().alphaF());
 	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::InvertKeyword), stringBool(axes.inverted(axis)));
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::LabelAnchorKeyword), TextPrimitive::textAnchor(axes.labelAnchor(axis)));
+	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::LabelOrientationKeyword), axes.labelOrientation(axis).x, axes.labelOrientation(axis).y, axes.labelOrientation(axis).z);
 	parser.writeLineF("      %s %f %f\n", Keywords::axisKeyword(Keywords::LimitsKeyword), axes.min(axis), axes.max(axis));
 	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::LogarithmicKeyword), stringBool(axes.logarithmic(axis)));
-	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::VisibleAxisKeyword), stringBool(axes.visible(axis)));
+	parser.writeLineF("      %s %i\n", Keywords::axisKeyword(Keywords::MinorTicksKeyword), axes.minorTicks(axis));
+	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionFractionalKeyword), axes.positionFractional(axis).x, axes.positionFractional(axis).y, axes.positionFractional(axis).z);
+	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionRealKeyword), axes.positionReal(axis).x, axes.positionReal(axis).y, axes.positionReal(axis).z);
 	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::StretchKeyword), axes.stretch(axis));
+	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::TickDeltaKeyword), axes.tickDelta(axis));
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::TitleAnchorKeyword), TextPrimitive::textAnchor(axes.titleAnchor(axis)));
+	parser.writeLineF("      %s '%s'\n", Keywords::axisKeyword(Keywords::TitleKeyword), qPrintable(axes.title(axis)));
+	parser.writeLineF("      %s %f %f %f %f\n", Keywords::axisKeyword(Keywords::TitleOrientationKeyword), axes.titleOrientation(axis).x, axes.titleOrientation(axis).y, axes.titleOrientation(axis).z, axes.titleOrientation(axis).w);
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::VisibleAxisKeyword), stringBool(axes.visible(axis)));
 	parser.writeLineF("    %s\n", Keywords::axisKeyword(Keywords::EndAxisKeyword));
 
 	return true;
@@ -86,7 +91,7 @@ bool UChromaWindow::writeCollectionBlock(LineParser& parser, Collection* collect
 	parser.writeLineF("%s  %s %f %f\n", indent, Keywords::collectionKeyword(Keywords::InterpolateStepKeyword), collection->interpolationStep(0), collection->interpolationStep(2));
 
 	// Colour Setup
-	parser.writeLineF("%s  %s %i\n", indent, Keywords::collectionKeyword(Keywords::ColourSourceKeyword), collection->colourSource());
+	parser.writeLineF("%s  %s '%s'\n", indent, Keywords::collectionKeyword(Keywords::ColourSourceKeyword), Collection::colourSource(collection->colourSource()));
 	ColourScalePoint* csp;
 	QColor colour;
 	double value;
@@ -113,7 +118,7 @@ bool UChromaWindow::writeCollectionBlock(LineParser& parser, Collection* collect
 		parser.writeLineF("%s  %s %f %i %i %i %i\n", indent, Keywords::collectionKeyword(Keywords::ColourCustomGradientKeyword), csp->value(), csp->colour().red(), csp->colour().green(), csp->colour().blue(), csp->colour().alpha());
 	}
 	// -- Alpha control
-	parser.writeLineF("%s  %s %i\n", indent, Keywords::collectionKeyword(Keywords::ColourAlphaControlKeyword), collection->alphaControl());
+	parser.writeLineF("%s  %s '%s'\n", indent, Keywords::collectionKeyword(Keywords::ColourAlphaControlKeyword), Collection::alphaControl(collection->alphaControl()));
 	parser.writeLineF("%s  %s %f\n", indent, Keywords::collectionKeyword(Keywords::ColourAlphaFixedKeyword), collection->fixedAlpha());
 
 	// Display

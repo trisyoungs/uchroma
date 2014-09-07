@@ -23,6 +23,7 @@
 #include "base/lineparser.h"
 #include "base/messenger.h"
 #include "math/constants.h"
+#include "math/mathfunc.h"
 #include <math.h>
 #include <stdio.h>
 #include <stddef.h>

@@ -23,6 +23,7 @@
 #define UCHROMA_TEXTPRIMITIVE_H
 
 #include "math/matrix.h"
+#include "math/cuboid.h"
 #include "templates/vector3.h"
 #include "templates/list.h"
 #include <FTGL/ftgl.h>
@@ -91,8 +92,8 @@ class TextPrimitiveChunk
 	void add(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize);
 	// Return number of primitives in the list
 	int nPrimitives();
-	// Calculate global bounding box for all text primitives in the chunk
-	void boundingBox(ViewPane& pane, Vec4<double>& boundingBox, Matrix viewMatrix, bool correctOrientation, double baseFontSize);
+	// Update global bounding cuboid for all text primitives in the chunk
+	Cuboid boundingCuboid(ViewPane& pane, bool correctOrientation, double baseFontSize, Cuboid startingCuboid = Cuboid());
 	// Render all primitives in chunk
 	void renderAll(Matrix viewMatrix, bool correctOrientation, double baseFontSize);
 };
@@ -117,8 +118,8 @@ class TextPrimitiveList
 	void add(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize);
 	// Return number of primitives in the list
 	int nPrimitives();
-	// Calculate global bounding box for all text primitives in the list
-	Vec4<double> boundingBox(ViewPane& pane, Matrix viewMatrix, bool correctOrientation, double baseFontSize);
+	// Update global bounding cuboid for all text primitives in the list
+	Cuboid boundingCuboid(ViewPane& pane, bool correctOrientation, double baseFontSize, Cuboid startingCuboid = Cuboid());
 	// Render all primitives in list
 	void renderAll(Matrix viewMatrix, bool correctOrientation, double baseFontSize);
 };

@@ -160,14 +160,13 @@ int TextPrimitiveChunk::nPrimitives()
 	return nTextPrimitives_;
 }
 
-// Calculate global bounding box for all text primitives in the chunk
-void TextPrimitiveChunk::boundingBox(ViewPane& pane, Vec4<double>& boundingBox, Matrix viewMatrix, bool correctOrientation, double baseFontSize)
+// Calculate global bounding cuboid for all text primitives in the chunk
+Cuboid TextPrimitiveChunk::boundingCuboid(ViewPane& pane, bool correctOrientation, double baseFontSize, Cuboid startingCuboid)
 {
-	Vec4<double> screen;
+	Cuboid result = startingCuboid;
 
 	Matrix textMatrix;
-	Vec3<double> corners[4], textCentre;
-	double scale;
+	Vec3<double> corners[4], local;
 
 	for (int n=0; n<nTextPrimitives_; ++n)
 	{
@@ -177,16 +176,17 @@ void TextPrimitiveChunk::boundingBox(ViewPane& pane, Vec4<double>& boundingBox, 
 		corners[2].set(corners[0].x, corners[1].y, 0.0);
 		corners[3].set(corners[1].x, corners[0].y, 0.0);
 
-		// Transform the four corners of the bounding box, and get their extreme coordinates
+		// Transform the four corners of the bounding box with the text primitive's transformation matrix
+		// and determine the extreme x, y, and z coordinates of the primitives in the local frame
 		for (int m=0; m <4; ++m)
 		{
-			screen = pane.modelToScreen(textMatrix*corners[m], viewMatrix);
-			if (screen.x < boundingBox.x) boundingBox.x = screen.x;
-			if (screen.x > boundingBox.z) boundingBox.z = screen.x;
-			if (screen.y < boundingBox.y) boundingBox.y = screen.y;
-			if (screen.y > boundingBox.w) boundingBox.w = screen.y;
+// 			screen = pane.modelToScreen(textMatrix*corners[m], viewMatrix);
+			local = textMatrix*corners[m];
+			result.updateExtremes(local);
 		}
 	}
+
+	return result;
 }
 
 // Render all primitives in chunk
@@ -237,14 +237,11 @@ int TextPrimitiveList::nPrimitives()
 	return n;
 }
 
-// Calculate global bounding box for all text primitives in the list
-Vec4<double> TextPrimitiveList::boundingBox(ViewPane& pane, Matrix viewMatrix, bool correctOrientation, double baseFontSize)
+// Update global bounding cuboid for all text primitives in the list
+Cuboid TextPrimitiveList::boundingCuboid(ViewPane& pane, bool correctOrientation, double baseFontSize, Cuboid startingCuboid)
 {
-	// Create initial, out-of-range result (xmin,ymin,xmax,ymax)
-	Vec4<double> result(1.0e9, 1.0e9, -1.0e9, -1.0e9);
-
-	for (TextPrimitiveChunk *chunk = textPrimitives_.first(); chunk != NULL; chunk = chunk->next) chunk->boundingBox(pane, result, viewMatrix, correctOrientation, baseFontSize);
-
+	Cuboid result = startingCuboid;
+	for (TextPrimitiveChunk *chunk = textPrimitives_.first(); chunk != NULL; chunk = chunk->next) result = chunk->boundingCuboid(pane, correctOrientation, baseFontSize, result);
 	return result;
 }
 

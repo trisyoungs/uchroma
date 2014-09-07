@@ -135,6 +135,12 @@ void Viewer::wheelEvent(QWheelEvent *event)
 	msg.exit("Viewer::wheelEvent");
 }
 
+// Qt Virtual (mouse double click event)
+void Viewer::mouseDoubleClickEvent(QMouseEvent* event)
+{
+	uChroma_->doubleClickInteraction(event->x(), height()-event->y());
+}
+
 // Return mouse coordinates at last mousedown event
 Vec3<double> Viewer::rMouseDown()
 {

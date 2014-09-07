@@ -22,6 +22,7 @@
 #include "base/viewpane.h"
 #include "base/collection.h"
 #include "base/viewlayout.h"
+#include "math/cuboid.h"
 #include <algorithm>
 
 // Static Members
@@ -261,7 +262,7 @@ void ViewPane::recalculateViewport(int gridPixelWidth, int gridPixelHeight, int 
 	if ((leftEdge_+width_) == nColumns) viewportMatrix_[2] += widthRemainder;
 	if ((bottomEdge_+height_) == nRows) viewportMatrix_[3] += heightRemainder;
 
-	// Recalculate projection matrix and view matrix (if 2D)
+	// Recalculate projection matrix and view
 	projectionMatrix_ = calculateProjectionMatrix(viewTranslation_.z);
 	calculateFontScaling();
 	recalculateView();
@@ -662,7 +663,7 @@ Vec3<double> ViewPane::modelToWorld(Vec3<double> modelr)
 }
 
 // Project given model coordinates into screen coordinates
-Vec4<double> ViewPane::modelToScreen(Vec3<double> modelr, double screenradius)
+Vec3<double> ViewPane::modelToScreen(Vec3<double> modelr)
 {
 	msg.enter("Viewer::modelToScreen");
 	Vec4<double> screenr, tempscreen;
@@ -683,20 +684,12 @@ Vec4<double> ViewPane::modelToScreen(Vec3<double> modelr, double screenradius)
 	screenr.y = viewportMatrix_[1] + viewportMatrix_[3]*(screenr.y+1)*0.5;
 	screenr.z = screenr.z / screenr.w;
 
-	// Calculate 2D 'radius' around the point - Multiply world[x+delta] coordinates by P
-	if (screenradius > 0.0)
-	{
-		worldr.x += screenradius;
-		tempscreen = projectionMatrix_ * worldr;
-		tempscreen.x /= tempscreen.w;
-		screenr.w = fabs( (viewportMatrix_[0] + viewportMatrix_[2]*(tempscreen.x+1)*0.5) - screenr.x);
-	}
 	msg.exit("Viewer::modelToScreen");
-	return screenr;
+	return Vec3<double>(screenr.x, screenr.y, screenr.z);
 }
 
 // Project given model coordinates into screen coordinates using supplied rotation matrix and translation vector
-Vec4<double> ViewPane::modelToScreen(Vec3<double> modelr, Matrix rotationMatrix, Vec3<double> translation)
+Vec3<double> ViewPane::modelToScreen(Vec3<double> modelr, Matrix rotationMatrix, Vec3<double> translation)
 {
 	msg.enter("Viewer::modelToScreen");
 	Vec4<double> screenr, tempscreen;
@@ -719,7 +712,7 @@ Vec4<double> ViewPane::modelToScreen(Vec3<double> modelr, Matrix rotationMatrix,
 	screenr.z = screenr.z / screenr.w;
 
 	msg.exit("Viewer::modelToScreen");
-	return screenr;
+	return Vec3<double>(screenr.x, screenr.y, screenr.z);
 }
 
 // Return z translation necessary to display coordinates supplied, assuming the identity view matrix
@@ -824,7 +817,7 @@ void ViewPane::recalculateView()
 	// To begin, set the stretch factors to our best first estimate, dividing the pane width by the range of the axes
 	// Doing this first will allow us to get much better values for the pixel overlaps we need later on
 	// -- Project a point one unit each along X and Y and subtract off the viewport centre coordinate in order to get literal 'pixels per unit' for X and Y axes range
-	Vec4<double> unit = modelToScreen(Vec3<double>(1.0, 1.0, 0.0), Matrix());
+	Vec3<double> unit = modelToScreen(Vec3<double>(1.0, 1.0, 0.0), Matrix());
 	unit.x -= viewportMatrix_[0] + viewportMatrix_[2]/2.0;
 	unit.y -= viewportMatrix_[1] + viewportMatrix_[3]/2.0;
 
@@ -846,16 +839,22 @@ void ViewPane::recalculateView()
 	// calculated for the axes labels, to see what the absolute pixel overlaps are
 	Matrix viewMat;
 	viewMat.applyTranslation(-axes().coordCentre());
-	Vec4<double> xAxisLimitMin = modelToScreen(Vec3<double>( axisMin.x*axes_.stretch(0), 0.0, 0.0), viewMat);
-	Vec4<double> xAxisLimitMax = modelToScreen(Vec3<double>( axisMax.x*axes_.stretch(0), 0.0, 0.0), viewMat);
-	Vec4<double> yAxisLimitMin = modelToScreen(Vec3<double>( 0.0, axisMin.y*axes_.stretch(1), 0.0), viewMat);
-	Vec4<double> yAxisLimitMax = modelToScreen(Vec3<double>( 0.0, axisMax.y*axes_.stretch(1), 0.0), viewMat);
-	Vec4<double> xA = axes_.labelPrimitive(0).boundingBox(*this, viewMat, false, textZScale_);
-	Vec4<double> xB = axes_.titlePrimitive(0).boundingBox(*this, viewMat, false, textZScale_);
-	Vec4<double> xTextBounds(std::min(xA.x,xB.x), std::min(xA.y,xB.y), std::min(xA.z,xB.z), std::min(xA.w,xB.w));
-	Vec4<double> yA = axes_.labelPrimitive(1).boundingBox(*this, viewMat, false, textZScale_);
-	Vec4<double> yB = axes_.labelPrimitive(1).boundingBox(*this, viewMat, false, textZScale_);
-	Vec4<double> yTextBounds(std::min(yA.x,yB.x), std::min(yA.y,yB.y), std::min(yA.z,yB.z), std::min(yA.w,yB.w));
+	Vec3<double> xAxisLimitMin = modelToScreen(Vec3<double>( axisMin.x*axes_.stretch(0), 0.0, 0.0), viewMat);
+	Vec3<double> xAxisLimitMax = modelToScreen(Vec3<double>( axisMax.x*axes_.stretch(0), 0.0, 0.0), viewMat);
+	Vec3<double> yAxisLimitMin = modelToScreen(Vec3<double>( 0.0, axisMin.y*axes_.stretch(1), 0.0), viewMat);
+	Vec3<double> yAxisLimitMax = modelToScreen(Vec3<double>( 0.0, axisMax.y*axes_.stretch(1), 0.0), viewMat);
+	Cuboid cuboid;
+	Vec3<double> a, b;
+	cuboid = axes_.labelPrimitive(0).boundingCuboid(*this, false, textZScale_);
+	cuboid = axes_.titlePrimitive(0).boundingCuboid(*this, false, textZScale_, cuboid);
+	a = modelToScreen(cuboid.minima(), viewMat);
+	b = modelToScreen(cuboid.maxima(), viewMat);
+	Vec4<double> xTextBounds(std::min(a.x,b.x), std::min(a.y,b.y), std::max(a.x,b.x), std::max(a.y,b.y));
+	cuboid = axes_.labelPrimitive(1).boundingCuboid(*this, false, textZScale_);
+	cuboid = axes_.labelPrimitive(1).boundingCuboid(*this, false, textZScale_, cuboid);
+	a = modelToScreen(cuboid.minima(), viewMat);
+	b = modelToScreen(cuboid.maxima(), viewMat);
+	Vec4<double> yTextBounds(std::min(a.x,b.x), std::min(a.y,b.y), std::max(a.x,b.x), std::max(a.y,b.y));
 // 	printf("COORDS: XAxXMin = %f, YAxXMin = %f, XLabXMin = %f, YLabXMin = %f\n", xAxisLimitMin.x, yAxisLimitMin.x, xLabelBounds.x, yLabelBounds.x);
 // 	printf("XAXLIMMIN: "); xAxisLimitMin.print();
 // 	printf("XAXLIMMAX: "); xAxisLimitMax.print();
@@ -1079,7 +1078,7 @@ void ViewPane::collectionsUpdateCurrentSlices(int axis, double axisValue)
 void ViewPane::calculateFontScaling()
 {
 	// Calculate text scaling factor
-	Vec4<double> unit = modelToScreen(Vec3<double>(0.0, 1.0, 0.0), Matrix(), Vec3<double>(0.0, 0.0, zOffset_));
+	Vec3<double> unit = modelToScreen(Vec3<double>(0.0, 1.0, viewTranslation_.z), Matrix(), Vec3<double>(0.0, 0.0, zOffset_));
 	unit.y -= viewportMatrix_[1] + viewportMatrix_[3]*0.5;
 	textZScale_ = unit.y;
 }
@@ -1146,6 +1145,30 @@ double ViewPane::titlePointSize()
 double ViewPane::textZScale()
 {
 	return textZScale_;
+}
+
+/*
+ * Interaction
+ */
+
+// Return axis title at specified coordinates (if any)
+int ViewPane::axisTitleAt(int screenX, int screenY)
+{
+	printf("Coords=%i %i\n", screenX, screenY);
+	Vec3<double> labelMin, labelMax;
+	for (int axis=0; axis<3; ++axis)
+	{
+		// Reset bounding box extreme values
+		labelMin.set(1e9,1e9,1e9);
+		labelMax = -labelMin;
+
+		// Calculate orthogonal bounding cuboid for this axis title (local coordinates)
+		Cuboid cuboid = axes_.titlePrimitive(axis).boundingCuboid(*this, false, textZScale_);
+
+		// Determine whether the screen point specified is within the projected cuboid
+		if (cuboid.isPointWithinProjection(screenX, screenY, viewMatrix(), projectionMatrix_, viewportMatrix_)) return axis;
+	}
+	return -1;
 }
 
 /*

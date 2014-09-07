@@ -21,6 +21,7 @@
 
 #include "math/mathfunc.h"
 #include "math/constants.h"
+#include "math/matrix.h"
 #include <cstdlib>
 #include <math.h>
 
@@ -81,4 +82,10 @@ int uChromaMath::power(int i, int p)
 int uChromaMath::sgn(int x)
 {
 	return (x < 0 ? -1 : x > 0);
+}
+
+// Calculate area of triangle from supplied coordinates
+double uChromaMath::triangleArea(double ax, double ay, double bx, double by, double cx, double cy)
+{
+	return fabs( 0.5*( ax*(by-cy) + bx*(cy-ay) + cx*(ay-by)) );
 }

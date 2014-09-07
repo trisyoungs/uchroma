@@ -583,23 +583,6 @@ const char* FitKernel::minimisationMethod(FitKernel::MinimisationMethod id)
 	return  MinimisationMethodKeywords[id];
 }
 
-// Update destination with current fitted data
-void FitKernel::updateFittedData()
-{
-	// Check destination collection
-	if (destinationCollection_ == NULL)
-	{
-		msg.print("Internal Error: No destination collection set in FitKernel::updateFittedData().\n");
-		return;
-	}
-
-	// Clear existing slices
-	destinationCollection_->clearDataSets();
-
-	// Copy all slice data over
-	fitSpace_.copy(destinationCollection_);
-}
-
 // Generate SOS error for current targets
 double FitKernel::sosError(Array<double>& alpha)
 {
@@ -805,12 +788,13 @@ bool FitKernel::fit()
 		// Call the minimiser
 		result = minimise();
 
-		// Copy final fitted data over to destination collection
-		updateFittedData();
-
 		// Loop DataSpaceRange pointers in reference variable
 		for (RefListItem<ReferenceVariable,bool>* ri = usedReferences_.first(); ri != NULL; ri = ri->next) ri->item->moveToNextDataSpaceRange();
 	}
+
+	// Clear destination datasets, and copy final fitted data over
+	destinationCollection_->clearDataSets();
+	fitSpace_.copy(destinationCollection_);
 
 	return result;
 }

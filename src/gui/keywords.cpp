@@ -53,10 +53,10 @@ const char* Keywords::inputBlock(Keywords::InputBlock id)
 */
 
 // Axis Block Keywords
-const char* AxisBlockKeywords[] = { "AutoTicks", "EndAxis", "FirstTick", "FractionalPositioning", "Invert", "LabelAnchor", "LabelOrientation", "Limits", "Logarithmic", "MinorTicks", "PositionFractional", "PositionReal", "Stretch", "TickDelta", "TickDirection", "Title", "TitleAnchor", "TitleOrientation", "Visible" };
+const char* AxisBlockKeywords[] = { "AutoTicks", "EndAxis", "FirstTick", "FractionalPositioning", "GridLines", "GridLineMajorStyle", "GridLineMinorStyle", "Invert", "LabelAnchor", "LabelOrientation", "Limits", "Logarithmic", "MinorTicks", "PositionFractional", "PositionReal", "Stretch", "TickDelta", "TickDirection", "Title", "TitleAnchor", "TitleOrientation", "Visible" };
 
 // Axis Block NArguments
-int AxisKeywordNArguments[] = { 1, 0, 1, 1, 1, 1, 3, 2, 1, 1, 3, 3, 1, 1, 3, 1, 1, 4, 1 };
+int AxisKeywordNArguments[] = { 1, 0, 1, 1, 3, 6, 6, 1, 1, 3, 2, 1, 1, 3, 3, 1, 1, 3, 1, 1, 4, 1 };
 
 /*!
  * \brief Convert text string to AxisKeyword

@@ -1,11 +1,13 @@
 add_library(math
-doubleexp.cpp
-mathfunc.cpp
-matrix.cpp
-constants.h
-doubleexp.h
-mathfunc.h
-matrix.h
+  cuboid.cpp
+  doubleexp.cpp
+  mathfunc.cpp
+  matrix.cpp
+  constants.h
+  cuboid.h
+  doubleexp.h
+  mathfunc.h
+  matrix.h
 )
 
 include_directories(

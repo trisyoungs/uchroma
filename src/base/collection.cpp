@@ -1001,6 +1001,38 @@ void Collection::updateLimitsAndTransforms()
  * Colours
  */
 
+// ColourSource Keywords
+const char* ColourSourceKeywords[] = { "SingleColour", "RGBGradient", "HSVGradient", "CustomGradient" };
+
+// Convert text string to ColourSource
+Collection::ColourSource Collection::colourSource(const char* s)
+{
+	for (int n=0; n<Collection::nColourSources; ++n) if (strcmp(s, ColourSourceKeywords[n]) == 0) return (Collection::ColourSource) n;
+	return Collection::nColourSources;
+}
+
+// Convert ColourSource to text string
+const char* Collection::colourSource(ColourSource cs)
+{
+	return ColourSourceKeywords[cs];
+}
+
+// AlphaControl keywords
+const char* AlphaControlKeywords[] = { "OwnAlpha", "FixedAlpha" };
+
+// Convert text string to AlphaControl
+Collection::AlphaControl Collection::alphaControl(const char* s)
+{
+	for (int n=0; n<Collection::nAlphaControls; ++n) if (strcmp(s, AlphaControlKeywords[n]) == 0) return (Collection::AlphaControl) n;
+	return Collection::nAlphaControls;
+}
+
+// Convert AlphaControl to text string
+const char* Collection::alphaControl(Collection::AlphaControl as)
+{
+	return AlphaControlKeywords[as];
+}
+
 // Update colour scale
 void Collection::updateColourScale()
 {

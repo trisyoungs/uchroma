@@ -62,9 +62,9 @@ class Viewer : public QGLWidget
 
 
 	/*
-	// Character / Setup
-	// (in viewer_funcs.cpp)
-	*/
+	 * Character / Setup
+	 * (in viewer_funcs.cpp)
+	 */
 	private:
 	// GLExtension pointer stack
 	List<GLExtensions> extensionsStack_;
@@ -107,9 +107,9 @@ class Viewer : public QGLWidget
 
 
 	/*
-	// Mouse / Keyboard Input
-	// (in viewer_input.cpp)
-	*/
+	 * Mouse / Keyboard Input
+	 * (in viewer_input.cpp)
+	 */
 	private:
 	// Canvas coordinates of mouse down
 	Vec3<double> rMouseDown_;
@@ -127,6 +127,8 @@ class Viewer : public QGLWidget
 	void mouseMoveEvent(QMouseEvent*);
 	// Qt Virtual (mouse wheel event)
 	void wheelEvent(QWheelEvent*);
+	// Qt Virtual (mouse double click event)
+	void mouseDoubleClickEvent(QMouseEvent* event);
 
 	public:
 	// Return mouse coordinates at last mousedown event
@@ -142,9 +144,9 @@ class Viewer : public QGLWidget
 
 
 	/*
-	// Rendering Preferences
-	// (in viewer_prefs.cpp)
-	*/ 
+	 * Rendering Preferences
+	 * (in viewer_prefs.cpp)
+	 */ 
 	private:
 	// Flag specifying whether framebuffer should be used for offscreen rendering
 	bool useFrameBuffer_;
@@ -165,10 +167,11 @@ class Viewer : public QGLWidget
 	// Set line width to use for line primitives
 	void setLineWidth(double lineWidth);
 
+
 	/*
-	// User Functions / Data
-	// (in viewer_user.cpp)
-	*/
+	 * User Functions / Data
+	 * (in viewer_user.cpp)
+	 */
 	private:
 	// Reference list of all created primitives (to which all user primitives must be added)
 	RefList<Primitive,int> primitiveList_;

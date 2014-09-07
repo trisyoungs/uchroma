@@ -1,6 +1,6 @@
 /*
 	*** Double/Exponent class
-	*** src/base/doubleexp.h
+	*** src/math/doubleexp.h
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.

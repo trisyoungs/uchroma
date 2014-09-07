@@ -240,8 +240,6 @@ class FitKernel
 
 
 	private:
-	// Update destination with current fitted data
-	void updateFittedData();
 	// Calculate SOS error for current targets
 	double sosError(Array<double>& alpha);
 	// Calculate RMS error for current targets

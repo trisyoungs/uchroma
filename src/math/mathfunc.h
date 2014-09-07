@@ -22,6 +22,8 @@
 #ifndef UCHROMA_MATHFUNC_H
 #define UCHROMA_MATHFUNC_H
 
+class Matrix;
+
 // Mathematical functions
 class uChromaMath
 {
@@ -41,6 +43,9 @@ class uChromaMath
 
 	// Sign function
 	static int sgn(int x);
+
+	// Calculate area of triangle from supplied coordinates
+	static double triangleArea(double ax, double ay, double bx, double by, double cx, double cy);
 };
 
 #endif
