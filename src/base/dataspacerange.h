@@ -22,8 +22,8 @@
 #ifndef UCHROMA_DATASPACERANGE_H
 #define UCHROMA_DATASPACERANGE_H
 
-#include "base/dataspacedata.h"
 #include "base/indexdata.h"
+#include "templates/array.h"
 #include "templates/list.h"
 #include "templates/reflist.h"
 
@@ -65,6 +65,8 @@ class DataSpaceRange : public ListItem<DataSpaceRange>
 	public:
 	// Set target information
 	void set(Collection* collection, int abscissaFirst, int abscissaLast, int firstDataSet, int lastDataSet, bool referenceDataOnly);
+	// Set target information from existing DataSpaceRange
+	void set(Collection* collection, DataSpaceRange* source, bool referenceDataOnly);
 	// Return index of first DisplayDataSet to be fit
 	int displayDataSetStart();
 	// Return index of last DisplayDataSet to be fit
@@ -91,8 +93,16 @@ class DataSpaceRange : public ListItem<DataSpaceRange>
 	 * Values
 	 */
 	private:
-	// Associated values for target space
-	List<DataSpaceData> values_;
+	// X values for target data
+	Array<double> x_;
+	// Z values for target data
+	Array<double> z_;
+	// Reference Y values
+	Array2D<double> yReference_;
+	// Reference Y types
+	Array2D<double> yTypes_;
+	// Calculated Y values
+	Array2D<double> yCalculated_;
 
 	public:
 	// Return reference y value specified
@@ -105,8 +115,8 @@ class DataSpaceRange : public ListItem<DataSpaceRange>
 	bool calculateValues(Expression& equation, Variable* xVariable, Variable* zVariable, const RefList<ReferenceVariable,bool>& usedReferences);
 	// Return sos error between stored and referenced values
 	double sosError();
-	// Copy values to specified Collection
-	void copyCalculatedValues(Collection* target);
+	// Add values to datasets in specified Collection
+	void addCalculatedValues(Collection* target, int sourceZOffset);
 };
 
 #endif

@@ -69,18 +69,45 @@ void DataSpaceRange::set(Collection* collection, int abscissaFirst, int abscissa
 	double zStretch = collection->displayPane()->axes().stretch(2);
 
 	// Setup data arrays
-	values_.clear();
+	x_.clear();
+	z_.clear();
+	yReference_.clear();
+	yTypes_.clear();
+	yCalculated_.clear();
+
 	const Array<double>& abscissa = collection->displayAbscissa();
 	DisplayDataSet** dataSets = collection->displayData().array();
+
+	// Store x values
+	for (int n=0; n<nPoints_; ++n) x_.add(abscissa.value(n+abscissaStart_)/xStretch);
+
+	// Store z values
+	for (int n=0; n<nDataSets_; ++n) z_.add(dataSets[n+displayDataSetStart_]->z()/zStretch);
+
+	// Copy y data
+	yReference_.initialise(nPoints_, nDataSets_);
+	if (!referenceDataOnly)
+	{
+		yTypes_.initialise(nPoints_, nDataSets_);
+		yCalculated_.initialise(nPoints_, nDataSets_);
+	}
+
 	for (int n=0; n<nDataSets_; ++n)
 	{
-		DataSpaceData* data = values_.add();
 		const Array<double>& y = dataSets[n+displayDataSetStart_]->y();
 		const Array<DisplayDataSet::DataPointType>& yType = dataSets[n+displayDataSetStart_]->yType();
-		if (referenceDataOnly) for (int i=0; i<nPoints_; ++i) data->addPoint(abscissa.value(i+abscissaStart_)/xStretch, y.value(i+abscissaStart_)/yStretch);
-		else for (int i=0; i<nPoints_; ++i) data->addPoint(abscissa.value(i+abscissaStart_)/xStretch, y.value(i+abscissaStart_)/yStretch, yType.value(i+abscissaStart_), 0.0);
-		data->setZ(dataSets[n+displayDataSetStart_]->z()/zStretch);
+		for (int i=0; i<nPoints_; ++i)
+		{
+			yReference_.ref(i,n) = y.value(i+abscissaStart_)/yStretch;
+			if (!referenceDataOnly) yTypes_.ref(i,n) = yType.value(i+abscissaStart_);
+		}
 	}
+}
+
+// Set target information from existing DataSpaceRange
+void DataSpaceRange::set(Collection* collection, DataSpaceRange* source, bool referenceDataOnly)
+{
+	set(collection, source->abscissaStart_, source->abscissaEnd_, source->displayDataSetStart_, source->displayDataSetEnd_, referenceDataOnly);
 }
 
 // Return index of first DisplayDataSet in this target
@@ -123,52 +150,52 @@ int DataSpaceRange::nPoints()
 double DataSpaceRange::xStart()
 {
 	// Check for valid collection
-	if (values_.nItems() == 0)
+	if (x_.nItems() == 0)
 	{
-		msg.print("DataSpaceRange::xStart() - No values_ array.\n");
+		msg.print("DataSpaceRange::xStart() - x_ array is empty.\n");
 		return 0.0;
 	}
 
-	return values_.first()->x().first();
+	return x_.first();
 }
 
 // Return final x value of range
 double DataSpaceRange::xEnd()
 {
 	// Check for valid collection
-	if (values_.nItems() == 0)
+	if (x_.nItems() == 0)
 	{
-		msg.print("DataSpaceRange::xEnd() - No values_ array.\n");
+		msg.print("DataSpaceRange::xEnd() - x_ array is empty.\n");
 		return 0.0;
 	}
 
-	return values_.first()->x().last();
+	return x_.last();
 }
 
 // Return starting z value of range
 double DataSpaceRange::zStart()
 {
 	// Check for valid collection
-	if (values_.nItems() == 0)
+	if (z_.nItems() == 0)
 	{
-		msg.print("DataSpaceRange::zStart() - No values_ array.\n");
+		msg.print("DataSpaceRange::zStart() - z_ array is empty.\n");
 		return 0.0;
 	}
 
-	return values_.first()->z();
+	return z_.first();
 }
 
 // Return final z value of range
 double DataSpaceRange::zEnd()
 {
 	// Check for valid collection
-	if (values_.nItems() == 0)
+	if (z_.nItems() == 0)
 	{
-		msg.print("DataSpaceRange::zEnd() - No values_ array.\n");
+		msg.print("DataSpaceRange::zEnd() - z_ array is empty.\n");
 		return 0.0;
 	}
 
-	return values_.last()->z();
+	return z_.last();
 }
 
 /*
@@ -178,17 +205,13 @@ double DataSpaceRange::zEnd()
 // Return reference y value specified
 double DataSpaceRange::referenceY(int xIndex, int zIndex)
 {
-	DataSpaceData* data = values_[zIndex];
-	if (data) return data->yReference().value(xIndex);
-	else return 0.0;
+	return yReference_.ref(xIndex, zIndex);
 }
 
 // Return calculated y value specified
 double DataSpaceRange::calculatedY(int xIndex, int zIndex)
 {
-	DataSpaceData* data = values_[zIndex];
-	if (data) return data->yCalculated().value(xIndex);
-	else return 0.0;
+	return yCalculated_.ref(xIndex, zIndex);
 }
 
 // Copy values from stored source collection, using index data provided
@@ -199,6 +222,8 @@ bool DataSpaceRange::copyValues(IndexData xIndex, IndexData zIndex)
 	List<DisplayDataSet>& dataSets = parent_.sourceCollection()->displayData();
 	DisplayDataSet* dataSet;
 	int actualZ, actualX;
+
+	yReference_ = 0.0;
 
 	// Loop over z indices defined in range
 	for (int z = 0; z < nDataSets_; ++z)
@@ -229,11 +254,7 @@ bool DataSpaceRange::copyValues(IndexData xIndex, IndexData zIndex)
 		}
 
 		// Check validity of dataset - if none is set, zero the relevant values_ entry and move on
-		if (!dataSet)
-		{
-			values_[z]->zeroYReference();
-			continue;
-		}
+		if (!dataSet) continue;
 
 		// Grab data from dataSet
 		const Array<double>& yRef = dataSet->y();
@@ -247,8 +268,7 @@ bool DataSpaceRange::copyValues(IndexData xIndex, IndexData zIndex)
 			else if (xIndex.type() == IndexData::RelativeIndex) actualX = abscissaStart_+x+xIndex.offset();
 
 			// Check index of x against valid abscissa range
-			if ((x < 0) || (x >= nAbscissaPoints)) values_[z]->setReferenceY(x, 0.0);
-			else values_[z]->setReferenceY(x, yRef.value(actualX));
+			if ((x >= 0) && (x < nAbscissaPoints)) yReference_.ref(x, z) = yRef.value(actualX);
 		}
 	}
 
@@ -260,40 +280,35 @@ bool DataSpaceRange::calculateValues(Expression& equation, Variable* xVariable, 
 {
 	bool success;
 
-	// Generate fitted data over all targetted datasets / abscissa values
-	DataSpaceData* values = values_.first();
+	// Need the yTypes_ array here, so check to see if there is anything in it...
+	if (yTypes_.linearArraySize() == 0)
+	{
+		msg.print("Internal Error: yTypes_ array is empty in DataSpaceRange::calculateValues().\n");
+		return false;
+	}
 
-	// Grab abscissa data
-	const Array<double>& x = values->x();
-
-	// Loop over datasets
+	// Loop over datasets (z points)
 	for (int n=0; n<nDataSets_; ++n)
 	{
-		// Grab original data types
-		const Array<DisplayDataSet::DataPointType>& yType = values->yType();
+		// Set z value
+		zVariable->set(z_.value(n));
 
-		// Set z variable value
-		zVariable->set(values->z());
-		
 		// Loop over abscissa values
 		for (int i=0; i<nPoints_; ++i)
 		{
 			// Nothing to do if this point does not exist...
-			if (yType.value(i) == DisplayDataSet::NoPoint) continue;
+			if (yTypes_.ref(i,n) == DisplayDataSet::NoPoint) continue;
 
-			// Set x variable value	
-			xVariable->set(x.value(i));
+			// Set x variable value
+			xVariable->set(x_.value(i));
 
 			// Generate reference values
 			for (RefListItem<ReferenceVariable,bool>* ri = usedReferences.first(); ri != NULL; ri = ri->next) ri->item->updateValue(i, n);
 
 			// Calculate and store y value
-			values->setCalculatedY(i, equation.execute(success));
+			yCalculated_.ref(i,n) = equation.execute(success);
 			if (!success) return false;
 		}
-
-		// Move to next calculated data element
-		values = values->next;
 	}
 }
 
@@ -301,20 +316,17 @@ bool DataSpaceRange::calculateValues(Expression& equation, Variable* xVariable, 
 double DataSpaceRange::sosError()
 {
 	double sos = 0.0, yDiff;
-	for (DataSpaceData* values = values_.first(); values != NULL; values = values->next)
-	{
-		// Grab arrays
-		const Array<double>& yReference = values->yReference();
-		const Array<double>& yCalculated = values->yCalculated();
-		const Array<DisplayDataSet::DataPointType>& yType = values->yType();
 
+	// Loop over datasets (z values)
+	for (int n=0; n<nDataSets_; ++n)
+	{
 		// Loop over abscissa values
 		for (int i=0; i<nPoints_; ++i)
 		{
 			// Nothing to do if this point does not exist...
-			if (yType.value(i) == DisplayDataSet::NoPoint) continue;
+			if (yTypes_.ref(i,n) == DisplayDataSet::NoPoint) continue;
 			
-			yDiff = yReference.value(i) - yCalculated.value(i);
+			yDiff = yReference_.ref(i,n) - yCalculated_.ref(i,n);
 
 			sos += yDiff * yDiff;
 		}
@@ -323,15 +335,29 @@ double DataSpaceRange::sosError()
 	return sos;
 }
 
-// Copy calculated data to specified Collection
-void DataSpaceRange::copyCalculatedValues(Collection* target)
+// Add calculated data into specified Collection
+void DataSpaceRange::addCalculatedValues(Collection* target, int sourceZOffset)
 {
-	DataSet* newDataSet;
-	printf("NDataSpaceData to copy = %i\n", values_.nItems());
-	for (DataSpaceData* values = values_.first(); values != NULL; values = values->next)
+	// Target collection should already have had DataSet 'space' created in it
+	int actualX, actualZ;
+
+	for (int n=0; n<nDataSets_; ++n)
 	{
-		newDataSet = target->addDataSet();
-		target->setDataSetData(newDataSet, values->x(), values->yCalculated());
-		target->setDataSetZ(newDataSet, values->z());
+		// Grab DataSet pointer
+		actualZ = n+displayDataSetStart_+sourceZOffset;
+		DataSet* dataSet = target->dataSet(actualZ);
+		if (!dataSet)
+		{
+			msg.print("Internal Error: Couldn't retrieve dataset index %i from target collection.\n", actualZ);
+			return;
+		}
+
+		// Loop over x values
+		for (int i=0; i<nPoints_; ++i)
+		{
+			actualX = i + abscissaStart_;
+			dataSet->data().setX(i, x_.value(i));
+			dataSet->data().setY(i, yCalculated_.ref(i,n));
+		}
 	}
 }

@@ -124,7 +124,7 @@ bool DataSpace::initialise(const DataSpace& source, bool referenceDataOnly)
 	for (DataSpaceRange* range = source.ranges_.first(); range != NULL; range = range->next)
 	{
 		DataSpaceRange* newRange = ranges_.add(*this);
-		newRange->set(sourceCollection_, range->abscissaStart(), range->abscissaEnd(), range->displayDataSetStart(), range->displayDataSetEnd(), referenceDataOnly);
+		newRange->set(sourceCollection_, range, referenceDataOnly);
 	}
 }
 
@@ -143,6 +143,22 @@ DataSpaceRange* DataSpace::ranges()
 // Copy calculated y data to destination collection specified
 void DataSpace::copy(Collection* destinationCollection)
 {
+	// Check for valid source and destination collections before we start...
+	if (!Collection::objectValid(sourceCollection_, "source collection in DataSpace::copy()")) return;
+	if (!Collection::objectValid(destinationCollection, "destination collection in DataSpace::copy()")) return;
+
+	// Clear any existing datasets in the destination collection
 	destinationCollection->clearDataSets();
-	for (DataSpaceRange* fitRange = ranges_.first(); fitRange != NULL; fitRange = fitRange->next) fitRange->copyCalculatedValues(destinationCollection);
+
+	// Create destination datasets using those in the sourceCollection_ to get the z values, and size the x/y arrays
+	for (int n=displayDataSetStart_; n<=displayDataSetEnd_; ++n)
+	{
+		DataSet* dataSet = sourceCollection_->dataSet(n);
+		DataSet* newDataSet = destinationCollection->addDataSet();
+		newDataSet->data().initialise(nPoints_);
+		destinationCollection->setDataSetZ(newDataSet, dataSet->data().z());
+	}
+
+	// Copy data from DataSpaceRanges/DataSpaceData into the new datasets
+	for (DataSpaceRange* fitRange = ranges_.first(); fitRange != NULL; fitRange = fitRange->next) fitRange->addCalculatedValues(destinationCollection, displayDataSetStart_);
 }

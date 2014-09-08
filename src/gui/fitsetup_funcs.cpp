@@ -35,9 +35,14 @@ FitSetupDialog::FitSetupDialog(UChromaWindow& parent) : QDialog(&parent), uChrom
 	ui.setupUi(this);
 
 	fitKernelTarget_ = NULL;
+	softReject_ = false;
+
+	refreshing_ = true;
+
+	// Add items to MethodCombo
+	for (int n=0; n<FitKernel::nMinimisationMethods; ++n) ui.MinimisationMethodCombo->addItem(FitKernel::minimisationMethod( (FitKernel::MinimisationMethod) n));
 
 	refreshing_ = false;
-	softReject_ = false;
 }
 
 // Destructor

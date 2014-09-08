@@ -6,7 +6,6 @@ add_library(base
   data2d.cpp
   dataset.cpp
   dataspace.cpp
-  dataspacedata.cpp
   dataspacerange.cpp
   displaydataset.cpp
   dnchar.cpp
@@ -28,7 +27,6 @@ add_library(base
   data2d.h
   dataset.h
   dataspace.h
-  dataspacedata.h
   dataspacerange.h
   displaydataset.h
   dnchar.h

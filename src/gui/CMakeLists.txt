@@ -80,7 +80,7 @@ SET(pro_UIS
   equationselect.ui
   fitsetup.ui
   layout.ui
-  linestyledialog.cpp
+  linestyledialog.ui
   log.ui
   referencedialog.ui
   saveimage.ui

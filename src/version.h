@@ -22,8 +22,8 @@
 #ifndef UCHROMA_VERSION_H
 #define UCHROMA_VERSION_H
 
-#define UCHROMAREVISION "134"
-#define UCHROMADATE "Mon 08 Sep 2014 - 00:11"
+#define UCHROMAREVISION "135"
+#define UCHROMADATE "Mon 08 Sep 2014 - 22:44"
 #define UCHROMAURL "http://www.projectaten.net/uchroma"
 
 #endif
