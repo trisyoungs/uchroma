@@ -848,9 +848,17 @@ bool UChromaWindow::loadInputFile(QString fileName)
 				CHECKIOFAIL
 				break;
 		}
-		if (!success) return false;
+
+		// If we have failed for any reason, exit now
+		if (!success) break;
 	}
 	parser.closeFiles();
+
+	// Show a message if we encountered problems...
+	if (!success)
+	{
+		QMessageBox::warning(this, "Problems Loading File", "Errors were encountered while loading the file.\nCheck the Log window for possible error messages.");
+	}
 
 	// Set necessary variables
 	currentViewPane_ = viewLayout_.panes();

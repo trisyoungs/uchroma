@@ -77,8 +77,7 @@ void UChromaWindow::on_actionFileLoadSession_triggered(bool checked)
 	if (fileName.isEmpty()) return;
 	inputFileDirectory_ = fileName;
 
-	// Clear existing data and load input file
-	clearData(true);
+	// Load input file
 	loadInputFile(fileName);
 
 	// Update the GUI

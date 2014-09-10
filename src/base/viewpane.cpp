@@ -755,9 +755,8 @@ double ViewPane::calculateRequiredZoom(double xMax, double yMax, double fraction
 		// Increase zoom distance
 		translation.z -= std::max( std::max(rScreen.x / targetX, rScreen.y/ targetY), 1.0);
 
-
 		// Limit the number of iterations so we can never get into an infinite loop
-		if (++count == 100) break;
+		if (++count == 1000) break;
 
 	} while ((rScreen.x > targetX) || (rScreen.y> targetY));
 	return translation.z;

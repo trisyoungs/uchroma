@@ -481,11 +481,8 @@ void Collection::setTransformEnabled(int axis, bool enabled)
 	transforms_[axis].setEnabled(enabled);
 
 	// Make sure limits and transform are up to date
-	if (transforms_[axis].enabled())
-	{
-		dataChanged_ = true;
-		updateLimitsAndTransforms();
-	}
+	dataChanged_ = true;
+	updateLimitsAndTransforms();
 
 	displayDataValid_ = false;
 
