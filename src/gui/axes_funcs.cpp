@@ -21,7 +21,7 @@
 
 #include "gui/axes.h"
 #include "gui/uchroma.h"
-#include "gui/linestyledialog.h"
+#include "gui/editlinestyle.h"
 #include "templates/reflist.h"
 #include <limits>
 
@@ -399,12 +399,14 @@ bool AxesWindow::axisGridStyleClicked(int axis, bool major)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
-	LineStyleDialog dialog(this);
+	EditLineStyleDialog dialog(this);
 	bool success = dialog.call(major ? &currentAxes().gridLineMajorStyle(axis) : &currentAxes().gridLineMinorStyle(axis));
 
 	// Update relevant parts of gui
 	if (success)
 	{
+		if (major) currentAxes().gridLineMajorStyle(axis) = dialog.lineStyle();
+		else currentAxes().gridLineMinorStyle(axis) = dialog.lineStyle();
 		currentAxes().setPrimitivesInvalid();
 		uChroma_.updateDisplay();
 	}

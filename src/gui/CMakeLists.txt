@@ -11,6 +11,23 @@ ${CMAKE_BINARY_DIR}/src/
 
 # Source files (not Qt UI files or custom .h [uih])
 SET(qtproject_SRCS
+  editdataset_funcs.cpp
+  editfitkernel_funcs.cpp
+  editlinestyle_funcs.cpp
+  editreference_funcs.cpp
+
+  selectequation_funcs.cpp
+  selecttarget_funcs.cpp
+
+  colourbutton_funcs.cpp
+  gradientbar_funcs.cpp
+  paneorganiser_funcs.cpp
+  texponentialspin_funcs.cpp
+  viewer_funcs.cpp
+  viewer_input.cpp
+  viewer_prefs.cpp
+  viewer_user.cpp
+
   uchroma_collection.cpp
   uchroma_data.cpp
   uchroma_funcs.cpp
@@ -18,74 +35,71 @@ SET(qtproject_SRCS
   uchroma_interaction.cpp
   uchroma_slots.cpp
   uchroma_view.cpp
+
   io_load.cpp
   io_save.cpp
   keywords.cpp
+
   axes_funcs.cpp
-  colourbutton_funcs.cpp
   create_funcs.cpp
   data_funcs.cpp
   dataimport_funcs.cpp
   dataimport_seqxy.cpp
-  equationselect_funcs.cpp
-  fitsetup_funcs.cpp
-  gradientbar_funcs.cpp
   layout_funcs.cpp
-  linestyledialog_funcs.cpp
   log_funcs.cpp
-  paneorganiser_funcs.cpp
-  referencedialog_funcs.cpp
   saveimage_funcs.cpp
   style_funcs.cpp
-  targetselect_funcs.cpp
-  texponentialspin_funcs.cpp
   transform_funcs.cpp 
   view_funcs.cpp
-  viewer_funcs.cpp
-  viewer_input.cpp
-  viewer_prefs.cpp
-  viewer_user.cpp
 )
 
 SET(pro_MOC_HDRS
-  axes.h
-  uchroma.h
-  create.h
-  data.h
-  dataimport.h
-  equationselect.h
-  fitsetup.h
-  layout.h
-  linestyledialog.h
-  log.h
-  referencedialog.h
-  saveimage.h
-  style.h
-  targetselect.h
-  transform.h
-  view.h
   colourbutton.uih
   gradientbar.uih
   paneorganiser.uih
   texponentialspin.uih
   viewer.uih
+
+  editdataset.h
+  editfitkernel.h
+  editlinestyle.h
+  editreference.h
+
+  selectequation.h
+  selecttarget.h
+
+  axes.h
+  uchroma.h
+  create.h
+  data.h
+  dataimport.h
+  layout.h
+  log.h
+  saveimage.h
+  style.h
+  transform.h
+  view.h
 )
 QT4_WRAP_CPP(pro_MOC_SRCS ${pro_MOC_HDRS} OPTIONS -f)
 
 SET(pro_UIS
+  editdataset.ui
+  editfitkernel.ui
+  editlinestyle.ui
+  editreference.ui
+
+  selectequation.ui
+  selecttarget.ui
+
   axes.ui
   create.ui
   data.ui
   dataimport.ui
-  equationselect.ui
   fitsetup.ui
   layout.ui
-  linestyledialog.ui
   log.ui
-  referencedialog.ui
   saveimage.ui
   style.ui
-  targetselect.ui
   transform.ui
   view.ui
   uchroma.ui

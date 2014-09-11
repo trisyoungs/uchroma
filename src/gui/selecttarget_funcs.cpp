@@ -1,6 +1,6 @@
 /*
-	*** TargetSelect Functions
-	*** src/gui/targetselect_funcs.cpp
+	*** Select Target Functions
+	*** src/gui/selecttarget_funcs.cpp
 	Copyright T. Youngs 2012-2014
 
 	This file is part of uChroma.
@@ -19,19 +19,19 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/targetselect.h"
+#include "gui/selecttarget.h"
 #include "base/collection.h"
 #include "base/viewpane.h"
 #include "templates/variantpointer.h"
 
 // Constructor
-TargetSelectDialog::TargetSelectDialog(QWidget* parent) : QDialog(parent)
+SelectTargetDialog::SelectTargetDialog(QWidget* parent) : QDialog(parent)
 {
 	ui.setupUi(this);
 }
 
 // Destructor
-TargetSelectDialog::~TargetSelectDialog()
+SelectTargetDialog::~SelectTargetDialog()
 {
 }
 
@@ -40,7 +40,7 @@ TargetSelectDialog::~TargetSelectDialog()
  */
 
 // Populate list with available targets
-void TargetSelectDialog::populateLists(ViewPane* currentPane, ViewPane* availablePanes, Collection* availableCollections)
+void SelectTargetDialog::populateLists(ViewPane* currentPane, ViewPane* availablePanes, Collection* availableCollections)
 {
 	// Populate the panes list
 	QListWidgetItem* item;
@@ -66,7 +66,7 @@ void TargetSelectDialog::populateLists(ViewPane* currentPane, ViewPane* availabl
 }
 
 // Return selected panes
-RefList<ViewPane,bool> TargetSelectDialog::selectedPanes()
+RefList<ViewPane,bool> SelectTargetDialog::selectedPanes()
 {
 	RefList<ViewPane,bool> result;
 	QList<QListWidgetItem*> items = ui.AvailablePanesList->selectedItems();
@@ -75,7 +75,7 @@ RefList<ViewPane,bool> TargetSelectDialog::selectedPanes()
 }
 
 // Return selected collections
-RefList<Collection,bool> TargetSelectDialog::selectedCollections()
+RefList<Collection,bool> SelectTargetDialog::selectedCollections()
 {
 	RefList<Collection,bool> result;
 	QList<QListWidgetItem*> items = ui.AvailableCollectionsList->selectedItems();
@@ -87,22 +87,22 @@ RefList<Collection,bool> TargetSelectDialog::selectedCollections()
  * Slots
  */
 
-void TargetSelectDialog::on_AvailablePanesList_itemDoubleClicked(QListWidgetItem* item)
+void SelectTargetDialog::on_AvailablePanesList_itemDoubleClicked(QListWidgetItem* item)
 {
 	accept();
 }
 
-void TargetSelectDialog::on_AvailableCollectionsList_itemDoubleClicked(QListWidgetItem* item)
+void SelectTargetDialog::on_AvailableCollectionsList_itemDoubleClicked(QListWidgetItem* item)
 {
 	accept();
 }
 
-void TargetSelectDialog::on_CancelButton_clicked(bool checked)
+void SelectTargetDialog::on_CancelButton_clicked(bool checked)
 {
 	reject();
 }
 
-void TargetSelectDialog::on_SelectButton_clicked(bool checked)
+void SelectTargetDialog::on_SelectButton_clicked(bool checked)
 {
 	accept();
 }

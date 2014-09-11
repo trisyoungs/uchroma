@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>LineStyleDialog</class>
- <widget class="QDialog" name="LineStyleDialog">
+ <class>EditLineStyleDialog</class>
+ <widget class="QDialog" name="EditLineStyleDialog">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>228</width>
-    <height>157</height>
+    <height>159</height>
    </rect>
   </property>
   <property name="windowTitle">

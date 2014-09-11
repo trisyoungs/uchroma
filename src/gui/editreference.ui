@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ReferenceSetupDialog</class>
- <widget class="QDialog" name="ReferenceSetupDialog">
+ <class>EditReferenceDialog</class>
+ <widget class="QDialog" name="EditReferenceDialog">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>596</width>
-    <height>308</height>
+    <width>670</width>
+    <height>318</height>
    </rect>
   </property>
   <property name="font">

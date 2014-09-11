@@ -350,6 +350,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="ImportButton">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
        <property name="text">
         <string>&amp;Import</string>
        </property>

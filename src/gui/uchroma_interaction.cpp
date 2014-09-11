@@ -175,14 +175,14 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 	switch (interactionMode_)
 	{
 		case (InteractionMode::FitSetupSelectXInteraction):
-			fitSetupDialog_.ui.XAbsoluteMinSpin->setValue(min(clickedInteractionValue_, currentInteractionValue_));
-			fitSetupDialog_.ui.XAbsoluteMaxSpin->setValue(max(clickedInteractionValue_, currentInteractionValue_));
-			fitSetupDialog_.show();
+			editFitSetupDialog_.ui.XAbsoluteMinSpin->setValue(min(clickedInteractionValue_, currentInteractionValue_));
+			editFitSetupDialog_.ui.XAbsoluteMaxSpin->setValue(max(clickedInteractionValue_, currentInteractionValue_));
+			editFitSetupDialog_.show();
 			break;
 		case (InteractionMode::FitSetupSelectZInteraction):
-			fitSetupDialog_.ui.ZAbsoluteMinSpin->setValue(min(clickedInteractionValue_, currentInteractionValue_));
-			fitSetupDialog_.ui.ZAbsoluteMaxSpin->setValue(max(clickedInteractionValue_, currentInteractionValue_));
-			fitSetupDialog_.show();
+			editFitSetupDialog_.ui.ZAbsoluteMinSpin->setValue(min(clickedInteractionValue_, currentInteractionValue_));
+			editFitSetupDialog_.ui.ZAbsoluteMaxSpin->setValue(max(clickedInteractionValue_, currentInteractionValue_));
+			editFitSetupDialog_.show();
 			break;
 		case (InteractionMode::ZoomInteraction):
 			// None : Zoom to defined region

@@ -1,6 +1,6 @@
 /*
-	*** EquationSelect Dialog
-	*** src/gui/equationselect.h
+	*** Select Equation Dialog
+	*** src/gui/selectequation.h
 	Copyright T. Youngs 2012-2014.
 
 	This file is part of uChroma.
@@ -19,12 +19,12 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_EQUATIONSELECT_H
-#define UCHROMA_EQUATIONSELECT_H
+#ifndef UCHROMA_SELECTEQUATION_H
+#define UCHROMA_SELECTEQUATION_H
 
+#include "gui/ui_selectequation.h"
 #include <QtGui/QDialog>
 #include <QtCore/QObject>
-#include "gui/ui_equationselect.h"
 
 // Forward Declarations
 /* none */
@@ -60,19 +60,19 @@ class Equation
 };
 
 /*
- * Equation Select Dialog
+ * Select Equation Dialog
  */
-class EquationSelectDialog : public QDialog
+class SelectEquationDialog : public QDialog
 {
 	Q_OBJECT
 
 	public:
 	// Constructor
-	EquationSelectDialog(QWidget *parent);
+	SelectEquationDialog(QWidget *parent);
 	// Destructor
-	~EquationSelectDialog();
+	~SelectEquationDialog();
 	// Main form declaration
-	Ui::EquationSelectDialog ui;
+	Ui::SelectEquationDialog ui;
 
 
 	/*

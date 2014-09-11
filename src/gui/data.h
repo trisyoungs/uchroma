@@ -35,8 +35,8 @@ class DataWindow : public QWidget
 
 
 	/*
-	// Window Functions
-	*/
+	 * Window Functions
+	 */
 	private:
 	// Whether the window is refreshing / updating its controls
 	bool refreshing_;
@@ -74,10 +74,12 @@ class DataWindow : public QWidget
 	void on_SourceDirSelectButton_clicked(bool checked);
 	void on_AddFilesButton_clicked(bool checked);
 	void on_RemoveFilesButton_clicked(bool checked);
-	void on_SourceFilesTable_itemSelectionChanged();
-	void on_SourceFilesTable_cellChanged(int row, int column);
+	void on_DataSetsTable_itemSelectionChanged();
+	void on_DataSetsTable_itemDoubleClicked(QTableWidgetItem* item);
+	void on_DataSetsTable_cellChanged(int row, int column);
 	void on_GetZFromTimeStampButton_clicked(bool checked);
 	void on_ReloadFilesButton_clicked(bool checked);
+	void on_EditDataSetButton_clicked(bool checked);
 
 
 	/*

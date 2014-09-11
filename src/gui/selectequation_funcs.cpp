@@ -1,6 +1,6 @@
 /*
-	*** Fit Widget Functions
-	*** src/gui/fit_funcs.cpp
+	*** Select Equation Functions
+	*** src/gui/selectequation_funcs.cpp
 	Copyright T. Youngs 2012-2014
 
 	This file is part of uChroma.
@@ -19,7 +19,7 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/equationselect.h"
+#include "gui/selectequation.h"
 #include "templates/variantpointer.h"
 
 // Static list of fit equations
@@ -33,7 +33,7 @@ Equation Equation::equations[] = {
 };
 
 // Constructor
-EquationSelectDialog::EquationSelectDialog(QWidget* parent) : QDialog(parent)
+SelectEquationDialog::SelectEquationDialog(QWidget* parent) : QDialog(parent)
 {
 	ui.setupUi(this);
 
@@ -49,7 +49,7 @@ EquationSelectDialog::EquationSelectDialog(QWidget* parent) : QDialog(parent)
 }
 
 // Destructor
-EquationSelectDialog::~EquationSelectDialog()
+SelectEquationDialog::~SelectEquationDialog()
 {
 }
 
@@ -58,7 +58,7 @@ EquationSelectDialog::~EquationSelectDialog()
  */
 
 // Return selected equation
-Equation EquationSelectDialog::selectedEquation()
+Equation SelectEquationDialog::selectedEquation()
 {
 	return (*selectedEquation_);
 }
@@ -67,7 +67,7 @@ Equation EquationSelectDialog::selectedEquation()
  * Slots
  */
 
-void EquationSelectDialog::on_EquationList_currentRowChanged(int index)
+void SelectEquationDialog::on_EquationList_currentRowChanged(int index)
 {
 	selectedEquation_ = &Equation::equations[index];
 
@@ -77,18 +77,18 @@ void EquationSelectDialog::on_EquationList_currentRowChanged(int index)
 	ui.EquationDescriptionLabel->setText(selectedEquation_->description);
 }
 
-void EquationSelectDialog::on_EquationList_itemDoubleClicked(QListWidgetItem* item)
+void SelectEquationDialog::on_EquationList_itemDoubleClicked(QListWidgetItem* item)
 {
 	selectedEquation_ = VariantPointer<Equation>(item->data(Qt::UserRole));
 	accept();
 }
 
-void EquationSelectDialog::on_CancelButton_clicked(bool checked)
+void SelectEquationDialog::on_CancelButton_clicked(bool checked)
 {
 	reject();
 }
 
-void EquationSelectDialog::on_SelectButton_clicked(bool checked)
+void SelectEquationDialog::on_SelectButton_clicked(bool checked)
 {
 	accept();
 }

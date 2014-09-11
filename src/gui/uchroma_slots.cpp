@@ -131,6 +131,9 @@ void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 		imageExportMaintainAspect_ = saveImageDialog_.imageAspectRatioMaintained();
 		QPixmap pixmap = ui.MainView->generateImage(imageExportWidth_, imageExportHeight_);
 		pixmap.save(imageExportFile_, Viewer::imageFormatExtension(imageExportFormat_), -1);
+
+		// The sizes of panes may now be incorrect, so trigger a resize event
+		recalculateViewLayout(ui.MainView->contextWidth(), ui.MainView->contextHeight());
 	}
 }
 
@@ -333,8 +336,8 @@ void UChromaWindow::on_actionAnalyseNewFit_triggered(bool checked)
 	// Add a new fit collection to the current collection
 	Collection* newFit = currentCollection_->addFit(currentCollection_->uniqueFitName("New Fit"));
 
-	fitSetupDialog_.setFitKernel(newFit->fitKernel());
-	if (fitSetupDialog_.updateAndExec()) newFit->fitKernel()->fit();
+	editFitSetupDialog_.setFitKernel(newFit->fitKernel());
+	if (editFitSetupDialog_.updateAndExec()) newFit->fitKernel()->fit();
 	else currentCollection_->removeFit(newFit);
 
 	updateGUI();
@@ -346,8 +349,8 @@ void UChromaWindow::on_actionAnalyseEditFit_triggered(bool checked)
 
 	if (currentCollection_->fitKernel())
 	{
-		fitSetupDialog_.setFitKernel(currentCollection_->fitKernel());
-		if (fitSetupDialog_.updateAndExec())
+		editFitSetupDialog_.setFitKernel(currentCollection_->fitKernel());
+		if (editFitSetupDialog_.updateAndExec())
 		{
 			if (currentCollection_->fitKernel()->fit()) updateGUI();
 		}

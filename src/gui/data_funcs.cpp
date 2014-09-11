@@ -21,8 +21,10 @@
 
 #include "gui/data.h"
 #include "gui/uchroma.h"
+#include "gui/editdataset.h"
 #include "base/currentproject.h"
 #include "templates/reflist.h"
+#include "templates/variantpointer.h"
 
 /*
  * Window Functions
@@ -158,11 +160,11 @@ void DataWindow::on_RemoveFilesButton_clicked(bool checked)
 	if (!currentCollection) return;
 
 	// From the selected items, construct a list of dataset to remove
-	RefList<DataSet,int> slicesToRemove;
-	foreach(QTableWidgetItem* item, ui.SourceFilesTable->selectedItems()) slicesToRemove.addUnique(currentCollection->dataSet(item->row()));
+	RefList<DataSet,int> dataSetsToRemove;
+	foreach(QTableWidgetItem* item, ui.DataSetsTable->selectedItems()) dataSetsToRemove.addUnique(currentCollection->dataSet(item->row()));
 
 	// Delete datasets....
-	for (RefListItem<DataSet,int>* ri = slicesToRemove.first(); ri != NULL; ri = ri->next) currentCollection->removeDataSet(ri->item);
+	for (RefListItem<DataSet,int>* ri = dataSetsToRemove.first(); ri != NULL; ri = ri->next) currentCollection->removeDataSet(ri->item);
 
 	// Need to update GUI
 	CurrentProject::setAsModified();
@@ -170,12 +172,28 @@ void DataWindow::on_RemoveFilesButton_clicked(bool checked)
 }
 
 // Source data item selection changed
-void DataWindow::on_SourceFilesTable_itemSelectionChanged()
+void DataWindow::on_DataSetsTable_itemSelectionChanged()
 {
-	ui.RemoveFilesButton->setEnabled(ui.SourceFilesTable->selectedItems().count() != 0);
+	bool nSelected = ui.DataSetsTable->selectedItems().count();
+	ui.RemoveFilesButton->setEnabled(nSelected > 0);
+	ui.EditDataSetButton->setEnabled(nSelected > 0);
 }
 
-void DataWindow::on_SourceFilesTable_cellChanged(int row, int column)
+void DataWindow::on_DataSetsTable_itemDoubleClicked(QTableWidgetItem* item)
+{
+	if (item->column() == 0)
+	{
+		DataSet* dataSet = VariantPointer<DataSet>(item->data(Qt::UserRole));
+		if (!dataSet) return;
+
+		EditDataSetDialog dataSetDialog(this);
+		if (dataSetDialog.call(dataSet)) uChroma_.currentCollection()->setDataSetData(dataSet, dataSetDialog.dataSet());
+
+		updateControls();
+	}
+}
+
+void DataWindow::on_DataSetsTable_cellChanged(int row, int column)
 {
 	// Check for window refreshing or invalid Collection
 	Collection* currentCollection = uChroma_.currentCollection();
@@ -188,7 +206,7 @@ void DataWindow::on_SourceFilesTable_cellChanged(int row, int column)
 		DataSet* dataSet = currentCollection->dataSet(row);
 		if (dataSet == NULL) return;
 
-		QTableWidgetItem* item = ui.SourceFilesTable->item(row, column);
+		QTableWidgetItem* item = ui.DataSetsTable->item(row, column);
 		if (item == NULL) return;
 
 		// Set new value of z (its position in the list will be adjusted if necessary)
@@ -207,7 +225,7 @@ void DataWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 	Collection* currentCollection = uChroma_.currentCollection();
 	if (refreshing_ || (!currentCollection)) return;
 
-	// Check for no slices
+	// Check for no datasets
 	if (currentCollection->nDataSets() == 0) return;
 
 // 	QString dir = QInputDialog::getText(this, "Choose File Location", "Select the location of the files that will be interrogated:", QLineEdit::Normal, 
@@ -270,7 +288,7 @@ void DataWindow::on_ReloadFilesButton_clicked(bool checked)
 	// Any failed to load?
 	if (nFailed > 0)
 	{
-		QMessageBox::StandardButton button = QMessageBox::warning(this, "Failed to Load Data", QString("Failed to reload data for ") + QString::number(nFailed) + " defined slices.\nWould you like to remove empty slices from the list?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+		QMessageBox::StandardButton button = QMessageBox::warning(this, "Failed to Load Data", QString("Failed to reload data for ") + QString::number(nFailed) + " defined datasets.\nWould you like to remove empty datasets from the list?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 		if (button == QMessageBox::Yes)
 		{
 			DataSet* dataSet = currentCollection->dataSets(), *nextDataSet;
@@ -286,6 +304,25 @@ void DataWindow::on_ReloadFilesButton_clicked(bool checked)
 	// Need to update GUI
 	CurrentProject::setAsModified();
 	uChroma_.updateGUI();
+}
+
+void DataWindow::on_EditDataSetButton_clicked(bool checked)
+{
+	// From the selected items, construct a list of dataset to remove
+	RefList<DataSet,int> dataSetsToEdit;
+	foreach(QTableWidgetItem* item, ui.DataSetsTable->selectedItems()) dataSetsToEdit.addUnique(VariantPointer<DataSet>(item->data(Qt::UserRole)));
+
+	// Raise a dialog for each selected dataset in turn
+	for (RefListItem<DataSet,int>* ri = dataSetsToEdit.first(); ri != NULL; ri = ri->next)
+	{
+		DataSet* dataSet = ri->item;
+		if (!dataSet) continue;
+
+		EditDataSetDialog dataSetDialog(this);
+		if (dataSetDialog.call(dataSet)) uChroma_.currentCollection()->setDataSetData(dataSet, dataSetDialog.dataSet());
+	}
+
+	updateControls();
 }
 
 /*
@@ -314,19 +351,38 @@ void DataWindow::updateControls(bool force)
 
 	ui.SourceDirEdit->setText(currentCollection->dataFileDirectory().absolutePath());
 
-	ui.SourceFilesTable->clearContents();
-	ui.SourceFilesTable->setRowCount(currentCollection->nDataSets());
+	ui.DataSetsTable->clearContents();
+	ui.DataSetsTable->setRowCount(currentCollection->nDataSets());
 	int count = 0;
 	for (DataSet* dataSet = currentCollection->dataSets(); dataSet != NULL; dataSet = dataSet->next)
 	{
+		// Create filename item
 		QTableWidgetItem* item = new QTableWidgetItem(dataSet->sourceFileName());
+		item->setData(Qt::UserRole, VariantPointer<DataSet>(dataSet));
 		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-		ui.SourceFilesTable->setItem(count, 0, item);
+		ui.DataSetsTable->setItem(count, 0, item);
+
+		// Create nPoints item
+		item = new QTableWidgetItem(QString::number(dataSet->data().nPoints()));
+		item->setData(Qt::UserRole, VariantPointer<DataSet>(dataSet));
+		item->setFlags(Qt::ItemIsSelectable);
+		ui.DataSetsTable->setItem(count, 1, item);
+
+		// Create Z value item
 		item = new QTableWidgetItem(QString::number(dataSet->data().z()));
-		ui.SourceFilesTable->setItem(count, 1, item);
+		item->setData(Qt::UserRole, VariantPointer<DataSet>(dataSet));
+		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
+		ui.DataSetsTable->setItem(count, 2, item);
+
+		// Create Source item
+		item = new QTableWidgetItem(DataSet::dataSource(dataSet->dataSource()));
+		item->setData(Qt::UserRole, VariantPointer<DataSet>(dataSet));
+		item->setFlags(Qt::ItemIsSelectable);
+		ui.DataSetsTable->setItem(count, 3, item);
+
 		++count;
 	}
-	ui.SourceFilesTable->resizeColumnsToContents();
+	ui.DataSetsTable->resizeColumnsToContents();
 
 	refreshing_ = false;
 }

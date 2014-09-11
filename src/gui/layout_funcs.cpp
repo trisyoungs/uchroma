@@ -21,7 +21,7 @@
 
 #include "gui/layout.h"
 #include "gui/uchroma.h"
-#include "gui/targetselect.h"
+#include "gui/selecttarget.h"
 #include "templates/variantpointer.h"
 
 /*
@@ -180,14 +180,14 @@ void LayoutDialog::on_PaneTargetsList_currentRowChanged(int index)
 
 void LayoutDialog::on_PaneAddTargetButton_clicked(bool checked)
 {
-	TargetSelectDialog targetSelect(this);
-	targetSelect.populateLists(currentPane_, uChroma_.viewLayout().panes(), uChroma_.collections());
-	if (targetSelect.exec())
+	SelectTargetDialog targetDialog(this);
+	   targetDialog.populateLists(currentPane_, uChroma_.viewLayout().panes(), uChroma_.collections());
+	if (targetDialog.exec())
 	{
 		// Get lists of panes and collections, and add them to the targets list
-		RefList<ViewPane,bool> panes = targetSelect.selectedPanes();
+		RefList<ViewPane,bool> panes = targetDialog.selectedPanes();
 		for (RefListItem<ViewPane,bool>* ri = panes.first(); ri != NULL; ri = ri->next) currentPane_->addRoleTargetPane(ri->item);
-		RefList<Collection,bool> collections = targetSelect.selectedCollections();
+		RefList<Collection,bool> collections = targetDialog.selectedCollections();
 		for (RefListItem<Collection,bool>* rj = collections.first(); rj != NULL; rj = rj->next) currentPane_->addRoleTargetCollection(rj->item);
 	}
 

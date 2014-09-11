@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>FitSetupDialog</class>
- <widget class="QDialog" name="FitSetupDialog">
+ <class>EditFitKernelDialog</class>
+ <widget class="QDialog" name="EditFitKernelDialog">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>524</width>
+    <width>530</width>
     <height>608</height>
    </rect>
   </property>

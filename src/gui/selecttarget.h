@@ -1,6 +1,6 @@
 /*
-	*** TargetSelect Dialog
-	*** src/gui/targetselect.h
+	*** Select Target Dialog
+	*** src/gui/selecttarget.h
 	Copyright T. Youngs 2012-2014.
 
 	This file is part of uChroma.
@@ -19,12 +19,12 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_TARGETSELECT_H
-#define UCHROMA_TARGETSELECT_H
+#ifndef UCHROMA_SELECTTARGET_H
+#define UCHROMA_SELECTTARGET_H
 
+#include "gui/ui_selecttarget.h"
 #include <QtGui/QDialog>
 #include <QtCore/QObject>
-#include "gui/ui_targetselect.h"
 #include "templates/reflist.h"
 
 // Forward Declarations
@@ -34,17 +34,17 @@ class ViewPane;
 /*
  * Target Select Dialog
  */
-class TargetSelectDialog : public QDialog
+class SelectTargetDialog : public QDialog
 {
 	Q_OBJECT
 
 	public:
 	// Constructor
-	TargetSelectDialog(QWidget *parent);
+	SelectTargetDialog(QWidget *parent);
 	// Destructor
-	~TargetSelectDialog();
+	~SelectTargetDialog();
 	// Main form declaration
-	Ui::TargetSelectDialog ui;
+	Ui::SelectTargetDialog ui;
 
 
 	/*

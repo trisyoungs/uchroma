@@ -1,6 +1,6 @@
 /*
-	*** Line Style Dialog
-	*** src/gui/linestyledialog.h
+	*** Edit DataSet Dialog
+	*** src/gui/editdataset.h
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,27 +19,27 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_LINESTYLEDIALOG_H
-#define UCHROMA_LINESTYLEDIALOG_H
+#ifndef UCHROMA_EDITDATASETDIALOG_H
+#define UCHROMA_EDITDATASETDIALOG_H
 
-#include "gui/ui_linestyledialog.h"
-#include "render/linestyle.h"
+#include "gui/ui_editdataset.h"
+#include "base/dataset.h"
 #include <QtGui/QDialog>
 
 // Forward Declarations
 /* none */
 
-class LineStyleDialog : public QDialog
+class EditDataSetDialog : public QDialog
 {
 	// All Qt declarations must include this macro
 	Q_OBJECT
 
 	public:
 	// Constructor / Destructor
-	LineStyleDialog(QWidget *parent);
-	~LineStyleDialog();
+	EditDataSetDialog(QWidget *parent);
+	~EditDataSetDialog();
 	// Main form declaration
-	Ui::LineStyleDialog ui;
+	Ui::EditDataSetDialog ui;
 
 
 	/*
@@ -48,10 +48,8 @@ class LineStyleDialog : public QDialog
 	private:
 	// Whether the window is refreshing / updating its controls
 	bool refreshing_;
-	// Target reference pointer
-	LineStyle* lineStyleTarget_;
-	// Backup copy of LineStyle (in case the dialog is cancelled)
-	LineStyle lineStyleBackup_;
+	// Data we are editing
+	DataSet dataSet_;
 
 	protected:
 	// Window close event
@@ -64,16 +62,16 @@ class LineStyleDialog : public QDialog
 
 	public:
 	// Call dialog to edit specified reference
-	bool call(LineStyle* target);
+	bool call(DataSet* target);
+	// Get current data stored in dialog
+	DataSet& dataSet();
 
 
 	/*
 	 * Slots
 	 */
 	private slots:
-	void on_LineColourButton_clicked(bool checked);
-	void on_LineWidthSpin_valueChanged(double value);
-	void on_LineStippleCombo_currentIndexChanged(int currentIndex);
+	void on_DataTable_cellChanged(int row, int column);
 };
 
 #endif

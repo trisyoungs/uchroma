@@ -1,6 +1,6 @@
 /*
-	*** Line Style Dialog
-	*** src/gui/linestyledialog_funcs.cpp
+	*** Edit LineStyle Dialog
+	*** src/gui/editlinestyle_funcs.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,18 +19,18 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/linestyledialog.h"
+#include "gui/editlinestyle.h"
 #include "base/messenger.h"
 #include <QtGui/QPainter>
 
 // Constructor
-LineStyleDialog::LineStyleDialog(QWidget *parent) : QDialog(parent)
+EditLineStyleDialog::EditLineStyleDialog(QWidget *parent) : QDialog(parent)
 {
 	ui.setupUi(this);
 }
 
 // Destructor
-LineStyleDialog::~LineStyleDialog()
+EditLineStyleDialog::~EditLineStyleDialog()
 {
 }
 
@@ -39,43 +39,39 @@ LineStyleDialog::~LineStyleDialog()
  */
 
 // Window close event
-void LineStyleDialog::closeEvent(QCloseEvent* event)
+void EditLineStyleDialog::closeEvent(QCloseEvent* event)
 {
 	reject();
 }
 
-void LineStyleDialog::reject()
+void EditLineStyleDialog::reject()
 {
-	// Revert to saved data
-	(*lineStyleTarget_) = lineStyleBackup_;
-
 	setResult(QDialog::Rejected);
 	hide();
 }
 
-void LineStyleDialog::on_OKButton_clicked(bool checked)
+void EditLineStyleDialog::on_OKButton_clicked(bool checked)
 {
 	accept();
 }
 
-void LineStyleDialog::on_CancelButton_clicked(bool checked)
+void EditLineStyleDialog::on_CancelButton_clicked(bool checked)
 {
 	reject();
 }
 
 // Call dialog to edit specified reference
-bool LineStyleDialog::call(LineStyle* target)
+bool EditLineStyleDialog::call(LineStyle* target)
 {
 	// Check supplied var
 	if (!target)
 	{
-		msg.print("Internal Error: NULL LineStyle given to LineStyleDialog::call().\n");
+		msg.print("Internal Error: NULL LineStyle given to EditLineStyleDialog::call().\n");
 		return false;
 	}
 
-	// Take copy of supplied data
-	lineStyleTarget_ = target;
-	lineStyleBackup_ = (*lineStyleTarget_);
+	// Copy supplied data
+	lineStyle_ = (*target);
 
 	refreshing_ = true;
 
@@ -104,9 +100,9 @@ bool LineStyleDialog::call(LineStyle* target)
 	}
 
 	// Update widgets
-	ui.LineWidthSpin->setValue(lineStyleTarget_->width());
-	ui.LineColourButton->setColour(lineStyleTarget_->colour());
-	ui.LineStippleCombo->setCurrentIndex(lineStyleTarget_->stipple());
+	ui.LineWidthSpin->setValue(lineStyle_.width());
+	ui.LineColourButton->setColour(lineStyle_.colour());
+	ui.LineStippleCombo->setCurrentIndex(lineStyle_.stipple());
 
 	refreshing_ = false;
 
@@ -115,27 +111,33 @@ bool LineStyleDialog::call(LineStyle* target)
 	else return false;
 }
 
+// Return edited data
+LineStyle& EditLineStyleDialog::lineStyle()
+{
+	return lineStyle_;
+}
+
 /*
  * Slots
  */
 
-void LineStyleDialog::on_LineColourButton_clicked(bool checked)
+void EditLineStyleDialog::on_LineColourButton_clicked(bool checked)
 {
 	if (refreshing_) return;
 
-	if (ui.LineColourButton->selectColour()) lineStyleTarget_->setColour(ui.LineColourButton->colour());
+	if (ui.LineColourButton->selectColour()) lineStyle_.setColour(ui.LineColourButton->colour());
 }
 
-void LineStyleDialog::on_LineWidthSpin_valueChanged(double value)
+void EditLineStyleDialog::on_LineWidthSpin_valueChanged(double value)
 {
 	if (refreshing_) return;
 
-	lineStyleTarget_->setWidth(value);
+	lineStyle_.setWidth(value);
 }
 
-void LineStyleDialog::on_LineStippleCombo_currentIndexChanged(int currentIndex)
+void EditLineStyleDialog::on_LineStippleCombo_currentIndexChanged(int currentIndex)
 {
 	if (refreshing_) return;
 
-	lineStyleTarget_->setStipple( (LineStipple::StippleType) currentIndex);
+	lineStyle_.setStipple( (LineStipple::StippleType) currentIndex);
 }

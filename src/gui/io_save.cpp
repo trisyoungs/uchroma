@@ -129,7 +129,7 @@ bool UChromaWindow::writeCollectionBlock(LineParser& parser, Collection* collect
 	for (DataSet* dataSet = collection->dataSets(); dataSet != NULL; dataSet = dataSet->next) writeDataSetBlock(parser, dataSet, indentLevel);
 
 	// Write FitKernel data if present
-	if (collection->fitKernel()) writeFitParametersBlock(parser, collection->fitKernel(), indentLevel+1);
+	if (collection->fitKernel()) writeFitParametersBlock(parser, collection->fitKernel(), indentLevel);
 
 	// Additional data
 	// -- Fits

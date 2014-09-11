@@ -1,6 +1,6 @@
 /*
-	*** Fit Setup Dialog
-	*** src/gui/fitsetup.h
+	*** Edit FitKernel Dialog
+	*** src/gui/editfitkernel.h
 	Copyright T. Youngs 2012-2014.
 
 	This file is part of uChroma.
@@ -19,12 +19,12 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_FITSETUP_H
-#define UCHROMA_FITSETUP_H
+#ifndef UCHROMA_EDITFITKERNELDIALOG_H
+#define UCHROMA_EDITFITKERNELDIALOG_H
 
 #include <QtGui/QDialog>
 #include <QtCore/QObject>
-#include "gui/ui_fitsetup.h"
+#include "gui/ui_editfitkernel.h"
 #include "base/dnchar.h"
 #include "base/data2d.h"
 #include "base/equationvariable.h"
@@ -40,19 +40,19 @@ class DataSet;
 class Variable;
 
 /*
- * FitSetup Dialog
+ * Edit FitKernel Dialog
  */
-class FitSetupDialog : public QDialog
+class EditFitKernelDialog : public QDialog
 {
 	Q_OBJECT
 
 	public:
 	// Constructor
-	FitSetupDialog(UChromaWindow& parent);
+	EditFitKernelDialog(UChromaWindow& parent);
 	// Destructor
-	~FitSetupDialog();
+	~EditFitKernelDialog();
 	// Main form declaration
-	Ui::FitSetupDialog ui;
+	Ui::EditFitKernelDialog ui;
 	// UChromaWindow reference
 	UChromaWindow& uChroma_;
 
@@ -65,7 +65,7 @@ class FitSetupDialog : public QDialog
 	bool refreshing_;
 	// Whether the next reject() call should be treated as soft
 	bool softReject_;
-	// Backup FitKernel data
+	// FitKernel data
 	FitKernel fitKernelBackup_;
 
 	protected:

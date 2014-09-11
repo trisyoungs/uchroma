@@ -21,7 +21,7 @@
 
 #include "gui/create.h"
 #include "gui/uchroma.h"
-#include "gui/equationselect.h"
+#include "gui/selectequation.h"
 #include "expression/variable.h"
 #include "base/currentproject.h"
 
@@ -224,8 +224,8 @@ void CreateCollectionDialog::on_EquationEdit_textChanged(QString text)
 
 void CreateCollectionDialog::on_EquationSelectButton_clicked(bool checked)
 {
-	EquationSelectDialog selectDialog(this);
-	if (selectDialog.exec()) ui.EquationEdit->setText(selectDialog.selectedEquation().equationText);
+	SelectEquationDialog equationDialog(this);
+	if (equationDialog.exec()) ui.EquationEdit->setText(equationDialog.selectedEquation().equationText);
 }
 
 /*

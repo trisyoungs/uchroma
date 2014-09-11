@@ -78,8 +78,10 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	void removeDataSet(DataSet* dataSet);
 	// Set z value of specified dataset
 	void setDataSetZ(DataSet* target, double z);
-	// Set data for specified dataset
+	// Set data for specified dataset (from arrays);
 	void setDataSetData(DataSet* target, const Array<double>& x, const Array<double>& y);
+	// Set data for specified dataste (from source DataSet)
+	void setDataSetData(DataSet* target, DataSet& source);
 	// Return first dataset in list
 	DataSet* dataSets() const;
 	// Return named dataset

@@ -262,12 +262,31 @@ void Collection::setDataSetData(DataSet* target, const Array<double>& x, const A
 	// Check that this DataSet is owned by the collection
 	if (!dataSets_.contains(target))
 	{
-// 		msg.print("Internal Error : Tried to set the data of a dataset using the wrong collection.\n");
+		msg.print("Internal Error : Tried to set the data of a dataset using the wrong collection.\n");
 		return;
 	}
 
 	target->data().clear();
 	for (int n=0; n<x.nItems(); ++n) target->data().addPoint(x.value(n), y.value(n));
+
+	dataChanged_ = true;
+	displayDataValid_ = false;
+	displayPrimitivesValid_ = false;
+
+	CurrentProject::setAsModified();
+}
+
+// Set data for specified dataste (from source DataSet)
+void Collection::setDataSetData(DataSet* target, DataSet& source)
+{
+	// Check that this DataSet is owned by the collection
+	if (!dataSets_.contains(target))
+	{
+		msg.print("Internal Error : Tried to set the data of a dataset using the wrong collection.\n");
+		return;
+	}
+
+	(*target) = source;
 
 	dataChanged_ = true;
 	displayDataValid_ = false;

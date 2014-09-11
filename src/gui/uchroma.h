@@ -26,7 +26,7 @@
 #include "gui/axes.h"
 #include "gui/create.h"
 #include "gui/data.h"
-#include "gui/fitsetup.h"
+#include "gui/editfitkernel.h"
 #include "gui/layout.h"
 #include "gui/log.h"
 #include "gui/style.h"
@@ -103,7 +103,7 @@ class UChromaWindow : public QMainWindow
 	// Data Import Dialog
 	DataImportDialog dataImportDialog_;
 	// Fit Window
-	FitSetupDialog fitSetupDialog_;
+	EditFitKernelDialog editFitSetupDialog_;
 	// Layout Dialog
 	LayoutDialog layoutDialog_;
 	// Save Image Dialog
