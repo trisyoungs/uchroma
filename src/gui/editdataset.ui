@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>EditDataSetDialog</class>
  <widget class="QDialog" name="EditDataSetDialog">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -19,7 +22,7 @@
    <string>Edit Data</string>
   </property>
   <property name="modal">
-   <bool>true</bool>
+   <bool>false</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">

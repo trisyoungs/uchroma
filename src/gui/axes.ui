@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>370</width>
-    <height>456</height>
+    <height>466</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -49,7 +49,7 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="XAxisTab">
+     <widget class="QWidget" name="XTab">
       <attribute name="title">
        <string>X Axis</string>
       </attribute>
@@ -61,11 +61,11 @@
         <number>4</number>
        </property>
        <item>
-        <widget class="QTabWidget" name="XAxisTabs">
+        <widget class="QTabWidget" name="XTabs">
          <property name="currentIndex">
           <number>0</number>
          </property>
-         <widget class="QWidget" name="XAxisGeneralTab">
+         <widget class="QWidget" name="XGeneralTab">
           <attribute name="title">
            <string>General</string>
           </attribute>
@@ -86,28 +86,28 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="AxisXTitleEdit"/>
+              <widget class="QLineEdit" name="XTitleEdit"/>
              </item>
             </layout>
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_21">
              <item>
-              <widget class="QCheckBox" name="AxisXInvertCheck">
+              <widget class="QCheckBox" name="XInvertCheck">
                <property name="text">
                 <string>Invert</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="AxisXLogarithmicCheck">
+              <widget class="QCheckBox" name="XLogarithmicCheck">
                <property name="text">
                 <string>Logarithmic</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="AxisXVisibleCheck">
+              <widget class="QCheckBox" name="XVisibleCheck">
                <property name="text">
                 <string>Visible</string>
                </property>
@@ -125,7 +125,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QDoubleSpinBox" name="AxisXStretchSpin">
+              <widget class="QDoubleSpinBox" name="XStretchSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -155,7 +155,7 @@
             </layout>
            </item>
            <item>
-            <widget class="QGroupBox" name="XAxisLimitsGroup">
+            <widget class="QGroupBox" name="XLimitsGroup">
              <property name="title">
               <string>Limits</string>
              </property>
@@ -172,7 +172,7 @@
                  <number>4</number>
                 </property>
                 <item row="0" column="5">
-                 <widget class="QToolButton" name="AxisXMaxSetMaximumButton">
+                 <widget class="QToolButton" name="XMaxSetMaximumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -198,7 +198,7 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QLabel" name="AxisXMinLabel">
+                 <widget class="QLabel" name="XMinLabel">
                   <property name="font">
                    <font>
                     <pointsize>8</pointsize>
@@ -210,7 +210,7 @@
                  </widget>
                 </item>
                 <item row="1" column="4">
-                 <widget class="QLabel" name="AxisXMaxLabel">
+                 <widget class="QLabel" name="XMaxLabel">
                   <property name="font">
                    <font>
                     <pointsize>8</pointsize>
@@ -222,7 +222,7 @@
                  </widget>
                 </item>
                 <item row="0" column="0">
-                 <widget class="QToolButton" name="AxisXMinSetMinimumButton">
+                 <widget class="QToolButton" name="XMinSetMinimumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -248,7 +248,7 @@
                  </widget>
                 </item>
                 <item row="0" column="3">
-                 <widget class="QLabel" name="XAxisLabel">
+                 <widget class="QLabel" name="XLabel">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                     <horstretch>0</horstretch>
@@ -261,7 +261,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="TExponentialSpin" name="AxisXMinSpin" native="true">
+                 <widget class="TExponentialSpin" name="XMinSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -280,7 +280,7 @@
                  </widget>
                 </item>
                 <item row="0" column="4">
-                 <widget class="TExponentialSpin" name="AxisXMaxSpin" native="true">
+                 <widget class="TExponentialSpin" name="XMaxSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -304,7 +304,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="XAxisCrossGroup">
+            <widget class="QGroupBox" name="XCrossGroup">
              <property name="title">
               <string>Cross At</string>
              </property>
@@ -321,7 +321,7 @@
                  <number>4</number>
                 </property>
                 <item row="1" column="5">
-                 <widget class="QToolButton" name="AxisXPositionYSetMaximumButton">
+                 <widget class="QToolButton" name="XPositionYSetMaximumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -347,7 +347,7 @@
                  </widget>
                 </item>
                 <item row="1" column="4">
-                 <widget class="QToolButton" name="AxisXPositionYSetZeroButton">
+                 <widget class="QToolButton" name="XPositionYSetZeroButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -373,7 +373,7 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="TExponentialSpin" name="AxisXPositionYRealSpin" native="true">
+                 <widget class="TExponentialSpin" name="XPositionYRealSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -392,7 +392,7 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="TExponentialSpin" name="AxisXPositionZRealSpin" native="true">
+                 <widget class="TExponentialSpin" name="XPositionZRealSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -411,7 +411,7 @@
                  </widget>
                 </item>
                 <item row="1" column="3">
-                 <widget class="QToolButton" name="AxisXPositionYSetMinimumButton">
+                 <widget class="QToolButton" name="XPositionYSetMinimumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -463,7 +463,7 @@
                  </widget>
                 </item>
                 <item row="2" column="3">
-                 <widget class="QToolButton" name="AxisXPositionZSetMinimumButton">
+                 <widget class="QToolButton" name="XPositionZSetMinimumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -489,7 +489,7 @@
                  </widget>
                 </item>
                 <item row="2" column="4">
-                 <widget class="QToolButton" name="AxisXPositionZSetZeroButton">
+                 <widget class="QToolButton" name="XPositionZSetZeroButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -515,7 +515,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QRadioButton" name="AxisXPositionRealRadio">
+                 <widget class="QRadioButton" name="XPositionRealRadio">
                   <property name="text">
                    <string>Real</string>
                   </property>
@@ -525,7 +525,7 @@
                  </widget>
                 </item>
                 <item row="2" column="5">
-                 <widget class="QToolButton" name="AxisXPositionZSetMaximumButton">
+                 <widget class="QToolButton" name="XPositionZSetMaximumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -551,7 +551,7 @@
                  </widget>
                 </item>
                 <item row="1" column="2">
-                 <widget class="TExponentialSpin" name="AxisXPositionYFractionalSpin" native="true">
+                 <widget class="TExponentialSpin" name="XPositionYFractionalSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -570,7 +570,7 @@
                  </widget>
                 </item>
                 <item row="2" column="2">
-                 <widget class="TExponentialSpin" name="AxisXPositionZFractionalSpin" native="true">
+                 <widget class="TExponentialSpin" name="XPositionZFractionalSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -589,7 +589,7 @@
                  </widget>
                 </item>
                 <item row="0" column="2">
-                 <widget class="QRadioButton" name="AxisXPositionFractionalRadio">
+                 <widget class="QRadioButton" name="XPositionFractionalRadio">
                   <property name="text">
                    <string>Fractional</string>
                   </property>
@@ -602,7 +602,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="XAxisTicksTab">
+         <widget class="QWidget" name="XTicksTab">
           <attribute name="title">
            <string>Tick Marks</string>
           </attribute>
@@ -616,7 +616,7 @@
            <item>
             <layout class="QGridLayout" name="gridLayout_9">
              <item row="0" column="1" colspan="2">
-              <widget class="QDoubleSpinBox" name="AxisXTicksStartSpin">
+              <widget class="QDoubleSpinBox" name="XTicksStartSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -661,7 +661,7 @@
               </widget>
              </item>
              <item row="4" column="3">
-              <widget class="QDoubleSpinBox" name="AxisXTickDirectionZSpin">
+              <widget class="QDoubleSpinBox" name="XTickDirectionZSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -683,7 +683,7 @@
               </widget>
              </item>
              <item row="2" column="1">
-              <widget class="QSpinBox" name="AxisXMinorTicksSpin"/>
+              <widget class="QSpinBox" name="XMinorTicksSpin"/>
              </item>
              <item row="5" column="0">
               <widget class="QLabel" name="label_37">
@@ -693,14 +693,14 @@
               </widget>
              </item>
              <item row="1" column="3">
-              <widget class="QCheckBox" name="AxisXAutoTicksCheck">
+              <widget class="QCheckBox" name="XAutoTicksCheck">
                <property name="text">
                 <string>Auto</string>
                </property>
               </widget>
              </item>
              <item row="4" column="1">
-              <widget class="QDoubleSpinBox" name="AxisXTickDirectionXSpin">
+              <widget class="QDoubleSpinBox" name="XTickDirectionXSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -742,7 +742,7 @@
               </widget>
              </item>
              <item row="4" column="2">
-              <widget class="QDoubleSpinBox" name="AxisXTickDirectionYSpin">
+              <widget class="QDoubleSpinBox" name="XTickDirectionYSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -764,7 +764,7 @@
               </widget>
              </item>
              <item row="5" column="1">
-              <widget class="QDoubleSpinBox" name="AxisXTickSizeSpin">
+              <widget class="QDoubleSpinBox" name="XTickSizeSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -793,7 +793,7 @@
               </widget>
              </item>
              <item row="1" column="1" colspan="2">
-              <widget class="QDoubleSpinBox" name="AxisXTicksDeltaSpin">
+              <widget class="QDoubleSpinBox" name="XTicksDeltaSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -835,7 +835,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="XAxisLabelsTab">
+         <widget class="QWidget" name="XLabelsTab">
           <attribute name="title">
            <string>Labels</string>
           </attribute>
@@ -847,7 +847,69 @@
             <number>4</number>
            </property>
            <item>
-            <widget class="QGroupBox" name="XAxisLabelOrientationGroup">
+            <widget class="QGroupBox" name="XNumberFormatGroup">
+             <property name="title">
+              <string>Number Format</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_14">
+              <property name="spacing">
+               <number>4</number>
+              </property>
+              <property name="margin">
+               <number>4</number>
+              </property>
+              <item>
+               <widget class="QFrame" name="XNumberFormatTestFrame">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Sunken</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_15">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
+                 <property name="margin">
+                  <number>4</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="XNumberFormatTestLabel">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>1.23456789</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="XNumberFormatChangeButton">
+                <property name="text">
+                 <string>Change...</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="XLabelOrientationGroup">
              <property name="title">
               <string>Label Orientation</string>
              </property>
@@ -874,7 +936,7 @@
                  </widget>
                 </item>
                 <item row="2" column="3">
-                 <widget class="QSlider" name="AxisXLabelInPlaneRotationSlider">
+                 <widget class="QSlider" name="XLabelInPlaneRotationSlider">
                   <property name="toolTip">
                    <string>Change the in-plane rotation (about Z) of the labels</string>
                   </property>
@@ -887,7 +949,7 @@
                  </widget>
                 </item>
                 <item row="2" column="2">
-                 <widget class="QSpinBox" name="AxisXLabelAxialRotationSpin">
+                 <widget class="QSpinBox" name="XLabelAxialRotationSpin">
                   <property name="toolTip">
                    <string>Change the axial rotation (along X) of the labels</string>
                   </property>
@@ -897,7 +959,7 @@
                  </widget>
                 </item>
                 <item row="2" column="4">
-                 <widget class="QSpinBox" name="AxisXLabelInPlaneRotationSpin">
+                 <widget class="QSpinBox" name="XLabelInPlaneRotationSpin">
                   <property name="toolTip">
                    <string>Change the in-plane rotation (about Z) of the labels</string>
                   </property>
@@ -917,7 +979,7 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="QSlider" name="AxisXLabelAxialRotationSlider">
+                 <widget class="QSlider" name="XLabelAxialRotationSlider">
                   <property name="toolTip">
                    <string>Change the axial rotation (along X) of the labels</string>
                   </property>
@@ -940,7 +1002,7 @@
                  </widget>
                 </item>
                 <item row="3" column="2">
-                 <widget class="QDoubleSpinBox" name="AxisXLabelDistanceSpin">
+                 <widget class="QDoubleSpinBox" name="XLabelDistanceSpin">
                   <property name="minimum">
                    <double>-99.000000000000000</double>
                   </property>
@@ -950,7 +1012,7 @@
                  </widget>
                 </item>
                 <item row="3" column="3">
-                 <widget class="QComboBox" name="AxisXLabelAnchorCombo">
+                 <widget class="QComboBox" name="XLabelAnchorCombo">
                   <property name="toolTip">
                    <string>Text anchor position for axis title</string>
                   </property>
@@ -972,7 +1034,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="XAxisTitleOrientationGroup">
+            <widget class="QGroupBox" name="XTitleOrientationGroup">
              <property name="title">
               <string>Title Orientation</string>
              </property>
@@ -999,7 +1061,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSlider" name="AxisXTitleHOffsetSlider">
+                 <widget class="QSlider" name="XTitleHOffsetSlider">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                     <horstretch>0</horstretch>
@@ -1024,7 +1086,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QToolButton" name="AxisXTitleHOffsetLeftButton">
+                 <widget class="QToolButton" name="XTitleHOffsetLeftButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -1050,7 +1112,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QToolButton" name="AxisXTitleHOffsetCentreButton">
+                 <widget class="QToolButton" name="XTitleHOffsetCentreButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -1076,7 +1138,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QToolButton" name="AxisXTitleHOffsetRightButton">
+                 <widget class="QToolButton" name="XTitleHOffsetRightButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -1102,7 +1164,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="AxisXTitleAnchorCombo">
+                 <widget class="QComboBox" name="XTitleAnchorCombo">
                   <property name="toolTip">
                    <string>Text anchor position for axis title</string>
                   </property>
@@ -1126,7 +1188,7 @@
                  </widget>
                 </item>
                 <item row="2" column="3">
-                 <widget class="QSlider" name="AxisXTitleInPlaneRotationSlider">
+                 <widget class="QSlider" name="XTitleInPlaneRotationSlider">
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -1136,14 +1198,14 @@
                  </widget>
                 </item>
                 <item row="2" column="2">
-                 <widget class="QSpinBox" name="AxisXTitleAxialRotationSpin">
+                 <widget class="QSpinBox" name="XTitleAxialRotationSpin">
                   <property name="maximum">
                    <number>360</number>
                   </property>
                  </widget>
                 </item>
                 <item row="2" column="4">
-                 <widget class="QSpinBox" name="AxisXTitleInPlaneRotationSpin">
+                 <widget class="QSpinBox" name="XTitleInPlaneRotationSpin">
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -1160,7 +1222,7 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="QSlider" name="AxisXTitleAxialRotationSlider">
+                 <widget class="QSlider" name="XTitleAxialRotationSlider">
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -1180,7 +1242,7 @@
                  </widget>
                 </item>
                 <item row="3" column="2">
-                 <widget class="QDoubleSpinBox" name="AxisXTitleDistanceSpin">
+                 <widget class="QDoubleSpinBox" name="XTitleDistanceSpin">
                   <property name="minimum">
                    <double>-99.000000000000000</double>
                   </property>
@@ -1213,7 +1275,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="YAxisTab">
+     <widget class="QWidget" name="YTab">
       <attribute name="title">
        <string>Y Axis</string>
       </attribute>
@@ -1225,11 +1287,11 @@
         <number>4</number>
        </property>
        <item>
-        <widget class="QTabWidget" name="YAxisTabs">
+        <widget class="QTabWidget" name="YTabs">
          <property name="currentIndex">
           <number>0</number>
          </property>
-         <widget class="QWidget" name="YAxisGeneralTab">
+         <widget class="QWidget" name="YGeneralTab">
           <attribute name="title">
            <string>General</string>
           </attribute>
@@ -1250,28 +1312,28 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="AxisYTitleEdit"/>
+              <widget class="QLineEdit" name="YTitleEdit"/>
              </item>
             </layout>
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_22">
              <item>
-              <widget class="QCheckBox" name="AxisYInvertCheck">
+              <widget class="QCheckBox" name="YInvertCheck">
                <property name="text">
                 <string>Invert</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="AxisYLogarithmicCheck">
+              <widget class="QCheckBox" name="YLogarithmicCheck">
                <property name="text">
                 <string>Logarithmic</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="AxisYVisibleCheck">
+              <widget class="QCheckBox" name="YVisibleCheck">
                <property name="text">
                 <string>Visible</string>
                </property>
@@ -1289,7 +1351,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QDoubleSpinBox" name="AxisYStretchSpin">
+              <widget class="QDoubleSpinBox" name="YStretchSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -1319,7 +1381,7 @@
             </layout>
            </item>
            <item>
-            <widget class="QGroupBox" name="YAxisLimitsGroup">
+            <widget class="QGroupBox" name="YLimitsGroup">
              <property name="title">
               <string>Limits</string>
              </property>
@@ -1336,7 +1398,7 @@
                  <number>4</number>
                 </property>
                 <item row="1" column="1">
-                 <widget class="QLabel" name="AxisYMinLabel">
+                 <widget class="QLabel" name="YMinLabel">
                   <property name="font">
                    <font>
                     <pointsize>8</pointsize>
@@ -1348,7 +1410,7 @@
                  </widget>
                 </item>
                 <item row="1" column="4">
-                 <widget class="QLabel" name="AxisYMaxLabel">
+                 <widget class="QLabel" name="YMaxLabel">
                   <property name="font">
                    <font>
                     <pointsize>8</pointsize>
@@ -1360,7 +1422,7 @@
                  </widget>
                 </item>
                 <item row="0" column="4">
-                 <widget class="TExponentialSpin" name="AxisYMaxSpin" native="true">
+                 <widget class="TExponentialSpin" name="YMaxSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1379,7 +1441,7 @@
                  </widget>
                 </item>
                 <item row="0" column="3">
-                 <widget class="QLabel" name="YAxisLabel">
+                 <widget class="QLabel" name="YLabel">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                     <horstretch>0</horstretch>
@@ -1392,7 +1454,7 @@
                  </widget>
                 </item>
                 <item row="0" column="0">
-                 <widget class="QToolButton" name="AxisYMinSetMinimumButton">
+                 <widget class="QToolButton" name="YMinSetMinimumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -1418,7 +1480,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="TExponentialSpin" name="AxisYMinSpin" native="true">
+                 <widget class="TExponentialSpin" name="YMinSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1437,7 +1499,7 @@
                  </widget>
                 </item>
                 <item row="0" column="5">
-                 <widget class="QToolButton" name="AxisYMaxSetMaximumButton">
+                 <widget class="QToolButton" name="YMaxSetMaximumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -1468,7 +1530,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="XAxisCrossGroup_2">
+            <widget class="QGroupBox" name="YCrossGroup">
              <property name="title">
               <string>Cross At</string>
              </property>
@@ -1485,7 +1547,7 @@
                  <number>4</number>
                 </property>
                 <item row="1" column="5">
-                 <widget class="QToolButton" name="AxisYPositionXSetMaximumButton">
+                 <widget class="QToolButton" name="YPositionXSetMaximumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -1511,7 +1573,7 @@
                  </widget>
                 </item>
                 <item row="1" column="4">
-                 <widget class="QToolButton" name="AxisYPositionXSetZeroButton">
+                 <widget class="QToolButton" name="YPositionXSetZeroButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -1537,7 +1599,7 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="TExponentialSpin" name="AxisYPositionXRealSpin" native="true">
+                 <widget class="TExponentialSpin" name="YPositionXRealSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1556,7 +1618,7 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="TExponentialSpin" name="AxisYPositionZRealSpin" native="true">
+                 <widget class="TExponentialSpin" name="YPositionZRealSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1575,7 +1637,7 @@
                  </widget>
                 </item>
                 <item row="1" column="3">
-                 <widget class="QToolButton" name="AxisYPositionXSetMinimumButton">
+                 <widget class="QToolButton" name="YPositionXSetMinimumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -1627,7 +1689,7 @@
                  </widget>
                 </item>
                 <item row="2" column="3">
-                 <widget class="QToolButton" name="AxisYPositionZSetMinimumButton">
+                 <widget class="QToolButton" name="YPositionZSetMinimumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -1653,7 +1715,7 @@
                  </widget>
                 </item>
                 <item row="2" column="4">
-                 <widget class="QToolButton" name="AxisYPositionZSetZeroButton">
+                 <widget class="QToolButton" name="YPositionZSetZeroButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -1679,7 +1741,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QRadioButton" name="AxisYPositionRealRadio">
+                 <widget class="QRadioButton" name="YPositionRealRadio">
                   <property name="text">
                    <string>Real</string>
                   </property>
@@ -1689,7 +1751,7 @@
                  </widget>
                 </item>
                 <item row="2" column="5">
-                 <widget class="QToolButton" name="AxisYPositionZSetMaximumButton">
+                 <widget class="QToolButton" name="YPositionZSetMaximumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -1715,7 +1777,7 @@
                  </widget>
                 </item>
                 <item row="1" column="2">
-                 <widget class="TExponentialSpin" name="AxisYPositionXFractionalSpin" native="true">
+                 <widget class="TExponentialSpin" name="YPositionXFractionalSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1734,7 +1796,7 @@
                  </widget>
                 </item>
                 <item row="2" column="2">
-                 <widget class="TExponentialSpin" name="AxisYPositionZFractionalSpin" native="true">
+                 <widget class="TExponentialSpin" name="YPositionZFractionalSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1753,7 +1815,7 @@
                  </widget>
                 </item>
                 <item row="0" column="2">
-                 <widget class="QRadioButton" name="AxisYPositionFractionalRadio">
+                 <widget class="QRadioButton" name="YPositionFractionalRadio">
                   <property name="text">
                    <string>Fractional</string>
                   </property>
@@ -1766,7 +1828,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="YAxisTicksTab">
+         <widget class="QWidget" name="YTicksTab">
           <attribute name="title">
            <string>Tick Marks</string>
           </attribute>
@@ -1780,7 +1842,7 @@
            <item>
             <layout class="QGridLayout" name="gridLayout">
              <item row="5" column="2">
-              <widget class="QDoubleSpinBox" name="AxisYTickDirectionYSpin">
+              <widget class="QDoubleSpinBox" name="YTickDirectionYSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -1802,7 +1864,7 @@
               </widget>
              </item>
              <item row="5" column="1">
-              <widget class="QDoubleSpinBox" name="AxisYTickDirectionXSpin">
+              <widget class="QDoubleSpinBox" name="YTickDirectionXSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -1831,7 +1893,7 @@
               </widget>
              </item>
              <item row="0" column="1" colspan="2">
-              <widget class="QDoubleSpinBox" name="AxisYTicksStartSpin">
+              <widget class="QDoubleSpinBox" name="YTicksStartSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -1857,7 +1919,7 @@
               </widget>
              </item>
              <item row="5" column="3">
-              <widget class="QDoubleSpinBox" name="AxisYTickDirectionZSpin">
+              <widget class="QDoubleSpinBox" name="YTickDirectionZSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -1893,7 +1955,7 @@
               </widget>
              </item>
              <item row="1" column="3">
-              <widget class="QCheckBox" name="AxisYAutoTicksCheck">
+              <widget class="QCheckBox" name="YAutoTicksCheck">
                <property name="text">
                 <string>Auto</string>
                </property>
@@ -1913,10 +1975,10 @@
               </widget>
              </item>
              <item row="3" column="1">
-              <widget class="QSpinBox" name="AxisYMinorTicksSpin"/>
+              <widget class="QSpinBox" name="YMinorTicksSpin"/>
              </item>
              <item row="1" column="1" colspan="2">
-              <widget class="QDoubleSpinBox" name="AxisYTicksDeltaSpin">
+              <widget class="QDoubleSpinBox" name="YTicksDeltaSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -1955,7 +2017,7 @@
               </widget>
              </item>
              <item row="6" column="1">
-              <widget class="QDoubleSpinBox" name="AxisYTickSizeSpin">
+              <widget class="QDoubleSpinBox" name="YTickSizeSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -1993,7 +2055,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="YAxisLabelsTab">
+         <widget class="QWidget" name="YLabelsTab">
           <attribute name="title">
            <string>Labels</string>
           </attribute>
@@ -2005,7 +2067,69 @@
             <number>4</number>
            </property>
            <item>
-            <widget class="QGroupBox" name="YAxisLabelOrientationGroup">
+            <widget class="QGroupBox" name="YNumberFormatGroup">
+             <property name="title">
+              <string>Number Format</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_16">
+              <property name="spacing">
+               <number>4</number>
+              </property>
+              <property name="margin">
+               <number>4</number>
+              </property>
+              <item>
+               <widget class="QFrame" name="YNumberFormatTestFrame">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Sunken</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_17">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
+                 <property name="margin">
+                  <number>4</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="YNumberFormatTestLabel">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>1.23456789</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="YNumberFormatChangeButton">
+                <property name="text">
+                 <string>Change...</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="YLabelOrientationGroup">
              <property name="title">
               <string>Label Orientation</string>
              </property>
@@ -2032,7 +2156,7 @@
                  </widget>
                 </item>
                 <item row="2" column="3">
-                 <widget class="QSlider" name="AxisYLabelInPlaneRotationSlider">
+                 <widget class="QSlider" name="YLabelInPlaneRotationSlider">
                   <property name="toolTip">
                    <string>Change the in-plane rotation (about Z) of the labels</string>
                   </property>
@@ -2045,7 +2169,7 @@
                  </widget>
                 </item>
                 <item row="2" column="2">
-                 <widget class="QSpinBox" name="AxisYLabelAxialRotationSpin">
+                 <widget class="QSpinBox" name="YLabelAxialRotationSpin">
                   <property name="toolTip">
                    <string>Change the axial rotation (along X) of the labels</string>
                   </property>
@@ -2055,7 +2179,7 @@
                  </widget>
                 </item>
                 <item row="2" column="4">
-                 <widget class="QSpinBox" name="AxisYLabelInPlaneRotationSpin">
+                 <widget class="QSpinBox" name="YLabelInPlaneRotationSpin">
                   <property name="toolTip">
                    <string>Change the in-plane rotation (about Z) of the labels</string>
                   </property>
@@ -2075,7 +2199,7 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="QSlider" name="AxisYLabelAxialRotationSlider">
+                 <widget class="QSlider" name="YLabelAxialRotationSlider">
                   <property name="toolTip">
                    <string>Change the axial rotation (along X) of the labels</string>
                   </property>
@@ -2098,7 +2222,7 @@
                  </widget>
                 </item>
                 <item row="3" column="2">
-                 <widget class="QDoubleSpinBox" name="AxisYLabelDistanceSpin">
+                 <widget class="QDoubleSpinBox" name="YLabelDistanceSpin">
                   <property name="minimum">
                    <double>-99.000000000000000</double>
                   </property>
@@ -2108,7 +2232,7 @@
                  </widget>
                 </item>
                 <item row="3" column="3">
-                 <widget class="QComboBox" name="AxisYLabelAnchorCombo">
+                 <widget class="QComboBox" name="YLabelAnchorCombo">
                   <property name="toolTip">
                    <string>Text anchor position for axis title</string>
                   </property>
@@ -2130,7 +2254,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="YAxisTitleOrientationGroup">
+            <widget class="QGroupBox" name="YTitleOrientationGroup">
              <property name="title">
               <string>Title Orientation</string>
              </property>
@@ -2157,7 +2281,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSlider" name="AxisYTitleHOffsetSlider">
+                 <widget class="QSlider" name="YTitleHOffsetSlider">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                     <horstretch>0</horstretch>
@@ -2182,7 +2306,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QToolButton" name="AxisYTitleHOffsetLeftButton">
+                 <widget class="QToolButton" name="YTitleHOffsetLeftButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -2208,7 +2332,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QToolButton" name="AxisYTitleHOffsetCentreButton">
+                 <widget class="QToolButton" name="YTitleHOffsetCentreButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -2234,7 +2358,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QToolButton" name="AxisYTitleHOffsetRightButton">
+                 <widget class="QToolButton" name="YTitleHOffsetRightButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -2260,7 +2384,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="AxisYTitleAnchorCombo">
+                 <widget class="QComboBox" name="YTitleAnchorCombo">
                   <property name="toolTip">
                    <string>Text anchor position for axis title</string>
                   </property>
@@ -2299,7 +2423,7 @@
                  </widget>
                 </item>
                 <item row="2" column="3">
-                 <widget class="QSlider" name="AxisYTitleInPlaneRotationSlider">
+                 <widget class="QSlider" name="YTitleInPlaneRotationSlider">
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -2309,14 +2433,14 @@
                  </widget>
                 </item>
                 <item row="2" column="2">
-                 <widget class="QSpinBox" name="AxisYTitleAxialRotationSpin">
+                 <widget class="QSpinBox" name="YTitleAxialRotationSpin">
                   <property name="maximum">
                    <number>360</number>
                   </property>
                  </widget>
                 </item>
                 <item row="2" column="4">
-                 <widget class="QSpinBox" name="AxisYTitleInPlaneRotationSpin">
+                 <widget class="QSpinBox" name="YTitleInPlaneRotationSpin">
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -2333,7 +2457,7 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="QSlider" name="AxisYTitleAxialRotationSlider">
+                 <widget class="QSlider" name="YTitleAxialRotationSlider">
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -2353,7 +2477,7 @@
                  </widget>
                 </item>
                 <item row="3" column="2">
-                 <widget class="QDoubleSpinBox" name="AxisYTitleDistanceSpin">
+                 <widget class="QDoubleSpinBox" name="YTitleDistanceSpin">
                   <property name="minimum">
                    <double>-99.000000000000000</double>
                   </property>
@@ -2386,7 +2510,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="ZAxisTab">
+     <widget class="QWidget" name="ZTab">
       <attribute name="title">
        <string>Z Axis</string>
       </attribute>
@@ -2398,11 +2522,11 @@
         <number>4</number>
        </property>
        <item>
-        <widget class="QTabWidget" name="ZAxisTabs">
+        <widget class="QTabWidget" name="ZTabs">
          <property name="currentIndex">
           <number>0</number>
          </property>
-         <widget class="QWidget" name="ZAxisGeneralTab">
+         <widget class="QWidget" name="ZGeneralTab">
           <attribute name="title">
            <string>General</string>
           </attribute>
@@ -2423,28 +2547,28 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="AxisZTitleEdit"/>
+              <widget class="QLineEdit" name="ZTitleEdit"/>
              </item>
             </layout>
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_23">
              <item>
-              <widget class="QCheckBox" name="AxisZInvertCheck">
+              <widget class="QCheckBox" name="ZInvertCheck">
                <property name="text">
                 <string>Invert</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="AxisZLogarithmicCheck">
+              <widget class="QCheckBox" name="ZLogarithmicCheck">
                <property name="text">
                 <string>Logarithmic</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="AxisZVisibleCheck">
+              <widget class="QCheckBox" name="ZVisibleCheck">
                <property name="text">
                 <string>Visible</string>
                </property>
@@ -2462,7 +2586,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QDoubleSpinBox" name="AxisZStretchSpin">
+              <widget class="QDoubleSpinBox" name="ZStretchSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -2509,7 +2633,7 @@
                  <number>4</number>
                 </property>
                 <item row="1" column="4">
-                 <widget class="QLabel" name="AxisZMaxLabel">
+                 <widget class="QLabel" name="ZMaxLabel">
                   <property name="font">
                    <font>
                     <pointsize>8</pointsize>
@@ -2521,7 +2645,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="TExponentialSpin" name="AxisZMinSpin" native="true">
+                 <widget class="TExponentialSpin" name="ZMinSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -2540,7 +2664,7 @@
                  </widget>
                 </item>
                 <item row="0" column="3">
-                 <widget class="QLabel" name="ZAxisLabel">
+                 <widget class="QLabel" name="ZLabel">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                     <horstretch>0</horstretch>
@@ -2553,7 +2677,7 @@
                  </widget>
                 </item>
                 <item row="0" column="0">
-                 <widget class="QToolButton" name="AxisZMinSetMinimumButton">
+                 <widget class="QToolButton" name="ZMinSetMinimumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -2579,7 +2703,7 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QLabel" name="AxisZMinLabel">
+                 <widget class="QLabel" name="ZMinLabel">
                   <property name="font">
                    <font>
                     <pointsize>8</pointsize>
@@ -2591,7 +2715,7 @@
                  </widget>
                 </item>
                 <item row="0" column="4">
-                 <widget class="TExponentialSpin" name="AxisZMaxSpin" native="true">
+                 <widget class="TExponentialSpin" name="ZMaxSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -2610,7 +2734,7 @@
                  </widget>
                 </item>
                 <item row="0" column="5">
-                 <widget class="QToolButton" name="AxisZMaxSetMaximumButton">
+                 <widget class="QToolButton" name="ZMaxSetMaximumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -2641,7 +2765,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="XAxisCrossGroup_3">
+            <widget class="QGroupBox" name="ZCrossGroup">
              <property name="title">
               <string>Cross At</string>
              </property>
@@ -2658,7 +2782,7 @@
                  <number>4</number>
                 </property>
                 <item row="1" column="5">
-                 <widget class="QToolButton" name="AxisZPositionXSetMaximumButton">
+                 <widget class="QToolButton" name="ZPositionXSetMaximumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -2684,7 +2808,7 @@
                  </widget>
                 </item>
                 <item row="1" column="4">
-                 <widget class="QToolButton" name="AxisZPositionXSetZeroButton">
+                 <widget class="QToolButton" name="ZPositionXSetZeroButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -2710,7 +2834,7 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="TExponentialSpin" name="AxisZPositionXRealSpin" native="true">
+                 <widget class="TExponentialSpin" name="ZPositionXRealSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -2729,7 +2853,7 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="TExponentialSpin" name="AxisZPositionYRealSpin" native="true">
+                 <widget class="TExponentialSpin" name="ZPositionYRealSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -2748,7 +2872,7 @@
                  </widget>
                 </item>
                 <item row="1" column="3">
-                 <widget class="QToolButton" name="AxisZPositionXSetMinimumButton">
+                 <widget class="QToolButton" name="ZPositionXSetMinimumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -2800,7 +2924,7 @@
                  </widget>
                 </item>
                 <item row="2" column="3">
-                 <widget class="QToolButton" name="AxisZPositionYSetMinimumButton">
+                 <widget class="QToolButton" name="ZPositionYSetMinimumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -2826,7 +2950,7 @@
                  </widget>
                 </item>
                 <item row="2" column="4">
-                 <widget class="QToolButton" name="AxisZPositionYSetZeroButton">
+                 <widget class="QToolButton" name="ZPositionYSetZeroButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -2852,7 +2976,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QRadioButton" name="AxisZPositionRealRadio">
+                 <widget class="QRadioButton" name="ZPositionRealRadio">
                   <property name="text">
                    <string>Real</string>
                   </property>
@@ -2862,7 +2986,7 @@
                  </widget>
                 </item>
                 <item row="2" column="5">
-                 <widget class="QToolButton" name="AxisZPositionYSetMaximumButton">
+                 <widget class="QToolButton" name="ZPositionYSetMaximumButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -2888,7 +3012,7 @@
                  </widget>
                 </item>
                 <item row="1" column="2">
-                 <widget class="TExponentialSpin" name="AxisZPositionXFractionalSpin" native="true">
+                 <widget class="TExponentialSpin" name="ZPositionXFractionalSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -2907,7 +3031,7 @@
                  </widget>
                 </item>
                 <item row="2" column="2">
-                 <widget class="TExponentialSpin" name="AxisZPositionYFractionalSpin" native="true">
+                 <widget class="TExponentialSpin" name="ZPositionYFractionalSpin" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -2926,7 +3050,7 @@
                  </widget>
                 </item>
                 <item row="0" column="2">
-                 <widget class="QRadioButton" name="AxisZPositionFractionalRadio">
+                 <widget class="QRadioButton" name="ZPositionFractionalRadio">
                   <property name="text">
                    <string>Fractional</string>
                   </property>
@@ -2939,7 +3063,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="ZAxisTicksTab">
+         <widget class="QWidget" name="ZTicksTab">
           <attribute name="title">
            <string>Tick Marks</string>
           </attribute>
@@ -2967,7 +3091,7 @@
               </widget>
              </item>
              <item row="0" column="1" colspan="2">
-              <widget class="QDoubleSpinBox" name="AxisZTicksStartSpin">
+              <widget class="QDoubleSpinBox" name="ZTicksStartSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -2986,7 +3110,7 @@
               </widget>
              </item>
              <item row="1" column="1" colspan="2">
-              <widget class="QDoubleSpinBox" name="AxisZTicksDeltaSpin">
+              <widget class="QDoubleSpinBox" name="ZTicksDeltaSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -3031,7 +3155,7 @@
               </widget>
              </item>
              <item row="4" column="2">
-              <widget class="QDoubleSpinBox" name="AxisZTickDirectionYSpin">
+              <widget class="QDoubleSpinBox" name="ZTickDirectionYSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -3060,7 +3184,7 @@
               </widget>
              </item>
              <item row="4" column="1">
-              <widget class="QDoubleSpinBox" name="AxisZTickDirectionXSpin">
+              <widget class="QDoubleSpinBox" name="ZTickDirectionXSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -3089,7 +3213,7 @@
               </widget>
              </item>
              <item row="4" column="3">
-              <widget class="QDoubleSpinBox" name="AxisZTickDirectionZSpin">
+              <widget class="QDoubleSpinBox" name="ZTickDirectionZSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -3111,7 +3235,7 @@
               </widget>
              </item>
              <item row="5" column="1">
-              <widget class="QDoubleSpinBox" name="AxisZTickSizeSpin">
+              <widget class="QDoubleSpinBox" name="ZTickSizeSpin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -3133,14 +3257,14 @@
               </widget>
              </item>
              <item row="1" column="3">
-              <widget class="QCheckBox" name="AxisZAutoTicksCheck">
+              <widget class="QCheckBox" name="ZAutoTicksCheck">
                <property name="text">
                 <string>Auto</string>
                </property>
               </widget>
              </item>
              <item row="2" column="1">
-              <widget class="QSpinBox" name="AxisZMinorTicksSpin"/>
+              <widget class="QSpinBox" name="ZMinorTicksSpin"/>
              </item>
              <item row="3" column="0" colspan="4">
               <widget class="Line" name="line_3">
@@ -3166,7 +3290,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="ZAxisLabelsTab">
+         <widget class="QWidget" name="ZLabelsTab">
           <attribute name="title">
            <string>Labels</string>
           </attribute>
@@ -3178,7 +3302,69 @@
             <number>4</number>
            </property>
            <item>
-            <widget class="QGroupBox" name="ZAxisTextOrientationGroup">
+            <widget class="QGroupBox" name="ZNumberFormatGroup">
+             <property name="title">
+              <string>Number Format</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_18">
+              <property name="spacing">
+               <number>4</number>
+              </property>
+              <property name="margin">
+               <number>4</number>
+              </property>
+              <item>
+               <widget class="QFrame" name="ZNumberFormatTestFrame">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Sunken</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_19">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
+                 <property name="margin">
+                  <number>4</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="ZNumberFormatTestLabel">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>1.23456789</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="ZNumberFormatChangeButton">
+                <property name="text">
+                 <string>Change...</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="ZTextOrientationGroup">
              <property name="title">
               <string>Label Orientation</string>
              </property>
@@ -3205,7 +3391,7 @@
                  </widget>
                 </item>
                 <item row="2" column="3">
-                 <widget class="QSlider" name="AxisZLabelInPlaneRotationSlider">
+                 <widget class="QSlider" name="ZLabelInPlaneRotationSlider">
                   <property name="toolTip">
                    <string>Change the in-plane rotation (about Z) of the labels</string>
                   </property>
@@ -3218,7 +3404,7 @@
                  </widget>
                 </item>
                 <item row="2" column="2">
-                 <widget class="QSpinBox" name="AxisZLabelAxialRotationSpin">
+                 <widget class="QSpinBox" name="ZLabelAxialRotationSpin">
                   <property name="toolTip">
                    <string>Change the axial rotation (along X) of the labels</string>
                   </property>
@@ -3228,7 +3414,7 @@
                  </widget>
                 </item>
                 <item row="2" column="4">
-                 <widget class="QSpinBox" name="AxisZLabelInPlaneRotationSpin">
+                 <widget class="QSpinBox" name="ZLabelInPlaneRotationSpin">
                   <property name="toolTip">
                    <string>Change the in-plane rotation (about Z) of the labels</string>
                   </property>
@@ -3248,7 +3434,7 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="QSlider" name="AxisZLabelAxialRotationSlider">
+                 <widget class="QSlider" name="ZLabelAxialRotationSlider">
                   <property name="toolTip">
                    <string>Change the axial rotation (along X) of the labels</string>
                   </property>
@@ -3271,7 +3457,7 @@
                  </widget>
                 </item>
                 <item row="3" column="2">
-                 <widget class="QDoubleSpinBox" name="AxisZLabelDistanceSpin">
+                 <widget class="QDoubleSpinBox" name="ZLabelDistanceSpin">
                   <property name="minimum">
                    <double>-99.000000000000000</double>
                   </property>
@@ -3281,7 +3467,7 @@
                  </widget>
                 </item>
                 <item row="3" column="3">
-                 <widget class="QComboBox" name="AxisZLabelAnchorCombo">
+                 <widget class="QComboBox" name="ZLabelAnchorCombo">
                   <property name="toolTip">
                    <string>Text anchor position for axis title</string>
                   </property>
@@ -3303,7 +3489,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="ZAxisTitleOrientationGroup">
+            <widget class="QGroupBox" name="ZTitleOrientationGroup">
              <property name="title">
               <string>Title Orientation</string>
              </property>
@@ -3330,7 +3516,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSlider" name="AxisZTitleHOffsetSlider">
+                 <widget class="QSlider" name="ZTitleHOffsetSlider">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                     <horstretch>0</horstretch>
@@ -3355,7 +3541,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QToolButton" name="AxisZTitleHOffsetLeftButton">
+                 <widget class="QToolButton" name="ZTitleHOffsetLeftButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -3381,7 +3567,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QToolButton" name="AxisZTitleHOffsetCentreButton">
+                 <widget class="QToolButton" name="ZTitleHOffsetCentreButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -3407,7 +3593,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QToolButton" name="AxisZTitleHOffsetRightButton">
+                 <widget class="QToolButton" name="ZTitleHOffsetRightButton">
                   <property name="maximumSize">
                    <size>
                     <width>24</width>
@@ -3433,7 +3619,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="AxisZTitleAnchorCombo">
+                 <widget class="QComboBox" name="ZTitleAnchorCombo">
                   <property name="toolTip">
                    <string>Text anchor position for axis title</string>
                   </property>
@@ -3457,7 +3643,7 @@
                  </widget>
                 </item>
                 <item row="2" column="3">
-                 <widget class="QSlider" name="AxisZTitleInPlaneRotationSlider">
+                 <widget class="QSlider" name="ZTitleInPlaneRotationSlider">
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -3467,14 +3653,14 @@
                  </widget>
                 </item>
                 <item row="2" column="2">
-                 <widget class="QSpinBox" name="AxisZTitleAxialRotationSpin">
+                 <widget class="QSpinBox" name="ZTitleAxialRotationSpin">
                   <property name="maximum">
                    <number>360</number>
                   </property>
                  </widget>
                 </item>
                 <item row="2" column="4">
-                 <widget class="QSpinBox" name="AxisZTitleInPlaneRotationSpin">
+                 <widget class="QSpinBox" name="ZTitleInPlaneRotationSpin">
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -3491,7 +3677,7 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="QSlider" name="AxisZTitleAxialRotationSlider">
+                 <widget class="QSlider" name="ZTitleAxialRotationSlider">
                   <property name="maximum">
                    <number>360</number>
                   </property>
@@ -3511,7 +3697,7 @@
                  </widget>
                 </item>
                 <item row="3" column="2">
-                 <widget class="QDoubleSpinBox" name="AxisZTitleDistanceSpin">
+                 <widget class="QDoubleSpinBox" name="ZTitleDistanceSpin">
                   <property name="minimum">
                    <double>-99.000000000000000</double>
                   </property>
@@ -3550,7 +3736,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_17">
        <item>
-        <widget class="QGroupBox" name="AxisXGridGroup">
+        <widget class="QGroupBox" name="XGridGroup">
          <property name="title">
           <string>Gridlines Along X</string>
          </property>
@@ -3564,7 +3750,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_4">
             <item>
-             <widget class="QCheckBox" name="AxisXGridLineMajorCheck">
+             <widget class="QCheckBox" name="XGridLineMajorCheck">
               <property name="text">
                <string>At major tick intervals</string>
               </property>
@@ -3584,7 +3770,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="AxisXGridLineMajorStyleButton">
+             <widget class="QPushButton" name="XGridLineMajorStyleButton">
               <property name="text">
                <string>Change Style...</string>
               </property>
@@ -3595,7 +3781,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>
-             <widget class="QCheckBox" name="AxisXGridLineMinorCheck">
+             <widget class="QCheckBox" name="XGridLineMinorCheck">
               <property name="text">
                <string>At minor tick intervals</string>
               </property>
@@ -3615,7 +3801,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="AxisXGridLineMinorStyleButton">
+             <widget class="QPushButton" name="XGridLineMinorStyleButton">
               <property name="text">
                <string>Change Style...</string>
               </property>
@@ -3626,7 +3812,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_6">
             <item>
-             <widget class="QCheckBox" name="AxisXGridLineFullCheck">
+             <widget class="QCheckBox" name="XGridLineFullCheck">
               <property name="text">
                <string>Entire volume</string>
               </property>
@@ -3646,7 +3832,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="AxisXGridLineApplyStyleButton">
+             <widget class="QPushButton" name="XGridLineApplyStyleButton">
               <property name="text">
                <string>Apply Style to All Axes</string>
               </property>
@@ -3658,7 +3844,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="AxisYGridGroup">
+        <widget class="QGroupBox" name="YGridGroup">
          <property name="title">
           <string>Gridlines Along Y</string>
          </property>
@@ -3672,7 +3858,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_8">
             <item>
-             <widget class="QCheckBox" name="AxisYGridLineMajorCheck">
+             <widget class="QCheckBox" name="YGridLineMajorCheck">
               <property name="text">
                <string>At major tick intervals</string>
               </property>
@@ -3692,7 +3878,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="AxisYGridLineMajorStyleButton">
+             <widget class="QPushButton" name="YGridLineMajorStyleButton">
               <property name="text">
                <string>Change Style...</string>
               </property>
@@ -3703,7 +3889,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_10">
             <item>
-             <widget class="QCheckBox" name="AxisYGridLineMinorCheck">
+             <widget class="QCheckBox" name="YGridLineMinorCheck">
               <property name="text">
                <string>At minor tick intervals</string>
               </property>
@@ -3723,7 +3909,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="AxisYGridLineMinorStyleButton">
+             <widget class="QPushButton" name="YGridLineMinorStyleButton">
               <property name="text">
                <string>Change Style...</string>
               </property>
@@ -3734,7 +3920,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <item>
-             <widget class="QCheckBox" name="AxisYGridLineFullCheck">
+             <widget class="QCheckBox" name="YGridLineFullCheck">
               <property name="text">
                <string>Entire volume</string>
               </property>
@@ -3754,7 +3940,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="AxisYGridLineApplyStyleButton">
+             <widget class="QPushButton" name="YGridLineApplyStyleButton">
               <property name="text">
                <string>Apply Style to All Axes</string>
               </property>
@@ -3766,7 +3952,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="AxisZGridGroup">
+        <widget class="QGroupBox" name="ZGridGroup">
          <property name="title">
           <string>Gridlines Along Z</string>
          </property>
@@ -3780,7 +3966,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_13">
             <item>
-             <widget class="QCheckBox" name="AxisZGridLineMajorCheck">
+             <widget class="QCheckBox" name="ZGridLineMajorCheck">
               <property name="text">
                <string>At major tick intervals</string>
               </property>
@@ -3800,7 +3986,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="AxisZGridLineMajorStyleButton">
+             <widget class="QPushButton" name="ZGridLineMajorStyleButton">
               <property name="text">
                <string>Change Style...</string>
               </property>
@@ -3811,7 +3997,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_12">
             <item>
-             <widget class="QCheckBox" name="AxisZGridLineMinorCheck">
+             <widget class="QCheckBox" name="ZGridLineMinorCheck">
               <property name="text">
                <string>At minor tick intervals</string>
               </property>
@@ -3831,7 +4017,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="AxisZGridLineMinorStyleButton">
+             <widget class="QPushButton" name="ZGridLineMinorStyleButton">
               <property name="text">
                <string>Change Style...</string>
               </property>
@@ -3842,7 +4028,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_11">
             <item>
-             <widget class="QCheckBox" name="AxisZGridLineFullCheck">
+             <widget class="QCheckBox" name="ZGridLineFullCheck">
               <property name="text">
                <string>Entire volume</string>
               </property>
@@ -3862,7 +4048,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="AxisZGridLineApplyStyleButton">
+             <widget class="QPushButton" name="ZGridLineApplyStyleButton">
               <property name="text">
                <string>Apply Style to All Axes</string>
               </property>

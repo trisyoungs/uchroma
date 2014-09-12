@@ -48,7 +48,7 @@ class IndexData
 	IndexType type_;
 	// Integer index (for FixedIndex)
 	int index_;
-	// X offset (for RelativeIndex)
+	// Index offset (for RelativeIndex)
 	int offset_;
 
 	public:

@@ -14,6 +14,7 @@ SET(qtproject_SRCS
   editdataset_funcs.cpp
   editfitkernel_funcs.cpp
   editlinestyle_funcs.cpp
+  editnumberformat_funcs.cpp
   editreference_funcs.cpp
 
   selectequation_funcs.cpp
@@ -63,6 +64,7 @@ SET(pro_MOC_HDRS
   editdataset.h
   editfitkernel.h
   editlinestyle.h
+  editnumberformat.h
   editreference.h
 
   selectequation.h
@@ -86,6 +88,7 @@ SET(pro_UIS
   editdataset.ui
   editfitkernel.ui
   editlinestyle.ui
+  editnumberformat.ui
   editreference.ui
 
   selectequation.ui

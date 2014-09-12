@@ -596,6 +596,12 @@ int Axes::minorTicks(int axis)
  * Labels
  */
 
+// Return number format for specified axis
+NumberFormat& Axes::numberFormat(int axis)
+{
+	return numberFormat_[axis];
+}
+
 // Set orientation of labels for specified axis
 void Axes::setLabelOrientation(int axis, int component, double value)
 {
@@ -850,10 +856,8 @@ void Axes::updateAxisPrimitives()
 					// Tick label
 					if (count == 0)
 					{
-						// Create text, accounting for zero-roundoff, and add a text primitive
-						// TODO This is crap - what if number format is exponential?
-						if (fabs(value) < pow(10,power-5)) s = "0";
-						else s = QString::number(value);
+						// Get formatted value text
+						s = numberFormat_[axis].format(value);
 
 						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor_[axis], tickDir * (tickSize_[axis]+labelOrientation_[axis].z), labelTransform, parent_.labelPointSize());
 					}
@@ -903,10 +907,9 @@ void Axes::updateAxisPrimitives()
 					if (count %(minorTicks_[axis]+1) == 0)
 					{
 						axisPrimitives_[axis].line(u, u + tickDir*tickSize_[axis]);
-						
-						// Get formatted label text, acounting for roundoff error
-						if (fabs(value) < tickDelta_[axis]*1.0e-10) s = "0";
-						else s = QString::number(value);
+
+						// Get formatted label text
+						s = numberFormat_[axis].format(value);
 
 						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor_[axis], tickDir * (tickSize_[axis] + labelOrientation_[axis].z), labelTransform, parent_.labelPointSize());
 

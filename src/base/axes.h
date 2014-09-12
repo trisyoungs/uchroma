@@ -22,6 +22,7 @@
 #ifndef UCHROMA_AXES_H
 #define UCHROMA_AXES_H
 
+#include "base/numberformat.h"
 #include "render/primitive.h"
 #include "render/textprimitive.h"
 #include "render/linestyle.h"
@@ -197,6 +198,8 @@ class Axes
 	 * Labels
 	 */
 	private:
+	// Number formats for labels
+	NumberFormat numberFormat_[3];
 	// Orientation of axis labels (axial rot, in-plane rot, distance)
 	Vec3<double> labelOrientation_[3];
 	// Axis label text anchor positions
@@ -209,6 +212,8 @@ class Axes
 	TextPrimitive::TextAnchor titleAnchor_[3];
 
 	public:
+	// Return number format for specified axis
+	NumberFormat& numberFormat(int axis);
 	// Set orientation of labels for specified axis
 	void setLabelOrientation(int axis, int component, double value);
 	// Return orientation of labels for specified axis

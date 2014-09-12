@@ -61,9 +61,9 @@ class EditLineStyleDialog : public QDialog
 	void on_CancelButton_clicked(bool checked);
 
 	public:
-	// Call dialog to edit specified reference
+	// Call dialog to edit specified LineStyle
 	bool call(LineStyle* target);
-	// Return edited data
+	// Return LineStyle stored in dialog
 	LineStyle& lineStyle();
 
 

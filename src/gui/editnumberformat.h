@@ -1,6 +1,6 @@
 /*
-	*** Edit DataSet Dialog
-	*** src/gui/editdataset.h
+	*** Edit LineStyle Dialog
+	*** src/gui/editlinestyledialog.h
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,27 +19,27 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_EDITDATASETDIALOG_H
-#define UCHROMA_EDITDATASETDIALOG_H
+#ifndef UCHROMA_EDINUMBERFORMATDIALOG_H
+#define UCHROMA_EDINUMBERFORMATDIALOG_H
 
-#include "gui/ui_editdataset.h"
-#include "base/dataset.h"
+#include "gui/ui_editnumberformat.h"
+#include "base/numberformat.h"
 #include <QtGui/QDialog>
 
 // Forward Declarations
 /* none */
 
-class EditDataSetDialog : public QDialog
+class EditNumberFormatDialog : public QDialog
 {
 	// All Qt declarations must include this macro
 	Q_OBJECT
 
 	public:
 	// Constructor / Destructor
-	EditDataSetDialog(QWidget *parent);
-	~EditDataSetDialog();
+	EditNumberFormatDialog(QWidget *parent);
+	~EditNumberFormatDialog();
 	// Main form declaration
-	Ui::EditDataSetDialog ui;
+	Ui::EditNumberFormatDialog ui;
 
 
 	/*
@@ -48,8 +48,8 @@ class EditDataSetDialog : public QDialog
 	private:
 	// Whether the window is refreshing / updating its controls
 	bool refreshing_;
-	// Data we are editing
-	DataSet dataSet_;
+	// LineStyle being edited
+	NumberFormat numberFormat_;
 
 	protected:
 	// Window close event
@@ -61,17 +61,27 @@ class EditDataSetDialog : public QDialog
 	void on_CancelButton_clicked(bool checked);
 
 	public:
-	// Call dialog to edit specified DataSet
-	bool call(DataSet* target);
-	// Get DataSet stored in dialog
-	DataSet& dataSet();
+	// Call dialog to edit specified NumberFormat
+	bool call(NumberFormat* target);
+	// Return NumberFormat stored in dialog
+	NumberFormat& numberFormat();
 
 
 	/*
 	 * Slots
 	 */
 	private slots:
-	void on_DataTable_cellChanged(int row, int column);
+	void on_IntegerFormatRadio_toggled(bool checked);
+	void on_DecimalFormatRadio_toggled(bool checked);
+	void on_DecimalFormatDecimalsSpin_valueChanged(int value);
+	void on_ScientificFormatRadio_toggled(bool checked);
+	void on_ScientificFormatDecimalsSpin_valueChanged(int value);
+	void on_UpperCaseExponentCheck_clicked(bool checked);
+	void on_PrecedeWithPlusCheck_clicked(bool checked);
+
+	private:
+	// Update preview label
+	void updatePreview();
 };
 
 #endif

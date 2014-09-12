@@ -51,13 +51,13 @@ IndexData::~IndexData()
 {
 }
 
-// Set X index type
+// Set index type
 void IndexData::setType(IndexData::IndexType type)
 {
 	type_ = type;
 }
 
-// Return X index type
+// Return index type
 IndexData::IndexType IndexData::type()
 {
 	return type_;
@@ -86,4 +86,3 @@ int IndexData::offset()
 {
 	return offset_;
 }
-

@@ -13,6 +13,7 @@ add_library(base
   indexdata.cpp
   lineparser.cpp
   messenger.cpp
+  numberformat.cpp
   nxs.cpp
   referencevariable.cpp
   sysfunc.cpp
@@ -34,6 +35,7 @@ add_library(base
   indexdata.h
   lineparser.h
   messenger.h
+  numberformat.h
   nxs.h
   referencevariable.h
   sysfunc.h
