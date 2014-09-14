@@ -19,13 +19,12 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_CALCULATOR_H
-#define UCHROMA_CALCULATOR_H
+#ifndef UCHROMA_EXPRESSION_H
+#define UCHROMA_EXPRESSION_H
 
 #include "expression/node.h"
 #include "expression/functions.h"
 #include "base/dnchar.h"
-#include <QtCore/QString>
 
 // Forward declarations
 class Node;

@@ -168,6 +168,8 @@ class Matrix
 	// Apply a general scaling to the matrix (as glScaled would to)
 	void applyScaling(double scalex, double scaley, double scalez);
 	// Apply a general scaling to the matrix (as glScaled would to)
+	void applyScaling(double scalexyz);
+	// Apply a general scaling to the matrix (as glScaled would to)
 	void applyScaling(Vec3<double> scaling);
 	// Apply an xy-scaling to the matrix
 	void applyScalingXY(double scalex, double scaley);

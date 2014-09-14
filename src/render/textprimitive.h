@@ -26,19 +26,50 @@
 #include "math/cuboid.h"
 #include "templates/vector3.h"
 #include "templates/list.h"
-#include <FTGL/ftgl.h>
 #include <QtCore/QString>
-
-#define TEXTCHUNKSIZE 100
 
 // Forward Declarations
 class ViewPane;
 
-// Text Primitive
-class TextPrimitive
+// Text Fragment
+class TextFragment : public ListItem<TextFragment>
 {
 	public:
-	// Text Anchors
+	// Constructor / Destructor
+	TextFragment();
+	~TextFragment();
+
+
+	/*
+	 * Fragment Definition
+	 */
+	private:
+	// Fragment text
+	QString text_;
+	// Local scale for fragment
+	double scale_;
+	// Local translation for fragment
+	Vec3<double> translation_;
+
+	public:
+	// Set fragment data
+	void set(QString& text, double scale = 1.0, Vec3<double> translation = Vec3<double>());
+	// Return fragment text
+	QString text();
+	// Return local scale for fragment
+	double scale();
+	// Return local translation for fragment
+	Vec3<double> translation();
+};
+
+// Text Primitive
+class TextPrimitive : public ListItem<TextPrimitive>
+{
+	public:
+	// Constructor / Destructor
+	TextPrimitive();
+	~TextPrimitive();
+	// Text Anchors enum
 	enum TextAnchor { TopLeftAnchor, TopMiddleAnchor, TopRightAnchor, MiddleLeftAnchor, CentralAnchor, MiddleRightAnchor, BottomLeftAnchor, BottomMiddleAnchor, BottomRightAnchor, nTextAnchors };
 	// Convert text string to TextAnchor
 	static TextAnchor textAnchor(const char* s);
@@ -56,47 +87,20 @@ class TextPrimitive
 	Matrix localRotation_;
 	// Text size
 	double textSize_;
-	// Text to render
-	QString text_;
+	// Text fragments to render
+	List<TextFragment> fragments_;
 
 	public:
 	// Set data
 	void set(QString text, Vec3<double> anchorPoint, TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize);
-	// Return text to render
-	QString& text();
-	// Return transformation matrix to use when rendering the text
-	Matrix transformationMatrix(double baseFontSize);
+	// Return transformation matrix to use when rendering (including fragment scale/translation if one is specified)
+	Matrix transformationMatrix(double baseFontSize, TextFragment* fragment = NULL);
+	// Calculate bounding box of primitive
+	void boundingBox(Vec3<double>& lowerLeft, Vec3<double>& upperRight);
+	// Render primitive
+	void render(Matrix viewMatrix, bool correctOrientation, double baseFontSize);
 };
 
-// Text Primitive Chunk
-class TextPrimitiveChunk
-{
-	public:
-	// Constructor
-	TextPrimitiveChunk();
-	// List pointers
-	TextPrimitiveChunk *prev, *next;
-
-	private:
-	// Array of TextPrimitive
-	TextPrimitive textPrimitives_[TEXTCHUNKSIZE];
-	// Number of text primitives currently in the array
-	int nTextPrimitives_;
-
-	public:
-	// Forget all text primitives in list
-	void forgetAll();
-	// Return whether array is full
-	bool full();
-	// Add primitive to list
-	void add(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize);
-	// Return number of primitives in the list
-	int nPrimitives();
-	// Update global bounding cuboid for all text primitives in the chunk
-	Cuboid boundingCuboid(ViewPane& pane, bool correctOrientation, double baseFontSize, Cuboid startingCuboid = Cuboid());
-	// Render all primitives in chunk
-	void renderAll(Matrix viewMatrix, bool correctOrientation, double baseFontSize);
-};
 
 // Text Primitive List
 class TextPrimitiveList
@@ -107,17 +111,13 @@ class TextPrimitiveList
 
 	private:
 	// List of text primitive chunks
-	List<TextPrimitiveChunk> textPrimitives_;
-	// Current TextPrimitiveChunk
-	TextPrimitiveChunk *currentChunk_;
+	List<TextPrimitive> textPrimitives_;
 
 	public:
-	// Forget all text primitives, but keeping lists intact
-	void forgetAll();
+	// Clear list
+	void clear();
 	// Add primitive to list
 	void add(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize);
-	// Return number of primitives in the list
-	int nPrimitives();
 	// Update global bounding cuboid for all text primitives in the list
 	Cuboid boundingCuboid(ViewPane& pane, bool correctOrientation, double baseFontSize, Cuboid startingCuboid = Cuboid());
 	// Render all primitives in list

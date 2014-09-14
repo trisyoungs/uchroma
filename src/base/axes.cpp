@@ -796,8 +796,8 @@ void Axes::updateAxisPrimitives()
 	{
 		// Clear old axis primitives
 		axisPrimitives_[axis].forgetAll();
-		labelPrimitives_[axis].forgetAll();
-		titlePrimitives_[axis].forgetAll();
+		labelPrimitives_[axis].clear();
+		titlePrimitives_[axis].clear();
 
 		// Normalise tickDirection
 		tickDir = tickDirection_[axis];

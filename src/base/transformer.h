@@ -24,6 +24,7 @@
 
 #include "expression/expression.h"
 #include "templates/array.h"
+#include <QtCore/QString>
 
 // Forward Declarations
 class Variable;

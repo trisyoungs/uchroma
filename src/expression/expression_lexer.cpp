@@ -27,6 +27,7 @@
 #include "base/sysfunc.h"
 #include "base/messenger.h"
 #include <math.h>
+#include <cctype>
 
 // Symbols
 const char* SymbolTokenKeywords[Expression::nSymbolTokens] = { "==", ">=", "<=", "!=", "<>", "&&", "||" };

@@ -24,6 +24,7 @@
 #include "expression/functionnode.h"
 #include "math/constants.h"
 #include <cmath>
+#include <cstring>
 
 // Static singleton
 Functions functions;

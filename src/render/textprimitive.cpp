@@ -25,8 +25,60 @@
 #include <base/viewpane.h>
 
 /*
+ * Text Fragment
+ */
+
+// Constructor
+TextFragment::TextFragment() : ListItem<TextFragment>()
+{
+	scale_ = 1.0;
+}
+
+// Destructor
+TextFragment::~TextFragment()
+{
+
+}
+
+// Set fragment data
+void TextFragment::set(QString& text, double scale, Vec3<double> translation)
+{
+	text_ = text;
+	scale_ = scale;
+	translation_ = translation;
+}
+
+// Return text of fragment
+QString TextFragment::text()
+{
+	return text_;
+}
+
+// Return local scale for fragment
+double TextFragment::scale()
+{
+	return scale_;
+}
+
+// Return local translation for fragment
+Vec3<double> TextFragment::translation()
+{
+	return translation_;
+}
+
+/*
  * Text Primitive
  */
+
+// Constructor
+TextPrimitive::TextPrimitive() : ListItem<TextPrimitive>()
+{
+}
+
+// Destructor
+TextPrimitive::~TextPrimitive()
+{
+}
 
 // Text Anchor Keywords
 const char* TextAnchorKeywords[] = { "TopLeft", "TopMiddle", "TopRight", "MiddleLeft", "Central", "MiddleRight", "BottomLeft", "BottomMiddle", "BottomRight" };
@@ -47,7 +99,73 @@ const char* TextPrimitive::textAnchor(TextPrimitive::TextAnchor anchor)
 // Set data
 void TextPrimitive::set(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize)
 {
-	text_ = text;
+	TextFragment* fragment;
+	Vec3<double> ll, ur, translation;
+	double basicHeight, scale, y;
+	QString fragmentText;
+	int supSub = 0;
+
+	// Get the height of a basic bounding box so we have a reference
+	FontInstance::boundingBox("A", ll, ur);
+	basicHeight = ur.y - ll.y;
+
+	int n=0;
+	while (n<text.length())
+	{
+		// If the current character is a backslash, check the next character to see what action we need to take...
+		if (text[n] == QChar('\\'))
+		{
+			// Increment n and do a quick check on the next character (in case it's another backslash)
+			++n;
+			if (text[n] == QChar('\\'))
+			{
+				fragmentText += text[n];
+				++n;
+				continue;
+			}
+			else if (!fragmentText.isEmpty())
+			{
+				// Create a fragment for any previously-stored characters
+
+				// -- Generate vertical text position
+				translation.y = 0.0;
+				y = basicHeight;
+				if (supSub > 0) for (int i=0; i<supSub; ++i) { translation.y += y - (y/3.0); y *= 0.583; }
+				scale = pow(0.583,abs(supSub));
+				fragment = fragments_.add();
+				fragment->set(fragmentText, scale, translation);
+
+				// -- Increase x offset
+				FontInstance::boundingBox(fragmentText, ll, ur);
+				translation.x += (ur.x - ll.x) * scale;
+
+				// -- Empty string
+				fragmentText = QString();
+			}
+
+			// Check the character again, this time for our own escape sequences
+			if (text[n] == QChar('S')) ++supSub;
+		}
+		else fragmentText += text[n];
+
+		++n;
+	}
+
+	// Any text remaining?
+	if (!fragmentText.isEmpty())
+	{
+		// Generate vertical text position
+		translation.y = 0.0;
+		y = basicHeight;
+		if (supSub > 0) for (int i=0; i<supSub; ++i) { translation.y += y - (y/3.0); y *= 0.583; }
+		fragment = fragments_.add();
+		fragment->set(fragmentText, pow(0.583,abs(supSub)), translation);
+	}
+
+// 	XXX Title="\it{Q}, A\sup{-1}"
+// 	XXX Shear matrix for fake italics
+// 	XXX Temporarily increase glLineWidth for bold chars.
+
 	anchorPoint_ = anchorPoint;
 	anchorPosition_ = anchorPosition;
 	adjustmentVector_ = adjustmentVector;
@@ -56,16 +174,16 @@ void TextPrimitive::set(QString text, Vec3<double> anchorPoint, TextPrimitive::T
 }
 
 // Return transformation matrix to use when rendering the text
-Matrix TextPrimitive::transformationMatrix(double baseFontSize)
+Matrix TextPrimitive::transformationMatrix(double baseFontSize, TextFragment* fragment)
 {
 	Matrix textMatrix, A;
 	Vec3<double> lowerLeft, upperRight, anchorPos, anchorPosRotated, textCentre;
 
 	// Calculate scaling factor for font
 	double scale = FontInstance::fontBaseHeight() * textSize_ / baseFontSize;
-
+	
 	// Calculate bounding box and anchor position on it
-	FontInstance::boundingBox(text_, lowerLeft, upperRight);
+	boundingBox(lowerLeft, upperRight);
 	switch (anchorPosition_)
 	{
 		case (TextPrimitive::TopLeftAnchor):
@@ -102,77 +220,120 @@ Matrix TextPrimitive::transformationMatrix(double baseFontSize)
 	anchorPosRotated = localRotation_ * (anchorPos - textCentre) * scale;
 
 	// Construct matrix
-	// -- Translate to centre of text bounding box (not rotated)
+	// -- Translate to centre of text bounding box (not rotated) accounting for fragment translation if one was specified
+	if (fragment) textCentre -= fragment->translation();
 	textMatrix.createTranslation(-textCentre);
 	// -- Apply scaled local rotation matrix
 	A = localRotation_;
 	A.applyScaling(scale, scale, scale);
 	textMatrix *= A;
-	// -- Apply transform to text anchor point
+	// -- Apply translation to text anchor point
 	textMatrix.applyTranslation(-anchorPosRotated+anchorPoint_+adjustmentVector_*scale);
+	// -- Apply local scaling to text (if fragment was provided)
+	if (fragment) textMatrix.applyScaling(fragment->scale());
 
 	return textMatrix;
 }
 
-// Return text to render
-QString& TextPrimitive::text()
+// Calculate bounding box of primitive
+void TextPrimitive::boundingBox(Vec3<double>& lowerLeft, Vec3<double>& upperRight)
 {
-	return text_;
+	// Set initial lowerLeft and upperRight from the first primitive in the list
+	if (fragments_.first()) FontInstance::boundingBox(fragments_.first()->text(), lowerLeft, upperRight);
+	else
+	{
+		// No fragments in list!
+		lowerLeft.zero();
+		upperRight.zero();
+		return;
+	}
+	
+	// Loop over remaining fragments, keeping track of the total width of the primitive and the max/min y values
+	Vec3<double> ll, ur;
+	double width = upperRight.x - lowerLeft.x;
+	for (TextFragment* fragment = fragments_.first()->next; fragment != NULL; fragment = fragment->next)
+	{
+		// Get bounding box for this fragment
+		FontInstance::boundingBox(fragment->text(), ll, ur);
+
+		// Scale the box by the current scaling factor...
+		ur.x = ll.x + (ur.x - ll.x)*fragment->scale();
+		ur.y = ll.y + (ur.y - ll.y)*fragment->scale();
+
+		// Translate the box by the defined amount
+		ll += fragment->translation();
+		ur += fragment->translation();
+
+		// Update lowerLeft and upperRight values
+		if (ll.y < lowerLeft.y) lowerLeft.y = ll.y;
+		if (ur.y > upperRight.y) upperRight.y = ur.y;
+		if (ur.x > upperRight.x) upperRight.x = ur.x;
+	}
+}
+
+// Render primitive
+void TextPrimitive::render(Matrix viewMatrix, bool correctOrientation, double baseFontSize)
+{
+	Matrix textMatrix;
+
+	// Loop over fragments
+	for (TextFragment* fragment = fragments_.first(); fragment != NULL; fragment = fragment->next)
+	{
+		textMatrix = transformationMatrix(baseFontSize, fragment) * viewMatrix;
+		glLoadMatrixd(textMatrix.matrix());
+
+		// Draw bounding boxes around each fragment
+		if (false)
+		{
+			glDisable(GL_LINE_STIPPLE);
+			glLineWidth(1.0);
+			Vec3<double> ll, ur;
+			FontInstance::boundingBox(fragment->text(), ll, ur);
+			glBegin(GL_LINE_LOOP);
+			glVertex3d(ll.x, ll.y, 0.0);
+			glVertex3d(ur.x, ll.y, 0.0);
+			glVertex3d(ur.x, ur.y, 0.0);
+			glVertex3d(ll.x, ur.y, 0.0);
+			glEnd();
+		}
+
+		FontInstance::font()->Render(qPrintable(fragment->text()));
+	}
 }
 
 /*
- * Text Primitive Chunk
+ * Text Primitive List
  */
 
 // Constructor
-TextPrimitiveChunk::TextPrimitiveChunk()
+TextPrimitiveList::TextPrimitiveList()
 {
-	// Public variables
-	prev = NULL;
-	next = NULL;
-
-	// Private variable
-	nTextPrimitives_ = 0;
 }
 
-// Forget all text primitives in list
-void TextPrimitiveChunk::forgetAll()
+// Clear list
+void TextPrimitiveList::clear()
 {
-	nTextPrimitives_ = 0;
+	textPrimitives_.clear();
 }
 
-// Return whether array is full
-bool TextPrimitiveChunk::full()
+// Set data from literal coordinates and text
+void TextPrimitiveList::add(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize)
 {
-	return (nTextPrimitives_ == TEXTCHUNKSIZE);
+	TextPrimitive* primitive = textPrimitives_.add();
+	primitive->set(text, anchorPoint, anchorPosition, adjustmentVector, rotation, textSize);
 }
 
-// Add primitive to chunk
-void TextPrimitiveChunk::add(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize)
-{
-	textPrimitives_[nTextPrimitives_].set(text, anchorPoint, anchorPosition, adjustmentVector, rotation, textSize);
-	++nTextPrimitives_;
-}
-
-// Return number of primitives in the list
-int TextPrimitiveChunk::nPrimitives()
-{
-	return nTextPrimitives_;
-}
-
-// Calculate global bounding cuboid for all text primitives in the chunk
-Cuboid TextPrimitiveChunk::boundingCuboid(ViewPane& pane, bool correctOrientation, double baseFontSize, Cuboid startingCuboid)
+// Update global bounding cuboid for all text primitives in the list
+Cuboid TextPrimitiveList::boundingCuboid(ViewPane& pane, bool correctOrientation, double baseFontSize, Cuboid startingCuboid)
 {
 	Cuboid result = startingCuboid;
-
 	Matrix textMatrix;
 	Vec3<double> corners[4], local;
-
-	for (int n=0; n<nTextPrimitives_; ++n)
+	for (TextPrimitive* primitive = textPrimitives_.first(); primitive != NULL; primitive = primitive->next)
 	{
 		// Get transformation matrix and bounding box for text
-		textMatrix = textPrimitives_[n].transformationMatrix(baseFontSize);
-		FontInstance::boundingBox(textPrimitives_[n].text(), corners[0], corners[1]);
+		textMatrix = primitive->transformationMatrix(baseFontSize);
+		primitive->boundingBox(corners[0], corners[1]);
 		corners[2].set(corners[0].x, corners[1].y, 0.0);
 		corners[3].set(corners[1].x, corners[0].y, 0.0);
 
@@ -184,70 +345,15 @@ Cuboid TextPrimitiveChunk::boundingCuboid(ViewPane& pane, bool correctOrientatio
 			local = textMatrix*corners[m];
 			result.updateExtremes(local);
 		}
+
 	}
 
-	return result;
-}
-
-// Render all primitives in chunk
-void TextPrimitiveChunk::renderAll(Matrix viewMatrix, bool correctOrientation, double baseFontSize)
-{
-	Matrix textMatrix;
-	for (int n=0; n<nTextPrimitives_; ++n)
-	{
-		// Get transformation matrix for text, and multiply by general view matrix
-		textMatrix = textPrimitives_[n].transformationMatrix(baseFontSize) * viewMatrix;
-		glLoadMatrixd(textMatrix.matrix());
-		FontInstance::font()->Render(qPrintable(textPrimitives_[n].text()));
-	}
-}
-
-/*
- * Text Primitive List
- */
-
-// Constructor
-TextPrimitiveList::TextPrimitiveList()
-{
-	currentChunk_ = NULL;
-}
-
-// Forget all text primitives, but keeping lists intact
-void TextPrimitiveList::forgetAll()
-{
-	for (TextPrimitiveChunk *chunk = textPrimitives_.first(); chunk != NULL; chunk = chunk->next) chunk->forgetAll();
-	currentChunk_ = textPrimitives_.first();
-}
-
-// Set data from literal coordinates and text
-void TextPrimitiveList::add(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize)
-{
-	if (currentChunk_ == NULL) currentChunk_ = textPrimitives_.add();
-	else if (currentChunk_->full()) currentChunk_ = textPrimitives_.add();
-
-	// Add primitive and set data
-	currentChunk_->add(text, anchorPoint, anchorPosition, adjustmentVector, rotation, textSize);
-}
-
-// Return number of primitives in the list
-int TextPrimitiveList::nPrimitives()
-{
-	int n = 0;
-	for (TextPrimitiveChunk *chunk = textPrimitives_.first(); chunk != NULL; chunk = chunk->next) n += chunk->nPrimitives();
-	return n;
-}
-
-// Update global bounding cuboid for all text primitives in the list
-Cuboid TextPrimitiveList::boundingCuboid(ViewPane& pane, bool correctOrientation, double baseFontSize, Cuboid startingCuboid)
-{
-	Cuboid result = startingCuboid;
-	for (TextPrimitiveChunk *chunk = textPrimitives_.first(); chunk != NULL; chunk = chunk->next) result = chunk->boundingCuboid(pane, correctOrientation, baseFontSize, result);
 	return result;
 }
 
 // Render all primitives in list
 void TextPrimitiveList::renderAll(Matrix viewMatrix, bool correctOrientation, double baseFontSize)
 {
-	for (TextPrimitiveChunk *chunk = textPrimitives_.first(); chunk != NULL; chunk = chunk->next) chunk->renderAll(viewMatrix, correctOrientation, baseFontSize);
+	for (TextPrimitive* primitive = textPrimitives_.first(); primitive != NULL; primitive = primitive->next) primitive->render(viewMatrix, correctOrientation, baseFontSize);
 }
 

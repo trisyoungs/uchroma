@@ -842,6 +842,12 @@ void Matrix::applyScaling(double scalex, double scaley, double scalez)
 }
 
 // Apply a general scaling to the matrix (as glScaled would to)
+void Matrix::applyScaling(double scalexyz)
+{
+	applyScaling(scalexyz, scalexyz, scalexyz);
+}
+
+// Apply a general scaling to the matrix (as glScaled would to)
 void Matrix::applyScaling(Vec3<double> scaling)
 {
 	applyScalingX(scaling.x);
