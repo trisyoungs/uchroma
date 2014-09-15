@@ -52,6 +52,7 @@ void ViewLayout::operator=(const ViewLayout& source)
 	panes_.clear();
 
 	// Copy source data
+	name_ = source.name_;
 	nColumns_ = source.nColumns_;
 	nRows_ = source.nRows_;
 	panes_ = source.panes_;
@@ -65,8 +66,6 @@ void ViewLayout::operator=(const ViewLayout& source)
 void ViewLayout::paneChanged(ViewPane* caller)
 {
 	if (caller) caller->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
-
-	CurrentProject::setAsModified();
 }
 
 /*
@@ -146,9 +145,22 @@ ViewPane* ViewLayout::addPane(QString name, int left, int top, int width, int he
 
 	pane->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
 
-	CurrentProject::setAsModified();
-
 	return pane;
+}
+
+// Remove pane from layout
+void ViewLayout::removePane(ViewPane* pane)
+{
+	if (!panes_.contains(pane))
+	{
+		msg.print("Internal Error: Tried to remove a pane from a ViewLayout that doesn't own it.\n");
+		return;
+	}
+
+	// Notify all collections associated to the pane that it longer exists
+	for (RefListItem<Collection,bool>* ri = pane->collections(); ri != NULL; ri = ri->next) ri->item->setDisplayPane(NULL);
+
+	panes_.remove(pane);
 }
 
 // Return list of panes

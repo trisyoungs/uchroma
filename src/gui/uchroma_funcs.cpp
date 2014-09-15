@@ -29,7 +29,7 @@
 // Constructor
 UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	axesWindow_(*this), dataWindow_(*this), logWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this),
-	createCollectionDialog_(*this), dataImportDialog_(*this), editFitSetupDialog_(*this), layoutDialog_(*this), saveImageDialog_(*this),
+	createCollectionDialog_(*this), dataImportDialog_(*this), editFitSetupDialog_(*this), saveImageDialog_(*this),
 	viewLayout_(*this)
 {
 	// Initialise the icon resource
@@ -60,9 +60,8 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	interacting_ = false;
 	refreshing_ = false;
 
-	// Set basic view layout, and give pointer to PaneOrganiser in LayoutWindow
+	// Set basic view layout
 	currentViewPane_ = viewLayout_.setDefault();
-	layoutDialog_.ui.Organiser->setViewLayout(&viewLayout_);
 
 	// Add an empty collection, and add it to the current view pane
 	currentViewPane_->addCollection(addCollection());
@@ -90,10 +89,6 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 
 	// Connect CollectionTree context menu signal
 	connect(ui.CollectionTree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(collectionTreeContextMenuRequested(QPoint)));
-
-	// Connect LayoutWindow and PaneOrganiser update signals
-	connect(layoutDialog_.ui.Organiser, SIGNAL(updateMainDisplay()), this, SLOT(updateDisplay()));
-	connect(&layoutDialog_, SIGNAL(updateMainDisplay()), this, SLOT(updateDisplay()));
 
 	// Connect sub-window closed signal to toggle buttons / menu items in uChroma's main window
 	connect(&axesWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowAxes, SLOT(setChecked(bool)));
@@ -123,6 +118,8 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 // Destructor
 UChromaWindow::~UChromaWindow()
 {
+	// Delete all collections explicitly, before the ViewLayout (and ViewPanes) are deleted
+	collections_.clear();
 }
 
 /*

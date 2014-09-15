@@ -69,8 +69,6 @@ ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), parent_(parent), 
 // Destructor
 ViewPane::~ViewPane()
 {
-	// Notify all associated collections that we no longer exist
-	for (RefListItem<Collection,bool>* ri = collections_.first(); ri != NULL; ri = ri->next) ri->item->setDisplayPane(NULL);
 }
 
 // Copy constructor

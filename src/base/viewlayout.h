@@ -109,6 +109,8 @@ class ViewLayout : public ListItem<ViewLayout>
 	public:
 	// Add pane to layout
 	ViewPane* addPane(QString name = QString(), int left = 0, int top = 0, int width = 1, int height = 1);
+	// Remove pane from layout
+	void removePane(ViewPane* pane);
 	// Return first pane in list
 	ViewPane* panes();
 	// Return last pane in list

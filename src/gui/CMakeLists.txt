@@ -16,6 +16,7 @@ SET(qtproject_SRCS
   editlinestyle_funcs.cpp
   editnumberformat_funcs.cpp
   editreference_funcs.cpp
+  editviewlayout_funcs.cpp
 
   selectequation_funcs.cpp
   selecttarget_funcs.cpp
@@ -66,6 +67,7 @@ SET(pro_MOC_HDRS
   editlinestyle.h
   editnumberformat.h
   editreference.h
+  editviewlayouts.h
 
   selectequation.h
   selecttarget.h
@@ -90,6 +92,7 @@ SET(pro_UIS
   editlinestyle.ui
   editnumberformat.ui
   editreference.ui
+  editviewlayouts.ui
 
   selectequation.ui
   selecttarget.ui

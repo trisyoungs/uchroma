@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>LayoutDialog</class>
- <widget class="QDialog" name="LayoutDialog">
+ <class>EditViewLayoutDialog</class>
+ <widget class="QDialog" name="EditViewLayoutDialog">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>406</width>
-    <height>582</height>
+    <width>453</width>
+    <height>596</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -524,6 +524,9 @@
       <widget class="QPushButton" name="OKButton">
        <property name="text">
         <string>&amp;OK</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

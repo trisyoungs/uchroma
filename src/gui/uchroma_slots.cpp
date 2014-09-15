@@ -21,6 +21,7 @@
 
 #include "base/currentproject.h"
 #include "gui/uchroma.h"
+#include "gui/editviewlayout.h"
 #include "render/fontinstance.h"
 #include "templates/reflist.h"
 #include "version.h"
@@ -124,6 +125,12 @@ void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 {
 	if (saveImageDialog_.getImageDetails(imageExportFile_, imageExportWidth_, imageExportHeight_, imageExportFormat_, imageExportMaintainAspect_, double(ui.MainView->width()) / double(ui.MainView->height())))
 	{
+		// Check to see if existing image file already exists
+		if (QFile::exists(saveImageDialog_.imageFileName()))
+		{
+			if (QMessageBox::question(this, "File Exists", "The file '" + saveImageDialog_.imageFileName() + "' already exists.\nOverwrite it?", QMessageBox::No | QMessageBox::Yes, QMessageBox::No) == QMessageBox::No) return;
+		}
+
 		imageExportFile_ = saveImageDialog_.imageFileName();
 		imageExportFormat_ = saveImageDialog_.imageFormat();
 		imageExportHeight_ = saveImageDialog_.imageHeight();
@@ -220,7 +227,19 @@ void UChromaWindow::on_actionViewAxes_triggered(bool checked)
 
 void UChromaWindow::on_actionViewChangeLayout_triggered(bool checked)
 {
-	layoutDialog_.updateAndShow();
+	EditViewLayoutDialog layoutDialog(*this);
+
+	// Call the dialog
+	if (layoutDialog.call(&viewLayout_))
+	{
+		viewLayout_ = layoutDialog.viewLayout();
+		currentViewPane_ = viewLayout_.panes();
+		recalculateViewLayout(ui.MainView->contextWidth(), ui.MainView->contextHeight());
+
+		CurrentProject::setAsModified();
+
+		updateGUI();
+	}
 }
 
 /*

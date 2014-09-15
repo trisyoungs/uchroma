@@ -1,6 +1,6 @@
 /*
-	*** uChroma Layout Window
-	*** src/gui/layout_funcs.cpp
+	*** Edit ViewLayout Dialog
+	*** src/gui/editviewlayout_funcs.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,7 +19,7 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/layout.h"
+#include "gui/editviewlayout.h"
 #include "gui/uchroma.h"
 #include "gui/selecttarget.h"
 #include "templates/variantpointer.h"
@@ -29,13 +29,14 @@
  */
 
 // Constructor
-LayoutDialog::LayoutDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(parent), layoutBackup_(parent)
+EditViewLayoutDialog::EditViewLayoutDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(parent), layout_(parent)
 {
 	ui.setupUi(this);
 
+	currentPane_ = NULL;
+
 	refreshing_ = true;
 
-	currentPane_ = NULL;
 	// Set items in PaneRoleCombo
 	for (int n=0; n<ViewPane::nPaneRoles; ++n) ui.PaneRoleCombo->addItem(ViewPane::paneRole((ViewPane::PaneRole) n));
 
@@ -43,34 +44,63 @@ LayoutDialog::LayoutDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(p
 }
 
 // Destructor
-LayoutDialog::~LayoutDialog()
+EditViewLayoutDialog::~EditViewLayoutDialog()
 {
 }
 
 // Window close event
-void LayoutDialog::closeEvent(QCloseEvent* event)
+void EditViewLayoutDialog::closeEvent(QCloseEvent* event)
 {
 	reject();
 }
 
-void LayoutDialog::reject()
+void EditViewLayoutDialog::reject()
 {
-	// Revert to saved data
-	uChroma_.setViewLayout(layoutBackup_);
-
 	setResult(QDialog::Rejected);
 	hide();
 }
 
-void LayoutDialog::on_OKButton_clicked(bool checked)
+void EditViewLayoutDialog::on_OKButton_clicked(bool checked)
 {
 	accept();
 }
 
-void LayoutDialog::on_CancelButton_clicked(bool checked)
+void EditViewLayoutDialog::on_CancelButton_clicked(bool checked)
 {
 	reject();
 }
+
+// Call dialog to edit specified ViewLayout
+bool EditViewLayoutDialog::call(ViewLayout* target)
+{
+	// Check supplied var
+	if (!target)
+	{
+		msg.print("Internal Error: NULL ViewLayout given to EditViewLayoutDialog::call().\n");
+		return false;
+	}
+
+	// Copy supplied data
+	layout_ = (*target);
+
+	// Tell the Organiser widget which layout it's editing
+	ui.Organiser->setViewLayout(&layout_);
+
+	updateControls();
+
+
+	// Call the dialog
+	if (exec()) return true;
+	else return false;
+
+}
+
+// Return ViewLayout stored in dialog
+ViewLayout& EditViewLayoutDialog::viewLayout()
+{
+	return layout_;
+}
+
 /*
  * Convenience Functions
  */
@@ -79,64 +109,66 @@ void LayoutDialog::on_CancelButton_clicked(bool checked)
  * Slots - Pane Layout
  */
 
-void LayoutDialog::on_GridNColumnsSpin_valueChanged(int value)
+void EditViewLayoutDialog::on_GridNColumnsSpin_valueChanged(int value)
 {
 	if (refreshing_) return;
 
-	uChroma_.viewLayout().setGrid(value, ui.GridNRowsSpin->value());
+	layout_.setGrid(value, ui.GridNRowsSpin->value());
 	updateControls();
-	emit(updateMainDisplay());
 }
 
-void LayoutDialog::on_GridNRowsSpin_valueChanged(int value)
+void EditViewLayoutDialog::on_GridNRowsSpin_valueChanged(int value)
 {
 	if (refreshing_) return;
 
-	uChroma_.viewLayout().setGrid(ui.GridNColumnsSpin->value(), value);
+	layout_.setGrid(ui.GridNColumnsSpin->value(), value);
 	updateControls();
-	emit(updateMainDisplay());
 }
 
-void LayoutDialog::on_PaneAddButton_clicked(bool checked)
+void EditViewLayoutDialog::on_PaneAddButton_clicked(bool checked)
 {
 	if (refreshing_) return;
 
-	currentPane_ = uChroma_.viewLayout().addPane("New Pane");
+	currentPane_ = layout_.addPane("New Pane");
 
 	updateControls();
 }
 
-void LayoutDialog::on_PaneRemoveButton_clicked(bool checked)
+void EditViewLayoutDialog::on_PaneRemoveButton_clicked(bool checked)
 {
 	if (refreshing_) return;
+
+	layout_.removePane(currentPane_);
+
+	updateControls();
 }
 
-void LayoutDialog::on_PaneNextButton_clicked(bool checked)
+void EditViewLayoutDialog::on_PaneNextButton_clicked(bool checked)
 {
 	if (refreshing_) return;
 
 	if (currentPane_) currentPane_ = currentPane_->next;
-	if (!currentPane_) currentPane_ = uChroma_.viewLayout().panes();
+	if (!currentPane_) currentPane_ = layout_.panes();
 
 	updateControls();
 }
 
-void LayoutDialog::on_PanePreviousButton_clicked(bool checked)
+void EditViewLayoutDialog::on_PanePreviousButton_clicked(bool checked)
 {
 	if (refreshing_) return;
 
 	if (currentPane_) currentPane_ = currentPane_->prev;
-	if (!currentPane_) currentPane_ = uChroma_.viewLayout().lastPane();
+	if (!currentPane_) currentPane_ = layout_.lastPane();
 
 	updateControls();
 }
 
-void LayoutDialog::on_Organiser_currentPaneChanged(int gridX, int gridY)
+void EditViewLayoutDialog::on_Organiser_currentPaneChanged(int gridX, int gridY)
 {
 	if (refreshing_) return;
 
 	// Get pane at the specified grid coordinates
-	currentPane_ = uChroma_.viewLayout().paneAtGrid(gridX, gridY);
+	currentPane_ = layout_.paneAtGrid(gridX, gridY);
 
 	updateControls();
 }
@@ -145,7 +177,7 @@ void LayoutDialog::on_Organiser_currentPaneChanged(int gridX, int gridY)
  * Slots - Pane Basic Info
  */
 
-void LayoutDialog::on_PaneNameEdit_textChanged(QString text)
+void EditViewLayoutDialog::on_PaneNameEdit_textChanged(QString text)
 {
 	if (refreshing_) return;
 
@@ -153,7 +185,7 @@ void LayoutDialog::on_PaneNameEdit_textChanged(QString text)
 	ui.Organiser->update();
 }
 
-void LayoutDialog::on_PaneRoleCombo_currentIndexChanged(int index)
+void EditViewLayoutDialog::on_PaneRoleCombo_currentIndexChanged(int index)
 {
 	if (refreshing_) return;
 
@@ -161,27 +193,26 @@ void LayoutDialog::on_PaneRoleCombo_currentIndexChanged(int index)
 	updateControls();
 }
 
-void LayoutDialog::on_Pane2DCheck_clicked(bool checked)
+void EditViewLayoutDialog::on_Pane2DCheck_clicked(bool checked)
 {
 	if (refreshing_) return;
 
 	if (currentPane_) currentPane_->setTwoDimensional(checked);
-	emit(updateMainDisplay());
 }
 
 /*
  * Slots - Pane Targets
  */
 
-void LayoutDialog::on_PaneTargetsList_currentRowChanged(int index)
+void EditViewLayoutDialog::on_PaneTargetsList_currentRowChanged(int index)
 {
 	ui.PaneRemoveTargetButton->setEnabled(index != -1);
 }
 
-void LayoutDialog::on_PaneAddTargetButton_clicked(bool checked)
+void EditViewLayoutDialog::on_PaneAddTargetButton_clicked(bool checked)
 {
 	SelectTargetDialog targetDialog(this);
-	   targetDialog.populateLists(currentPane_, uChroma_.viewLayout().panes(), uChroma_.collections());
+	targetDialog.populateLists(currentPane_, layout_.panes(), uChroma_.collections());
 	if (targetDialog.exec())
 	{
 		// Get lists of panes and collections, and add them to the targets list
@@ -194,7 +225,7 @@ void LayoutDialog::on_PaneAddTargetButton_clicked(bool checked)
 	updateControls();
 }
 
-void LayoutDialog::on_PaneRemoveTargetButton_clicked(bool checked)
+void EditViewLayoutDialog::on_PaneRemoveTargetButton_clicked(bool checked)
 {
 	// Get list of current items
 	QList<QListWidgetItem*> items = ui.PaneTargetsList->selectedItems();
@@ -215,31 +246,18 @@ void LayoutDialog::on_PaneRemoveTargetButton_clicked(bool checked)
  * Update
  */
 
-// Update controls and show window
-void LayoutDialog::updateAndShow()
-{
-	// Take a copy of the current layout so we can revert back to it if necessary...
-	layoutBackup_ = uChroma_.viewLayout();
-
-	updateControls(true);
-	exec();
-}
-
 // Update controls
-void LayoutDialog::updateControls(bool force)
+void EditViewLayoutDialog::updateControls()
 {
-	// If the window isn't visible, do nothing...
-	if ((!isVisible()) && (!force)) return;
-
 	refreshing_ = true;
 
 	// Make a check on the currentPane_ to see if it still exists in the layout...
-	if (currentPane_ && (!uChroma_.viewLayout().containsPane(currentPane_))) currentPane_ = uChroma_.viewLayout().panes();
+	if (currentPane_ && (!layout_.containsPane(currentPane_))) currentPane_ = layout_.panes();
 
 	ui.Organiser->update();
 
-	ui.GridNColumnsSpin->setValue(uChroma_.viewLayout().nColumns());
-	ui.GridNRowsSpin->setValue(uChroma_.viewLayout().nRows());
+	ui.GridNColumnsSpin->setValue(layout_.nColumns());
+	ui.GridNRowsSpin->setValue(layout_.nRows());
 
 	// Check that a valid pane is selected in the organiser
 	ui.PaneNameEdit->setEnabled(currentPane_);

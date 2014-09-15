@@ -1,6 +1,6 @@
 /*
-	*** uChroma Layout Window
-	*** src/gui/layout.h
+	*** Edit ViewLayout Dialog
+	*** src/gui/editviewlayout.h
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,29 +19,29 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_LAYOUTDIALOG_H
-#define UCHROMA_LAYOUTDIALOG_H
+#ifndef UCHROMA_EDITVIEWLAYOUTDIALOG_H
+#define UCHROMA_EDITVIEWLAYOUTDIALOG_H
 
-#include "gui/ui_layout.h"
+#include "gui/ui_editviewlayout.h"
 #include "base/viewlayout.h"
 
 // Forward Declarations
 class UChromaWindow;
 
-class LayoutDialog : public QDialog
+class EditViewLayoutDialog : public QDialog
 {
 	// All Qt declarations must include this macro
 	Q_OBJECT
 
-
 	public:
 	// Constructor / Destructor
-	LayoutDialog(UChromaWindow& parent);
-	~LayoutDialog();
+	EditViewLayoutDialog(UChromaWindow& parent);
+	~EditViewLayoutDialog();
 	// Main form declaration
-	Ui::LayoutDialog ui;
+	Ui::EditViewLayoutDialog ui;
 	// UChromaWindow reference
 	UChromaWindow& uChroma_;
+
 
 	/*
 	 * Window Functions
@@ -49,8 +49,8 @@ class LayoutDialog : public QDialog
 	private:
 	// Whether the window is refreshing / updating its controls
 	bool refreshing_;
-	// Backup copy of layout
-	ViewLayout layoutBackup_;
+	// ViewLayout we are editing
+	ViewLayout layout_;
 
 	protected:
 	// Window close event
@@ -60,6 +60,11 @@ class LayoutDialog : public QDialog
 	void reject();
 	void on_OKButton_clicked(bool checked);
 	void on_CancelButton_clicked(bool checked);
+
+	// Call dialog to edit specified ViewLayout
+	bool call(ViewLayout* target);
+	// Return ViewLayout stored in dialog
+	ViewLayout& viewLayout();
 
 
 	/*
@@ -103,21 +108,11 @@ class LayoutDialog : public QDialog
 
 
 	/*
-	 * Signals
-	 */
-	signals:
-	// Main display update required
-	void updateMainDisplay();
-
-
-	/*
 	 * Update Functions
 	 */
 	public:
-	// Update controls and show window
-	void updateAndShow();
 	// Update controls
-	void updateControls(bool force = false);
+	void updateControls();
 };
 
 #endif
