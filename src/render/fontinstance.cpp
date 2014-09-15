@@ -27,6 +27,7 @@ QString FontInstance::fontFile_ = "";
 FTFont* FontInstance::font_ = NULL;
 double FontInstance::fontBaseHeight_ = 0.0;
 double FontInstance::fontFullHeight_ = 0.0;
+double FontInstance::dotWidth_ = 0.0;
 
 // Setup font specified
 bool FontInstance::setupFont(QString fontName)
@@ -57,9 +58,11 @@ bool FontInstance::setupFont(QString fontName)
 // 		font_->Outset(-.5, 1.5);
 		font_->FaceSize(1);
 		FTBBox boundingBox = font_->BBox("0123456789");
-		fontBaseHeight_ = boundingBox.Upper().Yf() - boundingBox.Lower().Yf();
+		fontBaseHeight_ = boundingBox.Upper().Y() - boundingBox.Lower().Y();
 		boundingBox = font_->BBox("ABCDEfghijKLMNOpqrstUVWXYz");
-		fontFullHeight_ = boundingBox.Upper().Yf() - boundingBox.Lower().Yf();
+		fontFullHeight_ = boundingBox.Upper().Y() - boundingBox.Lower().Y();
+		boundingBox = font_->BBox("..");
+		dotWidth_ = boundingBox.Upper().X() - boundingBox.Lower().X();
 	}
 
 	return (font_ != NULL);
@@ -86,15 +89,33 @@ double FontInstance::fontBaseHeight()
 // Return bounding box for specified string
 FTBBox FontInstance::boundingBox(QString text)
 {
-	if (font_) return font_->BBox(qPrintable(text));
-	else return FTBBox();
+	if (!font_) return FTBBox();
+
+	// Need to be a little careful here - we will put a '.' either side of the text so we get the full width of strings with trailing spaces..
+	FTBBox box = font_->BBox(qPrintable("." + text + "."));
+// 	double newWidth = box.Upper().X() - dotWidth_;
+// 	box.Upper().X(newWidth);
+	return FTBBox(box.Lower(), FTPoint(box.Upper().X()-dotWidth_, box.Upper().Y()));
 }
 
 // Calculate bounding box for specified string
 void FontInstance::boundingBox(QString text, Vec3<double>& lowerLeft, Vec3<double>& upperRight)
 {
-	FTBBox box;
-	if (font_) box = font_->BBox(qPrintable(text));
+	FTBBox box = boundingBox(text);
 	lowerLeft.set(box.Lower().X(), box.Lower().Y(), box.Lower().Z());
 	upperRight.set(box.Upper().X(), box.Upper().Y(), box.Upper().Z());
+}
+
+// Calculate bounding box width for specified string
+double FontInstance::boundingBoxWidth(QString text)
+{
+	FTBBox box = boundingBox(text);
+	return (box.Upper().X() - box.Lower().X());
+}
+
+// Calculate bounding box height for specified string
+double FontInstance::boundingBoxHeight(QString text)
+{
+	FTBBox box = boundingBox(text);
+	return (box.Upper().Y() - box.Lower().Y());
 }

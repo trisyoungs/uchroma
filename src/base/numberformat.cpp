@@ -24,7 +24,7 @@
 #include <QtCore/QString>
 
 // FormatType Keywords
-const char* FormatTypeKeywords[] = { "Integer", "Decimal", "Scientific" };
+const char* FormatTypeKeywords[] = { "Concise", "Decimal", "Integer", "Scientific" };
 
 // Convert text string to FormatType
 NumberFormat::FormatType NumberFormat::formatType(const char* s)
@@ -42,9 +42,10 @@ const char* NumberFormat::formatType(NumberFormat::FormatType ft)
 // Constructor
 NumberFormat::NumberFormat()
 {
-	type_ = NumberFormat::DecimalFormat;
+	type_ = NumberFormat::ConciseFormat;
 	nDecimals_ = 4;
 	forcePrecedingPlus_ = false;
+	useUpperCaseExponent_ = true;
 }
 
 // Destructor
@@ -68,28 +69,16 @@ NumberFormat::FormatType NumberFormat::type()
 	return type_;
 }
 
-// Set number of decimals
+// Set number of decimals to use
 void NumberFormat::setNDecimals(int n)
 {
 	nDecimals_ = n;
 }
 
-// Return number of decimals
+// Return number of decimals to use
 int NumberFormat::nDecimals()
 {
 	return nDecimals_;
-}
-
-// Set number of decimals in scientific format
-void NumberFormat::setNScientificDecimals(int n)
-{
-	nScientificDecimals_ = n;
-}
-
-// Return number of decimals in scientific format
-int NumberFormat::nScientificDecimals()
-{
-	return nScientificDecimals_;
 }
 
 // Set whether to force display of preceding '+' as well as '-'
@@ -145,6 +134,18 @@ QString NumberFormat::format(double number)
 			{
 				if (forcePrecedingPlus_) sprintf(result, "%+1.*e", nDecimals_, number);
 				else sprintf(result, "%1.*e", nDecimals_, number);
+			}
+			break;
+		case (NumberFormat::ConciseFormat):
+			if (useUpperCaseExponent_)
+			{
+				if (forcePrecedingPlus_) sprintf(result, "%+1.*G", nDecimals_, number);
+				else sprintf(result, "%1.*G", nDecimals_, number);
+			}
+			else
+			{
+				if (forcePrecedingPlus_) sprintf(result, "%+1.*g", nDecimals_, number);
+				else sprintf(result, "%1.*g", nDecimals_, number);
 			}
 			break;
 	}

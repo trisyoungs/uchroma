@@ -54,6 +54,8 @@ bool UChromaWindow::writeAxisBlock(LineParser& parser, Axes& axes, int axis)
 	parser.writeLineF("      %s %f %f\n", Keywords::axisKeyword(Keywords::LimitsKeyword), axes.min(axis), axes.max(axis));
 	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::LogarithmicKeyword), stringBool(axes.logarithmic(axis)));
 	parser.writeLineF("      %s %i\n", Keywords::axisKeyword(Keywords::MinorTicksKeyword), axes.minorTicks(axis));
+	NumberFormat fmt = axes.numberFormat(axis);
+	parser.writeLineF("      %s '%s' %i %s %s\n", Keywords::axisKeyword(Keywords::NumberFormatKeyword), NumberFormat::formatType(fmt.type()), fmt.nDecimals(), stringBool(fmt.useUpperCaseExponent()), stringBool(fmt.forcePrecedingPlus()));
 	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionFractionalKeyword), axes.positionFractional(axis).x, axes.positionFractional(axis).y, axes.positionFractional(axis).z);
 	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionRealKeyword), axes.positionReal(axis).x, axes.positionReal(axis).y, axes.positionReal(axis).z);
 	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::StretchKeyword), axes.stretch(axis));

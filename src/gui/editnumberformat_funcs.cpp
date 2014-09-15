@@ -78,9 +78,9 @@ bool EditNumberFormatDialog::call(NumberFormat* target)
 	if (numberFormat_.type() == NumberFormat::IntegerFormat) ui.IntegerFormatRadio->setChecked(true);
 	else if (numberFormat_.type() == NumberFormat::DecimalFormat) ui.DecimalFormatRadio->setChecked(true);
 	else if (numberFormat_.type() == NumberFormat::ScientificFormat) ui.ScientificFormatRadio->setChecked(true);
+	else if (numberFormat_.type() == NumberFormat::ConciseFormat) ui.ConciseFormatRadio->setChecked(true);
 
-	ui.DecimalFormatDecimalsSpin->setValue(numberFormat_.nDecimals());
-	ui.ScientificFormatDecimalsSpin->setValue(numberFormat_.nScientificDecimals());
+	ui.DecimalsSpin->setValue(numberFormat_.nDecimals());
 	ui.PrecedeWithPlusCheck->setChecked(numberFormat_.forcePrecedingPlus());
 	ui.UpperCaseExponentCheck->setChecked(numberFormat_.useUpperCaseExponent());
 
@@ -105,8 +105,7 @@ void EditNumberFormatDialog::on_IntegerFormatRadio_toggled(bool checked)
 {
 	if (!checked) return;
 
-	ui.DecimalFormatDecimalsSpin->setEnabled(false);
-	ui.ScientificFormatDecimalsSpin->setEnabled(false);
+	ui.DecimalsSpin->setEnabled(false);
 
 	if (refreshing_) return;
 
@@ -119,8 +118,7 @@ void EditNumberFormatDialog::on_DecimalFormatRadio_toggled(bool checked)
 {
 	if (!checked) return;
 
-	ui.DecimalFormatDecimalsSpin->setEnabled(true);
-	ui.ScientificFormatDecimalsSpin->setEnabled(false);
+	ui.DecimalsSpin->setEnabled(true);
 
 	if (refreshing_) return;
 
@@ -129,21 +127,11 @@ void EditNumberFormatDialog::on_DecimalFormatRadio_toggled(bool checked)
 	updatePreview();
 }
 
-void EditNumberFormatDialog::on_DecimalFormatDecimalsSpin_valueChanged(int value)
-{
-	if (refreshing_) return;
-
-	numberFormat_.setNDecimals(value);
-
-	updatePreview();
-}
-
 void EditNumberFormatDialog::on_ScientificFormatRadio_toggled(bool checked)
 {
 	if (!checked) return;
 
-	ui.DecimalFormatDecimalsSpin->setEnabled(false);
-	ui.ScientificFormatDecimalsSpin->setEnabled(true);
+	ui.DecimalsSpin->setEnabled(true);
 
 	if (refreshing_) return;
 
@@ -152,11 +140,24 @@ void EditNumberFormatDialog::on_ScientificFormatRadio_toggled(bool checked)
 	updatePreview();
 }
 
-void EditNumberFormatDialog::on_ScientificFormatDecimalsSpin_valueChanged(int value)
+void EditNumberFormatDialog::on_ConciseFormatRadio_toggled(bool checked)
+{
+	if (!checked) return;
+
+	ui.DecimalsSpin->setEnabled(true);
+
+	if (refreshing_) return;
+
+	numberFormat_.setType(NumberFormat::ConciseFormat);
+
+	updatePreview();
+}
+
+void EditNumberFormatDialog::on_DecimalsSpin_valueChanged(int value)
 {
 	if (refreshing_) return;
 
-	numberFormat_.setNScientificDecimals(value);
+	numberFormat_.setNDecimals(value);
 
 	updatePreview();
 }

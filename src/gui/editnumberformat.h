@@ -73,9 +73,9 @@ class EditNumberFormatDialog : public QDialog
 	private slots:
 	void on_IntegerFormatRadio_toggled(bool checked);
 	void on_DecimalFormatRadio_toggled(bool checked);
-	void on_DecimalFormatDecimalsSpin_valueChanged(int value);
 	void on_ScientificFormatRadio_toggled(bool checked);
-	void on_ScientificFormatDecimalsSpin_valueChanged(int value);
+	void on_ConciseFormatRadio_toggled(bool checked);
+	void on_DecimalsSpin_valueChanged(int value);
 	void on_UpperCaseExponentCheck_clicked(bool checked);
 	void on_PrecedeWithPlusCheck_clicked(bool checked);
 

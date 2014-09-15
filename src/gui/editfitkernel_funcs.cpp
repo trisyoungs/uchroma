@@ -24,7 +24,7 @@
 #include "gui/editreference.h"
 #include "gui/uchroma.h"
 #include "base/collection.h"
-#include "expression//variable.h"
+#include "expression/variable.h"
 #include "kernels/fit.h"
 #include "templates/variantpointer.h"
 #include <QtGui/QMessageBox>

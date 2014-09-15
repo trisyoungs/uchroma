@@ -28,33 +28,13 @@ Matrix::Matrix()
 }
 
 /*
-// Operators
-*/
+ * Operators
+ */
 
 // Matrix multiply (operator *) (return new matrix)
 Matrix Matrix::operator*(const Matrix &B) const
 {
-	// [ row(A|this).column(B) ]
 	Matrix AB;
-// 	AB.matrix_[0] = matrix_[0]*B.matrix_[0] + matrix_[4]*B.matrix_[1] + matrix_[8]*B.matrix_[2] + matrix_[12]*B.matrix_[3];
-// 	AB.matrix_[1] = matrix_[1]*B.matrix_[0] + matrix_[5]*B.matrix_[1] + matrix_[9]*B.matrix_[2] + matrix_[13]*B.matrix_[3];
-// 	AB.matrix_[2] = matrix_[2]*B.matrix_[0] + matrix_[6]*B.matrix_[1] + matrix_[10]*B.matrix_[2] + matrix_[14]*B.matrix_[3];
-// 	AB.matrix_[3] = matrix_[3]*B.matrix_[0] + matrix_[7]*B.matrix_[1] + matrix_[11]*B.matrix_[2] + matrix_[15]*B.matrix_[3];
-// 
-// 	AB.matrix_[4] = matrix_[0]*B.matrix_[4] + matrix_[4]*B.matrix_[5] + matrix_[8]*B.matrix_[6] + matrix_[12]*B.matrix_[7];
-// 	AB.matrix_[5] = matrix_[1]*B.matrix_[4] + matrix_[5]*B.matrix_[5] + matrix_[9]*B.matrix_[6] + matrix_[13]*B.matrix_[7];
-// 	AB.matrix_[6] = matrix_[2]*B.matrix_[4] + matrix_[6]*B.matrix_[5] + matrix_[10]*B.matrix_[6] + matrix_[14]*B.matrix_[7];
-// 	AB.matrix_[7] = matrix_[3]*B.matrix_[4] + matrix_[7]*B.matrix_[5] + matrix_[11]*B.matrix_[6] + matrix_[15]*B.matrix_[7];
-// 
-// 	AB.matrix_[8] = matrix_[0]*B.matrix_[8] + matrix_[4]*B.matrix_[9] + matrix_[8]*B.matrix_[10] + matrix_[12]*B.matrix_[11];
-// 	AB.matrix_[9] = matrix_[1]*B.matrix_[8] + matrix_[5]*B.matrix_[9] + matrix_[9]*B.matrix_[10] + matrix_[13]*B.matrix_[11];
-// 	AB.matrix_[10] = matrix_[2]*B.matrix_[8] + matrix_[6]*B.matrix_[9] + matrix_[10]*B.matrix_[10] + matrix_[14]*B.matrix_[11];
-// 	AB.matrix_[11] = matrix_[3]*B.matrix_[8] + matrix_[7]*B.matrix_[9] + matrix_[11]*B.matrix_[10] + matrix_[15]*B.matrix_[11];
-// 
-// 	AB.matrix_[12] = matrix_[0]*B.matrix_[12] + matrix_[4]*B.matrix_[13] + matrix_[8]*B.matrix_[14] + matrix_[12]*B.matrix_[15];
-// 	AB.matrix_[13] = matrix_[1]*B.matrix_[12] + matrix_[5]*B.matrix_[13] + matrix_[9]*B.matrix_[14] + matrix_[13]*B.matrix_[15];
-// 	AB.matrix_[14] = matrix_[2]*B.matrix_[12] + matrix_[6]*B.matrix_[13] + matrix_[10]*B.matrix_[14] + matrix_[14]*B.matrix_[15];
-// 	AB.matrix_[15] = matrix_[3]*B.matrix_[12] + matrix_[7]*B.matrix_[13] + matrix_[11]*B.matrix_[14] + matrix_[15]*B.matrix_[15];
 	AB.matrix_[0] = matrix_[0]*B.matrix_[0] + matrix_[1]*B.matrix_[4] + matrix_[2]*B.matrix_[8] + matrix_[3]*B.matrix_[12];
 	AB.matrix_[1] = matrix_[0]*B.matrix_[1] + matrix_[1]*B.matrix_[5] + matrix_[2]*B.matrix_[9] + matrix_[3]*B.matrix_[13];
 	AB.matrix_[2] = matrix_[0]*B.matrix_[2] + matrix_[1]*B.matrix_[6] + matrix_[2]*B.matrix_[10] + matrix_[3]*B.matrix_[14];
@@ -151,8 +131,8 @@ double &Matrix::operator[](int index)
 }
 
 /*
-// Basic Set/Get
-*/
+ * Basic Set/Get
+ */
 
 // Reset to the identity matrix
 void Matrix::setIdentity()
@@ -329,8 +309,8 @@ void Matrix::invert()
 }
 
 /*
-// Column Operations
-*/
+ * Column Operations
+ */
 
 // Copy column contents to supplied Vec3
 Vec3<double> Matrix::columnAsVec3(int col)
@@ -482,8 +462,8 @@ void Matrix::orthogonaliseColumn(int targetcol, int orthocol1, int orthocol2)
 }
 
 /*
-// Rotations
-*/
+ * Rotations
+ */
 
 // Create rotation matrix about X
 void Matrix::createRotationX(double angle)
@@ -741,8 +721,8 @@ void Matrix::applyRotationAxis(double ax, double ay, double az, double angle, bo
 }
 
 /*
-// Translations
-*/
+ * Translations
+ */
 
 // Apply a translation to the matrix (as glTranslated would do)
 void Matrix::createTranslation(double dx, double dy, double dz)
@@ -830,8 +810,8 @@ void Matrix::setTranslation(Vec3<double> translation)
 }
 
 /*
-// Scaling
-*/
+ * Scaling
+ */
 
 // Apply a general scaling to the matrix (as glScaled would do)
 void Matrix::applyScaling(double scalex, double scaley, double scalez)
@@ -889,9 +869,40 @@ void Matrix::applyScalingZ(double scale)
 	matrix_[11] *= scale;
 }
 
+// Apply a shearing along X
+void Matrix::applyShearX(double shearx)
+{
+// 	A[0] = 1.0
+// 	A[4] = 0.2;
+// 	A[5] = 1.0;
+// 	A[9] = 1.0;
+// 	A[15] = 1.0;
+// 	Matrix AB;
+// 	AB.matrix_[0] = matrix_[0];
+// 	AB.matrix_[1] = matrix_[1];
+// 	AB.matrix_[2] = matrix_[2];
+// 	AB.matrix_[3] = matrix_[3];
+
+	matrix_[4] += shearx*matrix_[0];
+	matrix_[5] += shearx*matrix_[1];
+	matrix_[6] += shearx*matrix_[2];
+	matrix_[7] += shearx*matrix_[3];
+
+// 	AB.matrix_[8] = matrix_[8]*B.matrix_[0] + matrix_[9]*B.matrix_[4] + matrix_[10]*B.matrix_[8] + matrix_[11]*B.matrix_[12];
+// 	AB.matrix_[9] = matrix_[8]*B.matrix_[1] + matrix_[9]*B.matrix_[5] + matrix_[10]*B.matrix_[9] + matrix_[11]*B.matrix_[13];
+// 	AB.matrix_[10] = matrix_[8]*B.matrix_[2] + matrix_[9]*B.matrix_[6] + matrix_[10]*B.matrix_[10] + matrix_[11]*B.matrix_[14];
+// 	AB.matrix_[11] = matrix_[8]*B.matrix_[3] + matrix_[9]*B.matrix_[7] + matrix_[10]*B.matrix_[11] + matrix_[11]*B.matrix_[15];
+// 
+// 	AB.matrix_[12] = matrix_[12]*B.matrix_[0] + matrix_[13]*B.matrix_[4] + matrix_[14]*B.matrix_[8] + matrix_[15]*B.matrix_[12];
+// 	AB.matrix_[13] = matrix_[12]*B.matrix_[1] + matrix_[13]*B.matrix_[5] + matrix_[14]*B.matrix_[9] + matrix_[15]*B.matrix_[13];
+// 	AB.matrix_[14] = matrix_[12]*B.matrix_[2] + matrix_[13]*B.matrix_[6] + matrix_[14]*B.matrix_[10] + matrix_[15]*B.matrix_[14];
+// 	AB.matrix_[15] = matrix_[12]*B.matrix_[3] + matrix_[13]*B.matrix_[7] + matrix_[14]*B.matrix_[11] + matrix_[15]*B.matrix_[15];
+// 	return AB;
+}
+
 /*
-// Misc
-*/
+ * Misc
+ */
 
 // Transform coordinates supplied and return as Vec3<double>
 Vec3<double> Matrix::transform(double x, double y, double z) const

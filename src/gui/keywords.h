@@ -70,6 +70,7 @@ class Keywords
 		LimitsKeyword,
 		LogarithmicKeyword,
 		MinorTicksKeyword,
+		NumberFormatKeyword,
 		PositionFractionalKeyword,
 		PositionRealKeyword,
 		StretchKeyword,

@@ -32,6 +32,7 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 {
 	TextPrimitive::TextAnchor anchor;
 	LineStipple::StippleType stipple;
+	NumberFormat::FormatType ft;
 	while (!parser.eofOrBlank())
 	{
 		// Get line from file
@@ -103,7 +104,7 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 				anchor = TextPrimitive::textAnchor(parser.argc(1));
 				if (anchor == TextPrimitive::nTextAnchors)
 				{
-					msg.print("Warning: Unrecognised text anchor '%s'. Defaulting to 'TopMiddle'.\n");
+					msg.print("Warning: Unrecognised text anchor '%s'. Defaulting to '%s'.\n", parser.argc(1), TextPrimitive::textAnchor(TextPrimitive::TopMiddleAnchor));
 					anchor = TextPrimitive::TopMiddleAnchor;
 					CHECKIOFAIL
 				}
@@ -127,6 +128,20 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 			// Axis minor ticks
 			case (Keywords::MinorTicksKeyword):
 				axes.setMinorTicks(axis, parser.argi(1));
+				break;
+			// Number Format
+			case (Keywords::NumberFormatKeyword):
+				ft = NumberFormat::formatType(parser.argc(1));
+				if (ft == NumberFormat::nNumberFormats)
+				{
+					msg.print("Warning: Unrecognised number format '%s'. Defaulting to '%s'.\n", parser.argc(1), NumberFormat::formatType(NumberFormat::DecimalFormat));
+					ft = NumberFormat::DecimalFormat;
+					CHECKIOFAIL
+				}
+				axes.numberFormat(axis).setType(ft);
+				axes.numberFormat(axis).setNDecimals(parser.argi(2));
+				axes.numberFormat(axis).setUseUpperCaseExponent(parser.argb(3));
+				axes.numberFormat(axis).setForcePrecedingPlus(parser.argb(4));
 				break;
 			// Axis position (in fractional axis coordinates)
 			case (Keywords::PositionFractionalKeyword):

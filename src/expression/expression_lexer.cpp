@@ -21,7 +21,7 @@
 
 #include "expression/expression.h"
 #include "expression/functions.h"
-#include "expression/grammar.hh"
+#include "expression/expression_grammar.hh"
 #include "expression/variable.h"
 #include "math/constants.h"
 #include "base/sysfunc.h"

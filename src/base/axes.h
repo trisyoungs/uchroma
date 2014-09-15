@@ -24,7 +24,7 @@
 
 #include "base/numberformat.h"
 #include "render/primitive.h"
-#include "render/textprimitive.h"
+#include "render/textprimitivelist.h"
 #include "render/linestyle.h"
 #include "templates/vector3.h"
 #include "templates/vector4.h"

@@ -22,8 +22,8 @@
 #include "expression/expression.h"
 #include "expression/variable.h"
 #include "expression/functionnode.h"
-#include "expression/grammar.hh"
-#include "expression//variablenode.h"
+#include "expression/expression_grammar.hh"
+#include "expression/variablenode.h"
 #include "base/sysfunc.h"
 #include "base/messenger.h"
 #include <stdarg.h>

@@ -35,7 +35,7 @@ class NumberFormat
 	NumberFormat();
 	~NumberFormat();
 	// Basic Number Type
-	enum FormatType { IntegerFormat, DecimalFormat, ScientificFormat, nNumberFormats };
+	enum FormatType { ConciseFormat, DecimalFormat, IntegerFormat, ScientificFormat, nNumberFormats };
 	// Convert text string to FormatType
 	static FormatType formatType(const char* s);
 	// Convert FormatType to text string
@@ -48,10 +48,8 @@ class NumberFormat
 	private:
 	// Format type
 	FormatType type_;
-	// Number of decimals in decimal format
+	// Number of decimals to use
 	int nDecimals_;
-	// Number of decimals in scientific format
-	int nScientificDecimals_;
 	// Whether to force display of preceding '+' as well as '-'
 	bool forcePrecedingPlus_;
 	// Whether or not use use uppercase exponent character (for ScientificFormat)
@@ -62,14 +60,10 @@ class NumberFormat
 	void setType(NumberFormat::FormatType type);
 	// Return format type
 	NumberFormat::FormatType type();
-	// Set number of decimals in decimal format
+	// Set number of decimals to use
 	void setNDecimals(int n);
-	// Return number of decimals in decimal format
+	// Return number of decimals to use
 	int nDecimals();
-	// Set number of decimals in scientific format
-	void setNScientificDecimals(int n);
-	// Return number of decimals in scientific format
-	int nScientificDecimals();
 	// Set whether to force display of preceding '+' as well as '-'
 	void setForcePrecedingPlus(bool b);
 	// Return whether to force display of preceding '+' as well as '-'

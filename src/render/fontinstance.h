@@ -41,6 +41,8 @@ class FontInstance
 	static double fontFullHeight_;
 	// Font base height (from baseline to top of ascender)
 	static double fontBaseHeight_;
+	// Width of double dot (used for correction of width of strings with trailing spaces)
+	static double dotWidth_;
 
 	public:
 	// Setup font specified
@@ -57,6 +59,10 @@ class FontInstance
 	static FTBBox boundingBox(QString text);
 	// Calculate bounding box for specified string
 	static void boundingBox(QString text, Vec3<double>& lowerLeft, Vec3<double>& upperRight);
+	// Calculate bounding box width for specified string
+	static double boundingBoxWidth(QString text);
+	// Calculate bounding box height for specified string
+	static double boundingBoxHeight(QString text);
 };
 
 #endif

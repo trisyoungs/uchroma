@@ -22,45 +22,17 @@
 #ifndef UCHROMA_TEXTPRIMITIVE_H
 #define UCHROMA_TEXTPRIMITIVE_H
 
+#include "render/textfragment.h"
+#include "render/textformat.h"
 #include "math/matrix.h"
 #include "math/cuboid.h"
+#include "base/dnchar.h"
 #include "templates/vector3.h"
 #include "templates/list.h"
 #include <QtCore/QString>
 
 // Forward Declarations
-class ViewPane;
-
-// Text Fragment
-class TextFragment : public ListItem<TextFragment>
-{
-	public:
-	// Constructor / Destructor
-	TextFragment();
-	~TextFragment();
-
-
-	/*
-	 * Fragment Definition
-	 */
-	private:
-	// Fragment text
-	QString text_;
-	// Local scale for fragment
-	double scale_;
-	// Local translation for fragment
-	Vec3<double> translation_;
-
-	public:
-	// Set fragment data
-	void set(QString& text, double scale = 1.0, Vec3<double> translation = Vec3<double>());
-	// Return fragment text
-	QString text();
-	// Return local scale for fragment
-	double scale();
-	// Return local translation for fragment
-	Vec3<double> translation();
-};
+/* none */
 
 // Text Primitive
 class TextPrimitive : public ListItem<TextPrimitive>
@@ -75,7 +47,15 @@ class TextPrimitive : public ListItem<TextPrimitive>
 	static TextAnchor textAnchor(const char* s);
 	// Convert TextAnchor to text string
 	static const char* textAnchor(TextAnchor anchor);
+	// Escape Sequence enum
+	enum EscapeSequence { BoldEscape, ItalicEscape, NewLineEscape, SubScriptEscape, SuperScriptEscape, nEscapeSequences };
+	// Convert text string to EscapeSequence
+	static EscapeSequence escapeSequence(const char* s);
 
+
+	/*
+	 * Definition
+	 */
 	private:
 	// Coordinates of anchorpoint of text
 	Vec3<double> anchorPoint_;
@@ -99,29 +79,42 @@ class TextPrimitive : public ListItem<TextPrimitive>
 	void boundingBox(Vec3<double>& lowerLeft, Vec3<double>& upperRight);
 	// Render primitive
 	void render(Matrix viewMatrix, bool correctOrientation, double baseFontSize);
-};
 
 
-// Text Primitive List
-class TextPrimitiveList
-{
-	public:
-	// Constructor
-	TextPrimitiveList();
-
+	/*
+	 * Generation
+	 */
 	private:
-	// List of text primitive chunks
-	List<TextPrimitive> textPrimitives_;
+	// Character string source
+	static Dnchar stringSource_;
+	// Integer position in stringSource, total length of string, and starting position of current token/function
+	static int stringPos_, stringLength_;
+	// Get next character from current input stream
+	static char getChar();
+	// Peek next character from current input stream
+	static char peekChar();
+	// 'Replace' last character read from current input stream
+	static void unGetChar();
+	// Current target for generation
+	static TextPrimitive* target_;
+	// Format stack, used when generating primitive
+	static List<TextFormat> formatStack_;
+	// Current horizontal position, used when generating primitive
+	static double horizontalPosition_;
 
 	public:
-	// Clear list
-	void clear();
-	// Add primitive to list
-	void add(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize);
-	// Update global bounding cuboid for all text primitives in the list
-	Cuboid boundingCuboid(ViewPane& pane, bool correctOrientation, double baseFontSize, Cuboid startingCuboid = Cuboid());
-	// Render all primitives in list
-	void renderAll(Matrix viewMatrix, bool correctOrientation, double baseFontSize);
+	// Parser lexer, called by yylex()
+	static int lex();
+	// Generate TextFragment data for specified TextPrimitive from supplied string
+	static bool generateFragments(TextPrimitive* target, QString inputString);
+	// Return current target
+	static TextPrimitive* target();
+	// Add text fragment
+	bool addFragment(QString text);
+	// Add escape marker
+	static bool addEscape(TextPrimitive::EscapeSequence escSeq);
+	// Remove escape marker
+	static void removeEscape();
 };
 
 #endif
