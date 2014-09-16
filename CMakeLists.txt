@@ -3,7 +3,7 @@ project(uChroma)
 set(DESCRIPTION "uChroma")
 set(AUTHOR "Tristan Youngs")
 set(VERSION_MAJOR "1")
-set(VERSION_MINOR "41")
+set(VERSION_MINOR "42")
 
 set(CMAKE_BUILD_TYPE "Release")
 
@@ -45,6 +45,7 @@ find_package(Qt4 REQUIRED)
 if(WIN32 OR APPLE)
  find_package(OPENGL REQUIRED)
 endif(WIN32 OR APPLE)
+include(FindBISON)
 
 # Setup HDF5-related stuff
 if(MINGW)

@@ -47,7 +47,6 @@ SET(qtproject_SRCS
   data_funcs.cpp
   dataimport_funcs.cpp
   dataimport_seqxy.cpp
-  layout_funcs.cpp
   log_funcs.cpp
   saveimage_funcs.cpp
   style_funcs.cpp
@@ -67,7 +66,7 @@ SET(pro_MOC_HDRS
   editlinestyle.h
   editnumberformat.h
   editreference.h
-  editviewlayouts.h
+  editviewlayout.h
 
   selectequation.h
   selecttarget.h
@@ -77,7 +76,6 @@ SET(pro_MOC_HDRS
   create.h
   data.h
   dataimport.h
-  layout.h
   log.h
   saveimage.h
   style.h
@@ -92,7 +90,7 @@ SET(pro_UIS
   editlinestyle.ui
   editnumberformat.ui
   editreference.ui
-  editviewlayouts.ui
+  editviewlayout.ui
 
   selectequation.ui
   selecttarget.ui
@@ -101,8 +99,6 @@ SET(pro_UIS
   create.ui
   data.ui
   dataimport.ui
-  fitsetup.ui
-  layout.ui
   log.ui
   saveimage.ui
   style.ui

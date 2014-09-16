@@ -1,14 +1,7 @@
-include_directories(
-./
-../
-${CMAKE_CURRENT_BINARY_DIR} 
-${CMAKE_CURRENT_BINARY_DIR}/../
-${CMAKE_BINARY_DIR}
-${CMAKE_BINARY_DIR}/src/
-)
+bison_target(TextPrimitiveParser textprimitive_grammar.yy ${CMAKE_CURRENT_SOURCE_DIR}/textprimitive_grammar.cc COMPILE_FLAGS -y )
 
 add_library(render
-  textprimitive_grammar.yy
+  ${BISON_TextPrimitiveParser_OUTPUTS}
   fontinstance.cpp
   glextensions.cpp
   linestipple.cpp
@@ -41,5 +34,14 @@ add_library(render
   textprimitive.h
   textprimitivelist.h
   vertexchunk.h
+)
+
+include_directories(
+./
+../
+${CMAKE_CURRENT_BINARY_DIR} 
+${CMAKE_CURRENT_BINARY_DIR}/../
+${CMAKE_BINARY_DIR}
+${CMAKE_BINARY_DIR}/src/
 )
 

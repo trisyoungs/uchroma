@@ -1,9 +1,11 @@
+bison_target(ExpressionParser expression_grammar.yy ${CMAKE_CURRENT_SOURCE_DIR}/expression_grammar.cc COMPILE_FLAGS -y )
+
 add_library(expression
+  ${BISON_ExpressionParser_OUTPUTS}
   expression.cpp
   expression_lexer.cpp
   functionnode.cpp
   functions.cpp
-  grammar.cc
   node.cpp
   variable.cpp
   variablenode.cpp
