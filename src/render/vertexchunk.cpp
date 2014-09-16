@@ -22,6 +22,9 @@
 #include "render/vertexchunk.h"
 #include <stdio.h>
 #include <math.h>
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#endif
 
 // Constructor
 VertexChunk::VertexChunk()
@@ -290,7 +293,7 @@ void VertexChunk::forgetAll()
 {
 	nDefinedTypes_ = 0;
 	nDefinedVertices_ = 0;
-	nDefinedIndices_;
+	nDefinedIndices_ = 0;
 
 	// Clear centroid array if we were using it
 	if (calcCentroids_ && centroids_) for (int n=0; n<maxTypes_; ++n) centroids_[n] = 0.0f;

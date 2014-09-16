@@ -28,7 +28,11 @@
 #include "math/matrix.h"
 #include "templates/list.h"
 #include "templates/reflist.h"
+#ifndef __APPLE__
 #include <GL/gl.h>
+#else
+#include <OpenGL/gl3.h>
+#endif
 #include <QtCore/QString>
 
 // Forward Declarations

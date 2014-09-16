@@ -22,7 +22,11 @@
 #ifndef UCHROMA_PRIMITIVEINSTANCE_H
 #define UCHROMA_PRIMITIVEINSTANCE_H
 
+#ifndef __APPLE__
 #include <GL/gl.h>
+#else
+#include <OpenGL/gl3.h>
+#endif
 #ifdef _WIN32
 #include <windows.h>
 #include "glext.h"

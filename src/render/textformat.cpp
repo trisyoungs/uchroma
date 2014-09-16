@@ -20,7 +20,6 @@
 */
 
 #include "render/textformat.h"
-#include <../aten/src/base/sginfo.h>
 
 // Constructor
 TextFormat::TextFormat() :  ListItem<TextFormat>()

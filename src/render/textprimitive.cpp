@@ -351,7 +351,7 @@ bool TextPrimitive::generateFragments(TextPrimitive* target, QString inputString
 	formatStack_.add();
 	horizontalPosition_ = 0.0;
 
-	TextPrimitiveParser_parse();
+	return (TextPrimitiveParser_parse() == 0);
 }
 
 // Return current target

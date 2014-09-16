@@ -26,8 +26,18 @@ else(WIN32)
 	set (target_name uchroma)
 endif(WIN32)
 
-# Setup SZIP and FTGL (Windows Only)
+# Find required packages for this project
+find_package(Qt4 REQUIRED)
+find_package(HDF5 REQUIRED)
+find_package(ZLIB REQUIRED)
+include(FindBISON)
+
+# Perform system-specific setup
+# -- Windows
 if(WIN32)
+  # Find SZIP
+  find_package(SZIP REQUIRED)
+  # Setup SZIP and FTGL, and GLExt bits and pieces (for custom build machine)
   set(SZIP_DIR "C:/src/szip-2.1")
   set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "C:/src/szip-2.1/")
   set(FTGL_INCLUDES "C:/src/ftgl-2.1.3~rc5/src")
@@ -35,30 +45,28 @@ if(WIN32)
   set(FTGL_LIBRARIES "C:/src/ftgl-2.1.3~rc5/src/libftgl.a")
   set(FT2_LIBRARIES "C:/GnuWin32/lib/libfreetype.dll.a")
   set(GLEXT_INCLUDES "C:/src/include")
+  # Find OpenGL
+  find_package(OPENGL REQUIRED)
+  # Setup HDF5
+  SET(HDF5_LIBS "-LC:/src/hdf5-1.8.10-patch1/bin -lhdf5 -L${SZIP_DIR}/bin -lszip" CACHE STRING "Link-time commands to use HDF5 (Windows only)")
 endif(WIN32)
+
+# -- Unix
 if(UNIX)
+  # Set include location for FreeType2
   set(FT2_INCLUDES "/usr/include/freetype2")
 endif(UNIX)
 
-# Find required packages for this project
-find_package(Qt4 REQUIRED)
-if(WIN32 OR APPLE)
- find_package(OPENGL REQUIRED)
-endif(WIN32 OR APPLE)
-include(FindBISON)
+# -- OSX
+if(APPLE)
+  # Set include location for FreeType2
+  set(FT2_INCLUDES "/usr/local/include/freetype2")
+  # Find OpenGL and GLUT
+  find_package(OPENGL REQUIRED)
+  find_package(GLUT REQUIRED)
+endif(APPLE)
 
-# Setup HDF5-related stuff
-if(MINGW)
-	  SET(HDF5_LIBS "-LC:/src/hdf5-1.8.10-patch1/bin -lhdf5 -L${SZIP_DIR}/bin -lszip" CACHE STRING "Link-time commands to use HDF5 (Windows only)")
-else(MINGW)
-	  SET(HDF5_LIBS "C:/Program Files (x86)/HDF_Group/HDF5/1.8.10/lib/hdf5dll.lib" CACHE STRING "Link-time commands to use HDF5 (Windows only)")
-endif(MINGW)
-find_package(HDF5 REQUIRED)
-find_package(ZLIB REQUIRED)
-if(NOT UNIX)
-	find_package(SZIP REQUIRED)
-endif(NOT UNIX)
-
+# Set output paths for libraries and binaries
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 set(SRCS src/)

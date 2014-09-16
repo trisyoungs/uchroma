@@ -26,12 +26,27 @@
 #include <windows.h>
 #include <GL/gl.h>
 #include "glext.h"
+#elif __APPLE__
+#include <OpenGL/gl3.h>
 #else
 #include <GL/glx.h>
 #endif
 #include "templates/list.h"
 
-
+// On OSX there are no typedefs for the extension functions, so must do it ourselves...
+#ifdef TESThKJHKJHKJHJKHKJ
+typedef void (*PFNGLBEGINQUERYPROC) (GLenum target, GLuint id);
+typedef void (*PFNGLENDQUERYPROC) (GLenum target);
+typedef void (*PFNGLGENQUERIESPROC) (GLsizei n, GLuint *ids);
+typedef void (*PFNGLGETQUERYOBJECTIVPROC) (GLuint id, GLenum pname, GLint *params);
+typedef void (*PFNGLGETQUERYOBJECTUI64VPROC) (GLuint id, GLenum pname, GLint64 *params);
+typedef void (*PFNGLGENBUFFERSPROC) (GLsizei n, GLuint *buffers);
+typedef void (*PFNGLBINDBUFFERPROC) (GLenum target, GLuint buffer);
+typedef void (*PFNGLBUFFERDATAPROC) (GLenum target, GLsizeiptr size, const GLvoid *data, GLenum usage);
+typedef void (*PFNGLBUFFERSUBDATAPROC) (GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid *data);
+typedef void (*PFNGLDELETEBUFFERSPROC) (GLsizei n, const GLuint *buffers);
+#endif
+ 
 // GL Extensions
 class GLExtensions : public ListItem<GLExtensions>
 {

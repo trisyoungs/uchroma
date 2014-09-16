@@ -22,8 +22,10 @@
 #include "base/messenger.h"
 #include "render/glextensions.h"
 #include "render/primitive.h"
-
 #include <string.h>
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#endif
 
 // Constructor
 Primitive::Primitive() : ListItem<Primitive>()

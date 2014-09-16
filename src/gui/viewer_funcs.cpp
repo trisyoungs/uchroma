@@ -19,10 +19,12 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// Note - must include glextensions.h before any other file since (or OSX doesn't see PROC typedefs) 
+#include "render/glextensions.h"
+
 #include "gui/viewer.uih"
 #include "gui/uchroma.h"
 #include "base/messenger.h"
-#include "render/glextensions.h"
 #include "render/fontinstance.h"
 
 /*

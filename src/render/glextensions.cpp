@@ -22,6 +22,22 @@
 #include "render/glextensions.h"
 #include <string.h>
 
+// For OSX, define an function to obtain function entry point from a library
+#ifdef __APPLE__
+#import <mach-o/dyld.h>
+void* osxglGetProcAddress(const char *name)
+{
+    NSSymbol symbol;
+    char* symbolName = new char[strlen(name)+2];
+    strcpy(symbolName + 1, name);
+    symbolName[0] = '_';
+    symbol = NULL;
+    if (NSIsSymbolNameDefined (symbolName)) symbol = NSLookupAndBindSymbol (symbolName);
+    delete[] symbolName;
+    return symbol ? NSAddressOfSymbol (symbol) : NULL;
+}
+#endif
+
 // Constructor
 GLExtensions::GLExtensions() : ListItem<GLExtensions>()
 {
@@ -59,6 +75,19 @@ GLExtensions::GLExtensions() : ListItem<GLExtensions>()
 	glBufferData = (PFNGLBUFFERDATAPROC) wglGetProcAddress("glBufferData");
 	glBufferSubData = (PFNGLBUFFERSUBDATAPROC) wglGetProcAddress("glBufferSubData");
 	glDeleteBuffers = (PFNGLDELETEBUFFERSPROC) wglGetProcAddress("glDeleteBuffers");
+#elif __APPLE__
+	// Queries
+	glBeginQuery = (PFNGLBEGINQUERYPROC) osxglGetProcAddress("glBeginQuery");
+	glEndQuery = (PFNGLENDQUERYPROC) osxglGetProcAddress("glEndQuery");
+	glGenQueries = (PFNGLGENQUERIESPROC) osxglGetProcAddress("glGenQueries");
+	glGetQueryObjectiv = (PFNGLGETQUERYOBJECTIVPROC) osxglGetProcAddress("glGetQueryObjectiv");
+	glGetQueryObjectui64v = (PFNGLGETQUERYOBJECTUI64VPROC) osxglGetProcAddress("glGetQueryObjectui64v");
+	// VBOs
+	glGenBuffers = (PFNGLGENBUFFERSPROC) osxglGetProcAddress("glGenBuffers");
+	glBindBuffer = (PFNGLBINDBUFFERPROC) osxglGetProcAddress("glBindBuffer");
+	glBufferData = (PFNGLBUFFERDATAPROC) osxglGetProcAddress("glBufferData");
+	glBufferSubData = (PFNGLBUFFERSUBDATAPROC) osxglGetProcAddress("glBufferSubData");
+	glDeleteBuffers = (PFNGLDELETEBUFFERSPROC) osxglGetProcAddress("glDeleteBuffers");
 #else
 	// Queries
 	glBeginQuery = (PFNGLBEGINQUERYPROC) glXGetProcAddress((const GLubyte*) "glBeginQuery");
