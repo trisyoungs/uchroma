@@ -224,13 +224,13 @@ void Viewer::paintGL()
 
 		// Send axis primitives to the display first
 		glLoadMatrixd(viewMatrix.matrix());
-		glEnable(GL_MULTISAMPLE);
-		glEnable(GL_BLEND);
 		GLfloat colourBlack[4] = { 0.0, 0.0, 0.0, 1.0 };
 		glColor4fv(colourBlack);
 		int maxAxis = (pane->twoDimensional() ? 2 : 3);
 
 		// -- Render axis text
+		glEnable(GL_MULTISAMPLE);
+		glEnable(GL_BLEND);
 		if (FontInstance::fontOK())
 		{
 			FontInstance::font()->FaceSize(1);
@@ -311,7 +311,7 @@ void Viewer::paintGL()
 			collection->updateDisplayData();
 			if (renderingOffscreen_)
 			{
-				if (updateSurfacePrimitive(collection, true, true)) ++nSurfacesUpdated;
+				updateSurfacePrimitive(collection, true, true);
 				collectionList.add(collection);
 			}
 			else if (updateSurfacePrimitive(collection)) ++nSurfacesUpdated;

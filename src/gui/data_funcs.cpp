@@ -140,8 +140,7 @@ void DataWindow::on_AddFilesButton_clicked(bool checked)
 	if (count == 0) return;
 
 	// Query whether limits should be updated to encompass all data
-	QMessageBox::Button button = QMessageBox::question(this, "New Data Loaded", "New data has been loaded - set current data limts to encompass all data?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-	if (button == QMessageBox::Yes)
+	if (QMessageBox::question(this, "New Data Loaded", "New data has been loaded - set current data limits to encompass all data?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
 	{
 		// Check display pane for current collection
 		if (currentCollection->displayPane()) currentCollection->displayPane()->showAllData();
