@@ -19,13 +19,18 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// Note - must include glextensions.h before any other file since (or OSX doesn't see PROC typedefs) 
+// On OSX must include glextensions.h before any other file since (or OSX doesn't see PROC typedefs) since gl.h and gl3.h clash
+// However, on normal unix systems it must be included *after* viewer.uih, otherwise Qt throws lots of errors.
+#ifdef __APPLE__
 #include "render/glextensions.h"
-
+#endif
 #include "gui/viewer.uih"
 #include "gui/uchroma.h"
 #include "base/messenger.h"
 #include "render/fontinstance.h"
+#ifndef __APPLE__
+#include "render/glextensions.h"
+#endif
 
 /*
  * Image Formats
