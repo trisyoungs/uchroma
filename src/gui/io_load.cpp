@@ -205,6 +205,7 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 {
 	DataSet* dataSet;
 	int xyz;
+	double alpha;
 	Collection::AlphaControl ac;
 	Collection::ColourSource cs;
 	Collection::DisplayStyle ds;
@@ -235,12 +236,14 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				break;
 			// Colour alpha fixed value
 			case (Keywords::ColourAlphaFixedKeyword):
-				if ((parser.argi(1) < 0) || (parser.argi(1) > 255))
+				alpha = parser.argd(1);
+				if ((alpha < 0.0) || (alpha > 1.0))
 				{
-					msg.print("Warning: Alpha value is out of range for %s keyword.\n", Keywords::collectionKeyword(collectionKwd));
+					msg.print("Warning: Alpha value (%f) is out of range for %s keyword - it will be reset to 1.0.\n", alpha, Keywords::collectionKeyword(collectionKwd));
+					alpha = 1.0;
 					CHECKIOFAIL
 				}
-				else collection->setFixedAlpha(parser.argi(1));
+				collection->setFixedAlpha(alpha);
 				break;
 			// Colour Custom Gradient point definition
 			case (Keywords::ColourCustomGradientKeyword):

@@ -25,7 +25,7 @@
 #include "base/viewpane.h"
 
 // Create/update surface primitive
-bool Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate)
+bool Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate, bool noPop)
 {
 	// Check for valid collection
 	if (!collection) return false;
@@ -33,8 +33,8 @@ bool Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate)
 	// Check whether the primitive for this collection needs updating
 	if (collection->displayPrimitivesValid() && collection->colourScaleValid() && (!forceUpdate)) return false;
 
-	// Pop old primitive instances and adjust primitive settings
-	collection->displayPrimitives().popInstance(context());
+	// Pop old primitive instance (unless flagged not to) and adjust primitive settings
+	if (!noPop) collection->displayPrimitives().popInstance(context());
 	collection->displayPrimitives().forgetAll();
 	
 	// Need a valid set of axes in order to construct the surface
@@ -64,16 +64,4 @@ bool Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate)
 	collection->setDisplayPrimitiveValid();
 
 	return true;
-}
-
-// Add supplied surface primitive to list
-void Viewer::addCollectionPrimitive(Primitive* primitive)
-{
-	primitiveList_.add(primitive);
-}
-
-// Remove surface primitive from primitive list
-void Viewer::removeCollectionPrimitive(Primitive* primitive)
-{
-	primitiveList_.remove(primitive);
 }

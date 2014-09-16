@@ -198,7 +198,7 @@ void Primitive::popInstance(const QGLContext *context)
 					if (bufid != 0) extensions->glDeleteBuffers(1, &bufid);
 				}
 			}
-			else glDeleteLists(pi->listObject(),1);
+			else if (pi->listObject() != 0) glDeleteLists(pi->listObject(),1);
 		}
 	}
 	instances_.removeLast();

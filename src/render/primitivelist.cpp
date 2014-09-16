@@ -33,8 +33,6 @@ PrimitiveList::PrimitiveList()
 // Destructor
 PrimitiveList::~PrimitiveList()
 {
-	// Remove primitives from Viewer reflist
-	for (Primitive* prim = primitives_.first(); prim != NULL; prim = prim->next) viewer_->removeCollectionPrimitive(prim);
 }
 
 // Clear all existing primitives
@@ -53,21 +51,13 @@ void PrimitiveList::forgetAll()
 void PrimitiveList::reinitialise(int newSize, bool allowShrink, int maxVertices, int maxIndices, GLenum type, bool colourData)
 {
 	// Add enough primitives to match the new size
-	while (primitives_.nItems() < newSize)
-	{
-		Primitive* newPrim = primitives_.add();
-		viewer_->addCollectionPrimitive(newPrim);
-	}
+	while (primitives_.nItems() < newSize) primitives_.add();
 
 	// Shrink list to new size (if allowed)
 	if (allowShrink)
 	{
 		// Manage primitive list, reusing where possible...
-		while (primitives_.nItems() > newSize)
-		{
-			viewer_->removeCollectionPrimitive(primitives_.last());
-			primitives_.removeLast();
-		}
+		while (primitives_.nItems() > newSize) primitives_.removeLast();
 	}
 
 	// Loop over all current primitives and set information
@@ -81,7 +71,6 @@ void PrimitiveList::reinitialise(int newSize, bool allowShrink, int maxVertices,
 Primitive* PrimitiveList::addPrimitive(int maxVertices, int maxIndices, GLenum type, bool colourData)
 {
 	Primitive* newPrim = primitives_.add();
-	viewer_->addCollectionPrimitive(newPrim);
 	newPrim->initialise(maxVertices, maxIndices, type, colourData);
 
 	return newPrim;

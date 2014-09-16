@@ -173,19 +173,9 @@ class Viewer : public QGLWidget
 	 * (in viewer_user.cpp)
 	 */
 	private:
-	// Reference list of all created primitives (to which all user primitives must be added)
-	RefList<Primitive,int> primitiveList_;
-
-	private:
 	// Create/update surface primitive for specified collection
-	bool updateSurfacePrimitive(Collection* collection, bool forceUpdate = false);
+	bool updateSurfacePrimitive(Collection* collection, bool forceUpdate = false, bool noPop = false);
 
-	public:
-	// Add supplied collection primitive to list
-	void addCollectionPrimitive(Primitive* primitive);
-	// Remove collection primitive from primitive list
-	void removeCollectionPrimitive(Primitive* primitive);
-	
 	signals:
 	// View was clicked on
 	void viewClicked();

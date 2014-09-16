@@ -114,10 +114,10 @@ void Viewer::initializeGL()
 	// that, when saving a bitmap using QGLWidget::renderPixmap(), we automatically create new display list
 	// objects, rather than having to worry about context sharing etc. Slow, but safer and more compatible.
 // 	msg.print("In Viewer::initializeGL, pushing instances for %i primitives...\n", primitiveList_.nItems());
-	for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->pushInstance(context(), extensions);
+	//for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->pushInstance(context(), extensions);
 
 	// Recreate surface primitives (so that images are saved correctly)
-	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) updateSurfacePrimitive(collection, true);
+// 	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) updateSurfacePrimitive(collection, true);
 
 	// Recalculate view layouts
 	uChroma_->recalculateViewLayout(contextWidth_, contextHeight_);
@@ -165,6 +165,9 @@ void Viewer::paintGL()
 	
 	// Update / recreate axes, display data and surface primitives if necessary
 	int nSurfacesUpdated = 0;
+
+	// Displayed collections list - we use this to keep track of collection primitives sent to the display
+	RefList<Collection,bool> collectionList;
 
 	// Loop over defined viewpanes
 	GLdouble clipPlaneBottom[4] = { 0.0, 1.0, 0.0, 0.0 }, clipPlaneTop[4] = { 0.0, -1.0, 0.0, 0.0 };
@@ -306,7 +309,12 @@ void Viewer::paintGL()
 			collection = ri->item;
 // 			printf("PANE '%s' : Update and render collection %p ('%s')\n", qPrintable(pane->name()), collection, qPrintable(collection->name()));
 			collection->updateDisplayData();
-			if (updateSurfacePrimitive(collection)) ++nSurfacesUpdated;
+			if (renderingOffscreen_)
+			{
+				if (updateSurfacePrimitive(collection, true, true)) ++nSurfacesUpdated;
+				collectionList.add(collection);
+			}
+			else if (updateSurfacePrimitive(collection)) ++nSurfacesUpdated;
 
 			collection->sendToGL();
 		}
@@ -342,7 +350,8 @@ void Viewer::paintGL()
 	if (renderingOffscreen_)
 	{
 // 		msg.print("In Viewer::PaintGL, popping instances for %i primitives...\n", primitiveList_.nItems());
-		for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->popInstance(context());
+// 		for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->popInstance(context());
+		for (RefListItem<Collection,bool> *ri = collectionList.first(); ri != NULL; ri = ri->next) ri->item->displayPrimitives().popInstance(context());
 		extensionsStack_.removeLast();
 	}
 	
