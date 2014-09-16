@@ -1,4 +1,4 @@
-bison_target(ExpressionParser expression_grammar.yy ${CMAKE_CURRENT_SOURCE_DIR}/expression_grammar.cc COMPILE_FLAGS -y )
+bison_target(ExpressionParser expression_grammar.yy ${CMAKE_CURRENT_BINARY_DIR}/expression_grammar.cc COMPILE_FLAGS -y )
 
 add_library(expression
   ${BISON_ExpressionParser_OUTPUTS}
@@ -21,6 +21,7 @@ include_directories(
 ../
 ${QT_INCLUDE_DIR}
 ${CMAKE_SOURCE_DIR}
+${CMAKE_CURRENT_BINARY_DIR}
 ${CMAKE_BINARY_DIR}
 ${CMAKE_BINARY_DIR}/src
 ${CMAKE_SOURCE_DIR}/src/gui

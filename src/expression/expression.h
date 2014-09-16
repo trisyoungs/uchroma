@@ -26,6 +26,9 @@
 #include "expression/functions.h"
 #include "base/dnchar.h"
 
+// External declarations
+extern int ExpressionParser_parser();
+
 // Forward declarations
 class Node;
 class Variable;

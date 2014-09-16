@@ -1,4 +1,4 @@
-bison_target(TextPrimitiveParser textprimitive_grammar.yy ${CMAKE_CURRENT_SOURCE_DIR}/textprimitive_grammar.cc COMPILE_FLAGS -y )
+bison_target(TextPrimitiveParser textprimitive_grammar.yy ${CMAKE_CURRENT_BINARY_DIR}/textprimitive_grammar.cc COMPILE_FLAGS -y )
 
 add_library(render
   ${BISON_TextPrimitiveParser_OUTPUTS}

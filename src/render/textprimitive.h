@@ -31,6 +31,9 @@
 #include "templates/list.h"
 #include <QtCore/QString>
 
+// External Declarations
+extern int TextPrimitiveParser_parse();
+
 // Forward Declarations
 /* none */
 
