@@ -26,7 +26,7 @@
 
 // Static members
 TextPrimitive* TextPrimitive::target_ = NULL;
-Dnchar TextPrimitive::stringSource_;
+QString TextPrimitive::stringSource_;
 int TextPrimitive::stringPos_, TextPrimitive::stringLength_;
 List<TextFormat> TextPrimitive::formatStack_;
 double TextPrimitive::horizontalPosition_;
@@ -241,23 +241,19 @@ int TextPrimitiveParser_lex()
 }
 
 // Get next character from current input stream
-char TextPrimitive::getChar()
+QChar TextPrimitive::getChar()
 {
-	char c = 0;
-
 	// Are we at the end of the current string?
 	if (stringPos_ == stringLength_) return 0;
 
-	// Return current char
-	c = stringSource_[stringPos_];
-	++stringPos_;
-	return c;
+	// Return current char and increment index
+	return stringSource_.at(stringPos_++);
 }
 
 // Peek next character from current input stream
-char TextPrimitive::peekChar()
+QChar TextPrimitive::peekChar()
 {
-	return (stringPos_ == stringLength_ ? 0 : stringSource_[stringPos_]);
+	return (stringPos_ == stringLength_ ? 0 : stringSource_.at(stringPos_));
 }
 
 // 'Replace' last character read from current input stream
@@ -270,8 +266,8 @@ void TextPrimitive::unGetChar()
 int TextPrimitive::lex()
 {
 	bool done, isEscape;
-	static Dnchar token;
-	char c;
+	static QString token;
+	QChar c;
 
 	// Reset some variables
 	token.clear();
@@ -281,35 +277,35 @@ int TextPrimitive::lex()
 	do
 	{
 		c = getChar();
-		switch (c)
+		if (c == QChar(0))
 		{
-			case 0:
-				if (token.length() == 0) return 0;
-				done = true;
-				break;
-			case '\\':
-				if (token.length() == 0)
-				{
-					isEscape = true;
-					break;
-				}
-				unGetChar();
-				done = true;
-				break;
-			case '{':
-				if (token.length() == 0) return '{';
-				unGetChar();
-				done = true;
-				break;
-			case '}':
-				if (token.length() == 0) return '}';
-				unGetChar();
-				done = true;
-				break;
-			default:
-				token += c;
-				break;
+			if (token.length() == 0) return 0;
+			done = true;
+			break;
 		}
+		else if (c == QChar('\\'))
+		{
+			if (token.length() == 0)
+			{
+				isEscape = true;
+				break;
+			}
+			unGetChar();
+			done = true;
+		}
+		else if (c == QChar('{'))
+		{
+			if (token.length() == 0) return '{';
+			unGetChar();
+			done = true;
+		}
+		else if (c == QChar('}'))
+		{
+			if (token.length() == 0) return '}';
+			unGetChar();
+			done = true;
+		}
+		else token += c;
 
 		// Break out if we are finished
 		if (done) break;
@@ -319,19 +315,19 @@ int TextPrimitive::lex()
 	if (isEscape)
 	{
 		// Is the text a recognised escape?
-		TextPrimitive::EscapeSequence es = TextPrimitive::escapeSequence(token);
+		TextPrimitive::EscapeSequence es = TextPrimitive::escapeSequence(qPrintable(token));
 		if (es == TextPrimitive::nEscapeSequences)
 		{
-			msg.print(Messenger::Verbose, "Error: String '%s' is not a valid escape sequence.\n", token.get());
-			return FAIL;
+			msg.print(Messenger::Verbose, "Error: String '%s' is not a valid escape sequence.\n", qPrintable(token));
+			return UCR_TP_FAIL;
 		}
 		TextPrimitiveParser_lval.escSeq = es;
-		return ESCAPE;
+		return UCR_TP_ESCAPE;
 	}
 	else
 	{
-		TextPrimitiveParser_lval.text = token.get();
-		return TEXT;
+		TextPrimitiveParser_lval.text = &token;
+		return UCR_TP_TEXT;
 	}
 
 	return 0;
@@ -343,7 +339,7 @@ bool TextPrimitive::generateFragments(TextPrimitive* target, QString inputString
 	// Set / reset variables
 	target_ = target;
 	stringPos_ = 0;
-	stringSource_ = qPrintable(inputString);
+	stringSource_ = inputString;
 	stringLength_ = stringSource_.length();
 
 	// Clear the format stack and create a basic format

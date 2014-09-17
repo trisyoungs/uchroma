@@ -52,9 +52,7 @@ void UChromaWindow::on_actionFileNewSession_triggered(bool checked)
 		}
 	}
 
-	// Clear data and create new, empty collection ready for use
-	clearData(false);
-	currentCollection_ = addCollection();
+	startNewSession(true);
 
 	// Update the GUI
 	updateGUI();
@@ -79,7 +77,11 @@ void UChromaWindow::on_actionFileLoadSession_triggered(bool checked)
 	inputFileDirectory_ = fileName;
 
 	// Load input file
-	loadInputFile(fileName);
+	if (!loadInputFile(fileName))
+	{
+		QMessageBox::information(this, "Failed to load session", "Failed to load the session, so reverting to the default.\n");
+		startNewSession(true);
+	}
 
 	// Update the GUI
 	updateGUI();

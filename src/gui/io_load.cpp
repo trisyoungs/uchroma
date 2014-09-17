@@ -715,7 +715,7 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 			// Collection association
 			case (Keywords::CollectionAssociatedKeyword):
 				// Find named collection
-				collection = findCollection(parser.argc(1));
+				collection = locateCollection(parser.argc(1));
 				if (collection == NULL)
 				{
 					msg.print("Warning: Collection '%s' is listed in ViewPane '%s', but no collection by this name exists.\n", parser.argc(1), qPrintable(pane->name()));
@@ -760,7 +760,7 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				break;
 			// Role associated collection
 			case (Keywords::RoleTargetCollectionKeyword):
-				collection = findCollection(parser.argc(1));
+				collection = locateCollection(parser.argc(1));
 				if (!collection)
 				{
 					msg.print("Warning: Collection '%s' not found, and can't be associated to pane '%s'.\n", parser.argc(1), qPrintable(pane->name()));
@@ -815,7 +815,7 @@ bool UChromaWindow::loadInputFile(QString fileName)
 	}
 
 	// Clear existing data
-	clearData(true);
+	startNewSession(false);
 
 	// Read line from file and decide what to do with it
 	Keywords::InputBlock block;

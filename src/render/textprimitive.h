@@ -89,13 +89,13 @@ class TextPrimitive : public ListItem<TextPrimitive>
 	 */
 	private:
 	// Character string source
-	static Dnchar stringSource_;
+	static QString stringSource_;
 	// Integer position in stringSource, total length of string, and starting position of current token/function
 	static int stringPos_, stringLength_;
 	// Get next character from current input stream
-	static char getChar();
+	static QChar getChar();
 	// Peek next character from current input stream
-	static char peekChar();
+	static QChar peekChar();
 	// 'Replace' last character read from current input stream
 	static void unGetChar();
 	// Current target for generation

@@ -91,6 +91,8 @@ void UChromaWindow::on_CollectionTree_itemChanged(QTreeWidgetItem* item, int col
 
 	// Set name of collection
 	collection->setName(item->text(0));
+
+	updateCollectionInfo();
 }
 
 void UChromaWindow::on_CollectionAddButton_clicked(bool checked)

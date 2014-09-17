@@ -64,6 +64,8 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	void setName(QString title);
 	// Return name
 	QString name();
+	// Return collection locator
+	QString locator(QString currentPath = QString());
 	// Add dataset
 	DataSet* addDataSet();
 	// Add dataset at specified z
@@ -92,7 +94,7 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	DataSet* dataSet(int index);
 	// Return index of specified dataset
 	int dataSetIndex(const char* name);
-	// Return unique name based on supplied dataset
+	// Return unique name based on supplied basename
 	QString uniqueDataSetName(QString baseName);
 	// Return number of dataset with no data present
 	int nEmptyDataSets();
@@ -196,8 +198,8 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	void getSlice(int axis, int bin);
 
 	public:
-	// Find collection with name specified
-	Collection* findCollection(QString name);
+	// Locate collection using parts specified
+	Collection* locateCollection(const QStringList& parts, int offset);
 	// Return next logical collection in lists
 	Collection* nextCollection(bool descend);
 	// Return previous logical collection in lists

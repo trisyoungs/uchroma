@@ -19,6 +19,7 @@ SET(qtproject_SRCS
   editviewlayout_funcs.cpp
 
   selectequation_funcs.cpp
+  selectsymbol_funcs.cpp
   selecttarget_funcs.cpp
 
   colourbutton_funcs.cpp
@@ -69,6 +70,7 @@ SET(pro_MOC_HDRS
   editviewlayout.h
 
   selectequation.h
+  selectsymbol.h
   selecttarget.h
 
   axes.h
@@ -93,6 +95,7 @@ SET(pro_UIS
   editviewlayout.ui
 
   selectequation.ui
+  selectsymbol.ui
   selecttarget.ui
 
   axes.ui

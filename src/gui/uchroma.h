@@ -349,10 +349,12 @@ class UChromaWindow : public QMainWindow
 	Collection* currentCollection_;
 
 	private:
-	// Recalculate tick deltas for specified axis
-	void calculateTickDeltas(int axis);
+	// Return unique name based on supplied baseName
+	QString uniqueCollectionName(QString baseName);
 
 	public:
+	// Setup new, empty session
+	void startNewSession(bool createDefaults);
 	// Add new collection
 	Collection* addCollection(QString name = QString());
 	// Remove existing collection
@@ -361,16 +363,14 @@ class UChromaWindow : public QMainWindow
 	Collection* collections();
 	// Return nth collection in list
 	Collection* collection(int index);
-	// Find named collection
-	Collection* findCollection(QString name);
+	// Locate named collection
+	Collection* locateCollection(QString locator);
 	// Move collection focus to next in list
 	void focusNextCollection();
 	// Move collection focus to previous in list
 	void focusPreviousCollection();
 	// Return currently-selected Collection
 	Collection* currentCollection();
-	// Clear current data
-	void clearData(bool resetLayout);
 
 
 	/*

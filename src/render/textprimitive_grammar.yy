@@ -21,13 +21,13 @@ void TextPrimitiveParser_error(char *s);
 /* Type Definition */
 %union {
 	TextPrimitive::EscapeSequence escSeq;	/* Escape Sequence id */
-	const char* text;			/* Text string */
+	QString* text;				/* Text string */
 	bool success;				/* TextFragment pointer */
 };
 
-%token <text> TEXT
-%token <escSeq> ESCAPE
-%token FAIL
+%token <text> UCR_TP_TEXT
+%token <escSeq> UCR_TP_ESCAPE
+%token UCR_TP_FAIL
 
 %type <success> fragment pushescape
 
@@ -48,14 +48,14 @@ fragmentsequence:
 /* ---------- */
 
 fragment:
-	TEXT						{
-		$$ = TextPrimitive::target()->addFragment($1);
+	UCR_TP_TEXT							{
+		$$ = TextPrimitive::target()->addFragment(*$1);
 		if (! $$) YYABORT;
 		}
-	| ESCAPE pushescape '{' fragmentsequence '}' popescape	{
+	| UCR_TP_ESCAPE pushescape '{' fragmentsequence '}' popescape	{
 		$$ = $2;
 		}
-	| FAIL						{
+	| UCR_TP_FAIL							{
 		YYABORT;
 		}
 	;
@@ -63,11 +63,11 @@ fragment:
 /* Semantics */
 
 pushescape:
-	/* empty */					{ $$ = TextPrimitive::target()->addEscape(yylval.escSeq); }
+	/* empty */							{ $$ = TextPrimitive::target()->addEscape(yylval.escSeq); }
 	;
 
 popescape:
-	/* empty */					{ TextPrimitive::target()->removeEscape(); }
+	/* empty */							{ TextPrimitive::target()->removeEscape(); }
 	;
 
 %%

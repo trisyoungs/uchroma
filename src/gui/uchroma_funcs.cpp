@@ -55,17 +55,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	imageExportMaintainAspect_ = true;
 	imageExportFormat_ = Viewer::PNGFormat;
 
-	// Clear data
-	clearData(true);
-	interacting_ = false;
 	refreshing_ = false;
-
-	// Set basic view layout
-	currentViewPane_ = viewLayout_.setDefault();
-
-	// Add an empty collection, and add it to the current view pane
-	currentViewPane_->addCollection(addCollection());
-	currentViewPane_->translateView(0.0, 0.0, -15.0);
 
 	// Load settings...
 	loadSettings();

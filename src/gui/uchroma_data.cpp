@@ -22,11 +22,63 @@
 #include "base/currentproject.h"
 #include "gui/uchroma.h"
 
+// Return unique name based on supplied baseName
+QString UChromaWindow::uniqueCollectionName(QString baseName)
+{
+	QString testName = baseName;
+	int index = 0;
+	Collection* collection;
+	do
+	{
+		// Add on suffix (if index > 0)
+		if (index > 0) testName = baseName + " "+QString::number(index);
+		++index;
+		for (collection = collections_.first(); collection != NULL; collection = collection->next) if (collection->name() == testName) break;
+	} while (collection);
+
+	return testName;
+}
+
+// Setup new, empty session
+void UChromaWindow::startNewSession(bool createDefaults)
+{
+	// Clear collections
+	collections_.clear();
+
+	// Clear layout
+	viewLayout_.clear();
+	currentViewPane_ = NULL;
+
+	// Interaction
+	interacting_ = false;
+	interactionMode_ = InteractionMode::ViewInteraction;
+	interactionAxis_ = -1;
+	clickedInteractionValue_ = 0.0;
+	currentInteractionValue_ = 0.0;
+
+	// View
+	labelFaceViewer_ = false;
+	labelCorrectOrientation_ = true;
+
+	// Create defaults if requested
+	if (createDefaults)
+	{
+		// Set basic view layout
+		currentViewPane_ = viewLayout_.setDefault();
+
+		// Add an empty collection, and add it to the current view pane
+		currentViewPane_->addCollection(addCollection());
+		currentViewPane_->translateView(0.0, 0.0, -15.0);
+	}
+
+	// Set current project data
+	CurrentProject::setAsNotModified();
+	CurrentProject::setInputFile(QString());
+}
+
 // Add new collection
 Collection* UChromaWindow::addCollection(QString name)
 {
-	static int collectionCount = 1;
-
 	// Add an empty collection
 	currentCollection_ = collections_.add();
 
@@ -34,9 +86,8 @@ Collection* UChromaWindow::addCollection(QString name)
 	currentCollection_->displayPrimitives().setViewer(ui.MainView);
 
 	// Set the title
-	// TODO Generate unique collection name here...
-	if (name.isEmpty()) currentCollection_->setName("Empty Collection " + QString::number(collectionCount++));
-	else currentCollection_->setName(name);
+	if (name.isEmpty()) currentCollection_->setName( uniqueCollectionName("Empty Collection ") );
+	else currentCollection_->setName(uniqueCollectionName(name));
 
 	CurrentProject::setAsModified();
 
@@ -115,13 +166,16 @@ Collection* UChromaWindow::collection(int index)
 	return collections_[index];
 }
 
-// Find named collection
-Collection* UChromaWindow::findCollection(QString name)
+// Locate collection
+Collection* UChromaWindow::locateCollection(QString locator)
 {
-	// Loop over main collections
+	// First, split up the supplied string by the delimiter '//'
+	QStringList locatorParts = locator.split("//");
+
+	// Loop over main collections, passing parts list
 	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
 	{
-		Collection* foundCollection = collection->findCollection(name);
+		Collection* foundCollection = collection->locateCollection(locatorParts, 0);
 		if (foundCollection) return foundCollection;
 	}
 	return NULL;
@@ -137,33 +191,4 @@ Collection* UChromaWindow::collections()
 Collection* UChromaWindow::currentCollection()
 {
 	return currentCollection_;
-}
-
-// Clear current data
-void UChromaWindow::clearData(bool resetLayout)
-{
-	// Collections
-	collections_.clear();
-
-	// Layout
-	if (resetLayout)
-	{
-		viewLayout_.clear();
-		currentViewPane_ = NULL;
-	}
-
-	// Interaction
-	interactionMode_ = InteractionMode::ViewInteraction;
-	interactionAxis_ = -1;
-	clickedInteractionValue_ = 0.0;
-	currentInteractionValue_ = 0.0;
-
-	// View
-	labelFaceViewer_ = false;
-	labelCorrectOrientation_ = true;
-	ui.actionViewPerspective->setChecked(false);
-
-	// Set current project data
-	CurrentProject::setAsNotModified();
-	CurrentProject::setInputFile(QString());
 }

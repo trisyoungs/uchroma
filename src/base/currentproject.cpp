@@ -46,6 +46,9 @@ void CurrentProject::updateTitleBar()
 {
 	if (!mainWindow_) return;
 
+	// Do nothing if the modification status is the same as it was last time we were called
+	if (modified_ == lastTitleBarModificationStatus_) return;
+
 	if (modified_) mainWindow_->setWindowTitle("uChroma v" + QString(UCHROMAREVISION) + " - " + inputFile_ + " (modified) ");
 	else mainWindow_->setWindowTitle("uChroma v" + QString(UCHROMAREVISION) + " - " + inputFile_);
 
@@ -79,7 +82,7 @@ void CurrentProject::setAsModified()
 {
 	modified_ = true;
 
-	if (modified_ != lastTitleBarModificationStatus_) updateTitleBar();
+	updateTitleBar();
 }
 
 // Set as not modified
@@ -87,7 +90,7 @@ void CurrentProject::setAsNotModified()
 {
 	modified_ = false;
 
-	if (modified_ != lastTitleBarModificationStatus_) updateTitleBar();
+	updateTitleBar();
 }
 
 // Return status of flag

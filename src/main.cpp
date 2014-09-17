@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
 	UChromaWindow mainWindow;
 
 	/* Do we have CLI options? */
+	bool fileLoaded = false;
 	if (argc > 1)
 	{
 		int n = 1;
@@ -52,7 +53,8 @@ int main(int argc, char *argv[])
 			if (argv[n][0] != '-')
 			{
 				// Must be an input file to load....
-				if (!mainWindow.loadInputFile(argv[n])) return 1;
+				fileLoaded = mainWindow.loadInputFile(argv[n]);
+				if (!fileLoaded) return 1;
 				++n;
 				continue;
 			}
@@ -95,6 +97,9 @@ int main(int argc, char *argv[])
 
 	/* Direct Messenger to the LogWindow */
 	msg.setTextBrowser(mainWindow.logWindowBrowser());
+
+	/* If a file was not loaded, create a new, empty session */
+	if (!fileLoaded) mainWindow.startNewSession(true);
 
 	/* Update main window */
 	mainWindow.updateGUI();

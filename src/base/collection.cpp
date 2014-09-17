@@ -150,6 +150,21 @@ QString Collection::name()
 	return name_;
 }
 
+// Return collection locator
+QString Collection::locator(QString currentPath)
+{
+	// Check parent - if it is NULL then we are at the 'top' and can start setting the path
+	if (!parent_) return name_;
+
+	// We are in the 'middle' of the chain, so get the parent's contribution to the path first...
+	QString result = parent_->locator(currentPath);
+
+	// Add our info on to the path...
+	result += "//" + name_;
+
+	return result;
+}
+
 // Add dataset
 DataSet* Collection::addDataSet()
 {
@@ -328,7 +343,7 @@ int Collection::dataSetIndex(const char* name)
 	return -1;
 }
 
-// Return unique name based on supplied dataset
+// Return unique name based on supplied basename
 QString Collection::uniqueDataSetName(QString baseName)
 {
 	QString testName = baseName, suffix;
@@ -640,23 +655,27 @@ void Collection::getSlice(int axis, int bin)
 	}
 }
 
-// Find collection with name specified
-Collection* Collection::findCollection(QString name)
+// Locate collection using parts specified
+Collection* Collection::locateCollection(const QStringList& parts, int offset)
 {
-	// Does the name of this collection match?
-	if (name_ == name) return this;
+	// If we don't match the first part (including offset) in the list, return now...
+	if (name_ != parts.at(offset)) return NULL;
+
+	// If this is the last part in the list, then we are the match. If not, check fit and slice data
+	++offset;
+	if (parts.size() == offset) return this;
 
 	// Check fit data
 	for (Collection* fit = fits_.first(); fit != NULL; fit = fit->next)
 	{
-		Collection* result = fit->findCollection(name);
+		Collection* result = fit->locateCollection(parts, offset);
 		if (result) return result;
 	}
 
 	// Check extracted data
 	for (Collection* extract = slices_.first(); extract != NULL; extract = extract->next)
 	{
-		Collection* result = extract->findCollection(name);
+		Collection* result = extract->locateCollection(parts, offset);
 		if (result) return result;
 	}
 
