@@ -1364,9 +1364,9 @@ void Data2D::trim(double minX, double maxX)
 bool Data2D::load(const char* fileName)
 {
 	// Open file and check that we're OK to proceed reading from it
-	LineParser parser;
+	LineParser parser(fileName);
 
-	if ((!parser.openInput(fileName)) || (!parser.isFileGoodForReading()))
+	if (!parser.ready())
 	{
 		msg.print("Couldn't open file '%s' for reading.\n", fileName);
 		return false;
@@ -1375,10 +1375,10 @@ bool Data2D::load(const char* fileName)
 	int success, nCols = -1;
 	double oldZ = z_;
 	clear();
-	while (!parser.eofOrBlank())
+	while (!parser.atEnd())
 	{
-		success = parser.getArgsDelim(LineParser::SkipBlanks);
-		if (success != 0)
+		success = parser.getArgs(LineParser::SkipBlanks);
+		if (!success)
 		{
 			parser.closeFiles();
 			msg.print("Error reading from file '%s'.\n", fileName);
@@ -1402,11 +1402,10 @@ bool Data2D::load(const char* fileName)
 bool Data2D::save(const char* fileName) const
 {
 	// Open file and check that we're OK to proceed writing to it
-	LineParser parser;
+	LineParser parser(fileName, true);
 	msg.print("Writing datafile '%s'...\n", fileName);
 
-	parser.openOutput(fileName, true);
-	if (!parser.isFileGoodForWriting())
+	if (!parser.ready())
 	{
 		msg.print("Couldn't open file '%s' for writing.\n", fileName);
 		return false;
@@ -1423,11 +1422,10 @@ bool Data2D::save(const char* fileName) const
 bool Data2D::saveWithInterpolation(const char* fileName)
 {
 	// Open file and check that we're OK to proceed writing to it
-	LineParser parser;
+	LineParser parser(fileName, true);
 	msg.print("Writing datafile '%s'...\n", fileName);
 
-	parser.openOutput(fileName, true);
-	if (!parser.isFileGoodForWriting())
+	if (!parser.ready())
 	{
 		msg.print("Couldn't open file '%s' for writing.\n", fileName);
 		return false;

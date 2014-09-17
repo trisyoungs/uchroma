@@ -1349,16 +1349,16 @@ void AxesWindow::updateControls(bool force)
 	ui.XMinSpin->setRange(axes.logarithmic(0), axes.limitMin(0), false, 0.0);
 	ui.YMinSpin->setRange(axes.logarithmic(1), axes.limitMin(1), false, 0.0);
 	ui.ZMinSpin->setRange(axes.logarithmic(2), axes.limitMin(2), false, 0.0);
-	ui.XMinSpin->setSingleStep(max((axes.limitMax(0)-axes.limitMin(0))*0.01, 1.0));
-	ui.YMinSpin->setSingleStep(max((axes.limitMax(1)-axes.limitMin(1))*0.01, 1.0));
-	ui.ZMinSpin->setSingleStep(max((axes.limitMax(2)-axes.limitMin(2))*0.01, 1.0));
+	ui.XMinSpin->setSingleStep(std::max((axes.limitMax(0)-axes.limitMin(0))*0.01, 1.0));
+	ui.YMinSpin->setSingleStep(std::max((axes.limitMax(1)-axes.limitMin(1))*0.01, 1.0));
+	ui.ZMinSpin->setSingleStep(std::max((axes.limitMax(2)-axes.limitMin(2))*0.01, 1.0));
 
 	ui.XMaxSpin->setRange(axes.logarithmic(0), axes.limitMin(0), false, 0.0);
 	ui.YMaxSpin->setRange(axes.logarithmic(1), axes.limitMin(1), false, 0.0);
 	ui.ZMaxSpin->setRange(axes.logarithmic(2), axes.limitMin(2), false, 0.0);
-	ui.XMaxSpin->setSingleStep(max((axes.limitMax(0)-axes.limitMin(0))*0.01, 1.0));
-	ui.YMaxSpin->setSingleStep(max((axes.limitMax(1)-axes.limitMin(1))*0.01, 1.0));
-	ui.ZMaxSpin->setSingleStep(max((axes.limitMax(2)-axes.limitMin(2))*0.01, 1.0));
+	ui.XMaxSpin->setSingleStep(std::max((axes.limitMax(0)-axes.limitMin(0))*0.01, 1.0));
+	ui.YMaxSpin->setSingleStep(std::max((axes.limitMax(1)-axes.limitMin(1))*0.01, 1.0));
+	ui.ZMaxSpin->setSingleStep(std::max((axes.limitMax(2)-axes.limitMin(2))*0.01, 1.0));
 	ui.XMinSpin->setValue(axes.min(0));
 	ui.YMinSpin->setValue(axes.min(1));
 	ui.ZMinSpin->setValue(axes.min(2));

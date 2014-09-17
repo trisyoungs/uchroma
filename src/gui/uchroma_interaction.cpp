@@ -175,13 +175,13 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 	switch (interactionMode_)
 	{
 		case (InteractionMode::FitSetupSelectXInteraction):
-			editFitSetupDialog_.ui.XAbsoluteMinSpin->setValue(min(clickedInteractionValue_, currentInteractionValue_));
-			editFitSetupDialog_.ui.XAbsoluteMaxSpin->setValue(max(clickedInteractionValue_, currentInteractionValue_));
+			editFitSetupDialog_.ui.XAbsoluteMinSpin->setValue(std::min(clickedInteractionValue_, currentInteractionValue_));
+			editFitSetupDialog_.ui.XAbsoluteMaxSpin->setValue(std::max(clickedInteractionValue_, currentInteractionValue_));
 			editFitSetupDialog_.show();
 			break;
 		case (InteractionMode::FitSetupSelectZInteraction):
-			editFitSetupDialog_.ui.ZAbsoluteMinSpin->setValue(min(clickedInteractionValue_, currentInteractionValue_));
-			editFitSetupDialog_.ui.ZAbsoluteMaxSpin->setValue(max(clickedInteractionValue_, currentInteractionValue_));
+			editFitSetupDialog_.ui.ZAbsoluteMinSpin->setValue(std::min(clickedInteractionValue_, currentInteractionValue_));
+			editFitSetupDialog_.ui.ZAbsoluteMaxSpin->setValue(std::max(clickedInteractionValue_, currentInteractionValue_));
 			editFitSetupDialog_.show();
 			break;
 		case (InteractionMode::ZoomInteraction):
@@ -194,8 +194,8 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 			}
 			else
 			{
-				double newMin = min(clickedInteractionValue_, currentInteractionValue_);
-				double newMax = max(clickedInteractionValue_, currentInteractionValue_);
+				double newMin = std::min(clickedInteractionValue_, currentInteractionValue_);
+				double newMax = std::max(clickedInteractionValue_, currentInteractionValue_);
 				if ((newMax-newMin) > 1.0e-10)
 				{
 					currentViewPane_->axes().setMin(interactionAxis_, newMin);

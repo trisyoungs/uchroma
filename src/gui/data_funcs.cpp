@@ -128,10 +128,11 @@ void DataWindow::on_AddFilesButton_clicked(bool checked)
 		dataSet->setName(fileInfo.fileName());
 		dataSet->setDataSource(DataSet::FileSource);
 		dataSet->setSourceFileName(currentCollection->dataFileDirectory().relativeFilePath(fileName));
-		currentCollection->setDataSetZ(dataSet, z);
 
 		if (dataSet && currentCollection->loadDataSet(dataSet)) ++count;
-		
+
+		currentCollection->setDataSetZ(dataSet, z);
+
 		z += delta;
 	}
 	progress.setValue(files.count());

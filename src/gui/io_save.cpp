@@ -61,7 +61,7 @@ bool UChromaWindow::writeAxisBlock(LineParser& parser, Axes& axes, int axis)
 	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::StretchKeyword), axes.stretch(axis));
 	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::TickDeltaKeyword), axes.tickDelta(axis));
 	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::TitleAnchorKeyword), TextPrimitive::textAnchor(axes.titleAnchor(axis)));
-	parser.writeLineF("      %s '%s'\n", Keywords::axisKeyword(Keywords::TitleKeyword), qPrintable(axes.title(axis)));
+	parser.writeLine(QString("      ")+Keywords::axisKeyword(Keywords::TitleKeyword)+" '"+axes.title(axis)+"'\n");
 	parser.writeLineF("      %s %f %f %f %f\n", Keywords::axisKeyword(Keywords::TitleOrientationKeyword), axes.titleOrientation(axis).x, axes.titleOrientation(axis).y, axes.titleOrientation(axis).z, axes.titleOrientation(axis).w);
 	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::VisibleAxisKeyword), stringBool(axes.visible(axis)));
 	parser.writeLineF("    %s\n", Keywords::axisKeyword(Keywords::EndAxisKeyword));
@@ -257,9 +257,8 @@ bool UChromaWindow::writeViewPaneBlock(LineParser& parser, ViewPane* pane)
 // Save current data to file specified
 bool UChromaWindow::saveInputFile(QString fileName)
 {
-	LineParser parser;
-	parser.openOutput(qPrintable(fileName), true);
-	if (!parser.isFileGoodForWriting())
+	LineParser parser(fileName, true);
+	if (!parser.ready())
 	{
 		QMessageBox::warning(this, "Error", "Can't open specified file for writing.");
 		return false;

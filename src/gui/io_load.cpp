@@ -33,13 +33,13 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 	TextPrimitive::TextAnchor anchor;
 	LineStipple::StippleType stipple;
 	NumberFormat::FormatType ft;
-	while (!parser.eofOrBlank())
+	while (!parser.atEnd())
 	{
 		// Get line from file
-		parser.getArgsDelim(LineParser::UseQuotes + LineParser::SkipBlanks);
+		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
 
 		// Get keyword and check number of arguments provided
-		Keywords::AxisKeyword axisKwd = Keywords::axisKeyword(parser.argc(0));
+		Keywords::AxisKeyword axisKwd = Keywords::axisKeyword(parser.argChar(0));
 		if ((axisKwd != Keywords::nAxisKeywords) && (Keywords::axisKeywordNArguments(axisKwd) > (parser.nArgs()-1)))
 		{
 			msg.print("Error : Axis keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::axisKeyword(axisKwd), Keywords::axisKeywordNArguments(axisKwd), parser.nArgs()-1);
@@ -72,10 +72,10 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 			// GridLine major style
 			case (Keywords::GridLineMajorStyleKeyword):
 				axes.gridLineMajorStyle(axis).setWidth(parser.argd(1));
-				stipple = LineStipple::stippleType(parser.argc(2));
+				stipple = LineStipple::stippleType(parser.argChar(2));
 				if (stipple == LineStipple::nStippleTypes)
 				{
-					msg.print("Warning: Unrecognised line stipple type '%s'. Defaulting to 'NoStipple'.\n", parser.argc(2));
+					msg.print("Warning: Unrecognised line stipple type '%s'. Defaulting to 'NoStipple'.\n", parser.argChar(2));
 					stipple = LineStipple::NoStipple;
 					CHECKIOFAIL
 				}
@@ -85,10 +85,10 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 			// GridLine minor style
 			case (Keywords::GridLineMinorStyleKeyword):
 				axes.gridLineMinorStyle(axis).setWidth(parser.argd(1));
-				stipple = LineStipple::stippleType(parser.argc(2));
+				stipple = LineStipple::stippleType(parser.argChar(2));
 				if (stipple == LineStipple::nStippleTypes)
 				{
-					msg.print("Warning: Unrecognised line stipple type '%s'. Defaulting to 'NoStipple'.\n", parser.argc(2));
+					msg.print("Warning: Unrecognised line stipple type '%s'. Defaulting to 'NoStipple'.\n", parser.argChar(2));
 					stipple = LineStipple::NoStipple;
 					CHECKIOFAIL
 				}
@@ -101,10 +101,10 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 				break;
 			// Axis label anchor
 			case (Keywords::LabelAnchorKeyword):
-				anchor = TextPrimitive::textAnchor(parser.argc(1));
+				anchor = TextPrimitive::textAnchor(parser.argChar(1));
 				if (anchor == TextPrimitive::nTextAnchors)
 				{
-					msg.print("Warning: Unrecognised text anchor '%s'. Defaulting to '%s'.\n", parser.argc(1), TextPrimitive::textAnchor(TextPrimitive::TopMiddleAnchor));
+					msg.print("Warning: Unrecognised text anchor '%s'. Defaulting to '%s'.\n", parser.argChar(1), TextPrimitive::textAnchor(TextPrimitive::TopMiddleAnchor));
 					anchor = TextPrimitive::TopMiddleAnchor;
 					CHECKIOFAIL
 				}
@@ -131,10 +131,10 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 				break;
 			// Number Format
 			case (Keywords::NumberFormatKeyword):
-				ft = NumberFormat::formatType(parser.argc(1));
+				ft = NumberFormat::formatType(parser.argChar(1));
 				if (ft == NumberFormat::nNumberFormats)
 				{
-					msg.print("Warning: Unrecognised number format '%s'. Defaulting to '%s'.\n", parser.argc(1), NumberFormat::formatType(NumberFormat::DecimalFormat));
+					msg.print("Warning: Unrecognised number format '%s'. Defaulting to '%s'.\n", parser.argChar(1), NumberFormat::formatType(NumberFormat::DecimalFormat));
 					ft = NumberFormat::DecimalFormat;
 					CHECKIOFAIL
 				}
@@ -165,11 +165,11 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 				break;
 			// Axis title
 			case (Keywords::TitleKeyword):
-				axes.setTitle(axis, parser.argc(1));
+				axes.setTitle(axis, parser.argString(1));
 				break;
 			// Axis title anchor
 			case (Keywords::TitleAnchorKeyword):
-				anchor = TextPrimitive::textAnchor(parser.argc(1));
+				anchor = TextPrimitive::textAnchor(parser.argChar(1));
 				if (anchor == TextPrimitive::nTextAnchors)
 				{
 					msg.print("Warning: Unrecognised text anchor '%s'. Defaulting to 'TopMiddle'.\n");
@@ -191,7 +191,7 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 				break;
 			// Unrecognised keyword
 			default:
-				msg.print("Warning: Unrecognised axis keyword: %s\n", parser.argc(0));
+				msg.print("Warning: Unrecognised axis keyword: %s\n", parser.argChar(0));
 				CHECKIOFAIL
 				break;
 		}
@@ -209,13 +209,13 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 	Collection::AlphaControl ac;
 	Collection::ColourSource cs;
 	Collection::DisplayStyle ds;
-	while (!parser.eofOrBlank())
+	while (!parser.atEnd())
 	{
 		// Get line from file
-		parser.getArgsDelim(LineParser::UseQuotes + LineParser::SkipBlanks);
+		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
 
 		// Get keyword and check number of arguments provided
-		Keywords::CollectionKeyword collectionKwd = Keywords::collectionKeyword(parser.argc(0));
+		Keywords::CollectionKeyword collectionKwd = Keywords::collectionKeyword(parser.argChar(0));
 		if ((collectionKwd != Keywords::nCollectionKeywords) && (Keywords::collectionKeywordNArguments(collectionKwd) > (parser.nArgs()-1)))
 		{
 			msg.print("Error: Collection keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::collectionKeyword(collectionKwd), Keywords::collectionKeywordNArguments(collectionKwd), parser.nArgs()-1);
@@ -225,10 +225,10 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 		{
 			// Colour alpha control
 			case (Keywords::ColourAlphaControlKeyword):
-				ac = Collection::alphaControl(parser.argc(1));
+				ac = Collection::alphaControl(parser.argChar(1));
 				if (ac == Collection::nAlphaControls)
 				{
-					msg.print("Warning: Unrecognised alpha control type '%s'. Defaulting to '%s'.\n", parser.argc(1), Collection::alphaControl(Collection::OwnAlpha));
+					msg.print("Warning: Unrecognised alpha control type '%s'. Defaulting to '%s'.\n", parser.argChar(1), Collection::alphaControl(Collection::OwnAlpha));
 					ac = Collection::OwnAlpha;
 					CHECKIOFAIL
 				}
@@ -265,10 +265,10 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				break;
 			// Colour source
 			case (Keywords::ColourSourceKeyword):
-				cs = Collection::colourSource(parser.argc(1));
+				cs = Collection::colourSource(parser.argChar(1));
 				if (cs == Collection::nColourSources)
 				{
-					msg.print("Warning: Unrecognised colour source '%s'. Defaulting to '%s'.\n", parser.argc(1), Collection::colourSource(Collection::SingleColourSource));
+					msg.print("Warning: Unrecognised colour source '%s'. Defaulting to '%s'.\n", parser.argChar(1), Collection::colourSource(Collection::SingleColourSource));
 					cs = Collection::SingleColourSource;
 					CHECKIOFAIL
 				}
@@ -276,7 +276,7 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				break;
 			// Dataset directory
 			case (Keywords::DataDirectoryKeyword):
-				collection->setDataFileDirectory(QDir(parser.argc(1)));
+				collection->setDataFileDirectory(QDir(parser.argString(1)));
 				if (!collection->dataFileDirectory().isReadable())
 				{
 					QMessageBox::StandardButton button = QMessageBox::warning(this, "Error", "The data directory specified (" + collection->dataFileDirectory().absolutePath() + ") does not exist or is unreadable.\nDo you want to reset the datafile location?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
@@ -291,7 +291,7 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 			case (Keywords::DataSetDefinitionKeyword):
 				// Create new dataset
 				dataSet = collection->addDataSet();
-				dataSet->setName(parser.argc(1));
+				dataSet->setName(parser.argString(1));
 				if (!readDataSetBlock(parser, dataSet, collection)) return false;
 				break;
 			// End input block
@@ -300,7 +300,7 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				break;
 			// Fit data block
 			case (Keywords::FitBlockKeyword):
-				if (!readCollectionBlock(parser, collection->addFit(parser.argc(1)))) return false;
+				if (!readCollectionBlock(parser, collection->addFit(parser.argString(1)))) return false;
 				break;
 			// Fit parameters block
 			case (Keywords::FitParametersBlockKeyword):
@@ -329,14 +329,14 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				break;
 			// Slice data block
 			case (Keywords::SliceBlockKeyword):
-				if (!readCollectionBlock(parser, collection->addSlice(parser.argc(1)))) return false;
+				if (!readCollectionBlock(parser, collection->addSlice(parser.argChar(1)))) return false;
 				break;
 			// Display style
 			case (Keywords::StyleKeyword):
-				ds = Collection::displayStyle(parser.argc(1));
+				ds = Collection::displayStyle(parser.argChar(1));
 				if (ds == Collection::nDisplayStyles)
 				{
-					msg.print("Warning: Unrecognised display style '%s'.\n", parser.argc(1));
+					msg.print("Warning: Unrecognised display style '%s'.\n", parser.argChar(1));
 					CHECKIOFAIL
 				}
 				collection->setDisplayStyle(ds);
@@ -347,7 +347,7 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 			case (Keywords::TransformZKeyword):
 				xyz = collectionKwd - Keywords::TransformXKeyword;
 				collection->setTransformEnabled(xyz, parser.argb(1));
-				collection->setTransformEquation(xyz,  parser.argc(2));
+				collection->setTransformEquation(xyz,  parser.argString(2));
 				break;
 			// Visible flag
 			case (Keywords::VisibleCollectionKeyword):
@@ -355,7 +355,7 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				break;
 			// Unrecognised Keyword
 			default:
-				msg.print("Warning: Unrecognised collection keyword: %s\n", parser.argc(0));
+				msg.print("Warning: Unrecognised collection keyword: %s\n", parser.argChar(0));
 				CHECKIOFAIL
 				break;
 		}
@@ -370,13 +370,13 @@ bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Colle
 	int nPoints;
 	bool foundEnd;
 	DataSet::DataSource source;
-	while (!parser.eofOrBlank())
+	while (!parser.atEnd())
 	{
 		// Get line from file
-		parser.getArgsDelim(LineParser::UseQuotes + LineParser::SkipBlanks);
+		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
 
 		// Get keyword and check number of arguments provided
-		Keywords::DataSetKeyword dataSetKwd = Keywords::dataSetKeyword(parser.argc(0));
+		Keywords::DataSetKeyword dataSetKwd = Keywords::dataSetKeyword(parser.argChar(0));
 		if ((dataSetKwd != Keywords::nDataSetKeywords) && (Keywords::dataSetKeywordNArguments(dataSetKwd) > (parser.nArgs()-1)))
 		{
 			msg.print("Error : DataSet keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::dataSetKeyword(dataSetKwd), Keywords::dataSetKeywordNArguments(dataSetKwd), parser.nArgs()-1);
@@ -389,11 +389,11 @@ bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Colle
 				foundEnd = false;
 				do
 				{
-					parser.getArgsDelim(LineParser::Defaults);
+					parser.getArgs(LineParser::Defaults);
 					// Check for 'EndData'
-					if (strcmp(parser.argc(0),"EndData") == 0) foundEnd = true;
+					if (parser.argString(0) == "EndData") foundEnd = true;
 					else dataSet->data().addPoint(parser.argd(0), parser.argd(1));
-				} while ((!foundEnd) && (!parser.eofOrBlank()));
+				} while ((!foundEnd) && (!parser.atEnd()));
 				if (!foundEnd)
 				{
 					msg.print("Error : Unterminated 'Data' block in dataSet '%s'.\n", qPrintable(dataSet->name()));
@@ -404,10 +404,10 @@ bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Colle
 				return true;
 				break;
 			case (Keywords::SourceKeyword):
-				source = DataSet::dataSource(parser.argc(1));
+				source = DataSet::dataSource(parser.argChar(1));
 				if (source == DataSet::nDataSources)
 				{
-					msg.print("Warning: Datasource for dataSet not recognised (%s)\n", parser.argc(1));
+					msg.print("Warning: Datasource for dataSet not recognised (%s)\n", parser.argChar(1));
 					CHECKIOFAIL
 					break;
 				}
@@ -415,7 +415,7 @@ bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Colle
 				// Depending on the source, we might expect other data here...
 				if (source == DataSet::FileSource)
 				{
-					if (parser.hasArg(2)) dataSet->setSourceFileName(parser.argc(2));
+					if (parser.hasArg(2)) dataSet->setSourceFileName(parser.argChar(2));
 					else
 					{
 						msg.print("Error: Expected data file name after 'Source File' declaration in dataSet '%s'.\n", qPrintable(dataSet->name()));
@@ -428,7 +428,7 @@ bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Colle
 				break;
 			// Unrecognised Keyword
 			default:
-				msg.print("Warning: Unrecognised DataSet keyword: %s\n", parser.argc(0));
+				msg.print("Warning: Unrecognised DataSet keyword: %s\n", parser.argChar(0));
 				CHECKIOFAIL
 				break;
 		}
@@ -444,13 +444,13 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 	IndexData::IndexType indexType;
 	EquationVariable* eqVar;
 	ReferenceVariable* refVar;
-	while (!parser.eofOrBlank())
+	while (!parser.atEnd())
 	{
 		// Get line from file
-		parser.getArgsDelim(LineParser::UseQuotes + LineParser::SkipBlanks);
+		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
 
 		// Get keyword and check number of arguments provided
-		Keywords::FitParametersKeyword fitParamsKwd = Keywords::fitParametersKeyword(parser.argc(0));
+		Keywords::FitParametersKeyword fitParamsKwd = Keywords::fitParametersKeyword(parser.argChar(0));
 		if ((fitParamsKwd != Keywords::nFitParametersKeywords) && (Keywords::fitParametersKeywordNArguments(fitParamsKwd) > (parser.nArgs()-1)))
 		{
 			msg.print("Error : FitParameters keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::fitParametersKeyword(fitParamsKwd), Keywords::fitParametersKeywordNArguments(fitParamsKwd), parser.nArgs()-1);
@@ -462,7 +462,7 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 				return true;
 				break;
 			case (Keywords::EquationKeyword):
-				fitKernel->setEquation(parser.argc(1));
+				fitKernel->setEquation(parser.argString(1));
 				break;
 			case (Keywords::GlobalKeyword):
 				fitKernel->setGlobal(parser.argb(1));
@@ -475,31 +475,31 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 				break;
 			case (Keywords::ReferenceKeyword):
 				// Create new reference with this name
-				refVar = fitKernel->addReference(parser.argc(1));
+				refVar = fitKernel->addReference(parser.argString(1));
 				if (!refVar) CHECKIOFAIL
-				indexType = IndexData::indexType(parser.argc(2));
+				indexType = IndexData::indexType(parser.argChar(2));
 				if (indexType == IndexData::nIndexTypes)
 				{
-					msg.print("Warning: Unrecognised type '%s' for reference '%s' - defaulting to 'Normal'.\n", parser.argc(2), parser.argc(1));
+					msg.print("Warning: Unrecognised type '%s' for reference '%s' - defaulting to 'Normal'.\n", parser.argChar(2), parser.argChar(1));
 					CHECKIOFAIL
 				}
 				refVar->xIndex().setType(indexType);
 				refVar->xIndex().setIndex(parser.argi(3));
 				refVar->xIndex().setOffset(parser.argi(4));
-				indexType = IndexData::indexType(parser.argc(5));
+				indexType = IndexData::indexType(parser.argChar(5));
 				if (indexType == IndexData::nIndexTypes)
 				{
-					msg.print("Warning: Unrecognised type '%s' for reference '%s' - defaulting to 'Normal'.\n", parser.argc(5), parser.argc(1));
+					msg.print("Warning: Unrecognised type '%s' for reference '%s' - defaulting to 'Normal'.\n", parser.argChar(5), parser.argChar(1));
 					CHECKIOFAIL
 				}
 				refVar->zIndex().setType(indexType);
 				refVar->zIndex().setIndex(parser.argi(6));
 				refVar->zIndex().setOffset(parser.argi(7));
-				refVar->setZDataSetName(parser.argc(8));
+				refVar->setZDataSetName(parser.argString(8));
 				break;
 			case (Keywords::VariableKeyword):
 				// First, see if named variable exists
-				eqVar = fitKernel->variable(parser.argc(1));
+				eqVar = fitKernel->variable(parser.argString(1));
 				if (!eqVar)
 				{
 					msg.print("Warning: Variable '%s' is not in fit equation, so will ignore settings in FitParameters.\n");
@@ -511,10 +511,10 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 				eqVar->setMaximumLimit(parser.argb(6), parser.argd(7));
 				break;
 			case (Keywords::XRangeTypeKeyword):
-				rangeType = FitKernel::rangeType(parser.argc(1));
+				rangeType = FitKernel::rangeType(parser.argChar(1));
 				if (rangeType == FitKernel::nRangeTypes)
 				{
-					msg.print("Warning: Unrecognised range type '%s' given for X in fit. Defaulting to '%s'\n", parser.argc(1), FitKernel::rangeType(FitKernel::AbsoluteRange));
+					msg.print("Warning: Unrecognised range type '%s' given for X in fit. Defaulting to '%s'\n", parser.argChar(1), FitKernel::rangeType(FitKernel::AbsoluteRange));
 					rangeType = FitKernel::AbsoluteRange;
 					CHECKIOFAIL
 				}
@@ -532,10 +532,10 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 				fitKernel->setIndexXSingle(parser.argi(1)-1);
 				break;
 			case (Keywords::ZRangeTypeKeyword):
-				rangeType = FitKernel::rangeType(parser.argc(1));
+				rangeType = FitKernel::rangeType(parser.argChar(1));
 				if (rangeType == FitKernel::nRangeTypes)
 				{
-					msg.print("Warning: Unrecognised range type '%s' given for Z in fit. Defaulting to '%s'\n", parser.argc(1), FitKernel::rangeType(FitKernel::AbsoluteRange));
+					msg.print("Warning: Unrecognised range type '%s' given for Z in fit. Defaulting to '%s'\n", parser.argChar(1), FitKernel::rangeType(FitKernel::AbsoluteRange));
 					rangeType = FitKernel::AbsoluteRange;
 					CHECKIOFAIL
 				}
@@ -554,7 +554,7 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 				break;
 			// Unrecognised Keyword
 			default:
-				msg.print("Warning: Unrecognised FitParameters keyword: %s\n", parser.argc(0));
+				msg.print("Warning: Unrecognised FitParameters keyword: %s\n", parser.argChar(0));
 				CHECKIOFAIL
 				break;
 		}
@@ -566,13 +566,14 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 // Read SettingsBlock keywords
 bool UChromaWindow::readSettingsBlock(LineParser& parser)
 {
-	while (!parser.eofOrBlank())
+	Viewer::ImageFormat fmt;
+	while (!parser.atEnd())
 	{
 		// Get line from file
-		parser.getArgsDelim(LineParser::UseQuotes + LineParser::SkipBlanks);
+		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
 
 		// Get keyword and check number of arguments provided
-		Keywords::SettingsKeyword settingsKwd = Keywords::settingsKeyword(parser.argc(0));
+		Keywords::SettingsKeyword settingsKwd = Keywords::settingsKeyword(parser.argChar(0));
 		if ((settingsKwd != Keywords::nSettingsKeywords) && (Keywords::settingsKeywordNArguments(settingsKwd) > (parser.nArgs()-1)))
 		{
 			msg.print("Error : Settings keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::settingsKeyword(settingsKwd), Keywords::settingsKeywordNArguments(settingsKwd), parser.nArgs()-1);
@@ -586,15 +587,22 @@ bool UChromaWindow::readSettingsBlock(LineParser& parser)
 				break;
 			// Image Export info
 			case (Keywords::ImageExportKeyword):
-				imageExportFile_ = parser.argc(1);
+				imageExportFile_ = parser.argString(1);
 				imageExportWidth_ = parser.argi(2);
 				imageExportHeight_ = parser.argi(3);
-				imageExportFormat_ = Viewer::imageFormat(parser.argc(4));
+				fmt = Viewer::imageFormat(parser.argChar(4));
+				if (fmt == Viewer::nImageFormats)
+				{
+					msg.print("Warning: Unrecognised image format '%s'. Defaulting to '%s'.\n", parser.argChar(4), Viewer::imageFormatExtension(Viewer::PNGFormat));
+					fmt = Viewer::PNGFormat;
+					CHECKIOFAIL
+				}
+				imageExportFormat_ = fmt;
 				imageExportMaintainAspect_ = parser.argi(5);
 				break;
 			// Unrecognised Keyword
 			default:
-				msg.print("Warning: Unrecognised settings keyword: %s\n", parser.argc(0));
+				msg.print("Warning: Unrecognised settings keyword: %s\n", parser.argChar(0));
 				CHECKIOFAIL
 				break;
 		}
@@ -607,13 +615,13 @@ bool UChromaWindow::readSettingsBlock(LineParser& parser)
 bool UChromaWindow::readViewBlock(LineParser& parser)
 {
 	ViewPane* pane;
-	while (!parser.eofOrBlank())
+	while (!parser.atEnd())
 	{
 		// Get line from file
-		parser.getArgsDelim(LineParser::UseQuotes + LineParser::SkipBlanks);
+		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
 
 		// Get keyword and check number of arguments provided
-		Keywords::ViewKeyword viewKwd = Keywords::viewKeyword(parser.argc(0));
+		Keywords::ViewKeyword viewKwd = Keywords::viewKeyword(parser.argChar(0));
 		if ((viewKwd != Keywords::nViewKeywords) && (Keywords::viewKeywordNArguments(viewKwd) > (parser.nArgs()-1)))
 		{
 			msg.print("Error : View keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::viewKeyword(viewKwd), Keywords::viewKeywordNArguments(viewKwd), parser.nArgs()-1);
@@ -636,13 +644,13 @@ bool UChromaWindow::readViewBlock(LineParser& parser)
 			// ViewPane definition
 			case (Keywords::ViewPaneBlockKeyword):
 				// Check to see if pane has already been created (through it being referenced by another pane)
-				pane = viewLayout_.pane(parser.argc(1));
-				if (!pane) pane = viewLayout_.addPane(parser.argc(1));
+				pane = viewLayout_.pane(parser.argString(1));
+				if (!pane) pane = viewLayout_.addPane(parser.argString(1));
 				if (!readViewPaneBlock(parser, pane)) return false;
 				break;
 			// Unrecognised Keyword
 			default:
-				msg.print("Warning: Unrecognised view keyword: %s\n", parser.argc(0));
+				msg.print("Warning: Unrecognised view keyword: %s\n", parser.argChar(0));
 				CHECKIOFAIL
 				break;
 		}
@@ -660,13 +668,13 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 	ViewPane* associatedPane;
 	ViewPane::PaneRole role;
 	ViewPane::AutoScaleMethod as;
-	while (!parser.eofOrBlank())
+	while (!parser.atEnd())
 	{
 		// Get line from file
-		parser.getArgsDelim(LineParser::UseQuotes + LineParser::SkipBlanks);
+		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
 
 		// Get keyword and check number of arguments provided
-		Keywords::ViewPaneKeyword viewPaneKwd = Keywords::viewPaneKeyword(parser.argc(0));
+		Keywords::ViewPaneKeyword viewPaneKwd = Keywords::viewPaneKeyword(parser.argChar(0));
 		if ((viewPaneKwd != Keywords::nViewPaneKeywords) && (Keywords::viewPaneKeywordNArguments(viewPaneKwd) > (parser.nArgs()-1)))
 		{
 			msg.print("Error: ViewPane keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::viewPaneKeyword(viewPaneKwd), Keywords::viewPaneKeywordNArguments(viewPaneKwd), parser.nArgs()-1);
@@ -676,10 +684,10 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 		{
 			// Autoscale method
 			case (Keywords::AutoScaleKeyword):
-				as = ViewPane::autoScaleMethod(parser.argc(1));
+				as = ViewPane::autoScaleMethod(parser.argChar(1));
 				if (as == ViewPane::nAutoScaleMethods)
 				{
-					msg.print("Warning: Unrecognised autoscale method '%s'.\n", parser.argc(1));
+					msg.print("Warning: Unrecognised autoscale method '%s'.\n", parser.argChar(1));
 					CHECKIOFAIL
 				}
 				pane->setAutoScale(as);
@@ -715,10 +723,10 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 			// Collection association
 			case (Keywords::CollectionAssociatedKeyword):
 				// Find named collection
-				collection = locateCollection(parser.argc(1));
+				collection = locateCollection(parser.argString(1));
 				if (collection == NULL)
 				{
-					msg.print("Warning: Collection '%s' is listed in ViewPane '%s', but no collection by this name exists.\n", parser.argc(1), qPrintable(pane->name()));
+					msg.print("Warning: Collection '%s' is listed in ViewPane '%s', but no collection by this name exists.\n", parser.argChar(1), qPrintable(pane->name()));
 					CHECKIOFAIL
 				}
 				else pane->addCollection(collection);
@@ -749,10 +757,10 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				break;
 			// Role
 			case (Keywords::RoleKeyword):
-				role = ViewPane::paneRole(parser.argc(1));
+				role = ViewPane::paneRole(parser.argChar(1));
 				if (role == ViewPane::nPaneRoles)
 				{
-					msg.print("Warning: Unrecognised role '%s' for pane '%s'. Defaulting to '%s'.\n", parser.argc(1), qPrintable(pane->name()), ViewPane::paneRole(ViewPane::StandardRole));
+					msg.print("Warning: Unrecognised role '%s' for pane '%s'. Defaulting to '%s'.\n", parser.argChar(1), qPrintable(pane->name()), ViewPane::paneRole(ViewPane::StandardRole));
 					role = ViewPane::StandardRole;
 					CHECKIOFAIL
 				}
@@ -760,18 +768,18 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				break;
 			// Role associated collection
 			case (Keywords::RoleTargetCollectionKeyword):
-				collection = locateCollection(parser.argc(1));
+				collection = locateCollection(parser.argChar(1));
 				if (!collection)
 				{
-					msg.print("Warning: Collection '%s' not found, and can't be associated to pane '%s'.\n", parser.argc(1), qPrintable(pane->name()));
+					msg.print("Warning: Collection '%s' not found, and can't be associated to pane '%s'.\n", parser.argChar(1), qPrintable(pane->name()));
 					CHECKIOFAIL
 				}
 				pane->addRoleTargetCollection(collection);
 				break;
 			// Role target pane
 			case (Keywords::RoleTargetPaneKeyword):
-				associatedPane = viewLayout_.pane(parser.argc(1));
-				if (!associatedPane) associatedPane = viewLayout_.addPane(parser.argc(1));
+				associatedPane = viewLayout_.pane(parser.argString(1));
+				if (!associatedPane) associatedPane = viewLayout_.addPane(parser.argString(1));
 				pane->addRoleTargetPane(associatedPane);
 				break;
 			// Title scale
@@ -788,7 +796,7 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				break;
 			// Unrecognised Keyword
 			default:
-				msg.print("Warning: Unrecognised ViewPane keyword: %s\n", parser.argc(0));
+				msg.print("Warning: Unrecognised ViewPane keyword: %s\n", parser.argChar(0));
 				CHECKIOFAIL
 				break;
 		}
@@ -806,9 +814,9 @@ void UChromaWindow::setHardIOFail(bool hardFail)
 // Load data from file specified
 bool UChromaWindow::loadInputFile(QString fileName)
 {
-	LineParser parser;
-	parser.openInput(qPrintable(fileName));
-	if (!parser.isFileGoodForReading())
+	LineParser parser(fileName);
+
+	if (!parser.ready())
 	{
 		QMessageBox::warning(this, "Error", "Can't open specified file for reading.");
 		return false;
@@ -821,18 +829,18 @@ bool UChromaWindow::loadInputFile(QString fileName)
 	Keywords::InputBlock block;
 	int axis, nEmpty;
 	bool success;
-	while (!parser.eofOrBlank())
+	while (!parser.atEnd())
 	{
-		parser.getArgsDelim(LineParser::UseQuotes + LineParser::SkipBlanks);
+		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
 
 		// We expect a block keyword in this loop...
-		block = Keywords::inputBlock(parser.argc(0));
+		block = Keywords::inputBlock(parser.argChar(0));
 		switch (block)
 		{
 			// Collection Block
 			case (Keywords::CollectionBlock):
 				// Create new master Collection and set its title
-				currentCollection_ = addCollection(parser.argc(1));
+				currentCollection_ = addCollection(parser.argString(1));
 
 				// Load the collection data
 				success = readCollectionBlock(parser, currentCollection_);
@@ -862,7 +870,7 @@ bool UChromaWindow::loadInputFile(QString fileName)
 				success = readViewBlock(parser);
 				break;
 			default:
-				msg.print("Warning: Unrecognised input block: %s\n", parser.argc(0));
+				msg.print("Warning: Unrecognised input block: %s\n", parser.argChar(0));
 				CHECKIOFAIL
 				break;
 		}

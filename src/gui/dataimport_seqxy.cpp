@@ -32,14 +32,13 @@ bool DataImportDialog::importSequentialXY()
 	Vec3<int> columns(ui.SeqXYColumnXSpin->value()-1, ui.SeqXYColumnYSpin->value()-1,  ui.SeqXYColumnZSpin->value()-1);
 	int maxColumn = columns.max();
 	int nStartSkip = ui.SeqXYNSkip->value();
-	Dnchar fileName = qPrintable(ui.DataFileEdit->text());
 	
 	// Open file and check that we're OK to proceed reading from it
-	LineParser parser;
+	LineParser parser(ui.DataFileEdit->text());
 
-	if ((!parser.openInput(fileName)) || (!parser.isFileGoodForReading()))
+	if (!parser.ready())
 	{
-		msg.print("Couldn't open file '%s' for reading.\n", fileName.get());
+		msg.print("Couldn't open file '%s' for reading.\n", qPrintable(ui.DataFileEdit->text()));
 		return false;
 	}
 
@@ -49,20 +48,21 @@ bool DataImportDialog::importSequentialXY()
 	// Skip lines at start
 	if (nStartSkip > 0) parser.skipLines(nStartSkip);
 
-	int success, nCols = -1;
+	bool success;
+	int nCols = -1;
 	Vec3<int> count(0, 0, 0);
-	while (!parser.eofOrBlank())
+	while (!parser.atEnd())
 	{
 		if (nStartSkip == -1)
 		{
-			success = parser.getArgsDelim(LineParser::SkipBlanks);
+			success = parser.getArgs(LineParser::SkipBlanks);
 			nStartSkip = 0;
 		}
-		else success = parser.getArgsDelim(LineParser::Defaults);
-		if (success != 0)
+		else success = parser.getArgs(LineParser::Defaults);
+		if (!success)
 		{
 			parser.closeFiles();
-			msg.print("Error reading from file '%s'.\n", fileName.get());
+			msg.print("Error reading from file '%s'.\n", qPrintable(ui.DataFileEdit->text()));
 			return false;
 		}
 
