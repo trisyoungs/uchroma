@@ -26,7 +26,7 @@
 Variable::Variable(double value, bool readOnly) : Node()
 {
 	// Private variables
-	name_.set("unnamedvariable");
+	name_ = "unnamedvariable";
 	initialValue_ = NULL;
 	nodeType_ = Node::VarNode;
 	value_ = value;
@@ -40,15 +40,15 @@ Variable::~Variable()
 }
 
 // Set name of variable
-void Variable::setName(const char* s)
+void Variable::setName(QString s)
 {
-	name_.set(s);
+	name_ = s;
 }
 
 // Get name of variable
-const char* Variable::name() const
+QString Variable::name() const
 {
-	return name_.get();
+	return name_;
 }
 
 // Initialise variable
@@ -63,7 +63,7 @@ bool Variable::initialise()
 			if (set(rv)) return true;
 			else
 			{
-				printf("Error: Failed to initialise variable '%s'.\n", name_.get());
+				printf("Error: Failed to initialise variable '%s'.\n", qPrintable(name_));
 				return false;
 			}
 		}
@@ -81,7 +81,7 @@ bool Variable::setInitialValue(Node* node)
 	// Check return type
 	if (!node->returnsNumber())
 	{
-		printf("Error: Initial value for '%s' does not return a number.\n", name_.get());
+		printf("Error: Initial value for '%s' does not return a number.\n", qPrintable(name_));
 		return false;
 	}
 
@@ -101,32 +101,32 @@ Node* Variable::initialValue() const
 // Set value of variable (real)
 bool Variable::set(double rv)
 {
-        if (readOnly_)
-        {
-                printf("A constant value (in this case a double) cannot be assigned to.\n");
-                return false;
-        }
-        value_ = rv;
-        return true;
+	if (readOnly_)
+	{
+		printf("A constant value (in this case a double) cannot be assigned to.\n");
+		return false;
+	}
+	value_ = rv;
+	return true;
 }
 
 // Return value of node
 bool Variable::execute(double& rv)
 {
-        rv = value_;
-        return true;
+	rv = value_;
+	return true;
 }
 
 // Print node contents
 void Variable::nodePrint(int offset, const char* prefix)
 {
-        // Construct tabbed offset
-        Dnchar tab(offset+32);
-        for (int n=0; n<offset-1; n++) tab += '\t';
-        if (offset > 1) tab.strcat("   |--> ");
-        tab.strcat(prefix);
+	// Construct tabbed offset
+	QString tab;
+	for (int n=0; n<offset-1; n++) tab += '\t';
+	if (offset > 1) tab += "   |--> ";
+	tab += prefix;
 
-        // Output node data
-        if (readOnly_) printf("[C]%s%f (constant value)\n", tab.get(), value_);
-        else printf("[V]%s%f (variable, name=%s)\n", tab.get(), value_, name_.get());
+	// Output node data
+	if (readOnly_) printf("[C]%s%f (constant value)\n", qPrintable(tab), value_);
+	else printf("[V]%s%f (variable, name=%s)\n", qPrintable(tab), value_, qPrintable(name_));
 }

@@ -21,7 +21,7 @@
 
 #include "gui/uchroma.h"
 #include "render/fontinstance.h"
-#include "base/currentproject.h"
+#include "base/session.h"
 #include "templates/reflist.h"
 #include "templates/variantpointer.h"
 #include "version.h"
@@ -39,7 +39,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	ui.setupUi(this);
 
 	// Set pointer in CurrentProject
-	CurrentProject::setMainWindow(this);
+	Session::setMainWindow(this);
 
 	// Set variable defaults
 	hardIOFail_ = false;

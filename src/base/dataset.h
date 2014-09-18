@@ -23,7 +23,6 @@
 #define UCHROMA_DATASET_H
 
 #include "base/data2d.h"
-#include "base/dnchar.h"
 #include "base/transformer.h"
 #include "templates/list.h"
 #include <QtCore/QDir>

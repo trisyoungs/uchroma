@@ -25,10 +25,20 @@
 #include <stdio.h>
 #include <limits>
 
-// Constructor
+// Constructors
+DoubleExp::DoubleExp()
+{
+	mantissa_ = 0.0;
+	exponent_ = 0.0;
+	recalculate();
+}
+DoubleExp::DoubleExp(double value)
+{
+	set(value);
+	recalculate();
+}
 DoubleExp::DoubleExp(double mantissa, int exponent)
 {
-	// Private variables
 	mantissa_ = mantissa;
 	exponent_ = exponent;
 	recalculate();

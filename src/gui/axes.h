@@ -65,29 +65,30 @@ class AxesWindow : public QWidget
 	private:
 	bool haveCurrentAxes();
 	Axes& currentAxes();
-	bool axisInvertChanged(int axis, bool checked);
-	bool axisLogarithmicChanged(int axis, bool checked);
-	bool axisVisibleChanged(int axis, bool checked);
-	bool axisStretchChanged(int axis, double value);
-	bool axisLimitChanged(int axis, bool minLim, double value);
-	bool axisLimitSetExtreme(int axis, bool minLim);
-	bool axisPositionIsFractionalChanged(int axis, bool real);
-	bool axisPositionChanged(bool real, int axis, int dir, double value);
-	bool axisPositionSet(bool real, int axis, int dir, int type);
-	bool axisAutoTicksChanged(int axis, bool enabled);
-	bool axisTicksChanged(int axis, bool start, double value);
-	bool axisTickOrientationChanged(int axis, int dir, double value);
-	bool axisTickSizeChanged(int axis, double value);
-	bool axisLabelOrientationChanged(int axis, int component, double value);
-	bool axisMinorTicksChanged(int axis, int value);
-	bool axisTitleChanged(int axis, QString& title);
-	bool axisTitleOrientationChanged(int axis, int component, double value);
-	bool axisAnchorChanged(int axis, bool titleAnchor, TextPrimitive::TextAnchor anchor);
-	bool axisGridLineChanged(int axis, bool major, bool on);
-	bool axisGridFullChanged(int axis, bool full);
-	bool axisGridStyleClicked(int axis, bool major);
-	bool axisGridStyleApplyClicked(int axis);
-	bool axisNumberFormatChangeClicked(int axis);
+	bool invertChanged(int axis, bool checked);
+	bool logarithmicChanged(int axis, bool checked);
+	bool visibleChanged(int axis, bool checked);
+	bool stretchChanged(int axis, double value);
+	bool limitChanged(int axis, bool minLim, double value);
+	bool limitSetExtreme(int axis, bool minLim);
+	bool positionIsFractionalChanged(int axis, bool real);
+	bool positionChanged(bool real, int axis, int dir, double value);
+	bool positionSet(bool real, int axis, int dir, int type);
+	bool autoTicksChanged(int axis, bool enabled);
+	bool ticksChanged(int axis, bool start, double value);
+	bool tickOrientationChanged(int axis, int dir, double value);
+	bool tickSizeChanged(int axis, double value);
+	bool labelOrientationChanged(int axis, int component, double value);
+	bool minorTicksChanged(int axis, int value);
+	bool titleChanged(int axis, QString& title);
+	bool titleAddSymbolButtonClicked(int axis);
+	bool titleOrientationChanged(int axis, int component, double value);
+	bool anchorChanged(int axis, bool titleAnchor, TextPrimitive::TextAnchor anchor);
+	bool gridLineChanged(int axis, bool major, bool on);
+	bool gridFullChanged(int axis, bool full);
+	bool gridStyleClicked(int axis, bool major);
+	bool gridStyleApplyClicked(int axis);
+	bool numberFormatChangeClicked(int axis);
 
 
 	/*
@@ -100,6 +101,7 @@ class AxesWindow : public QWidget
 	void on_XLogarithmicCheck_clicked(bool checked);
 	void on_XVisibleCheck_clicked(bool checked);
 	void on_XTitleEdit_textChanged(QString text);
+	void on_XTitleAddSymbolButton_clicked(bool checked);
 	void on_XStretchSpin_valueChanged(double value);
 	void on_XMinSpin_valueChanged(double value);
 	void on_XMaxSpin_valueChanged(double value);
@@ -157,6 +159,7 @@ class AxesWindow : public QWidget
 	void on_YLogarithmicCheck_clicked(bool checked);
 	void on_YVisibleCheck_clicked(bool checked);
 	void on_YTitleEdit_textChanged(QString text);
+	void on_YTitleAddSymbolButton_clicked(bool checked);
 	void on_YStretchSpin_valueChanged(double value);
 	void on_YMinSpin_valueChanged(double value);
 	void on_YMinSetMinimumButton_clicked(bool checked);
@@ -214,6 +217,7 @@ class AxesWindow : public QWidget
 	void on_ZLogarithmicCheck_clicked(bool checked);
 	void on_ZVisibleCheck_clicked(bool checked);
 	void on_ZTitleEdit_textChanged(QString text);
+	void on_ZTitleAddSymbolButton_clicked(bool checked);
 	void on_ZStretchSpin_valueChanged(double value);
 	void on_ZMinSpin_valueChanged(double value);
 	void on_ZMinSetMinimumButton_clicked(bool checked);

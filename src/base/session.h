@@ -1,6 +1,6 @@
 /*
-	*** Current Project Statics
-	*** src/base/currentproject.h
+	*** Session Statics
+	*** src/base/session.h
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,16 +19,16 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_CURRENTPROJECT_H
-#define UCHROMA_CURRENTPROJECT_H
+#ifndef UCHROMA_SESSION_H
+#define UCHROMA_SESSION_H
 
 #include <QtCore/QString>
 
 // Forward Declarations
 class QMainWindow;
 
-// Modified Flag
-class CurrentProject
+// Session
+class Session
 {
 	/*
 	 * Main Window Link

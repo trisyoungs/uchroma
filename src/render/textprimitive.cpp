@@ -285,13 +285,12 @@ int TextPrimitive::lex()
 		}
 		else if (c == QChar('\\'))
 		{
-			if (token.length() == 0)
+			if (token.length() == 0) isEscape = true;
+			else
 			{
-				isEscape = true;
-				break;
+				unGetChar();
+				done = true;
 			}
-			unGetChar();
-			done = true;
 		}
 		else if (c == QChar('{'))
 		{

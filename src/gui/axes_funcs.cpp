@@ -23,6 +23,8 @@
 #include "gui/uchroma.h"
 #include "gui/editlinestyle.h"
 #include "gui/editnumberformat.h"
+#include "gui/selectsymbol.h"
+#include "base/session.h"
 #include "templates/reflist.h"
 #include <limits>
 
@@ -96,7 +98,7 @@ Axes& AxesWindow::currentAxes()
 	return pane->axes();
 }
 
-bool AxesWindow::axisInvertChanged(int axis, bool checked)
+bool AxesWindow::invertChanged(int axis, bool checked)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 	
@@ -108,11 +110,13 @@ bool AxesWindow::axisInvertChanged(int axis, bool checked)
 	return true;
 }
 
-bool AxesWindow::axisLogarithmicChanged(int axis, bool checked)
+bool AxesWindow::logarithmicChanged(int axis, bool checked)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 	
 	currentAxes().setLogarithmic(axis, checked);
+
+	Session::setAsModified();
 
 	// Update relevant parts of gui
 	updateControls();
@@ -121,37 +125,43 @@ bool AxesWindow::axisLogarithmicChanged(int axis, bool checked)
 	return true;
 }
 
-bool AxesWindow::axisVisibleChanged(int axis, bool checked)
+bool AxesWindow::visibleChanged(int axis, bool checked)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 	
 	currentAxes().setVisible(axis, checked);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
 
 	return true;
 }
 
-bool AxesWindow::axisStretchChanged(int axis, double value)
+bool AxesWindow::stretchChanged(int axis, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
 	currentAxes().setStretch(axis, value);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
 
 	return true;
 }
 
-bool AxesWindow::axisLimitChanged(int axis, bool minLim, double value)
+bool AxesWindow::limitChanged(int axis, bool minLim, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 	
 	if (minLim) currentAxes().setMin(axis, value);
 	else currentAxes().setMax(axis, value);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	updateControls();
 	uChroma_.updateDisplay();
@@ -159,12 +169,14 @@ bool AxesWindow::axisLimitChanged(int axis, bool minLim, double value)
 	return true;
 }
 
-bool AxesWindow::axisLimitSetExtreme(int axis, bool minLim)
+bool AxesWindow::limitSetExtreme(int axis, bool minLim)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 	
 	currentAxes().setToLimit(axis, minLim);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	updateControls();
 	uChroma_.updateDisplay();
@@ -172,7 +184,7 @@ bool AxesWindow::axisLimitSetExtreme(int axis, bool minLim)
 	return true;
 }
 
-bool AxesWindow::axisPositionIsFractionalChanged(int axis, bool fractional)
+bool AxesWindow::positionIsFractionalChanged(int axis, bool fractional)
 {
 	// Disable / enable relevant widgets, and set button graphics to reflect choice
 	if (axis == 0)
@@ -214,26 +226,30 @@ bool AxesWindow::axisPositionIsFractionalChanged(int axis, bool fractional)
 
 	currentAxes().setPositionIsFractional(axis, fractional);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
 
 	return true;
 }
 
-bool AxesWindow::axisPositionChanged(bool real, int axis, int dir, double value)
+bool AxesWindow::positionChanged(bool real, int axis, int dir, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
 	if (real) currentAxes().setPositionReal(axis, dir, value);
 	else currentAxes().setPositionFractional(axis, dir, value);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
 
 	return true;
 }
 
-bool AxesWindow::axisPositionSet(bool real, int axis, int dir, int type)
+bool AxesWindow::positionSet(bool real, int axis, int dir, int type)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
@@ -252,6 +268,8 @@ bool AxesWindow::axisPositionSet(bool real, int axis, int dir, int type)
 		else return false;
 	}
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	updateControls();
 	uChroma_.updateDisplay();
@@ -259,12 +277,14 @@ bool AxesWindow::axisPositionSet(bool real, int axis, int dir, int type)
 	return true;
 }
 
-bool AxesWindow::axisAutoTicksChanged(int axis, bool enabled)
+bool AxesWindow::autoTicksChanged(int axis, bool enabled)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
 	currentAxes().setAutoTicks(axis, enabled);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	updateControls();
 	uChroma_.updateDisplay();
@@ -272,13 +292,15 @@ bool AxesWindow::axisAutoTicksChanged(int axis, bool enabled)
 	return true;
 }
 
-bool AxesWindow::axisTicksChanged(int axis, bool start, double value)
+bool AxesWindow::ticksChanged(int axis, bool start, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
 	if (start) currentAxes().setFirstTick(axis, value);
 	else currentAxes().setTickDelta(axis, value);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
 
@@ -286,117 +308,151 @@ bool AxesWindow::axisTicksChanged(int axis, bool start, double value)
 }
 
 
-bool AxesWindow::axisTickOrientationChanged(int axis, int dir, double value)
+bool AxesWindow::tickOrientationChanged(int axis, int dir, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
 	currentAxes().setTickDirection(axis, dir, value);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
 
 	return true;
 }
 
-bool AxesWindow::axisLabelOrientationChanged(int axis, int component, double value)
+bool AxesWindow::labelOrientationChanged(int axis, int component, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
 	currentAxes().setLabelOrientation(axis, component, value);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
 
 	return true;
 }
 
-bool AxesWindow::axisTickSizeChanged(int axis, double value)
+bool AxesWindow::tickSizeChanged(int axis, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
 	currentAxes().setTickSize(axis, value);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
 
 	return true;
 }
 
-bool AxesWindow::axisTitleOrientationChanged(int axis, int component, double value)
+bool AxesWindow::titleOrientationChanged(int axis, int component, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
 	currentAxes().setTitleOrientation(axis, component, value);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
 
 	return true;
 }
 
-bool AxesWindow::axisMinorTicksChanged(int axis, int value)
+bool AxesWindow::minorTicksChanged(int axis, int value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
 	currentAxes().setMinorTicks(axis, value);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
 
 	return true;
 }
 
-bool AxesWindow::axisTitleChanged(int axis, QString& title)
+bool AxesWindow::titleChanged(int axis, QString& title)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
 	currentAxes().setTitle(axis, title);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
 
 	return true;
 }
 
-bool AxesWindow::axisAnchorChanged(int axis, bool titleAnchor, TextPrimitive::TextAnchor anchor)
+bool AxesWindow::titleAddSymbolButtonClicked(int axis)
+{
+	SelectSymbolDialog symbolDialog(this);
+	symbolDialog.show();
+	symbolDialog.updateTable(true);
+	if (symbolDialog.exec())
+	{
+		QString newTitle = currentAxes().title(axis) + symbolDialog.selectedSymbol();
+		ui.XTitleEdit->setText(newTitle);
+
+		return true;
+	}
+
+	return false;
+}
+
+bool AxesWindow::anchorChanged(int axis, bool titleAnchor, TextPrimitive::TextAnchor anchor)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
 	if (titleAnchor) currentAxes().setTitleAnchor(axis, anchor);
 	else currentAxes().setLabelAnchor(axis, anchor);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
 
 	return true;
 }
 
-bool AxesWindow::axisGridLineChanged(int axis, bool major, bool on)
+bool AxesWindow::gridLineChanged(int axis, bool major, bool on)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
 	if (major) currentAxes().setGridLinesMajor(axis, on);
 	else currentAxes().setGridLinesMinor(axis, on);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
 
 	return true;
 }
 
-bool AxesWindow::axisGridFullChanged(int axis, bool full)
+bool AxesWindow::gridFullChanged(int axis, bool full)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
 	currentAxes().setGridLinesFull(axis, full);
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
 
 	return true;
 }
 
-bool AxesWindow::axisGridStyleClicked(int axis, bool major)
+bool AxesWindow::gridStyleClicked(int axis, bool major)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
@@ -408,6 +464,9 @@ bool AxesWindow::axisGridStyleClicked(int axis, bool major)
 	{
 		if (major) currentAxes().gridLineMajorStyle(axis) = dialog.lineStyle();
 		else currentAxes().gridLineMinorStyle(axis) = dialog.lineStyle();
+
+		Session::setAsModified();
+
 		currentAxes().setPrimitivesInvalid();
 		uChroma_.updateDisplay();
 	}
@@ -415,7 +474,7 @@ bool AxesWindow::axisGridStyleClicked(int axis, bool major)
 	return success;
 }
 
-bool AxesWindow::axisGridStyleApplyClicked(int axis)
+bool AxesWindow::gridStyleApplyClicked(int axis)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
@@ -426,6 +485,8 @@ bool AxesWindow::axisGridStyleApplyClicked(int axis)
 		currentAxes().gridLineMinorStyle(n) = currentAxes().gridLineMinorStyle(axis);
 	}
 
+	Session::setAsModified();
+
 	// Update relevant parts of gui
 	currentAxes().setPrimitivesInvalid();
 	uChroma_.updateDisplay();
@@ -433,14 +494,17 @@ bool AxesWindow::axisGridStyleApplyClicked(int axis)
 	return true;
 }
 
-bool AxesWindow::axisNumberFormatChangeClicked(int axis)
+bool AxesWindow::numberFormatChangeClicked(int axis)
 {
 	EditNumberFormatDialog numberDialog(this);
 	if (numberDialog.call(&currentAxes().numberFormat(axis)))
 	{
 		currentAxes().numberFormat(axis) = numberDialog.numberFormat();
 
+		Session::setAsModified();
+
 		// Update relevant parts of gui
+		updateControls();
 		currentAxes().setPrimitivesInvalid();
 		uChroma_.updateDisplay();
 	}
@@ -456,837 +520,852 @@ bool AxesWindow::axisNumberFormatChangeClicked(int axis)
 
 void AxesWindow::on_XInvertCheck_clicked(bool checked)
 {
-	axisInvertChanged(0, checked);
+	invertChanged(0, checked);
 }
 
 void AxesWindow::on_XLogarithmicCheck_clicked(bool checked)
 {
-	axisLogarithmicChanged(0, checked);
+	logarithmicChanged(0, checked);
 }
 
 void AxesWindow::on_XVisibleCheck_clicked(bool checked)
 {
-	axisVisibleChanged(0, checked);
+	visibleChanged(0, checked);
 }
 
 void AxesWindow::on_XTitleEdit_textChanged(QString text)
 {
-	axisTitleChanged(0, text);
+	titleChanged(0, text);
+}
+
+void AxesWindow::on_XTitleAddSymbolButton_clicked(bool checked)
+{
+	titleAddSymbolButtonClicked(0);
 }
 
 void AxesWindow::on_XStretchSpin_valueChanged(double value)
 {
-	axisStretchChanged(0, value);
+	stretchChanged(0, value);
 }
 
 void AxesWindow::on_XMinSpin_valueChanged(double value)
 {
-	axisLimitChanged(0, true, value);
+	limitChanged(0, true, value);
 }
 
 void AxesWindow::on_XMinSetMinimumButton_clicked(bool checked)
 {
-	axisLimitSetExtreme(0, true);
+	limitSetExtreme(0, true);
 }
 
 void AxesWindow::on_XMaxSpin_valueChanged(double value)
 {
-	axisLimitChanged(0, false, value);
+	limitChanged(0, false, value);
 }
 
 void AxesWindow::on_XMaxSetMaximumButton_clicked(bool checked)
 {
-	axisLimitSetExtreme(0, false);
+	limitSetExtreme(0, false);
 }
 
 void AxesWindow::on_XPositionRealRadio_clicked(bool checked)
 {
-	axisPositionIsFractionalChanged(0, !checked);
+	positionIsFractionalChanged(0, !checked);
 }
 
 void AxesWindow::on_XPositionFractionalRadio_clicked(bool checked)
 {
-	axisPositionIsFractionalChanged(0, checked);
+	positionIsFractionalChanged(0, checked);
 }
 
 void AxesWindow::on_XPositionYRealSpin_valueChanged(double value)
 {
-	axisPositionChanged(true, 0, 1, value);
+	positionChanged(true, 0, 1, value);
 }
 
 void AxesWindow::on_XPositionYFractionalSpin_valueChanged(double value)
 {
-	axisPositionChanged(false, 0, 1, value);
+	positionChanged(false, 0, 1, value);
 }
 
 void AxesWindow::on_XPositionZRealSpin_valueChanged(double value)
 {
-	axisPositionChanged(true, 0, 2, value);
+	positionChanged(true, 0, 2, value);
 }
 
 void AxesWindow::on_XPositionZFractionalSpin_valueChanged(double value)
 {
-	axisPositionChanged(false, 0, 2, value);
+	positionChanged(false, 0, 2, value);
 }
 
 void AxesWindow::on_XPositionYSetMinimumButton_clicked(bool checked)
 {
-	axisPositionSet(ui.XPositionRealRadio->isChecked(), 0, 1, -1);
+	positionSet(ui.XPositionRealRadio->isChecked(), 0, 1, -1);
 }
 
 void AxesWindow::on_XPositionYSetZeroButton_clicked(bool checked)
 {
-	axisPositionSet(ui.XPositionRealRadio->isChecked(), 0, 1, 0);
+	positionSet(ui.XPositionRealRadio->isChecked(), 0, 1, 0);
 }
 
 void AxesWindow::on_XPositionYSetMaximumButton_clicked(bool checked)
 {
-	axisPositionSet(ui.XPositionRealRadio->isChecked(), 0, 1, 1);
+	positionSet(ui.XPositionRealRadio->isChecked(), 0, 1, 1);
 }
 
 void AxesWindow::on_XPositionZSetMinimumButton_clicked(bool checked)
 {
-	axisPositionSet(ui.XPositionRealRadio->isChecked(), 0, 2, -1);
+	positionSet(ui.XPositionRealRadio->isChecked(), 0, 2, -1);
 }
 
 void AxesWindow::on_XPositionZSetZeroButton_clicked(bool checked)
 {
-	axisPositionSet(ui.XPositionRealRadio->isChecked(), 0, 2, 0);
+	positionSet(ui.XPositionRealRadio->isChecked(), 0, 2, 0);
 }
 
 void AxesWindow::on_XPositionZSetMaximumButton_clicked(bool checked)
 {
-	axisPositionSet(ui.XPositionRealRadio->isChecked(), 0, 2, 1);
+	positionSet(ui.XPositionRealRadio->isChecked(), 0, 2, 1);
 }
 
 // X Axis - Ticks
 
 void AxesWindow::on_XAutoTicksCheck_clicked(bool checked)
 {
-	axisAutoTicksChanged(0, checked);
+	autoTicksChanged(0, checked);
 }
 
 void AxesWindow::on_XTicksStartSpin_valueChanged(double value)
 {
-	axisTicksChanged(0, true, value);
+	ticksChanged(0, true, value);
 }
 
 void AxesWindow::on_XTicksDeltaSpin_valueChanged(double value)
 {
-	axisTicksChanged(0, false, value);
+	ticksChanged(0, false, value);
 }
 
 void AxesWindow::on_XMinorTicksSpin_valueChanged(int value)
 {
-	axisMinorTicksChanged(0, value);
+	minorTicksChanged(0, value);
 }
 
 void AxesWindow::on_XTickDirectionXSpin_valueChanged(double value)
 {
-	axisTickOrientationChanged(0, 0, value);
+	tickOrientationChanged(0, 0, value);
 }
 
 void AxesWindow::on_XTickDirectionYSpin_valueChanged(double value)
 {
-	axisTickOrientationChanged(0, 1, value);
+	tickOrientationChanged(0, 1, value);
 }
 
 void AxesWindow::on_XTickDirectionZSpin_valueChanged(double value)
 {
-	axisTickOrientationChanged(0, 2, value);
+	tickOrientationChanged(0, 2, value);
 }
 
 void AxesWindow::on_XTickSizeSpin_valueChanged(double value)
 {
-	axisTickSizeChanged(0, value);
+	tickSizeChanged(0, value);
 }
 
 // X Axis - Labels
 
 void AxesWindow::on_XNumberFormatChangeButton_clicked(bool checked)
 {
-	axisNumberFormatChangeClicked(0);
+	numberFormatChangeClicked(0);
 }
 
 void AxesWindow::on_XLabelAnchorCombo_currentIndexChanged(int index)
 {
-	axisAnchorChanged(0, false, (TextPrimitive::TextAnchor) index);
+	anchorChanged(0, false, (TextPrimitive::TextAnchor) index);
 }
 
 void AxesWindow::on_XLabelAxialRotationSlider_valueChanged(int value)
 {
 	ui.XLabelAxialRotationSpin->setValue(value);
-	axisLabelOrientationChanged(0, 0, value);
+	labelOrientationChanged(0, 0, value);
 }
 
 void AxesWindow::on_XLabelAxialRotationSpin_valueChanged(int value)
 {
 	ui.XLabelAxialRotationSlider->setValue(value);
-	axisLabelOrientationChanged(0, 0, value);
+	labelOrientationChanged(0, 0, value);
 }
 
 void AxesWindow::on_XLabelInPlaneRotationSlider_valueChanged(int value)
 {
 	ui.XLabelInPlaneRotationSpin->setValue(value);
-	axisLabelOrientationChanged(0, 1, value);
+	labelOrientationChanged(0, 1, value);
 }
 
 void AxesWindow::on_XLabelInPlaneRotationSpin_valueChanged(int value)
 {
 	ui.XLabelInPlaneRotationSlider->setValue(value);
-	axisLabelOrientationChanged(0, 1, value);
+	labelOrientationChanged(0, 1, value);
 }
 
 void AxesWindow::on_XLabelDistanceSpin_valueChanged(double value)
 {
-	axisLabelOrientationChanged(0, 2, value);
+	labelOrientationChanged(0, 2, value);
 }
 
 void AxesWindow::on_XTitleHOffsetSlider_valueChanged(int value)
 {
-	axisTitleOrientationChanged(0, 3, double(value) / 1000.0);
+	titleOrientationChanged(0, 3, double(value) / 1000.0);
 }
 
 void AxesWindow::on_XTitleHOffsetLeftButton_clicked(bool checked)
 {
 	ui.XTitleHOffsetSlider->setValue(0);
-	axisTitleOrientationChanged(0, 3, 0.0);
+	titleOrientationChanged(0, 3, 0.0);
 }
 
 void AxesWindow::on_XTitleHOffsetCentreButton_clicked(bool checked)
 {
 	ui.XTitleHOffsetSlider->setValue(500);
-	axisTitleOrientationChanged(0, 3, 0.5);
+	titleOrientationChanged(0, 3, 0.5);
 }
 
 void AxesWindow::on_XTitleHOffsetRightButton_clicked(bool checked)
 {
 	ui.XTitleHOffsetSlider->setValue(1000);
-	axisTitleOrientationChanged(0, 3, 1.0);
+	titleOrientationChanged(0, 3, 1.0);
 }
 
 void AxesWindow::on_XTitleAnchorCombo_currentIndexChanged(int index)
 {
-	axisAnchorChanged(0, true, (TextPrimitive::TextAnchor) index);
+	anchorChanged(0, true, (TextPrimitive::TextAnchor) index);
 }
 
 void AxesWindow::on_XTitleAxialRotationSlider_valueChanged(int value)
 {
 	ui.XTitleAxialRotationSpin->setValue(value);
-	axisTitleOrientationChanged(0, 0, value);
+	titleOrientationChanged(0, 0, value);
 }
 
 void AxesWindow::on_XTitleAxialRotationSpin_valueChanged(int value)
 {
 	ui.XTitleAxialRotationSlider->setValue(value);
-	axisTitleOrientationChanged(0, 0, value);
+	titleOrientationChanged(0, 0, value);
 }
 
 void AxesWindow::on_XTitleInPlaneRotationSlider_valueChanged(int value)
 {
 	ui.XTitleInPlaneRotationSpin->setValue(value);
-	axisTitleOrientationChanged(0, 1, value);
+	titleOrientationChanged(0, 1, value);
 }
 
 void AxesWindow::on_XTitleInPlaneRotationSpin_valueChanged(int value)
 {
 	ui.XTitleInPlaneRotationSlider->setValue(value);
-	axisTitleOrientationChanged(0, 1, value);
+	titleOrientationChanged(0, 1, value);
 }
 
 void AxesWindow::on_XTitleDistanceSpin_valueChanged(double value)
 {
-	axisTitleOrientationChanged(0, 2, value);
+	titleOrientationChanged(0, 2, value);
 }
 
 // X Axis - GridLines
 
 void AxesWindow::on_XGridLineMajorCheck_clicked(bool checked)
 {
-	axisGridLineChanged(0, true, checked);
+	gridLineChanged(0, true, checked);
 }
 
 void AxesWindow::on_XGridLineMinorCheck_clicked(bool checked)
 {
-	axisGridLineChanged(0, false, checked);
+	gridLineChanged(0, false, checked);
 }
 
 void AxesWindow::on_XGridLineFullCheck_clicked(bool checked)
 {
-	axisGridFullChanged(0, checked);
+	gridFullChanged(0, checked);
 }
 
 void AxesWindow::on_XGridLineMajorStyleButton_clicked(bool checked)
 {
-	axisGridStyleClicked(0, true);
+	gridStyleClicked(0, true);
 }
 
 void AxesWindow::on_XGridLineMinorStyleButton_clicked(bool checked)
 {
-	axisGridStyleClicked(0, false);
+	gridStyleClicked(0, false);
 }
 
 void AxesWindow::on_XGridLineApplyStyleButton_clicked(bool checked)
 {
-	axisGridStyleApplyClicked(0);
+	gridStyleApplyClicked(0);
 }
 
 // Y Axis - General
 
 void AxesWindow::on_YInvertCheck_clicked(bool checked)
 {
-	axisInvertChanged(1, checked);
+	invertChanged(1, checked);
 }
 
 void AxesWindow::on_YLogarithmicCheck_clicked(bool checked)
 {
-	axisLogarithmicChanged(1, checked);
+	logarithmicChanged(1, checked);
 }
 
 void AxesWindow::on_YVisibleCheck_clicked(bool checked)
 {
-	axisVisibleChanged(1, checked);
+	visibleChanged(1, checked);
 }
 
 void AxesWindow::on_YTitleEdit_textChanged(QString text)
 {
-	axisTitleChanged(1, text);
+	titleChanged(1, text);
+}
+
+void AxesWindow::on_YTitleAddSymbolButton_clicked(bool checked)
+{
+	titleAddSymbolButtonClicked(1);
 }
 
 void AxesWindow::on_YStretchSpin_valueChanged(double value)
 {
-	axisStretchChanged(1, value);
+	stretchChanged(1, value);
 }
 
 void AxesWindow::on_YMinSpin_valueChanged(double value)
 {
-	axisLimitChanged(1, true, value);
+	limitChanged(1, true, value);
 }
 
 void AxesWindow::on_YMinSetMinimumButton_clicked(bool checked)
 {
-	axisLimitSetExtreme(1, true);
+	limitSetExtreme(1, true);
 }
 
 void AxesWindow::on_YMaxSpin_valueChanged(double value)
 {
-	axisLimitChanged(1, false, value);
+	limitChanged(1, false, value);
 }
 
 void AxesWindow::on_YMaxSetMaximumButton_clicked(bool checked)
 {
-	axisLimitSetExtreme(1, false);
+	limitSetExtreme(1, false);
 }
 
 void AxesWindow::on_YPositionRealRadio_clicked(bool checked)
 {
-	axisPositionIsFractionalChanged(1, !checked);
+	positionIsFractionalChanged(1, !checked);
 }
 
 void AxesWindow::on_YPositionFractionalRadio_clicked(bool checked)
 {
-	axisPositionIsFractionalChanged(1, checked);
+	positionIsFractionalChanged(1, checked);
 }
 
 void AxesWindow::on_YPositionXRealSpin_valueChanged(double value)
 {
-	axisPositionChanged(true, 1, 0, value);
+	positionChanged(true, 1, 0, value);
 }
 
 void AxesWindow::on_YPositionXFractionalSpin_valueChanged(double value)
 {
-	axisPositionChanged(false, 1, 0, value);
+	positionChanged(false, 1, 0, value);
 }
 
 void AxesWindow::on_YPositionZRealSpin_valueChanged(double value)
 {
-	axisPositionChanged(true, 1, 2, value);
+	positionChanged(true, 1, 2, value);
 }
 
 void AxesWindow::on_YPositionZFractionalSpin_valueChanged(double value)
 {
-	axisPositionChanged(false, 1, 2, value);
+	positionChanged(false, 1, 2, value);
 }
 
 void AxesWindow::on_YPositionXSetMinimumButton_clicked(bool checked)
 {
-	axisPositionSet(ui.YPositionRealRadio->isChecked(), 1, 0, -1);
+	positionSet(ui.YPositionRealRadio->isChecked(), 1, 0, -1);
 }
 
 void AxesWindow::on_YPositionXSetZeroButton_clicked(bool checked)
 {
-	axisPositionSet(ui.YPositionRealRadio->isChecked(), 1, 0, 0);
+	positionSet(ui.YPositionRealRadio->isChecked(), 1, 0, 0);
 }
 
 void AxesWindow::on_YPositionXSetMaximumButton_clicked(bool checked)
 {
-	axisPositionSet(ui.YPositionRealRadio->isChecked(), 1, 0, 1);
+	positionSet(ui.YPositionRealRadio->isChecked(), 1, 0, 1);
 }
 
 void AxesWindow::on_YPositionZSetMinimumButton_clicked(bool checked)
 {
-	axisPositionSet(ui.YPositionRealRadio->isChecked(), 1, 2, -1);
+	positionSet(ui.YPositionRealRadio->isChecked(), 1, 2, -1);
 }
 
 void AxesWindow::on_YPositionZSetZeroButton_clicked(bool checked)
 {
-	axisPositionSet(ui.YPositionRealRadio->isChecked(), 1, 2, 0);
+	positionSet(ui.YPositionRealRadio->isChecked(), 1, 2, 0);
 }
 
 void AxesWindow::on_YPositionZSetMaximumButton_clicked(bool checked)
 {
-	axisPositionSet(ui.YPositionRealRadio->isChecked(), 1, 2, 1);
+	positionSet(ui.YPositionRealRadio->isChecked(), 1, 2, 1);
 }
 
 // Y Axis - Ticks
 
 void AxesWindow::on_YAutoTicksCheck_clicked(bool checked)
 {
-	axisAutoTicksChanged(1, checked);
+	autoTicksChanged(1, checked);
 }
 
 void AxesWindow::on_YTicksStartSpin_valueChanged(double value)
 {
-	axisTicksChanged(1, true, value);
+	ticksChanged(1, true, value);
 }
 
 void AxesWindow::on_YTicksDeltaSpin_valueChanged(double value)
 {
-	axisTicksChanged(1, false, value);
+	ticksChanged(1, false, value);
 }
 
 void AxesWindow::on_YMinorTicksSpin_valueChanged(int value)
 {
-	axisMinorTicksChanged(1, value);
+	minorTicksChanged(1, value);
 }
 
 void AxesWindow::on_YTickDirectionXSpin_valueChanged(double value)
 {
-	axisTickOrientationChanged(1, 0, value);
+	tickOrientationChanged(1, 0, value);
 }
 
 void AxesWindow::on_YTickDirectionYSpin_valueChanged(double value)
 {
-	axisTickOrientationChanged(1, 1, value);
+	tickOrientationChanged(1, 1, value);
 }
 
 void AxesWindow::on_YTickDirectionZSpin_valueChanged(double value)
 {
-	axisTickOrientationChanged(1, 2, value);
+	tickOrientationChanged(1, 2, value);
 }
 
 void AxesWindow::on_YTickSizeSpin_valueChanged(double value)
 {
-	axisTickSizeChanged(1, value);
+	tickSizeChanged(1, value);
 }
 
 // Y Axis - Labels
 
 void AxesWindow::on_YNumberFormatChangeButton_clicked(bool checked)
 {
-	axisNumberFormatChangeClicked(1);
+	numberFormatChangeClicked(1);
 }
 
 void AxesWindow::on_YLabelAnchorCombo_currentIndexChanged(int index)
 {
-	axisAnchorChanged(1, false, (TextPrimitive::TextAnchor) index);
+	anchorChanged(1, false, (TextPrimitive::TextAnchor) index);
 }
 
 void AxesWindow::on_YLabelAxialRotationSlider_valueChanged(int value)
 {
 	ui.YLabelAxialRotationSpin->setValue(value);
-	axisLabelOrientationChanged(1, 0, value);
+	labelOrientationChanged(1, 0, value);
 }
 
 void AxesWindow::on_YLabelAxialRotationSpin_valueChanged(int value)
 {
 	ui.YLabelAxialRotationSlider->setValue(value);
-	axisLabelOrientationChanged(1, 0, value);
+	labelOrientationChanged(1, 0, value);
 }
 
 void AxesWindow::on_YLabelInPlaneRotationSlider_valueChanged(int value)
 {
 	ui.YLabelInPlaneRotationSpin->setValue(value);
-	axisLabelOrientationChanged(1, 1, value);
+	labelOrientationChanged(1, 1, value);
 }
 
 void AxesWindow::on_YLabelInPlaneRotationSpin_valueChanged(int value)
 {
 	ui.YLabelInPlaneRotationSlider->setValue(value);
-	axisLabelOrientationChanged(1, 1, value);
+	labelOrientationChanged(1, 1, value);
 }
 
 void AxesWindow::on_YLabelDistanceSpin_valueChanged(double value)
 {
-	axisLabelOrientationChanged(1, 2, value);
+	labelOrientationChanged(1, 2, value);
 }
 
 void AxesWindow::on_YTitleHOffsetSlider_valueChanged(int value)
 {
-	axisTitleOrientationChanged(1, 3, double(value) / 1000.0);
+	titleOrientationChanged(1, 3, double(value) / 1000.0);
 }
 
 void AxesWindow::on_YTitleHOffsetLeftButton_clicked(bool checked)
 {
 	ui.YTitleHOffsetSlider->setValue(0);
-	axisTitleOrientationChanged(1, 3, 0.0);
+	titleOrientationChanged(1, 3, 0.0);
 }
 
 void AxesWindow::on_YTitleHOffsetCentreButton_clicked(bool checked)
 {
 	ui.YTitleHOffsetSlider->setValue(500);
-	axisTitleOrientationChanged(1, 3, 0.5);
+	titleOrientationChanged(1, 3, 0.5);
 }
 
 void AxesWindow::on_YTitleHOffsetRightButton_clicked(bool checked)
 {
 	ui.YTitleHOffsetSlider->setValue(1000);
-	axisTitleOrientationChanged(1, 3, 1.0);
+	titleOrientationChanged(1, 3, 1.0);
 }
 
 void AxesWindow::on_YTitleAnchorCombo_currentIndexChanged(int index)
 {
-	axisAnchorChanged(1, true, (TextPrimitive::TextAnchor) index);
+	anchorChanged(1, true, (TextPrimitive::TextAnchor) index);
 }
 
 void AxesWindow::on_YTitleAxialRotationSlider_valueChanged(int value)
 {
 	ui.YTitleAxialRotationSpin->setValue(value);
-	axisTitleOrientationChanged(1, 0, value);
+	titleOrientationChanged(1, 0, value);
 }
 
 void AxesWindow::on_YTitleAxialRotationSpin_valueChanged(int value)
 {
 	ui.YTitleAxialRotationSlider->setValue(value);
-	axisTitleOrientationChanged(1, 0, value);
+	titleOrientationChanged(1, 0, value);
 }
 
 void AxesWindow::on_YTitleInPlaneRotationSlider_valueChanged(int value)
 {
 	ui.YTitleInPlaneRotationSpin->setValue(value);
-	axisTitleOrientationChanged(1, 1, value);
+	titleOrientationChanged(1, 1, value);
 }
 
 void AxesWindow::on_YTitleInPlaneRotationSpin_valueChanged(int value)
 {
 	ui.YTitleInPlaneRotationSlider->setValue(value);
-	axisTitleOrientationChanged(1, 1, value);
+	titleOrientationChanged(1, 1, value);
 }
 
 void AxesWindow::on_YTitleDistanceSpin_valueChanged(double value)
 {
-	axisTitleOrientationChanged(1, 2, value);
+	titleOrientationChanged(1, 2, value);
 }
 
 // Y Axis - Grid
 
 void AxesWindow::on_YGridLineMajorCheck_clicked(bool checked)
 {
-	axisGridLineChanged(1, true, checked);
+	gridLineChanged(1, true, checked);
 }
 
 void AxesWindow::on_YGridLineMinorCheck_clicked(bool checked)
 {
-	axisGridLineChanged(1, false, checked);
+	gridLineChanged(1, false, checked);
 }
 
 void AxesWindow::on_YGridLineFullCheck_clicked(bool checked)
 {
-	axisGridFullChanged(1, checked);
+	gridFullChanged(1, checked);
 }
 
 void AxesWindow::on_YGridLineMajorStyleButton_clicked(bool checked)
 {
-	axisGridStyleClicked(1, true);
+	gridStyleClicked(1, true);
 }
 
 void AxesWindow::on_YGridLineMinorStyleButton_clicked(bool checked)
 {
-	axisGridStyleClicked(1, false);
+	gridStyleClicked(1, false);
 }
 
 void AxesWindow::on_YGridLineApplyStyleButton_clicked(bool checked)
 {
-	axisGridStyleApplyClicked(1);
+	gridStyleApplyClicked(1);
 }
 
 // Z Axis - General
 
 void AxesWindow::on_ZInvertCheck_clicked(bool checked)
 {
-	axisInvertChanged(2, checked);
+	invertChanged(2, checked);
 }
 
 void AxesWindow::on_ZLogarithmicCheck_clicked(bool checked)
 {
-	axisLogarithmicChanged(2, checked);
+	logarithmicChanged(2, checked);
 }
 
 void AxesWindow::on_ZVisibleCheck_clicked(bool checked)
 {
-	axisVisibleChanged(2, checked);
+	visibleChanged(2, checked);
 }
 
 void AxesWindow::on_ZTitleEdit_textChanged(QString text)
 {
-	axisTitleChanged(2, text);
+	titleChanged(2, text);
+}
+
+void AxesWindow::on_ZTitleAddSymbolButton_clicked(bool checked)
+{
+	titleAddSymbolButtonClicked(2);
 }
 
 void AxesWindow::on_ZStretchSpin_valueChanged(double value)
 {
-	axisStretchChanged(2, value);
+	stretchChanged(2, value);
 }
 
 void AxesWindow::on_ZMinSpin_valueChanged(double value)
 {
-	axisLimitChanged(2, true, value);
+	limitChanged(2, true, value);
 }
 
 void AxesWindow::on_ZMinSetMinimumButton_clicked(bool checked)
 {
-	axisLimitSetExtreme(2, true);
+	limitSetExtreme(2, true);
 }
 
 void AxesWindow::on_ZMaxSpin_valueChanged(double value)
 {
-	axisLimitChanged(2, false, value);
+	limitChanged(2, false, value);
 }
 
 void AxesWindow::on_ZMaxSetMaximumButton_clicked(bool checked)
 {
-	axisLimitSetExtreme(2, false);
+	limitSetExtreme(2, false);
 }
 
 void AxesWindow::on_ZPositionRealRadio_clicked(bool checked)
 {
-	axisPositionIsFractionalChanged(2, !checked);
+	positionIsFractionalChanged(2, !checked);
 }
 
 void AxesWindow::on_ZPositionFractionalRadio_clicked(bool checked)
 {
-	axisPositionIsFractionalChanged(2, checked);
+	positionIsFractionalChanged(2, checked);
 }
 
 void AxesWindow::on_ZPositionXRealSpin_valueChanged(double value)
 {
-	axisPositionChanged(true, 2, 0, value);
+	positionChanged(true, 2, 0, value);
 }
 
 void AxesWindow::on_ZPositionXFractionalSpin_valueChanged(double value)
 {
-	axisPositionChanged(false, 2, 0, value);
+	positionChanged(false, 2, 0, value);
 }
 
 void AxesWindow::on_ZPositionYRealSpin_valueChanged(double value)
 {
-	axisPositionChanged(true, 2, 1, value);
+	positionChanged(true, 2, 1, value);
 }
 
 void AxesWindow::on_ZPositionYFractionalSpin_valueChanged(double value)
 {
-	axisPositionChanged(false, 2, 1, value);
+	positionChanged(false, 2, 1, value);
 }
 
 void AxesWindow::on_ZPositionXSetMinimumButton_clicked(bool checked)
 {
-	axisPositionSet(ui.ZPositionRealRadio->isChecked(), 2, 0, -1);
+	positionSet(ui.ZPositionRealRadio->isChecked(), 2, 0, -1);
 }
 
 void AxesWindow::on_ZPositionXSetZeroButton_clicked(bool checked)
 {
-	axisPositionSet(ui.ZPositionRealRadio->isChecked(), 2, 0, 0);
+	positionSet(ui.ZPositionRealRadio->isChecked(), 2, 0, 0);
 }
 
 void AxesWindow::on_ZPositionXSetMaximumButton_clicked(bool checked)
 {
-	axisPositionSet(ui.ZPositionRealRadio->isChecked(), 2, 0, 1);
+	positionSet(ui.ZPositionRealRadio->isChecked(), 2, 0, 1);
 }
 
 void AxesWindow::on_ZPositionYSetMinimumButton_clicked(bool checked)
 {
-	axisPositionSet(ui.ZPositionRealRadio->isChecked(), 2, 1, -1);
+	positionSet(ui.ZPositionRealRadio->isChecked(), 2, 1, -1);
 }
 
 void AxesWindow::on_ZPositionYSetZeroButton_clicked(bool checked)
 {
-	axisPositionSet(ui.ZPositionRealRadio->isChecked(), 2, 1, 0);
+	positionSet(ui.ZPositionRealRadio->isChecked(), 2, 1, 0);
 }
 
 void AxesWindow::on_ZPositionYSetMaximumButton_clicked(bool checked)
 {
-	axisPositionSet(ui.ZPositionRealRadio->isChecked(), 2, 1, 1);
+	positionSet(ui.ZPositionRealRadio->isChecked(), 2, 1, 1);
 }
 
 // Z Axis - Ticks
 
 void AxesWindow::on_ZAutoTicksCheck_clicked(bool checked)
 {
-	axisAutoTicksChanged(2, checked);
+	autoTicksChanged(2, checked);
 }
 
 void AxesWindow::on_ZTicksStartSpin_valueChanged(double value)
 {
-	axisTicksChanged(2, true, value);
+	ticksChanged(2, true, value);
 }
 
 void AxesWindow::on_ZTicksDeltaSpin_valueChanged(double value)
 {
-	axisTicksChanged(2, false, value);
+	ticksChanged(2, false, value);
 }
 
 void AxesWindow::on_ZMinorTicksSpin_valueChanged(int value)
 {
-	axisMinorTicksChanged(2, value);
+	minorTicksChanged(2, value);
 }
 
 void AxesWindow::on_ZTickDirectionXSpin_valueChanged(double value)
 {
-	axisTickOrientationChanged(2, 0, value);
+	tickOrientationChanged(2, 0, value);
 }
 
 void AxesWindow::on_ZTickDirectionYSpin_valueChanged(double value)
 {
-	axisTickOrientationChanged(2, 1, value);
+	tickOrientationChanged(2, 1, value);
 }
 
 void AxesWindow::on_ZTickDirectionZSpin_valueChanged(double value)
 {
-	axisTickOrientationChanged(2, 2, value);
+	tickOrientationChanged(2, 2, value);
 }
 
 void AxesWindow::on_ZTickSizeSpin_valueChanged(double value)
 {
-	axisTickSizeChanged(2, value);
+	tickSizeChanged(2, value);
 }
 
 // Z Axis - Labels
 
 void AxesWindow::on_ZNumberFormatChangeButton_clicked(bool checked)
 {
-	axisNumberFormatChangeClicked(2);
+	numberFormatChangeClicked(2);
 }
 
 void AxesWindow::on_ZLabelAnchorCombo_currentIndexChanged(int index)
 {
-	axisAnchorChanged(2, false, (TextPrimitive::TextAnchor) index);
+	anchorChanged(2, false, (TextPrimitive::TextAnchor) index);
 }
 
 void AxesWindow::on_ZLabelAxialRotationSlider_valueChanged(int value)
 {
 	ui.ZLabelAxialRotationSpin->setValue(value);
-	axisLabelOrientationChanged(2, 0, value);
+	labelOrientationChanged(2, 0, value);
 }
 
 void AxesWindow::on_ZLabelAxialRotationSpin_valueChanged(int value)
 {
 	ui.ZLabelAxialRotationSlider->setValue(value);
-	axisLabelOrientationChanged(2, 0, value);
+	labelOrientationChanged(2, 0, value);
 }
 
 void AxesWindow::on_ZLabelInPlaneRotationSlider_valueChanged(int value)
 {
 	ui.ZLabelInPlaneRotationSpin->setValue(value);
-	axisLabelOrientationChanged(2, 1, value);
+	labelOrientationChanged(2, 1, value);
 }
 
 void AxesWindow::on_ZLabelInPlaneRotationSpin_valueChanged(int value)
 {
 	ui.ZLabelInPlaneRotationSlider->setValue(value);
-	axisLabelOrientationChanged(2, 1, value);
+	labelOrientationChanged(2, 1, value);
 }
 
 void AxesWindow::on_ZLabelDistanceSpin_valueChanged(double value)
 {
-	axisLabelOrientationChanged(2, 2, value);
+	labelOrientationChanged(2, 2, value);
 }
 
 void AxesWindow::on_ZTitleHOffsetSlider_valueChanged(int value)
 {
-	axisTitleOrientationChanged(2, 3, double(value) / 1000.0);
+	titleOrientationChanged(2, 3, double(value) / 1000.0);
 }
 
 void AxesWindow::on_ZTitleHOffsetLeftButton_clicked(bool checked)
 {
 	ui.ZTitleHOffsetSlider->setValue(0);
-	axisTitleOrientationChanged(2, 3, 0.0);
+	titleOrientationChanged(2, 3, 0.0);
 }
 
 void AxesWindow::on_ZTitleHOffsetCentreButton_clicked(bool checked)
 {
 	ui.ZTitleHOffsetSlider->setValue(500);
-	axisTitleOrientationChanged(2, 3, 0.5);
+	titleOrientationChanged(2, 3, 0.5);
 }
 
 void AxesWindow::on_ZTitleHOffsetRightButton_clicked(bool checked)
 {
 	ui.ZTitleHOffsetSlider->setValue(1000);
-	axisTitleOrientationChanged(2, 3, 1.0);
+	titleOrientationChanged(2, 3, 1.0);
 }
 
 void AxesWindow::on_ZTitleAnchorCombo_currentIndexChanged(int index)
 {
-	axisAnchorChanged(2, true, (TextPrimitive::TextAnchor) index);
+	anchorChanged(2, true, (TextPrimitive::TextAnchor) index);
 }
 
 void AxesWindow::on_ZTitleAxialRotationSlider_valueChanged(int value)
 {
 	ui.ZTitleAxialRotationSpin->setValue(value);
-	axisTitleOrientationChanged(2, 0, value);
+	titleOrientationChanged(2, 0, value);
 }
 
 void AxesWindow::on_ZTitleAxialRotationSpin_valueChanged(int value)
 {
 	ui.ZTitleAxialRotationSlider->setValue(value);
-	axisTitleOrientationChanged(2, 0, value);
+	titleOrientationChanged(2, 0, value);
 }
 
 void AxesWindow::on_ZTitleInPlaneRotationSlider_valueChanged(int value)
 {
 	ui.ZTitleInPlaneRotationSpin->setValue(value);
-	axisTitleOrientationChanged(2, 1, value);
+	titleOrientationChanged(2, 1, value);
 }
 
 void AxesWindow::on_ZTitleInPlaneRotationSpin_valueChanged(int value)
 {
 	ui.ZTitleInPlaneRotationSlider->setValue(value);
-	axisTitleOrientationChanged(2, 1, value);
+	titleOrientationChanged(2, 1, value);
 }
 
 void AxesWindow::on_ZTitleDistanceSpin_valueChanged(double value)
 {
-	axisTitleOrientationChanged(2, 2, value);
+	titleOrientationChanged(2, 2, value);
 }
 
 // Z Axis - Grid
 
 void AxesWindow::on_ZGridLineMajorCheck_clicked(bool checked)
 {
-	axisGridLineChanged(2, true, checked);
+	gridLineChanged(2, true, checked);
 }
 
 void AxesWindow::on_ZGridLineMinorCheck_clicked(bool checked)
 {
-	axisGridLineChanged(2, false, checked);
+	gridLineChanged(2, false, checked);
 }
 
 void AxesWindow::on_ZGridLineFullCheck_clicked(bool checked)
 {
-	axisGridFullChanged(2, checked);
+	gridFullChanged(2, checked);
 }
 
 void AxesWindow::on_ZGridLineMajorStyleButton_clicked(bool checked)
 {
-	axisGridStyleClicked(2, true);
+	gridStyleClicked(2, true);
 }
 
 void AxesWindow::on_ZGridLineMinorStyleButton_clicked(bool checked)
 {
-	axisGridStyleClicked(2, false);
+	gridStyleClicked(2, false);
 }
 
 void AxesWindow::on_ZGridLineApplyStyleButton_clicked(bool checked)
 {
-	axisGridStyleApplyClicked(2);
+	gridStyleApplyClicked(2);
 }
 
 /*
@@ -1375,7 +1454,7 @@ void AxesWindow::updateControls(bool force)
 	// Axis positions
 	// -- X
 	ui.XPositionFractionalRadio->setChecked(axes.positionIsFractional(0));
-	axisPositionIsFractionalChanged(0, axes.positionIsFractional(0));
+	positionIsFractionalChanged(0, axes.positionIsFractional(0));
 	ui.XPositionYRealSpin->setRange(axes.logarithmic(1), axes.limitMin(1), false, 0.0);
 	ui.XPositionYRealSpin->setValue(axes.positionReal(0).y);
 	ui.XPositionZRealSpin->setRange(axes.logarithmic(2), axes.limitMin(2), false, 0.0);
@@ -1384,7 +1463,7 @@ void AxesWindow::updateControls(bool force)
 	ui.XPositionZFractionalSpin->setValue(axes.positionFractional(0).z);
 	// -- Y
 	ui.YPositionFractionalRadio->setChecked(axes.positionIsFractional(1));
-	axisPositionIsFractionalChanged(1, axes.positionIsFractional(1));
+	positionIsFractionalChanged(1, axes.positionIsFractional(1));
 	ui.YPositionXRealSpin->setRange(axes.logarithmic(0), axes.limitMin(0), false, 0.0);
 	ui.YPositionXRealSpin->setValue(axes.positionReal(1).x);
 	ui.YPositionZRealSpin->setRange(axes.logarithmic(2), axes.limitMin(2), false, 0.0);
@@ -1393,7 +1472,7 @@ void AxesWindow::updateControls(bool force)
 	ui.YPositionZFractionalSpin->setValue(axes.positionFractional(1).z);
 	// -- Z
 	ui.ZPositionFractionalRadio->setChecked(axes.positionIsFractional(2));
-	axisPositionIsFractionalChanged(2, axes.positionIsFractional(2));
+	positionIsFractionalChanged(2, axes.positionIsFractional(2));
 	ui.ZPositionXRealSpin->setRange(axes.logarithmic(0), axes.limitMin(0), false, 0.0);
 	ui.ZPositionXRealSpin->setValue(axes.positionReal(2).x);
 	ui.ZPositionYRealSpin->setRange(axes.logarithmic(1), axes.limitMin(1), false, 0.0);

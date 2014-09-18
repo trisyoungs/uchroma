@@ -48,6 +48,11 @@ bool UChromaWindow::setCurrentViewPane(int layoutX, int layoutY)
 	if (newCurrentPane == NULL) return false;
 
 	currentViewPane_ = newCurrentPane;
+
+	// Toolbars and AxesWindow now need updating
+	updateToolBars();
+	axesWindow_.setWindowTitle("Axes (" + currentViewPane_->name() + ")");
+
 	return true;
 }
 

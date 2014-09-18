@@ -238,6 +238,9 @@ void UChromaWindow::updateCollectionInfo()
 		ui.CollectionNPrimitivesLabel->setText("0");
 	}
 
+	// Set number of collections in the current session (can use Collection's ObjectList to get number)
+	ui.CollectionNCollectionsLabel->setText("("+QString::number(Collection::nObjects())+")");
+
 	// Update collection info label
 	if (currentCollection_)
 	{

@@ -23,6 +23,7 @@
 #define UCHROMA_VARIABLENODE_H
 
 #include "expression/node.h"
+#include <QtCore/QString>
 
 // Forward Declarations
 class Variable;
@@ -49,7 +50,7 @@ class VariableNode : public Node
 	// Get variable target
 	Variable* variable();
 	// Return name of variable target
-	const char* name();
+	QString name();
 
 
 	/*

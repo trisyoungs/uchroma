@@ -24,7 +24,7 @@
 
 #include "expression/node.h"
 #include "expression/functions.h"
-#include "base/dnchar.h"
+#include <QtCore/QString>
 
 // External declarations
 extern int ExpressionParser_parse();
@@ -52,7 +52,7 @@ class Expression
 
 	private:
 	// Character string source
-	Dnchar stringSource_;
+	QString stringSource_;
 	// Integer position in stringSource, total length of string, and starting position of current token/function
 	int stringPos_, stringLength_, tokenStart_, functionStart_;
 	// Whether to use additional pre-defined constants
@@ -80,7 +80,7 @@ class Expression
 	// 'Replace' last character read from current input stream
 	void unGetChar();
 	// Perform expression generation for this expression
-	bool generate(const char* expressionText, bool quiet = false);
+	bool generate(QString expressionText, bool quiet = false);
 	// Return current expression target
 	static Expression* target();
 	// Print error information and location
@@ -132,9 +132,9 @@ class Expression
 	// Add double constant
 	Variable* createConstant(double d, bool permanent = false);
 	// Add variable
-	Variable* createVariable(const char* name, Node* initialValue = 0, bool permanent = false);
+	Variable* createVariable(QString name, Node* initialValue = 0, bool permanent = false);
 	// Search for variable
-	Variable* variable(const char* name);
+	Variable* variable(QString name);
 	// Return variables
 	RefListItem<Variable,bool>* variables();
 	// Return constants

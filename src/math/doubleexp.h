@@ -21,18 +21,22 @@
 
 #ifndef UCHROMA_DOUBLEEXP_H
 #define UCHROMA_DOUBLEEXP_H
+
 #include <QtCore/QString>
 
 // Mantissa/exponent class
 class DoubleExp
 {
 	public:
-	// Constructor / Destructor
-	DoubleExp(double mantissa = 0.0, int exponent = 0);
+	// Constructors
+	DoubleExp();
+	DoubleExp(double value);
+	DoubleExp(double mantissa, int exponent);
 
+	
 	/*
-	// Data
-	*/
+	 * Data
+	 */
 	private:
 	// Mantissa
 	double mantissa_;
@@ -41,9 +45,10 @@ class DoubleExp
 	// Value
 	double value_;
 
+	
 	/*
-	// Functions
-	*/
+	 * Functions
+	 */
 	private:
 	// Recalculate value from stored mantissa and exponent
 	void recalculate();

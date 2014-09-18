@@ -6,7 +6,6 @@
 /* Includes */
 
 #include "render/textprimitive.h"
-#include "base/dnchar.h"
 #include "base/messenger.h"
 
 /* Prototypes */

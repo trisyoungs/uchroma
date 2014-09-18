@@ -21,7 +21,7 @@
 
 #include "base/collection.h"
 #include "base/viewpane.h"
-#include "base/currentproject.h"
+#include "base/session.h"
 #include "kernels/fit.h"
 #include <limits>
 
@@ -174,7 +174,7 @@ DataSet* Collection::addDataSet()
 	dataChanged_ = true;
 	displayDataValid_ = false;
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 
 	return dataSet;
 }
@@ -185,7 +185,7 @@ DataSet* Collection::addDataSet(double z)
 	DataSet* dataSet = dataSets_.add();
 	setDataSetZ(dataSet, z);
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 
 	return dataSet;
 }
@@ -201,7 +201,7 @@ void Collection::addDataSet(DataSet* source)
 	displayDataValid_ = false;
 	displayPrimitivesValid_ = false;
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 }
 
 // Copy datasets from specified source collection
@@ -223,7 +223,7 @@ void Collection::removeDataSet(DataSet* dataSet)
 
 	displayDataValid_ = false;
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 }
 
 // Set z value of specified dataset
@@ -268,7 +268,7 @@ void Collection::setDataSetZ(DataSet* target, double z)
 	displayDataValid_ = false;
 	displayPrimitivesValid_ = false;
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 }
 
 // Set data of specified dataset
@@ -288,7 +288,7 @@ void Collection::setDataSetData(DataSet* target, const Array<double>& x, const A
 	displayDataValid_ = false;
 	displayPrimitivesValid_ = false;
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 }
 
 // Set data for specified dataste (from source DataSet)
@@ -307,7 +307,7 @@ void Collection::setDataSetData(DataSet* target, DataSet& source)
 	displayDataValid_ = false;
 	displayPrimitivesValid_ = false;
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 }
 
 // Return first dataset in list
@@ -376,7 +376,7 @@ void Collection::clearDataSets()
 	displayDataValid_ = false;
 	displayPrimitivesValid_ = false;
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 }
 
 // Return total number of points across all datasets
@@ -392,7 +392,7 @@ void Collection::setDataFileDirectory(QDir directory)
 {
 	dataFileDirectory_ = directory;
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 }
 
 // Return root directory for datafiles
@@ -406,7 +406,7 @@ bool Collection::loadDataSet(DataSet* dataSet)
 {
 	if (!dataSet) return false;
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 
 	return dataSet->loadData(dataFileDirectory_);
 }
@@ -417,7 +417,7 @@ int Collection::loadAllDataSets()
 	int nFailed = 0;
 	for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next) if (!dataSet->loadData(dataFileDirectory_)) ++nFailed;
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 
 	return nFailed;
 }
@@ -494,7 +494,7 @@ void Collection::setTransformEquation(int axis, QString transformEquation)
 
 	displayDataValid_ = false;
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 }
 
 // Return transform equation for data
@@ -520,7 +520,7 @@ void Collection::setTransformEnabled(int axis, bool enabled)
 
 	displayDataValid_ = false;
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 }
 
 // Return whether specified transform is enabled
@@ -534,7 +534,7 @@ void Collection::setInterpolate(int axis, bool enabled)
 {
 	interpolate_[axis] = enabled;
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 }
 
 // Return whether interpolation is enabled
@@ -548,7 +548,7 @@ void Collection::setInterpolateConstrained(int axis, bool enabled)
 {
 	interpolateConstrained_[axis] = enabled;
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 }
 
 // Return whether interpolation is constrained
@@ -562,7 +562,7 @@ void Collection::setInterpolationStep(int axis, double step)
 {
 	interpolationStep_[axis] = step;
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 }
 
 // Return interpolation step size
@@ -789,7 +789,7 @@ Collection* Collection::addFit(QString name)
 	newFit->setParent(this);
 	newFit->addFitKernel();
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 
 	return newFit;
 }
@@ -799,7 +799,7 @@ void Collection::removeFit(Collection* collection)
 {
 	fits_.remove(collection);
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 }
 
 // Return fits in Collection
@@ -839,7 +839,7 @@ Collection* Collection::addSlice(QString name)
 	newSlice->setParent(this);
 	newSlice->addFitKernel();
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 
 	return newSlice;
 }
@@ -849,7 +849,7 @@ void Collection::removeSlice(Collection* collection)
 {
 	slices_.remove(collection);
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 }
 
 // Return slices in Collection
@@ -899,7 +899,7 @@ void Collection::addFitKernel()
 	fitKernel_->setSourceCollection(parent_);
 	fitKernel_->setDestinationCollection(this);
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 }
 
 // Return FitKernel

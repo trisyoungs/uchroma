@@ -109,7 +109,7 @@ void Expression::printErrorInfo()
 	for (i=tokenStart_; i<stringPos_; i++) temp[i] = '^';
 	temp[stringPos_] = '\0';
 	// Print current string
-	msg.print(" %s\n", stringSource_.get());
+	msg.print(" %s\n", qPrintable(stringSource_));
 	msg.print(" %s^\n", temp);
 	delete[] temp;
 }
@@ -123,7 +123,7 @@ char Expression::getChar()
 	if (stringPos_ == stringLength_) return 0;
 
 	// Return current char
-	c = stringSource_[stringPos_];
+	c = stringSource_.at(stringPos_).toAscii();
 	stringPos_++;
 	return c;
 }
@@ -131,7 +131,7 @@ char Expression::getChar()
 // Peek next character from current input stream
 char Expression::peekChar()
 {
-	return (stringPos_ == stringLength_ ? 0 : stringSource_[stringPos_]);
+	return (stringPos_ == stringLength_ ? 0 : stringSource_.at(stringPos_).toAscii());
 }
 
 // 'Replace' last character read from current input stream
@@ -141,7 +141,7 @@ void Expression::unGetChar()
 }
 
 // Generate an expression
-bool Expression::generate(const char* expressionText, bool quiet)
+bool Expression::generate(QString expressionText, bool quiet)
 {
 	msg.enter("Expression::generate");
 
@@ -152,7 +152,7 @@ bool Expression::generate(const char* expressionText, bool quiet)
 	stringSource_ += ';';
 	stringPos_ = 0;
 	stringLength_ = stringSource_.length();
-	msg.print(Messenger::Verbose, "Parser source string is '%s', length is %i\n", stringSource_.get(), stringLength_);
+	msg.print(Messenger::Verbose, "Parser source string is '%s', length is %i\n", qPrintable(stringSource_), stringLength_);
 
 	// Perform the parsing
 	int result = ExpressionParser_parse();
@@ -325,9 +325,9 @@ Variable* Expression::createConstant(double d, bool permanent)
 }
 
 // Add variable to topmost scope
-Variable* Expression::createVariable(const char* name, Node* initialValue, bool permanent)
+Variable* Expression::createVariable(QString name, Node* initialValue, bool permanent)
 {
-	msg.print(Messenger::Verbose, "A new variable '%s' is being created.\n", name);
+	msg.print(Messenger::Verbose, "A new variable '%s' is being created.\n", qPrintable(name));
 
 	Variable* var = new Variable;
 	var->setName(name);
@@ -341,28 +341,28 @@ Variable* Expression::createVariable(const char* name, Node* initialValue, bool 
 	if (permanent) permanentNodes_.own(var);
 	else nodes_.own(var);
 	variables_.add(var, permanent);
-	msg.print(Messenger::Verbose, "Created variable '%s'.\n", name);
+	msg.print(Messenger::Verbose, "Created variable '%s'.\n", qPrintable(name));
 
 	return var;
 }
 
 // Search for variable in current scope
-Variable *Expression::variable(const char* name)
+Variable *Expression::variable(QString name)
 {
 	// Search global scope first
 	Variable* result = NULL;
 
 	for (RefListItem<Variable,bool>* ri = variables_.first(); ri != NULL; ri = ri->next)
 	{
-		if (strcmp(ri->item->name(),name) == 0)
+		if (ri->item->name() == name)
 		{
 			result = ri->item;
 			break;
 		}
 	}
 
-	if (result == NULL) msg.print(Messenger::Verbose, "...variable '%s' not found.\n", name);
-	else msg.print(Messenger::Verbose, "...variable '%s' found.\n", name);
+	if (result == NULL) msg.print(Messenger::Verbose, "...variable '%s' not found.\n", qPrintable(name));
+	else msg.print(Messenger::Verbose, "...variable '%s' found.\n", qPrintable(name));
 	return result;
 }
 

@@ -20,7 +20,7 @@
 */
 
 #include "base/viewlayout.h"
-#include "base/currentproject.h"
+#include "base/session.h"
 #include "gui/uchroma.h"
 
 // Constructor

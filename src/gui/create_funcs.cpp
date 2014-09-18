@@ -23,7 +23,7 @@
 #include "gui/uchroma.h"
 #include "gui/selectequation.h"
 #include "expression/variable.h"
-#include "base/currentproject.h"
+#include "base/session.h"
 
 // Constructor
 CreateCollectionDialog::CreateCollectionDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(parent)
@@ -103,7 +103,7 @@ void CreateCollectionDialog::updateVariables()
 		Variable* var = ri->item;
 
 		// Is this variable one of 'x' or 'z'?
-		if ((strcmp(var->name(),"x") == 0) || (strcmp(var->name(),"z") == 0)) continue;
+		if ((var->name() == "x") || (var->name() == "z")) continue;
 
 		for (eqVar = equationVariables_.first(); eqVar != NULL; eqVar = eqVar->next) if (eqVar->name() == var->name()) break;
 		if (eqVar == NULL)
@@ -191,7 +191,7 @@ void CreateCollectionDialog::on_CreateButton_clicked(bool checked)
 	// Make sure the data is up to date
 	createData(target);
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 
 	uChroma_.updateGUI();
 }

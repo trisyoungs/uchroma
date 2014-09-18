@@ -20,11 +20,12 @@
 */
 
 #include "base/numberformat.h"
+#include <math/doubleexp.h>
 #include <stdio.h>
 #include <QtCore/QString>
 
 // FormatType Keywords
-const char* FormatTypeKeywords[] = { "Concise", "Decimal", "Integer", "Scientific" };
+const char* FormatTypeKeywords[] = { "Decimal", "Integer", "Scientific" };
 
 // Convert text string to FormatType
 NumberFormat::FormatType NumberFormat::formatType(const char* s)
@@ -42,10 +43,11 @@ const char* NumberFormat::formatType(NumberFormat::FormatType ft)
 // Constructor
 NumberFormat::NumberFormat()
 {
-	type_ = NumberFormat::ConciseFormat;
-	nDecimals_ = 4;
+	type_ = NumberFormat::DecimalFormat;
+	nDecimals_ = 3;
 	forcePrecedingPlus_ = false;
 	useUpperCaseExponent_ = true;
+	useENotation_ = false;
 }
 
 // Destructor
@@ -105,6 +107,18 @@ bool NumberFormat::useUpperCaseExponent()
 	return useUpperCaseExponent_;
 }
 
+// Set whether to use 'E' notation in preference to 'x10' notation
+void NumberFormat::setUseENotation(bool b)
+{
+	useENotation_ = b;
+}
+
+// Return whether to use 'E' notation in preference to 'x10' notation
+bool NumberFormat::useENotation()
+{
+	return useENotation_;
+}
+
 /*
  * Number Conversion
  */
@@ -112,43 +126,28 @@ bool NumberFormat::useUpperCaseExponent()
 // Return number formatted according to internal definition
 QString NumberFormat::format(double number)
 {
-	static char result[128];
+	QString result;
 
+	DoubleExp x(number);
+
+	// Add '+' onto string if requested and number is positive
+	if (forcePrecedingPlus_ && (number >= 0.0)) result = "+";
+
+	// Construct rest of string
 	switch (type_)
 	{
 		case (NumberFormat::IntegerFormat):
-			if (forcePrecedingPlus_) sprintf(result, "%+i", int(number));
-			else  sprintf(result, "%i", int(number));
+			result += QString::number(int(number));
 			break;
 		case (NumberFormat::DecimalFormat):
-			if (forcePrecedingPlus_) sprintf(result, "%+1.*f", nDecimals_, number);
-			else sprintf(result, "%1.*f", nDecimals_, number);
+			result += QString::number(number, 'f', nDecimals_);
 			break;
 		case (NumberFormat::ScientificFormat):
-			if (useUpperCaseExponent_)
-			{
-				if (forcePrecedingPlus_) sprintf(result, "%+1.*E", nDecimals_, number);
-				else sprintf(result, "%1.*E", nDecimals_, number);
-			}
-			else
-			{
-				if (forcePrecedingPlus_) sprintf(result, "%+1.*e", nDecimals_, number);
-				else sprintf(result, "%1.*e", nDecimals_, number);
-			}
-			break;
-		case (NumberFormat::ConciseFormat):
-			if (useUpperCaseExponent_)
-			{
-				if (forcePrecedingPlus_) sprintf(result, "%+1.*G", nDecimals_, number);
-				else sprintf(result, "%1.*G", nDecimals_, number);
-			}
-			else
-			{
-				if (forcePrecedingPlus_) sprintf(result, "%+1.*g", nDecimals_, number);
-				else sprintf(result, "%1.*g", nDecimals_, number);
-			}
+			if (!useENotation_) result += QString::number(x.mantissa(), 'f', nDecimals_) + QChar(0x00D7)+"10\\sup{" + QString::number(x.exponent()) + "}";
+			else if (useUpperCaseExponent_) result += QString::number(x.mantissa(), 'f', nDecimals_) + "E" + QString::number(x.exponent());
+			else result += QString::number(x.mantissa(), 'f', nDecimals_) + "e" + QString::number(x.exponent());
 			break;
 	}
-	
-	return QString(result);
+
+	return result;
 }

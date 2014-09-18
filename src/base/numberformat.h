@@ -35,7 +35,7 @@ class NumberFormat
 	NumberFormat();
 	~NumberFormat();
 	// Basic Number Type
-	enum FormatType { ConciseFormat, DecimalFormat, IntegerFormat, ScientificFormat, nNumberFormats };
+	enum FormatType { DecimalFormat, IntegerFormat, ScientificFormat, nNumberFormats };
 	// Convert text string to FormatType
 	static FormatType formatType(const char* s);
 	// Convert FormatType to text string
@@ -54,6 +54,8 @@ class NumberFormat
 	bool forcePrecedingPlus_;
 	// Whether or not use use uppercase exponent character (for ScientificFormat)
 	bool useUpperCaseExponent_;
+	// Whether to use 'E' notation in preference to 'x10' notation
+	bool useENotation_;
 
 	public:
 	// Set format type
@@ -72,6 +74,10 @@ class NumberFormat
 	void setUseUpperCaseExponent(bool b);
 	// Return whether or not use use uppercase exponent character (for ScientificFormat)
 	bool useUpperCaseExponent();
+	// Set whether to use 'E' notation in preference to 'x10' notation
+	void setUseENotation(bool b);
+	// Return whether to use 'E' notation in preference to 'x10' notation
+	bool useENotation();
 
 
 	/*

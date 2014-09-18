@@ -25,7 +25,6 @@
 #include <QtGui/QDialog>
 #include <QtCore/QObject>
 #include "gui/ui_editfitkernel.h"
-#include "base/dnchar.h"
 #include "base/data2d.h"
 #include "base/equationvariable.h"
 #include "kernels/fit.h"

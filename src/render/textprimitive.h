@@ -26,7 +26,6 @@
 #include "render/textformat.h"
 #include "math/matrix.h"
 #include "math/cuboid.h"
-#include "base/dnchar.h"
 #include "templates/vector3.h"
 #include "templates/list.h"
 #include <QtCore/QString>

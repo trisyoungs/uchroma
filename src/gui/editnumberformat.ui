@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>317</width>
-    <height>377</height>
+    <width>320</width>
+    <height>406</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -54,13 +54,6 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QRadioButton" name="ConciseFormatRadio">
-        <property name="text">
-         <string>Concise (choose between decimal and scientific)</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -101,6 +94,13 @@
        <widget class="QCheckBox" name="UpperCaseExponentCheck">
         <property name="text">
          <string>Use upper-case exponent character</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="UseENotationCheck">
+        <property name="text">
+         <string>Use 'E' rather than 'x10' notation</string>
         </property>
        </widget>
       </item>

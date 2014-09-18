@@ -24,7 +24,7 @@ void ExpressionParser_error(char *s);
 /* Type Definition */
 %union {
 	int functionId;			/* Function enum id */
-	Dnchar* name;			/* Character pointer for names */
+	QString* name;			/* Character pointer for names */
 	Node* node;			/* node pointer */
 	Variable* variable;		/* variable pointer */
 	double doubleConst;		/* double constant value */
@@ -145,7 +145,7 @@ expression:
 	| expression UCR_EP_OR expression		{ $$ = Expression::target()->addOperator(Functions::OperatorOr, $1, $3); }
 	| '(' expression ')'				{ $$ = $2; }
 	| '!' expression				{ $$ = Expression::target()->addOperator(Functions::OperatorNot, $2); }
-	| UCR_EP_NEWTOKEN				{ msg.print(Messenger::Verbose, "Error: '%s' has not been declared as a function or a variable.\n", yylval.name->get()); YYABORT; }
+	| UCR_EP_NEWTOKEN				{ msg.print(Messenger::Verbose, "Error: '%s' has not been declared as a function or a variable.\n", qPrintable(*yylval.name)); YYABORT; }
 	;
 
 /* Expression List */

@@ -19,7 +19,7 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/currentproject.h"
+#include "base/session.h"
 #include "gui/uchroma.h"
 #include "gui/editviewlayout.h"
 #include "render/fontinstance.h"
@@ -40,15 +40,15 @@ void UChromaWindow::closeEvent(QCloseEvent *event)
 
 void UChromaWindow::on_actionFileNewSession_triggered(bool checked)
 {
-	if (CurrentProject::isModified())
+	if (Session::isModified())
 	{
 		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No, QMessageBox::Cancel);
 		if (button == QMessageBox::Cancel) return;
 		else if (button == QMessageBox::Yes)
 		{
-			// Save file, and check CurrentProject::isModified() status to make sure it wasn't cancelled.
+			// Save file, and check Session::isModified() status to make sure it wasn't cancelled.
 			on_actionFileSaveSession_triggered(false);
-			if (CurrentProject::isModified()) return;
+			if (Session::isModified()) return;
 		}
 	}
 
@@ -60,15 +60,15 @@ void UChromaWindow::on_actionFileNewSession_triggered(bool checked)
 
 void UChromaWindow::on_actionFileLoadSession_triggered(bool checked)
 {
-	if (CurrentProject::isModified())
+	if (Session::isModified())
 	{
 		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No, QMessageBox::Cancel);
 		if (button == QMessageBox::Cancel) return;
 		else if (button == QMessageBox::Yes)
 		{
-			// Save file, and check CurrentProject::isModified() status to make sure it wasn't cancelled.
+			// Save file, and check Session::isModified() status to make sure it wasn't cancelled.
 			on_actionFileSaveSession_triggered(false);
-			if (CurrentProject::isModified()) return;
+			if (Session::isModified()) return;
 		}
 	}
 
@@ -90,7 +90,7 @@ void UChromaWindow::on_actionFileLoadSession_triggered(bool checked)
 void UChromaWindow::on_actionFileSaveSession_triggered(bool checked)
 {
 	// Has an input filename already been chosen?
-	if (CurrentProject::inputFile().isEmpty())
+	if (Session::inputFile().isEmpty())
 	{
 		QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", inputFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
 		if (fileName.isEmpty()) return;
@@ -98,10 +98,10 @@ void UChromaWindow::on_actionFileSaveSession_triggered(bool checked)
 		// Make sure the file has the right extension
 		QFileInfo fileInfo(fileName);
 		if (fileInfo.suffix() != "ucr") fileName += ".ucr";
-		CurrentProject::setInputFile(fileName);
+		Session::setInputFile(fileName);
 	}
 
-	if (saveInputFile(CurrentProject::inputFile())) CurrentProject::setAsNotModified();
+	if (saveInputFile(Session::inputFile())) Session::setAsNotModified();
 }
 
 void UChromaWindow::on_actionFileSaveSessionAs_triggered(bool checked)
@@ -113,9 +113,9 @@ void UChromaWindow::on_actionFileSaveSessionAs_triggered(bool checked)
 	// Make sure the file has the right extension
 	QFileInfo fileInfo(fileName);
 	if (fileInfo.suffix() != "ucr") fileName += ".ucr";
-	CurrentProject::setInputFile(fileName);
+	Session::setInputFile(fileName);
 
-	if (saveInputFile(CurrentProject::inputFile())) CurrentProject::setAsNotModified();
+	if (saveInputFile(Session::inputFile())) Session::setAsNotModified();
 }
 
 void UChromaWindow::on_actionFilePrint_triggered(bool checked)
@@ -154,15 +154,15 @@ void UChromaWindow::on_actionFileQuit_triggered(bool checked)
 // Check for modified data before closing
 bool UChromaWindow::checkBeforeClose()
 {
-	if (CurrentProject::isModified())
+	if (Session::isModified())
 	{
 		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No, QMessageBox::Cancel);
 		if (button == QMessageBox::Cancel) return false;
 		else if (button == QMessageBox::Yes)
 		{
-			// Save file, and check CurrentProject::isModified() status to make sure it wasn't cancelled.
+			// Save file, and check Session::isModified() status to make sure it wasn't cancelled.
 			on_actionFileSaveSession_triggered(false);
-			if (CurrentProject::isModified()) return false;
+			if (Session::isModified()) return false;
 		}
 	}
 	return true;
@@ -176,6 +176,8 @@ void UChromaWindow::on_actionViewPerspective_triggered(bool checked)
 {
 	if (currentViewPane_) currentViewPane_->setHasPerspective(checked);
 
+	Session::setAsModified();
+
 	ui.MainView->update();
 }
 
@@ -186,6 +188,8 @@ void UChromaWindow::on_actionViewReset_triggered(bool checked)
 	currentViewPane_->resetViewMatrix();
 	currentViewPane_->recalculateView();
 
+	Session::setAsModified();
+
 	ui.MainView->update();
 }
 
@@ -195,6 +199,8 @@ void UChromaWindow::on_actionViewShowAll_triggered(bool checked)
 
 	currentViewPane_->showAllData();
 	currentViewPane_->recalculateView();
+
+	Session::setAsModified();
 
 	updateGUI();
 }
@@ -207,6 +213,8 @@ void UChromaWindow::on_actionView2D_triggered(bool checked)
 	if (checked) currentViewPane_->resetViewMatrix();
 	currentViewPane_->recalculateView();
 
+	Session::setAsModified();
+
 	axesWindow_.updateControls();
 	ui.MainView->update();
 }
@@ -217,6 +225,8 @@ void UChromaWindow::on_actionViewAutostretch3D_triggered(bool checked)
 
 	currentViewPane_->setAutoStretch3D(checked);
 	currentViewPane_->recalculateView();
+
+	Session::setAsModified();
 
 	axesWindow_.updateControls();
 	ui.MainView->update();
@@ -238,7 +248,7 @@ void UChromaWindow::on_actionViewChangeLayout_triggered(bool checked)
 		currentViewPane_ = viewLayout_.panes();
 		recalculateViewLayout(ui.MainView->contextWidth(), ui.MainView->contextHeight());
 
-		CurrentProject::setAsModified();
+		Session::setAsModified();
 
 		updateGUI();
 	}

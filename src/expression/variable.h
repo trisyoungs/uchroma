@@ -23,7 +23,7 @@
 #define UCHROMA_VARIABLE_H
 
 #include "expression/node.h"
-#include "base/dnchar.h"
+#include <QtCore/QString>
 
 // Variable
 class Variable : public Node
@@ -39,7 +39,7 @@ class Variable : public Node
 	 */
 	protected:
 	// Name of the variable
-	Dnchar name_;
+	QString name_;
 	// Value of variable
 	double value_;
 	// Initial value of new variable
@@ -47,9 +47,9 @@ class Variable : public Node
 
 	public:
 	// Set name of variable
-	void setName(const char* s);
+	void setName(QString s);
 	// Get name of variable
-	const char* name() const;
+		QString name() const;
 	// Set initial value expression
 	bool setInitialValue(Node* node);
 	// Return Node corresponding to initial value

@@ -25,7 +25,6 @@
 #include <QtGui/QDialog>
 #include <QtCore/QObject>
 #include "gui/ui_create.h"
-#include "base/dnchar.h"
 #include "base/equationvariable.h"
 #include "expression/expression.h"
 #include "templates/array.h"

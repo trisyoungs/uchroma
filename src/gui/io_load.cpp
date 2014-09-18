@@ -23,7 +23,7 @@
 #include "gui/keywords.h"
 #include "kernels/fit.h"
 #include "base/lineparser.h"
-#include "base/currentproject.h"
+#include "base/session.h"
 
 #define CHECKIOFAIL if (hardIOFail_) { return false; } else { break; }
 
@@ -753,7 +753,7 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				break;
 			// Perspective
 			case (Keywords::PerspectiveKeyword):
-				pane->setHasPerspective(true);
+				pane->setHasPerspective(parser.argb(1));
 				break;
 			// Role
 			case (Keywords::RoleKeyword):
@@ -890,8 +890,8 @@ bool UChromaWindow::loadInputFile(QString fileName)
 	currentViewPane_ = viewLayout_.panes();
 
 	// Set current project data
-	CurrentProject::setInputFile(fileName);
-	CurrentProject::setAsNotModified();
+	Session::setInputFile(fileName);
+	Session::setAsNotModified();
 
 	return true;
 }

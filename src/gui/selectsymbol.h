@@ -1,6 +1,6 @@
 /*
-	*** Select Equation Dialog
-	*** src/gui/selectequation.h
+	*** Select Symbol Dialog
+	*** src/gui/selectsymbol.h
 	Copyright T. Youngs 2012-2014.
 
 	This file is part of uChroma.
@@ -19,10 +19,10 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UCHROMA_SELECTEQUATION_H
-#define UCHROMA_SELECTEQUATION_H
+#ifndef UCHROMA_SELECTSYMBOL_H
+#define UCHROMA_SELECTSYMBOL_H
 
-#include "gui/ui_selectequation.h"
+#include "gui/ui_selectsymbol.h"
 #include <QtGui/QDialog>
 #include <QtCore/QObject>
 
@@ -30,24 +30,73 @@
 /* none */
 
 /*
- * Equation
+ * Symbol
  */
-class Equation
+class Symbol
 {
 	public:
-	// Fit Equations
-	enum Equations
+	// Symbols
+	enum Symbols
 	{
-		Exponential1Equation,
-		Exponential2Equation,
-		Exponential3Equation,
-		nEquations
+		MultiplySymbol,
+		DivisionSymbol,
+		AngstromSymbol,
+		DegreeSymbol,
+		AlphaSymbol,
+		BetaSymbol,
+		GammaSymbol,
+		DeltaSymbol,
+		EpsilonSymbol,
+		ZetaSymbol,
+		EtaSymbol,
+		ThetaSymbol,
+		IotaSymbol,
+		KappaSymbol,
+		LambdaSymbol,
+		MuSymbol,
+		NuSymbol,
+		XiSymbol,
+		OmicronSymbol,
+		PiSymbol,
+		RhoSymbol,
+		SigmaSymbol,
+		TauSymbol,
+		UpsilonSymbol,
+		PhiSymbol,
+		ChiSymbol,
+		PsiSymbol,
+		OmegaSymbol,
+		CapitalAlphaSymbol,
+		CapitalBetaSymbol,
+		CapitalGammaSymbol,
+		CapitalDeltaSymbol,
+		CapitalEpsilonSymbol,
+		CapitalZetaSymbol,
+		CapitalEtaSymbol,
+		CapitalThetaSymbol,
+		CapitalIotaSymbol,
+		CapitalKappaSymbol,
+		CapitalLambdaSymbol,
+		CapitalMuSymbol,
+		CapitalNuSymbol,
+		CapitalXiSymbol,
+		CapitalOmicronSymbol,
+		CapitalPiSymbol,
+		CapitalRhoSymbol,
+		CapitalSigmaSymbol,
+		CapitalTauSymbol,
+		CapitalUpsilonSymbol,
+		CapitalPhiSymbol,
+		CapitalChiSymbol,
+		CapitalPsiSymbol,
+		CapitalOmegaSymbol,
+		nSymbols
 	};
-	// Name of equation
+	// Unicode Character
+	QChar character;
+	// Short name of symbol
 	QString name;
-	// Equation text
-	QString equationText;
-	// Description
+	// Symbol description
 	QString description;
 
 
@@ -55,46 +104,65 @@ class Equation
 	 * Singleton
 	 */
 	public:
-	// Static list of fit equations
-	static Equation equations[];
+	// Static list of symbols
+	static Symbol symbols[];
 };
 
 /*
- * Select Equation Dialog
+ * Select Symbol Dialog
  */
-class SelectEquationDialog : public QDialog
+class SelectSymbolDialog : public QDialog
 {
 	Q_OBJECT
 
 	public:
 	// Constructor
-	SelectEquationDialog(QWidget *parent);
+	SelectSymbolDialog(QWidget *parent);
 	// Destructor
-	~SelectEquationDialog();
+	~SelectSymbolDialog();
 	// Main form declaration
-	Ui::SelectEquationDialog ui;
+	Ui::SelectSymbolDialog ui;
 
 
 	/*
-	 * Equation
+	 * Symbol Table
 	 */
 	private:
+	// Desired minimum size of item in table
+	const int itemSize_;
 	// Selected equation
-	Equation* selectedEquation_;
+	QChar selectedSymbol_;
 
 	public:
-	// Return selected equation
-	Equation selectedEquation();
+	// Return selected character
+	QChar selectedSymbol();
+
+
+	/*
+	 * Reimplementations
+	 */
+	protected:
+	void resizeEvent(QResizeEvent* event);
 
 
 	/*
 	 * Slots
 	 */
 	public slots:
-	void on_EquationList_currentRowChanged(int index);
-	void on_EquationList_itemDoubleClicked(QListWidgetItem* item);
+	void on_SearchEdit_textChanged(QString text);
+	void on_ClearSearchButton_clicked(bool checked);
+	void on_SymbolTable_itemSelectionChanged();
+	void on_SymbolTable_itemDoubleClicked(QTableWidgetItem* item);
 	void on_CancelButton_clicked(bool checked);
 	void on_SelectButton_clicked(bool checked);
+
+
+	/*
+	 * Update
+	 */
+	public:
+	// Update symbol table
+	void updateTable(bool force = false);
 };
 
 #endif

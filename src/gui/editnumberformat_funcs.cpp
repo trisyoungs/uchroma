@@ -78,7 +78,6 @@ bool EditNumberFormatDialog::call(NumberFormat* target)
 	if (numberFormat_.type() == NumberFormat::IntegerFormat) ui.IntegerFormatRadio->setChecked(true);
 	else if (numberFormat_.type() == NumberFormat::DecimalFormat) ui.DecimalFormatRadio->setChecked(true);
 	else if (numberFormat_.type() == NumberFormat::ScientificFormat) ui.ScientificFormatRadio->setChecked(true);
-	else if (numberFormat_.type() == NumberFormat::ConciseFormat) ui.ConciseFormatRadio->setChecked(true);
 
 	ui.DecimalsSpin->setValue(numberFormat_.nDecimals());
 	ui.PrecedeWithPlusCheck->setChecked(numberFormat_.forcePrecedingPlus());
@@ -140,19 +139,6 @@ void EditNumberFormatDialog::on_ScientificFormatRadio_toggled(bool checked)
 	updatePreview();
 }
 
-void EditNumberFormatDialog::on_ConciseFormatRadio_toggled(bool checked)
-{
-	if (!checked) return;
-
-	ui.DecimalsSpin->setEnabled(true);
-
-	if (refreshing_) return;
-
-	numberFormat_.setType(NumberFormat::ConciseFormat);
-
-	updatePreview();
-}
-
 void EditNumberFormatDialog::on_DecimalsSpin_valueChanged(int value)
 {
 	if (refreshing_) return;
@@ -167,6 +153,15 @@ void EditNumberFormatDialog::on_UpperCaseExponentCheck_clicked(bool checked)
 	if (refreshing_) return;
 
 	numberFormat_.setUseUpperCaseExponent(checked);
+
+	updatePreview();
+}
+
+void EditNumberFormatDialog::on_UseENotationCheck_clicked(bool checked)
+{
+	if (refreshing_) return;
+
+	numberFormat_.setUseENotation(checked);
 
 	updatePreview();
 }

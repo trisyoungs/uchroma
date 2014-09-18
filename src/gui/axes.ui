@@ -88,6 +88,23 @@
              <item>
               <widget class="QLineEdit" name="XTitleEdit"/>
              </item>
+             <item>
+              <widget class="QToolButton" name="XTitleAddSymbolButton">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="icons.qrc">
+                 <normaloff>:/uchroma/icons/symbol.svg</normaloff>:/uchroma/icons/symbol.svg</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>16</width>
+                 <height>16</height>
+                </size>
+               </property>
+              </widget>
+             </item>
             </layout>
            </item>
            <item>
@@ -599,6 +616,19 @@
               </item>
              </layout>
             </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_6">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -1314,6 +1344,23 @@
              <item>
               <widget class="QLineEdit" name="YTitleEdit"/>
              </item>
+             <item>
+              <widget class="QToolButton" name="YTitleAddSymbolButton">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="icons.qrc">
+                 <normaloff>:/uchroma/icons/symbol.svg</normaloff>:/uchroma/icons/symbol.svg</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>16</width>
+                 <height>16</height>
+                </size>
+               </property>
+              </widget>
+             </item>
             </layout>
            </item>
            <item>
@@ -1825,6 +1872,19 @@
               </item>
              </layout>
             </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_8">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -2549,6 +2609,23 @@
              <item>
               <widget class="QLineEdit" name="ZTitleEdit"/>
              </item>
+             <item>
+              <widget class="QToolButton" name="ZTitleAddSymbolButton">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="icons.qrc">
+                 <normaloff>:/uchroma/icons/symbol.svg</normaloff>:/uchroma/icons/symbol.svg</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>16</width>
+                 <height>16</height>
+                </size>
+               </property>
+              </widget>
+             </item>
             </layout>
            </item>
            <item>
@@ -3060,6 +3137,19 @@
               </item>
              </layout>
             </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_9">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>

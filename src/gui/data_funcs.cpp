@@ -22,7 +22,7 @@
 #include "gui/data.h"
 #include "gui/uchroma.h"
 #include "gui/editdataset.h"
-#include "base/currentproject.h"
+#include "base/session.h"
 #include "templates/reflist.h"
 #include "templates/variantpointer.h"
 
@@ -80,7 +80,7 @@ void DataWindow::reloadDataSets()
 	progress.setValue(currentCollection->nDataSets());
 
 	// Need to update GUI
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 	uChroma_.updateGUI();
 }
 
@@ -148,7 +148,7 @@ void DataWindow::on_AddFilesButton_clicked(bool checked)
 	}
 
 	// Need to update GUI
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 	uChroma_.updateGUI();
 }
 
@@ -167,7 +167,7 @@ void DataWindow::on_RemoveFilesButton_clicked(bool checked)
 	for (RefListItem<DataSet,int>* ri = dataSetsToRemove.first(); ri != NULL; ri = ri->next) currentCollection->removeDataSet(ri->item);
 
 	// Need to update GUI
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 	uChroma_.updateGUI();
 }
 
@@ -213,7 +213,7 @@ void DataWindow::on_DataSetsTable_cellChanged(int row, int column)
 		currentCollection->setDataSetZ(dataSet, item->text().toDouble());
 
 		// Need to update now
-		CurrentProject::setAsModified();
+		Session::setAsModified();
 		uChroma_.updateGUI();
 	}
 }
@@ -262,7 +262,7 @@ void DataWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 	currentCollection->setDisplayDataInvalid();
 
 	// Need to update now
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 	uChroma_.updateGUI();
 }
 
@@ -302,7 +302,7 @@ void DataWindow::on_ReloadFilesButton_clicked(bool checked)
 	}
 
 	// Need to update GUI
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 	uChroma_.updateGUI();
 }
 

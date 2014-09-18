@@ -90,6 +90,11 @@ template <class T> class ObjectList
 		}
 		return true;
 	}
+	// Return number of available objects
+	static int nObjects()
+	{
+		return objects_.nItems();
+	}
 };
 
 #endif

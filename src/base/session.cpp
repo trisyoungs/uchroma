@@ -1,6 +1,6 @@
 /*
-	*** CurrentProject Flag
-	*** src/base/modified.cpp
+	*** Session Statics
+	*** src/base/session.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,22 +19,22 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/currentproject.h"
+#include "base/session.h"
 #include "version.h"
 #include <QtGui/QMainWindow>
 
 // Static variables
-bool CurrentProject::modified_ = false;
-QMainWindow* CurrentProject::mainWindow_ = NULL;
-bool CurrentProject::lastTitleBarModificationStatus_ = false;
-QString CurrentProject::inputFile_;
+bool Session::modified_ = false;
+QMainWindow* Session::mainWindow_ = NULL;
+bool Session::lastTitleBarModificationStatus_ = false;
+QString Session::inputFile_;
 
 /*
  * Main Window Pointer
  */
 
 // Set main window pointer
-void CurrentProject::setMainWindow(QMainWindow* ptr)
+void Session::setMainWindow(QMainWindow* ptr)
 {
 	mainWindow_ = ptr;
 
@@ -42,7 +42,7 @@ void CurrentProject::setMainWindow(QMainWindow* ptr)
 }
 
 // Update title bar of main window
-void CurrentProject::updateTitleBar()
+void Session::updateTitleBar()
 {
 	if (!mainWindow_) return;
 
@@ -60,7 +60,7 @@ void CurrentProject::updateTitleBar()
  */
 
 // Set name of input file
-void CurrentProject::setInputFile(QString fileName)
+void Session::setInputFile(QString fileName)
 {
 	inputFile_ = fileName;
 
@@ -68,7 +68,7 @@ void CurrentProject::setInputFile(QString fileName)
 }
 
 // Return name of input file
-QString CurrentProject::inputFile()
+QString Session::inputFile()
 {
 	return inputFile_;
 }
@@ -78,7 +78,7 @@ QString CurrentProject::inputFile()
  */
 
 // Set as modified
-void CurrentProject::setAsModified()
+void Session::setAsModified()
 {
 	modified_ = true;
 
@@ -86,7 +86,7 @@ void CurrentProject::setAsModified()
 }
 
 // Set as not modified
-void CurrentProject::setAsNotModified()
+void Session::setAsNotModified()
 {
 	modified_ = false;
 
@@ -94,7 +94,7 @@ void CurrentProject::setAsNotModified()
 }
 
 // Return status of flag
-bool CurrentProject::isModified()
+bool Session::isModified()
 {
 	return modified_;
 }

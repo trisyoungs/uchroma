@@ -19,7 +19,7 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/currentproject.h"
+#include "base/session.h"
 #include "gui/uchroma.h"
 
 // Return unique name based on supplied baseName
@@ -72,8 +72,8 @@ void UChromaWindow::startNewSession(bool createDefaults)
 	}
 
 	// Set current project data
-	CurrentProject::setAsNotModified();
-	CurrentProject::setInputFile(QString());
+	Session::setAsNotModified();
+	Session::setInputFile(QString());
 }
 
 // Add new collection
@@ -89,7 +89,7 @@ Collection* UChromaWindow::addCollection(QString name)
 	if (name.isEmpty()) currentCollection_->setName( uniqueCollectionName("Empty Collection ") );
 	else currentCollection_->setName(uniqueCollectionName(name));
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 
 	return currentCollection_;
 }
@@ -135,7 +135,7 @@ void UChromaWindow::removeCollection(Collection* collection)
 		}
 	}
 
-	CurrentProject::setAsModified();
+	Session::setAsModified();
 }
 
 // Move collection focus to next in list

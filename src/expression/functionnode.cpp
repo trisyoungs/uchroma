@@ -20,10 +20,6 @@
 */
 
 #include "expression/functionnode.h"
-// #include "parser/tree.h"
-// #include "parser/variablenode.h"
-// #include "parser/commands.h"
-#include "base/dnchar.h"
 #include "base/sysfunc.h"
 #include "base/messenger.h"
 #include <string.h>
@@ -64,14 +60,14 @@ bool FunctionNode::execute(double& rv)
 void FunctionNode::nodePrint(int offset, const char* prefix)
 {
 	// Construct tabbed offset
-	Dnchar tab(offset+32);
+	QString tab;
 	for (int n=0; n<offset-1; n++) tab += '\t';
-	if (offset > 1) tab.strcat("   |--> ");
-	tab.strcat(prefix);
+	if (offset > 1) tab += "   |--> ";
+	tab += prefix;
 
 	// Output node data
 // 	printf("Function id = %p\n", function_);
-	printf("[CN]%s%s (Function) (%i arguments)\n", tab.get(), Functions::data[function_].keyword, args_.nItems());
+	printf("[CN]%s%s (Function) (%i arguments)\n", qPrintable(tab), Functions::data[function_].keyword, args_.nItems());
 	// Output Argument data
 	for (RefListItem<Node,int> *ri = args_.first(); ri != NULL; ri = ri->next) ri->item->nodePrint(offset+1);
 }

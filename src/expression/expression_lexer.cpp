@@ -49,7 +49,7 @@ int Expression::lex()
 {
 	int n;
 	bool done, hasExp;
-	static Dnchar token, name;
+	static QString token, name;
 	char quotechar, c;
 	token.clear();
 
@@ -90,7 +90,7 @@ int Expression::lex()
 			else if ((c == '-') || (c == '+'))
 			{
 				// We allow '-' or '+' only as part of an exponentiation, so if it is not preceeded by 'E' we stop parsing
-				if ((!token.isEmpty()) && (token.lastChar() != 'E'))
+				if ((!token.isEmpty()) && (!token.endsWith("E")))
 				{
 					unGetChar();
 					done = true;
@@ -104,14 +104,13 @@ int Expression::lex()
 			}
 		} while (!done);
 		// We now have the number as a text token...
-		if (!hasExp) ExpressionParser_lval.doubleConst = atof(token);
-		else ExpressionParser_lval.doubleConst = atof(beforeChar(token,'E')) * pow(10.0, atof(afterChar(token,'E')));
-		msg.print(Messenger::Verbose, "LEXER (%p): found a numeric constant [%s] [%e]\n", this, token.get(), ExpressionParser_lval.doubleConst);
+		ExpressionParser_lval.doubleConst = token.toDouble();
+		msg.print(Messenger::Verbose, "LEXER (%p): found a numeric constant [%s] [%e]\n", this, qPrintable(token), ExpressionParser_lval.doubleConst);
 		return UCR_EP_CONSTANT;
 	}
 
 	/*
-	// Alphanumeric-token - function or variable
+	// Alpha-token - function or variable
 	*/
 	if (isalpha (c))
 	{
@@ -122,7 +121,7 @@ int Expression::lex()
 		}
 		while (isalnum(c) || (c == '_'));
 		unGetChar();
-		msg.print(Messenger::Verbose, "LEXER (%p): found an alpha token [%s]...\n", this, token.get());
+		msg.print(Messenger::Verbose, "LEXER (%p): found an alpha token [%s]...\n", this, qPrintable(token));
 
 		// Built-in numeric constants
 		if (token == "Pi")
@@ -191,7 +190,7 @@ int Expression::lex()
 		}
 
 		// Is it one of uChroma's function keywords?
-		n = Functions::function(token);
+		n = Functions::function(qPrintable(token));
 		if (n != Functions::nFunctions)
 		{
 			msg.print(Messenger::Verbose, "LEXER (%p): ... which is a function (->FUNCCALL).\n", this);
@@ -235,10 +234,10 @@ int Expression::lex()
 	{
 		c = getChar();
 		token += c;
-		msg.print(Messenger::Verbose, "LEXER (%p): found symbol [%s]\n",this,token.get());
-		SymbolToken st = (SymbolToken) enumSearch("", nSymbolTokens, SymbolTokenKeywords, token.get());
+		msg.print(Messenger::Verbose, "LEXER (%p): found symbol [%s]\n", this, qPrintable(token));
+		SymbolToken st = (SymbolToken) enumSearch("", nSymbolTokens, SymbolTokenKeywords, qPrintable(token));
 		if (st != nSymbolTokens) return SymbolTokenValues[st];
-		else printf("Error: Unrecognised symbol found in input (%s).\n", token.get());
+		else printf("Error: Unrecognised symbol found in input (%s).\n", qPrintable(token));
  	}
 	else
 	{

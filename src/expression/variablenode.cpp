@@ -50,7 +50,7 @@ Variable *VariableNode::variable()
 }
 
 // Return name of variable target
-const char* VariableNode::name()
+QString VariableNode::name()
 {
 	if (variable_ == NULL)
 	{
@@ -75,7 +75,7 @@ bool VariableNode::execute(double& rv)
 
 	// Call the local variable's execute() function to get the base value
 	bool result = variable_->execute(rv);
-	if (!result) printf("Variable retrieval ('%s') failed.\n", variable_->name());
+	if (!result) printf("Variable retrieval ('%s') failed.\n", qPrintable(variable_->name()));
 
 	return result;
 }
