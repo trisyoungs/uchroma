@@ -125,27 +125,32 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	enum PaneRole { FitResultsRole, ExtractionRole, SliceMonitorRole, StandardRole, nPaneRoles };
 	// Convert text string to PaneRole
 	static PaneRole paneRole(const char* s);
-	// Convert InputBlock to text string
+	// Convert PaneRole to text string
 	static const char* paneRole(PaneRole role);
 	// Autoscaling for 2D plots
 	enum AutoScaleMethod { NoAutoScale, ExpandingAutoScale, FullAutoScale, nAutoScaleMethods };
-	// Convert text string to AutoScale2D
+	// Convert text string to AutoScaleMethod
 	static AutoScaleMethod autoScaleMethod(const char* s);
-	// Convert InputBlock to text string
+	// Convert AutoScaleMethod to text string
 	static const char* autoScaleMethod(AutoScaleMethod scale);
+	// View type
+	enum ViewType { NormalView, AutoStretchedView, FlatXYView, FlatXZView, FlatYZView, LinkedView, nViewTypes };
+	// Convert text string to ViewType
+	static ViewType viewType(const char* s);
+	// Convert ViewType to text string
+	static const char* viewType(ViewType vt);
+
 
 	private:
 	// Role of this pane
 	PaneRole role_;
 	// Autoscaling method employed
 	AutoScaleMethod autoScale_;
-	// Whether this pane is a 2D plot
-	bool twoDimensional_;
-	// Whether autostretching of 3D axes is enabled for this pane
-	bool autoStretch3D_;
-	// Target target pane for role, if relevant
+	// Type of view to use
+	ViewType viewType_;
+	// Target pane(s) for role, if relevant
 	RefList<ViewPane,bool> roleTargetPanes_;
-	// Target target collection for role, if relevant
+	// Target collection(s) for role, if relevant
 	RefList<Collection,TargetData> roleTargetCollections_;
 
 	public:
@@ -157,14 +162,10 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	void setAutoScale(ViewPane::AutoScaleMethod method);
 	// Return autoscaling method employed
 	ViewPane::AutoScaleMethod autoScale();
-	// Set whether this pane is a 2D plot
-	void setTwoDimensional(bool b);
-	// Return whether this pane is a 2D plot
-	bool twoDimensional();
-	// Set whether autostretching of 3D axes is enabled for this pane
-	void setAutoStretch3D(bool b);
-	// Return whether autostretching of 3D axes is enabled for this pane
-	bool autoStretch3D();
+	// Set view type
+	void setViewType(ViewPane::ViewType vt);
+	// Return view type
+	ViewPane::ViewType viewType();
 	// Add target pane for role
 	void addRoleTargetPane(ViewPane* pane);
 	// Remove target pane for role

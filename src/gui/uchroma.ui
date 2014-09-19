@@ -763,13 +763,26 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
+    <widget class="QMenu" name="menuView_Type">
+     <property name="title">
+      <string>View Type</string>
+     </property>
+     <addaction name="actionViewNormal"/>
+     <addaction name="separator"/>
+     <addaction name="actionViewAutoStretched3D"/>
+     <addaction name="separator"/>
+     <addaction name="actionViewFlatXY"/>
+     <addaction name="actionViewFlatXZ"/>
+     <addaction name="actionViewFlatYZ"/>
+     <addaction name="separator"/>
+     <addaction name="actionViewLinked"/>
+    </widget>
     <addaction name="actionViewReset"/>
     <addaction name="actionViewShowAll"/>
     <addaction name="separator"/>
     <addaction name="actionDummyCurrentPane"/>
+    <addaction name="menuView_Type"/>
     <addaction name="actionViewPerspective"/>
-    <addaction name="actionView2D"/>
-    <addaction name="actionViewAutostretch3D"/>
     <addaction name="actionViewAxes"/>
     <addaction name="separator"/>
     <addaction name="actionViewChangeLayout"/>
@@ -863,8 +876,13 @@
    <addaction name="actionViewShowAll"/>
    <addaction name="separator"/>
    <addaction name="actionViewPerspective"/>
-   <addaction name="actionView2D"/>
-   <addaction name="actionViewAutostretch3D"/>
+   <addaction name="separator"/>
+   <addaction name="actionViewNormal"/>
+   <addaction name="actionViewAutoStretched3D"/>
+   <addaction name="actionViewFlatXY"/>
+   <addaction name="actionViewFlatXZ"/>
+   <addaction name="actionViewFlatYZ"/>
+   <addaction name="actionViewLinked"/>
   </widget>
   <widget class="QToolBar" name="InteractToolBar">
    <property name="windowTitle">
@@ -970,27 +988,6 @@
    </property>
    <property name="toolTip">
     <string>Save current session under a new name</string>
-   </property>
-  </action>
-  <action name="actionViewPerspective">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/uchroma/icons/view_perspective.svg</normaloff>:/uchroma/icons/view_perspective.svg</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Perspective</string>
-   </property>
-   <property name="toolTip">
-    <string>Toggle perspective</string>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>false</bool>
    </property>
   </action>
   <action name="actionFileExportImage">
@@ -1322,7 +1319,7 @@
     <string>Ctrl+Shift+L</string>
    </property>
   </action>
-  <action name="actionView2D">
+  <action name="actionViewFlatXY">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -1331,7 +1328,10 @@
      <normaloff>:/uchroma/icons/view_2D.svg</normaloff>:/uchroma/icons/view_2D.svg</iconset>
    </property>
    <property name="text">
-    <string>&amp;Two-Dimensional</string>
+    <string>&amp;Flat XY</string>
+   </property>
+   <property name="toolTip">
+    <string>Flat view facing XY plane</string>
    </property>
   </action>
   <action name="actionFilePrint">
@@ -1356,7 +1356,7 @@
     </font>
    </property>
   </action>
-  <action name="actionViewAutostretch3D">
+  <action name="actionViewAutoStretched3D">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -1365,7 +1365,10 @@
      <normaloff>:/uchroma/icons/view_autostretch.svg</normaloff>:/uchroma/icons/view_autostretch.svg</iconset>
    </property>
    <property name="text">
-    <string>Autostretch &amp;3D</string>
+    <string>Autostretched &amp;3D</string>
+   </property>
+   <property name="toolTip">
+    <string>Normal 3D view with automatically-stretched axes to fit view</string>
    </property>
   </action>
   <action name="actionCollectionDelete">
@@ -1479,6 +1482,78 @@
    </property>
    <property name="toolTip">
     <string>View/edit data in the current collection</string>
+   </property>
+  </action>
+  <action name="actionViewFlatXZ">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/view_2D.svg</normaloff>:/uchroma/icons/view_2D.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Flat XZ</string>
+   </property>
+   <property name="toolTip">
+    <string>Flat view facing XZ plane</string>
+   </property>
+  </action>
+  <action name="actionViewFlatYZ">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/view_2D.svg</normaloff>:/uchroma/icons/view_2D.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Flat YZ</string>
+   </property>
+   <property name="toolTip">
+    <string>Flat view facing YZ plane</string>
+   </property>
+  </action>
+  <action name="actionViewNormal">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/view_autostretch.svg</normaloff>:/uchroma/icons/view_autostretch.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Normal</string>
+   </property>
+   <property name="toolTip">
+    <string>Normal 3D view</string>
+   </property>
+  </action>
+  <action name="actionViewLinked">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/view_autostretch.svg</normaloff>:/uchroma/icons/view_autostretch.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Linked</string>
+   </property>
+   <property name="toolTip">
+    <string>Link view to another pane</string>
+   </property>
+  </action>
+  <action name="actionViewPerspective">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/uchroma/icons/view_perspective.svg</normaloff>:/uchroma/icons/view_perspective.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Perspective</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle perspective on 3D views</string>
    </property>
   </action>
  </widget>

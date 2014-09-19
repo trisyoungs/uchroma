@@ -172,9 +172,24 @@ bool UChromaWindow::checkBeforeClose()
  * View Actions
  */
 
+bool UChromaWindow::viewTypeChanged(ViewPane::ViewType vt)
+{
+	currentViewPane_->setViewType(vt);
+	currentViewPane_->resetViewMatrix();
+	currentViewPane_->recalculateView();
+
+	Session::setAsModified();
+
+	axesWindow_.updateControls();
+	ui.MainView->update();
+}
+
 void UChromaWindow::on_actionViewPerspective_triggered(bool checked)
 {
-	if (currentViewPane_) currentViewPane_->setHasPerspective(checked);
+	// Check current ViewPane
+	if (!ViewPane::objectValid(currentViewPane_, "view pane in UChromaWindow::on_actionViewPerspective_triggered()")) return;
+	
+	currentViewPane_->setHasPerspective(checked);
 
 	Session::setAsModified();
 
@@ -183,7 +198,8 @@ void UChromaWindow::on_actionViewPerspective_triggered(bool checked)
 
 void UChromaWindow::on_actionViewReset_triggered(bool checked)
 {
-	if (!currentViewPane_) return;
+	// Check current ViewPane
+	if (!ViewPane::objectValid(currentViewPane_, "view pane in UChromaWindow::on_actionViewReset_triggered()")) return;
 
 	currentViewPane_->resetViewMatrix();
 	currentViewPane_->recalculateView();
@@ -195,7 +211,8 @@ void UChromaWindow::on_actionViewReset_triggered(bool checked)
 
 void UChromaWindow::on_actionViewShowAll_triggered(bool checked)
 {
-	if (!currentViewPane_) return;
+	// Check current ViewPane
+	if (!ViewPane::objectValid(currentViewPane_, "view pane in UChromaWindow::on_actionViewShowAll_triggered()")) return;
 
 	currentViewPane_->showAllData();
 	currentViewPane_->recalculateView();
@@ -205,31 +222,64 @@ void UChromaWindow::on_actionViewShowAll_triggered(bool checked)
 	updateGUI();
 }
 
-void UChromaWindow::on_actionView2D_triggered(bool checked)
+void UChromaWindow::on_actionViewNormal_triggered(bool checked)
 {
-	if (refreshing_ || (!currentViewPane_)) return;
+	if (refreshing_) return;
 
-	currentViewPane_->setTwoDimensional(checked);
-	if (checked) currentViewPane_->resetViewMatrix();
-	currentViewPane_->recalculateView();
+	// Check current ViewPane
+	if (!ViewPane::objectValid(currentViewPane_, "view pane in UChromaWindow::on_actionViewNormal_triggered()")) return;
 
-	Session::setAsModified();
-
-	axesWindow_.updateControls();
-	ui.MainView->update();
+	if (checked) viewTypeChanged(ViewPane::NormalView);
 }
 
-void UChromaWindow::on_actionViewAutostretch3D_triggered(bool checked)
+void UChromaWindow::on_actionViewAutoStretched3D_triggered(bool checked)
 {
-	if (refreshing_ || (!currentViewPane_)) return;
+	if (refreshing_) return;
 
-	currentViewPane_->setAutoStretch3D(checked);
-	currentViewPane_->recalculateView();
+	// Check current ViewPane
+	if (!ViewPane::objectValid(currentViewPane_, "view pane in UChromaWindow::on_actionViewAutoStretched3D_triggered()")) return;
 
-	Session::setAsModified();
+	if (checked) viewTypeChanged(ViewPane::AutoStretchedView);
+}
 
-	axesWindow_.updateControls();
-	ui.MainView->update();
+void UChromaWindow::on_actionViewFlatXY_triggered(bool checked)
+{
+	if (refreshing_) return;
+
+	// Check current ViewPane
+	if (!ViewPane::objectValid(currentViewPane_, "view pane in UChromaWindow::on_actionViewFlatXY_triggered()")) return;
+
+	if (checked) viewTypeChanged(ViewPane::FlatXYView);
+}
+
+void UChromaWindow::on_actionViewFlatXZ_triggered(bool checked)
+{
+	if (refreshing_) return;
+
+	// Check current ViewPane
+	if (!ViewPane::objectValid(currentViewPane_, "view pane in UChromaWindow::on_actionViewFlatXZ_triggered()")) return;
+
+	if (checked) viewTypeChanged(ViewPane::FlatXZView);
+}
+
+void UChromaWindow::on_actionViewFlatYZ_triggered(bool checked)
+{
+	if (refreshing_) return;
+
+	// Check current ViewPane
+	if (!ViewPane::objectValid(currentViewPane_, "view pane in UChromaWindow::on_actionViewFlatYZ_triggered()")) return;
+
+	if (checked) viewTypeChanged(ViewPane::FlatYZView);
+}
+
+void UChromaWindow::on_actionViewLinked_triggered(bool checked)
+{
+	if (refreshing_) return;
+
+	// Check current ViewPane
+	if (!ViewPane::objectValid(currentViewPane_, "view pane in UChromaWindow::on_actionViewLinked_triggered()")) return;
+
+	if (checked) viewTypeChanged(ViewPane::LinkedView);
 }
 
 void UChromaWindow::on_actionViewAxes_triggered(bool checked)
@@ -297,7 +347,8 @@ void UChromaWindow::on_actionCollectionTransform_triggered(bool checked)
 
 void UChromaWindow::on_actionCollectionDelete_triggered(bool checked)
 {
-	if (!currentCollection_) return;
+	// Check current Collection
+	if (!Collection::objectValid(currentCollection_, "collection in UChromaWindow::on_actionCollectionDelete_triggered()")) return;
 
 	if (QMessageBox::question(this, "Confirm Delete", "Are you sure you want to delete collection '"+currentCollection_->name()+"' and all of its associated data?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
 	{
@@ -313,16 +364,16 @@ void UChromaWindow::on_actionCollectionDelete_triggered(bool checked)
 
 void UChromaWindow::on_actionDataLoadXY_triggered(bool checked)
 {
-	// Check for valid current collection
-	if (!currentCollection_) return;
+	// Check current Collection
+	if (!Collection::objectValid(currentCollection_, "collection in UChromaWindow::on_actionDataLoadXY_triggered()")) return;
 
 	dataWindow_.ui.AddFilesButton->click();
 }
 
 void UChromaWindow::on_actionDataImport_triggered(bool checked)
 {
-	// Check for valid current collection
-	if (!currentCollection_) return;
+	// Check current Collection
+	if (!Collection::objectValid(currentCollection_, "collection in UChromaWindow::on_actionDataImport_triggered()")) return;
 
 	// Raise the Data Import dialog
 	bool result = dataImportDialog_.import();
@@ -354,7 +405,8 @@ void UChromaWindow::on_actionDataView_triggered(bool checked)
 
 void UChromaWindow::on_actionAnalyseNewFit_triggered(bool checked)
 {
-	if (!currentCollection_) return;
+	// Check current Collection
+	if (!Collection::objectValid(currentCollection_, "collection in UChromaWindow::on_actionAnalyseNewFit_triggered()")) return;
 
 	// Ensure that the current collection has had its display data created (otherwise we have nothing to fit!)
 	currentCollection_->updateDisplayData();
@@ -376,7 +428,8 @@ void UChromaWindow::on_actionAnalyseNewFit_triggered(bool checked)
 
 void UChromaWindow::on_actionAnalyseEditFit_triggered(bool checked)
 {
-	if (!currentCollection_) return;
+	// Check current Collection
+	if (!Collection::objectValid(currentCollection_, "collection in UChromaWindow::on_actionAnalyseEditFit_triggered()")) return;
 
 	if (currentCollection_->fitKernel())
 	{
@@ -394,7 +447,8 @@ void UChromaWindow::on_actionAnalyseEditFit_triggered(bool checked)
 
 void UChromaWindow::on_actionAnalyseUpdateFit_triggered(bool checked)
 {
-	if (!currentCollection_) return;
+	// Check current Collection
+	if (!Collection::objectValid(currentCollection_, "collection in UChromaWindow::on_actionAnalyseUpdateFit_triggered()")) return;
 
 	if (currentCollection_->fitKernel())
 	{

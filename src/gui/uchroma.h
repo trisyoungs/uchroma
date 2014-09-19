@@ -152,12 +152,23 @@ class UChromaWindow : public QMainWindow
 	/*
 	 * View Actions
 	 */
+	private:
+	// Action group for actions related to ViewPane::ViewType
+	QActionGroup viewTypeActionGroup_;
+
+	private:
+	bool viewTypeChanged(ViewPane::ViewType vt);
+
 	private slots:
 	void on_actionViewPerspective_triggered(bool checked);
 	void on_actionViewReset_triggered(bool checked);
 	void on_actionViewShowAll_triggered(bool checked);
-	void on_actionView2D_triggered(bool checked);
-	void on_actionViewAutostretch3D_triggered(bool checked);
+	void on_actionViewNormal_triggered(bool checked);
+	void on_actionViewAutoStretched3D_triggered(bool checked);
+	void on_actionViewFlatXY_triggered(bool checked);
+	void on_actionViewFlatXZ_triggered(bool checked);
+	void on_actionViewFlatYZ_triggered(bool checked);
+	void on_actionViewLinked_triggered(bool checked);
 	void on_actionViewAxes_triggered(bool checked);
 	void on_actionViewChangeLayout_triggered(bool checked);
 

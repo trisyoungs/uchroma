@@ -37,6 +37,9 @@ EditViewLayoutDialog::EditViewLayoutDialog(UChromaWindow& parent) : QDialog(&par
 
 	refreshing_ = true;
 
+	// Set items in PaneViewTypeCombo
+	for (int n=0; n<ViewPane::nViewTypes; ++n) ui.PaneViewTypeCombo->addItem(ViewPane::viewType((ViewPane::ViewType) n));
+
 	// Set items in PaneRoleCombo
 	for (int n=0; n<ViewPane::nPaneRoles; ++n) ui.PaneRoleCombo->addItem(ViewPane::paneRole((ViewPane::PaneRole) n));
 
@@ -106,7 +109,7 @@ ViewLayout& EditViewLayoutDialog::viewLayout()
  */
 
 /*
- * Slots - Pane Layout
+ * Slots - Main Layout
  */
 
 void EditViewLayoutDialog::on_GridNColumnsSpin_valueChanged(int value)
@@ -143,6 +146,36 @@ void EditViewLayoutDialog::on_PaneRemoveButton_clicked(bool checked)
 	updateControls();
 }
 
+void EditViewLayoutDialog::on_Organiser_currentPaneChanged(int gridX, int gridY)
+{
+	if (refreshing_) return;
+
+	// Get pane at the specified grid coordinates
+	currentPane_ = layout_.paneAtGrid(gridX, gridY);
+
+	updateControls();
+}
+
+/*
+ * Slots - Current Pane
+ */
+
+void EditViewLayoutDialog::on_PaneNameEdit_textChanged(QString text)
+{
+	if (refreshing_) return;
+
+	if (currentPane_) currentPane_->setName(text);
+	ui.Organiser->update();
+}
+
+void EditViewLayoutDialog::on_PaneRoleCombo_currentIndexChanged(int index)
+{
+	if (refreshing_) return;
+
+	if (currentPane_) currentPane_->setRole((ViewPane::PaneRole) index);
+	updateControls();
+}
+
 void EditViewLayoutDialog::on_PaneNextButton_clicked(bool checked)
 {
 	if (refreshing_) return;
@@ -163,41 +196,15 @@ void EditViewLayoutDialog::on_PanePreviousButton_clicked(bool checked)
 	updateControls();
 }
 
-void EditViewLayoutDialog::on_Organiser_currentPaneChanged(int gridX, int gridY)
-{
-	if (refreshing_) return;
-
-	// Get pane at the specified grid coordinates
-	currentPane_ = layout_.paneAtGrid(gridX, gridY);
-
-	updateControls();
-}
-
 /*
- * Slots - Pane Basic Info
- */
+ * Slots - Pane View Style
+ */ 
 
-void EditViewLayoutDialog::on_PaneNameEdit_textChanged(QString text)
+void EditViewLayoutDialog::on_PaneViewTypeCombo_currentIndexChanged(int index)
 {
 	if (refreshing_) return;
 
-	if (currentPane_) currentPane_->setName(text);
-	ui.Organiser->update();
-}
-
-void EditViewLayoutDialog::on_PaneRoleCombo_currentIndexChanged(int index)
-{
-	if (refreshing_) return;
-
-	if (currentPane_) currentPane_->setRole((ViewPane::PaneRole) index);
-	updateControls();
-}
-
-void EditViewLayoutDialog::on_Pane2DCheck_clicked(bool checked)
-{
-	if (refreshing_) return;
-
-	if (currentPane_) currentPane_->setTwoDimensional(checked);
+	if (currentPane_) currentPane_->setViewType( (ViewPane::ViewType) index );
 }
 
 /*
@@ -267,7 +274,7 @@ void EditViewLayoutDialog::updateControls()
 	{
 		ui.PaneNameEdit->setText(currentPane_->name());
 		ui.PaneRoleCombo->setCurrentIndex(currentPane_->role());
-		ui.Pane2DCheck->setChecked(currentPane_->twoDimensional());
+		ui.PaneViewTypeCombo->setCurrentIndex(currentPane_->viewType());
 
 		// Update targets list
 		ui.PaneTargetsList->clear();

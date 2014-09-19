@@ -89,18 +89,20 @@ class EditViewLayoutDialog : public QDialog
 	 * Slots
 	 */
 	private slots:
-	// Pane Layout
+	// Main Layout
 	void on_GridNColumnsSpin_valueChanged(int value);
 	void on_GridNRowsSpin_valueChanged(int value);
 	void on_PaneAddButton_clicked(bool checked);
 	void on_PaneRemoveButton_clicked(bool checked);
-	void on_PaneNextButton_clicked(bool checked);
-	void on_PanePreviousButton_clicked(bool checked);
 	void on_Organiser_currentPaneChanged(int gridX, int gridY);
-	// Pane Basic Info
+	// Current Pane
 	void on_PaneNameEdit_textChanged(QString text);
 	void on_PaneRoleCombo_currentIndexChanged(int index);
-	void on_Pane2DCheck_clicked(bool checked);
+	void on_PaneNextButton_clicked(bool checked);
+	void on_PanePreviousButton_clicked(bool checked);
+	// Pane View Style
+	void on_PaneViewTypeCombo_currentIndexChanged(int index);
+// 	void on_Pane
 	// Pane Targets
 	void on_PaneTargetsList_currentRowChanged(int index);
 	void on_PaneAddTargetButton_clicked(bool checked);

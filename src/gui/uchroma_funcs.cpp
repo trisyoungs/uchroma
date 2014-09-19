@@ -30,7 +30,8 @@
 UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	axesWindow_(*this), dataWindow_(*this), logWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this),
 	createCollectionDialog_(*this), dataImportDialog_(*this), editFitSetupDialog_(*this), saveImageDialog_(*this),
-	viewLayout_(*this)
+	viewLayout_(*this),
+	viewTypeActionGroup_(this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -88,7 +89,17 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	connect(&transformWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowTransform, SLOT(setChecked(bool)));
 	connect(&viewWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowView, SLOT(setChecked(bool)));
 
-	// Create an action group for the axis interact buttons
+	// Create necessary action groups
+
+	// -- ViewType actions
+	viewTypeActionGroup_.addAction(ui.actionViewNormal);
+	viewTypeActionGroup_.addAction(ui.actionViewAutoStretched3D);
+	viewTypeActionGroup_.addAction(ui.actionViewFlatXY);
+	viewTypeActionGroup_.addAction(ui.actionViewFlatXZ);
+	viewTypeActionGroup_.addAction(ui.actionViewFlatYZ);
+	viewTypeActionGroup_.addAction(ui.actionViewLinked);
+
+	// -- Interaction mode actions
 	QActionGroup* actionGroup = new QActionGroup(this);
 	actionGroup->addAction(ui.actionInteractNone);
 	actionGroup->addAction(ui.actionInteractX);
@@ -192,12 +203,13 @@ void UChromaWindow::updateSubWindows()
 // Update tool bars
 void UChromaWindow::updateToolBars()
 {
-	// Toggle perspective and 2D based on current pane
-	if (! currentViewPane_) return;
-
-	ui.actionViewPerspective->setChecked(currentViewPane_->hasPerspective());
-	ui.actionView2D->setChecked(currentViewPane_->twoDimensional());
-	ui.actionViewAutostretch3D->setChecked(currentViewPane_->autoStretch3D());
+	// Update controls related to current ViewPane
+	if (ViewPane::objectValid(currentViewPane_, "view pane in UChromaWindow::updateToolBars()"))
+	{
+		ui.actionViewPerspective->setChecked(currentViewPane_->hasPerspective());
+		QAction* action = viewTypeActionGroup_.actions().at(currentViewPane_->viewType());
+		if (action) action->setChecked(true);
+	}
 }
 
 // Update display

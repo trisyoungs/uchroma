@@ -668,6 +668,7 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 	ViewPane* associatedPane;
 	ViewPane::PaneRole role;
 	ViewPane::AutoScaleMethod as;
+	ViewPane::ViewType vt;
 	while (!parser.atEnd())
 	{
 		// Get line from file
@@ -691,10 +692,6 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 					CHECKIOFAIL
 				}
 				pane->setAutoScale(as);
-				break;
-			// Auto stretch 3D 
-			case (Keywords::AutoStretch3DKeyword):
-				pane->setAutoStretch3D(parser.argb(1));
 				break;
 			// Axis block
 			case (Keywords::AxisBlockKeyword):
@@ -790,9 +787,16 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 			case (Keywords::TranslationKeyword):
 				pane->setViewTranslation(parser.argd(1), parser.argd(2), parser.argd(3));
 				break;
-			// Two Dimensional flag
-			case (Keywords::TwoDimensionalKeyword):
-				pane->setTwoDimensional(parser.argb(1));
+			// View Type
+			case (Keywords::ViewTypeKeyword):
+				vt = ViewPane::viewType(parser.argChar(1));
+				if (vt == ViewPane::nViewTypes)
+				{
+					msg.print("Warning: Unrecognised view type '%s'. Defaulting to '%s'.\n", parser.argChar(1), ViewPane::viewType(ViewPane::NormalView));
+					vt = ViewPane::NormalView;
+					CHECKIOFAIL
+				}
+				pane->setViewType(vt);
 				break;
 			// Unrecognised Keyword
 			default:

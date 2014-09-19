@@ -263,10 +263,10 @@ int Keywords::viewKeywordNArguments(Keywords::ViewKeyword kwd)
  */
 
 // ViewPane Block Keywords
-const char* ViewPaneBlockKeywords[] = { "AutoScale", "AutoStretch3D", "Axis", "BoundingBox", "BoundingBoxPlaneY", "Collection", "EndViewPane", "Geometry", "LabelPointSize", "Perspective", "Role", "RoleTargetCollection", "RoleTargetPane", "RotationX", "RotationY", "RotationZ", "TitlePointSize", "Translation", "TwoDimensional" };
+const char* ViewPaneBlockKeywords[] = { "AutoScale", "Axis", "BoundingBox", "BoundingBoxPlaneY", "Collection", "EndViewPane", "Geometry", "LabelPointSize", "Perspective", "Role", "RoleTargetCollection", "RoleTargetPane", "RotationX", "RotationY", "RotationZ", "TitlePointSize", "Translation", "ViewType" };
 
 // ViewPane Block NArguments
-int ViewPaneKeywordNArguments[] = { 1, 1, 1, 1, 1, 1, 0, 4, 1, 1, 1, 1, 1, 3, 3, 3, 1, 3, 1 };
+int ViewPaneKeywordNArguments[] = { 1, 1, 1, 1, 1, 0, 4, 1, 1, 1, 1, 1, 3, 3, 3, 1, 3, 1 };
 
 /*!
  * \brief Convert text string to ViewPaneKeyword

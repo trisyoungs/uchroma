@@ -1388,7 +1388,7 @@ void Collection::updateDisplayData()
 		double z = dataSet->transformedData().z();
 		// -- Is the transformed Z value within range?
 		// -- If the pane is 2D, display all data regardless of z
-		if ((!displayPane_->twoDimensional()) && ((z < axisMin.z) || (z > axisMax.z)))
+		if ((z < axisMin.z) || (z > axisMax.z))
 		{
 			dataSet = displayPane_->axes().inverted(2) ? dataSet->prev : dataSet->next;
 			continue;
@@ -1475,6 +1475,7 @@ void Collection::updateDisplayData()
 	}
 	DisplayDataSet** slices = displayData_.array();
 	displayAbscissa_.clear();
+
 	// -- Loop over all datasets simultaneously, seeking next lowest point in their x data
 	int test = 0;
 	while (nFinished != nTransformedDataSets)

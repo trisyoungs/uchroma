@@ -1416,7 +1416,7 @@ void AxesWindow::updateControls(bool force)
 	ui.ZTitleEdit->setText(axes.title(2));
 
 	// Axis Stretch factors
-	bool stretchOff = (pane->twoDimensional() || pane->autoStretch3D());
+	bool stretchOff = (pane->viewType() != ViewPane::NormalView);
 	ui.XStretchSpin->setValue(axes.stretch(0));
 	ui.XStretchSpin->setDisabled(stretchOff);
 	ui.YStretchSpin->setValue(axes.stretch(1));

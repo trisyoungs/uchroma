@@ -233,7 +233,10 @@ void Viewer::paintGL()
 		glLoadMatrixd(viewMatrix.matrix());
 		GLfloat colourBlack[4] = { 0.0, 0.0, 0.0, 1.0 };
 		glColor4fv(colourBlack);
-		int maxAxis = (pane->twoDimensional() ? 2 : 3);
+		int skipAxis = -1;
+		if (pane->viewType() == ViewPane::FlatXYView) skipAxis = 2;
+		else if (pane->viewType() == ViewPane::FlatXZView) skipAxis = 1;
+		else if (pane->viewType() == ViewPane::FlatYZView) skipAxis = 0;
 
 		// -- Render axis text
 		glEnable(GL_MULTISAMPLE);
@@ -241,7 +244,7 @@ void Viewer::paintGL()
 		if (FontInstance::fontOK())
 		{
 			FontInstance::font()->FaceSize(1);
-			for (int n=0; n<maxAxis; ++n) if (pane->axes().visible(n))
+			for (int n=0; n<3; ++n) if (pane->axes().visible(n) && (n != skipAxis))
 			{
 				pane->axes().labelPrimitive(n).renderAll(viewMatrix, uChroma_->labelCorrectOrientation(), pane->textZScale());
 				pane->axes().titlePrimitive(n).renderAll(viewMatrix, uChroma_->labelCorrectOrientation(), pane->textZScale());
@@ -252,18 +255,18 @@ void Viewer::paintGL()
 		glLoadMatrixd(viewMatrix.matrix());
 		glDisable(GL_LIGHTING);
 		glEnable(GL_LINE_SMOOTH);
-		for (int axis=0; axis<maxAxis; ++axis) if (pane->axes().visible(axis))
+		for (int axis=0; axis<3; ++axis) if (pane->axes().visible(axis) && (axis != skipAxis))
 		{
 			pane->axes().gridLineMinorStyle(axis).apply();
 			pane->axes().gridLineMinorPrimitive(axis).sendToGL();
 		}
-		for (int axis=0; axis<maxAxis; ++axis) if (pane->axes().visible(axis))
+		for (int axis=0; axis<3; ++axis) if (pane->axes().visible(axis) && (axis != skipAxis))
 		{
 			pane->axes().gridLineMajorStyle(axis).apply();
 			pane->axes().gridLineMajorPrimitive(axis).sendToGL();
 		}
 		LineStyle::revert();
-		for (int axis=0; axis<maxAxis; ++axis) if (pane->axes().visible(axis)) pane->axes().axisPrimitive(axis).sendToGL();
+		for (int axis=0; axis<3; ++axis) if (pane->axes().visible(axis) && (axis != skipAxis)) pane->axes().axisPrimitive(axis).sendToGL();
 		glEnable(GL_LIGHTING);
 		glDisable(GL_LINE_SMOOTH);
 

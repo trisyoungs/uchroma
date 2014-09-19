@@ -230,7 +230,6 @@ class Keywords
 	enum ViewPaneKeyword
 	{
 		AutoScaleKeyword,
-		AutoStretch3DKeyword,
 		AxisBlockKeyword,
 		BoundingBoxKeyword,
 		BoundingBoxPlaneYKeyword,
@@ -247,7 +246,7 @@ class Keywords
 		RotationZKeyword,
 		TitlePointSizeKeyword,
 		TranslationKeyword,
-		TwoDimensionalKeyword,
+		ViewTypeKeyword,
 		nViewPaneKeywords
 	};
 	// Convert text string to ViewKeyword
