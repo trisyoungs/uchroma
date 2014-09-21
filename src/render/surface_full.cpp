@@ -20,64 +20,84 @@
 */
 
 #include "render/surface.h"
+#include "base/axes.h"
 
 // Construct full surface representation of data
-void Surface::constructFull(PrimitiveList& primitives, double yAxisScale, bool yLogarithmic, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale)
+void Surface::constructFull(PrimitiveList& primitiveList, const Axes& axes, const Array<double>& displayAbscissa, List<DisplayDataSet>& displayData, ColourScale colourScale)
 {
-	GLfloat zA, zB;
-
 	// Forget all data in current primitives
-	primitives.forgetAll();
+	primitiveList.forgetAll();
 
-	// Check for low number of datasets or low number of points in x
-	if (displayData.nItems() == 0) return;
-	if (displayData.nItems() == 1)
+	// Get extents of displayData to use based on current axes limits
+	Vec3<int> minIndex, maxIndex;
+	if (!calculateExtents(axes, displayAbscissa, displayData, minIndex, maxIndex)) return;
+	int nZ = (maxIndex.z - minIndex.z) + 1;
+
+	// Copy and transform abscissa values (still in data space) into axes coordinates
+	Array<double> x(displayAbscissa, minIndex.x, maxIndex.x);
+	axes.transformX(x);
+	int nX = x.nItems();
+
+	// Check for specific actions when we have a low number of display datasets
+	if (nZ == 1)
 	{
 		// Special case, if there is exactly one dataset, draw a standard XY line surface instead
-		constructLineXY(primitives, yAxisScale, yLogarithmic, abscissa, displayData, colourScale);
+		constructLineXY(primitiveList, axes, displayAbscissa, displayData, colourScale);
 		return;
 	}
-	if (abscissa.nItems() < 2) return;
+	if (nX == 1)
+	{
+		// Special case, if there is exactly one dataset, draw a standard XY line surface instead
+		constructLineZY(primitiveList, axes, displayAbscissa, displayData, colourScale);
+		return;
+	}
 
 	// Resize primitive list so it's large enough for our needs
-	int maxVertices = (abscissa.nItems()+1)*2;
-	int maxIndices = (abscissa.nItems()-1)*6;
-	primitives.reinitialise(displayData.nItems()-1, false, maxVertices, maxIndices, GL_TRIANGLES, true);
+	int maxVertices = (x.nItems()+1)*2;
+	int maxIndices = (x.nItems()-1)*6;
+	primitiveList.reinitialise(nZ-1, false, maxVertices, maxIndices, GL_TRIANGLES, true);
 
 	// Temporary variables
 	Array< Vec3<double> > normA, normB;
+	Array<double> yA, yB, yC;
+	Array<DisplayDataSet::DataPointType> typeA, typeB, typeC;
 	Array< Vec4<GLfloat> > colourA, colourB;
-	int n;
 	QColor colour;
+	double zA, zB, zC;
 	Vec3<double> nrm(0.0, 1.0, 0.0);
 
 	// Construct first slice data and set initial min/max values
-	DisplayDataSet* dataSetA = displayData.first();
-	constructSurfaceStrip(abscissa, dataSetA, yAxisScale, yLogarithmic, normA, colourA, colourScale, NULL, dataSetA->next);
-	int nPoints = abscissa.nItems();
+	yA.copy(displayData[minIndex.z]->y(), minIndex.x, maxIndex.x);
+	axes.transformY(yA);
+	typeA.copy(displayData[minIndex.z]->yType(), minIndex.x, maxIndex.x);
+	zA = axes.transformZ(displayData[minIndex.z]->z());
+	if ((minIndex.z+1) <= maxIndex.z)	// Safety check - this should always be true because of the checks above
+	{
+		yB.copy(displayData[minIndex.z+1]->y(), minIndex.x, maxIndex.x);
+		axes.transformY(yB);
+		typeB.copy(displayData[minIndex.z+1]->yType(), minIndex.x, maxIndex.x);
+		zB = axes.transformZ(displayData[minIndex.z+1]->z());
+	}
+	constructSurfaceStrip(x, yA, zA, axes, normA, colourA, colourScale, yC, 0.0, yB, zB);
 
-	// Create triangles
-	int balls = 1;
+	// Create triangles in strips between the previous and target Y/Z values
 	int nBit, nPlusOneBit, totalBit;
 	GLuint vertexAn = -1, vertexBn = -1, vertexAnPlusOne = -1, vertexBnPlusOne = -1;
-	Primitive* currentPrimitive = primitives[0];
-	for (DisplayDataSet* dataSetB = dataSetA->next; dataSetB != NULL; dataSetB = dataSetB->next)
+	Primitive* currentPrimitive = primitiveList[0];
+	for (int index = minIndex.z+1; index <=maxIndex.z; ++index)
 	{
-		// Grab slice pointers
-		DisplayDataSet* dataSetC = (dataSetB->next == NULL ? NULL : dataSetB->next);
+		// Grab next data (if we are not at the end of the index range)
+		if (index < maxIndex.z)
+		{
+			yC.copy(displayData[index+1]->y(), minIndex.x, maxIndex.x);
+			axes.transformY(yC);
+			typeC.copy(displayData[index+1]->yType(), minIndex.x, maxIndex.x);
+			zC = axes.transformZ(displayData[index+1]->z());
+		}
+		else yC.clear();
 
 		// Construct data for current slice
-		constructSurfaceStrip(abscissa, dataSetB, yAxisScale, yLogarithmic, normB, colourB, colourScale, dataSetA, dataSetC);
-
-		// Grab z values
-		zA = (GLfloat) dataSetA->z();
-		zB = (GLfloat) dataSetB->z();
-	
-		// Get nPoints and array references
-		const Array<double>& yA = dataSetA->y();
-		const Array<double>& yB = dataSetB->y();
-		const Array<DisplayDataSet::DataPointType>& yTypeA = dataSetA->yType();
-		const Array<DisplayDataSet::DataPointType>& yTypeB = dataSetB->yType();
+		constructSurfaceStrip(x, yB, zB, axes, normB, colourB, colourScale, yA, zA, yC, zC);
 
 		// Use a simple bit to quickly determine which triangles to draw, given possible lack of datapoints in slices
 		//
@@ -90,25 +110,25 @@ void Surface::constructFull(PrimitiveList& primitives, double yAxisScale, bool y
 
 		// Set initial bit, and generate initial vertices
 		nBit = 0;
-		if (yTypeA.value(0) == DisplayDataSet::NoPoint)
+		if (typeA.value(0) == DisplayDataSet::NoPoint)
 		{
 			nBit += 4;
 			vertexAn = -1;
 		}
-		else vertexAn = currentPrimitive->defineVertex(abscissa.value(0), yA.value(0), zA, normA[0], colourA[0]);
-		if (yTypeB.value(0) == DisplayDataSet::NoPoint)
+		else vertexAn = currentPrimitive->defineVertex(x.value(0), yA.value(0), zA, normA[0], colourA[0]);
+		if (typeB.value(0) == DisplayDataSet::NoPoint)
 		{
 			nBit += 8;
 			vertexBn = -1;
 		}
-		else vertexBn = currentPrimitive->defineVertex(abscissa.value(0), yB.value(0), zB, normB[0], colourB[0]);
+		else vertexBn = currentPrimitive->defineVertex(x.value(0), yB.value(0), zB, normB[0], colourB[0]);
 
-		for (int n=0; n<nPoints-1; ++n)
+		for (int n=0; n<nX-1; ++n)
 		{
 			// Construct bit for n+1
 			nPlusOneBit = 0;
-			if (yTypeA.value(n+1) == DisplayDataSet::NoPoint) nPlusOneBit += 1;
-			if (yTypeB.value(n+1) == DisplayDataSet::NoPoint) nPlusOneBit += 2;
+			if (typeA.value(n+1) == DisplayDataSet::NoPoint) nPlusOneBit += 1;
+			if (typeB.value(n+1) == DisplayDataSet::NoPoint) nPlusOneBit += 2;
 			totalBit = nBit + nPlusOneBit;
 
 			// Reset indices for current (n+1) column
@@ -119,43 +139,43 @@ void Surface::constructFull(PrimitiveList& primitives, double yAxisScale, bool y
 			if (totalBit == 0)
 			{
 				// Draw both
-				if (vertexAn == -1) vertexAn = currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n]);
-				if (vertexBn == -1) vertexBn = currentPrimitive->defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n]);
-				vertexAnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n+1]);
-				vertexBnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1]);
+				if (vertexAn == -1) vertexAn = currentPrimitive->defineVertex(x.value(n), yA.value(n), zA, normA[n], colourA[n]);
+				if (vertexBn == -1) vertexBn = currentPrimitive->defineVertex(x.value(n), yB.value(n), zB, normB[n], colourB[n]);
+				vertexAnPlusOne = currentPrimitive->defineVertex(x.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n+1]);
+				vertexBnPlusOne = currentPrimitive->defineVertex(x.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1]);
 				currentPrimitive->defineIndices(vertexAn, vertexAnPlusOne, vertexBnPlusOne);
 				currentPrimitive->defineIndices(vertexAn, vertexBn, vertexBnPlusOne);
 			}
 			else if (totalBit == 1)
 			{
 				// Bottom left corner only
-				if (vertexAn == -1) vertexAn = currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n]);
-				if (vertexBn == -1) vertexBn = currentPrimitive->defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n]);
-				vertexBnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1]);
+				if (vertexAn == -1) vertexAn = currentPrimitive->defineVertex(x.value(n), yA.value(n), zA, normA[n], colourA[n]);
+				if (vertexBn == -1) vertexBn = currentPrimitive->defineVertex(x.value(n), yB.value(n), zB, normB[n], colourB[n]);
+				vertexBnPlusOne = currentPrimitive->defineVertex(x.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1]);
 				currentPrimitive->defineIndices(vertexAn, vertexBnPlusOne, vertexBn);
 			}
 			else if (totalBit == 2)
 			{
 				// Top left corner only
-				if (vertexAn == -1) vertexAn = currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n]);
-				if (vertexBn == -1) vertexBn = currentPrimitive->defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n]);
-				vertexAnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n]);
+				if (vertexAn == -1) vertexAn = currentPrimitive->defineVertex(x.value(n), yA.value(n), zA, normA[n], colourA[n]);
+				if (vertexBn == -1) vertexBn = currentPrimitive->defineVertex(x.value(n), yB.value(n), zB, normB[n], colourB[n]);
+				vertexAnPlusOne = currentPrimitive->defineVertex(x.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n]);
 				currentPrimitive->defineIndices(vertexAn, vertexAnPlusOne, vertexBn);
 			}
 			else if (totalBit == 4)
 			{
 				// Bottom right corner only
-				if (vertexBn == -1) vertexBn = currentPrimitive->defineVertex(abscissa.value(n), yB.value(n), zB, normB[n], colourB[n]);
-				vertexAnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n+1]);
-				vertexBnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1]);
+				if (vertexBn == -1) vertexBn = currentPrimitive->defineVertex(x.value(n), yB.value(n), zB, normB[n], colourB[n]);
+				vertexAnPlusOne = currentPrimitive->defineVertex(x.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n+1]);
+				vertexBnPlusOne = currentPrimitive->defineVertex(x.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1]);
 				currentPrimitive->defineIndices(vertexAnPlusOne, vertexBnPlusOne, vertexBn);
 			}
 			else if (totalBit == 8)
 			{
 				// Top right corner only
-				if (vertexAn == -1) vertexAn = currentPrimitive->defineVertex(abscissa.value(n), yA.value(n), zA, normA[n], colourA[n]);
-				vertexAnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n+1]);
-				vertexBnPlusOne = currentPrimitive->defineVertex(abscissa.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1]);
+				if (vertexAn == -1) vertexAn = currentPrimitive->defineVertex(x.value(n), yA.value(n), zA, normA[n], colourA[n]);
+				vertexAnPlusOne = currentPrimitive->defineVertex(x.value(n+1), yA.value(n+1), zA, normA[n+1], colourA[n+1]);
+				vertexBnPlusOne = currentPrimitive->defineVertex(x.value(n+1), yB.value(n+1), zB, normB[n+1], colourB[n+1]);
 				currentPrimitive->defineIndices(vertexAn, vertexAnPlusOne, vertexBnPlusOne);
 			}
 
@@ -165,11 +185,16 @@ void Surface::constructFull(PrimitiveList& primitives, double yAxisScale, bool y
 			vertexBn = vertexBnPlusOne;
 		}
 
-		// Copy arrays ready for next pass
+		// Shuffle data backwards...
+		yA = yB;
+		zA = zB;
+		typeA = typeB;
 		normA = normB;
 		colourA = colourB;
-		dataSetA = dataSetB;
-
+		yB = yC;
+		zB = zC;
+		typeB = typeC;
+		
 		// Increment primitive pointer
 		currentPrimitive = currentPrimitive->next;
 	}

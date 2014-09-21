@@ -36,9 +36,9 @@ Collection::Collection() : ListItem<Collection>(), ObjectList<Collection>(this)
 	dataSets_.clear();
 	dataFileDirectory_ = getenv("PWD");
 	name_ = "Empty Collection";
-	dataChanged_ = true;
 	dataMin_.zero();
 	dataMax_.set(10.0, 10.0, 10.0);
+	dataVersion_ = 0;
 
 	// Transform
 	transformMin_.zero();
@@ -66,7 +66,8 @@ Collection::Collection() : ListItem<Collection>(), ObjectList<Collection>(this)
 	colourSource_ = SingleColourSource;
 	alphaControl_ = Collection::OwnAlpha;
 	fixedAlpha_ = 0.5;
-	colourScaleValid_ = false;
+	colourVersion_ = 0;
+	colourScaleGeneratedAt_ = -1;
 
 	// Associated data
 	parent_ = NULL;
@@ -74,20 +75,22 @@ Collection::Collection() : ListItem<Collection>(), ObjectList<Collection>(this)
 	currentSlice_ = NULL;
 	fitKernel_ = NULL;
 
+	// Update
+	limitsAndTransformsVersion_ = -1;
+
 	// Display
 	visible_ = true;
 	displayData_.clear();
+	displayDataGeneratedAt_ = -1;
 	displayStyle_ = Collection::LineXYStyle;
-	displayDataValid_ = false;
-	displayPrimitivesValid_ = false;
-	displayPane_ = NULL;
+	styleVersion_ = 0;
+
 }
 
 // Destructor
 Collection::~Collection()
 {
 	// Ensure that the collection is removed from the pane it is being displayed in
-	if (displayPane_) displayPane_->removeCollection(this);
 	if (fitKernel_) delete fitKernel_;
 }
 
@@ -106,7 +109,7 @@ void Collection::operator=(const Collection& source)
 	dataFileDirectory_ = source.dataFileDirectory_;
 	dataMin_ = source.dataMin_;
 	dataMax_ = source.dataMax_;
-	dataChanged_ = source.dataChanged_;
+	dataVersion_ = source.dataVersion_;
 
 	// Transforms
 	transformMin_ = source.transformMin_;
@@ -119,6 +122,7 @@ void Collection::operator=(const Collection& source)
 	interpolate_ = source.interpolate_;
 	interpolateConstrained_ = source.interpolateConstrained_;
 	interpolationStep_ = source.interpolationStep_;
+	limitsAndTransformsVersion_ = source.limitsAndTransformsVersion_;
 
 	// Colours
 	colourSource_ = source.colourSource_;
@@ -131,7 +135,11 @@ void Collection::operator=(const Collection& source)
 	customColourScale_ = source.customColourScale_;
 	alphaControl_ = source.alphaControl_;
 	fixedAlpha_ = source.fixedAlpha_;
-	colourScaleValid_ = source.colourScaleValid_;
+	colourVersion_ = source.colourVersion_;
+	colourScaleGeneratedAt_ = source.colourScaleGeneratedAt_;
+
+	// Display data
+	displayDataGeneratedAt_ = -1;
 }
 
 /*
@@ -171,8 +179,7 @@ DataSet* Collection::addDataSet()
 	// Create new dataset
 	DataSet* dataSet = dataSets_.add();
 
-	dataChanged_ = true;
-	displayDataValid_ = false;
+	++dataVersion_;
 
 	Session::setAsModified();
 
@@ -197,9 +204,7 @@ void Collection::addDataSet(DataSet* source)
 	DataSet* dataSet = dataSets_.add();
 	(*dataSet) = (*source);
 
-	dataChanged_ = true;
-	displayDataValid_ = false;
-	displayPrimitivesValid_ = false;
+	++dataVersion_;
 
 	Session::setAsModified();
 }
@@ -221,7 +226,7 @@ void Collection::removeDataSet(DataSet* dataSet)
 {
 	dataSets_.remove(dataSet);
 
-	displayDataValid_ = false;
+	++dataVersion_;
 
 	Session::setAsModified();
 }
@@ -248,7 +253,6 @@ void Collection::setDataSetZ(DataSet* target, double z)
 		{
 			// Shift specified target up the list
 			dataSets_.shiftUp(target);
-			displayDataValid_ = false;
 			minBad = (target->prev ? (target->prev->data().z() > target->data().z()) : false);
 		}
 		else minBad = false;
@@ -256,7 +260,6 @@ void Collection::setDataSetZ(DataSet* target, double z)
 		{
 			// Move specified target down the list
 			dataSets_.shiftDown(target);
-			displayDataValid_ = false;
 			maxBad = (target->next ? (target->next->data().z() < target->data().z()) : false);
 		}
 		else maxBad = false;
@@ -264,9 +267,7 @@ void Collection::setDataSetZ(DataSet* target, double z)
 		
 	} while (minBad || maxBad);
 
-	dataChanged_ = true;
-	displayDataValid_ = false;
-	displayPrimitivesValid_ = false;
+	++dataVersion_;
 
 	Session::setAsModified();
 }
@@ -284,9 +285,7 @@ void Collection::setDataSetData(DataSet* target, const Array<double>& x, const A
 	target->data().clear();
 	for (int n=0; n<x.nItems(); ++n) target->data().addPoint(x.value(n), y.value(n));
 
-	dataChanged_ = true;
-	displayDataValid_ = false;
-	displayPrimitivesValid_ = false;
+	++dataVersion_;
 
 	Session::setAsModified();
 }
@@ -303,9 +302,7 @@ void Collection::setDataSetData(DataSet* target, DataSet& source)
 
 	(*target) = source;
 
-	dataChanged_ = true;
-	displayDataValid_ = false;
-	displayPrimitivesValid_ = false;
+	++dataVersion_;
 
 	Session::setAsModified();
 }
@@ -372,9 +369,7 @@ void Collection::clearDataSets()
 	dataSets_.clear();
 	displayData_.clear();
 
-	dataChanged_ = true;
-	displayDataValid_ = false;
-	displayPrimitivesValid_ = false;
+	++dataVersion_;
 
 	Session::setAsModified();
 }
@@ -440,6 +435,12 @@ Vec3<double> Collection::dataMax()
 	return dataMax_;
 }
 
+// Return version counter for changes to data
+int Collection::dataVersion()
+{
+	return dataVersion_;
+}
+
 /*
  * Transforms
  */
@@ -488,11 +489,9 @@ void Collection::setTransformEquation(int axis, QString transformEquation)
 	// Make sure limits and transform are up to date
 	if (transforms_[axis].enabled())
 	{
-		dataChanged_ = true;
+		++dataVersion_;
 		updateLimitsAndTransforms();
 	}
-
-	displayDataValid_ = false;
 
 	Session::setAsModified();
 }
@@ -514,11 +513,10 @@ void Collection::setTransformEnabled(int axis, bool enabled)
 {
 	transforms_[axis].setEnabled(enabled);
 
-	// Make sure limits and transform are up to date
-	dataChanged_ = true;
-	updateLimitsAndTransforms();
+	++dataVersion_;
 
-	displayDataValid_ = false;
+	// Make sure limits and transform are up to date
+	updateLimitsAndTransforms();
 
 	Session::setAsModified();
 }
@@ -759,7 +757,7 @@ QString Collection::iconString()
 	else if (type_ == Collection::ExtractedCollection) iconName = ":/uchroma/icons/collection_extracted";
 
 	// If display pane is invalid, tweak icon name
-	if (displayPane_ == NULL) iconName += "_nopane";
+// 	if (displayPane_ == NULL) iconName += "_nopane"; // TODO Introduce class in ViewLayout to see if a Collection is displayed anywhere
 	iconName += ".svg";
 	
 	return iconName;
@@ -940,7 +938,8 @@ RefListItem<Collection,Collection::CollectionSignal>* Collection::deleteCollecti
 // Update data limits and transform data
 void Collection::updateLimitsAndTransforms()
 {
-	if (!dataChanged_) return;
+	if (dataVersion_ == limitsAndTransformsVersion_) return;
+
 	dataMin_ = 0.0;
 	dataMax_ = 0.0;
 	if (dataSets_.nItems() > 0)
@@ -1028,8 +1027,8 @@ void Collection::updateLimitsAndTransforms()
 	if (transformMaxPositive_.y < 0.0) transformMaxPositive_.y = 1.0;
 	if (transformMaxPositive_.z < 0.0) transformMaxPositive_.z = 1.0;
 
-	// Reset flag
-	dataChanged_ = false;
+	// Update version
+	limitsAndTransformsVersion_ = dataVersion_;
 }
 
 /*
@@ -1071,6 +1070,8 @@ const char* Collection::alphaControl(Collection::AlphaControl as)
 // Update colour scale
 void Collection::updateColourScale()
 {
+	if (colourVersion_ == colourScaleGeneratedAt_) return;
+
 	colourScale_.clear();
 	if (colourSource_ == Collection::SingleColourSource) colourScale_.addPoint(0.0, colourSinglePoint_.colour());
 	else if (colourSource_ == Collection::RGBGradientSource)
@@ -1090,17 +1091,15 @@ void Collection::updateColourScale()
 	// Set alpha value for all points if alphaControl_ == FixedAlpha
 	if (alphaControl_ == Collection::FixedAlpha) colourScale_.setAllAlpha(fixedAlpha_);
 
-	colourScaleValid_ = true;
-
-	// Primitive will now need to be regenerated...
-	displayPrimitivesValid_ = false;
+	colourScaleGeneratedAt_ = colourVersion_;
 }
 
 // Set colourscale source to use
 void Collection::setColourSource(ColourSource source)
 {
 	colourSource_ = source;
-	colourScaleValid_ = false;
+
+	++colourVersion_;
 }
 
 // Return colourscale source to use
@@ -1131,7 +1130,7 @@ void Collection::setColourScalePoint(ColourSource source, QColor colour, double 
 	}
 
 	// Update colourscale?
-	if (source == colourSource_) colourScaleValid_ = false;
+	if (source == colourSource_) ++colourVersion_;
 }
 
 // Return colourscale point specified
@@ -1176,7 +1175,7 @@ void Collection::addCustomColourScalePoint()
 	customColourScale_.addPoint(customColourScale_.lastPoint() ? customColourScale_.lastPoint()->value() + 1.0 : 0.0, Qt::white);
 
 	// Update colourscale?
-	if (colourSource_ == Collection::CustomGradientSource) colourScaleValid_ = false;
+	if (colourSource_ == Collection::CustomGradientSource) ++colourVersion_;
 }
 
 // Add point to custom colourscale
@@ -1209,7 +1208,7 @@ void Collection::removeCustomColourScalePoint(ColourScalePoint* point)
 	customColourScale_.removePoint(point);
 
 	// Update colourscale?
-	if (colourSource_ == Collection::CustomGradientSource) colourScaleValid_ = false;
+	if (colourSource_ == Collection::CustomGradientSource) ++colourVersion_;
 }
 
 // Set alpha control
@@ -1217,7 +1216,8 @@ void Collection::setAlphaControl(Collection::AlphaControl alpha)
 {
 
 	alphaControl_ = alpha;
-	colourScaleValid_ = false;
+
+	++colourVersion_;
 }
 
 // Return current alpha control
@@ -1230,7 +1230,8 @@ Collection::AlphaControl Collection::alphaControl()
 void Collection::setFixedAlpha(double alpha)
 {
 	fixedAlpha_ = alpha;
-	colourScaleValid_ = false;
+
+	++colourVersion_;
 }
 
 // Return fixed alpha value
@@ -1243,15 +1244,15 @@ double Collection::fixedAlpha()
 const ColourScale& Collection::colourScale()
 {
 	// Does the colourscale need updating first?
-	if (!colourScaleValid_) updateColourScale();
+	updateColourScale();
 	
 	return colourScale_;
 }
 
-// Return whether colourscale is valid
-bool Collection::colourScaleValid()
+// Return colour version
+bool Collection::colourVersion()
 {
-	return colourScaleValid_;
+	return colourVersion_;
 }
 
 /*
@@ -1295,120 +1296,41 @@ const Array<double>& Collection::displayAbscissa() const
 // Return transformed data to display
 List<DisplayDataSet>& Collection::displayData()
 {
-	return displayData_;
-}
-
-// Set display style of data
-void Collection::setDisplayStyle(DisplayStyle style)
-{
-	displayStyle_ = style;
-
-	displayPrimitivesValid_ = false;
-}
-
-// Return display style of data
-Collection::DisplayStyle Collection::displayStyle()
-{
-	return displayStyle_;
-}
-
-// Set line width (for line styles)
-void Collection::setDisplayLineWidth(double width)
-{
-	displayLineWidth_ = width;
-}
-
-// Return Line width (for line styles)
-double Collection::displayLineWidth()
-{
-	return displayLineWidth_;
-}
-
-// Manually set the flag to force regeneration of surface data
-void Collection::setDisplayDataInvalid()
-{
-	// Update subcollections first
-	// -- Fit data
-	for (Collection* fit = fits_.first(); fit != NULL; fit = fit->next) fit->setDisplayDataInvalid();
-	// -- Extracted data
-	for (Collection* extract = slices_.first(); extract != NULL; extract = extract->next) extract->setDisplayDataInvalid();
-	// -- Current slice
-	if (currentSlice_) currentSlice_->setDisplayDataInvalid();
-
-	displayDataValid_ = false;
-}
-
-// Flag that the primitive has been updated
-void Collection::setDisplayPrimitiveValid()
-{
-	displayPrimitivesValid_ = true;
-}
-
-// Return whether surface primitives are valid
-bool Collection::displayPrimitivesValid()
-{
-	return displayPrimitivesValid_;
-}
-
-// Return surface primitives list
-PrimitiveList& Collection::displayPrimitives()
-{
-	return displayPrimitives_;
-}
-
-// Update surface data if necessary
-void Collection::updateDisplayData()
-{
+	printf("Here in Collection::displayData() : dataVersion_=%i, displayDataGeneratedAt_=%i\n", dataVersion_, displayDataGeneratedAt_);
 	// Is surface reconstruction necessary?
-	if (displayDataValid_) return;
+	if (dataVersion_ == displayDataGeneratedAt_) return displayData_;
 
-	// Check view pane for this collection
-	if (displayPane_ == NULL) return;
-
+	printf("Updating limits and transforms...\n");
 	// Make sure transforms are up to date
 	updateLimitsAndTransforms();
 
-	// Grab some stuff from the pane's axes
-	Vec3<double> axisMin(displayPane_->axes().min(0), displayPane_->axes().min(1), displayPane_->axes().min(2));
-	Vec3<double> axisMax(displayPane_->axes().max(0), displayPane_->axes().max(1), displayPane_->axes().max(2));
-
+	printf("Now updating data...\n");
 	// Clear old displayData_ and create temporary Data2D list for display data construction
 	List<Data2D> transformedData;
 	displayData_.clear();
 	double x, y;
 
 	// Loop over slices, apply any transforms (X or Y) and check limits
-	DataSet* dataSet = displayPane_->axes().inverted(2) ? dataSets_.last() : dataSets_.first();
-	while (dataSet)
+	for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next)
 	{
 		// Check for slice with no points...
 		if (dataSet->data().nPoints() == 0) continue;
 
 		// Z
 		double z = dataSet->transformedData().z();
-		// -- Is the transformed Z value within range?
-		// -- If the pane is 2D, display all data regardless of z
-		if ((z < axisMin.z) || (z > axisMax.z))
-		{
-			dataSet = displayPane_->axes().inverted(2) ? dataSet->prev : dataSet->next;
-			continue;
-		}
-		if (displayPane_->axes().inverted(2) && displayPane_->axes().logarithmic(2)) z = log10(axisMax.z/z);   // XXX TODO Changed from 'log10(axisMax[n]/z)' which was a bug???
-		else if (displayPane_->axes().inverted(2)) z = (axisMax.z - z) + displayPane_->axes().min(2);
-		else if (displayPane_->axes().logarithmic(2)) z = log10(z);
 
 		// Add new item to transformedData and displayData_ arrays
 		Data2D* surfaceDataSet = transformedData.add();
 		DisplayDataSet* displayDataSet = displayData_.add();
-		displayDataSet->setZ(z * displayPane_->axes().stretch(2));
+		displayDataSet->setZ(z);
 
 		// Copy / interpolate raw data arrays
 		Array<double> array[2];
 		if (interpolate_.x)
 		{
 			dataSet->transformedData().interpolate(interpolateConstrained_.x);
-			double x = axisMin.x;
-			while (x <= axisMax.x)
+			double x = dataSet->transformedData().arrayX().first();
+			while (x <= dataSet->transformedData().arrayX().last())
 			{
 				array[0].add(x);
 				array[1].add(dataSet->transformedData().interpolated(x));
@@ -1421,39 +1343,8 @@ void Collection::updateDisplayData()
 			array[1] = dataSet->transformedData().arrayY();
 		}
 
-		// Now add data to surfaceDataSet, obeying defined x-limits
-		if (displayPane_->axes().inverted(0)) for (int n=array[0].nItems()-1; n >= 0; --n)
-		{
-			x = array[0].value(n);
-			if ((x < axisMin.x) || (x > axisMax.x)) continue;
-			if (displayPane_->axes().logarithmic(0)) x = log10(axisMax.x / x);
-			else x = (axisMax.x - x) + axisMin.x;
-			x *= displayPane_->axes().stretch(0);
-			y = array[1].value(n);
-			if (displayPane_->axes().logarithmic(1)) y = (displayPane_->axes().inverted(1) ? log10(axisMax.y / y) : log10(y));
-			else if (displayPane_->axes().inverted(1)) y = (axisMax.y - y) + axisMin.y;
-			y *= displayPane_->axes().stretch(1);
-			surfaceDataSet->addPoint(x, y);
-		}
-		else for (int n=0; n<array[0].nItems(); ++n)
-		{
-			x = array[0].value(n);
-			if ((x < axisMin.x) || (x > axisMax.x)) continue;
-			if (displayPane_->axes().logarithmic(0)) x = log10(x);
-			x *= displayPane_->axes().stretch(0);
-			y = array[1].value(n);
-			if (displayPane_->axes().logarithmic(1))
-			{
-				if (y < 0.0) y = 1.0e-10;
-				else y = (displayPane_->axes().inverted(1) ? log10(axisMax.y / y) : log10(y));
-			}
-			else if (displayPane_->axes().inverted(1)) y = (axisMax.y - y) + axisMin.y;
-			y *= displayPane_->axes().stretch(1);
-			surfaceDataSet->addPoint(x, y);
-		}
-
-		// Move to next Z slice
-		dataSet = displayPane_->axes().inverted(2) ? dataSet->prev : dataSet->next;
+		// Now add data to surfaceDataSet
+		for (int n=0; n<array[0].nItems(); ++n) surfaceDataSet->addPoint(array[0].value(n), array[1].value(n));
 	}
 
 	// Construct common x scale for data, and create y value data
@@ -1542,52 +1433,45 @@ void Collection::updateDisplayData()
 			}
 		}	
 	}
+	
+	printf("NDISPLAYABSCISSA = %i\n", displayAbscissa_.nItems());
 
-	// Data has been updated - surface primitive will need to be reconstructed
-	displayPrimitivesValid_ = false;
-	displayDataValid_ = true;
+	// Store new version 
+	displayDataGeneratedAt_ = dataVersion_;
+
+	return displayData_;
 }
 
-// Return whether display primitives are valid
-bool Collection::displayDataValid()
+// Set display style of data
+void Collection::setDisplayStyle(DisplayStyle style)
 {
-	return displayDataValid_;
+	displayStyle_ = style;
+
+	++styleVersion_;
 }
 
-// Set view pane on which this data is being displayed
-void Collection::setDisplayPane(ViewPane* pane)
+// Return display style of data
+Collection::DisplayStyle Collection::displayStyle()
 {
-	displayPane_ = pane;
-
-	// Axes limits are likely to be different, so must flag current display data as invalid
-	displayDataValid_ = false;
-	displayPrimitivesValid_ = false;
+	return displayStyle_;
 }
 
-// Return view pane on which this data is being displayed
-ViewPane* Collection::displayPane()
+// Set line width (for line styles)
+void Collection::setDisplayLineWidth(double width)
 {
-	return displayPane_;
+	displayLineWidth_ = width;
+
+	++styleVersion_;
 }
 
-// Send collection data to GL, including any associated fit and extracted data
-void Collection::sendToGL()
+// Return Line width (for line styles)
+double Collection::displayLineWidth()
 {
-	// If this collection is not visible return now
-	if (!visible_) return;
+	return displayLineWidth_;
+}
 
-	if (displayStyle_ == Collection::SurfaceStyle)
-	{
-		glEnable(GL_LIGHTING);
-		glDisable(GL_LINE_SMOOTH);
-	}
-	else
-	{
-		glEnable(GL_LINE_SMOOTH);
-		glLineWidth(displayLineWidth_);
-		glDisable(GL_LIGHTING);
-	}
-
-	// Send Primitives to display
-	displayPrimitives_.sendToGL();
+// Return style version
+int Collection::styleVersion()
+{
+	return styleVersion_;
 }

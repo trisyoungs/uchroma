@@ -35,13 +35,20 @@
 template <class A> class Array : public ListItem< Array<A> >
 {
 	public:
-	// Constructor
+	// Constructors
 	Array(int initialSize = 0) : ListItem< Array<A> >()
 	{
 		array_ = NULL;
 		size_ = 0;
 		nItems_ = 0;
 		if (initialSize > 0) createEmpty(initialSize);
+	}
+	Array(const Array<A>& source, int firstIndex, int lastIndex) : ListItem< Array<A> >()
+	{
+		array_ = NULL;
+		size_ = 0;
+		nItems_ = 0;
+		copy(source, firstIndex, lastIndex);
 	}
 	// Destructor
 	~Array()
@@ -154,6 +161,19 @@ template <class A> class Array : public ListItem< Array<A> >
 		
 		// ... then set number of items to zero
 		nItems_ = 0;
+	}
+	// Copy data from source array
+	void copy(const Array<A>& source, int firstIndex, int lastIndex)
+	{
+		clear();
+
+		int nItemsToCopy = (lastIndex - firstIndex) + 1;
+		if (nItemsToCopy > 0)
+		{
+			resize(nItemsToCopy);
+			nItems_ = nItemsToCopy;
+			for (int n=0; n<nItems_; ++n) array_[n] = source.array_[n+firstIndex];
+		}
 	}
 	///@}
 

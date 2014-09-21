@@ -24,44 +24,4 @@
 #include "base/collection.h"
 #include "base/viewpane.h"
 
-// Create/update surface primitive
-bool Viewer::updateSurfacePrimitive(Collection* collection, bool forceUpdate, bool noPop)
-{
-	// Check for valid collection
-	if (!collection) return false;
-
-	// Check whether the primitive for this collection needs updating
-	if (collection->displayPrimitivesValid() && collection->colourScaleValid() && (!forceUpdate)) return false;
-
-	// Pop old primitive instance (unless flagged not to) and adjust primitive settings
-	if (!noPop) collection->displayPrimitives().popInstance(context());
-	collection->displayPrimitives().forgetAll();
-	
-	// Need a valid set of axes in order to construct the surface
-	if (!collection->displayPane()) return false;
-
-	// Recreate primitive depending on current style
-	double yStretch = collection->displayPane()->axes().stretch(1);
-	bool yLogarithmic = collection->displayPane()->axes().logarithmic(1);
-	switch (collection->displayStyle())
-	{
-		case (Collection::LineXYStyle):
-			Surface::constructLineXY(collection->displayPrimitives(), yStretch, yLogarithmic, collection->displayAbscissa(), collection->displayData(), collection->colourScale());
-			break;
-		case (Collection::LineZYStyle):
-			Surface::constructLineZY(collection->displayPrimitives(), yStretch, yLogarithmic, collection->displayAbscissa(), collection->displayData(), collection->colourScale());
-			break;
-		case (Collection::GridStyle):
-			Surface::constructGrid(collection->displayPrimitives(), yStretch, yLogarithmic, collection->displayAbscissa(), collection->displayData(), collection->colourScale());
-			break;
-		case (Collection::SurfaceStyle):
-			Surface::constructFull(collection->displayPrimitives(), yStretch, yLogarithmic, collection->displayAbscissa(), collection->displayData(), collection->colourScale());
-			break;
-	}
-
-	// Push a new instance to create the new display list / vertex array
-	collection->displayPrimitives().pushInstance(context(), extensionsStack_.last());
-	collection->setDisplayPrimitiveValid();
-
-	return true;
-}
+// TODO Remove ths file from repo!

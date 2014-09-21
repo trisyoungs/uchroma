@@ -37,8 +37,8 @@ template <class T> class Vec3
 
 
 	/*
-	// Set / adjust / retrieve
-	*/
+	 * Set / adjust / retrieve
+	 */
 	public:
 	// Set the vector to 0,0,0
 	void zero();
@@ -57,8 +57,8 @@ template <class T> class Vec3
 
 
 	/*
-	// Operators
-	*/
+	 * Operators
+	 */
 	public:
 	// Operator =
 	void operator=(T);
@@ -87,8 +87,8 @@ template <class T> class Vec3
 
 
 	/*
-	// Methods
-	*/
+	 * Methods
+	 */
 	public:
 	// Return vector of absolute elements
 	Vec3<T> abs() const;
@@ -145,8 +145,8 @@ template <class T> Vec3<T>::Vec3(T xx, T yy, T zz)
 }
 
 /*
-// Set / adjust / retrieve 
-*/
+ * Set / adjust / retrieve 
+ */
 
 // Zero
 template <class T> void Vec3<T>::zero()
@@ -208,8 +208,8 @@ template <class T> T Vec3<T>::get(int index) const
 }
 
 /*
-// Operators
-*/
+ * Operators
+ */
 
 // Assignment from single value
 template <class T> void Vec3<T>::operator=(T a)
@@ -373,8 +373,8 @@ template <class T> T &Vec3<T>::operator[](int index)
 }
 
 /*
-// Methods
-*/
+ * Methods
+ */
 
 // Return vector of absolute elements
 template <class T> Vec3<T> Vec3<T>::abs() const

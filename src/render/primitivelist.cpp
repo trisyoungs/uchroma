@@ -20,10 +20,6 @@
 */
 
 #include "render/primitivelist.h"
-#include "gui/viewer.uih"
-
-// Static members
-Viewer* PrimitiveList::viewer_ = NULL;
 
 // Constructor
 PrimitiveList::PrimitiveList()
@@ -90,12 +86,6 @@ int PrimitiveList::nDefinedIndices()
 	int totalIndices = 0;
 	for (Primitive* prim = primitives_.first(); prim != NULL; prim = prim->next) totalIndices += prim->nDefinedIndices();
 	return totalIndices;
-}
-
-// Set viewer (static)
-void PrimitiveList::setViewer(Viewer* viewer)
-{
-	viewer_ = viewer;
 }
 
 // Push instance layer

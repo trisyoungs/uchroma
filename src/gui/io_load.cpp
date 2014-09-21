@@ -717,17 +717,6 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 			case (Keywords::BoundingBoxPlaneYKeyword):
 				pane->setBoundingBoxPlaneY(parser.argd(1));
 				break;
-			// Collection association
-			case (Keywords::CollectionAssociatedKeyword):
-				// Find named collection
-				collection = locateCollection(parser.argString(1));
-				if (collection == NULL)
-				{
-					msg.print("Warning: Collection '%s' is listed in ViewPane '%s', but no collection by this name exists.\n", parser.argChar(1), qPrintable(pane->name()));
-					CHECKIOFAIL
-				}
-				else pane->addCollection(collection);
-				break;
 			// End input block
 			case (Keywords::EndViewPaneKeyword):
 				return true;
@@ -765,19 +754,20 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				break;
 			// Role associated collection
 			case (Keywords::RoleTargetCollectionKeyword):
-				collection = locateCollection(parser.argChar(1));
+				// Locate named collection
+				collection = locateCollection(parser.argString(1));
 				if (!collection)
 				{
 					msg.print("Warning: Collection '%s' not found, and can't be associated to pane '%s'.\n", parser.argChar(1), qPrintable(pane->name()));
 					CHECKIOFAIL
 				}
-				pane->addRoleTargetCollection(collection);
+				pane->addCollectionTarget(collection);
 				break;
 			// Role target pane
 			case (Keywords::RoleTargetPaneKeyword):
 				associatedPane = viewLayout_.pane(parser.argString(1));
 				if (!associatedPane) associatedPane = viewLayout_.addPane(parser.argString(1));
-				pane->addRoleTargetPane(associatedPane);
+				pane->addPaneTarget(associatedPane);
 				break;
 			// Title scale
 			case (Keywords::TitlePointSizeKeyword):

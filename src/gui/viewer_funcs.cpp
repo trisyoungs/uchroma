@@ -74,7 +74,7 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	contextHeight_ = 0;
 	valid_ = false;
 	drawing_ = false;
-	renderingOffscreen_ = false;
+	renderingOffScreen_ = false;
 
 	// Engine Setup
 	correctTransparency_ = false;
@@ -120,11 +120,6 @@ void Viewer::initializeGL()
 	// Create an instance for each defined user primitive - we do this in every call to initialiseGL so
 	// that, when saving a bitmap using QGLWidget::renderPixmap(), we automatically create new display list
 	// objects, rather than having to worry about context sharing etc. Slow, but safer and more compatible.
-// 	msg.print("In Viewer::initializeGL, pushing instances for %i primitives...\n", primitiveList_.nItems());
-	//for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->pushInstance(context(), extensions);
-
-	// Recreate surface primitives (so that images are saved correctly)
-// 	for (Collection* collection = uChroma_->collections(); collection != NULL; collection = collection->next) updateSurfacePrimitive(collection, true);
 
 	// Recalculate view layouts
 	uChroma_->recalculateViewLayout(contextWidth_, contextHeight_);
@@ -173,8 +168,8 @@ void Viewer::paintGL()
 	// Update / recreate axes, display data and surface primitives if necessary
 	int nSurfacesUpdated = 0;
 
-	// Displayed collections list - we use this to keep track of collection primitives sent to the display
-	RefList<Collection,bool> collectionList;
+	// Used primitives list - we use this to pop primitives after being displayed when rendering offscreen
+	RefList<PrimitiveList,bool> primitiveList;
 
 	// Loop over defined viewpanes
 	GLdouble clipPlaneBottom[4] = { 0.0, 1.0, 0.0, 0.0 }, clipPlaneTop[4] = { 0.0, -1.0, 0.0, 0.0 };
@@ -312,22 +307,9 @@ void Viewer::paintGL()
 		glEnable(GL_CLIP_PLANE1);
 		glPopMatrix();
 
-		// Render relevant data to this pane
-		Collection* collection;
-		for (RefListItem<Collection,bool>* ri = pane->collections(); ri != NULL; ri = ri->next)
-		{
-			collection = ri->item;
-// 			printf("PANE '%s' : Update and render collection %p ('%s')\n", qPrintable(pane->name()), collection, qPrintable(collection->name()));
-			collection->updateDisplayData();
-			if (renderingOffscreen_)
-			{
-				updateSurfacePrimitive(collection, true, true);
-				collectionList.add(collection);
-			}
-			else if (updateSurfacePrimitive(collection)) ++nSurfacesUpdated;
-
-			collection->sendToGL();
-		}
+		// Render pane data
+		if (renderingOffScreen_) pane->renderData(context(), extensionsStack_.last(), primitiveList, true, true);
+		else pane->renderData(context(), extensionsStack_.last(), primitiveList);
 
 		// Disable current clip planes
 		glDisable(GL_CLIP_PLANE0);
@@ -357,11 +339,11 @@ void Viewer::paintGL()
 	drawing_ = false;
 
 	// If we were rendering offscreen, we may delete the topmost primitive instance and GLExtensions objects here
-	if (renderingOffscreen_)
+	if (renderingOffScreen_)
 	{
 // 		msg.print("In Viewer::PaintGL, popping instances for %i primitives...\n", primitiveList_.nItems());
 // 		for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->popInstance(context());
-		for (RefListItem<Collection,bool> *ri = collectionList.first(); ri != NULL; ri = ri->next) ri->item->displayPrimitives().popInstance(context());
+		for (RefListItem<PrimitiveList,bool> *ri = primitiveList.first(); ri != NULL; ri = ri->next) ri->item->popInstance(context());
 		extensionsStack_.removeLast();
 	}
 	
@@ -509,13 +491,13 @@ void Viewer::postRedisplay()
 // Render or grab image
 QPixmap Viewer::generateImage(int w, int h)
 {
-	renderingOffscreen_ = true;
+	renderingOffScreen_ = true;
 	if (useFrameBuffer_)
 	{
 		postRedisplay();
 		QImage image = grabFrameBuffer();
 
-		renderingOffscreen_ = false;
+		renderingOffScreen_ = false;
 		return QPixmap::fromImage(image);
 	}
 	else
@@ -533,7 +515,7 @@ QPixmap Viewer::generateImage(int w, int h)
 
 		// Reset everything back to normal
 		lineWidth_ = oldLineWidth;
-		renderingOffscreen_ = false;
+		renderingOffScreen_ = false;
 
 		return pixmap;
 	}

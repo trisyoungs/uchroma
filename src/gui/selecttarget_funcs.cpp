@@ -48,7 +48,7 @@ void SelectTargetDialog::populateLists(ViewPane* currentPane, ViewPane* availabl
 	{
 		// Don't add this pane if it is already in the current pane's list of targets, or is the current pane itself
 		if (pane == currentPane) continue;
-		if (currentPane->roleIsTargetPane(pane)) continue;
+		if (currentPane->paneIsTarget(pane)) continue;
 		item = new QListWidgetItem(ui.AvailablePanesList);
 		item->setText(pane->name());
 		item->setData(Qt::UserRole, VariantPointer<ViewPane>(pane));
@@ -58,7 +58,7 @@ void SelectTargetDialog::populateLists(ViewPane* currentPane, ViewPane* availabl
 	for (Collection* collection = availableCollections; collection != NULL; collection = collection->next)
 	{
 		// Don't add this collection if it is already in the current pane's list of targets
-		if (currentPane->roleIsTargetCollection(collection)) continue;
+		if (currentPane->collectionIsTarget(collection)) continue;
 		item = new QListWidgetItem(ui.AvailableCollectionsList);
 		item->setText(collection->name());
 		item->setData(Qt::UserRole, VariantPointer<Collection>(collection));

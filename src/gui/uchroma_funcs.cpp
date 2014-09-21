@@ -72,10 +72,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	connect(ui.MainView, SIGNAL(renderComplete(QString)), this, SLOT(updateRenderTimeLabel(QString)));
 	connect(ui.MainView, SIGNAL(surfacePrimitivesUpdated()), this, SLOT(updateCollectionInfo()));
 
-	// Set a static pointer to the main viewer in PrimitiveList
-	PrimitiveList::setViewer(ui.MainView);
-
-	// Hide CollectionList initially
+	// Hide LeftWidgets (Collection list etc.) initially
 	ui.LeftWidgetsWidget->setVisible(false);
 
 	// Connect CollectionTree context menu signal

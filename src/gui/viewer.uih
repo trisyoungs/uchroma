@@ -75,7 +75,7 @@ class Viewer : public QGLWidget
 	// Flag indicating if we are currently drawing to this context
 	bool drawing_;
 	// Flag specifying whether we are currently rendering offscreen
-	bool renderingOffscreen_; 
+	bool renderingOffScreen_; 
 	// String containing time taken to do last render
 	QString renderTime_;
 
@@ -172,10 +172,6 @@ class Viewer : public QGLWidget
 	 * User Functions / Data
 	 * (in viewer_user.cpp)
 	 */
-	private:
-	// Create/update surface primitive for specified collection
-	bool updateSurfacePrimitive(Collection* collection, bool forceUpdate = false, bool noPop = false);
-
 	signals:
 	// View was clicked on
 	void viewClicked();

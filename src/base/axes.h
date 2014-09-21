@@ -28,6 +28,7 @@
 #include "render/linestyle.h"
 #include "templates/vector3.h"
 #include "templates/vector4.h"
+#include "templates/array.h"
 #include <QtCore/QString>
 
 // Forward Declarations
@@ -91,59 +92,75 @@ class Axes
 	// Set minimum value for specified axis
 	void setMin(int axis, double value);
 	// Return minimum value for specified axis
-	double min(int axis);
+	double min(int axis) const;
 	// Set maximum value for specified axis
 	void setMax(int axis, double value);
 	// Return maximum value for specified axis
-	double max(int axis);
+	double max(int axis) const;
 	// Return axis range
-	double range(int axis);
+	double range(int axis) const;
 	// Set axis to extreme limit
 	void setToLimit(int axis, bool minLim);
 	// Set axis minimum limit for specified axis
 	void setLimitMin(int axis, double limit);
 	// Return axis minimum limit for specified axis
-	double limitMin(int axis);
+	double limitMin(int axis) const;
 	// Set axis maximum limit for specified axis
 	void setLimitMax(int axis, double limit);
 	// Return axis maximum limit for specified axis
-	double limitMax(int axis);
+	double limitMax(int axis) const;
 	// Return coordinate at centre of axes
-	Vec3<double> coordCentre();
+	Vec3<double> coordCentre() const;
 	// Return coordinate at minimum of specified axis
-	Vec3<double> coordMin(int axis);
+	Vec3<double> coordMin(int axis) const;
 	// Return coordinate at maximum of specified axis
-	Vec3<double> coordMax(int axis);
+	Vec3<double> coordMax(int axis) const;
 	// Set whether axis is inverted
 	void setInverted(int axis, bool b);
 	// Return whether axis is inverted
-	bool inverted(int axis);
+	bool inverted(int axis) const;
 	// Set whether axis is logarithmic
 	void setLogarithmic(int axis, bool b);
 	// Return whether axis is logarithmic
-	bool logarithmic(int axis);
+	bool logarithmic(int axis) const;
 	// Set whether axis is visible
 	void setVisible(int axis, bool b);
 	// Return whether specified axis is visible
-	bool visible(int axis);
+	bool visible(int axis) const;
 	// Set stretch factor for axis
 	void setStretch(int axis, double value);
 	// Return stretch factor for axis
-	double stretch(int axis);
+	double stretch(int axis) const;
 	// Set fractional position flag for axis
 	void setPositionIsFractional(int axis, bool value);
 	// Return fractional position flag for axis
-	bool positionIsFractional(int axis);
+	bool positionIsFractional(int axis) const;
 	// Set axis position (in real surface-space coordinates)
 	void setPositionReal(int axis, int dir, double value);
 	// Set axis position to axis limit (in real surface-space coordinates)
 	void setPositionRealToLimit(int axis, int dir, bool minLim);
 	// Return axis position (in real surface-space coordinates)
-	Vec3<double> positionReal(int axis);
+	Vec3<double> positionReal(int axis) const;
 	// Set axis position (in fractional axis coordinates)
 	void setPositionFractional(int axis, int dir, double value);
 	// Return axis position (in fractional axis coordinates)
-	Vec3<double> positionFractional(int axis);
+	Vec3<double> positionFractional(int axis) const;
+
+
+	/*
+	 * Data Transforms
+	 */
+	public:
+	// Return supplied data x value in local axes coordinates
+	double transformX(double x) const;
+	// Transform entire array of values into local axes coordinates
+	void transformX(Array<double>& xArray) const;
+	// Return supplied data y value in local axes coordinates
+	double transformY(double y) const;
+	// Transform entire array of values into local axes coordinates
+	void transformY(Array<double>& yArray) const;
+	// Return supplied data z value in local axes coordinates
+	double transformZ(double z) const;
 
 
 	/*
@@ -251,15 +268,31 @@ class Axes
 	// Set whether gridlines cover entire volume or just at axis lines
 	void setGridLinesFull(int axis, bool b);
 	// Return whether gridlines cover entire volume or just at axis lines
-	bool gridLinesFull(int axis);
+	bool gridLinesFull(int axis) const;
 	// Set whether gridLines at major tick intervals are active for specified axis
 	void setGridLinesMajor(int axis, bool on);
 	// Return whether gridLines at major tick intervals are active for specified axis
-	bool gridLinesMajor(int axis);
+	bool gridLinesMajor(int axis) const;
 	// Set whether gridLines at minor tick intervals are active for specified axis
 	void setGridLinesMinor(int axis, bool on);
 	// Return whether gridLines at minor tick intervals are active for specified axis
-	bool gridLinesMinor(int axis);
+	bool gridLinesMinor(int axis) const;
+
+
+	/*
+	 * Versions
+	 */
+	private:
+	// Version of axis definitions
+	int axesVersion_;
+	// Version of axis properties affecting data display
+	int displayVersion_;
+
+	public:
+	// Return version of axis definitions
+	int axesVersion();
+	// Return version of axis properties affecting data display
+	int displayVersion() const;
 
 
 	/*
@@ -278,8 +311,8 @@ class Axes
 	Primitive gridLineMajorPrimitives_[3], gridLineMinorPrimitives_[3];
 	// GridLine styles
 	LineStyle gridLineMajorStyle_[3], gridLineMinorStyle_[3];
-	// Whether axis primitives are valid
-	bool primitivesValid_;
+	// Versions at which primitives were last generated
+	int primitiveVersion_;
 
 	private:
 	// Update primitives for axis

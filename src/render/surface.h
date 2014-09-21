@@ -27,7 +27,7 @@
 #include "base/colourscale.h"
 
 // Forward Declarations
-/* none */
+class Axes;
 
 // Surface Generation
 class Surface
@@ -36,17 +36,19 @@ class Surface
 	// Construct normals for requested vertex TODO
 	static Vec3<double> constructVertexNormals(const Array<double>& abscissa, int index, DisplayDataSet* targetDataSet, DisplayDataSet* previousDataSet, DisplayDataSet* nextDataSet, int nPoints);
 	// Construct normal / colour surface data for dataset specified
-	static void constructSurfaceStrip(const Array<double>& abscissa, DisplayDataSet* targetDataSet, double yAxisScale, bool yLogarithmic, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, const ColourScale& colourScale, DisplayDataSet* previousDataSet, DisplayDataSet* nextDataSet);
+	static void constructSurfaceStrip(const Array<double>& x, const Array<double>& y, double z, const Axes& axes, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, const ColourScale& colourScale, const Array<double>& yPrev, double zPrev, const Array<double>& yNext, double zNext);
+	// Calculate integer index extents for display data given supplied axes
+	static bool calculateExtents(const Axes& axes, const Array<double>& abscissa, List<DisplayDataSet>& displayData, Vec3<int>& minIndex, Vec3<int>& maxIndex);
 
 	public:
 	// Construct line surface representation of data in XY slices
-	static void constructLineXY(PrimitiveList& primitives, double yAxisScale, bool yLogarithmic, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
+	static void constructLineXY(PrimitiveList& primitiveList, const Axes& axes, const Array<double>& displayAbscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
 	// Construct line surface representation of data in ZY slices
-	static void constructLineZY(PrimitiveList& primitives, double yAxisScale, bool yLogarithmic, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
+	static void constructLineZY(PrimitiveList& primitiveList, const Axes& axes, const Array<double>& displayAbscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
 	// Construct line surface representation of data
-	static void constructGrid(PrimitiveList& primitives, double yAxisScale, bool yLogarithmic, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
+	static void constructGrid(PrimitiveList& primitiveList, const Axes& axes, const Array<double>& displayAbscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
 	// Construct full surface representation of data
-	static void constructFull(PrimitiveList& primitives, double yAxisScale, bool yLogarithmic, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
+	static void constructFull(PrimitiveList& primitiveList, const Axes& axes, const Array<double>& displayAbscissa, List<DisplayDataSet>& displayData, ColourScale colourScale);
 };
 
 #endif

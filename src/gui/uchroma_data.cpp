@@ -67,7 +67,7 @@ void UChromaWindow::startNewSession(bool createDefaults)
 		currentViewPane_ = viewLayout_.setDefault();
 
 		// Add an empty collection, and add it to the current view pane
-		currentViewPane_->addCollection(addCollection());
+		currentViewPane_->addCollectionTarget(addCollection());
 		currentViewPane_->translateView(0.0, 0.0, -15.0);
 	}
 
@@ -81,9 +81,6 @@ Collection* UChromaWindow::addCollection(QString name)
 {
 	// Add an empty collection
 	currentCollection_ = collections_.add();
-
-	// Set link to MainView's primitive reflist
-	currentCollection_->displayPrimitives().setViewer(ui.MainView);
 
 	// Set the title
 	if (name.isEmpty()) currentCollection_->setName( uniqueCollectionName("Empty Collection ") );

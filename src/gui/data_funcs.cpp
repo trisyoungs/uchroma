@@ -141,10 +141,11 @@ void DataWindow::on_AddFilesButton_clicked(bool checked)
 	if (count == 0) return;
 
 	// Query whether limits should be updated to encompass all data
-	if (QMessageBox::question(this, "New Data Loaded", "New data has been loaded - set current data limits to encompass all data?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+	if (QMessageBox::question(this, "New Data Loaded", "New data has been loaded - expand limits to encompass all data?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
 	{
-		// Check display pane for current collection
-		if (currentCollection->displayPane()) currentCollection->displayPane()->showAllData();
+		// Get list of panes that are currently displaying this collection...
+		RefList<ViewPane,bool> panes = uChroma_.viewLayout().panes(currentCollection, ViewPane::StandardRole);
+		for (RefListItem<ViewPane,bool>* ri = panes.first(); ri != NULL; ri = ri->next) ri->item->showAllData();
 	}
 
 	// Need to update GUI
@@ -259,7 +260,6 @@ void DataWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 	
 	// Set correct offset
 	for (DataSet* dataSet = currentCollection->dataSets(); dataSet != NULL; dataSet = dataSet->next) dataSet->data().setZ(dataSet->data().z() - earliest);
-	currentCollection->setDisplayDataInvalid();
 
 	// Need to update now
 	Session::setAsModified();

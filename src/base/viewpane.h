@@ -118,7 +118,7 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 
 
 	/*
-	 * Role
+	 * Role / Targets
 	 */
 	public:
 	// Role of pane
@@ -127,6 +127,52 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	static PaneRole paneRole(const char* s);
 	// Convert PaneRole to text string
 	static const char* paneRole(PaneRole role);
+
+	private:
+	// Role of this pane
+	PaneRole role_;
+	// Target pane(s) for role, if relevant
+	RefList<ViewPane,bool> paneTargets_;
+	// Target collection(s) for role
+	RefList<Collection,bool> collectionTargets_;
+
+	public:
+	// Set role of this pane
+	void setRole(PaneRole role);
+	// Return role of this pane
+	PaneRole role();
+	// Add target pane for role
+	void addPaneTarget(ViewPane* pane);
+	// Remove target pane for role
+	void removePaneTarget(ViewPane* pane);
+	// Return whether specified pane is a target
+	bool paneIsTarget(ViewPane* pane);
+	// Return first target pane for role
+	RefListItem<ViewPane,bool>* paneTargets();
+	// Add target collection for role
+	void addCollectionTarget(Collection* collection);
+	// Remove target collection for role
+	void removeCollectionTarget(Collection* collection);
+	// Return whether specified collection is a target
+	bool collectionIsTarget(Collection* collection);
+	// Return first target collection for role
+	RefListItem<Collection,bool>* collectionTargets();
+	// Process supplied Collection changed/update signal if it is relevant to this pane
+	bool processUpdate(Collection* source, Collection::CollectionSignal signal);
+
+
+	/*
+	 * Generated/Derived Data
+	 */
+	private:
+	// Target collection(s) for role
+	List<TargetData> displayTargets_;
+
+
+	/*
+	 * Projection / View
+	 */
+	public:
 	// Autoscaling for 2D plots
 	enum AutoScaleMethod { NoAutoScale, ExpandingAutoScale, FullAutoScale, nAutoScaleMethods };
 	// Convert text string to AutoScaleMethod
@@ -140,56 +186,11 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	// Convert ViewType to text string
 	static const char* viewType(ViewType vt);
 
-
 	private:
-	// Role of this pane
-	PaneRole role_;
 	// Autoscaling method employed
 	AutoScaleMethod autoScale_;
 	// Type of view to use
 	ViewType viewType_;
-	// Target pane(s) for role, if relevant
-	RefList<ViewPane,bool> roleTargetPanes_;
-	// Target collection(s) for role, if relevant
-	RefList<Collection,TargetData> roleTargetCollections_;
-
-	public:
-	// Set role of this pane
-	void setRole(PaneRole role);
-	// Return role of this pane
-	PaneRole role();
-	// Set autoscaling method employed
-	void setAutoScale(ViewPane::AutoScaleMethod method);
-	// Return autoscaling method employed
-	ViewPane::AutoScaleMethod autoScale();
-	// Set view type
-	void setViewType(ViewPane::ViewType vt);
-	// Return view type
-	ViewPane::ViewType viewType();
-	// Add target pane for role
-	void addRoleTargetPane(ViewPane* pane);
-	// Remove target pane for role
-	void removeRoleTargetPane(ViewPane* pane);
-	// Return whether specified pane is a target
-	bool roleIsTargetPane(ViewPane* pane);
-	// Return first target pane for role
-	RefListItem<ViewPane,bool>* roleTargetPanes();
-	// Add target collection for role
-	void addRoleTargetCollection(Collection* collection);
-	// Remove target collection for role
-	void removeRoleTargetCollection(Collection* collection);
-	// Return whether specified collection is a target
-	RefListItem<Collection,TargetData>* roleIsTargetCollection(Collection* collection);
-	// Return first target collection for role
-	RefListItem<Collection,TargetData>* roleTargetCollections();
-	// Process supplied Collection changed/update signal if it is relevant to this pane
-	bool processUpdate(Collection* source, Collection::CollectionSignal signal);
-
-
-	/*
-	 * Projection / View
-	 */
-	private:
 	// Projection matrix for GL
 	Matrix projectionMatrix_;
 	// Whether projection has perspective
@@ -206,8 +207,18 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	private:
 	// Return calculated projection matrix
 	Matrix calculateProjectionMatrix(double zoom);
+	// Update primitive
+	void updatePrimitive(Collection* collection, PrimitiveList& primitive, bool forcePrimitiveUpdate = false, bool dontPopInstance = false);
 
 	public:
+	// Set autoscaling method employed
+	void setAutoScale(ViewPane::AutoScaleMethod method);
+	// Return autoscaling method employed
+	ViewPane::AutoScaleMethod autoScale();
+	// Set view type
+	void setViewType(ViewPane::ViewType vt);
+	// Return view type
+	ViewPane::ViewType viewType();
 	// Return projection matrix
 	Matrix projectionMatrix();
 	// Set whether this pane uses perspective
@@ -246,26 +257,18 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	void resetViewMatrix();
 	// Set display limits to show all available data
 	void showAllData();
+	// Render all data associated with this pane
+	void renderData(const QGLContext* context, GLExtensions* extensions, RefList<PrimitiveList,bool>& usedPrimitives, bool forcePrimitiveUpdate = false, bool dontPopInstance = false);
 
 
 	/*
-	 * Collections / Axes
+	 * Axes
 	 */
 	private:
-	// Reference list of collections displayed in this pane
-	RefList<Collection,bool> collections_;
 	// Axes for this pane
 	Axes axes_;
 
 	public:
-	// Add reference to collection to be displayed in this pane
-	void addCollection(Collection* collection);
-	// Remove reference to collection
-	void removeCollection(Collection* collection);
-	// Return first collection reference
-	RefListItem<Collection,bool>* collections();
-	// Flag all collections for updating
-	void flagCollectionDataInvalid();
 	// Return absolute minimum transformed values over all associated collections
 	Vec3<double> transformedDataMinima();
 	// Return absolute maximum transformed values over all associated collections

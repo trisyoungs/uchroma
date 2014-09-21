@@ -186,7 +186,7 @@ void CreateCollectionDialog::on_CreateButton_clicked(bool checked)
 {
 	// Create a new collection
 	Collection* target = uChroma_.addCollection(ui.EquationEdit->text());
-	if (uChroma_.currentViewPane()) uChroma_.currentViewPane()->addCollection(target);
+	if (uChroma_.currentViewPane()) uChroma_.currentViewPane()->addCollectionTarget(target);
 	
 	// Make sure the data is up to date
 	createData(target);

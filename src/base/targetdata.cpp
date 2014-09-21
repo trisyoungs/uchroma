@@ -20,22 +20,24 @@
 */
 
 #include "base/targetdata.h"
-#include "collection.h"
-#include "viewpane.h"
+#include "base/collection.h"
+#include "base/viewpane.h"
+#include "render/surface.h"
 
 // Constructor
-TargetData::TargetData()
+TargetData::TargetData() : ListItem<TargetData>()
 {
 	parent_ = NULL;
-	collectionData_ = new Collection*[TargetData::nTargetDataTypes];
-	for (int n=0; n<TargetData::nTargetDataTypes; ++n) collectionData_[n] = NULL;
+	collection_ = NULL;
+	primitiveDataUsedAt_ = -1;
+	primitiveColourUsedAt_ = -1;
+	primitiveStyleUsedAt_ = -1;
+	primitiveAxesUsedAt_ = -1;
 }
 
 // Destructor
 TargetData::~TargetData()
 {
-	for (int n=0; n<TargetData::nTargetDataTypes; ++n) if (collectionData_[n]) delete collectionData_[n];
-	delete[] collectionData_;
 }
 
 /*
@@ -49,27 +51,96 @@ void TargetData::setParent(ViewPane* parent)
 }
 
 /*
- * Collection Data
+ * Target Collection / Primitive
  */
 
-// Add new collection data
-Collection* TargetData::addCollectionData(TargetData::TargetDataType type)
+// Set pointer to target collection
+void TargetData::setCollection(Collection* collection)
 {
-	// Check if the data already exists
-	Collection* data = collectionData(type);
-	if (data) data->clearDataSets();
-	else
-	{
-		collectionData_[type] = new Collection;
-		parent_->addCollection(collectionData_[type]);
-		data = collectionData_[type];
-	}
-
-	return data;
+	collection_ = collection;
 }
 
-// Check if specified collection data type already exists
-Collection* TargetData::collectionData(TargetData::TargetDataType type)
+// Return pointer to target collection
+Collection* TargetData::collection()
 {
-	return collectionData_[type];
+	return collection_;
+}
+
+// Return primitive for display
+PrimitiveList& TargetData::primitive()
+{
+	return primitive_;
+}
+
+/*
+ * GL
+ */
+
+// Update primitive
+PrimitiveList& TargetData::updatePrimitive(const QGLContext* context, GLExtensions* extensions, const Axes& axes, bool forcePrimitiveUpdate, bool dontPopInstance)
+{
+	// Check collection validity
+	if (!Collection::objectValid(collection_, "collection in TargetData::updatePrimitive")) return primitive_;
+
+	// Check whether the primitive for this collection needs updating
+	bool upToDate = true;
+	if (forcePrimitiveUpdate) upToDate = false;
+	else if (primitiveAxesUsedAt_ != axes.displayVersion()) upToDate = false;
+	else if (primitiveColourUsedAt_ != collection_->colourVersion()) upToDate = false;
+	else if (primitiveDataUsedAt_ != collection_->dataVersion()) upToDate = false;
+	else if (primitiveStyleUsedAt_ != collection_->styleVersion()) upToDate = false;
+
+	// Pop old primitive instance (unless flagged not to)
+	if (!dontPopInstance) primitive_.popInstance(context);
+
+	// Recreate primitive depending on current style
+	switch (collection_->displayStyle())
+	{
+		case (Collection::LineXYStyle):
+			Surface::constructLineXY(primitive_, axes, collection_->displayAbscissa(), collection_->displayData(), collection_->colourScale());
+			break;
+		case (Collection::LineZYStyle):
+			Surface::constructLineZY(primitive_, axes, collection_->displayAbscissa(), collection_->displayData(), collection_->colourScale());
+			break;
+		case (Collection::GridStyle):
+			Surface::constructGrid(primitive_, axes, collection_->displayAbscissa(), collection_->displayData(), collection_->colourScale());
+			break;
+		case (Collection::SurfaceStyle):
+			Surface::constructFull(primitive_, axes, collection_->displayAbscissa(), collection_->displayData(), collection_->colourScale());
+			break;
+	}
+
+	// Push a new instance to create the new display list / vertex array
+	primitive_.pushInstance(context, extensions);
+
+	// Store version points for the up-to-date primitive
+	primitiveAxesUsedAt_ = axes.displayVersion();
+	primitiveColourUsedAt_ = collection_->colourVersion();
+	primitiveDataUsedAt_ = collection_->dataVersion();
+	primitiveStyleUsedAt_ = collection_->styleVersion();
+}
+
+// Send collection data to GL, including any associated fit and extracted data
+void TargetData::sendToGL()
+{
+	// Check collection validity
+	if (!Collection::objectValid(collection_, "collection in TargetData::updatePrimitive")) return;
+
+	// If this collection is not visible return now
+	if (!collection_->visible()) return;
+
+	if (collection_->displayStyle() == Collection::SurfaceStyle)
+	{
+		glEnable(GL_LIGHTING);
+		glDisable(GL_LINE_SMOOTH);
+	}
+	else
+	{
+		glEnable(GL_LINE_SMOOTH);
+		glLineWidth(collection_->displayLineWidth());
+		glDisable(GL_LIGHTING);
+	}
+
+	// Send Primitives to display
+	primitive_.sendToGL();
 }

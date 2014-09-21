@@ -224,9 +224,9 @@ void EditViewLayoutDialog::on_PaneAddTargetButton_clicked(bool checked)
 	{
 		// Get lists of panes and collections, and add them to the targets list
 		RefList<ViewPane,bool> panes = targetDialog.selectedPanes();
-		for (RefListItem<ViewPane,bool>* ri = panes.first(); ri != NULL; ri = ri->next) currentPane_->addRoleTargetPane(ri->item);
+		for (RefListItem<ViewPane,bool>* ri = panes.first(); ri != NULL; ri = ri->next) currentPane_->addPaneTarget(ri->item);
 		RefList<Collection,bool> collections = targetDialog.selectedCollections();
-		for (RefListItem<Collection,bool>* rj = collections.first(); rj != NULL; rj = rj->next) currentPane_->addRoleTargetCollection(rj->item);
+		for (RefListItem<Collection,bool>* rj = collections.first(); rj != NULL; rj = rj->next) currentPane_->addCollectionTarget(rj->item);
 	}
 
 	updateControls();
@@ -238,8 +238,8 @@ void EditViewLayoutDialog::on_PaneRemoveTargetButton_clicked(bool checked)
 	QList<QListWidgetItem*> items = ui.PaneTargetsList->selectedItems();
 	for (int n=0; n<items.count(); ++n)
 	{
-		if (items[n]->text().startsWith("(C)")) currentPane_->removeRoleTargetCollection(VariantPointer<Collection>(items[n]->data(Qt::UserRole)));
-		else if (items[n]->text().startsWith("(P)")) currentPane_->removeRoleTargetPane(VariantPointer<ViewPane>(items[n]->data(Qt::UserRole)));
+		if (items[n]->text().startsWith("(C)")) currentPane_->removeCollectionTarget(VariantPointer<Collection>(items[n]->data(Qt::UserRole)));
+		else if (items[n]->text().startsWith("(P)")) currentPane_->removePaneTarget(VariantPointer<ViewPane>(items[n]->data(Qt::UserRole)));
 	}
 
 	updateControls();
@@ -278,16 +278,16 @@ void EditViewLayoutDialog::updateControls()
 
 		// Update targets list
 		ui.PaneTargetsList->clear();
-		for (RefListItem<ViewPane,bool>* ri = currentPane_->roleTargetPanes(); ri != NULL; ri = ri->next)
+		QListWidgetItem* item;
+		for (RefListItem<ViewPane,bool>* ri = currentPane_->paneTargets(); ri != NULL; ri = ri->next)
 		{
-			QListWidgetItem* item;
 			item = new QListWidgetItem(ui.PaneTargetsList);
 			item->setText("(P) " + ri->item->name());
 			item->setData(Qt::UserRole, VariantPointer<ViewPane>(ri->item));
 		}
-		for (RefListItem<Collection,TargetData>* ri = currentPane_->roleTargetCollections(); ri != NULL; ri = ri->next)
+		for (RefListItem<Collection,bool>* ri = currentPane_->collectionTargets(); ri != NULL; ri = ri->next)
 		{
-			QListWidgetItem* item;
+			if (!Collection::objectValid(ri->item, "collection in EditViewLayoutDialog::updateControls")) continue;
 			item = new QListWidgetItem(ui.PaneTargetsList);
 			item->setText("(C) " + ri->item->name());
 			item->setData(Qt::UserRole, VariantPointer<Collection>(ri->item));

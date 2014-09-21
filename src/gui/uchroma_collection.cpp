@@ -158,21 +158,37 @@ void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 {
 	// Build the context menu to display
 	QMenu contextMenu;
+	QAction* action;
 	// -- Main 'edit' functions
 	QAction* deleteAction = contextMenu.addAction("&Delete");
 	QAction* duplicateAction = contextMenu.addAction("Du&plicate");
-	// -- "Move to..." pane menu
+	// -- "Display..." pane menu
 	contextMenu.addSeparator();
-	QMenu paneMenu;
-	QList<QAction*> paneActions;
-	for (ViewPane* pane = viewLayout_.panes(); pane != NULL; pane = pane->next)
+	QMenu paneMenu, removeFromPaneMenu, addToPaneMenu;
+	RefList<ViewPane,bool> usedPanes, displayPanes = viewLayout_.panes(ViewPane::StandardRole);
+	QList<QAction*> addToPaneActions, removeFromPaneActions;
+	// -- ... Populate removeFromPaneMenu first...
+	for (RefListItem<ViewPane,bool>* ri = displayPanes.first(); ri != NULL; ri = ri->next)
 	{
-		QAction* action = paneMenu.addAction(pane->name());
-		action->setData(VariantPointer<ViewPane>(pane));
-		paneActions << action;
+		action = removeFromPaneMenu.addAction(ri->item->name());
+		action->setData(VariantPointer<ViewPane>(ri->item));
+		removeFromPaneActions << action;
+		usedPanes.add(ri->item);
 	}
-	QAction* sendToPaneMenuAction = contextMenu.addMenu(&paneMenu);
-	sendToPaneMenuAction->setText("Move to...");
+	action = paneMenu.addMenu(&removeFromPaneMenu);
+	action->setText("Remove from pane...");
+	// -- ... Now populate addToPaneMenu...
+	for (RefListItem<ViewPane,bool>* ri = displayPanes.first(); ri != NULL; ri = ri->next)
+	{
+		if (usedPanes.contains(ri->item)) continue;
+		action = addToPaneMenu.addAction(ri->item->name());
+		action->setData(VariantPointer<ViewPane>(ri->item));
+		addToPaneActions << action;
+	}
+	action = paneMenu.addMenu(&addToPaneMenu);
+	action->setText("Add to pane...");
+	action = contextMenu.addMenu(&paneMenu);
+	action->setText("Display...");
 	// -- Analysis
 	contextMenu.addSeparator();
 	QAction* fitAction = contextMenu.addAction("New &Fit Equation...");
@@ -185,12 +201,21 @@ void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 	// What was clicked?
 	if (menuResult == deleteAction) on_actionCollectionDelete_triggered(false);
 	else if (menuResult == duplicateAction) on_actionCollectionDuplicate_triggered(false);
-	else if (paneActions.contains(menuResult))
+	else if (removeFromPaneActions.contains(menuResult))
 	{
-		// Check current display pane - if it is non-null we must remove it from that pane first
-		if (currentCollection_->displayPane()) currentCollection_->displayPane()->removeCollection(currentCollection_);
 		ViewPane* pane = VariantPointer<ViewPane>(menuResult->data());
-		if (pane) pane->addCollection(currentCollection_);
+		printf("jlklkjkl\n");
+		if (pane) pane->removeCollectionTarget(currentCollection_);
+
+		// Update the item
+		updateCollectionTreeItem(ui.CollectionTree->currentItem());
+
+		updateDisplay();
+	}
+	else if (addToPaneActions.contains(menuResult))
+	{
+		ViewPane* pane = VariantPointer<ViewPane>(menuResult->data());
+		if (pane) pane->addCollectionTarget(currentCollection_);
 
 		// Update the item
 		updateCollectionTreeItem(ui.CollectionTree->currentItem());
@@ -224,18 +249,11 @@ void UChromaWindow::updateCollectionInfo()
 	{
 		ui.CollectionNSlicesLabel->setText(QString::number(currentCollection_->nDataSets()));
 		ui.CollectionNPointsLabel->setText(QString::number(currentCollection_->nDataPoints()));
-		ui.CollectionNVerticesLabel->setText(QString::number(currentCollection_->displayPrimitives().nDefinedVertices()));
-		ui.CollectionNIndicesLabel->setText(QString::number(currentCollection_->displayPrimitives().nDefinedIndices()));
-		int nPrimitives = currentCollection_->displayPrimitives().nDefinedIndices() / (currentCollection_->displayStyle() == Collection::SurfaceStyle ? 3 : 2);
-		ui.CollectionNPrimitivesLabel->setText(QString::number(nPrimitives));
 	}
 	else
 	{
 		ui.CollectionNSlicesLabel->setText("0");
 		ui.CollectionNPointsLabel->setText("0");
-		ui.CollectionNVerticesLabel->setText("0");
-		ui.CollectionNIndicesLabel->setText("0");
-		ui.CollectionNPrimitivesLabel->setText("0");
 	}
 
 	// Set number of collections in the current session (can use Collection's ObjectList to get number)

@@ -52,21 +52,12 @@ void DataSpaceRange::set(Collection* collection, int abscissaFirst, int abscissa
 	// Check for valid collection
 	if (!Collection::objectValid(collection, "collection in DataSpaceRange::set()")) return;
 
-	// Check for valid pane/axes
-	if (!ViewPane::objectValid(collection->displayPane(), "display pane in DataSpaceRange::set()")) return;
-
 	displayDataSetStart_ = firstDataSet;
 	displayDataSetEnd_ = lastDataSet;
 	nDataSets_ = (displayDataSetEnd_ - displayDataSetStart_) + 1;
 	abscissaStart_ = abscissaFirst;
 	abscissaEnd_ = abscissaLast;
 	nPoints_ = (abscissaEnd_ - abscissaStart_) + 1;
-
-	// Grab stretch factors from the source collection's viewpane axes
-	// We need this since, because we are working with the Collection::displayData_ arrays, all X and Y values will have been scaled by these factors
-	double xStretch = collection->displayPane()->axes().stretch(0);
-	double yStretch = collection->displayPane()->axes().stretch(1);
-	double zStretch = collection->displayPane()->axes().stretch(2);
 
 	// Setup data arrays
 	x_.clear();
@@ -79,10 +70,10 @@ void DataSpaceRange::set(Collection* collection, int abscissaFirst, int abscissa
 	DisplayDataSet** dataSets = collection->displayData().array();
 
 	// Store x values
-	for (int n=0; n<nPoints_; ++n) x_.add(abscissa.value(n+abscissaStart_)/xStretch);
+	for (int n=0; n<nPoints_; ++n) x_.add(abscissa.value(n+abscissaStart_));
 
 	// Store z values
-	for (int n=0; n<nDataSets_; ++n) z_.add(dataSets[n+displayDataSetStart_]->z()/zStretch);
+	for (int n=0; n<nDataSets_; ++n) z_.add(dataSets[n+displayDataSetStart_]->z());
 
 	// Copy y data
 	yReference_.initialise(nPoints_, nDataSets_);
@@ -98,7 +89,7 @@ void DataSpaceRange::set(Collection* collection, int abscissaFirst, int abscissa
 		const Array<DisplayDataSet::DataPointType>& yType = dataSets[n+displayDataSetStart_]->yType();
 		for (int i=0; i<nPoints_; ++i)
 		{
-			yReference_.ref(i,n) = y.value(i+abscissaStart_)/yStretch;
+			yReference_.ref(i,n) = y.value(i+abscissaStart_);
 			if (!referenceDataOnly) yTypes_.ref(i,n) = yType.value(i+abscissaStart_);
 		}
 	}

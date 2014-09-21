@@ -408,14 +408,6 @@ void UChromaWindow::on_actionAnalyseNewFit_triggered(bool checked)
 	// Check current Collection
 	if (!Collection::objectValid(currentCollection_, "collection in UChromaWindow::on_actionAnalyseNewFit_triggered()")) return;
 
-	// Ensure that the current collection has had its display data created (otherwise we have nothing to fit!)
-	currentCollection_->updateDisplayData();
-	if (!currentCollection_->displayDataValid())
-	{
-		QMessageBox::critical(this, "Error", "Collection data must be associated to a pane in order to perform fitting.");
-		return;
-	}
-
 	// Add a new fit collection to the current collection
 	Collection* newFit = currentCollection_->addFit(currentCollection_->uniqueFitName("New Fit"));
 

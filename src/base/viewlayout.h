@@ -119,6 +119,10 @@ class ViewLayout : public ListItem<ViewLayout>
 	ViewPane* pane(QString name);
 	// Return index of specified pane in list
 	int paneIndex(ViewPane* pane);
+	// Return reflist of all panes of specified type
+	RefList<ViewPane,bool> panes(ViewPane::PaneRole role);
+	// Return reflist of panes (optionally of specified type) that target specified collection
+	RefList<ViewPane,bool> panes(Collection* collection, ViewPane::PaneRole role = ViewPane::nPaneRoles);
 	// Return if pane is in the current list
 	bool containsPane(ViewPane* pane);
 	// Return pane under specified coordinate

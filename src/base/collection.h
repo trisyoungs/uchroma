@@ -30,7 +30,6 @@
 #include "templates/objectlist.h"
 
 // Forward Declarations
-class ViewPane;
 class FitKernel;
 
 class Collection : public ListItem<Collection>, public ObjectList<Collection>
@@ -58,6 +57,8 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	QDir dataFileDirectory_;
 	// Extreme values of raw data
 	Vec3<double> dataMin_, dataMax_;
+	// Version counter for changes to data
+	int dataVersion_;
 
 	public:
 	// Set name of collection
@@ -114,6 +115,8 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	Vec3<double> dataMin();
 	// Return data maxima, calculating if necessary
 	Vec3<double> dataMax();
+	// Return version counter for changes to data
+	int dataVersion();
 
 
 	/*
@@ -268,8 +271,8 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	 * Update
 	 */
 	private:
-	// Flag indicating if slice data has been changed in any way
-	bool dataChanged_;
+	// Data version at which limits and transforms were last updated
+	int limitsAndTransformsVersion_;
 
 	private:
 	// Update data limits and transform data
@@ -308,8 +311,10 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	AlphaControl alphaControl_;
 	// Fixed alpha value (for FixedAlpha option)
 	double fixedAlpha_;
-	// Flag indicating that colourscale is valid (and doesn't need to be regenerated)
-	bool colourScaleValid_;
+	// Version for colourscale
+	int colourVersion_;
+	// Version at which the colourscale was last generated at
+	bool colourScaleGeneratedAt_;
 
 	public:
 	// Update colour scale
@@ -348,8 +353,8 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	double fixedAlpha();
 	// Return current colourscale
 	const ColourScale& colourScale();
-	// Return whether colourscale is valid
-	bool colourScaleValid();
+	// Return colour version
+	bool colourVersion();
 
 
 	/*
@@ -368,20 +373,16 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	bool visible_;
 	// Transformed data to display
 	List<DisplayDataSet> displayData_;
+	// Data version at which displayData_ was last generated
+	int displayDataGeneratedAt_;
 	// Abscissa values for display data
 	Array<double> displayAbscissa_;
 	// Display style of data
 	DisplayStyle displayStyle_;
 	// Line width (for line styles)
 	double displayLineWidth_;
-	// Flag indicating whether display data is valid (and doesn't need to be regenerated)
-	bool displayDataValid_;
-	// PrimitiveList containing GL display data
-	PrimitiveList displayPrimitives_;
-	// Flag indicating whether display primitives are valid (and don't need to be regenerated)
-	bool displayPrimitivesValid_;
-	// View pane on which this data is being displayed
-	ViewPane* displayPane_;
+	// Style version
+	int styleVersion_;
 
 	public:
 	// Set whether data is visible
@@ -400,24 +401,8 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	void setDisplayLineWidth(double width);
 	// Return Line width (for line styles)
 	double displayLineWidth();
-	// Manually set the flag to force regeneration of surface data
-	void setDisplayDataInvalid();
-	// Flag that the primitive has been updated
-	void setDisplayPrimitiveValid();
-	// Return whether primitives are valid
-	bool displayPrimitivesValid();
-	// Return list of display primitives
-	PrimitiveList& displayPrimitives();
-	// Update display data and surface if necessary
-	void updateDisplayData();
-	// Return whether display primitives are valid
-	bool displayDataValid();
-	// Set view pane on which this data is being displayed
-	void setDisplayPane(ViewPane* pane);
-	// Return view pane on which this data is being displayed
-	ViewPane* displayPane();
-	// Send collection data to GL, including any associated fit and extracted data
-	void sendToGL();
+	// Return style version
+	int styleVersion();
 };
 
 #endif

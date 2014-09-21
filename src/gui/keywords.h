@@ -233,7 +233,6 @@ class Keywords
 		AxisBlockKeyword,
 		BoundingBoxKeyword,
 		BoundingBoxPlaneYKeyword,
-		CollectionAssociatedKeyword,
 		EndViewPaneKeyword,
 		GeometryKeyword,
 		LabelPointSizeKeyword,

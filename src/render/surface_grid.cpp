@@ -20,83 +20,100 @@
 */
 
 #include "render/surface.h"
+#include "base/axes.h"
 
 // Construct grid surface representation of data
-void Surface::constructGrid(PrimitiveList& primitives, double yAxisScale, bool yLogarithmic, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale)
+void Surface::constructGrid(PrimitiveList& primitiveList, const Axes& axes, const Array<double>& displayAbscissa, List<DisplayDataSet>& displayData, ColourScale colourScale)
 {
 	// Forget all data in current primitives
-	primitives.forgetAll();
+	primitiveList.forgetAll();
 
-	// Return if no data
-	if (displayData.nItems() < 1) return;
+	// Get extents of displayData to use based on current axes limits
+	Vec3<int> minIndex, maxIndex;
+	if (!calculateExtents(axes, displayAbscissa, displayData, minIndex, maxIndex)) return;
+	int nZ = (maxIndex.z - minIndex.z) + 1;
+
+	// Copy and transform abscissa values (still in data space) into axes coordinates
+	Array<double> x(displayAbscissa, minIndex.x, maxIndex.x);
+	axes.transformX(x);
+	int nX = x.nItems();
+	if (nX < 2) return;
 
 	// Decide how large to make VertexChunks in Primitives
 	// We will consider multiple slices at once in order to take most advantage of the post-transform cache
 	// forming (abscissa.nItems()/(cacheSize-1)+1) Primitives (we divide by (cacheSize-1) because we will force an overlap
 	// of one gridpoint between adjacent strips).
 	const int cacheSize = 12;
-	int nPrimitives = abscissa.nItems()/(cacheSize-1) + 1;
-	int maxVertices = cacheSize*displayData.nItems();
-	int maxIndices = displayData.nItems()*(cacheSize-1) + (displayData.nItems()-1)*cacheSize;
+	int nPrimitives = x.nItems()/(cacheSize-1) + 1;
+	int maxVertices = cacheSize*nZ;
+	int maxIndices = nZ*(cacheSize-1) + (nZ-1)*cacheSize;
+
+	// Get some values from axes so we can calculate colours properly
+	bool yLogarithmic = axes.logarithmic(1);
+	double yStretch = axes.stretch(1);
 
 	// Reinitialise primitive list
-	primitives.reinitialise(nPrimitives, true, maxVertices, maxIndices*10, GL_LINES, true);
+	primitiveList.reinitialise(nPrimitives, true, maxVertices, maxIndices*10, GL_LINES, true);
 
 	// Temporary variables
-	int n, nPoints, offset = 0, i, nLimit, nMax;
+	int n, nPoints, offset = 0, i, nLimit, nMax, slice;
 	Vec4<GLfloat> colour;
 	GLfloat zA, zB;
 	Vec3<double> nrm(0.0, 1.0, 0.0);
+	Array<double> y;
+	Array<DisplayDataSet::DataPointType> yType;
 
-	DisplayDataSet** slices = displayData.array(), slice;
-	Primitive* currentPrimitive = primitives[0];
+	DisplayDataSet** slices = displayData.array();
+	Primitive* currentPrimitive = primitiveList[0];
 	GLuint verticesA[cacheSize], verticesB[cacheSize];
 	double z;
 
 	// Loop over abscissa indices
-	while (offset <= abscissa.nItems())
+	while (offset <= x.nItems())
 	{
 		// Set nLimit to ensure we don't go beyond the end of the data arrays
-		nLimit = std::min(cacheSize, abscissa.nItems()-offset);
+		nLimit = std::min(cacheSize, x.nItems()-offset);
 
-		// Grab arrays from first slice
-		const Array<double>& y = slices[0]->y();
-		const Array<DisplayDataSet::DataPointType>& yType = slices[0]->yType();
-		z = slices[0]->z();
-		
-		// Generate lines / vertices for first row
-		for (n=0; n<nLimit; ++n)
-		{
-			i = offset+n;
-			if (yType.value(i) != DisplayDataSet::NoPoint)
-			{
-				// A value exists here, so define a vertex
-				colourScale.colour((yLogarithmic ? pow(10.0, y.value(i)) : y.value(i)) / yAxisScale, colour);
-				verticesA[n] = currentPrimitive->defineVertex(abscissa.value(i), y.value(i), z, nrm, colour);
-
-				// If the previous vertex also exists, draw a line here
-				if ((n != 0) && (verticesA[n-1] != -1)) currentPrimitive->defineIndices(verticesA[n-1], verticesA[n]);
-			}
-			else verticesA[n] = -1;
-		}
+// 		// Grab arrays from first slice
+// 		y.copy(slices[0]->y(), offset, offset+nLimit-1);
+// 		axes.transformY(y);
+// 		yType.copy(slices[0]->yType(), offset, offset+nLimit-1);
+// 		z = axes.transformZ(slices[0]->z());
+// 		
+// 		// Generate lines / vertices for first row
+// 		for (n=0; n<nLimit; ++n)
+// 		{
+// 			i = offset+n;
+// 			if (yType.value(i) != DisplayDataSet::NoPoint)
+// 			{
+// 				// A value exists here, so define a vertex
+// 				colourScale.colour((yLogarithmic ? pow(10.0, y.value(i)) : y.value(i)) / yStretch, colour);
+// 				verticesA[n] = currentPrimitive->defineVertex(x.value(i), y.value(i), z, nrm, colour);
+// 
+// 				// If the previous vertex also exists, draw a line here
+// 				if ((n != 0) && (verticesA[n-1] != -1)) currentPrimitive->defineIndices(verticesA[n-1], verticesA[n]);
+// 			}
+// 			else verticesA[n] = -1;
+// 		}
 
 		// Loop over remaining displayData
-		for (int slice = 1; slice < displayData.nItems(); ++slice)
+		for (int slice = 0; slice < displayData.nItems(); ++slice)
 		{
 			// Grab arrays
-			const Array<double>& y = slices[slice]->y();
-			const Array<DisplayDataSet::DataPointType>& yType = slices[slice]->yType();
-			z = slices[slice]->z();
+			y.copy(slices[slice]->y(), minIndex.x+offset, minIndex.x+offset+nLimit-1);
+			axes.transformY(y);
+			yType.copy(slices[slice]->yType(), minIndex.x+offset, minIndex.x+offset+nLimit-1);
+			z = axes.transformZ(slices[slice]->z());
 
 			// Generate vertices for this row
 			for (n=0; n<nLimit; ++n)
 			{
 				i = offset+n;
-				if (yType.value(offset+n) != DisplayDataSet::NoPoint)
+				if (yType.value(n) != DisplayDataSet::NoPoint)
 				{
 					// A value exists here, so define a vertex
-					colourScale.colour((yLogarithmic ? pow(10.0, y.value(i)) : y.value(i)) / yAxisScale, colour);
-					verticesB[n] = currentPrimitive->defineVertex(abscissa.value(i), y.value(i), z, nrm, colour);
+					colourScale.colour((yLogarithmic ? pow(10.0, y.value(n)) : y.value(n)) / yStretch, colour);
+					verticesB[n] = currentPrimitive->defineVertex(x.value(i), y.value(n), z, nrm, colour);
 
 					// If the previous vertex on this row also exists, draw a line here
 					if ((n != 0) && (verticesB[n-1] != -1)) currentPrimitive->defineIndices(verticesB[n-1], verticesB[n]);
@@ -104,11 +121,14 @@ void Surface::constructGrid(PrimitiveList& primitives, double yAxisScale, bool y
 				else verticesB[n] = -1;
 			}
 
-			// Draw lines across slices
-			nMax= (displayData.nItems()-slice) > 1 ? nLimit-1 : nLimit;
-			for (n=0; n<nMax; ++n)
+			// Draw lines across slices (if slice != 0)
+			if (slice != 0)
 			{
-				if ((verticesA[n] != -1) && (verticesB[n] != -1)) currentPrimitive->defineIndices(verticesA[n], verticesB[n]);
+				nMax = (maxIndex.z-slice) > 1 ? nLimit-1 : nLimit;
+				for (n=0; n<nMax; ++n)
+				{
+					if ((verticesA[n] != -1) && (verticesB[n] != -1)) currentPrimitive->defineIndices(verticesA[n], verticesB[n]);
+				}
 			}
 
 			// Store current vertices for next pass

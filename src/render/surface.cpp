@@ -20,6 +20,8 @@
 */
 
 #include "render/surface.h"
+#include "base/axes.h"
+#include <X11/Xlib.h>
 
 // Construct normal / colour data for vertex specified
 Vec3<double> Surface::constructVertexNormals(const Array<double>& abscissa, int index, DisplayDataSet* targetDataSet, DisplayDataSet* previousDataSet, DisplayDataSet* nextDataSet, int nPoints)
@@ -27,7 +29,7 @@ Vec3<double> Surface::constructVertexNormals(const Array<double>& abscissa, int 
 	Vec3<double> normals;
 
 	// Grab references to first target array
-	const Array<double>& yTarget = targetDataSet->y();
+	const Array<double>& y = targetDataSet->y();
 
 	// Check whether previous / next slice information is available
 	if ((previousDataSet == NULL) && (nextDataSet == NULL))
@@ -92,38 +94,47 @@ Vec3<double> Surface::constructVertexNormals(const Array<double>& abscissa, int 
 }
 
 // Construct normal / colour data for slice specified
-void Surface::constructSurfaceStrip(const Array<double>& abscissa, DisplayDataSet* targetSlice, double yAxisScale, bool yLogarithmic, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, const ColourScale& colourScale, DisplayDataSet* previousSlice, DisplayDataSet* nextSlice)
+void Surface::constructSurfaceStrip(const Array<double>& x, const Array<double>& y, double z, const Axes& axes, Array< Vec3<double> >& normals, Array< Vec4<GLfloat> >& colours, const ColourScale& colourScale, const Array<double>& yPrev, double zPrev, const Array<double>& yNext, double zNext)
 {
 	normals.clear();
 	colours.clear();
-	if ((previousSlice == NULL) && (nextSlice == NULL)) return;
+	if ((yPrev.nItems() == 0) && (yNext.nItems() == 0)) return;
 	
 	// Grab references to target arrays
-	const Array<double>& yTarget = targetSlice->y();
-	int nPoints = abscissa.nItems();
-	if (nPoints < 2) return;
+	int nX = x.nItems();
+	if (nX < 2) return;
 
 	// Get colour data
 	int n;
 	QColor colour;
-	for (n=0; n<nPoints; ++n)
+	double yScale = axes.stretch(1);
+	if (axes.logarithmic(1))
 	{
-		colour = colourScale.colour((yLogarithmic ? pow(10.0, yTarget.value(n)): yTarget.value(n)) / yAxisScale);
-		colours.add(Vec4<GLfloat>(colour.redF(), colour.greenF(), colour.blueF(), colour.alphaF()));
+		for (n=0; n<nX; ++n)
+		{
+			colour = colourScale.colour(pow(10.0, y.value(n)) / yScale);
+			colours.add(Vec4<GLfloat>(colour.redF(), colour.greenF(), colour.blueF(), colour.alphaF()));
+		}
+	}
+	else
+	{
+		for (n=0; n<nX; ++n)
+		{
+			colour = colourScale.colour(y.value(n) / yScale);
+			colours.add(Vec4<GLfloat>(colour.redF(), colour.greenF(), colour.blueF(), colour.alphaF()));
+		}
 	}
 
 	// Calculate normals
 	Vec3<double> v1, v2, v3;
 	double dz;
-	if (previousSlice && nextSlice)
+	if ((yPrev.nItems() != 0) && (yNext.nItems() != 0))
 	{
 		// Grab other array references
-		const Array<double>& yPrev = previousSlice->y();
-		const Array<double>& yNext = nextSlice->y();
-		dz = previousSlice->z() - nextSlice->z();
+		dz = zPrev- zNext;
 
 		// -- First point
-		v1.set(abscissa.value(1) - abscissa.value(0), yTarget.value(1) - yTarget.value(0), 0);
+		v1.set(x.value(1) - x.value(0), y.value(1) - y.value(0), 0);
 		v2.set(0.0, yNext.value(0) - yPrev.value(0), dz);
 		normals.add(v1 * v2);
 // 		v3 = v1 * v2;
@@ -131,9 +142,9 @@ void Surface::constructSurfaceStrip(const Array<double>& abscissa, DisplayDataSe
 // 		normals.add(v3);
 // 		printf("Norm %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", 0, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		// -- Points 1 to N-2
-		for (n=1; n<nPoints-1; ++n)
+		for (n=1; n< nX -1; ++n)
 		{
-			v1.set(abscissa.value(n+1) - abscissa.value(n-1), yTarget.value(n+1) - yTarget.value(n-1), 0.0);
+			v1.set(x.value(n+1) - x.value(n-1), y.value(n+1) - y.value(n-1), 0.0);
 			v2.set(0.0, yNext.value(n) - yPrev.value(n), dz);
 			normals.add(v1 * v2);
 // 			v3 = v1 * v2;
@@ -142,33 +153,32 @@ void Surface::constructSurfaceStrip(const Array<double>& abscissa, DisplayDataSe
 // 			printf("Norm %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		}
 		// -- Last point
-		v1.set(abscissa.value(nPoints-1) - abscissa.value(nPoints-2), yTarget.value(nPoints-1) - yTarget.value(nPoints-2), 0.0);
-		v2.set(0.0, yPrev.value(nPoints-1) - yNext.value(nPoints-1), dz);
+		v1.set(x.value(nX -1) - x.value(nX -2), y.value(nX -1) - y.value(nX -2), 0.0);
+		v2.set(0.0, yPrev.value(nX -1) - yNext.value(nX -1), dz);
 		normals.add(v1 * v2);
 // 		v3 = v1 * v2;
 // 		v3.normalise();
 // 		normals.add(v3);
 // 		printf("Norm %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", nPoints-1, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 	}
-	else if (previousSlice)
+	else if (yPrev.nItems() != 0)
 	{
 		// Grab other array reference
-		const Array<double>& yPrev = previousSlice->y();
-		dz = previousSlice->z() - targetSlice->z();
+		dz = zPrev - z;
 
 		// -- First point
-		v1.set(abscissa.value(1) - abscissa.value(0), yTarget.value(1) - yTarget.value(0), 0.0);
-		v2.set(0.0, yTarget.value(0) - yPrev.value(0), dz);
+		v1.set(x.value(1) - x.value(0), y.value(1) - y.value(0), 0.0);
+		v2.set(0.0, y.value(0) - yPrev.value(0), dz);
 		normals.add(v1 * v2);
 // 		v3 = v1 * v2;
 // 		v3.normalise();
 // 		normals.add(v3);
 // 		printf("Last %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", 0, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		// -- Points 1 to N-2
-		for (n=1; n<nPoints-1; ++n)
+		for (n=1; n< nX -1; ++n)
 		{
-			v1.set(abscissa.value(n+1) - abscissa.value(n-1), yTarget.value(n+1) - yTarget.value(n-1), 0.0);
-			v2.set(0.0, yTarget.value(n) - yPrev.value(n), dz);
+			v1.set(x.value(n+1) - x.value(n-1), y.value(n+1) - y.value(n-1), 0.0);
+			v2.set(0.0, y.value(n) - yPrev.value(n), dz);
 			normals.add(v1 * v2);
 // 			v3 = v1 * v2;
 // 			v3.normalise();
@@ -176,8 +186,8 @@ void Surface::constructSurfaceStrip(const Array<double>& abscissa, DisplayDataSe
 // 			printf("Last %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		}
 		// -- Last point
-		v1.set(abscissa.value(nPoints-1) - abscissa.value(nPoints-2), yTarget.value(nPoints-1) - yTarget.value(nPoints-2), 0.0);
-		v2.set(0.0, yTarget.value(nPoints-1) - yPrev.value(nPoints-1), dz);
+		v1.set(x.value(nX -1) - x.value(nX -2), y.value(nX -1) - y.value(nX -2), 0.0);
+		v2.set(0.0, y.value(nX -1) - yPrev.value(nX -1), dz);
 		normals.add(v1 * v2);
 // 		v3 = v1 * v2;
 // 		v3.normalise();
@@ -187,22 +197,21 @@ void Surface::constructSurfaceStrip(const Array<double>& abscissa, DisplayDataSe
 	else
 	{
 		// Grab other array reference
-		const Array<double>& yNext = nextSlice->y();
-		dz = targetSlice->z() - nextSlice->z();
+		dz = z - zNext;
 
 		// -- First point
-		v1.set(abscissa.value(1) - abscissa.value(0), yTarget.value(1) - yTarget.value(0), 0.0);
-		v2.set(0.0, yNext.value(0) - yTarget.value(0), dz);
+		v1.set(x.value(1) - x.value(0), y.value(1) - y.value(0), 0.0);
+		v2.set(0.0, yNext.value(0) - y.value(0), dz);
 		normals.add(v1 * v2);
 // 		v3 = v1 * v2;
 // 		v3.normalise();
 // 		normals.add(v3);
 // 		printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f)\n", 0, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		// -- Points 1 to N-2
-		for (n=1; n<nPoints-1; ++n)
+		for (n=1; n< nX -1; ++n)
 		{
-			v1.set(abscissa.value(n+1) - abscissa.value(n-1), yTarget.value(n+1) - yTarget.value(n-1), 0.0);
-			v2.set(0.0, yNext.value(n) - yTarget.value(n), dz);
+			v1.set(x.value(n+1) - x.value(n-1), y.value(n+1) - y.value(n-1), 0.0);
+			v2.set(0.0, yNext.value(n) - y.value(n), dz);
 			normals.add(v1 * v2);
 // 			v3 = v1 * v2;
 // 			v3.normalise();
@@ -210,8 +219,8 @@ void Surface::constructSurfaceStrip(const Array<double>& abscissa, DisplayDataSe
 // 			printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f)\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		}
 		// -- Last point
-		v1.set(abscissa.value(nPoints-1) - abscissa.value(nPoints-2), yTarget.value(nPoints-1) - yTarget.value(nPoints-2), 0.0);
-		v2.set(0.0, yNext.value(nPoints-1) - yTarget.value(nPoints-1), dz);
+		v1.set(x.value(nX -1) - x.value(nX -2), y.value(nX -1) - y.value(nX -2), 0.0);
+		v2.set(0.0, yNext.value(nX -1) - y.value(nX -1), dz);
 		normals.add(v1 * v2);
 // 		v3 = v1 * v2;
 // 		v3.normalise();
@@ -221,4 +230,28 @@ void Surface::constructSurfaceStrip(const Array<double>& abscissa, DisplayDataSe
 	
 	// Normalise normals
 	for (n=0; n<normals.nItems(); ++n) normals[n].normalise();
+}
+
+// Calculate integer index extents for display data given supplied axes
+bool Surface::calculateExtents(const Axes& axes, const Array<double>& abscissa, List<DisplayDataSet>& displayData, Vec3<int>& minIndex, Vec3<int>& maxIndex)
+{
+	// Grab some stuff from the pane's axes
+	Vec3<double> axisMin(axes.min(0), axes.min(1), axes.min(2));
+	Vec3<double> axisMax(axes.max(0), axes.max(1), axes.max(2));
+
+	axisMin.print();
+	axisMax.print();
+	// Get x index limits
+	for (minIndex.x = 0; minIndex.x < abscissa.nItems(); ++minIndex.x) { printf("x = %f\n", abscissa.value(minIndex.x)); if (abscissa.value(minIndex.x) >= axisMin.x) break; }
+	if (minIndex.x == abscissa.nItems()) return false;
+	for (maxIndex.x = abscissa.nItems()-1; maxIndex.x >= 0; --maxIndex.x) if (abscissa.value(maxIndex.x) <= axisMax.x) break;
+	if (maxIndex.x < 0) return false;
+
+	// Get z index limits
+	for (minIndex.z = 0; minIndex.z < displayData.nItems(); ++minIndex.z) if (displayData[minIndex.z]->z() >= axisMin.z) break;
+	if (minIndex.z == displayData.nItems()) return false;
+	for (maxIndex.z = displayData.nItems()-1; maxIndex.z >= 0; --maxIndex.z)  if (displayData[maxIndex.z]->z() <= axisMax.z) break;
+	if (maxIndex.z < 0) return false;
+	
+	return true;
 }

@@ -157,9 +157,6 @@ void ViewLayout::removePane(ViewPane* pane)
 		return;
 	}
 
-	// Notify all collections associated to the pane that it longer exists
-	for (RefListItem<Collection,bool>* ri = pane->collections(); ri != NULL; ri = ri->next) ri->item->setDisplayPane(NULL);
-
 	panes_.remove(pane);
 }
 
@@ -186,6 +183,26 @@ ViewPane* ViewLayout::pane(QString name)
 int ViewLayout::paneIndex(ViewPane* pane)
 {
 	return panes_.indexOf(pane);
+}
+
+// Return reflist of all panes of specified type
+RefList<ViewPane,bool> ViewLayout::panes(ViewPane::PaneRole role)
+{
+	RefList<ViewPane,bool> result;
+	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next) if (pane->role() == role) result.add(pane);
+	return result;
+}
+
+// Return reflist of panes (optionally of specified type) that target specified collection
+RefList<ViewPane,bool> ViewLayout::panes(Collection* collection, ViewPane::PaneRole role)
+{
+	RefList<ViewPane,bool> result;
+	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next)
+	{
+		if ((role != ViewPane::nPaneRoles) && (pane->role() != role)) continue;
+		if (pane->collectionIsTarget(collection)) result.add(pane);
+	}
+	return result;
 }
 
 // Return if pane is in the current list

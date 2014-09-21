@@ -20,53 +20,65 @@
 */
 
 #include "render/surface.h"
+#include "base/axes.h"
 
 // Construct line representation of data in XY slices
-void Surface::constructLineXY(PrimitiveList& primitives, double yAxisScale, bool yLogarithmic, const Array<double>& abscissa, List<DisplayDataSet>& displayData, ColourScale colourScale)
+void Surface::constructLineXY(PrimitiveList& primitiveList, const Axes& axes, const Array<double>& displayAbscissa, List<DisplayDataSet>& displayData, ColourScale colourScale)
 {
 	// Forget all data in current primitives
-	primitives.forgetAll();
+	primitiveList.forgetAll();
 
-	// Check for low number of datasets or low number of points in x
-	if (displayData.nItems() == 0) return;
-	if (abscissa.nItems() < 2) return;
+	printf("It's LineXY time...\n");
+	// Get extents of displayData to use based on current axes limits
+	Vec3<int> minIndex, maxIndex;
+	if (!calculateExtents(axes, displayAbscissa, displayData, minIndex, maxIndex)) return;
+	int nZ = (maxIndex.z - minIndex.z) + 1;
 
+	// Copy and transform abscissa values (still in data space) into axes coordinates
+	Array<double> x(displayAbscissa, minIndex.x, maxIndex.x);
+	axes.transformX(x);
+	int nX = x.nItems();
+	if (nX < 2) return;
+	
 	// Resize primitive list so it's large enough for our needs
-	primitives.reinitialise(displayData.nItems(), true, abscissa.nItems(), (abscissa.nItems()-1)*2, GL_LINES, true);
+	primitiveList.reinitialise(nZ, true, nX, (nX-1)*2, GL_LINES, true);
+
+	// Get some values from axes so we can calculate colours properly
+	bool yLogarithmic = axes.logarithmic(1);
+	double yStretch = axes.stretch(1);
 
 	// Temporary variables
 	GLfloat z;
 	Vec4<GLfloat> colour(0,0,0,1);
 	int n, nPoints;
 	Vec3<double> nrm(0.0, 1.0, 0.0);
+	Array<double> y;
+	Array<DisplayDataSet::DataPointType> yType;
 
-	Primitive* currentPrimitive = primitives[0];
+	DisplayDataSet** slices = displayData.array();
+	Primitive* currentPrimitive = primitiveList[0];
 
 	// Create lines for slices
 	GLuint vertexA, vertexB;
-	for (DisplayDataSet* dataSet = displayData.first(); dataSet != NULL; dataSet = dataSet->next)
+	for (int slice = minIndex.z; slice <= maxIndex.z; ++slice)
 	{
 		// Grab y and z values
-		const Array<double>& y = dataSet->y();
-		const Array<DisplayDataSet::DataPointType>& yType = dataSet->yType();
-		z = (GLfloat) dataSet->z();
+		y.copy(slices[slice]->y(), minIndex.x, maxIndex.x);
+		axes.transformY(y);
+		yType.copy(slices[slice]->yType(), minIndex.x, maxIndex.x);
+		z = axes.transformZ(slices[slice]->z());
 
-		// Get nPoints, and initial vertex
-		nPoints = abscissa.nItems();
-		if (yType.value(0) != DisplayDataSet::NoPoint)
-		{
-			colourScale.colour((yLogarithmic ? pow(10.0, y.value(0)) : y.value(0)) / yAxisScale, colour);
-			vertexA = currentPrimitive->defineVertex(abscissa.value(0), y.value(0), z, nrm, colour);
-		}
-		else vertexA = -1;
+		// Reset vertexA to -1 so we don't draw a line at n=0
+		vertexA = -1;
 
-		for (n=1; n<nPoints; ++n)
+		// Loop over x values
+		for (n=0; n<nX; ++n)
 		{
 			// Define vertex index for this point (if one exists)
 			if (yType.value(n) != DisplayDataSet::NoPoint)
 			{
-				colourScale.colour((yLogarithmic ? pow(10.0, y.value(n)) : y.value(n)) / yAxisScale, colour);
-				vertexB = currentPrimitive->defineVertex(abscissa.value(n), y.value(n), z, nrm, colour);
+				colourScale.colour((yLogarithmic ? pow(10.0, y.value(n)) : y.value(n)) / yStretch, colour);
+				vertexB = currentPrimitive->defineVertex(x.value(n), y.value(n), z, nrm, colour);
 			}
 			else vertexB = -1;
 
@@ -75,6 +87,8 @@ void Surface::constructLineXY(PrimitiveList& primitives, double yAxisScale, bool
 
 			vertexA = vertexB;
 		}
+
+		// Move to next primitive
 		currentPrimitive = currentPrimitive->next;
 	}
 }

@@ -23,20 +23,53 @@
 #define UCHROMA_TARGETDATA_H
 
 #include "templates/reflist.h"
+#include "render/primitivelist.h"
 
 // Forward Declarations
 class Collection;
+class Axes;
 class ViewPane;
+class QGLContext;
+class GLExtensions;
+
+// Target Extra Data
+class TargetExtraData : public ListItem<TargetExtraData>
+{
+	public:
+	// Constructor / Destructor
+// 	TargetExtraData();
+// 	~TargetExtraData();
+	// Data Type
+	enum TargetDataType { SliceData, nTargetDataTypes };
+
+
+	/*
+	 * Data
+	 */
+	private:
+	// Collection containing data
+	Collection* collection_;
+	// Related primitive for display
+	PrimitiveList primitive_;
+	// Collection data version at which primitive was last created
+	int primitiveDataVersion_;
+	// Axes version at which primitive was last created
+	int primitiveAxesVersion_;
+
+	public:
+};
 
 // TargetData
-class TargetData
+class TargetData : public ListItem<TargetData>
 {
 	public:
 	// Constructor / Destructor
 	TargetData();
 	~TargetData();
-	// Data Type
-	enum TargetDataType { SliceData, nTargetDataTypes };
+	// Copy constructor
+	TargetData(const TargetData& source);
+	// Assignment operator
+	void operator=(const TargetData& source);
 
 
 	/*
@@ -52,17 +85,53 @@ class TargetData
 
 
 	/*
-	 * Collection Data
+	 * Target Collection / Primitive
 	 */
 	private:
-	// Array of potential target data
-	Collection** collectionData_;
+	// Target collection
+	Collection* collection_;
+	// Primitive for display of target collection (if necessary)
+	PrimitiveList primitive_;
+	// Collection data version at which primitive was last created
+	int primitiveDataUsedAt_;
+	// Collection colour version at which primitive was last created
+	int primitiveColourUsedAt_;
+	// ViewPane axes version at which primitive was last created
+	int primitiveAxesUsedAt_;
+	// Collection style version at which primitive was last created
+	int primitiveStyleUsedAt_;
 
 	public:
-	// Add new collection data
-	Collection* addCollectionData(TargetData::TargetDataType type);
+	// Set target collection
+	void setCollection(Collection* collection);
+	// Return target collection
+	Collection* collection();
+	// Return primary primitive for display
+	PrimitiveList& primitive();
+
+
+	/*
+	 * Additional Data
+	 */
+	private:
+	// List of additional data
+	List<TargetExtraData> data_;
+
+	public:
+	// Add new additional data
+	Collection* addData(TargetExtraData::TargetDataType type);
 	// Return specified collection data type (if it exists)
-	Collection* collectionData(TargetData::TargetDataType type);
+	Collection* data(TargetExtraData::TargetDataType type);
+
+
+	/*
+	 * GL
+	 */
+	public:
+	// Update primitive for target collection
+	PrimitiveList& updatePrimitive(const QGLContext* context, GLExtensions* extensions, const Axes& axes, bool forcePrimitiveUpdate = false, bool dontPopInstance = false);
+	// Send primitive to GL
+	void sendToGL();
 };
 
 #endif

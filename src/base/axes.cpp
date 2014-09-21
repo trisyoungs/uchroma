@@ -80,6 +80,10 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	// GridLines
 	gridLinesMajor_.set(false, false, false);
 	gridLinesMinor_.set(false, false, false);
+	
+	// Versions
+	axesVersion_ = 0;
+	displayVersion_ = 0;
 
 	// GL
 	for (int n=0; n<3; ++n)
@@ -93,13 +97,13 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	}
 	clipPlaneYMin_ = 0.0;
 	clipPlaneYMax_ = 0.0;
-	primitivesValid_ = false;
 	gridLineMajorStyle_[0].set(1.0, LineStipple::NoStipple, 0.5, 0.5, 0.5, 1.0);
 	gridLineMinorStyle_[0].set(1.0, LineStipple::QuartedDashStipple, 0.75, 0.75, 0.75, 1.0);
 	gridLineMajorStyle_[1] = gridLineMajorStyle_[0];
 	gridLineMinorStyle_[1] = gridLineMinorStyle_[0];
 	gridLineMajorStyle_[2] = gridLineMajorStyle_[0];
 	gridLineMinorStyle_[2] = gridLineMinorStyle_[0];
+	primitiveVersion_ = -1;
 }
 
 // Destructor
@@ -169,10 +173,13 @@ void Axes::operator=(const Axes& source)
 	gridLineMajorStyle_[2] = source.gridLineMajorStyle_[2];
 	gridLineMinorStyle_[2] = source.gridLineMinorStyle_[2];
 
+	// Versions
+	axesVersion_ = -1;
+	displayVersion_ = -1;
+
 	// GL
 	clipPlaneYMin_ = 0.0;
 	clipPlaneYMax_ = 0.0;
-	primitivesValid_ = false;
 	parent_.paneChanged();
 }
 
@@ -225,15 +232,14 @@ void Axes::setMin(int axis, double value)
 
 	calculateCoordCentre();
 
-	primitivesValid_ = false;
-	parent_.paneChanged();
-	parent_.flagCollectionDataInvalid();
+	++axesVersion_;
+	++displayVersion_;
 }
 
 // Return minimum value for specified axis
-double Axes::min(int axis)
+double Axes::min(int axis) const
 {
-	return min_[axis];
+	return min_.get(axis);
 }
 
 // Set maximum value for specified axis
@@ -243,21 +249,20 @@ void Axes::setMax(int axis, double value)
 
 	calculateCoordCentre();
 
-	primitivesValid_ = false;
-	parent_.paneChanged();
-	parent_.flagCollectionDataInvalid();
+	++axesVersion_;
+	++displayVersion_;
 }
 
 // Return maximum value for specified axis
-double Axes::max(int axis)
+double Axes::max(int axis) const
 {
-	return max_[axis];
+	return max_.get(axis);
 }
 
 // Return axis range
-double Axes::range(int axis)
+double Axes::range(int axis) const
 {
-	return max_[axis] - min_[axis];
+	return max_.get(axis) - min_.get(axis);
 }
 
 // Set axis to extreme limit
@@ -266,8 +271,8 @@ void Axes::setToLimit(int axis, bool minLim)
 	if (minLim) min_[axis] = limitMin_[axis];
 	else max_[axis] = limitMax_[axis];
 
-	primitivesValid_ = false;
-	parent_.paneChanged();
+	++axesVersion_;
+	++displayVersion_;
 }
 
 // Set axis minimum limit for specified axis
@@ -279,9 +284,9 @@ void Axes::setLimitMin(int axis, double limit)
 }
 
 // Return axis minimum limit for specified axis
-double Axes::limitMin(int axis)
+double Axes::limitMin(int axis) const
 {
-	return limitMin_[axis];
+	return limitMin_.get(axis);
 }
 
 // Set axis maximum limit for specified axis
@@ -293,25 +298,25 @@ void Axes::setLimitMax(int axis, double limit)
 }
 
 // Return axis maximum limit for specified axis
-double Axes::limitMax(int axis)
+double Axes::limitMax(int axis) const
 {
-	return limitMax_[axis];
+	return limitMax_.get(axis);
 }
 
 // Return coordinate at centre of current axes
-Vec3<double> Axes::coordCentre()
+Vec3<double> Axes::coordCentre() const
 {
 	return coordCentre_;
 }
 
 // Return coordinate at minimum of specified axis
-Vec3<double> Axes::coordMin(int axis)
+Vec3<double> Axes::coordMin(int axis) const
 {
 	return coordMin_[axis];
 }
 
 // Return coordinate at maximum of specified axis
-Vec3<double> Axes::coordMax(int axis)
+Vec3<double> Axes::coordMax(int axis) const
 {
 	return coordMax_[axis];
 }
@@ -321,15 +326,14 @@ void Axes::setInverted(int axis, bool b)
 {
 	inverted_[axis] = b;
 
-	primitivesValid_ = false;
-	parent_.paneChanged();
-	parent_.flagCollectionDataInvalid();
+	++axesVersion_;
+	++displayVersion_;
 }
 
 // Return whether axis is inverted
-bool Axes::inverted(int axis)
+bool Axes::inverted(int axis) const
 {
-	return inverted_[axis];
+	return inverted_.get(axis);
 }
 
 // Set whether axis is logarithmic
@@ -341,15 +345,14 @@ void Axes::setLogarithmic(int axis, bool b)
 	clamp(axis);
 	calculateCoordCentre();
 
-	primitivesValid_ = false;
-	parent_.paneChanged();
-	parent_.flagCollectionDataInvalid();
+	++axesVersion_;
+	++displayVersion_;
 }
 
 // Return whether axis is logarithmic
-bool Axes::logarithmic(int axis)
+bool Axes::logarithmic(int axis) const
 {
-	return logarithmic_[axis];
+	return logarithmic_.get(axis);
 }
 
 // Set whether axis is visible
@@ -359,9 +362,9 @@ void Axes::setVisible(int axis, bool b)
 }
 
 // Return whether specified axis is visible
-bool Axes::visible(int axis)
+bool Axes::visible(int axis) const
 {
-	return visible_[axis];
+	return visible_.get(axis);
 }
 
 // Set stretch factor for axis
@@ -371,14 +374,14 @@ void Axes::setStretch(int axis, double value)
 
 	calculateCoordCentre();
 
-	primitivesValid_ = false;
-	parent_.flagCollectionDataInvalid();
+	++axesVersion_;
+	++displayVersion_;
 }
 
 // Return stretch factor for axis
-double Axes::stretch(int axis)
+double Axes::stretch(int axis) const
 {
-	return stretch_[axis];
+	return stretch_.get(axis);
 }
 
 // Set fractional position flag for axis
@@ -386,14 +389,15 @@ void Axes::setPositionIsFractional(int axis, bool b)
 {
 	positionIsFractional_[axis] = b;
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
 // Return fractional position flag for axis
-bool Axes::positionIsFractional(int axis)
+bool Axes::positionIsFractional(int axis) const
 {
-	return positionIsFractional_[axis];
+	return positionIsFractional_.get(axis);
 }
 
 // Set axis position (in real surface-space coordinates)
@@ -404,7 +408,8 @@ void Axes::setPositionReal(int axis, int dir, double value)
 	else if (value < limitMin_[dir]) value = limitMin_[dir];
 	positionReal_[axis].set(dir, value);
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
@@ -413,12 +418,13 @@ void Axes::setPositionRealToLimit(int axis, int dir, bool minLim)
 {
 	positionReal_[axis].set(dir, minLim ? limitMin_[dir] : limitMax_[dir]);
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
 // Return axis position (in real surface-space coordinates)
-Vec3<double> Axes::positionReal(int axis)
+Vec3<double> Axes::positionReal(int axis) const
 {
 	return positionReal_[axis];
 }
@@ -431,14 +437,59 @@ void Axes::setPositionFractional(int axis, int dir, double value)
 	else if (value < 0.0) value = 0.0;
 	positionFractional_[axis].set(dir, value);
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
 // Return axis position (in fractional axis coordinates)
-Vec3<double> Axes::positionFractional(int axis)
+Vec3<double> Axes::positionFractional(int axis) const
 {
 	return positionFractional_[axis];
+}
+
+/*
+ * Data Transforms
+ */
+
+// Return supplied data x value in local axes coordinates
+double Axes::transformX(double x) const
+{
+	if (inverted_.x && logarithmic_.x) return log10(max_.x/x) * stretch_.x;
+	else if (inverted_.x) return ((max_.x - x) + min_.x) * stretch_.x;
+	else if (logarithmic_.x) return log10(x) * stretch_.x;
+}
+
+// // Transform entire array of values into local axes coordinates
+void Axes::transformX(Array<double>& xArray) const
+{
+	if (inverted_.x && logarithmic_.x) for (int n=0; n<xArray.nItems(); ++n) xArray[n] = log10(max_.x/xArray[n]) * stretch_.x;
+	else if (inverted_.x) for (int n=0; n<xArray.nItems(); ++n) xArray[n] = ((max_.x - xArray[n]) + min_.x) * stretch_.x;
+	else if (logarithmic_.x) for (int n=0; n<xArray.nItems(); ++n) xArray[n] = log10(xArray[n]) * stretch_.x;
+}
+
+// Return supplied data y value in local axes coordinates
+double Axes::transformY(double y) const
+{
+	if (inverted_.y && logarithmic_.y) return log10(max_.y/y) * stretch_.y;
+	else if (inverted_.y) return ((max_.y - y) + min_.y) * stretch_.y;
+	else if (logarithmic_.y) return log10(y) * stretch_.y;
+}
+
+// // Transform entire array of values into local axes coordinates
+void Axes::transformY(Array<double>& yArray) const
+{
+	if (inverted_.y && logarithmic_.y) for (int n=0; n< yArray.nItems(); ++n) yArray[n] = log10(max_.y/ yArray[n]) * stretch_.y;
+	else if (inverted_.y) for (int n=0; n< yArray.nItems(); ++n) yArray[n] = ((max_.y - yArray[n]) + min_.y) * stretch_.y;
+	else if (logarithmic_.y) for (int n=0; n< yArray.nItems(); ++n) yArray[n] = log10(yArray[n]) * stretch_.y;
+}
+
+// Return supplied data z value in local axes coordinates
+double Axes::transformZ(double value) const
+{
+	if (inverted_.z && logarithmic_.z) return log10(max_.z/ value) * stretch_.z;
+	else if (inverted_.z) return ((max_.z - value) + min_.z) * stretch_.z;
+	else if (logarithmic_.z) return log10(value) * stretch_.z;
 }
 
 /*
@@ -506,7 +557,8 @@ void Axes::setTickDirection(int axis, int dir, double value)
 {
 	tickDirection_[axis].set(dir, value);
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
@@ -521,7 +573,8 @@ void Axes::setTickSize(int axis, double size)
 {
 	tickSize_[axis] = size;
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
@@ -536,7 +589,8 @@ void Axes::setFirstTick(int axis, double value)
 {
 	tickFirst_[axis] = value;
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 
 }
@@ -552,7 +606,8 @@ void Axes::setTickDelta(int axis, double value)
 {
 	tickDelta_[axis] = value;
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
@@ -567,7 +622,8 @@ void Axes::setAutoTicks(int axis, bool b)
 {
 	autoTicks_[axis] = b;
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
@@ -582,7 +638,8 @@ void Axes::setMinorTicks(int axis, int value)
 {
 	minorTicks_[axis] = value;
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
@@ -607,7 +664,8 @@ void Axes::setLabelOrientation(int axis, int component, double value)
 {
 	labelOrientation_[axis].set(component, value);
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
@@ -622,7 +680,8 @@ void Axes::setLabelAnchor(int axis, TextPrimitive::TextAnchor anchor)
 {
 	labelAnchor_[axis] = anchor;
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
@@ -637,7 +696,8 @@ void Axes::setTitle(int axis, QString title)
 {
 	title_[axis] = title;
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
@@ -652,7 +712,8 @@ void Axes::setTitleOrientation(int axis, int component, double value)
 {
 	titleOrientation_[axis].set(component, value);
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
@@ -667,7 +728,8 @@ void Axes::setTitleAnchor(int axis, TextPrimitive::TextAnchor anchor)
 {
 	titleAnchor_[axis] = anchor;
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
@@ -686,14 +748,15 @@ void Axes::setGridLinesFull(int axis, bool b)
 {
 	gridLinesFull_[axis] = b;
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
 // Return whether gridlines cover entire volume or just at axis lines
-bool Axes::gridLinesFull(int axis)
+bool Axes::gridLinesFull(int axis) const
 {
-	return gridLinesFull_[axis];
+	return gridLinesFull_.get(axis);
 }
 
 // Set whether gridLines at major tick intervals are active for specified axis
@@ -701,14 +764,15 @@ void Axes::setGridLinesMajor(int axis, bool on)
 {
 	gridLinesMajor_[axis] = on;
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
 // Return whether gridLines at major tick intervals are active for specified axis
-bool Axes::gridLinesMajor(int axis)
+bool Axes::gridLinesMajor(int axis) const
 {
-	return gridLinesMajor_[axis];
+	return gridLinesMajor_.get(axis);
 }
 
 // Set whether gridLines at minor tick intervals are active for specified axis
@@ -716,14 +780,32 @@ void Axes::setGridLinesMinor(int axis, bool on)
 {
 	gridLinesMinor_[axis] = on;
 
-	primitivesValid_ = false;
+	++axesVersion_;
+
 	parent_.paneChanged();
 }
 
 // Return whether gridLines at minor tick intervals are active for specified axis
-bool Axes::gridLinesMinor(int axis)
+bool Axes::gridLinesMinor(int axis) const
 {
-	return gridLinesMinor_[axis];
+	return gridLinesMinor_.get(axis);
+}
+
+/*
+ * Versions
+ */
+
+
+// Return version of axis definition
+int Axes::axesVersion()
+{
+	return axesVersion_;
+}
+
+// Return version of axis properties affecting data display
+int Axes::displayVersion() const
+{
+	return displayVersion_;
 }
 
 /*
@@ -734,7 +816,7 @@ bool Axes::gridLinesMinor(int axis)
 void Axes::updateAxisPrimitives()
 {
 	// Check whether we need to regenerate the axes primitives / data
-	if (primitivesValid_) return;
+	if (axesVersion_ == primitiveVersion_) return;
 
 	QString s;
 	FTBBox boundingBox;
@@ -1000,10 +1082,7 @@ void Axes::updateAxisPrimitives()
 		}
 	}
 
-	primitivesValid_ = true;
-
-	// The axes have changed, so all associated collection data also needs to be regenerated
-	parent_.flagCollectionDataInvalid();
+	primitiveVersion_ = axesVersion_;
 }
 
 // Return clip plane lower Y value
@@ -1021,7 +1100,7 @@ GLdouble Axes::clipPlaneYMax()
 // Flag primitives as invalid
 void Axes::setPrimitivesInvalid()
 {
-	primitivesValid_ = false;
+	primitiveVersion_ = -1;
 	parent_.paneChanged();
 }
 
