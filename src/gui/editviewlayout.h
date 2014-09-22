@@ -104,7 +104,10 @@ class EditViewLayoutDialog : public QDialog
 	void on_PanePreviousButton_clicked(bool checked);
 	// Pane View Style
 	void on_PaneViewTypeCombo_currentIndexChanged(int index);
-// 	void on_Pane
+	// Axis Scaling
+	void on_PaneAutoScaleXCombo_currentIndexChanged(int index);
+	void on_PaneAutoScaleYCombo_currentIndexChanged(int index);
+	void on_PaneAutoScaleZCombo_currentIndexChanged(int index);
 	// Pane Targets
 	void on_PaneTargetsList_currentRowChanged(int index);
 	void on_PaneAddTargetButton_clicked(bool checked);

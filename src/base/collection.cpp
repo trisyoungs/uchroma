@@ -635,13 +635,8 @@ int Collection::closestBin(int axis, double value)
 // Get slice at specified axis and bin
 void Collection::getSlice(int axis, int bin)
 {
-	// Create the currentSlice_ collection if it doesn't already exist
-	if (currentSlice_ == NULL)
-	{
-		currentSlice_ = new Collection;
-		currentSlice_->parent_ = this;
-		currentSlice_->type_ = Collection::CurrentSliceCollection;
-	}
+	// Call currentSlice() so we generate a collection if one does not yet exist
+	currentSlice();
 	currentSlice_->clearDataSets();
 
 	// Are supplied bin and axis valid?
@@ -899,6 +894,14 @@ void Collection::extractCurrentSlice(int axis, double axisValue)
 // Return current slice
 Collection* Collection::currentSlice()
 {
+	// Create the currentSlice_ collection if it doesn't already exist
+	if (currentSlice_ == NULL)
+	{
+		currentSlice_ = new Collection;
+		currentSlice_->parent_ = this;
+		currentSlice_->type_ = Collection::CurrentSliceCollection;
+	}
+
 	return currentSlice_;
 }
 

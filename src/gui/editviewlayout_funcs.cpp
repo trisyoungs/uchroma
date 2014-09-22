@@ -43,6 +43,14 @@ EditViewLayoutDialog::EditViewLayoutDialog(UChromaWindow& parent) : QDialog(&par
 	// Set items in PaneRoleCombo
 	for (int n=0; n<ViewPane::nPaneRoles; ++n) ui.PaneRoleCombo->addItem(ViewPane::paneRole((ViewPane::PaneRole) n));
 
+	// Set items in axis scaling combos
+	for (int n=0; n<Axes::nAutoScaleMethods; ++n)
+	{
+		ui.PaneAutoScaleXCombo->addItem(Axes::autoScaleMethod((Axes::AutoScaleMethod) n));
+		ui.PaneAutoScaleYCombo->addItem(Axes::autoScaleMethod((Axes::AutoScaleMethod) n));
+		ui.PaneAutoScaleZCombo->addItem(Axes::autoScaleMethod((Axes::AutoScaleMethod) n));
+	}
+
 	refreshing_ = false;
 }
 
@@ -210,6 +218,31 @@ void EditViewLayoutDialog::on_PaneViewTypeCombo_currentIndexChanged(int index)
 }
 
 /*
+ * Slots - Axis Scaling
+ */
+
+void EditViewLayoutDialog::on_PaneAutoScaleXCombo_currentIndexChanged(int index)
+{
+	if (refreshing_) return;
+
+	if (currentPane_) currentPane_->axes().setAutoScale(0, (Axes::AutoScaleMethod) index);
+}
+
+void EditViewLayoutDialog::on_PaneAutoScaleYCombo_currentIndexChanged(int index)
+{
+	if (refreshing_) return;
+
+	if (currentPane_) currentPane_->axes().setAutoScale(1, (Axes::AutoScaleMethod) index);
+}
+
+void EditViewLayoutDialog::on_PaneAutoScaleZCombo_currentIndexChanged(int index)
+{
+	if (refreshing_) return;
+
+	if (currentPane_) currentPane_->axes().setAutoScale(2, (Axes::AutoScaleMethod) index);
+}
+
+/*
  * Slots - Pane Targets
  */
 
@@ -278,6 +311,11 @@ void EditViewLayoutDialog::updateControls()
 		ui.PaneRoleCombo->setCurrentIndex(currentPane_->role());
 		ui.PaneViewTypeCombo->setCurrentIndex(currentPane_->viewType());
 
+		// Axis Scaling
+		ui.PaneAutoScaleXCombo->setCurrentIndex(currentPane_->axes().autoScale(0));
+		ui.PaneAutoScaleYCombo->setCurrentIndex(currentPane_->axes().autoScale(1));
+		ui.PaneAutoScaleZCombo->setCurrentIndex(currentPane_->axes().autoScale(2));
+
 		// Update targets list
 		ui.PaneTargetsList->clear();
 		QListWidgetItem* item;
@@ -287,12 +325,12 @@ void EditViewLayoutDialog::updateControls()
 			item->setText("(P) " + ri->item->name());
 			item->setData(Qt::UserRole, VariantPointer<ViewPane>(ri->item));
 		}
-		for (RefListItem<Collection,bool>* ri = currentPane_->collectionTargets(); ri != NULL; ri = ri->next)
+		for (TargetData* target = currentPane_->collectionTargets(); target != NULL; target = target->next)
 		{
-			if (!Collection::objectValid(ri->item, "collection in EditViewLayoutDialog::updateControls")) continue;
+			if (!Collection::objectValid(target->collection(), "collection in EditViewLayoutDialog::updateControls")) continue;
 			item = new QListWidgetItem(ui.PaneTargetsList);
-			item->setText("(C) " + ri->item->name());
-			item->setData(Qt::UserRole, VariantPointer<Collection>(ri->item));
+			item->setText("(C) " + target->collection()->name());
+			item->setData(Qt::UserRole, VariantPointer<Collection>(target->collection()));
 		}
 
 		// Set the correct stack page for the selected role

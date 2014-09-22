@@ -33,7 +33,7 @@ class TargetData : public ListItem<TargetData>
 {
 	public:
 	// Constructor / Destructor
-	TargetData();
+	TargetData(ViewPane& parent);
 	~TargetData();
 	// Copy constructor
 	TargetData(const TargetData& source);
@@ -46,11 +46,7 @@ class TargetData : public ListItem<TargetData>
 	 */
 	private:
 	// Parent ViewPane
-	ViewPane* parent_;
-
-	public:
-	// Set parent ViewPane
-	void setParent(ViewPane* parent);
+	ViewPane& parent_;
 
 
 	/*
@@ -67,6 +63,8 @@ class TargetData : public ListItem<TargetData>
 	Collection** generatedData_;
 
 	private:
+	// Clear and nullify all data / pointers
+	void clear();
 	// Add new additional data
 	Collection* addData(TargetData::GeneratedDataType type);
 	// Return specified collection data type (if it exists)
@@ -74,20 +72,22 @@ class TargetData : public ListItem<TargetData>
 
 	public:
 	// Initialise with specified collection
-	void setCollection(Collection* collection);
+	void initialise(Collection* collection);
 	// Return target collection
 	Collection* collection();
 
 
 	/*
-	 * Display Primitives
+	 * Display Data
 	 */
 	private:
 	// List of additional data
 	List<TargetPrimitive> displayPrimitives_;
 
 	public:
-	// Return first display primitive
+	// Add target primitive for specified collection
+	void addDisplayPrimitive(Collection* collection);
+	// Return first display primitive in list
 	TargetPrimitive* displayPrimitives();
 };
 

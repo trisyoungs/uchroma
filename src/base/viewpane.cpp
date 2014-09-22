@@ -23,9 +23,8 @@
 #include "base/collection.h"
 #include "base/viewlayout.h"
 #include "math/cuboid.h"
-#include <../aten/src/base/sginfo.h>
 #include <algorithm>
-#include <X11/Xlib.h>
+// #include <X11/Xlib.h>
 
 // Static Members
 template<class ViewPane> RefList<ViewPane,bool> ObjectList<ViewPane>::objects_;
@@ -52,7 +51,6 @@ ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), parent_(parent), 
 	// Role
 	role_ = ViewPane::StandardRole;
 	viewType_ = ViewPane::NormalView;
-	autoScale_ = ViewPane::NoAutoScale;
 
 	// Style
 	boundingBox_ = ViewPane::NoBox;
@@ -110,14 +108,13 @@ void ViewPane::operator=(const ViewPane& source)
 
 	// Role
 	role_ = source.role_;
-	autoScale_ = source.autoScale_;
 	viewType_ = source.viewType_;
 	// -- Don't perform a literal copy of the paneTargets_. Re-add them instead...
 	paneTargets_.clear();
 // 	RefList<ViewPane,bool> paneTargets_;	TODO
 	// -- Don't perform a literal copy of the collectionTargets_. Re-add them instead...
 	collectionTargets_.clear();
-	for (RefListItem<Collection,bool>* ri = source.collectionTargets_.first(); ri != NULL; ri = ri->next) addCollectionTarget(ri->item);
+	for (TargetData* target = source.collectionTargets_.first(); target != NULL; target = target->next) addCollectionTarget(target->collection());
 
 	// Additional / Generated data
 	// -- Should be handled by performing re-addition of target collections above
@@ -362,19 +359,8 @@ RefListItem<ViewPane,bool>* ViewPane::paneTargets()
 // Add target collection for role
 void ViewPane::addCollectionTarget(Collection* collection)
 {
-	TargetData* target;
-
-	collectionTargets_.add(collection);
-
-	// Perform any initial actions
-	switch (role_)
-	{
-		// Standard Role
-		case (ViewPane::StandardRole):
-			// Add directly to displayTargets_
-			addDisplayTarget(collection);
-			break;
-	}
+	TargetData* target = collectionTargets_.add(*this);
+	target->initialise(collection);
 
 	paneChanged();
 }
@@ -382,33 +368,28 @@ void ViewPane::addCollectionTarget(Collection* collection)
 // Remove target collection for role
 void ViewPane::removeCollectionTarget(Collection* collection)
 {
-	if (!collectionIsTarget(collection)) msg.print(Messenger::Verbose, "Internal Error: Tried to remove collection '%s' from pane '%s', but it is not a target there.\n", qPrintable(collection->name()), qPrintable(name_));
-		
-	// Perform any final actions
-	switch (role_)
+	TargetData* target = collectionIsTarget(collection);
+	if (!target)
 	{
-		// Standard Role
-		case (ViewPane::StandardRole):
-			// Add directly to displayTargets_
-			removeDisplayTarget(collection);
-			break;
+		msg.print(Messenger::Verbose, "Internal Error: Tried to remove collection '%s' from pane '%s', but it is not a target there.\n", qPrintable(collection->name()), qPrintable(name_));
+		return;
 	}
 
 	// Remove the target
-	collectionTargets_.remove(collection);
+	collectionTargets_.remove(target);
 
 	paneChanged();
 }
 
 // Return whether specified collection is a target
-bool ViewPane::collectionIsTarget(Collection* collection)
+TargetData* ViewPane::collectionIsTarget(Collection* collection)
 {
-	for (RefListItem<Collection,bool>* ri = collectionTargets_.first(); ri != NULL; ri = ri->next) if (ri->item == collection) return true;
-	return false;
+	for (TargetData* target = collectionTargets_.first(); target != NULL; target = target->next) if (target->collection() == collection) return target;
+	return NULL;
 }
 
 // Return target collections for role
-RefListItem<Collection,bool>* ViewPane::collectionTargets()
+TargetData* ViewPane::collectionTargets()
 {
 	return collectionTargets_.first();
 }
@@ -416,7 +397,6 @@ RefListItem<Collection,bool>* ViewPane::collectionTargets()
 // Process supplied Collection changed/update signal if it is relevant to this pane
 bool ViewPane::processUpdate(Collection* source, Collection::CollectionSignal signal)
 {
-	TargetData* target;
 	Collection* collection;
 	switch (signal)
 	{
@@ -437,12 +417,8 @@ bool ViewPane::processUpdate(Collection* source, Collection::CollectionSignal si
 		case (Collection::CurrentSliceChangedSignal):
 			if (role_ != ViewPane::SliceMonitorRole) return false;
 			if (!collectionIsTarget(source)) return false;
-			// Grab slice storage and copy over data 
-// 			collection = ri->data.addCollectionData(TargetData::SliceData);  TODO
-// 			collection->clearDataSets();
-			addDisplayTarget(source->currentSlice());
-// 			collection->copyDataSets(source->currentSlice());
-			// Update axes limits if autoscaling?????? XXX TODO
+			// Update axes limits
+			updateAxisLimits();
 			break;
 		// Data Changed
 		// -- Role Relevance : ???
@@ -463,47 +439,8 @@ bool ViewPane::processUpdate(Collection* source, Collection::CollectionSignal si
 }
 
 /*
- * Generated/Derived Data
- */
-
-// Add display target
-void ViewPane::addDisplayTarget(Collection* collection)
-{
-	TargetData* target = displayTargets_.add();
-	target->setCollection(collection);
-	target->setParent(this);
-}
-
-// Remove display target
-void ViewPane::removeDisplayTarget(Collection* collection)
-{
-	// Find specified target
-	for (TargetData* target = displayTargets_.first(); target != NULL; target = target->next) if (target->collection() == collection)
-	{
-		displayTargets_.remove(target);
-		return;
-	}
-}
-
-/*
  * Projection / View
  */
-
-// AutoScale methods
-const char* AutoScaleKeywords[ViewPane::nAutoScaleMethods] = { "None", "Expanding", "Full" };
-
-// Convert text string to AutoScaleMethod
-ViewPane::AutoScaleMethod ViewPane::autoScaleMethod(const char* s)
-{
-	for (int n=0; n<ViewPane::nAutoScaleMethods; ++n) if (strcmp(s,AutoScaleKeywords[n]) == 0) return (ViewPane::AutoScaleMethod) n;
-	return ViewPane::nAutoScaleMethods;
-}
-
-// Convert AutoScaleMethod to text string
-const char* ViewPane::autoScaleMethod(ViewPane::AutoScaleMethod scale)
-{
-	return AutoScaleKeywords[scale];
-}
 
 // View types
 const char* ViewTypeKeywords[ViewPane::nViewTypes] = { "Normal", "AutoStretched", "FlatXY", "FlatXZ", "FlatYZ", "Linked" };
@@ -569,20 +506,6 @@ Matrix ViewPane::calculateProjectionMatrix(double orthoZoom)
 	}
 
 	return result;
-}
-
-// Set autoscaling method employed
-void ViewPane::setAutoScale(ViewPane::AutoScaleMethod method)
-{
-	autoScale_ = method;
-
-	paneChanged();
-}
-
-// Return autoscaling method employed
-ViewPane::AutoScaleMethod ViewPane::autoScale()
-{
-	return autoScale_;
 }
 
 // Set view type
@@ -1036,8 +959,7 @@ void ViewPane::showAllData()
 void ViewPane::renderData(const QGLContext* context, GLExtensions* extensions, bool forcePrimitiveUpdate, bool pushAndPop)
 {
 	// Loop over displayTargets_ list...
-	printf("There are %i targets in pane %p\n", displayTargets_.nItems(), this);
-	for (TargetData* target = displayTargets_.first(); target != NULL; target = target->next)
+	for (TargetData* target = collectionTargets_.first(); target != NULL; target = target->next)
 	{
 		// Loop over display primitives in this target...
 		for (TargetPrimitive* primitive = target->displayPrimitives(); primitive != NULL; primitive = primitive->next)
@@ -1055,16 +977,29 @@ void ViewPane::renderData(const QGLContext* context, GLExtensions* extensions, b
 // Return absolute minimum transformed values over all associated collections
 Vec3<double> ViewPane::transformedDataMinima()
 {
-	if (displayTargets_.nItems() == 0) return Vec3<double>(0.0,0.0,0.0);
+	if (collectionTargets_.nItems() == 0) return Vec3<double>(0.0,0.0,0.0);
 
-	// Set starting values from first collection
-	Vec3<double> v, minima = displayTargets_.first()->collection()->transformMin();
-	for (TargetData* target = displayTargets_.first()->next; target != NULL; target = target->next)
+	// Set starting values from first display collection we find
+	bool first = true;
+	Vec3<double> v, minima;
+	for (TargetData* target = collectionTargets_.first(); target != NULL; target = target->next)
 	{
-		v = target->collection()->transformMin();
-		if (v.x < minima.x) minima.x = v.x;
-		if (v.y < minima.y) minima.y = v.y;
-		if (v.z < minima.z) minima.z = v.z;
+		// Loop over display targets
+		for (TargetPrimitive* prim = target->displayPrimitives(); prim != NULL; prim = prim->next)
+		{
+			if (first)
+			{
+				minima = prim->collection()->transformMin();
+				first = false;
+			}
+			else
+			{
+				v = target->collection()->transformMin();
+				if (v.x < minima.x) minima.x = v.x;
+				if (v.y < minima.y) minima.y = v.y;
+				if (v.z < minima.z) minima.z = v.z;
+			}
+		}
 	}
 	return minima;
 }
@@ -1072,16 +1007,29 @@ Vec3<double> ViewPane::transformedDataMinima()
 // Return absolute maximum transformed values over all associated collections
 Vec3<double> ViewPane::transformedDataMaxima()
 {
-	if (displayTargets_.nItems() == 0) return Vec3<double>(0.0,0.0,0.0);
+	if (collectionTargets_.nItems() == 0) return Vec3<double>(0.0,0.0,0.0);
 
-	// Set starting values from first collection
-	Vec3<double> v, maxima = displayTargets_.first()->collection()->transformMax();
-	for (TargetData* target = displayTargets_.first()->next; target != NULL; target = target->next)
+	// Set starting values from first display collection we find
+	bool first = true;
+	Vec3<double> v, maxima;
+	for (TargetData* target = collectionTargets_.first(); target != NULL; target = target->next)
 	{
-		v =  target->collection()->transformMax();
-		if (v.x > maxima.x) maxima.x = v.x;
-		if (v.y > maxima.y) maxima.y = v.y;
-		if (v.z > maxima.z) maxima.z = v.z;
+		// Loop over display targets
+		for (TargetPrimitive* prim = target->displayPrimitives(); prim != NULL; prim = prim->next)
+		{
+			if (first)
+			{
+				maxima = prim->collection()->transformMax();
+				first = false;
+			}
+			else
+			{
+				v = target->collection()->transformMax();
+				if (v.x > maxima.x) maxima.x = v.x;
+				if (v.y > maxima.y) maxima.y = v.y;
+				if (v.z > maxima.z) maxima.z = v.z;
+			}
+		}
 	}
 	return maxima;
 }
@@ -1089,16 +1037,29 @@ Vec3<double> ViewPane::transformedDataMaxima()
 // Return absolute minimum positive transformed values over all associated collections
 Vec3<double> ViewPane::transformedDataPositiveMinima()
 {
-	if (displayTargets_.nItems() == 0) return Vec3<double>(0.0,0.0,0.0);
+	if (collectionTargets_.nItems() == 0) return Vec3<double>(0.0,0.0,0.0);
 
-	// Set starting values from first collection
-	Vec3<double> v, minima = displayTargets_.first()->collection()->transformMinPositive();
-	for (TargetData* target = displayTargets_.first()->next; target != NULL; target = target->next)
+	// Set starting values from first display collection we find
+	bool first = true;
+	Vec3<double> v, minima;
+	for (TargetData* target = collectionTargets_.first(); target != NULL; target = target->next)
 	{
-		v =  target->collection()->transformMinPositive();
-		if (v.x < minima.x) minima.x = v.x;
-		if (v.y < minima.y) minima.y = v.y;
-		if (v.z < minima.z) minima.z = v.z;
+		// Loop over display targets
+		for (TargetPrimitive* prim = target->displayPrimitives(); prim != NULL; prim = prim->next)
+		{
+			if (first)
+			{
+				minima = prim->collection()->transformMinPositive();
+				first = false;
+			}
+			else
+			{
+				v = target->collection()->transformMinPositive();
+				if (v.x < minima.x) minima.x = v.x;
+				if (v.y < minima.y) minima.y = v.y;
+				if (v.z < minima.z) minima.z = v.z;
+			}
+		}
 	}
 	return minima;
 }
@@ -1106,16 +1067,29 @@ Vec3<double> ViewPane::transformedDataPositiveMinima()
 // Return absolute maximum positive transformed values over all associated collections
 Vec3<double> ViewPane::transformedDataPositiveMaxima()
 {
-	if (displayTargets_.nItems() == 0) return Vec3<double>(0.0,0.0,0.0);
+	if (collectionTargets_.nItems() == 0) return Vec3<double>(0.0,0.0,0.0);
 
-	// Set starting values from first collection
-	Vec3<double> v, maxima = displayTargets_.first()->collection()->transformMaxPositive();
-	for (TargetData* target = displayTargets_.first()->next; target != NULL; target = target->next)
+	// Set starting values from first display collection we find
+	bool first = true;
+	Vec3<double> v, maxima;
+	for (TargetData* target = collectionTargets_.first(); target != NULL; target = target->next)
 	{
-		v = target->collection()->transformMaxPositive();
-		if (v.x > maxima.x) maxima.x = v.x;
-		if (v.y > maxima.y) maxima.y = v.y;
-		if (v.z > maxima.z) maxima.z = v.z;
+		// Loop over display targets
+		for (TargetPrimitive* prim = target->displayPrimitives(); prim != NULL; prim = prim->next)
+		{
+			if (first)
+			{
+				maxima = prim->collection()->transformMaxPositive();
+				first = false;
+			}
+			else
+			{
+				v = target->collection()->transformMaxPositive();
+				if (v.x > maxima.x) maxima.x = v.x;
+				if (v.y > maxima.y) maxima.y = v.y;
+				if (v.z > maxima.z) maxima.z = v.z;
+			}
+		}
 	}
 	return maxima;
 }
@@ -1155,7 +1129,13 @@ void ViewPane::updateAxisLimits()
 // Update current slices for all collections displayed in this pane
 void ViewPane::collectionsUpdateCurrentSlices(int axis, double axisValue)
 {
-	for (TargetData* target = displayTargets_.first(); target != NULL; target = target->next) target->collection()->updateCurrentSlice(axis, axisValue);
+	for (TargetData* target = collectionTargets_.first(); target != NULL; target = target->next)
+	{
+		for (TargetPrimitive* prim = target->displayPrimitives(); prim != NULL; prim = prim->next)
+		{
+			prim->collection()->updateCurrentSlice(axis, axisValue);
+		}
+	}
 }
 
 /*

@@ -53,10 +53,10 @@ const char* Keywords::inputBlock(Keywords::InputBlock id)
 */
 
 // Axis Block Keywords
-const char* AxisBlockKeywords[] = { "AutoTicks", "EndAxis", "FirstTick", "FractionalPositioning", "GridLines", "GridLineMajorStyle", "GridLineMinorStyle", "Invert", "LabelAnchor", "LabelOrientation", "Limits", "Logarithmic", "MinorTicks", "NumberFormat", "PositionFractional", "PositionReal", "Stretch", "TickDelta", "TickDirection", "Title", "TitleAnchor", "TitleOrientation", "Visible" };
+const char* AxisBlockKeywords[] = { "AutoScale", "AutoTicks", "EndAxis", "FirstTick", "FractionalPositioning", "GridLines", "GridLineMajorStyle", "GridLineMinorStyle", "Invert", "LabelAnchor", "LabelOrientation", "Limits", "Logarithmic", "MinorTicks", "NumberFormat", "PositionFractional", "PositionReal", "Stretch", "TickDelta", "TickDirection", "Title", "TitleAnchor", "TitleOrientation", "Visible" };
 
 // Axis Block NArguments
-int AxisKeywordNArguments[] = { 1, 0, 1, 1, 3, 6, 6, 1, 1, 3, 2, 1, 1, 4, 3, 3, 1, 1, 3, 1, 1, 4, 1 };
+int AxisKeywordNArguments[] = { 1, 1, 0, 1, 1, 3, 6, 6, 1, 1, 3, 2, 1, 1, 4, 3, 3, 1, 1, 3, 1, 1, 4, 1 };
 
 /*!
  * \brief Convert text string to AxisKeyword
@@ -263,10 +263,10 @@ int Keywords::viewKeywordNArguments(Keywords::ViewKeyword kwd)
  */
 
 // ViewPane Block Keywords
-const char* ViewPaneBlockKeywords[] = { "AutoScale", "Axis", "BoundingBox", "BoundingBoxPlaneY", "EndViewPane", "Geometry", "LabelPointSize", "Perspective", "Role", "RoleTargetCollection", "RoleTargetPane", "RotationX", "RotationY", "RotationZ", "TitlePointSize", "Translation", "ViewType" };
+const char* ViewPaneBlockKeywords[] = { "Axis", "BoundingBox", "BoundingBoxPlaneY", "EndViewPane", "Geometry", "LabelPointSize", "Perspective", "Role", "RoleTargetCollection", "RoleTargetPane", "RotationX", "RotationY", "RotationZ", "TitlePointSize", "Translation", "ViewType" };
 
 // ViewPane Block NArguments
-int ViewPaneKeywordNArguments[] = { 1, 1, 1, 1, 0, 4, 1, 1, 1, 1, 1, 3, 3, 3, 1, 3, 1 };
+int ViewPaneKeywordNArguments[] = { 1, 1, 1, 0, 4, 1, 1, 1, 1, 1, 3, 3, 3, 1, 3, 1 };
 
 /*!
  * \brief Convert text string to ViewPaneKeyword

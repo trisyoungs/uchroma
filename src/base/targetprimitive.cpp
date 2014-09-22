@@ -65,8 +65,6 @@ void TargetPrimitive::updateAndSendPrimitive(const Axes& axes, bool forceUpdate,
 	// Check collection validity
 	if (!Collection::objectValid(collection_, "collection in TargetPrimitive::updateAndSendPrimitive")) return;
 
-	printf("Updating primitive '%s' : local logs are: axes=%i(%i), colour=%i(%i), data=%i(%i), style=%i(%i)\n", qPrintable(collection_->name()), primitiveAxesUsedAt_, axes.displayVersion(), primitiveColourUsedAt_, collection_->colourVersion(), primitiveDataUsedAt_, collection_->dataVersion(), primitiveStyleUsedAt_, collection_->styleVersion());
-
 	// Check whether the primitive for this collection needs updating
 	bool upToDate = true;
 	if (forceUpdate) upToDate = false;

@@ -133,9 +133,6 @@ void PaneOrganiser::updateUnderMouse(QPoint pos)
 	paneUnderMouse_ = hoverPane;
 	if (interactionMode_ != StretchInteraction) stretchHandle_ = handle;
 
-	// Now get grid reference currently nearest to mouse
-	gridReferenceUnderMouse_ = gridReference(pos, true);
-
 	if (updateWidget) update();
 }
 

@@ -49,6 +49,9 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	coordMax_[2].zero();
 	coordCentre_.set(5.0, 5.0, 5.0);
 	stretch_.set(1.0, 1.0, 1.0);
+	autoScale_[0] = Axes::NoAutoScale;
+	autoScale_[1] = Axes::NoAutoScale;
+	autoScale_[2] = Axes::NoAutoScale;
 
 	// Ticks
 	tickDirection_[0].set(0.0, -1.0, 0.0);
@@ -140,6 +143,9 @@ void Axes::operator=(const Axes& source)
 	coordMax_[1] = source.coordMax_[1];
 	coordMax_[2] = source.coordMax_[2];
 	stretch_ = source.stretch_;
+	autoScale_[0] = source.autoScale_[0];
+	autoScale_[1] = source.autoScale_[1];
+	autoScale_[2] = source.autoScale_[2];
 
 	// Ticks / Labels
 	tickDirection_[0] = source.tickDirection_[0];
@@ -187,6 +193,22 @@ void Axes::operator=(const Axes& source)
 /*
  * Definition
  */
+
+// AutoScale methods
+const char* AutoScaleKeywords[Axes::nAutoScaleMethods] = { "None", "Expanding", "Full" };
+
+// Convert text string to AutoScaleMethod
+Axes::AutoScaleMethod Axes::autoScaleMethod(const char* s)
+{
+	for (int n=0; n<Axes::nAutoScaleMethods; ++n) if (strcmp(s,AutoScaleKeywords[n]) == 0) return (Axes::AutoScaleMethod) n;
+	return Axes::nAutoScaleMethods;
+}
+
+// Convert AutoScaleMethod to text string
+const char* Axes::autoScaleMethod(Axes::AutoScaleMethod scale)
+{
+	return AutoScaleKeywords[scale];
+}
 
 // Recalculate centre coordinate of axes
 void Axes::calculateCoordCentre()
@@ -280,7 +302,10 @@ void Axes::setToLimit(int axis, bool minLim)
 void Axes::setLimitMin(int axis, double limit)
 {
 	limitMin_[axis] = limit;
-	
+
+	if ((autoScale_[axis] == Axes::ExpandingAutoScale) && (min_[axis] > limitMin_[axis])) setToLimit(axis, true);
+	else if (autoScale_[axis] == Axes::FullAutoScale) setToLimit(axis, true);
+
 	clamp(axis);
 }
 
@@ -294,7 +319,10 @@ double Axes::limitMin(int axis) const
 void Axes::setLimitMax(int axis, double limit)
 {
 	limitMax_[axis] = limit;
-	
+
+	if ((autoScale_[axis] == Axes::ExpandingAutoScale) && (max_[axis] < limitMax_[axis])) setToLimit(axis, false);
+	else if (autoScale_[axis] == Axes::FullAutoScale) setToLimit(axis, false);
+
 	clamp(axis);
 }
 
@@ -302,6 +330,17 @@ void Axes::setLimitMax(int axis, double limit)
 double Axes::limitMax(int axis) const
 {
 	return limitMax_.get(axis);
+}
+
+// Set all axis limits at once
+void Axes::expandLimits(bool noShrink)
+{
+	printf("Here in ExpandLimits.\n");
+	for (int axis=0; axis<3; ++axis)
+	{
+		if ((min_[axis] > limitMin_[axis]) || (!noShrink)) setToLimit(axis, true);
+		if ((max_[axis] < limitMax_[axis]) || (!noShrink)) setToLimit(axis, false);
+	}
 }
 
 // Return coordinate at centre of current axes
@@ -447,6 +486,18 @@ void Axes::setPositionFractional(int axis, int dir, double value)
 Vec3<double> Axes::positionFractional(int axis) const
 {
 	return positionFractional_[axis];
+}
+
+// Set autoscaling method employed
+void Axes::setAutoScale(int axis, Axes::AutoScaleMethod method)
+{
+	autoScale_[axis] = method;
+}
+
+// Return autoscaling method employed
+Axes::AutoScaleMethod Axes::autoScale(int axis)
+{
+	return autoScale_[axis];
 }
 
 /*

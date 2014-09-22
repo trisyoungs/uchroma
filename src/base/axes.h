@@ -58,6 +58,14 @@ class Axes
 	/*
 	 * Definition
 	 */
+	public:
+	// Autoscaling for axes
+	enum AutoScaleMethod { NoAutoScale, ExpandingAutoScale, FullAutoScale, nAutoScaleMethods };
+	// Convert text string to AutoScaleMethod
+	static AutoScaleMethod autoScaleMethod(const char* s);
+	// Convert AutoScaleMethod to text string
+	static const char* autoScaleMethod(AutoScaleMethod scale);
+
 	private:
 	// Data limits for surface generation
 	Vec3<double> min_, max_;
@@ -81,6 +89,8 @@ class Axes
 	Vec3<double> positionReal_[3];
 	// Axis position in fractional axis coordinates
 	Vec3<double> positionFractional_[3];
+	// Autoscaling method employed for each axis
+	Axes::AutoScaleMethod autoScale_[3];
 
 	private:
 	// Recalculate centre coordinate of axes
@@ -109,6 +119,8 @@ class Axes
 	void setLimitMax(int axis, double limit);
 	// Return axis maximum limit for specified axis
 	double limitMax(int axis) const;
+	// Set all axis limits at once
+	void expandLimits(bool noShrink);
 	// Return coordinate at centre of axes
 	Vec3<double> coordCentre() const;
 	// Return coordinate at minimum of specified axis
@@ -145,6 +157,10 @@ class Axes
 	void setPositionFractional(int axis, int dir, double value);
 	// Return axis position (in fractional axis coordinates)
 	Vec3<double> positionFractional(int axis) const;
+	// Set autoscaling method employed for specified axis
+	void setAutoScale(int axis, Axes::AutoScaleMethod method);
+	// Return autoscaling method employed for specified axis
+	Axes::AutoScaleMethod autoScale(int axis);
 
 
 	/*

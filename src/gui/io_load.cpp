@@ -33,6 +33,7 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 	TextPrimitive::TextAnchor anchor;
 	LineStipple::StippleType stipple;
 	NumberFormat::FormatType ft;
+	Axes::AutoScaleMethod as;
 	while (!parser.atEnd())
 	{
 		// Get line from file
@@ -47,6 +48,17 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 		}
 		switch (axisKwd)
 		{
+			// Autoscale method
+			case (Keywords::AutoScaleKeyword):
+				as = Axes::autoScaleMethod(parser.argChar(1));
+				if (as == Axes::nAutoScaleMethods)
+				{
+					msg.print("Warning: Unrecognised autoscale method '%s'. Defaulting to '%s'.\n", parser.argChar(1), Axes::autoScaleMethod(Axes::NoAutoScale));
+					as = Axes::NoAutoScale;
+					CHECKIOFAIL
+				}
+				axes.setAutoScale(axis, as);
+				break;
 			// Auto ticks
 			case (Keywords::AutoTicksKeyword):
 				axes.setAutoTicks(axis, parser.argb(1));
@@ -667,7 +679,6 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 	Matrix mat;
 	ViewPane* associatedPane;
 	ViewPane::PaneRole role;
-	ViewPane::AutoScaleMethod as;
 	ViewPane::ViewType vt;
 	while (!parser.atEnd())
 	{
@@ -683,16 +694,6 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 		}
 		switch (viewPaneKwd)
 		{
-			// Autoscale method
-			case (Keywords::AutoScaleKeyword):
-				as = ViewPane::autoScaleMethod(parser.argChar(1));
-				if (as == ViewPane::nAutoScaleMethods)
-				{
-					msg.print("Warning: Unrecognised autoscale method '%s'.\n", parser.argChar(1));
-					CHECKIOFAIL
-				}
-				pane->setAutoScale(as);
-				break;
 			// Axis block
 			case (Keywords::AxisBlockKeyword):
 				// Get target axis...

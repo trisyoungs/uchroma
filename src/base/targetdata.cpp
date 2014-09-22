@@ -26,9 +26,8 @@
 #include <X11/Xlib.h>
 
 // Constructor
-TargetData::TargetData() : ListItem<TargetData>()
+TargetData::TargetData(ViewPane& parent) : ListItem<TargetData>(), parent_(parent)
 {
-	parent_ = NULL;
 	collection_ = NULL;
 	generatedData_ = new Collection*[TargetData::nGeneratedDataTypes];
 	for (int n=0; n<TargetData::nGeneratedDataTypes; ++n) generatedData_[n] = NULL;
@@ -37,26 +36,55 @@ TargetData::TargetData() : ListItem<TargetData>()
 // Destructor
 TargetData::~TargetData()
 {
-}
+	clear();
 
-/*
- * Parent
- */
-
-// Set parent ViewPane
-void TargetData::setParent(ViewPane* parent)
-{
-	parent_ = parent;
+	delete[] generatedData_;
 }
 
 /*
  * Target Collection and Derived Data
  */
 
-// Set pointer to target collection
-void TargetData::setCollection(Collection* collection)
+// Clear and nullify all data / pointers
+void TargetData::clear()
 {
+	// Clear display list first....
+	displayPrimitives_.clear();
+
+	// Now remove any generated data
+	for (int n=0; n<TargetData::nGeneratedDataTypes; ++n)
+	{
+		if (generatedData_[n]) delete generatedData_[n];
+		generatedData_[n] = NULL;
+	}
+}
+
+// Initialise with specified collection
+void TargetData::initialise(Collection* collection)
+{
+	// Clear any old data
+	clear();
+
+	// Set target collection
 	collection_ = collection;
+
+	// Check collection validity
+	if (!Collection::objectValid(collection, "collection in TargetData::initialise()")) return;
+
+	// Set up additional data based on the parent ViewPane's type
+	switch (parent_.role())
+	{
+		// Standard view pane - add a primitive for the target collection
+		case (ViewPane::StandardRole):
+			addDisplayPrimitive(collection);
+			break;
+		case (ViewPane::SliceMonitorRole):
+			addDisplayPrimitive(collection->currentSlice());
+			break;
+		default:
+			msg.print("Internal Error: ViewPane role '%s' not accounted for in TargetData::initialise().\n", ViewPane::paneRole(parent_.role()));
+			break;
+	}
 }
 
 // Return pointer to target collection
@@ -66,8 +94,15 @@ Collection* TargetData::collection()
 }
 
 /*
- * Display Primitives
+ * Display Data
  */
+
+// Add target primitive for specified collection
+void TargetData::addDisplayPrimitive(Collection* collection)
+{
+	TargetPrimitive* primitive = displayPrimitives_.add();
+	primitive->setCollection(collection);
+}
 
 // Return first display primitive
 TargetPrimitive* TargetData::displayPrimitives()

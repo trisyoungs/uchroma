@@ -57,6 +57,7 @@ class Keywords
 	// Axis Block Keyword Enum
 	enum AxisKeyword
 	{
+		AutoScaleKeyword,
 		AutoTicksKeyword,
 		EndAxisKeyword,
 		FirstTickKeyword,
@@ -229,7 +230,6 @@ class Keywords
 	// ViewPane Block Keyword Enum
 	enum ViewPaneKeyword
 	{
-		AutoScaleKeyword,
 		AxisBlockKeyword,
 		BoundingBoxKeyword,
 		BoundingBoxPlaneYKeyword,

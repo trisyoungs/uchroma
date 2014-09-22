@@ -618,7 +618,7 @@
      <x>0</x>
      <y>0</y>
      <width>947</width>
-     <height>23</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1423,6 +1423,9 @@
    </property>
   </action>
   <action name="actionViewPerspective">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/uchroma/icons/view_perspective.svg</normaloff>:/uchroma/icons/view_perspective.svg</iconset>

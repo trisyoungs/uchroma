@@ -40,6 +40,7 @@ const char* stringBool(bool b)
 bool UChromaWindow::writeAxisBlock(LineParser& parser, Axes& axes, int axis)
 {
 	parser.writeLineF("    %s %i\n", Keywords::viewPaneKeyword(Keywords::AxisBlockKeyword), axis);
+	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::AutoScaleKeyword), Axes::autoScaleMethod(axes.autoScale(axis)));
 	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::AutoTicksKeyword), stringBool(axes.autoTicks(axis)));
 	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::FirstTickKeyword), axes.tickFirst(axis));
 	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::FractionalPositioningKeyword), stringBool(axes.positionIsFractional(axis)));
@@ -231,7 +232,6 @@ bool UChromaWindow::writeViewPaneBlock(LineParser& parser, ViewPane* pane)
 	parser.writeLineF("  %s '%s'\n", Keywords::viewKeyword(Keywords::ViewPaneBlockKeyword), qPrintable(pane->name()));
 	parser.writeLineF("    %s %i %i %i %i\n", Keywords::viewPaneKeyword(Keywords::GeometryKeyword), pane->bottomEdge(), pane->leftEdge(), pane->width(), pane->height()); 
 	for (int axis=0; axis < 3; ++axis) writeAxisBlock(parser, pane->axes(), axis);
-	parser.writeLineF("    %s %s\n", Keywords::viewPaneKeyword(Keywords::AutoScaleKeyword), ViewPane::autoScaleMethod(pane->autoScale()));
 	parser.writeLineF("    %s %f\n", Keywords::viewPaneKeyword(Keywords::LabelPointSizeKeyword), pane->labelPointSize());
 	parser.writeLineF("    %s %f\n", Keywords::viewPaneKeyword(Keywords::TitlePointSizeKeyword), pane->titlePointSize());
 	parser.writeLineF("    %s %i\n", Keywords::viewPaneKeyword(Keywords::BoundingBoxKeyword), pane->boundingBox());
@@ -244,10 +244,10 @@ bool UChromaWindow::writeViewPaneBlock(LineParser& parser, ViewPane* pane)
 	parser.writeLineF("    %s %f %f %f\n", Keywords::viewPaneKeyword(Keywords::TranslationKeyword), trans.x, trans.y, trans.z);
 	parser.writeLineF("    %s %s\n", Keywords::viewPaneKeyword(Keywords::PerspectiveKeyword), stringBool(pane->hasPerspective()));
 	parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::RoleKeyword), ViewPane::paneRole(pane->role()));
-	for (RefListItem<Collection,bool>* ri = pane->collectionTargets(); ri != NULL; ri = ri->next)
+	for (TargetData* target = pane->collectionTargets(); target != NULL; target = target->next)
 	{
-		if (!Collection::objectValid(ri->item, "collection in UChromaWindow::writeViewPaneBlock")) continue;
-		parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::RoleTargetCollectionKeyword), qPrintable(ri->item->locator()));
+		if (!Collection::objectValid(target->collection(), "collection in UChromaWindow::writeViewPaneBlock")) continue;
+		parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::RoleTargetCollectionKeyword), qPrintable(target->collection()->locator()));
 	}
 	for (RefListItem<ViewPane,bool>* ri = pane->paneTargets(); ri != NULL; ri = ri->next) parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::RoleTargetPaneKeyword), qPrintable(ri->item->name()));
 	parser.writeLineF("    %s '%s'\n", Keywords::viewPaneKeyword(Keywords::ViewTypeKeyword), ViewPane::viewType(pane->viewType()));

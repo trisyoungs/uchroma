@@ -134,7 +134,7 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	// Target pane(s) for role, if relevant
 	RefList<ViewPane,bool> paneTargets_;
 	// Target collection(s) for role
-	RefList<Collection,bool> collectionTargets_;
+	ParentList<TargetData,ViewPane> collectionTargets_;
 
 	public:
 	// Set role of this pane
@@ -154,37 +154,17 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	// Remove target collection for role
 	void removeCollectionTarget(Collection* collection);
 	// Return whether specified collection is a target
-	bool collectionIsTarget(Collection* collection);
+	TargetData* collectionIsTarget(Collection* collection);
 	// Return first target collection for role
-	RefListItem<Collection,bool>* collectionTargets();
+	TargetData* collectionTargets();
 	// Process supplied Collection changed/update signal if it is relevant to this pane
 	bool processUpdate(Collection* source, Collection::CollectionSignal signal);
-
-
-	/*
-	 * Generated/Derived Data
-	 */
-	private:
-	// Display targets for pane
-	List<TargetData> displayTargets_;
-
-	private:
-	// Add display target
-	void addDisplayTarget(Collection* collection);
-	// Remove display target
-	void removeDisplayTarget(Collection* collection);
 
 
 	/*
 	 * Projection / View
 	 */
 	public:
-	// Autoscaling for 2D plots
-	enum AutoScaleMethod { NoAutoScale, ExpandingAutoScale, FullAutoScale, nAutoScaleMethods };
-	// Convert text string to AutoScaleMethod
-	static AutoScaleMethod autoScaleMethod(const char* s);
-	// Convert AutoScaleMethod to text string
-	static const char* autoScaleMethod(AutoScaleMethod scale);
 	// View type
 	enum ViewType { NormalView, AutoStretchedView, FlatXYView, FlatXZView, FlatYZView, LinkedView, nViewTypes };
 	// Convert text string to ViewType
@@ -193,8 +173,6 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	static const char* viewType(ViewType vt);
 
 	private:
-	// Autoscaling method employed
-	AutoScaleMethod autoScale_;
 	// Type of view to use
 	ViewType viewType_;
 	// Projection matrix for GL
@@ -217,10 +195,6 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	void updatePrimitive(Collection* collection, PrimitiveList& primitive, bool forcePrimitiveUpdate = false, bool dontPopInstance = false);
 
 	public:
-	// Set autoscaling method employed
-	void setAutoScale(ViewPane::AutoScaleMethod method);
-	// Return autoscaling method employed
-	ViewPane::AutoScaleMethod autoScale();
 	// Set view type
 	void setViewType(ViewPane::ViewType vt);
 	// Return view type
