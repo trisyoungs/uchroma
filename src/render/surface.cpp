@@ -227,9 +227,19 @@ void Surface::constructSurfaceStrip(const Array<double>& x, const Array<double>&
 // 		normals.add(v3);
 // 		printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f)\n", nPoints-1, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 	}
-	
+
 	// Normalise normals
 	for (n=0; n<normals.nItems(); ++n) normals[n].normalise();
+
+	// Swap signs of normals to 'undo' directionality imposed by axis inversions, to make surface lighting correct
+	if (axes.inverted(0) || axes.inverted(1) || axes.inverted(2))
+	{
+		Vec3<double> multiplier(1.0, 1.0, 1.0);
+		if (axes.inverted(0)) multiplier.multiply(Vec3<double>(1.0, -1.0, -1.0));
+		if (axes.inverted(1)) multiplier.multiply(Vec3<double>(-1.0, 1.0, -1.0));
+		if (axes.inverted(2)) multiplier.multiply(Vec3<double>(-1.0, -1.0, 1.0));
+		for (n=0; n<normals.nItems(); ++n) normals[n].multiply(multiplier);
+	}
 }
 
 // Calculate integer index extents for display data given supplied axes
@@ -239,10 +249,8 @@ bool Surface::calculateExtents(const Axes& axes, const Array<double>& abscissa, 
 	Vec3<double> axisMin(axes.min(0), axes.min(1), axes.min(2));
 	Vec3<double> axisMax(axes.max(0), axes.max(1), axes.max(2));
 
-	axisMin.print();
-	axisMax.print();
 	// Get x index limits
-	for (minIndex.x = 0; minIndex.x < abscissa.nItems(); ++minIndex.x) { printf("x = %f\n", abscissa.value(minIndex.x)); if (abscissa.value(minIndex.x) >= axisMin.x) break; }
+	for (minIndex.x = 0; minIndex.x < abscissa.nItems(); ++minIndex.x) if (abscissa.value(minIndex.x) >= axisMin.x) break;
 	if (minIndex.x == abscissa.nItems()) return false;
 	for (maxIndex.x = abscissa.nItems()-1; maxIndex.x >= 0; --maxIndex.x) if (abscissa.value(maxIndex.x) <= axisMax.x) break;
 	if (maxIndex.x < 0) return false;

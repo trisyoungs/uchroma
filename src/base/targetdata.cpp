@@ -77,21 +77,22 @@ PrimitiveList& TargetData::primitive()
  */
 
 // Update primitive
-PrimitiveList& TargetData::updatePrimitive(const QGLContext* context, GLExtensions* extensions, const Axes& axes, bool forcePrimitiveUpdate, bool dontPopInstance)
+bool TargetData::updatePrimitive(const Axes& axes, bool forceUpdate)
 {
 	// Check collection validity
-	if (!Collection::objectValid(collection_, "collection in TargetData::updatePrimitive")) return primitive_;
+	if (!Collection::objectValid(collection_, "collection in TargetData::updatePrimitive")) return false;
+
+	printf("Updating primitive '%s' : local logs are: axes=%i(%i), colour=%i(%i), data=%i(%i), style=%i(%i)\n", qPrintable(collection_->name()), primitiveAxesUsedAt_, axes.displayVersion(), primitiveColourUsedAt_, collection_->colourVersion(), primitiveDataUsedAt_, collection_->dataVersion(), primitiveStyleUsedAt_, collection_->styleVersion());
 
 	// Check whether the primitive for this collection needs updating
 	bool upToDate = true;
-	if (forcePrimitiveUpdate) upToDate = false;
+	if (forceUpdate) upToDate = false;
 	else if (primitiveAxesUsedAt_ != axes.displayVersion()) upToDate = false;
 	else if (primitiveColourUsedAt_ != collection_->colourVersion()) upToDate = false;
 	else if (primitiveDataUsedAt_ != collection_->dataVersion()) upToDate = false;
 	else if (primitiveStyleUsedAt_ != collection_->styleVersion()) upToDate = false;
 
-	// Pop old primitive instance (unless flagged not to)
-	if (!dontPopInstance) primitive_.popInstance(context);
+	if (upToDate) return false;
 
 	// Recreate primitive depending on current style
 	switch (collection_->displayStyle())
@@ -110,14 +111,13 @@ PrimitiveList& TargetData::updatePrimitive(const QGLContext* context, GLExtensio
 			break;
 	}
 
-	// Push a new instance to create the new display list / vertex array
-	primitive_.pushInstance(context, extensions);
-
 	// Store version points for the up-to-date primitive
 	primitiveAxesUsedAt_ = axes.displayVersion();
 	primitiveColourUsedAt_ = collection_->colourVersion();
 	primitiveDataUsedAt_ = collection_->dataVersion();
 	primitiveStyleUsedAt_ = collection_->styleVersion();
+
+	return true;
 }
 
 // Send collection data to GL, including any associated fit and extracted data
@@ -137,7 +137,7 @@ void TargetData::sendToGL()
 	else
 	{
 		glEnable(GL_LINE_SMOOTH);
-		glLineWidth(collection_->displayLineWidth());
+		collection_->displayLineStyle().apply();
 		glDisable(GL_LIGHTING);
 	}
 

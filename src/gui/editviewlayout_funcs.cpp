@@ -74,17 +74,10 @@ void EditViewLayoutDialog::on_CancelButton_clicked(bool checked)
 }
 
 // Call dialog to edit specified ViewLayout
-bool EditViewLayoutDialog::call(ViewLayout* target)
+bool EditViewLayoutDialog::call(ViewLayout target)
 {
-	// Check supplied var
-	if (!target)
-	{
-		msg.print("Internal Error: NULL ViewLayout given to EditViewLayoutDialog::call().\n");
-		return false;
-	}
-
 	// Copy supplied data
-	layout_ = (*target);
+	layout_ = target;
 
 	// Tell the Organiser widget which layout it's editing
 	ui.Organiser->setViewLayout(&layout_);
@@ -95,7 +88,6 @@ bool EditViewLayoutDialog::call(ViewLayout* target)
 	// Call the dialog
 	if (exec()) return true;
 	else return false;
-
 }
 
 // Return ViewLayout stored in dialog
@@ -144,6 +136,16 @@ void EditViewLayoutDialog::on_PaneRemoveButton_clicked(bool checked)
 	layout_.removePane(currentPane_);
 
 	updateControls();
+}
+
+void EditViewLayoutDialog::on_PaneBringToFrontButton_clicked(bool checked)
+{
+	layout_.bringPaneToFront(currentPane_);
+}
+
+void EditViewLayoutDialog::on_PaneSendToBackButton_clicked(bool checked)
+{
+	layout_.sendPaneToBack(currentPane_);
 }
 
 void EditViewLayoutDialog::on_Organiser_currentPaneChanged(int gridX, int gridY)

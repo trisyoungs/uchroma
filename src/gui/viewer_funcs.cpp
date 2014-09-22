@@ -117,10 +117,6 @@ void Viewer::initializeGL()
 		PrimitiveInstance::setGlobalInstanceType(PrimitiveInstance::ListInstance);
 	}
 
-	// Create an instance for each defined user primitive - we do this in every call to initialiseGL so
-	// that, when saving a bitmap using QGLWidget::renderPixmap(), we automatically create new display list
-	// objects, rather than having to worry about context sharing etc. Slow, but safer and more compatible.
-
 	// Recalculate view layouts
 	uChroma_->recalculateViewLayout(contextWidth_, contextHeight_);
 
@@ -153,7 +149,6 @@ void Viewer::paintGL()
 	glEnable(GL_TEXTURE_2D);
 
 	// Clear view
-	msg.print(Messenger::Verbose, " --> Clearing context, background, and setting pen colour\n");
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -165,12 +160,6 @@ void Viewer::paintGL()
 		extensions->glBeginQuery(GL_TIME_ELAPSED, timeQuery);
 	}
 	
-	// Update / recreate axes, display data and surface primitives if necessary
-	int nSurfacesUpdated = 0;
-
-	// Used primitives list - we use this to pop primitives after being displayed when rendering offscreen
-	RefList<PrimitiveList,bool> primitiveList;
-
 	// Loop over defined viewpanes
 	GLdouble clipPlaneBottom[4] = { 0.0, 1.0, 0.0, 0.0 }, clipPlaneTop[4] = { 0.0, -1.0, 0.0, 0.0 };
 	for (ViewPane* pane = uChroma_->viewLayout().panes(); pane != NULL; pane = pane->next)
@@ -308,14 +297,13 @@ void Viewer::paintGL()
 		glPopMatrix();
 
 		// Render pane data
-		if (renderingOffScreen_) pane->renderData(context(), extensionsStack_.last(), primitiveList, true, true);
-		else pane->renderData(context(), extensionsStack_.last(), primitiveList);
+		if (renderingOffScreen_) pane->renderData(context(), extensionsStack_.last(), true, true);
+		else pane->renderData(context(), extensionsStack_.last());
 
 		// Disable current clip planes
 		glDisable(GL_CLIP_PLANE0);
 		glDisable(GL_CLIP_PLANE1);
 	}
-	if (nSurfacesUpdated > 0) emit(surfacePrimitivesUpdated());
 
 	// End timer query
 	if (extensions->hasQueries())
@@ -338,14 +326,8 @@ void Viewer::paintGL()
 	// Set the rendering flag to false
 	drawing_ = false;
 
-	// If we were rendering offscreen, we may delete the topmost primitive instance and GLExtensions objects here
-	if (renderingOffScreen_)
-	{
-// 		msg.print("In Viewer::PaintGL, popping instances for %i primitives...\n", primitiveList_.nItems());
-// 		for (RefListItem<Primitive,int> *ri = primitiveList_.first(); ri != NULL; ri = ri->next) ri->item->popInstance(context());
-		for (RefListItem<PrimitiveList,bool> *ri = primitiveList.first(); ri != NULL; ri = ri->next) ri->item->popInstance(context());
-		extensionsStack_.removeLast();
-	}
+	// If we were rendering offscreen, delete the topmost GLExtensions object here (primitives will have already been popped)
+	if (renderingOffScreen_) extensionsStack_.removeLast();
 	
 	msg.exit("Viewer::paintGL");
 }
@@ -371,7 +353,7 @@ void Viewer::setupGL()
 	GLfloat spotlightAmbient[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	GLfloat spotlightDiffuse[4] = { 0.8f, 0.8f, 0.8f, 1.0f };
 	GLfloat spotlightSpecular[4] = { 0.7f, 0.7f, 0.7f, 1.0f };
-	GLfloat spotlightPosition[4] = { 100.0f, 100.0f, 0.0f, 0.0f };
+	GLfloat spotlightPosition[4] = { 1.0f, 1.0f, 0.0f, 0.0f };
 	GLfloat specularColour[4] = { 0.9f, 0.9f, 0.9f, 1.0f };
 
 	// Clear (background) colour

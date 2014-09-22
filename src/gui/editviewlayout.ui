@@ -210,7 +210,7 @@
           <item row="2" column="0">
            <widget class="QPushButton" name="PaneBringToFrontButton">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Bring to Front</string>
@@ -220,7 +220,7 @@
           <item row="2" column="1">
            <widget class="QPushButton" name="PaneSendToBackButton">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Send to Back</string>

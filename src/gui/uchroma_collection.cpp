@@ -125,7 +125,7 @@ void UChromaWindow::updateCollectionTreeItem(QTreeWidgetItem* item)
 	item->setCheckState(0, collection->visible() ? Qt::Checked : Qt::Unchecked);
 
 	// Set icon
-	item->setIcon(0, QIcon(collection->iconString()));
+	item->setIcon(0, QIcon(collection->iconString(viewLayout_.collectionUsed(collection, ViewPane::StandardRole))));
 
 	// If this is the current collection, select it
 	if (collection == currentCollection_) item->setSelected(true);
@@ -165,22 +165,22 @@ void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 	// -- "Display..." pane menu
 	contextMenu.addSeparator();
 	QMenu paneMenu, removeFromPaneMenu, addToPaneMenu;
-	RefList<ViewPane,bool> usedPanes, displayPanes = viewLayout_.panes(ViewPane::StandardRole);
+	RefList<ViewPane,bool> displayPanes = viewLayout_.panes(ViewPane::StandardRole);
+	RefList<ViewPane,bool> currentPanes = viewLayout_.panes(currentCollection_, ViewPane::StandardRole);
 	QList<QAction*> addToPaneActions, removeFromPaneActions;
 	// -- ... Populate removeFromPaneMenu first...
-	for (RefListItem<ViewPane,bool>* ri = displayPanes.first(); ri != NULL; ri = ri->next)
+	for (RefListItem<ViewPane,bool>* ri = currentPanes.first(); ri != NULL; ri = ri->next)
 	{
 		action = removeFromPaneMenu.addAction(ri->item->name());
 		action->setData(VariantPointer<ViewPane>(ri->item));
 		removeFromPaneActions << action;
-		usedPanes.add(ri->item);
 	}
 	action = paneMenu.addMenu(&removeFromPaneMenu);
 	action->setText("Remove from pane...");
 	// -- ... Now populate addToPaneMenu...
 	for (RefListItem<ViewPane,bool>* ri = displayPanes.first(); ri != NULL; ri = ri->next)
 	{
-		if (usedPanes.contains(ri->item)) continue;
+		if (currentPanes.contains(ri->item)) continue;
 		action = addToPaneMenu.addAction(ri->item->name());
 		action->setData(VariantPointer<ViewPane>(ri->item));
 		addToPaneActions << action;
@@ -204,7 +204,6 @@ void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 	else if (removeFromPaneActions.contains(menuResult))
 	{
 		ViewPane* pane = VariantPointer<ViewPane>(menuResult->data());
-		printf("jlklkjkl\n");
 		if (pane) pane->removeCollectionTarget(currentCollection_);
 
 		// Update the item
@@ -257,13 +256,13 @@ void UChromaWindow::updateCollectionInfo()
 	}
 
 	// Set number of collections in the current session (can use Collection's ObjectList to get number)
-	ui.CollectionNCollectionsLabel->setText("("+QString::number(Collection::nObjects())+")");
+	ui.CollectionNCollectionsLabel->setText("("+QString::number(collections_.nItems())+")");
 
 	// Update collection info label
 	if (currentCollection_)
 	{
 		ui.InfoCurrentCollectionLabel->setText(currentCollection_->name());
-		ui.InfoCurrentCollectionIconLabel->setPixmap(QPixmap(currentCollection_->iconString()));
+		ui.InfoCurrentCollectionIconLabel->setPixmap(QPixmap(currentCollection_->iconString(viewLayout_.collectionUsed(currentCollection_, ViewPane::StandardRole))));
 	}
 	else ui.InfoCurrentCollectionLabel->setText("<No Current Collection>");
 }

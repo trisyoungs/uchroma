@@ -61,17 +61,10 @@ void EditNumberFormatDialog::on_CancelButton_clicked(bool checked)
 }
 
 // Call dialog to edit specified NumberFormat
-bool EditNumberFormatDialog::call(NumberFormat* target)
+bool EditNumberFormatDialog::call(NumberFormat target)
 {
-	// Check supplied var
-	if (!target)
-	{
-		msg.print("Internal Error: NULL NumberFormat given to EditNumberFormatDialog::call().\n");
-		return false;
-	}
-
 	// Copy supplied data
-	numberFormat_ = (*target);
+	numberFormat_ = target;
 
 	refreshing_ = true;
 

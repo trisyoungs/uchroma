@@ -179,7 +179,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Number of collections present in the current session</string>
+               <string>Number of master collections present in the current session</string>
               </property>
               <property name="text">
                <string>(999)</string>
@@ -618,7 +618,7 @@
      <x>0</x>
      <y>0</y>
      <width>947</width>
-     <height>29</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -680,6 +680,7 @@
     <addaction name="actionCollectionNew"/>
     <addaction name="actionCollectionCreate"/>
     <addaction name="actionCollectionDuplicate"/>
+    <addaction name="actionCollectionPromoteToMaster"/>
     <addaction name="separator"/>
     <addaction name="actionCollectionStyle"/>
     <addaction name="actionCollectionTransform"/>
@@ -1202,7 +1203,7 @@
    </property>
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/uchroma/icons/view_2D.svg</normaloff>:/uchroma/icons/view_2D.svg</iconset>
+     <normaloff>:/uchroma/icons/view_flatxy.svg</normaloff>:/uchroma/icons/view_flatxy.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Flat XY</string>
@@ -1367,7 +1368,7 @@
    </property>
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/uchroma/icons/view_2D.svg</normaloff>:/uchroma/icons/view_2D.svg</iconset>
+     <normaloff>:/uchroma/icons/view_flatxz.svg</normaloff>:/uchroma/icons/view_flatxz.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Flat XZ</string>
@@ -1382,7 +1383,7 @@
    </property>
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/uchroma/icons/view_2D.svg</normaloff>:/uchroma/icons/view_2D.svg</iconset>
+     <normaloff>:/uchroma/icons/view_flatyz.svg</normaloff>:/uchroma/icons/view_flatyz.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Flat YZ</string>
@@ -1397,7 +1398,7 @@
    </property>
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/uchroma/icons/view_autostretch.svg</normaloff>:/uchroma/icons/view_autostretch.svg</iconset>
+     <normaloff>:/uchroma/icons/view_normal.svg</normaloff>:/uchroma/icons/view_normal.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Normal</string>
@@ -1431,6 +1432,11 @@
    </property>
    <property name="toolTip">
     <string>Toggle perspective on 3D views</string>
+   </property>
+  </action>
+  <action name="actionCollectionPromoteToMaster">
+   <property name="text">
+    <string>Promote to &amp;Master</string>
    </property>
   </action>
  </widget>

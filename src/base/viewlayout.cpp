@@ -205,6 +205,17 @@ RefList<ViewPane,bool> ViewLayout::panes(Collection* collection, ViewPane::PaneR
 	return result;
 }
 
+// Return whether pane is used anywhere on a pane (optionally only of specified type)
+ViewPane* ViewLayout::collectionUsed(Collection* collection, ViewPane::PaneRole role)
+{
+	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next)
+	{
+		if ((role != ViewPane::nPaneRoles) && (pane->role() != role)) continue;
+		if (pane->collectionIsTarget(collection)) return pane;
+	}
+	return NULL;
+}
+
 // Return if pane is in the current list
 bool ViewLayout::containsPane(ViewPane* pane)
 {
@@ -244,6 +255,22 @@ void ViewLayout::translatePane(ViewPane* pane, int deltaX, int deltaY)
 
 	pane->setBottomLeft(pane->bottomEdge()+deltaY, pane->leftEdge()+deltaX);
 	pane->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
+}
+
+// Bring pane to front
+void ViewLayout::bringPaneToFront(ViewPane* pane, bool onTop)
+{
+	// Bringing to front actually means send to tail of list, since this is pane drawing order
+	if (onTop) panes_.moveToEnd(pane);
+	else panes_.shiftDown(pane);
+}
+
+// Send pane to back
+void ViewLayout::sendPaneToBack(ViewPane* pane, bool onBottom)
+{
+	// Sending to back actually means bring to head of list, since this is pane drawing order
+	if (onBottom) panes_.moveToStart(pane);
+	else panes_.shiftUp(pane);
 }
 
 // Reset view of all panes

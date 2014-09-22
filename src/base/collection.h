@@ -26,6 +26,7 @@
 #include "base/displaydataset.h"
 #include "base/transformer.h"
 #include "base/colourscale.h"
+#include "render/linestyle.h"
 #include "render/primitivelist.h"
 #include "templates/objectlist.h"
 
@@ -214,7 +215,7 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	// Return type of this collection
 	CollectionType type();
 	// Return icon string reflecting this Collection's type / status
-	QString iconString();
+	QString iconString(bool isUsed = true);
 	// Return locally-unique fit name based on basename provided
 	QString uniqueFitName(QString baseName);
 	// Add fit to Collection
@@ -354,7 +355,7 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	// Return current colourscale
 	const ColourScale& colourScale();
 	// Return colour version
-	bool colourVersion();
+	int colourVersion();
 
 
 	/*
@@ -379,8 +380,8 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	Array<double> displayAbscissa_;
 	// Display style of data
 	DisplayStyle displayStyle_;
-	// Line width (for line styles)
-	double displayLineWidth_;
+	// Line style
+	LineStyle displayLineStyle_;
 	// Style version
 	int styleVersion_;
 
@@ -397,10 +398,8 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	void setDisplayStyle(DisplayStyle style);
 	// Return display style of data
 	DisplayStyle displayStyle();
-	// Set line width (for line styles)
-	void setDisplayLineWidth(double width);
-	// Return Line width (for line styles)
-	double displayLineWidth();
+	// Return line style
+	LineStyle& displayLineStyle();
 	// Return style version
 	int styleVersion();
 };

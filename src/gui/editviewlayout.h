@@ -62,7 +62,7 @@ class EditViewLayoutDialog : public QDialog
 	void on_CancelButton_clicked(bool checked);
 
 	// Call dialog to edit specified ViewLayout
-	bool call(ViewLayout* target);
+	bool call(ViewLayout target);
 	// Return ViewLayout stored in dialog
 	ViewLayout& viewLayout();
 
@@ -94,6 +94,8 @@ class EditViewLayoutDialog : public QDialog
 	void on_GridNRowsSpin_valueChanged(int value);
 	void on_PaneAddButton_clicked(bool checked);
 	void on_PaneRemoveButton_clicked(bool checked);
+	void on_PaneBringToFrontButton_clicked(bool checked);
+	void on_PaneSendToBackButton_clicked(bool checked);
 	void on_Organiser_currentPaneChanged(int gridX, int gridY);
 	// Current Pane
 	void on_PaneNameEdit_textChanged(QString text);

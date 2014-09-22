@@ -625,6 +625,7 @@ template <class T> void List<T>::shiftDown(T *item)
 		printf("Internal Error: NULL pointer passed to List<T>::shiftDown().\n");
 		return;
 	}
+
 	// If the item is already at the tail of the list, return.
 	if (listTail_ == item) return;
 	swapItems(item->next,item);

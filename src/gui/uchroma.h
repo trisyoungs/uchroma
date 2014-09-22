@@ -182,6 +182,7 @@ class UChromaWindow : public QMainWindow
 	void on_actionCollectionNew_triggered(bool checked);
 	void on_actionCollectionCreate_triggered(bool checked);
 	void on_actionCollectionDuplicate_triggered(bool checked);
+	void on_actionCollectionPromoteToMaster_triggered(bool checked);
 	void on_actionCollectionStyle_triggered(bool checked);
 	void on_actionCollectionTransform_triggered(bool checked);
 	void on_actionCollectionDelete_triggered(bool checked);

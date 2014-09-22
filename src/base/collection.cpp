@@ -109,7 +109,7 @@ void Collection::operator=(const Collection& source)
 	dataFileDirectory_ = source.dataFileDirectory_;
 	dataMin_ = source.dataMin_;
 	dataMax_ = source.dataMax_;
-	dataVersion_ = source.dataVersion_;
+	dataVersion_ = 0;
 
 	// Transforms
 	transformMin_ = source.transformMin_;
@@ -135,11 +135,24 @@ void Collection::operator=(const Collection& source)
 	customColourScale_ = source.customColourScale_;
 	alphaControl_ = source.alphaControl_;
 	fixedAlpha_ = source.fixedAlpha_;
-	colourVersion_ = source.colourVersion_;
-	colourScaleGeneratedAt_ = source.colourScaleGeneratedAt_;
+	colourVersion_ = 0;
+	colourScaleGeneratedAt_ = -1;
 
-	// Display data
+	// Associated data
+	parent_ = source.parent_;
+	type_ = source.type_;
+	// currentSlice_ = NULL;
+	// fitKernel_ = NULL;
+
+	// Update
+	limitsAndTransformsVersion_ = -1;
+
+	// Display
+	visible_ = source.visible_;
+	displayData_.clear();
 	displayDataGeneratedAt_ = -1;
+	displayStyle_ = source.displayStyle_;
+	styleVersion_ = 0;
 }
 
 /*
@@ -747,7 +760,7 @@ Collection::CollectionType Collection::type()
 }
 
 // Return icon string reflecting this Collection's type / status
-QString Collection::iconString()
+QString Collection::iconString(bool isUsed)
 {
 	QString iconName;
 
@@ -757,7 +770,7 @@ QString Collection::iconString()
 	else if (type_ == Collection::ExtractedCollection) iconName = ":/uchroma/icons/collection_extracted";
 
 	// If display pane is invalid, tweak icon name
-// 	if (displayPane_ == NULL) iconName += "_nopane"; // TODO Introduce class in ViewLayout to see if a Collection is displayed anywhere
+	if (!isUsed) iconName += "_nopane";
 	iconName += ".svg";
 	
 	return iconName;
@@ -782,7 +795,7 @@ QString Collection::uniqueFitName(QString baseName)
 Collection* Collection::addFit(QString name)
 {
 	Collection* newFit = fits_.add();
-	newFit->setName(name);
+	newFit->setName(uniqueFitName(name));
 	newFit->type_ = Collection::FitCollection;
 	newFit->setParent(this);
 	newFit->addFitKernel();
@@ -832,7 +845,7 @@ QString Collection::uniqueSliceName(QString baseName)
 Collection* Collection::addSlice(QString name)
 {
 	Collection* newSlice = slices_.add();
-	newSlice->setName(name);
+	newSlice->setName(uniqueSliceName(name));
 	newSlice->type_ = Collection::ExtractedCollection;
 	newSlice->setParent(this);
 	newSlice->addFitKernel();
@@ -1250,7 +1263,7 @@ const ColourScale& Collection::colourScale()
 }
 
 // Return colour version
-bool Collection::colourVersion()
+int Collection::colourVersion()
 {
 	return colourVersion_;
 }
@@ -1296,15 +1309,12 @@ const Array<double>& Collection::displayAbscissa() const
 // Return transformed data to display
 List<DisplayDataSet>& Collection::displayData()
 {
-	printf("Here in Collection::displayData() : dataVersion_=%i, displayDataGeneratedAt_=%i\n", dataVersion_, displayDataGeneratedAt_);
 	// Is surface reconstruction necessary?
 	if (dataVersion_ == displayDataGeneratedAt_) return displayData_;
 
-	printf("Updating limits and transforms...\n");
 	// Make sure transforms are up to date
 	updateLimitsAndTransforms();
 
-	printf("Now updating data...\n");
 	// Clear old displayData_ and create temporary Data2D list for display data construction
 	List<Data2D> transformedData;
 	displayData_.clear();
@@ -1434,8 +1444,6 @@ List<DisplayDataSet>& Collection::displayData()
 		}	
 	}
 	
-	printf("NDISPLAYABSCISSA = %i\n", displayAbscissa_.nItems());
-
 	// Store new version 
 	displayDataGeneratedAt_ = dataVersion_;
 
@@ -1456,18 +1464,10 @@ Collection::DisplayStyle Collection::displayStyle()
 	return displayStyle_;
 }
 
-// Set line width (for line styles)
-void Collection::setDisplayLineWidth(double width)
+// Return line style
+LineStyle& Collection::displayLineStyle()
 {
-	displayLineWidth_ = width;
-
-	++styleVersion_;
-}
-
-// Return Line width (for line styles)
-double Collection::displayLineWidth()
-{
-	return displayLineWidth_;
+	return displayLineStyle_;
 }
 
 // Return style version

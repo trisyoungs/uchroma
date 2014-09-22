@@ -100,6 +100,13 @@ void PrimitiveList::popInstance(const QGLContext *context)
 	for (Primitive* prim = primitives_.first(); prim != NULL; prim = prim->next) prim->popInstance(context);
 }
 
+// Return number of instances of topmost primitive
+int PrimitiveList::nInstances()
+{
+	if (primitives_.nItems() == 0) return 0;
+	else return primitives_.first()->nInstances();
+}
+
 // Send to OpenGL (i.e. render)
 void PrimitiveList::sendToGL()
 {

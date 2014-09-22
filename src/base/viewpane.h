@@ -165,8 +165,14 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	 * Generated/Derived Data
 	 */
 	private:
-	// Target collection(s) for role
+	// Display targets for pane
 	List<TargetData> displayTargets_;
+
+	private:
+	// Add display target
+	void addDisplayTarget(Collection* collection);
+	// Remove display target
+	void removeDisplayTarget(Collection* collection);
 
 
 	/*
@@ -258,7 +264,7 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	// Set display limits to show all available data
 	void showAllData();
 	// Render all data associated with this pane
-	void renderData(const QGLContext* context, GLExtensions* extensions, RefList<PrimitiveList,bool>& usedPrimitives, bool forcePrimitiveUpdate = false, bool dontPopInstance = false);
+	void renderData(const QGLContext* context, GLExtensions* extensions, bool forcePrimitiveUpdate = false, bool dontPopInstance = false);
 
 
 	/*

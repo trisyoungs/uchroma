@@ -292,7 +292,7 @@ void UChromaWindow::on_actionViewChangeLayout_triggered(bool checked)
 	EditViewLayoutDialog layoutDialog(*this);
 
 	// Call the dialog
-	if (layoutDialog.call(&viewLayout_))
+	if (layoutDialog.call(viewLayout_))
 	{
 		viewLayout_ = layoutDialog.viewLayout();
 		currentViewPane_ = viewLayout_.panes();
@@ -332,7 +332,39 @@ void UChromaWindow::on_actionCollectionCreate_triggered(bool checked)
 
 void UChromaWindow::on_actionCollectionDuplicate_triggered(bool checked)
 {
-	// TODO XXX
+	if (!Collection::objectValid(currentCollection_, "current collection in UChromaWindow::on_actionCollectionDuplicate_triggered")) return;
+
+	Collection* newCollection;
+	if (currentCollection_->parent())
+	{
+		if (currentCollection_->type() == Collection::FitCollection) newCollection = currentCollection_->parent()->addFit(currentCollection_->name());
+		else if (currentCollection_->type() == Collection::ExtractedCollection) newCollection = currentCollection_->parent()->addSlice(currentCollection_->name());
+		else return;
+	}
+	else newCollection = addCollection(currentCollection_->name());
+
+	// Grab name before we copy, since this will be overwritten...
+	QString name = newCollection->name();
+	(*newCollection) = (*currentCollection_);
+	newCollection->setName(name);
+
+	updateGUI();
+}
+
+void UChromaWindow::on_actionCollectionPromoteToMaster_triggered(bool checked)
+{
+	if (!Collection::objectValid(currentCollection_, "current collection in UChromaWindow::on_actionCollectionPromoteToMaster_triggered")) return;
+
+	if (currentCollection_->type() == Collection::MasterCollection) return;
+
+	Collection* newCollection = addCollection(currentCollection_->name());
+
+	// Grab name before we copy, since this will be overwritten...
+	QString name = newCollection->name();
+	(*newCollection) = (*currentCollection_);
+	newCollection->setName(name);
+
+	updateGUI();
 }
 
 void UChromaWindow::on_actionCollectionStyle_triggered(bool checked)
@@ -408,8 +440,11 @@ void UChromaWindow::on_actionAnalyseNewFit_triggered(bool checked)
 	// Check current Collection
 	if (!Collection::objectValid(currentCollection_, "collection in UChromaWindow::on_actionAnalyseNewFit_triggered()")) return;
 
-	// Add a new fit collection to the current collection
-	Collection* newFit = currentCollection_->addFit(currentCollection_->uniqueFitName("New Fit"));
+	// Add a new fit collection to the current collection, and add it to a suitable view pane
+	Collection* newFit = currentCollection_->addFit("New Fit");
+	RefList<ViewPane,bool> parentPanes = viewLayout_.panes(currentCollection_, ViewPane::StandardRole);
+	if (parentPanes.contains(currentViewPane_)) currentViewPane_->addCollectionTarget(newFit);
+	else if (parentPanes.nItems() != 0) parentPanes.first()->item->addCollectionTarget(newFit);
 
 	editFitSetupDialog_.setFitKernel(newFit->fitKernel());
 	if (editFitSetupDialog_.updateAndExec()) newFit->fitKernel()->fit();

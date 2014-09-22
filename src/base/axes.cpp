@@ -174,13 +174,14 @@ void Axes::operator=(const Axes& source)
 	gridLineMinorStyle_[2] = source.gridLineMinorStyle_[2];
 
 	// Versions
-	axesVersion_ = -1;
-	displayVersion_ = -1;
+	axesVersion_ = 0;
+	displayVersion_ = 0;
 
 	// GL
 	clipPlaneYMin_ = 0.0;
 	clipPlaneYMax_ = 0.0;
 	parent_.paneChanged();
+	primitiveVersion_ = -1;
 }
 
 /*
@@ -458,14 +459,16 @@ double Axes::transformX(double x) const
 	if (inverted_.x && logarithmic_.x) return log10(max_.x/x) * stretch_.x;
 	else if (inverted_.x) return ((max_.x - x) + min_.x) * stretch_.x;
 	else if (logarithmic_.x) return log10(x) * stretch_.x;
+	else return x * stretch_.x;
 }
 
-// // Transform entire array of values into local axes coordinates
+// Transform entire array of values into local axes coordinates
 void Axes::transformX(Array<double>& xArray) const
 {
 	if (inverted_.x && logarithmic_.x) for (int n=0; n<xArray.nItems(); ++n) xArray[n] = log10(max_.x/xArray[n]) * stretch_.x;
 	else if (inverted_.x) for (int n=0; n<xArray.nItems(); ++n) xArray[n] = ((max_.x - xArray[n]) + min_.x) * stretch_.x;
 	else if (logarithmic_.x) for (int n=0; n<xArray.nItems(); ++n) xArray[n] = log10(xArray[n]) * stretch_.x;
+	else xArray *= stretch_.x;
 }
 
 // Return supplied data y value in local axes coordinates
@@ -474,22 +477,25 @@ double Axes::transformY(double y) const
 	if (inverted_.y && logarithmic_.y) return log10(max_.y/y) * stretch_.y;
 	else if (inverted_.y) return ((max_.y - y) + min_.y) * stretch_.y;
 	else if (logarithmic_.y) return log10(y) * stretch_.y;
+	else return y * stretch_.y;
 }
 
-// // Transform entire array of values into local axes coordinates
+// Transform entire array of values into local axes coordinates
 void Axes::transformY(Array<double>& yArray) const
 {
 	if (inverted_.y && logarithmic_.y) for (int n=0; n< yArray.nItems(); ++n) yArray[n] = log10(max_.y/ yArray[n]) * stretch_.y;
 	else if (inverted_.y) for (int n=0; n< yArray.nItems(); ++n) yArray[n] = ((max_.y - yArray[n]) + min_.y) * stretch_.y;
 	else if (logarithmic_.y) for (int n=0; n< yArray.nItems(); ++n) yArray[n] = log10(yArray[n]) * stretch_.y;
+	else yArray *= stretch_.y;
 }
 
 // Return supplied data z value in local axes coordinates
-double Axes::transformZ(double value) const
+double Axes::transformZ(double z) const
 {
-	if (inverted_.z && logarithmic_.z) return log10(max_.z/ value) * stretch_.z;
-	else if (inverted_.z) return ((max_.z - value) + min_.z) * stretch_.z;
-	else if (logarithmic_.z) return log10(value) * stretch_.z;
+	if (inverted_.z && logarithmic_.z) return log10(max_.z/ z) * stretch_.z;
+	else if (inverted_.z) return ((max_.z - z) + min_.z) * stretch_.z;
+	else if (logarithmic_.z) return log10(z) * stretch_.z;
+	else return z * stretch_.z;
 }
 
 /*
@@ -856,7 +862,7 @@ void Axes::updateAxisPrimitives()
 			// Get axis position
 			position = (positionIsFractional_[axis] ? positionFractional_[axis][n]*(max_[n]-min_[n])+min_[n] : positionReal_[axis][n]);
 			if (logarithmic_[n]) coordMin_[axis].set(n, (inverted_[n] ? log10(max_[n]/position) : log10(position)) * stretch_[n]);
-			else coordMin_[axis].set(n, (inverted_[n] ? max_[n] - position : position) * stretch_[n]);
+			else coordMin_[axis].set(n, (inverted_[n] ? max_[n] - position +min_[n] : position) * stretch_[n]);
 		}
 		coordMax_[axis] = coordMin_[axis];
 

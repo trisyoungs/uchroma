@@ -83,7 +83,7 @@ Collection* UChromaWindow::addCollection(QString name)
 	currentCollection_ = collections_.add();
 
 	// Set the title
-	if (name.isEmpty()) currentCollection_->setName( uniqueCollectionName("Empty Collection ") );
+	if (name.isEmpty()) currentCollection_->setName( uniqueCollectionName("Empty Collection") );
 	else currentCollection_->setName(uniqueCollectionName(name));
 
 	Session::setAsModified();

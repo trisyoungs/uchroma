@@ -25,6 +25,7 @@
 #include "math/cuboid.h"
 #include <../aten/src/base/sginfo.h>
 #include <algorithm>
+#include <X11/Xlib.h>
 
 // Static Members
 template<class ViewPane> RefList<ViewPane,bool> ObjectList<ViewPane>::objects_;
@@ -111,8 +112,15 @@ void ViewPane::operator=(const ViewPane& source)
 	role_ = source.role_;
 	autoScale_ = source.autoScale_;
 	viewType_ = source.viewType_;
-// 	RefList<ViewPane,bool> paneTargets_;
-	collectionTargets_ = source.collectionTargets_;
+	// -- Don't perform a literal copy of the paneTargets_. Re-add them instead...
+	paneTargets_.clear();
+// 	RefList<ViewPane,bool> paneTargets_;	TODO
+	// -- Don't perform a literal copy of the collectionTargets_. Re-add them instead...
+	collectionTargets_.clear();
+	for (RefListItem<Collection,bool>* ri = source.collectionTargets_.first(); ri != NULL; ri = ri->next) addCollectionTarget(ri->item);
+
+	// Additional / Generated data
+	// -- Should be handled by performing re-addition of target collections above
 }
 
 /*
@@ -364,9 +372,8 @@ void ViewPane::addCollectionTarget(Collection* collection)
 		// Standard Role
 		case (ViewPane::StandardRole):
 			// Add directly to displayTargets_
-			target = displayTargets_.add();
-			target->setCollection(collection);
-			target->setParent(this);
+			addDisplayTarget(collection);
+			break;
 	}
 
 	paneChanged();
@@ -375,12 +382,22 @@ void ViewPane::addCollectionTarget(Collection* collection)
 // Remove target collection for role
 void ViewPane::removeCollectionTarget(Collection* collection)
 {
-	if (collectionIsTarget(collection))
+	if (!collectionIsTarget(collection)) msg.print(Messenger::Verbose, "Internal Error: Tried to remove collection '%s' from pane '%s', but it is not a target there.\n", qPrintable(collection->name()), qPrintable(name_));
+		
+	// Perform any final actions
+	switch (role_)
 	{
-		collectionTargets_.remove(collection);
-		paneChanged();
+		// Standard Role
+		case (ViewPane::StandardRole):
+			// Add directly to displayTargets_
+			removeDisplayTarget(collection);
+			break;
 	}
-	else msg.print(Messenger::Verbose, "Internal Error: Tried to remove collection '%s' from pane '%s', but it is not a target there.\n", qPrintable(collection->name()), qPrintable(name_));
+
+	// Remove the target
+	collectionTargets_.remove(collection);
+
+	paneChanged();
 }
 
 // Return whether specified collection is a target
@@ -422,8 +439,9 @@ bool ViewPane::processUpdate(Collection* source, Collection::CollectionSignal si
 			if (!collectionIsTarget(source)) return false;
 			// Grab slice storage and copy over data 
 // 			collection = ri->data.addCollectionData(TargetData::SliceData);  TODO
-			collection->clearDataSets();
-			collection->copyDataSets(source->currentSlice());
+// 			collection->clearDataSets();
+			addDisplayTarget(source->currentSlice());
+// 			collection->copyDataSets(source->currentSlice());
 			// Update axes limits if autoscaling?????? XXX TODO
 			break;
 		// Data Changed
@@ -442,6 +460,29 @@ bool ViewPane::processUpdate(Collection* source, Collection::CollectionSignal si
 	}
 
 	return true;
+}
+
+/*
+ * Generated/Derived Data
+ */
+
+// Add display target
+void ViewPane::addDisplayTarget(Collection* collection)
+{
+	TargetData* target = displayTargets_.add();
+	target->setCollection(collection);
+	target->setParent(this);
+}
+
+// Remove display target
+void ViewPane::removeDisplayTarget(Collection* collection)
+{
+	// Find specified target
+	for (TargetData* target = displayTargets_.first(); target != NULL; target = target->next) if (target->collection() == collection)
+	{
+		displayTargets_.remove(target);
+		return;
+	}
 }
 
 /*
@@ -992,13 +1033,27 @@ void ViewPane::showAllData()
 }
 
 // Render all data associated with this pane
-void ViewPane::renderData(const QGLContext* context, GLExtensions* extensions, RefList<PrimitiveList,bool>& usedPrimitives, bool forcePrimitiveUpdate, bool dontPopInstance)
+void ViewPane::renderData(const QGLContext* context, GLExtensions* extensions, bool forcePrimitiveUpdate, bool stackAndPop)
 {
 	// Loop over displayTargets_ list...
+	printf("There are %i targets in pane %p\n", displayTargets_.nItems(), this);
 	for (TargetData* target = displayTargets_.first(); target != NULL; target = target->next)
 	{
-		usedPrimitives.add(&target->updatePrimitive(context, extensions, axes_, forcePrimitiveUpdate, dontPopInstance));
+		// Make sure the primitive is up to date, creating a new instance if anything was changed
+		if (target->updatePrimitive(axes_, forcePrimitiveUpdate))
+		{
+			// Pop old primitive instance (unless flagged not to)
+			if ((!stackAndPop) && (target->primitive().nInstances() != 0)) target->primitive().popInstance(context);
+
+			// Push a new instance to create the new display list / vertex array
+			target->primitive().pushInstance(context, extensions);
+		}
+
+		// Send primitive to GL
 		target->sendToGL();
+
+		// Pop current instance (if flagged)
+		if (stackAndPop) target->primitive().popInstance(context);
 	}
 }
 

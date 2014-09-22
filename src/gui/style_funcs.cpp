@@ -82,7 +82,6 @@ void StyleWindow::on_StyleCombo_currentIndexChanged(int index)
 	// Update display
 	Session::setAsModified();
 	uChroma_.updateDisplay();
-	uChroma_.updateCollectionInfo();
 }
 
 // Single Colour

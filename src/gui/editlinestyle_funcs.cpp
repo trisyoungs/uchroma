@@ -61,17 +61,10 @@ void EditLineStyleDialog::on_CancelButton_clicked(bool checked)
 }
 
 // Call dialog to edit specified reference
-bool EditLineStyleDialog::call(LineStyle* target)
+bool EditLineStyleDialog::call(LineStyle target)
 {
-	// Check supplied var
-	if (!target)
-	{
-		msg.print("Internal Error: NULL LineStyle given to EditLineStyleDialog::call().\n");
-		return false;
-	}
-
 	// Copy supplied data
-	lineStyle_ = (*target);
+	lineStyle_ = target;
 
 	refreshing_ = true;
 

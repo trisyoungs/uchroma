@@ -62,7 +62,7 @@ class EditLineStyleDialog : public QDialog
 
 	public:
 	// Call dialog to edit specified LineStyle
-	bool call(LineStyle* target);
+	bool call(LineStyle target);
 	// Return LineStyle stored in dialog
 	LineStyle& lineStyle();
 

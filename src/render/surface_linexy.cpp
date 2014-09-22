@@ -28,7 +28,6 @@ void Surface::constructLineXY(PrimitiveList& primitiveList, const Axes& axes, co
 	// Forget all data in current primitives
 	primitiveList.forgetAll();
 
-	printf("It's LineXY time...\n");
 	// Get extents of displayData to use based on current axes limits
 	Vec3<int> minIndex, maxIndex;
 	if (!calculateExtents(axes, displayAbscissa, displayData, minIndex, maxIndex)) return;

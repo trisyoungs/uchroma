@@ -62,6 +62,8 @@ class PrimitiveList
 	void pushInstance(const QGLContext *context, GLExtensions* extensions);
 	// Pop topmost instance layer
 	void popInstance(const QGLContext *context);
+	// Return number of instances of topmost primitive
+	int nInstances();
 	// Send to OpenGL (i.e. render)
 	void sendToGL();
 

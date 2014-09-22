@@ -70,7 +70,6 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 
 	// Connect signals / slots between the Viewer and uChroma
 	connect(ui.MainView, SIGNAL(renderComplete(QString)), this, SLOT(updateRenderTimeLabel(QString)));
-	connect(ui.MainView, SIGNAL(surfacePrimitivesUpdated()), this, SLOT(updateCollectionInfo()));
 
 	// Hide LeftWidgets (Collection list etc.) initially
 	ui.LeftWidgetsWidget->setVisible(false);
@@ -87,7 +86,6 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	connect(&viewWindow_, SIGNAL(windowClosed(bool)), ui.actionWindowView, SLOT(setChecked(bool)));
 
 	// Create necessary action groups
-
 	// -- ViewType actions
 	viewTypeActionGroup_.addAction(ui.actionViewNormal);
 	viewTypeActionGroup_.addAction(ui.actionViewAutoStretched3D);
@@ -95,7 +93,6 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	viewTypeActionGroup_.addAction(ui.actionViewFlatXZ);
 	viewTypeActionGroup_.addAction(ui.actionViewFlatYZ);
 	viewTypeActionGroup_.addAction(ui.actionViewLinked);
-
 	// -- Interaction mode actions
 	QActionGroup* actionGroup = new QActionGroup(this);
 	actionGroup->addAction(ui.actionInteractNone);

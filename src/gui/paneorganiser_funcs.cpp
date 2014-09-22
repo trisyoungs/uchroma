@@ -56,13 +56,14 @@ void PaneOrganiser::calculateLayoutPixelSize()
 }
 
 // Return grid reference containing coordinates supplied
-QPoint PaneOrganiser::gridReference(QPoint point)
+QPoint PaneOrganiser::gridReference(QPoint point, bool nearest)
 {
 	if ((point.x() < 0) || (point.x() > width())) return QPoint(-1,-1);
 	else if ((point.y() < 0) || (point.y() > height())) return QPoint(-1,-1);
 
 	// Divide by pixel width and return
-	return QPoint(point.x() / layoutPixelWidth_, (height() - point.y()) / layoutPixelHeight_);
+	if (nearest) return QPoint(round(point.x() / double(layoutPixelWidth_)), round((height() - point.y()) / double(layoutPixelHeight_)));
+	else return QPoint(point.x() / layoutPixelWidth_, (height() - point.y()) / layoutPixelHeight_);
 }
 
 // Set layout to display / organise
@@ -100,13 +101,13 @@ void PaneOrganiser::updateUnderMouse(QPoint pos)
 		QPoint paneSize = QPoint(hoverPane->width()*layoutPixelWidth_, hoverPane->height()*layoutPixelHeight_);
 
 		// -- Bottom left
-		handleRect.moveBottomLeft(QPoint(paneBottomLeft.x(), paneBottomLeft.y()));
+		handleRect.moveBottomLeft(QPoint(paneBottomLeft.x(), height()-paneBottomLeft.y()));
 		if (handleRect.contains(pos.x(), pos.y())) handle = ViewPane::BottomLeftHandle;
 		// -- Bottom middle
 		handleRect.moveBottomLeft(QPoint(paneBottomLeft.x()+0.5*paneSize.x()-paneMargin_, height()-paneBottomLeft.y()));
 		if (handleRect.contains(pos.x(), pos.y())) handle = ViewPane::BottomMiddleHandle;
 		// -- Bottom right
-		handleRect.moveBottomRight(QPoint(paneBottomLeft.x()+paneSize.x(), height()-hoverPane->bottomEdge()*layoutPixelHeight_));
+		handleRect.moveBottomRight(QPoint(paneBottomLeft.x()+paneSize.x(), height()-paneBottomLeft.y()));
 		if (handleRect.contains(pos.x(), pos.y())) handle = ViewPane::BottomRightHandle;
 		// -- Middle left
 		handleRect.moveBottomLeft(QPoint(paneBottomLeft.x(), height()-(paneBottomLeft.y()+0.5*paneSize.y()-paneMargin_)));
@@ -131,6 +132,9 @@ void PaneOrganiser::updateUnderMouse(QPoint pos)
 	else if ((handle != stretchHandle_) || (interactionMode_ == StretchInteraction)) updateWidget = true;
 	paneUnderMouse_ = hoverPane;
 	if (interactionMode_ != StretchInteraction) stretchHandle_ = handle;
+
+	// Now get grid reference currently nearest to mouse
+	gridReferenceUnderMouse_ = gridReference(pos, true);
 
 	if (updateWidget) update();
 }

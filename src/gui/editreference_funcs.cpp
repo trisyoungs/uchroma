@@ -64,7 +64,7 @@ void EditReferenceDialog::on_CancelButton_clicked(bool checked)
 bool EditReferenceDialog::call(ReferenceVariable* target, FitKernel* parentKernel)
 {
 	// Check supplied var
-	if ((!target) || (!parentKernel))
+	if (!parentKernel)
 	{
 		msg.print("Internal Error: NULL ReferenceVariable or FitKernel given to EditReferenceDialog::call().\n");
 		return false;

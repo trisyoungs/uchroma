@@ -206,6 +206,12 @@ void Primitive::popInstance(const QGLContext *context)
 	instances_.removeLast();
 }
 
+// Return number of instances available
+int Primitive::nInstances()
+{
+	return instances_.nItems();
+}
+
 // Send to OpenGL (i.e. render)
 void Primitive::sendToGL() const
 {

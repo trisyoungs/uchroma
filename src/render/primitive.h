@@ -78,6 +78,8 @@ class Primitive : public ListItem<Primitive>
 	void pushInstance(const QGLContext* context, GLExtensions* extensions);
 	// Pop topmost instance layer
 	void popInstance(const QGLContext *context);
+	// Return number of instances available
+	int nInstances();
 	// Send to OpenGL (i.e. render)
 	void sendToGL() const;
 

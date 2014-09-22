@@ -457,7 +457,7 @@ bool AxesWindow::gridStyleClicked(int axis, bool major)
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
 	EditLineStyleDialog dialog(this);
-	bool success = dialog.call(major ? &currentAxes().gridLineMajorStyle(axis) : &currentAxes().gridLineMinorStyle(axis));
+	bool success = dialog.call(major ? currentAxes().gridLineMajorStyle(axis) : currentAxes().gridLineMinorStyle(axis));
 
 	// Update relevant parts of gui
 	if (success)
@@ -497,7 +497,7 @@ bool AxesWindow::gridStyleApplyClicked(int axis)
 bool AxesWindow::numberFormatChangeClicked(int axis)
 {
 	EditNumberFormatDialog numberDialog(this);
-	if (numberDialog.call(&currentAxes().numberFormat(axis)))
+	if (numberDialog.call(currentAxes().numberFormat(axis)))
 	{
 		currentAxes().numberFormat(axis) = numberDialog.numberFormat();
 

@@ -128,8 +128,8 @@ class TargetData : public ListItem<TargetData>
 	 * GL
 	 */
 	public:
-	// Update primitive for target collection
-	PrimitiveList& updatePrimitive(const QGLContext* context, GLExtensions* extensions, const Axes& axes, bool forcePrimitiveUpdate = false, bool dontPopInstance = false);
+	// Update primitive for target collection, returning if data was changed
+	bool updatePrimitive(const Axes& axes, bool forceUpdate = false);
 	// Send primitive to GL
 	void sendToGL();
 };

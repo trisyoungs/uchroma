@@ -123,6 +123,8 @@ class ViewLayout : public ListItem<ViewLayout>
 	RefList<ViewPane,bool> panes(ViewPane::PaneRole role);
 	// Return reflist of panes (optionally of specified type) that target specified collection
 	RefList<ViewPane,bool> panes(Collection* collection, ViewPane::PaneRole role = ViewPane::nPaneRoles);
+	// Return whether collection is used anywhere on a pane (optionally only of specified type)
+	ViewPane* collectionUsed(Collection* collection, ViewPane::PaneRole role = ViewPane::nPaneRoles);
 	// Return if pane is in the current list
 	bool containsPane(ViewPane* pane);
 	// Return pane under specified coordinate
@@ -131,6 +133,10 @@ class ViewLayout : public ListItem<ViewLayout>
 	ViewPane* paneAtGrid(int gridX, int gridY);
 	// Translate pane by the amount specified
 	void translatePane(ViewPane* pane, int deltaX, int deltaY);
+	// Bring pane to front
+	void bringPaneToFront(ViewPane* pane, bool onTop = false);
+	// Send pane to back
+	void sendPaneToBack(ViewPane* pane, bool onBottom = false);
 	// Reset view matrix of all panes
 	void resetViewMatrix();
 	// Update interaction primitives for all panes

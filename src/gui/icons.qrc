@@ -1,8 +1,11 @@
 <RCC>
   <qresource prefix="/uchroma">
+    <file>icons/view_normal.svg</file>
     <file>icons/symbol.svg</file>
     <file>icons/windows_log.svg</file>
-    <file>icons/view_2D.svg</file>
+    <file>icons/view_flatxy.svg</file>
+    <file>icons/view_flatxz.svg</file>
+    <file>icons/view_flatyz.svg</file>
     <file>icons/view_autostretch.svg</file>
     <file>icons/view_showall.svg</file>
     <file>icons/windows_fit.svg</file>

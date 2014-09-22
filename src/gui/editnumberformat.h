@@ -62,7 +62,7 @@ class EditNumberFormatDialog : public QDialog
 
 	public:
 	// Call dialog to edit specified NumberFormat
-	bool call(NumberFormat* target);
+	bool call(NumberFormat target);
 	// Return NumberFormat stored in dialog
 	NumberFormat& numberFormat();
 
