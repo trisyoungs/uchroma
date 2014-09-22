@@ -302,7 +302,7 @@ bool ViewPane::containsGridReference(int gridX, int gridY)
  */
 
 // Role of pane
-const char* RoleKeywords[ViewPane::nPaneRoles] = { "FitResults", "Extraction", "SliceMonitor", "Standard" };
+const char* RoleKeywords[ViewPane::nPaneRoles] = { "SliceMonitor", "Standard" };
 
 // Convert text string to PaneRole
 ViewPane::PaneRole ViewPane::paneRole(const char* s)
@@ -1033,27 +1033,18 @@ void ViewPane::showAllData()
 }
 
 // Render all data associated with this pane
-void ViewPane::renderData(const QGLContext* context, GLExtensions* extensions, bool forcePrimitiveUpdate, bool stackAndPop)
+void ViewPane::renderData(const QGLContext* context, GLExtensions* extensions, bool forcePrimitiveUpdate, bool pushAndPop)
 {
 	// Loop over displayTargets_ list...
 	printf("There are %i targets in pane %p\n", displayTargets_.nItems(), this);
 	for (TargetData* target = displayTargets_.first(); target != NULL; target = target->next)
 	{
-		// Make sure the primitive is up to date, creating a new instance if anything was changed
-		if (target->updatePrimitive(axes_, forcePrimitiveUpdate))
+		// Loop over display primitives in this target...
+		for (TargetPrimitive* primitive = target->displayPrimitives(); primitive != NULL; primitive = primitive->next)
 		{
-			// Pop old primitive instance (unless flagged not to)
-			if ((!stackAndPop) && (target->primitive().nInstances() != 0)) target->primitive().popInstance(context);
-
-			// Push a new instance to create the new display list / vertex array
-			target->primitive().pushInstance(context, extensions);
+			// Make sure the primitive is up to date and send it to GL
+			primitive->updateAndSendPrimitive(axes_, forcePrimitiveUpdate, pushAndPop, context, extensions);
 		}
-
-		// Send primitive to GL
-		target->sendToGL();
-
-		// Pop current instance (if flagged)
-		if (stackAndPop) target->primitive().popInstance(context);
 	}
 }
 

@@ -122,7 +122,7 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	 */
 	public:
 	// Role of pane
-	enum PaneRole { FitResultsRole, ExtractionRole, SliceMonitorRole, StandardRole, nPaneRoles };
+	enum PaneRole { SliceMonitorRole, StandardRole, nPaneRoles };
 	// Convert text string to PaneRole
 	static PaneRole paneRole(const char* s);
 	// Convert PaneRole to text string

@@ -17,6 +17,7 @@ add_library(base
   session.cpp
   sysfunc.cpp
   targetdata.cpp
+  targetprimitive.cpp
   transformer.cpp
   viewlayout.cpp
   viewpane.cpp
@@ -38,6 +39,7 @@ add_library(base
   session.h
   sysfunc.h
   targetdata.h
+  targetprimitive.h
   transformer.h
   viewlayout.h
   viewpane.h
