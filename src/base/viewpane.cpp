@@ -23,7 +23,6 @@
 #include "base/collection.h"
 #include "base/viewlayout.h"
 #include "math/cuboid.h"
-#include <../aten/src/base/sginfo.h>
 #include <algorithm>
 
 // Static Members
@@ -836,20 +835,26 @@ void ViewPane::recalculateView(bool force)
 	// Set axis stretch factors to fill available pixel width/height
 	for (axis=0; axis<3; ++axis) axes_.setStretch(axis, viewportMatrix_[axisDir[axis]+2] / (unit[axisDir[axis]] * (axisMax[axis] - axisMin[axis])));
 
+	const double margin = 10.0;
+	Matrix viewMat;
+	if (viewType_ == ViewPane::FlatXZView) viewMat.applyRotationX(90.0);
+	else if (viewType_ == ViewPane::FlatYZView) viewMat.applyRotationY(90.0);
+	viewMat.applyTranslation(-axes().coordCentre());
+	viewMat.print();
+	Vec3<double> coordMin[3], coordMax[3], a, b, globalMin, globalMax;
+	Vec4<double> textBounds[3];
+
+	// Iterate for a few cycles
 	for (int cycle = 0; cycle < 3; ++cycle)
 	{
+		printf("Pane '%s' Cycle = %i\n", qPrintable(name_), cycle);
 		// We will now calculate more accurate stretch factors to apply to the X and Y axes.
 		// Project the axis limits on to the screen using the relevant viewmatrix + coordinate centre translation
 		// We don't care if the projected coordinates are on-screen or not - we only need them to compare with the bounding box
 		// calculated for the axes labels, to see what the absolute pixel overlaps are
-		Matrix viewMat;
-		if (viewType_ == ViewPane::FlatXZView) viewMat.applyRotationX(90.0);
-		else if (viewType_ == ViewPane::FlatYZView) viewMat.applyRotationY(90.0);
-		viewMat.applyTranslation(-axes().coordCentre());
-		viewMat.print();
-		Vec3<double> coordMin[3], coordMax[3], a, b, globalMin(1e9,1e9,1e9), globalMax(-1e9,-1e9,-1e9);
-		Vec4<double> textBounds[3];
-		printf("VP = %i %i %i %i\n", viewportMatrix_[0], viewportMatrix_[1], viewportMatrix_[2], viewportMatrix_[3]);
+		globalMin.set(1e9,1e9,1e9);
+		globalMax = -globalMin;
+// 		printf("VP = %i %i %i %i\n", viewportMatrix_[0], viewportMatrix_[1], viewportMatrix_[2], viewportMatrix_[3]);
 		for (axis=0; axis<3; ++axis)
 		{
 			// Set min/max (stretched) coordinates to project
@@ -867,8 +872,11 @@ void ViewPane::recalculateView(bool force)
 			coordMax[axis].print();
 			for (int n=0; n<3; ++n)
 			{
+				
 				if (coordMin[axis][n] < globalMin[n]) globalMin[n] = coordMin[axis][n];
+				else if (coordMax[axis][n] < globalMin[n]) globalMin[n] = coordMax[axis][n];
 				if (coordMax[axis][n] > globalMax[n]) globalMax[n] = coordMax[axis][n];
+				else if (coordMin[axis][n] > globalMax[n]) globalMax[n] = coordMin[axis][n];
 			}
 
 			// Get bounding cuboid for axis text
@@ -888,8 +896,8 @@ void ViewPane::recalculateView(bool force)
 			// Update global min/max
 			for (int n=0; n<3; ++n)
 			{
-				if (coordMin[axis][n] < globalMin[n]) globalMin[n] = coordMin[axis][n];
-				if (coordMax[axis][n] > globalMax[n]) globalMax[n] = coordMax[axis][n];
+				if (textBounds[axis][n] < globalMin[n]) globalMin[n] = textBounds[axis][n];
+				if (textBounds[axis][n] > globalMax[n]) globalMax[n] = textBounds[axis][n];
 			}
 		}
 
@@ -902,8 +910,8 @@ void ViewPane::recalculateView(bool force)
 		printf("GlobalMinMax: X = %f/%f, Y=%f/%f\n", globalMin.x, globalMax.x, globalMin.y, globalMax.y);
 
 		// Calculate total width and height of objects as they are arranged
-		double globalWidth = globalMax.x - globalMin.x;
-		double globalHeight = globalMax.y - globalMin.y;
+		double globalWidth = globalMax.x - globalMin.x + 2*margin;
+		double globalHeight = globalMax.y - globalMin.y + 2*margin;
 
 		// Now, we know the width and height of the axis on its own, so work out the difference
 		double deltaWidth = viewportMatrix_[2] - globalWidth;
@@ -951,6 +959,9 @@ void ViewPane::recalculateView(bool force)
 	else if (viewType_ == ViewPane::FlatYZView) viewRotation_.applyRotationY(90.0);
 
 	// Set a translation in order to set the margins as requested
+	viewTranslation_.zero();
+// 	viewTranslation_[axisX] = (margin - globalMin.x) / unit.x;
+// 	viewTranslation_[axisY] = (margin - globalMin.y) / unit.y;
 // 	viewTranslation_[axisX] = (screenXMax - 0.5*(availableWidth+viewportMatrix_[2])) / unit.x;
 // 	viewTranslation_[axisY] = (screenYMax - 0.5*(availableHeight+viewportMatrix_[3])) / unit.y;
 
