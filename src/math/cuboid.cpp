@@ -42,9 +42,9 @@ void Cuboid::updateExtremes(Vec3<double> v)
 	else if (v.z < minima_.z) minima_.z = v.z;
 
 	if (!maximaSet_) maxima_ = v;
-	else if (v.x < maxima_.x) maxima_.x = v.x;
-	else if (v.y < maxima_.y) maxima_.y = v.y;
-	else if (v.z < maxima_.z) maxima_.z = v.z;
+	else if (v.x > maxima_.x) maxima_.x = v.x;
+	else if (v.y > maxima_.y) maxima_.y = v.y;
+	else if (v.z > maxima_.z) maxima_.z = v.z;
 
 	minimaSet_ = true;
 	maximaSet_ = true;

@@ -85,6 +85,8 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	double aspectRatio_;
 	// Viewport matrix for GL
 	GLuint viewportMatrix_[4];
+	// Version of viewport matrix
+	int viewportVersion_;
 
 	public:
 	// Set name of pane
@@ -187,6 +189,10 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	Vec3<double> viewTranslation_;
 	// Standard zOffset for translation matrix
 	const double zOffset_;
+	// Axes version at which view matrix was last calculated (mostly for keeping 2D view correct)
+	int viewAxesUsedAt_;
+	// Viewport version at which view matrix was last calculated
+	int viewViewportUsedAt_;
 
 	private:
 	// Return calculated projection matrix
@@ -232,7 +238,7 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	// Convert screen coordinates into model space coordinates
 	Vec3<double> screenToModel(int x, int y, double z);
 	// Recalculate current view parameters (e.g. for 2D, autostretched 3D etc.)
-	void recalculateView();
+	void recalculateView(bool force = false);
 	// Reset view matrix to face XY plane
 	void resetViewMatrix();
 	// Set display limits to show all available data

@@ -56,13 +56,11 @@ Cuboid TextPrimitiveList::boundingCuboid(ViewPane& pane, bool correctOrientation
 
 		// Transform the four corners of the bounding box with the text primitive's transformation matrix
 		// and determine the extreme x, y, and z coordinates of the primitives in the local frame
-		for (int m=0; m <4; ++m)
+		for (int m=0; m<4; ++m)
 		{
-// 			screen = pane.modelToScreen(textMatrix*corners[m], viewMatrix);
 			local = textMatrix*corners[m];
 			result.updateExtremes(local);
 		}
-
 	}
 
 	return result;

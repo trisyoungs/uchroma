@@ -175,8 +175,7 @@ bool UChromaWindow::checkBeforeClose()
 bool UChromaWindow::viewTypeChanged(ViewPane::ViewType vt)
 {
 	currentViewPane_->setViewType(vt);
-	currentViewPane_->resetViewMatrix();
-	currentViewPane_->recalculateView();
+	currentViewPane_->recalculateView(true);
 
 	Session::setAsModified();
 
@@ -215,7 +214,6 @@ void UChromaWindow::on_actionViewShowAll_triggered(bool checked)
 	if (!ViewPane::objectValid(currentViewPane_, "view pane in UChromaWindow::on_actionViewShowAll_triggered()")) return;
 
 	currentViewPane_->showAllData();
-	currentViewPane_->recalculateView();
 
 	Session::setAsModified();
 

@@ -138,7 +138,7 @@ QColor ColourScaleDelta::colour(double value, bool useHSV) const
 }
 
 // Get colour for value as GLfloat*, assuming that v is within the range 0 -> value_
-void ColourScaleDelta::colour(double v, bool useHSV, Vec4< GLfloat >& target) const
+void ColourScaleDelta::colour(double v, bool useHSV, Vec4<GLfloat>& target) const
 {
 	// Clamp 'v' to range 0.0 - 1.0 to span range of delta
 	double clampv = (v - start_) / delta_;
