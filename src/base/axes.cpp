@@ -85,6 +85,9 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	gridLinesMajor_.set(false, false, false);
 	gridLinesMinor_.set(false, false, false);
 	
+	// Style override
+	useBestView_ = false;
+
 	// Versions
 	axesVersion_ = 0;
 	displayVersion_ = 0;
@@ -369,7 +372,6 @@ double Axes::limitMax(int axis) const
 // Set all axis limits at once
 void Axes::expandLimits(bool noShrink)
 {
-	printf("Here in ExpandLimits.\n");
 	for (int axis=0; axis<3; ++axis)
 	{
 		if ((min_[axis] > limitMin_[axis]) || (!noShrink)) setToLimit(axis, true);
@@ -657,9 +659,15 @@ void Axes::setTickDirection(int axis, int dir, double value)
 }
 
 // Return axis tick direction
-Vec3<double> Axes::tickDirection(int axis)
+Vec3<double> Axes::tickDirection(int axis) const
 {
-	return tickDirection_[axis];
+	if ((!useBestView_) || (parent_.viewType() == ViewPane::NormalView)) return tickDirection_[axis];
+	else switch (parent_.viewType())
+	{
+		case (ViewPane::FlatXYView):	return (axis == 0 ? Vec3<double>(0.0, -1.0, 0.0) : Vec3<double>(-1.0, 0.0, 0.0));
+		case (ViewPane::FlatXZView):	return (axis == 0 ? Vec3<double>(0.0, -1.0, 0.0) : Vec3<double>(-1.0, 0.0, 0.0));
+		case (ViewPane::FlatYZView):	return (axis == 1 ? Vec3<double>(0.0, -1.0, 0.0) : Vec3<double>(-1.0, 0.0, 0.0));
+	}
 }
 
 // Set axis tick size (relative to font size)
@@ -764,8 +772,17 @@ void Axes::setLabelOrientation(int axis, int component, double value)
 }
 
 // Return orientation of labels for specified axis
-Vec3<double> Axes::labelOrientation(int axis)
+Vec3<double> Axes::labelOrientation(int axis) const
 {
+	if ((!useBestView_) || (parent_.viewType() == ViewPane::NormalView)) return labelOrientation_[axis];
+	else switch (parent_.viewType())
+	{
+		case (ViewPane::FlatXYView):	return (axis == 0 ? Vec3<double>(0.0, 0.0, 0.2) : Vec3<double>(0.0, 0.0, 0.2));
+		case (ViewPane::FlatXZView):	return (axis == 0 ? Vec3<double>(0.0, 0.0, 0.2) : Vec3<double>(0.0, 0.0, 0.2));
+		case (ViewPane::FlatYZView):	return (axis == 1 ? Vec3<double>(0.0, 0.0, 0.2) : Vec3<double>(0.0, 0.0, 0.2));
+	}
+
+	// Safety catch
 	return labelOrientation_[axis];
 }
 
@@ -780,7 +797,7 @@ void Axes::setLabelAnchor(int axis, TextPrimitive::TextAnchor anchor)
 }
 
 // Return axis label text anchor position for specified axis
-TextPrimitive::TextAnchor Axes::labelAnchor(int axis)
+TextPrimitive::TextAnchor Axes::labelAnchor(int axis) const
 {
 	return labelAnchor_[axis];
 }
@@ -796,7 +813,7 @@ void Axes::setTitle(int axis, QString title)
 }
 
 // Return title for specified axis
-QString Axes::title(int axis)
+QString Axes::title(int axis) const
 {
 	return title_[axis];
 }
@@ -812,8 +829,17 @@ void Axes::setTitleOrientation(int axis, int component, double value)
 }
 
 // Return orientation of titles for specified axis
-Vec4<double> Axes::titleOrientation(int axis)
+Vec4<double> Axes::titleOrientation(int axis) const
 {
+	if ((!useBestView_) || (parent_.viewType() == ViewPane::NormalView)) return titleOrientation_[axis];
+	else switch (parent_.viewType())
+	{
+		case (ViewPane::FlatXYView):	return (axis == 0 ? Vec4<double>(0.0, 0.0, 1.2, 0.5) : Vec4<double>(0.0, 270.0, 1.2, 0.5));
+		case (ViewPane::FlatXZView):	return (axis == 0 ? Vec4<double>(0.0, 0.0, 1.2, 0.5) : Vec4<double>(90.0, 90.0, 1.2, 0.5));
+		case (ViewPane::FlatYZView):	return (axis == 1 ? Vec4<double>(0.0, 0.0, 1.2, 0.5) : Vec4<double>(0.0, 0.0, 1.2, 0.5));
+	}
+
+	// Safety catch
 	return titleOrientation_[axis];
 }
 
@@ -828,9 +854,27 @@ void Axes::setTitleAnchor(int axis, TextPrimitive::TextAnchor anchor)
 }
 
 // Return axis title text anchor position for specified axis
-TextPrimitive::TextAnchor Axes::titleAnchor(int axis)
+TextPrimitive::TextAnchor Axes::titleAnchor(int axis) const
 {
 	return titleAnchor_[axis];
+}
+
+/*
+ * Style Overrides
+ */
+
+// Set whether to use best tick/label orientation for view
+void Axes::setUseBestView(bool b)
+{
+	useBestView_ = b;
+
+	++axesVersion_;
+}
+
+// Return whether to use best tick/label orientation for view
+bool Axes::useBestView()
+{
+	return useBestView_;
 }
 
 /*
@@ -946,22 +990,22 @@ void Axes::updateAxisPrimitives()
 		titlePrimitives_[axis].clear();
 
 		// Normalise tickDirection
-		tickDir = tickDirection_[axis];
+		tickDir = tickDirection(axis);
 		tickDir.normalise();
 
 		// Create tick label transformation matrix
 		labelTransform.setIdentity();
 		// -- 1) Apply axial rotation along X axis (left-to-right direction)
-		labelTransform.applyRotationX(labelOrientation_[axis].x);
+		labelTransform.applyRotationX(labelOrientation(axis).x);
 		// -- 2) Perform in-plane rotation
-		labelTransform.applyRotationY(labelOrientation_[axis].y);
+		labelTransform.applyRotationY(labelOrientation(axis).y);
 
 		// Create axis title transformation matrix
 		titleTransform.setIdentity();
 		// -- 1) Apply axial rotation along X axis (left-to-right direction)
-		titleTransform.applyRotationX(titleOrientation_[axis].x);
+		titleTransform.applyRotationX(titleOrientation(axis).x);
 		// -- 2) Perform in-plane rotation
-		titleTransform.applyRotationY(titleOrientation_[axis].y);
+		titleTransform.applyRotationY(titleOrientation(axis).y);
 
 		if (logarithmic_[axis])
 		{

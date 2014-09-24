@@ -206,7 +206,7 @@ class Axes
 	// Set axis tick direction
 	void setTickDirection(int axis, int dir, double value);
 	// Return axis tick direction for specified axis
-	Vec3<double> tickDirection(int axis);
+	Vec3<double> tickDirection(int axis) const;
 	// Set axis tick size (relative to font size)
 	void setTickSize(int axis, double size);
 	// Return axis tick size (relative to font size)
@@ -252,23 +252,37 @@ class Axes
 	// Set orientation of labels for specified axis
 	void setLabelOrientation(int axis, int component, double value);
 	// Return orientation of labels for specified axis
-	Vec3<double> labelOrientation(int axis);
+	Vec3<double> labelOrientation(int axis) const;
 	// Set axis label text anchor position for specified axis
 	void setLabelAnchor(int axis, TextPrimitive::TextAnchor anchor);
 	// Return axis label text anchor position for specified axis
-	TextPrimitive::TextAnchor labelAnchor(int axis);
+	TextPrimitive::TextAnchor labelAnchor(int axis) const;
 	// Set title for specified axis
 	void setTitle(int axis, QString title);
 	// Return title for specified axis
-	QString title(int axis);
+	QString title(int axis) const;
 	// Set orientation of titles for specified axis
 	void setTitleOrientation(int axis, int component, double value);
 	// Return orientation of titles for specified axis
-	Vec4<double> titleOrientation(int axis);
+	Vec4<double> titleOrientation(int axis) const;
 	// Set axis title text anchor position for specified axis
 	void setTitleAnchor(int axis, TextPrimitive::TextAnchor anchor);
 	// Return axis title text anchor position for specified axis
-	TextPrimitive::TextAnchor titleAnchor(int axis);
+	TextPrimitive::TextAnchor titleAnchor(int axis) const;
+
+
+	/*
+	 * Style Overrides
+	 */
+	private:
+	// Whether to use best tick/label orientation for view, or our own definitions
+	bool useBestView_;
+
+	public:
+	// Set whether to use best tick/label orientation for view
+	void setUseBestView(bool b);
+	// Return whether to use best tick/label orientation for view
+	bool useBestView();
 
 
 	/*
