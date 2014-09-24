@@ -39,14 +39,14 @@
 // Available image export formats
 const char* imageFormatFilters[Viewer::nImageFormats] = { "Windows Image (*.bmp)", "Joint Photographic Experts Group (*.jpg)", "Portable Network Graphics (*.png)", "Portable Pixmap (*.ppm)", "X11 Bitmap (*.xbm)", "X11 Pixmap (*.xpm)" };
 const char* imageFormatExtensions[Viewer::nImageFormats] = { "bmp", "jpg", "png", "ppm", "xbm", "xpm" };
-Viewer::ImageFormat Viewer::imageFormat(const char* s)
+Viewer::ImageFormat Viewer::imageFormat(QString s)
 {
-	for (int n=0; n<Viewer::nImageFormats; ++n) if (strcmp(s, imageFormatExtensions[n]) == 0) return (Viewer::ImageFormat) n;
+	for (int n=0; n<Viewer::nImageFormats; ++n) if (s == imageFormatExtensions[n]) return (Viewer::ImageFormat) n;
 	return Viewer::nImageFormats;
 }
-Viewer::ImageFormat Viewer::imageFormatFromFilter(const char* s)
+Viewer::ImageFormat Viewer::imageFormatFromFilter(QString s)
 {
-	for (int n=0; n<Viewer::nImageFormats; ++n) if (strcmp(s, imageFormatFilters[n]) == 0) return (Viewer::ImageFormat) n;
+	for (int n=0; n<Viewer::nImageFormats; ++n) if (s == imageFormatFilters[n]) return (Viewer::ImageFormat) n;
 	return Viewer::nImageFormats;
 }
 const char* Viewer::imageFormatFilter(Viewer::ImageFormat bf)
@@ -212,8 +212,7 @@ void Viewer::paintGL()
 		// Set modelview matrix as target for the remainder of the routine
 		glMatrixMode(GL_MODELVIEW);
 
-		// Get the main view matrix and centre coordinate translation
-		Vec3<double> centreTranslation;
+		// Get the pane's view matrix
 		Matrix viewMatrix = pane->viewMatrix();
 
 		// Send axis primitives to the display first

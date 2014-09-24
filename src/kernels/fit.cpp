@@ -304,9 +304,9 @@ RefListItem<ReferenceVariable,bool>* FitKernel::usedReferences()
 const char* RangeTypeKeywords[] = { "Absolute", "SingleIndex", "IndexRange" };
 
 // Convert text string to RangeType
-FitKernel::RangeType FitKernel::rangeType(const char* s)
+FitKernel::RangeType FitKernel::rangeType(QString s)
 {
-	for (int n=0; n<FitKernel::nRangeTypes; ++n) if (strcmp(RangeTypeKeywords[n],s) == 0) return (FitKernel::RangeType) n;
+	for (int n=0; n<FitKernel::nRangeTypes; ++n) if (s == RangeTypeKeywords[n]) return (FitKernel::RangeType) n;
 	return FitKernel::nRangeTypes;
 }
 

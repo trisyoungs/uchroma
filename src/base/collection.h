@@ -287,13 +287,13 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	// Available colourscale sources
 	enum ColourSource { SingleColourSource, RGBGradientSource, HSVGradientSource, CustomGradientSource, nColourSources };
 	// Convert text string to ColourSource
-	static ColourSource colourSource(const char* s);
+	static ColourSource colourSource(QString s);
 	// Convert ColourSource to text string
 	static const char* colourSource(Collection::ColourSource cs);
 	// Alpha control options
 	enum AlphaControl { OwnAlpha, FixedAlpha, nAlphaControls };
 	// Convert text string to AlphaControl
-	static AlphaControl alphaControl(const char* s);
+	static AlphaControl alphaControl(QString s);
 	// Convert AlphaControl to text string
 	static const char* alphaControl(Collection::AlphaControl as);
 
@@ -365,7 +365,7 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	// Display types enum
 	enum DisplayStyle { LineXYStyle, LineZYStyle, GridStyle, SurfaceStyle, nDisplayStyles };
 	// Convert text string to DisplayStyle
-	static DisplayStyle displayStyle(const char* s);
+	static DisplayStyle displayStyle(QString s);
 	// Convert DisplayStyle to text string
 	static const char* displayStyle(DisplayStyle kwd);
 

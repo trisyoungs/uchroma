@@ -37,7 +37,7 @@ class NumberFormat
 	// Basic Number Type
 	enum FormatType { DecimalFormat, IntegerFormat, ScientificFormat, nNumberFormats };
 	// Convert text string to FormatType
-	static FormatType formatType(const char* s);
+	static FormatType formatType(QString s);
 	// Convert FormatType to text string
 	static const char* formatType(FormatType id);
 

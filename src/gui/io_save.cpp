@@ -61,6 +61,7 @@ bool UChromaWindow::writeAxisBlock(LineParser& parser, Axes& axes, int axis)
 	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::PositionRealKeyword), axes.positionReal(axis).x, axes.positionReal(axis).y, axes.positionReal(axis).z);
 	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::StretchKeyword), axes.stretch(axis));
 	parser.writeLineF("      %s %f\n", Keywords::axisKeyword(Keywords::TickDeltaKeyword), axes.tickDelta(axis));
+	parser.writeLineF("      %s %f %f %f\n", Keywords::axisKeyword(Keywords::TickDirectionKeyword), axes.tickDirection(axis).x, axes.tickDirection(axis).y, axes.tickDirection(axis).z);
 	parser.writeLineF("      %s %s\n", Keywords::axisKeyword(Keywords::TitleAnchorKeyword), TextPrimitive::textAnchor(axes.titleAnchor(axis)));
 	parser.writeLine(QString("      ")+Keywords::axisKeyword(Keywords::TitleKeyword)+" '"+axes.title(axis)+"'\n");
 	parser.writeLineF("      %s %f %f %f %f\n", Keywords::axisKeyword(Keywords::TitleOrientationKeyword), axes.titleOrientation(axis).x, axes.titleOrientation(axis).y, axes.titleOrientation(axis).z, axes.titleOrientation(axis).w);

@@ -1055,9 +1055,9 @@ void Collection::updateLimitsAndTransforms()
 const char* ColourSourceKeywords[] = { "SingleColour", "RGBGradient", "HSVGradient", "CustomGradient" };
 
 // Convert text string to ColourSource
-Collection::ColourSource Collection::colourSource(const char* s)
+Collection::ColourSource Collection::colourSource(QString s)
 {
-	for (int n=0; n<Collection::nColourSources; ++n) if (strcmp(s, ColourSourceKeywords[n]) == 0) return (Collection::ColourSource) n;
+	for (int n=0; n<Collection::nColourSources; ++n) if (s == ColourSourceKeywords[n]) return (Collection::ColourSource) n;
 	return Collection::nColourSources;
 }
 
@@ -1071,9 +1071,9 @@ const char* Collection::colourSource(ColourSource cs)
 const char* AlphaControlKeywords[] = { "OwnAlpha", "FixedAlpha" };
 
 // Convert text string to AlphaControl
-Collection::AlphaControl Collection::alphaControl(const char* s)
+Collection::AlphaControl Collection::alphaControl(QString s)
 {
-	for (int n=0; n<Collection::nAlphaControls; ++n) if (strcmp(s, AlphaControlKeywords[n]) == 0) return (Collection::AlphaControl) n;
+	for (int n=0; n<Collection::nAlphaControls; ++n) if (s == AlphaControlKeywords[n]) return (Collection::AlphaControl) n;
 	return Collection::nAlphaControls;
 }
 
@@ -1279,9 +1279,9 @@ int Collection::colourVersion()
 const char* SurfaceStyleKeywords[] = { "LineXY", "LineZY", "Grid", "Surface" };
 
 // Convert text string to DisplayStyle
-Collection::DisplayStyle Collection::displayStyle(const char* s)
+Collection::DisplayStyle Collection::displayStyle(QString s)
 {
-	for (int n=0; n<nDisplayStyles; ++n) if (strcmp(s,SurfaceStyleKeywords[n]) == 0) return (Collection::DisplayStyle) n;
+	for (int n=0; n<nDisplayStyles; ++n) if (s == SurfaceStyleKeywords[n]) return (Collection::DisplayStyle) n;
 	return nDisplayStyles;
 }
 

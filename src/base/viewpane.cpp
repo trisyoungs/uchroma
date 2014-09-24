@@ -307,9 +307,9 @@ bool ViewPane::containsGridReference(int gridX, int gridY)
 const char* RoleKeywords[ViewPane::nPaneRoles] = { "SliceMonitor", "Standard" };
 
 // Convert text string to PaneRole
-ViewPane::PaneRole ViewPane::paneRole(const char* s)
+ViewPane::PaneRole ViewPane::paneRole(QString s)
 {
-	for (int n=0; n<ViewPane::nPaneRoles; ++n) if (strcmp(s,RoleKeywords[n]) == 0) return (ViewPane::PaneRole) n;
+	for (int n=0; n<ViewPane::nPaneRoles; ++n) if (s == RoleKeywords[n]) return (ViewPane::PaneRole) n;
 	return ViewPane::nPaneRoles;
 }
 
@@ -451,9 +451,9 @@ bool ViewPane::processUpdate(Collection* source, Collection::CollectionSignal si
 const char* ViewTypeKeywords[ViewPane::nViewTypes] = { "Normal", "AutoStretched", "FlatXY", "FlatXZ", "FlatYZ", "Linked" };
 
 // Convert text string to ViewType
-ViewPane::ViewType ViewPane::viewType(const char* s)
+ViewPane::ViewType ViewPane::viewType(QString s)
 {
-	for (int n=0; n<ViewPane::nViewTypes; ++n) if (strcmp(s,ViewTypeKeywords[n]) == 0) return (ViewPane::ViewType) n;
+	for (int n=0; n<ViewPane::nViewTypes; ++n) if (s == ViewTypeKeywords[n]) return (ViewPane::ViewType) n;
 	return ViewPane::nViewTypes;
 }
 
@@ -619,7 +619,8 @@ Matrix ViewPane::viewMatrix()
 	viewMatrix *= viewRotation_;
 
 	// Apply translation to apply view shift and zoom (the latter only if using perspective)
-	viewMatrix.applyTranslation(viewTranslation_.x, viewTranslation_.y, hasPerspective_ ? viewTranslation_.z : 0.0 );
+// 	viewMatrix.applyTranslation(viewTranslation_.x, viewTranslation_.y, hasPerspective_ ? viewTranslation_.z : 0.0 );
+	viewMatrix.applyTranslation(viewTranslation_.x, viewTranslation_.y, viewTranslation_.z);
 
 	return viewMatrix;
 }
@@ -812,6 +813,8 @@ void ViewPane::recalculateView(bool force)
 	Vec3<double> unit = modelToScreen(Vec3<double>(1.0, 1.0, 0.0), Matrix());
 	unit.x -= viewportMatrix_[0] + viewportMatrix_[2]/2.0;
 	unit.y -= viewportMatrix_[1] + viewportMatrix_[3]/2.0;
+	unit.z = unit.y;
+	unit.print();
 
 	// Get axis min/max, accounting for logarithmic axes
 	Vec3<double> axisMin, axisMax;
@@ -828,55 +831,54 @@ void ViewPane::recalculateView(bool force)
 	else if (viewType_ == ViewPane::FlatYZView)
 	{
 		axisDir.set(1,0,1);
-		axisX = 1;
-		axisY = 2;
+		axisX = 2;
 	}
 
 	// Set axis stretch factors to fill available pixel width/height
 	for (axis=0; axis<3; ++axis) axes_.setStretch(axis, viewportMatrix_[axisDir[axis]+2] / (unit[axisDir[axis]] * (axisMax[axis] - axisMin[axis])));
+	printf("Initial stretch factors for pane '%s' are %f %f %f\n", qPrintable(name_), axes_.stretch(0), axes_.stretch(1), axes_.stretch(2));
+	printf("AxisDir = "); axisDir.print();
 
 	const double margin = 10.0;
-	Matrix viewMat;
-	if (viewType_ == ViewPane::FlatXZView) viewMat.applyRotationX(90.0);
-	else if (viewType_ == ViewPane::FlatYZView) viewMat.applyRotationY(90.0);
-	viewMat.applyTranslation(-axes().coordCentre());
-	viewMat.print();
-	Vec3<double> coordMin[3], coordMax[3], a, b, globalMin, globalMax;
-	Vec4<double> textBounds[3];
+	Matrix viewMat, B;
+	double tempMin, tempMax;
+	Vec3<double> coordMin[3], coordMax[3], labelMin, labelMax, a, b, globalMin, globalMax;
 
 	// Iterate for a few cycles
-	for (int cycle = 0; cycle < 3; ++cycle)
+	for (int cycle = 0; cycle < 5; ++cycle)
 	{
 		printf("Pane '%s' Cycle = %i\n", qPrintable(name_), cycle);
 		// We will now calculate more accurate stretch factors to apply to the X and Y axes.
 		// Project the axis limits on to the screen using the relevant viewmatrix + coordinate centre translation
-		// We don't care if the projected coordinates are on-screen or not - we only need them to compare with the bounding box
-		// calculated for the axes labels, to see what the absolute pixel overlaps are
+		viewMat.createTranslation(-axes().coordCentre());
+		if (viewType_ == ViewPane::FlatXZView) viewMat.applyRotationX(-90.0);
+		else if (viewType_ == ViewPane::FlatYZView) viewMat.applyRotationY(90.0);
+		viewMat.print();
+
+		// Calculate coordinates and global extremes over axes and labels
 		globalMin.set(1e9,1e9,1e9);
 		globalMax = -globalMin;
+		labelMin = globalMin;
+		labelMax = -labelMin;
 // 		printf("VP = %i %i %i %i\n", viewportMatrix_[0], viewportMatrix_[1], viewportMatrix_[2], viewportMatrix_[3]);
 		for (axis=0; axis<3; ++axis)
 		{
-			// Set min/max (stretched) coordinates to project
-			a.zero();
-			a[axis] = axisMin[axis]*axes_.stretch(axis);
-			b.zero();
-			b[axis] = axisMax[axis]*axes_.stretch(axis);
+			// Skip third (i.e. 'z') axis
+			if ((axis != axisX) && (axis != axisY)) continue;
 
-			// Project onto screen
-			coordMin[axis] = modelToScreen(a, viewMat);
-			coordMax[axis] = modelToScreen(b, viewMat);
+			// Project axis min/max coordinates onto screen
+			a = modelToScreen(axes_.coordMin(axis), viewMat);
+			b = modelToScreen(axes_.coordMax(axis), viewMat);
+			coordMin[axis].set(std::min(a.x,b.x), std::min(a.y,b.y),  std::min(a.z,b.z)); 
+			coordMax[axis].set(std::max(a.x,b.x), std::max(a.y,b.y),  std::max(a.z,b.z)); 
 
 			// Update global min/max
-			coordMin[axis].print();
-			coordMax[axis].print();
+			printf("Projected %i Coord Min = ", axis); coordMin[axis].print();
+			printf("Projected %i Coord Max = ", axis); coordMax[axis].print();
 			for (int n=0; n<3; ++n)
 			{
-				
 				if (coordMin[axis][n] < globalMin[n]) globalMin[n] = coordMin[axis][n];
-				else if (coordMax[axis][n] < globalMin[n]) globalMin[n] = coordMax[axis][n];
 				if (coordMax[axis][n] > globalMax[n]) globalMax[n] = coordMax[axis][n];
-				else if (coordMin[axis][n] > globalMax[n]) globalMax[n] = coordMin[axis][n];
 			}
 
 			// Get bounding cuboid for axis text
@@ -887,84 +889,65 @@ void ViewPane::recalculateView(bool force)
 			// Project cuboid extremes and store projected coordinates
 			a = modelToScreen(cuboid.minima(), viewMat);
 			b = modelToScreen(cuboid.maxima(), viewMat);
+			printf("Label %i minima = ", axis); a.print();
+			printf("Label %i maxima = ", axis); b.print();
 
-			printf("Axis %i limits:\n", axis);
-			a.print();
-			b.print();
-			textBounds[axis].set(std::min(a.x,b.x), std::min(a.y,b.y), std::max(a.x,b.x), std::max(a.y,b.y));
-
-			// Update global min/max
+			// Update global and label min/max
 			for (int n=0; n<3; ++n)
 			{
-				if (textBounds[axis][n] < globalMin[n]) globalMin[n] = textBounds[axis][n];
-				if (textBounds[axis][n] > globalMax[n]) globalMax[n] = textBounds[axis][n];
+				tempMin = std::min(a[n],b[n]);
+				tempMax = std::max(a[n],b[n]);
+				if (tempMin < globalMin[n]) globalMin[n] = tempMin;
+				if (tempMax > globalMax[n]) globalMax[n] = tempMax;
+				if (tempMin < labelMin[n]) labelMin[n] = tempMin;
+				if (tempMax > labelMax[n]) labelMax[n] = tempMax;
 			}
 		}
 
 		// Now have screen coordinates of all necessary objects (axes and labels)
-		// So, work out maximal coordinates in each direction
-// 		double globalXMin = std::min( std::min( coordMin[axisX].x, coordMin[axisY].x), std::min( textBounds[axisX].z, textBounds[axisY].z ));
-// 		double globalXMax = std::max( std::max( coordMax[axisX].x, coordMax[axisY].x), std::max( textBounds[axisX].z, textBounds[axisY].z ));
-// 		double globalYMin = std::min( std::min( coordMin[axisX].y, coordMin[axisY].y), std::min( textBounds[axisX].w, textBounds[axisY].w ));
-// 		double globalYMax = std::max( std::max( coordMax[axisX].y, coordMax[axisY].y), std::max( textBounds[axisX].w, textBounds[axisY].w ));
 		printf("GlobalMinMax: X = %f/%f, Y=%f/%f\n", globalMin.x, globalMax.x, globalMin.y, globalMax.y);
 
 		// Calculate total width and height of objects as they are arranged
-		double globalWidth = globalMax.x - globalMin.x + 2*margin;
-		double globalHeight = globalMax.y - globalMin.y + 2*margin;
+		double globalWidth = globalMax.x - globalMin.x;
+		double globalHeight = globalMax.y - globalMin.y;
+		double axisWidth = coordMax[axisX].x - coordMin[axisX].x;
+		double axisHeight = coordMax[axisY].y - coordMin[axisY].y;
+		double labelWidth = labelMax.x - labelMin.x;
+		double labelHeight = labelMax.y - labelMin.y;
+		printf("Global w/h = %f/%f\n", globalWidth, globalHeight);
 
-		// Now, we know the width and height of the axis on its own, so work out the difference
-		double deltaWidth = viewportMatrix_[2] - globalWidth;
-		double deltaHeight = viewportMatrix_[3] - globalHeight;
-
+		// Now, we know the width and height of the axis on its own, and the extra 'added' by the labels, so work out how much we need to shrink the axis by
+		double deltaWidth = (viewportMatrix_[2] - 2*margin) - globalWidth;
+		double deltaHeight = (viewportMatrix_[3] - 2*margin) - globalHeight;
 		printf("deltas on width and height are %f and %f\n", deltaWidth, deltaHeight);
 
-		// So, need to lose deltaWidth and deltaHeight pixels from the axis exents, we'll do this by scaling the stretchfactor
-		double factor = (coordMax[axisX].x - coordMin[axisX].x) / (coordMax[axisX].x - coordMin[axisX].x - deltaWidth);
+		// So, need to lose deltaWidth and deltaHeight pixels from the axis exents - we'll do this by scaling the stretchfactor
+		double factor = axisWidth / (axisWidth - deltaWidth);
+		printf("Factor on axisX stretch = %f\n", factor);
 		axes_.setStretch(axisX, axes_.stretch(axisX) * factor);
-		factor = (coordMax[axisY].y - coordMin[axisY].y) / (coordMax[axisY].y - coordMin[axisY].y - deltaHeight);
+		factor = axisHeight / (axisHeight - deltaHeight);
+		printf("Factor on axisY stretch = %f\n", factor);
 		axes_.setStretch(axisY, axes_.stretch(axisY) * factor);
+
+		printf("New stretch factors at end of cycle %i are %f %f %f\n", cycle, axes_.stretch(0), axes_.stretch(1), axes_.stretch(2));
 	}
 
-// 	// Determine coordinates for extreme limits of axis lines (i.e. space around graph box, bounded by axis lines)
-// 	// We will use the two axes set earlier (in axisX and axisY)
-// 	double screenXMin, screenXMax, screenYMin, screenYMax;
-// 	const double margin = 10.0;
-// 	// -- Compare axes coordinate limit with label coordinate limits, and adjust margins by any pixel difference which would shrink the graph area
-// 	screenXMin = margin;
-// 	if (std::min(coordMin[axisX].x,coordMin[axisY].x) > std::min(textBounds[axisX].x,textBounds[axisY].x)) screenXMin += std::min(coordMin[axisX].x,coordMin[axisY].x) - std::min(textBounds[axisX].x,textBounds[axisY].x);
-// 	screenXMax = viewportMatrix_[2] - margin;
-// 	if (std::max(coordMax[axisX].x,coordMin[axisY].x) < std::max(textBounds[axisX].z,textBounds[axisY].x)) screenXMax += std::max(coordMax[axisX].x,coordMin[axisY].x) - std::max(textBounds[axisX].z,textBounds[axisY].x);
-// 	screenYMin = margin;
-// 	if (std::min(coordMin[axisX].y,coordMin[axisY].y) > std::min(textBounds[axisX].y,textBounds[axisY].y)) screenYMin += std::min(coordMin[axisX].y,coordMin[axisY].y) - std::min(textBounds[axisX].y,textBounds[axisY].y);
-// 	screenYMax = viewportMatrix_[3] - margin;
-// 	if (std::max(coordMin[axisX].y,coordMax[axisY].y) < std::max(textBounds[axisX].y,textBounds[axisY].w)) screenYMax += std::max(coordMin[axisX].y,coordMax[axisY].y) - std::max(textBounds[axisX].y,textBounds[axisY].w);
-// 	// -- Set available pixels for axes, accounting for margins
-// 	int availableWidth = screenXMax - screenXMin;
-// 	int availableHeight = screenYMax - screenYMin;
-// 
-// 	// Recalculate the pixels per unit values and set final stretch factors
-// 	unit = modelToScreen(Vec3<double>(1.0, 1.0, 0.0), Matrix());
-// 	unit.x -= viewportMatrix_[0] + 0.5*viewportMatrix_[2];
-// 	unit.y -= viewportMatrix_[1] + 0.5*viewportMatrix_[3];
-// 
-// 	// Set axis stretch factors to fill available pixel width/height
-// 	// Again, target only the two axes set earlier in axisX and axisY
-// 	axes_.setStretch(axisX, availableWidth / (unit.x * (axisMax[axisX] - axisMin[axisX])));
-// 	axes_.setStretch(axisY, availableHeight / (unit.y * (axisMax[axisY] - axisMin[axisY])));
-
-	// Set new view matrix
+	// Set new rotation matrix
 	viewRotation_.setIdentity();
 	if (viewType_ == ViewPane::FlatXZView) viewRotation_.applyRotationX(-90.0);
 	else if (viewType_ == ViewPane::FlatYZView) viewRotation_.applyRotationY(90.0);
+	viewRotation_.print();
 
 	// Set a translation in order to set the margins as requested
+	// The viewTranslation_ is applied in 'normal' coordinate axes, so viewTranslation_.x is along screen x etc.
+	printf("Final globalMin = "); globalMin.print();
+	printf("Final globalMax = "); globalMax.print();
+	printf("Viewport is %i %i %i %i\n", viewportMatrix_[0], viewportMatrix_[1], viewportMatrix_[2], viewportMatrix_[3]);
 	viewTranslation_.zero();
-// 	viewTranslation_[axisX] = (margin - globalMin.x) / unit.x;
-// 	viewTranslation_[axisY] = (margin - globalMin.y) / unit.y;
-// 	viewTranslation_[axisX] = (screenXMax - 0.5*(availableWidth+viewportMatrix_[2])) / unit.x;
-// 	viewTranslation_[axisY] = (screenYMax - 0.5*(availableHeight+viewportMatrix_[3])) / unit.y;
-
+	viewTranslation_[0] = (margin - (globalMin.x - viewportMatrix_[0])) / unit.x;
+	viewTranslation_[1] = (margin - (globalMin.y - viewportMatrix_[1])) / unit.y;
+	viewTranslation_.print();
+	
 	// Store new versions of view
 	viewAxesUsedAt_ = axes().axesVersion();
 	viewViewportUsedAt_ = viewportVersion_;
@@ -990,7 +973,6 @@ void ViewPane::resetViewMatrix()
 		// Recalculate projection matrix
 		projectionMatrix_ = calculateProjectionMatrix(zOffset_);
 	}
-
 
 	calculateFontScaling();
 }

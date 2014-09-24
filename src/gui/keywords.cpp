@@ -34,9 +34,9 @@ const char* InputBlockKeywords[] = { "Collection", "Settings", "View" };
 /*!
  * \brief Convert text string to InputBlock
  */
-Keywords::InputBlock Keywords::inputBlock(const char* s)
+Keywords::InputBlock Keywords::inputBlock(QString s)
 {
-	for (int n=0; n<Keywords::nInputBlocks; ++n) if (strcmp(s,InputBlockKeywords[n]) == 0) return (Keywords::InputBlock) n;
+	for (int n=0; n<Keywords::nInputBlocks; ++n) if (s == InputBlockKeywords[n]) return (Keywords::InputBlock) n;
 	return Keywords::nInputBlocks;
 }
 
@@ -61,9 +61,9 @@ int AxisKeywordNArguments[] = { 1, 1, 0, 1, 1, 3, 6, 6, 1, 1, 3, 2, 1, 1, 4, 3, 
 /*!
  * \brief Convert text string to AxisKeyword
  */
-Keywords::AxisKeyword Keywords::axisKeyword(const char* s)
+Keywords::AxisKeyword Keywords::axisKeyword(QString s)
 {
-	for (int n=0; n<nAxisKeywords; ++n) if (strcmp(s,AxisBlockKeywords[n]) == 0) return (Keywords::AxisKeyword) n;
+	for (int n=0; n<nAxisKeywords; ++n) if (s == AxisBlockKeywords[n]) return (Keywords::AxisKeyword) n;
 	return nAxisKeywords;
 }
 
@@ -96,9 +96,9 @@ int CollectionKeywordNArguments[] = { 1, 1, 5, 5, 5, 5, 5, 4, 1, 1, 1, 0, 1, 0, 
 /*!
  * \brief Convert text string to CollectionKeyword
  */
-Keywords::CollectionKeyword Keywords::collectionKeyword(const char* s)
+Keywords::CollectionKeyword Keywords::collectionKeyword(QString s)
 {
-	for (int n=0; n<nCollectionKeywords; ++n) if (strcmp(s,CollectionBlockKeywords[n]) == 0) return (Keywords::CollectionKeyword) n;
+	for (int n=0; n<nCollectionKeywords; ++n) if (s == CollectionBlockKeywords[n]) return (Keywords::CollectionKeyword) n;
 	return nCollectionKeywords;
 }
 
@@ -131,9 +131,9 @@ int FitParametersKeywordNArguments[] = { 0, 1, 1, 1, 1, 7, 7, 1, 2, 2, 1, 1, 2, 
 /*!
  * \brief Convert text string to FitParametersKeyword
  */
-Keywords::FitParametersKeyword Keywords::fitParametersKeyword(const char* s)
+Keywords::FitParametersKeyword Keywords::fitParametersKeyword(QString s)
 {
-	for (int n=0; n<nFitParametersKeywords; ++n) if (strcmp(s,FitParametersBlockKeywords[n]) == 0) return (Keywords::FitParametersKeyword) n;
+	for (int n=0; n<nFitParametersKeywords; ++n) if (s == FitParametersBlockKeywords[n]) return (Keywords::FitParametersKeyword) n;
 	return nFitParametersKeywords;
 }
 
@@ -166,9 +166,9 @@ int SettingsKeywordNArguments[] = { 0, 5 };
 /*!
  * \brief Convert text string to SettingsKeyword
  */
-Keywords::SettingsKeyword Keywords::settingsKeyword(const char* s)
+Keywords::SettingsKeyword Keywords::settingsKeyword(QString s)
 {
-	for (int n=0; n<nSettingsKeywords; ++n) if (strcmp(s,SettingsBlockKeywords[n]) == 0) return (Keywords::SettingsKeyword) n;
+	for (int n=0; n<nSettingsKeywords; ++n) if (s == SettingsBlockKeywords[n]) return (Keywords::SettingsKeyword) n;
 	return nSettingsKeywords;
 }
 
@@ -201,9 +201,9 @@ int DataSetKeywordNArguments[] = { 0, 0, 1, 1 };
 /*!
  * \brief Convert text string to DataSetKeyword
  */
-Keywords::DataSetKeyword Keywords::dataSetKeyword(const char* s)
+Keywords::DataSetKeyword Keywords::dataSetKeyword(QString s)
 {
-	for (int n=0; n<nDataSetKeywords; ++n) if (strcmp(s,DataSetBlockKeywords[n]) == 0) return (Keywords::DataSetKeyword) n;
+	for (int n=0; n<nDataSetKeywords; ++n) if (s == DataSetBlockKeywords[n]) return (Keywords::DataSetKeyword) n;
 	return nDataSetKeywords;
 }
 
@@ -236,9 +236,9 @@ int ViewKeywordNArguments[] = { 0, 2, 1, 1 };
 /*!
  * \brief Convert text string to ViewKeyword
  */
-Keywords::ViewKeyword Keywords::viewKeyword(const char* s)
+Keywords::ViewKeyword Keywords::viewKeyword(QString s)
 {
-	for (int n=0; n<nViewKeywords; ++n) if (strcmp(s,ViewBlockKeywords[n]) == 0) return (Keywords::ViewKeyword) n;
+	for (int n=0; n<nViewKeywords; ++n) if (s == ViewBlockKeywords[n]) return (Keywords::ViewKeyword) n;
 	return nViewKeywords;
 }
 
@@ -271,9 +271,9 @@ int ViewPaneKeywordNArguments[] = { 1, 1, 1, 0, 4, 1, 1, 1, 1, 1, 3, 3, 3, 1, 3,
 /*!
  * \brief Convert text string to ViewPaneKeyword
  */
-Keywords::ViewPaneKeyword Keywords::viewPaneKeyword(const char* s)
+Keywords::ViewPaneKeyword Keywords::viewPaneKeyword(QString s)
 {
-	for (int n=0; n<nViewPaneKeywords; ++n) if (strcmp(s,ViewPaneBlockKeywords[n]) == 0) return (Keywords::ViewPaneKeyword) n;
+	for (int n=0; n<nViewPaneKeywords; ++n) if (s == ViewPaneBlockKeywords[n]) return (Keywords::ViewPaneKeyword) n;
 	return nViewPaneKeywords;
 }
 

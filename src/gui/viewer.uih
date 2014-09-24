@@ -185,8 +185,8 @@ class Viewer : public QGLWidget
 	public:
 	// Available image export formats
         enum ImageFormat { BMPFormat, PGFormat, PNGFormat, PPMFormat, XBMFormat, X11Format, nImageFormats };
-        static ImageFormat imageFormat(const char* name);
-        static ImageFormat imageFormatFromFilter(const char* s);
+        static ImageFormat imageFormat(QString s);
+        static ImageFormat imageFormatFromFilter(QString s);
         static const char *imageFormatFilter(ImageFormat bf);
         static const char *imageFormatExtension(ImageFormat bf);
 };

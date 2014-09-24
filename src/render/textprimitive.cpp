@@ -45,9 +45,9 @@ TextPrimitive::~TextPrimitive()
 const char* TextAnchorKeywords[] = { "TopLeft", "TopMiddle", "TopRight", "MiddleLeft", "Central", "MiddleRight", "BottomLeft", "BottomMiddle", "BottomRight" };
 
 // Convert text string to TextAnchor
-TextPrimitive::TextAnchor TextPrimitive::textAnchor(const char* s)
+TextPrimitive::TextAnchor TextPrimitive::textAnchor(QString s)
 {
-	for (int n=0; n<TextPrimitive::nTextAnchors; ++n) if (strcmp(s,TextAnchorKeywords[n]) == 0) return (TextPrimitive::TextAnchor) n;
+	for (int n=0; n<TextPrimitive::nTextAnchors; ++n) if (s == TextAnchorKeywords[n]) return (TextPrimitive::TextAnchor) n;
 	return TextPrimitive::nTextAnchors;
 }
 
@@ -61,9 +61,9 @@ const char* TextPrimitive::textAnchor(TextPrimitive::TextAnchor anchor)
 const char* EscapeSequenceKeywords[] = { "b", "it", "n", "sub", "sup" };
 
 // Convert text string to EscapeSequence
-TextPrimitive::EscapeSequence TextPrimitive::escapeSequence(const char* s)
+TextPrimitive::EscapeSequence TextPrimitive::escapeSequence(QString s)
 {
-	for (int n=0; n<TextPrimitive::nEscapeSequences; ++n) if (strcmp(s,EscapeSequenceKeywords[n]) == 0) return (TextPrimitive::EscapeSequence) n;
+	for (int n=0; n<TextPrimitive::nEscapeSequences; ++n) if (s == EscapeSequenceKeywords[n]) return (TextPrimitive::EscapeSequence) n;
 	return TextPrimitive::nEscapeSequences;
 }
 

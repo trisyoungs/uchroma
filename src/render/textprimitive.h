@@ -46,13 +46,13 @@ class TextPrimitive : public ListItem<TextPrimitive>
 	// Text Anchors enum
 	enum TextAnchor { TopLeftAnchor, TopMiddleAnchor, TopRightAnchor, MiddleLeftAnchor, CentralAnchor, MiddleRightAnchor, BottomLeftAnchor, BottomMiddleAnchor, BottomRightAnchor, nTextAnchors };
 	// Convert text string to TextAnchor
-	static TextAnchor textAnchor(const char* s);
+	static TextAnchor textAnchor(QString s);
 	// Convert TextAnchor to text string
 	static const char* textAnchor(TextAnchor anchor);
 	// Escape Sequence enum
 	enum EscapeSequence { BoldEscape, ItalicEscape, NewLineEscape, SubScriptEscape, SuperScriptEscape, nEscapeSequences };
 	// Convert text string to EscapeSequence
-	static EscapeSequence escapeSequence(const char* s);
+	static EscapeSequence escapeSequence(QString s);
 
 
 	/*

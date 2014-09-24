@@ -22,6 +22,8 @@
 #ifndef UCHROMA_KEYWORDS_H
 #define UCHROMA_KEYWORDS_H
 
+#include <QtCore/QString>
+
 // Forward Declarations
 /* None */
 
@@ -43,7 +45,7 @@ class Keywords
 		nInputBlocks
 	};
 	// Convert text string to InputBlock
-	static InputBlock inputBlock(const char* s);
+	static InputBlock inputBlock(QString s);
 	// Convert InputBlock to text string
 	static const char* inputBlock(InputBlock id);
 	// Print list of valid keywords for InputBlock specified
@@ -84,7 +86,7 @@ class Keywords
 		nAxisKeywords
 	};
 	// Convert text string to AxisKeyword
-	static AxisKeyword axisKeyword(const char* s);
+	static AxisKeyword axisKeyword(QString s);
 	// Convert AxisKeyword to text string
 	static const char* axisKeyword(AxisKeyword kwd);
 	// Return minimum number of expected arguments
@@ -124,7 +126,7 @@ class Keywords
 		nCollectionKeywords
 	};
 	// Convert text string to CollectionKeyword
-	static CollectionKeyword collectionKeyword(const char* s);
+	static CollectionKeyword collectionKeyword(QString s);
 	// Convert CollectionKeyword to text string
 	static const char* collectionKeyword(CollectionKeyword kwd);
 	// Return minimum number of expected arguments
@@ -145,7 +147,7 @@ class Keywords
 		nDataSetKeywords
 	};
 	// Convert text string to DataSetKeyword
-	static DataSetKeyword dataSetKeyword(const char* s);
+	static DataSetKeyword dataSetKeyword(QString s);
 	// Convert DataSetKeyword to text string
 	static const char* dataSetKeyword(DataSetKeyword kwd);
 	// Return minimum number of expected arguments
@@ -177,7 +179,7 @@ class Keywords
 		nFitParametersKeywords
 	};
 	// Convert text string to FitParametersKeyword
-	static FitParametersKeyword fitParametersKeyword(const char* s);
+	static FitParametersKeyword fitParametersKeyword(QString s);
 	// Convert FitParametersKeyword to text string
 	static const char* fitParametersKeyword(FitParametersKeyword kwd);
 	// Return minimum number of expected arguments
@@ -196,7 +198,7 @@ class Keywords
 		nSettingsKeywords
 	};
 	// Convert text string to SettingsKeyword
-	static SettingsKeyword settingsKeyword(const char* s);
+	static SettingsKeyword settingsKeyword(QString s);
 	// Convert SettingsKeyword to text string
 	static const char* settingsKeyword(SettingsKeyword kwd);
 	// Return minimum number of expected arguments
@@ -217,7 +219,7 @@ class Keywords
 		nViewKeywords
 	};
 	// Convert text string to ViewKeyword
-	static ViewKeyword viewKeyword(const char* s);
+	static ViewKeyword viewKeyword(QString s);
 	// Convert ViewKeyword to text string
 	static const char* viewKeyword(ViewKeyword kwd);
 	// Return minimum number of expected arguments
@@ -249,7 +251,7 @@ class Keywords
 		nViewPaneKeywords
 	};
 	// Convert text string to ViewKeyword
-	static ViewPaneKeyword viewPaneKeyword(const char* s);
+	static ViewPaneKeyword viewPaneKeyword(QString s);
 	// Convert ViewKeyword to text string
 	static const char* viewPaneKeyword(ViewPaneKeyword kwd);
 	// Return minimum number of expected arguments

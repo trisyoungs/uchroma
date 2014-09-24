@@ -118,7 +118,7 @@ class FitKernel
 	// Range Type enum
 	enum RangeType { AbsoluteRange, SinglePointRange, IndexRange, nRangeTypes };
 	// Convert text string to RangeType
-	static FitKernel::RangeType rangeType(const char* s);
+	static FitKernel::RangeType rangeType(QString s);
 	// Convert RangeType to text string
 	static const char* rangeType(FitKernel::RangeType id);
 

@@ -26,9 +26,9 @@
 const char* IndexTypeKeywords[] = { "Normal", "Fixed", "Relative" };
 
 // Convert text string to IndexType
-IndexData::IndexType IndexData::indexType(const char* s)
+IndexData::IndexType IndexData::indexType(QString s)
 {
-	for (int n=0; n<IndexData::nIndexTypes; ++n) if (strcmp(s,IndexTypeKeywords[n]) == 0) return (IndexData::IndexType) n;
+	for (int n=0; n<IndexData::nIndexTypes; ++n) if (s == IndexTypeKeywords[n]) return (IndexData::IndexType) n;
 	return IndexData::nIndexTypes;
 }
 

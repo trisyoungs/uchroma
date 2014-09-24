@@ -31,6 +31,7 @@
 #include <GL/gl.h>
 #endif
 #include <QtCore/QVector>
+#include <QtCore/QString>
 
 // Forward Declarations
 /* none */
@@ -42,7 +43,7 @@ class LineStipple
 	// Line Stipple Types
 	enum StippleType { NoStipple, DotStipple, FineDashStipple, EighthDashStipple, QuartedDashStipple, HalfDashStipple, DotSDash1Stipple, nStippleTypes };
 	// Convert text string to StippleType
-	static LineStipple::StippleType stippleType(const char* s);
+	static LineStipple::StippleType stippleType(QString s);
 	// Convert InputBlock to text string
 	static const char* stippleType(LineStipple::StippleType stipple);
 

@@ -602,22 +602,22 @@ void Matrix::applyRotationX(double angle)
 	sinx = sin(theta);
 
 	// Recalculate second column and store in temp array
-	temp[0] = matrix_[4]*cosx + matrix_[8]*-sinx;
-	temp[1] = matrix_[5]*cosx + matrix_[9]*-sinx;
-	temp[2] = matrix_[6]*cosx + matrix_[10]*-sinx;
-	temp[3] = matrix_[7]*cosx + matrix_[11]*-sinx;
+	temp[0] = matrix_[1]*cosx + matrix_[2]*sinx;
+	temp[1] = matrix_[5]*cosx + matrix_[6]*sinx;
+	temp[2] = matrix_[9]*cosx + matrix_[10]*sinx;
+	temp[3] = matrix_[13]*cosx + matrix_[14]*sinx;
 
 	// Set third column immediately
-	matrix_[8] = matrix_[4]*sinx + matrix_[8]*cosx;
-	matrix_[9] = matrix_[5]*sinx + matrix_[9]*cosx;
-	matrix_[10] = matrix_[6]*sinx + matrix_[10]*cosx;
-	matrix_[11] = matrix_[7]*sinx + matrix_[11]*cosx;
+	matrix_[2] = matrix_[1]*-sinx + matrix_[2]*cosx;
+	matrix_[6] = matrix_[5]*-sinx + matrix_[6]*cosx;
+	matrix_[10] = matrix_[9]*-sinx + matrix_[10]*cosx;
+	matrix_[14] = matrix_[13]*-sinx + matrix_[14]*cosx;
 
 	// Put temporary values back into first column
-	matrix_[4] = temp[0];
+	matrix_[1] = temp[0];
 	matrix_[5] = temp[1];
-	matrix_[6] = temp[2];
-	matrix_[7] = temp[3];
+	matrix_[9] = temp[2];
+	matrix_[13] = temp[3];
 }
 
 // Apply rotation about Y axis
@@ -627,23 +627,20 @@ void Matrix::applyRotationY(double angle)
 	cosx = cos(theta);
 	sinx = sin(theta);
 
-	// Recalculate first column and store in temp array
-	temp[0] = matrix_[0]*cosx + matrix_[8]*sinx;
-	temp[1] = matrix_[1]*cosx + matrix_[9]*sinx;
-	temp[2] = matrix_[2]*cosx + matrix_[10]*sinx;
-	temp[3] = matrix_[3]*cosx + matrix_[11]*sinx;
+	temp[0] = matrix_[0]*cosx + matrix_[2]*-sinx;
+	temp[1] = matrix_[4]*cosx + matrix_[6]*-sinx;
+	temp[2] = matrix_[8]*cosx + matrix_[10]*-sinx;
+	temp[3] = matrix_[12]*cosx + matrix_[14]*-sinx;
 
-	// Set third column immediately
-	matrix_[8] = matrix_[0]*-sinx + matrix_[8]*cosx;
-	matrix_[9] = matrix_[1]*-sinx + matrix_[9]*cosx;
-	matrix_[10] = matrix_[2]*-sinx + matrix_[10]*cosx;
-	matrix_[11] = matrix_[3]*-sinx + matrix_[11]*cosx;
+	matrix_[2] = matrix_[0]*sinx + matrix_[2]*cosx;
+	matrix_[6] = matrix_[4]*sinx + matrix_[6]*cosx;
+	matrix_[10] = matrix_[8]*sinx + matrix_[10]*cosx;
+	matrix_[14] = matrix_[12]*sinx + matrix_[14]*cosx;
 
-	// Put temporary values back into first column
 	matrix_[0] = temp[0];
-	matrix_[1] = temp[1];
-	matrix_[2] = temp[2];
-	matrix_[3] = temp[3];
+	matrix_[4] = temp[1];
+	matrix_[8] = temp[2];
+	matrix_[12] = temp[3];
 }
 
 // Apply rotation about Z axis
@@ -653,23 +650,20 @@ void Matrix::applyRotationZ(double angle)
 	cosx = cos(theta);
 	sinx = sin(theta);
 
-	// Recalculate first column and store in temp array
-	temp[0] = matrix_[0]*cosx + matrix_[4]*-sinx;
-	temp[1] = matrix_[1]*cosx + matrix_[5]*-sinx;
-	temp[2] = matrix_[2]*cosx + matrix_[6]*-sinx;
-	temp[3] = matrix_[3]*cosx + matrix_[7]*-sinx;
+	temp[0] = matrix_[0]*cosx + matrix_[1]*sinx;
+	temp[1] = matrix_[4]*cosx + matrix_[5]*sinx;
+	temp[2] = matrix_[8]*cosx + matrix_[9]*sinx;
+	temp[3] = matrix_[12]*cosx + matrix_[13]*sinx;
 
-	// Set second column immediately
-	matrix_[4] = matrix_[0]*sinx + matrix_[4]*cosx;
-	matrix_[5] = matrix_[1]*sinx + matrix_[5]*cosx;
-	matrix_[6] = matrix_[2]*sinx + matrix_[6]*cosx;
-	matrix_[7] = matrix_[3]*sinx + matrix_[7]*cosx;
+	matrix_[1] = matrix_[0]*-sinx + matrix_[1]*cosx;
+	matrix_[5] = matrix_[4]*-sinx + matrix_[5]*cosx;
+	matrix_[9] = matrix_[8]*-sinx + matrix_[9]*cosx;
+	matrix_[13] = matrix_[12]*-sinx + matrix_[13]*cosx;
 
-	// Put temporary values back into first column
 	matrix_[0] = temp[0];
-	matrix_[1] = temp[1];
-	matrix_[2] = temp[2];
-	matrix_[3] = temp[3];
+	matrix_[4] = temp[1];
+	matrix_[8] = temp[2];
+	matrix_[12] = temp[3];
 }
 
 // Apply axis rotation quaternion
@@ -695,29 +689,29 @@ void Matrix::applyRotationAxis(double ax, double ay, double az, double angle, bo
 	multipliers[9] = ay*az*(1.0-cosx) - ax*sinx;
 	multipliers[10] = az*az*(1.0-cosx) + cosx;
 
-	temp[0] = matrix_[0]*multipliers[0] + matrix_[4]*multipliers[1] + matrix_[8]*multipliers[2];
-	temp[1] = matrix_[1]*multipliers[0] + matrix_[5]*multipliers[1] + matrix_[9]*multipliers[2];
-	temp[2] = matrix_[2]*multipliers[0] + matrix_[6]*multipliers[1] + matrix_[10]*multipliers[2];
-	temp[3] = matrix_[3]*multipliers[0] + matrix_[7]*multipliers[1] + matrix_[11]*multipliers[2];
+	temp[0] = matrix_[0]*multipliers[0] + matrix_[1]*multipliers[4] + matrix_[2]*multipliers[8];
+	temp[1] = matrix_[4]*multipliers[0] + matrix_[5]*multipliers[4] + matrix_[6]*multipliers[8];
+	temp[2] = matrix_[8]*multipliers[0] + matrix_[9]*multipliers[4] + matrix_[10]*multipliers[8];
+	temp[3] = matrix_[12]*multipliers[0] + matrix_[13]*multipliers[4] + matrix_[14]*multipliers[8];
 
-	temp[4] = matrix_[0]*multipliers[4] + matrix_[4]*multipliers[5] + matrix_[8]*multipliers[6];
-	temp[5] = matrix_[1]*multipliers[4] + matrix_[5]*multipliers[5] + matrix_[9]*multipliers[6];
-	temp[6] = matrix_[2]*multipliers[4] + matrix_[6]*multipliers[5] + matrix_[10]*multipliers[6];
-	temp[7] = matrix_[3]*multipliers[4] + matrix_[7]*multipliers[5] + matrix_[11]*multipliers[6];
+	temp[4] = matrix_[0]*multipliers[1] + matrix_[1]*multipliers[5] + matrix_[2]*multipliers[9];
+	temp[5] = matrix_[4]*multipliers[1] + matrix_[5]*multipliers[5] + matrix_[6]*multipliers[9];
+	temp[6] = matrix_[8]*multipliers[1] + matrix_[9]*multipliers[5] + matrix_[10]*multipliers[9];
+	temp[7] = matrix_[12]*multipliers[1] + matrix_[13]*multipliers[5] + matrix_[14]*multipliers[9];
 
-	matrix_[8] = matrix_[0]*multipliers[8] + matrix_[4]*multipliers[9] + matrix_[8]*multipliers[10];
-	matrix_[9] = matrix_[1]*multipliers[8] + matrix_[5]*multipliers[9] + matrix_[9]*multipliers[10];
-	matrix_[10] = matrix_[2]*multipliers[8] + matrix_[6]*multipliers[9] + matrix_[10]*multipliers[10];
-	matrix_[11] = matrix_[3]*multipliers[8] + matrix_[7]*multipliers[9] + matrix_[11]*multipliers[10];
+	matrix_[2] = matrix_[0]*multipliers[2] + matrix_[1]*multipliers[6] + matrix_[2]*multipliers[10];
+	matrix_[6] = matrix_[4]*multipliers[2] + matrix_[5]*multipliers[6] + matrix_[6]*multipliers[10];
+	matrix_[10] = matrix_[8]*multipliers[2] + matrix_[9]*multipliers[6] + matrix_[10]*multipliers[10];
+	matrix_[14] = matrix_[12]*multipliers[2] + matrix_[13]*multipliers[6] + matrix_[14]*multipliers[10];
 
 	matrix_[0] = temp[0];
-	matrix_[1] = temp[1];
-	matrix_[2] = temp[2];
-	matrix_[3] = temp[3];
-	matrix_[4] = temp[4];
+	matrix_[4] = temp[1];
+	matrix_[8] = temp[2];
+	matrix_[12] = temp[3];
+	matrix_[1] = temp[4];
 	matrix_[5] = temp[5];
-	matrix_[6] = temp[6];
-	matrix_[7] = temp[7];
+	matrix_[9] = temp[6];
+	matrix_[13] = temp[7];
 }
 
 /*

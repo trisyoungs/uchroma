@@ -126,7 +126,7 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	// Role of pane
 	enum PaneRole { SliceMonitorRole, StandardRole, nPaneRoles };
 	// Convert text string to PaneRole
-	static PaneRole paneRole(const char* s);
+	static PaneRole paneRole(QString s);
 	// Convert PaneRole to text string
 	static const char* paneRole(PaneRole role);
 
@@ -170,7 +170,7 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	// View type
 	enum ViewType { NormalView, AutoStretchedView, FlatXYView, FlatXZView, FlatYZView, LinkedView, nViewTypes };
 	// Convert text string to ViewType
-	static ViewType viewType(const char* s);
+	static ViewType viewType(QString s);
 	// Convert ViewType to text string
 	static const char* viewType(ViewType vt);
 

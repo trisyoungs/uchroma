@@ -52,6 +52,7 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	autoScale_[0] = Axes::NoAutoScale;
 	autoScale_[1] = Axes::NoAutoScale;
 	autoScale_[2] = Axes::NoAutoScale;
+	coordinateVersion_ = -1;
 
 	// Ticks
 	tickDirection_[0].set(0.0, -1.0, 0.0);
@@ -146,6 +147,7 @@ void Axes::operator=(const Axes& source)
 	autoScale_[0] = source.autoScale_[0];
 	autoScale_[1] = source.autoScale_[1];
 	autoScale_[2] = source.autoScale_[2];
+	coordinateVersion_ = -1;
 
 	// Ticks / Labels
 	tickDirection_[0] = source.tickDirection_[0];
@@ -198,9 +200,9 @@ void Axes::operator=(const Axes& source)
 const char* AutoScaleKeywords[Axes::nAutoScaleMethods] = { "None", "Expanding", "Full" };
 
 // Convert text string to AutoScaleMethod
-Axes::AutoScaleMethod Axes::autoScaleMethod(const char* s)
+Axes::AutoScaleMethod Axes::autoScaleMethod(QString s)
 {
-	for (int n=0; n<Axes::nAutoScaleMethods; ++n) if (strcmp(s,AutoScaleKeywords[n]) == 0) return (Axes::AutoScaleMethod) n;
+	for (int n=0; n<Axes::nAutoScaleMethods; ++n) if (s == AutoScaleKeywords[n]) return (Axes::AutoScaleMethod) n;
 	return Axes::nAutoScaleMethods;
 }
 
@@ -211,14 +213,50 @@ const char* Axes::autoScaleMethod(Axes::AutoScaleMethod scale)
 }
 
 // Recalculate centre coordinate of axes
-void Axes::calculateCoordCentre()
+void Axes::updateCoordinates()
 {
-	// Determine central coordinate within current axes and the Y clip limits
+	// Check coordinate version
+	if (coordinateVersion_ == axesVersion_) return;
+
+	// Determine central coordinate within current axes
 	for (int n=0; n<3; ++n)
 	{
-		if (logarithmic_[n]) coordCentre_[n] = (inverted_[n] ? log10(max_[n]/min_[n]) : log10(max_[n]*min_[n])) * 0.5 * stretch_[n];
-		else coordCentre_[n] = (max_[n]+min_[n]) * 0.5 * stretch_[n];
+
 	}
+	double position;
+	
+	// Loop over axes
+	for (int axis=0; axis < 3; ++axis)
+	{
+		// Determine central coordinate component
+		if (logarithmic_[axis]) coordCentre_[axis] = (inverted_[axis] ? log10(max_[axis]/min_[axis]) : log10(max_[axis]*min_[axis])) * 0.5 * stretch_[axis];
+		else coordCentre_[axis] = (max_[axis]+min_[axis]) * 0.5 * stretch_[axis];
+		
+		// Set axis position along other directions
+		for (int n=0; n<3; ++n)
+		{
+			// Get axis position
+			position = (positionIsFractional_[axis] ? positionFractional_[axis][n]*(max_[n]-min_[n])+min_[n] : positionReal_[axis][n]);
+			if (logarithmic_[n]) coordMin_[axis].set(n, (inverted_[n] ? log10(max_[n]/position) : log10(position)) * stretch_[n]);
+			else coordMin_[axis].set(n, (inverted_[n] ? max_[n] - position +min_[n] : position) * stretch_[n]);
+		}
+		coordMax_[axis] = coordMin_[axis];
+
+		// Set axis min/max coordinates
+		if (logarithmic_[axis])
+		{
+			coordMin_[axis].set(axis, (inverted_[axis] ? log10(max_[axis] / min_[axis]) : log10(min_[axis])) * stretch_[axis]);
+			coordMax_[axis].set(axis, (inverted_[axis] ? log10(max_[axis] / max_[axis]) : log10(max_[axis])) * stretch_[axis]);
+		}
+		else
+		{
+			coordMin_[axis].set(axis, (inverted_[axis] ? max_[axis] : min_[axis]) * stretch_[axis]);
+			coordMax_[axis].set(axis, (inverted_[axis] ? min_[axis] : max_[axis]) * stretch_[axis]);
+		}
+	}
+
+	// Set new version
+	coordinateVersion_ = axesVersion_;
 }
 
 // Clamp axis position and min/max to current limits if necessary
@@ -253,8 +291,6 @@ void Axes::setMin(int axis, double value)
 {
 	min_[axis] = value;
 
-	calculateCoordCentre();
-
 	++axesVersion_;
 	++displayVersion_;
 }
@@ -269,8 +305,6 @@ double Axes::min(int axis) const
 void Axes::setMax(int axis, double value)
 {
 	max_[axis] = value;
-
-	calculateCoordCentre();
 
 	++axesVersion_;
 	++displayVersion_;
@@ -344,20 +378,26 @@ void Axes::expandLimits(bool noShrink)
 }
 
 // Return coordinate at centre of current axes
-Vec3<double> Axes::coordCentre() const
+Vec3<double> Axes::coordCentre()
 {
+	updateCoordinates();
+
 	return coordCentre_;
 }
 
 // Return coordinate at minimum of specified axis
-Vec3<double> Axes::coordMin(int axis) const
+Vec3<double> Axes::coordMin(int axis)
 {
+	updateCoordinates();
+
 	return coordMin_[axis];
 }
 
 // Return coordinate at maximum of specified axis
-Vec3<double> Axes::coordMax(int axis) const
+Vec3<double> Axes::coordMax(int axis)
 {
+	updateCoordinates();
+
 	return coordMax_[axis];
 }
 
@@ -383,7 +423,6 @@ void Axes::setLogarithmic(int axis, bool b)
 
 	// Update and clamp axis values according to data
 	clamp(axis);
-	calculateCoordCentre();
 
 	++axesVersion_;
 	++displayVersion_;
@@ -411,8 +450,6 @@ bool Axes::visible(int axis) const
 void Axes::setStretch(int axis, double value)
 {
 	stretch_[axis] = value;
-
-	calculateCoordCentre();
 
 	++axesVersion_;
 	++displayVersion_;
@@ -885,12 +922,8 @@ void Axes::updateAxisPrimitives()
 	Array<double> tickPositions[3];
 	Array<bool> tickIsMajor[3];
 
-	// Determine central coordinate within current axes and the Y clip limits
-	for (int n=0; n<3; ++n)
-	{
-		if (logarithmic_[n]) coordCentre_[n] = (inverted_[n] ? log10(max_[n]/min_[n]) : log10(max_[n]*min_[n])) * 0.5 * stretch_[n];
-		else coordCentre_[n] = (max_[n]+min_[n]) * 0.5 * stretch_[n];
-	}
+	// Make sure coordinates are up-to-date
+	updateCoordinates();
 
 	// Set Y clip
 	if (logarithmic_.y)
@@ -902,32 +935,6 @@ void Axes::updateAxisPrimitives()
 	{
 		clipPlaneYMin_ = (min_.y * stretch_.y) - clipPlaneDelta;
 		clipPlaneYMax_ = (max_.y * stretch_.y) + clipPlaneDelta;
-	}
-	
-	// Set basic extreme coordinates for axes
-	for (int axis=0; axis < 3; ++axis)
-	{
-		double position;
-		for (int n=0; n<3; ++n)
-		{
-			// Get axis position
-			position = (positionIsFractional_[axis] ? positionFractional_[axis][n]*(max_[n]-min_[n])+min_[n] : positionReal_[axis][n]);
-			if (logarithmic_[n]) coordMin_[axis].set(n, (inverted_[n] ? log10(max_[n]/position) : log10(position)) * stretch_[n]);
-			else coordMin_[axis].set(n, (inverted_[n] ? max_[n] - position +min_[n] : position) * stretch_[n]);
-		}
-		coordMax_[axis] = coordMin_[axis];
-
-		// Set axis min/max coordinates
-		if (logarithmic_[axis])
-		{
-			coordMin_[axis].set(axis, (inverted_[axis] ? log10(max_[axis] / min_[axis]) : log10(min_[axis])) * stretch_[axis]);
-			coordMax_[axis].set(axis, (inverted_[axis] ? log10(max_[axis] / max_[axis]) : log10(max_[axis])) * stretch_[axis]);
-		}
-		else
-		{
-			coordMin_[axis].set(axis, (inverted_[axis] ? max_[axis] : min_[axis]) * stretch_[axis]);
-			coordMax_[axis].set(axis, (inverted_[axis] ? min_[axis] : max_[axis]) * stretch_[axis]);
-		}
 	}
 
 	// Construct axes
@@ -947,14 +954,14 @@ void Axes::updateAxisPrimitives()
 		// -- 1) Apply axial rotation along X axis (left-to-right direction)
 		labelTransform.applyRotationX(labelOrientation_[axis].x);
 		// -- 2) Perform in-plane rotation
-		labelTransform.applyRotationZ(labelOrientation_[axis].y);
+		labelTransform.applyRotationY(labelOrientation_[axis].y);
 
 		// Create axis title transformation matrix
 		titleTransform.setIdentity();
 		// -- 1) Apply axial rotation along X axis (left-to-right direction)
 		titleTransform.applyRotationX(titleOrientation_[axis].x);
 		// -- 2) Perform in-plane rotation
-		titleTransform.applyRotationZ(titleOrientation_[axis].y);
+		titleTransform.applyRotationY(titleOrientation_[axis].y);
 
 		if (logarithmic_[axis])
 		{

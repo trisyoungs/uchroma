@@ -44,7 +44,7 @@ class DataSet: public ListItem<DataSet>
 	// Data Sources
 	enum DataSource { FileSource, InternalSource, nDataSources };
 	// Convert text string to DataSource
-	static DataSource dataSource(const char* s);
+	static DataSource dataSource(QString s);
 	// Convert DataSource to text string
 	static const char* dataSource(DataSource kwd);
 

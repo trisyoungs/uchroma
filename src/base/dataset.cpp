@@ -28,9 +28,9 @@ const char* DataSourceKeywords[] = { "File", "Internal" };
 /*!
  * \brief Convert text string to SettingsKeyword
  */
-DataSet::DataSource DataSet::dataSource(const char* s)
+DataSet::DataSource DataSet::dataSource(QString s)
 {
-	for (int n=0; n<nDataSources; ++n) if (strcmp(s,DataSourceKeywords[n]) == 0) return (DataSet::DataSource) n;
+	for (int n=0; n<nDataSources; ++n) if (s == DataSourceKeywords[n]) return (DataSet::DataSource) n;
 	return nDataSources;
 }
 

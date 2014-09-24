@@ -28,9 +28,9 @@
 const char* FormatTypeKeywords[] = { "Decimal", "Integer", "Scientific" };
 
 // Convert text string to FormatType
-NumberFormat::FormatType NumberFormat::formatType(const char* s)
+NumberFormat::FormatType NumberFormat::formatType(QString s)
 {
-	for (int n=0; n<NumberFormat::nNumberFormats; ++n) if (strcmp(s,FormatTypeKeywords[n]) == 0) return (NumberFormat::FormatType) n;
+	for (int n=0; n<NumberFormat::nNumberFormats; ++n) if (s == FormatTypeKeywords[n]) return (NumberFormat::FormatType) n;
 	return NumberFormat::nNumberFormats;
 }
 

@@ -22,6 +22,8 @@
 #ifndef UCHROMA_INDEXDATA_H
 #define UCHROMA_INDEXDATA_H
 
+#include <QtCore/QString>
+
 // Forward Declarations
 /* none */
 
@@ -35,7 +37,7 @@ class IndexData
 	// Reference Type
 	enum IndexType { NormalIndex, FixedIndex, RelativeIndex, nIndexTypes };
 	// Convert text string to IndexType
-	static IndexType indexType(const char* s);
+	static IndexType indexType(QString s);
 	// Convert IndexType to text string
 	static const char* indexType(IndexType id);
 

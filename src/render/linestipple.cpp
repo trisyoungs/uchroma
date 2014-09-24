@@ -37,9 +37,9 @@ LineStipple LineStipple::stipple[] = {
 };
 
 // Convert text string to StippleType
-LineStipple::StippleType LineStipple::stippleType(const char* s)
+LineStipple::StippleType LineStipple::stippleType(QString s)
 {
-	for (int n=0; n<LineStipple::nStippleTypes; ++n) if (strcmp(s,LineStipple::stipple[n].name) == 0) return (LineStipple::StippleType) n;
+	for (int n=0; n<LineStipple::nStippleTypes; ++n) if (s == LineStipple::stipple[n].name) return (LineStipple::StippleType) n;
 	return LineStipple::nStippleTypes;
 }
 
