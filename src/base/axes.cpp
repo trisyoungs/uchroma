@@ -868,6 +868,7 @@ void Axes::setUseBestView(bool b)
 {
 	useBestView_ = b;
 
+	printf("Use best view is now... %i\n", useBestView_);
 	++axesVersion_;
 }
 
@@ -965,6 +966,7 @@ void Axes::updateAxisPrimitives()
 	Matrix labelTransform, titleTransform;
 	Array<double> tickPositions[3];
 	Array<bool> tickIsMajor[3];
+	bool autoPositionTitle[3] = { false, false, false };
 
 	// Make sure coordinates are up-to-date
 	updateCoordinates();
@@ -998,14 +1000,14 @@ void Axes::updateAxisPrimitives()
 		// -- 1) Apply axial rotation along X axis (left-to-right direction)
 		labelTransform.applyRotationX(labelOrientation(axis).x);
 		// -- 2) Perform in-plane rotation
-		labelTransform.applyRotationY(labelOrientation(axis).y);
+		labelTransform.applyRotationZ(labelOrientation(axis).y);
 
 		// Create axis title transformation matrix
 		titleTransform.setIdentity();
 		// -- 1) Apply axial rotation along X axis (left-to-right direction)
 		titleTransform.applyRotationX(titleOrientation(axis).x);
 		// -- 2) Perform in-plane rotation
-		titleTransform.applyRotationY(titleOrientation(axis).y);
+		titleTransform.applyRotationZ(titleOrientation(axis).y);
 
 		if (logarithmic_[axis])
 		{
@@ -1118,11 +1120,31 @@ void Axes::updateAxisPrimitives()
 				++count;
 			}
 
-			// Add axis title
-			u = coordMin_[axis];
-			value = min_[axis] + (max_[axis] - min_[axis]) * titleOrientation_[axis].w;
-			u.set(axis, (inverted_[axis] ? (max_[axis] - value) + min_[axis]: value) * stretch_[axis]);
-			titlePrimitives_[axis].add(title_[axis], u, titleAnchor_[axis], tickDir * titleOrientation_[axis].z, titleTransform, parent_.titlePointSize());
+			if (autoPositionTitle[axis])
+			{
+				printf("autoPosition %i\n", axis);
+				Cuboid cuboid = labelPrimitives_[axis].boundingCuboid(parent_, false, parent_.textZScale());
+				// Project tick direction onto cuboid width/height
+				Vec3<double> extent = cuboid.maxima() - cuboid.minima();
+				printf("Minima = "); cuboid.minima().print();
+				printf("Maxima = "); cuboid.maxima().print();
+				printf("Extent = "); extent.print();
+				extent.multiply(tickDir);
+				extent *= 10.0;
+				printf("Modified = "); extent.print();
+				u = coordMin_[axis];
+				value = min_[axis] + (max_[axis] - min_[axis]) * titleOrientation_[axis].w;
+				u.set(axis, (inverted_[axis] ? (max_[axis] - value) + min_[axis]: value) * stretch_[axis]);
+				titlePrimitives_[axis].add(title_[axis], u + tickDir*tickSize_[axis], titleAnchor_[axis], extent, titleTransform, parent_.titlePointSize());
+			}
+			else
+			{
+				// Add axis title
+				u = coordMin_[axis];
+				value = min_[axis] + (max_[axis] - min_[axis]) * titleOrientation_[axis].w;
+				u.set(axis, (inverted_[axis] ? (max_[axis] - value) + min_[axis]: value) * stretch_[axis]);
+				titlePrimitives_[axis].add(title_[axis], u, titleAnchor_[axis], tickDir * titleOrientation_[axis].z, titleTransform, parent_.titlePointSize());
+			}
 		}
 	}
 

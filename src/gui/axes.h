@@ -272,6 +272,13 @@ class AxesWindow : public QWidget
 
 
 	/*
+	 * Options
+	 */
+	private slots:
+	void on_UseBestViewCheck_clicked(bool checked);
+
+
+	/*
 	 * Update Functions
 	 */
 	public:

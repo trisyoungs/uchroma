@@ -496,7 +496,6 @@ Matrix ViewPane::calculateProjectionMatrix(double orthoZoom)
 		bottom = -top;
 		left = -aspectRatio_*top;
 		right = aspectRatio_*top;
-		printf("In Projection (%p) : fov=%f, aspect=%f, ozoom=%f, top = %f, bot = %f, left = %f, right = %f\n", perspectiveFieldOfView_, aspectRatio_, orthoZoom, top, bottom, left, right);
 
 		result.setColumn(0, 2.0 / (right-left), 0.0, 0.0, (right+left)/(right-left));
 		result.setColumn(1, 0.0, 2.0 / (top-bottom), 0.0, (top+bottom)/(top-bottom));
@@ -814,7 +813,6 @@ void ViewPane::recalculateView(bool force)
 	unit.x -= viewportMatrix_[0] + viewportMatrix_[2]/2.0;
 	unit.y -= viewportMatrix_[1] + viewportMatrix_[3]/2.0;
 	unit.z = unit.y;
-	unit.print();
 
 	// Get axis min/max, accounting for logarithmic axes
 	Vec3<double> axisMin, axisMax;
@@ -836,8 +834,6 @@ void ViewPane::recalculateView(bool force)
 
 	// Set axis stretch factors to fill available pixel width/height
 	for (axis=0; axis<3; ++axis) axes_.setStretch(axis, viewportMatrix_[axisDir[axis]+2] / (unit[axisDir[axis]] * (axisMax[axis] - axisMin[axis])));
-	printf("Initial stretch factors for pane '%s' are %f %f %f\n", qPrintable(name_), axes_.stretch(0), axes_.stretch(1), axes_.stretch(2));
-	printf("AxisDir = "); axisDir.print();
 
 	const double margin = 10.0;
 	Matrix viewMat, B;
@@ -847,13 +843,12 @@ void ViewPane::recalculateView(bool force)
 	// Iterate for a few cycles
 	for (int cycle = 0; cycle < 5; ++cycle)
 	{
-		printf("Pane '%s' Cycle = %i\n", qPrintable(name_), cycle);
+// 		printf("Pane '%s' Cycle = %i\n", qPrintable(name_), cycle);
 		// We will now calculate more accurate stretch factors to apply to the X and Y axes.
 		// Project the axis limits on to the screen using the relevant viewmatrix + coordinate centre translation
 		viewMat.createTranslation(-axes().coordCentre());
 		if (viewType_ == ViewPane::FlatXZView) viewMat.applyRotationX(-90.0);
 		else if (viewType_ == ViewPane::FlatYZView) viewMat.applyRotationY(90.0);
-		viewMat.print();
 
 		// Calculate coordinates and global extremes over axes and labels
 		globalMin.set(1e9,1e9,1e9);
@@ -873,8 +868,8 @@ void ViewPane::recalculateView(bool force)
 			coordMax[axis].set(std::max(a.x,b.x), std::max(a.y,b.y),  std::max(a.z,b.z)); 
 
 			// Update global min/max
-			printf("Projected %i Coord Min = ", axis); coordMin[axis].print();
-			printf("Projected %i Coord Max = ", axis); coordMax[axis].print();
+// 			printf("Projected %i Coord Min = ", axis); coordMin[axis].print();
+// 			printf("Projected %i Coord Max = ", axis); coordMax[axis].print();
 			for (int n=0; n<3; ++n)
 			{
 				if (coordMin[axis][n] < globalMin[n]) globalMin[n] = coordMin[axis][n];
@@ -889,8 +884,8 @@ void ViewPane::recalculateView(bool force)
 			// Project cuboid extremes and store projected coordinates
 			a = modelToScreen(cuboid.minima(), viewMat);
 			b = modelToScreen(cuboid.maxima(), viewMat);
-			printf("Label %i minima = ", axis); a.print();
-			printf("Label %i maxima = ", axis); b.print();
+// 			printf("Label %i minima = ", axis); a.print();
+// 			printf("Label %i maxima = ", axis); b.print();
 
 			// Update global and label min/max
 			for (int n=0; n<3; ++n)
@@ -905,7 +900,7 @@ void ViewPane::recalculateView(bool force)
 		}
 
 		// Now have screen coordinates of all necessary objects (axes and labels)
-		printf("GlobalMinMax: X = %f/%f, Y=%f/%f\n", globalMin.x, globalMax.x, globalMin.y, globalMax.y);
+// 		printf("GlobalMinMax: X = %f/%f, Y=%f/%f\n", globalMin.x, globalMax.x, globalMin.y, globalMax.y);
 
 		// Calculate total width and height of objects as they are arranged
 		double globalWidth = globalMax.x - globalMin.x;
@@ -914,40 +909,39 @@ void ViewPane::recalculateView(bool force)
 		double axisHeight = coordMax[axisY].y - coordMin[axisY].y;
 		double labelWidth = labelMax.x - labelMin.x;
 		double labelHeight = labelMax.y - labelMin.y;
-		printf("Global w/h = %f/%f\n", globalWidth, globalHeight);
+// 		printf("Global w/h = %f/%f\n", globalWidth, globalHeight);
 
 		// Now, we know the width and height of the axis on its own, and the extra 'added' by the labels, so work out how much we need to shrink the axis by
 		double deltaWidth = (viewportMatrix_[2] - 2*margin) - globalWidth;
 		double deltaHeight = (viewportMatrix_[3] - 2*margin) - globalHeight;
-		printf("deltas on width and height are %f and %f\n", deltaWidth, deltaHeight);
+// 		printf("deltas on width and height are %f and %f\n", deltaWidth, deltaHeight);
 
 		// So, need to lose deltaWidth and deltaHeight pixels from the axis exents - we'll do this by scaling the stretchfactor
 		double factor = axisWidth / (axisWidth - deltaWidth);
-		printf("Factor on axisX stretch = %f\n", factor);
+// 		printf("Factor on axisX stretch = %f\n", factor);
 		axes_.setStretch(axisX, axes_.stretch(axisX) * factor);
 		factor = axisHeight / (axisHeight - deltaHeight);
-		printf("Factor on axisY stretch = %f\n", factor);
+// 		printf("Factor on axisY stretch = %f\n", factor);
 		axes_.setStretch(axisY, axes_.stretch(axisY) * factor);
 
-		printf("New stretch factors at end of cycle %i are %f %f %f\n", cycle, axes_.stretch(0), axes_.stretch(1), axes_.stretch(2));
+// 		printf("New stretch factors at end of cycle %i are %f %f %f\n", cycle, axes_.stretch(0), axes_.stretch(1), axes_.stretch(2));
 	}
 
 	// Set new rotation matrix
 	viewRotation_.setIdentity();
 	if (viewType_ == ViewPane::FlatXZView) viewRotation_.applyRotationX(-90.0);
 	else if (viewType_ == ViewPane::FlatYZView) viewRotation_.applyRotationY(90.0);
-	viewRotation_.print();
 
 	// Set a translation in order to set the margins as requested
 	// The viewTranslation_ is applied in 'normal' coordinate axes, so viewTranslation_.x is along screen x etc.
-	printf("Final globalMin = "); globalMin.print();
-	printf("Final globalMax = "); globalMax.print();
-	printf("Viewport is %i %i %i %i\n", viewportMatrix_[0], viewportMatrix_[1], viewportMatrix_[2], viewportMatrix_[3]);
+// 	printf("Final globalMin = "); globalMin.print();
+// 	printf("Final globalMax = "); globalMax.print();
+// 	printf("Viewport is %i %i %i %i\n", viewportMatrix_[0], viewportMatrix_[1], viewportMatrix_[2], viewportMatrix_[3]);
 	viewTranslation_.zero();
 	viewTranslation_[0] = (margin - (globalMin.x - viewportMatrix_[0])) / unit.x;
 	viewTranslation_[1] = (margin - (globalMin.y - viewportMatrix_[1])) / unit.y;
-	viewTranslation_.print();
-	
+// 	viewTranslation_.print();
+
 	// Store new versions of view
 	viewAxesUsedAt_ = axes().axesVersion();
 	viewViewportUsedAt_ = viewportVersion_;

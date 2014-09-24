@@ -1368,6 +1368,19 @@ void AxesWindow::on_ZGridLineApplyStyleButton_clicked(bool checked)
 	gridStyleApplyClicked(2);
 }
 
+// Options
+
+void AxesWindow::on_UseBestViewCheck_clicked(bool checked)
+{
+	if (refreshing_ || (!haveCurrentAxes())) return;
+	
+	currentAxes().setUseBestView(checked);
+
+	updateControls();
+
+	uChroma_.updateDisplay();
+}
+
 /*
  * Update
  */
@@ -1573,6 +1586,9 @@ void AxesWindow::updateControls(bool force)
 	ui.ZGridLineMajorCheck->setChecked(axes.gridLinesMajor(2));
 	ui.ZGridLineMinorCheck->setChecked(axes.gridLinesMinor(2));
 	ui.ZGridLineFullCheck->setChecked(axes.gridLinesFull(2));
+
+	// Options
+	ui.UseBestViewCheck->setChecked(axes.useBestView());
 
 	refreshing_ = false;
 }
