@@ -3,7 +3,7 @@ project(uChroma)
 set(DESCRIPTION "uChroma")
 set(AUTHOR "Tristan Youngs")
 set(VERSION_MAJOR "1")
-set(VERSION_MINOR "61")
+set(VERSION_MINOR "62")
 
 set(CMAKE_BUILD_TYPE "Release")
 
@@ -35,8 +35,6 @@ include(FindBISON)
 # Perform system-specific setup
 # -- Windows
 if(WIN32)
-  # Find SZIP
-  find_package(SZIP REQUIRED)
   # Setup SZIP and FTGL, and GLExt bits and pieces (for custom build machine)
   set(SZIP_DIR "C:/src/szip-2.1")
   set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "C:/src/szip-2.1/")

@@ -23,7 +23,6 @@
 #include "base/collection.h"
 #include "base/viewpane.h"
 #include "render/surface.h"
-#include <X11/Xlib.h>
 
 // Constructor
 TargetData::TargetData(ViewPane& parent) : ListItem<TargetData>(), parent_(parent)

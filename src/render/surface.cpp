@@ -21,7 +21,6 @@
 
 #include "render/surface.h"
 #include "base/axes.h"
-#include <X11/Xlib.h>
 
 // Construct normal / colour data for vertex specified
 Vec3<double> Surface::constructVertexNormals(const Array<double>& abscissa, int index, DisplayDataSet* targetDataSet, DisplayDataSet* previousDataSet, DisplayDataSet* nextDataSet, int nPoints)
