@@ -122,9 +122,9 @@ void UChromaWindow::startInteraction(int mouseX, int mouseY, Qt::KeyboardModifie
 	if (interactionMode_ == InteractionMode::ViewInteraction) return;
 
 	// Check interaction pane
-	if (currentViewPane_ == NULL)
+	if (!ViewPane::objectValid(currentViewPane_))
 	{
-		msg.print("NULL interaction pane - refusing to start interaction.\n");
+		msg.print("Internal Error: Invalid interaction pane - refusing to start interaction.\n");
 		return;
 	}
 
@@ -165,9 +165,9 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 	if (!interacting_) return;
 
 	// Check interaction pane
-	if (currentViewPane_ == NULL)
+	if (!ViewPane::objectValid(currentViewPane_))
 	{
-		msg.print("NULL interaction pane - refusing to end interaction.\n");
+		msg.print("Internal Error: Invalid interaction pane - refusing to end interaction.\n");
 		return;
 	}
 

@@ -618,7 +618,7 @@
      <x>0</x>
      <y>0</y>
      <width>947</width>
-     <height>29</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1410,6 +1410,9 @@
   <action name="actionViewLinked">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="icons.qrc">

@@ -275,7 +275,8 @@ class AxesWindow : public QWidget
 	 * Options
 	 */
 	private slots:
-	void on_UseBestViewCheck_clicked(bool checked);
+	void on_UseBestFlatViewCheck_clicked(bool checked);
+	void on_AutoPositionTitlesCheck_clicked(bool checked);
 
 
 	/*

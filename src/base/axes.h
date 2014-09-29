@@ -272,17 +272,23 @@ class Axes
 
 
 	/*
-	 * Style Overrides
+	 * Style Helpers
 	 */
 	private:
-	// Whether to use best tick/label orientation for view, or our own definitions
-	bool useBestView_;
+	// Whether to use best tick/label orientation for flat views, or the user's definitions
+	bool useBestFlatView_;
+	// Whether to automatically place titles at a sensible position after label text
+	bool autoPositionTitles_;
 
 	public:
 	// Set whether to use best tick/label orientation for view
-	void setUseBestView(bool b);
+	void setUseBestFlatView(bool b);
 	// Return whether to use best tick/label orientation for view
-	bool useBestView();
+	bool useBestFlatView();
+	// Set whether to automatically place titles at a sensible position after label text
+	void setAutoPositionTitles(bool b);
+	// Return whether to automatically place titles at a sensible position after label text
+	bool autoPositionTitles();
 
 
 	/*

@@ -152,6 +152,13 @@ void Viewer::paintGL()
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
+	// Set some colours
+	GLfloat colourBlack[4] = { 0.0, 0.0, 0.0, 1.0 };
+	GLfloat colourGray[4] = { 0.8, 0.8, 0.8, 1.0 };
+	GLfloat colourBlue[4] = { 0.88, 0.95, 1.0, 1.0 };
+	GLfloat colourWhite[4] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat colourTransparentGray[4] = { 0.0, 0.0, 0.0, 0.3 };
+
 	// Create a query object to get timing information
 	GLuint timeQuery = 0;
 	if (extensions->hasQueries())
@@ -159,7 +166,7 @@ void Viewer::paintGL()
 		extensions->glGenQueries(1, &timeQuery);
 		extensions->glBeginQuery(GL_TIME_ELAPSED, timeQuery);
 	}
-	
+
 	// Loop over defined viewpanes
 	GLdouble clipPlaneBottom[4] = { 0.0, 1.0, 0.0, 0.0 }, clipPlaneTop[4] = { 0.0, -1.0, 0.0, 0.0 };
 	for (ViewPane* pane = uChroma_->viewLayout().panes(); pane != NULL; pane = pane->next)
@@ -178,10 +185,6 @@ void Viewer::paintGL()
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		glDisable(GL_LIGHTING);
-		GLfloat colourGray[4] = { 0.8, 0.8, 0.8, 1.0 };
-		GLfloat colourBlue[4] = { 0.88, 0.95, 1.0, 1.0 };
-		GLfloat colourWhite[4] = { 1.0, 1.0, 1.0, 1.0 };
-
 		// Draw graduated background for current pane
 		if (pane == uChroma_->currentViewPane())
 		{
@@ -207,17 +210,16 @@ void Viewer::paintGL()
 		// Set projection matrix
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrixd(pane->projectionMatrix().matrix());
-		glClear(GL_DEPTH_BUFFER_BIT);
 
 		// Set modelview matrix as target for the remainder of the routine
 		glMatrixMode(GL_MODELVIEW);
+		glClear(GL_DEPTH_BUFFER_BIT);
 
 		// Get the pane's view matrix
 		Matrix viewMatrix = pane->viewMatrix();
 
 		// Send axis primitives to the display first
 		glLoadMatrixd(viewMatrix.matrix());
-		GLfloat colourBlack[4] = { 0.0, 0.0, 0.0, 1.0 };
 		glColor4fv(colourBlack);
 		int skipAxis = -1;
 		if (pane->viewType() == ViewPane::FlatXYView) skipAxis = 2;
@@ -305,6 +307,30 @@ void Viewer::paintGL()
 		// Disable current clip planes
 		glDisable(GL_CLIP_PLANE0);
 		glDisable(GL_CLIP_PLANE1);
+
+		// Render toolbar?
+// 		// Setup an orthographic matrix
+// 		glMatrixMode(GL_PROJECTION);
+// 		glLoadIdentity();
+// 		glOrtho(0, pane->viewportMatrix()[2], 0, pane->viewportMatrix()[3], -10, 10);
+// 		glClear(GL_DEPTH_BUFFER_BIT);
+// 
+// 		glMatrixMode(GL_MODELVIEW);
+// 		glLoadIdentity();
+// 		glColor4fv(colourTransparentGray);
+// 		glBegin(GL_LINE_LOOP);
+// 		glVertex2i(pane->viewportMatrix()[2]-2, pane->viewportMatrix()[3]-2);
+// 		glVertex2i(pane->viewportMatrix()[2]-2, pane->viewportMatrix()[3]-16);
+// 		glVertex2i(pane->viewportMatrix()[2]-16, pane->viewportMatrix()[3]-16);
+// 		glVertex2i(pane->viewportMatrix()[2]-16, pane->viewportMatrix()[3]-2);
+// 		glEnd();
+// 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+// 		glBegin(GL_LINE_LOOP);
+// 		glVertex2i(pane->viewportMatrix()[2]-2, pane->viewportMatrix()[3]-2);
+// 		glVertex2i(pane->viewportMatrix()[2]-2, pane->viewportMatrix()[3]-6);
+// 		glVertex2i(pane->viewportMatrix()[2]-16, pane->viewportMatrix()[3]-6);
+// 		glVertex2i(pane->viewportMatrix()[2]-16, pane->viewportMatrix()[3]-2);
+// 		glEnd();
 	}
 
 	// End timer query

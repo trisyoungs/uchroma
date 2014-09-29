@@ -76,7 +76,7 @@ void TextPrimitive::set(QString text, Vec3<double> anchorPoint, TextPrimitive::T
 	QString fragmentText;
 	int supSub = 0;
 
-	// Call the parser // TODO Note return value!
+	// Call the parser
 	generateFragments(this, text);
 
 	anchorPoint_ = anchorPoint;

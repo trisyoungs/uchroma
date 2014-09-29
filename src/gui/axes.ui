@@ -4157,9 +4157,16 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_24">
        <item>
-        <widget class="QCheckBox" name="UseBestViewCheck">
+        <widget class="QCheckBox" name="UseBestFlatViewCheck">
          <property name="text">
-          <string>Use best tick/label orientation</string>
+          <string>Use best tick/label orientation for flat views</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="AutoPositionTitlesCheck">
+         <property name="text">
+          <string>Position titles automatically</string>
          </property>
         </widget>
        </item>

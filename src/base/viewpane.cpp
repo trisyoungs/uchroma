@@ -618,8 +618,7 @@ Matrix ViewPane::viewMatrix()
 	viewMatrix *= viewRotation_;
 
 	// Apply translation to apply view shift and zoom (the latter only if using perspective)
-// 	viewMatrix.applyTranslation(viewTranslation_.x, viewTranslation_.y, hasPerspective_ ? viewTranslation_.z : 0.0 );
-	viewMatrix.applyTranslation(viewTranslation_.x, viewTranslation_.y, viewTranslation_.z);
+	viewMatrix.applyTranslation(viewTranslation_.x, viewTranslation_.y, hasPerspective_ ? viewTranslation_.z : 0.0 );
 
 	return viewMatrix;
 }
@@ -668,8 +667,8 @@ Vec3<double> ViewPane::modelToScreen(Vec3<double> modelr)
 	return Vec3<double>(screenr.x, screenr.y, screenr.z);
 }
 
-// Project given model coordinates into screen coordinates using supplied rotation matrix and translation vector
-Vec3<double> ViewPane::modelToScreen(Vec3<double> modelr, Matrix rotationMatrix, Vec3<double> translation)
+// Project given model coordinates into screen coordinates using supplied projection matrix, rotation matrix and translation vector
+Vec3<double> ViewPane::modelToScreen(Vec3<double> modelr, Matrix projectionMatrix, Matrix rotationMatrix, Vec3< double > translation)
 {
 	msg.enter("Viewer::modelToScreen");
 	Vec4<double> screenr, tempscreen;
@@ -684,7 +683,7 @@ Vec3<double> ViewPane::modelToScreen(Vec3<double> modelr, Matrix rotationMatrix,
 	vmat = rotationMatrix;
 	vmat.applyTranslation(translation);
 	worldr = vmat * pos;
-	screenr = projectionMatrix_ * worldr;
+	screenr = projectionMatrix * worldr;
 	screenr.x /= screenr.w;
 	screenr.y /= screenr.w;
 	screenr.x = viewportMatrix_[0] + viewportMatrix_[2]*(screenr.x+1)*0.5;
@@ -806,10 +805,13 @@ void ViewPane::recalculateView(bool force)
 
 	int axis;
 
+	// Calculate ourselves a 'standard' projection matrix
+	Matrix projectionMatrix = calculateProjectionMatrix(zOffset_);
+
 	// To begin, set the stretch factors to our best first estimate, dividing the pane width by the range of the axes
 	// Doing this first will allow us to get much better values for the pixel overlaps we need later on
 	// -- Project a point one unit each along X and Y and subtract off the viewport centre coordinate in order to get literal 'pixels per unit' for (screen) X and Y 
-	Vec3<double> unit = modelToScreen(Vec3<double>(1.0, 1.0, 0.0), Matrix());
+	Vec3<double> unit = modelToScreen(Vec3<double>(1.0, 1.0, 0.0), projectionMatrix, Matrix());
 	unit.x -= viewportMatrix_[0] + viewportMatrix_[2]/2.0;
 	unit.y -= viewportMatrix_[1] + viewportMatrix_[3]/2.0;
 	unit.z = unit.y;
@@ -843,33 +845,29 @@ void ViewPane::recalculateView(bool force)
 	// Iterate for a few cycles
 	for (int cycle = 0; cycle < 5; ++cycle)
 	{
-// 		printf("Pane '%s' Cycle = %i\n", qPrintable(name_), cycle);
 		// We will now calculate more accurate stretch factors to apply to the X and Y axes.
 		// Project the axis limits on to the screen using the relevant viewmatrix + coordinate centre translation
 		viewMat.createTranslation(-axes().coordCentre());
-		if (viewType_ == ViewPane::FlatXZView) viewMat.applyRotationX(-90.0);
-		else if (viewType_ == ViewPane::FlatYZView) viewMat.applyRotationY(90.0);
+		if (viewType_ == ViewPane::FlatXZView) viewMat.applyRotationX(90.0);
+		else if (viewType_ == ViewPane::FlatYZView) viewMat.applyRotationY(-90.0);
 
 		// Calculate coordinates and global extremes over axes and labels
 		globalMin.set(1e9,1e9,1e9);
 		globalMax = -globalMin;
 		labelMin = globalMin;
 		labelMax = -labelMin;
-// 		printf("VP = %i %i %i %i\n", viewportMatrix_[0], viewportMatrix_[1], viewportMatrix_[2], viewportMatrix_[3]);
 		for (axis=0; axis<3; ++axis)
 		{
 			// Skip third (i.e. 'z') axis
 			if ((axis != axisX) && (axis != axisY)) continue;
 
 			// Project axis min/max coordinates onto screen
-			a = modelToScreen(axes_.coordMin(axis), viewMat);
-			b = modelToScreen(axes_.coordMax(axis), viewMat);
+			a = modelToScreen(axes_.coordMin(axis), projectionMatrix, viewMat);
+			b = modelToScreen(axes_.coordMax(axis), projectionMatrix, viewMat);
 			coordMin[axis].set(std::min(a.x,b.x), std::min(a.y,b.y),  std::min(a.z,b.z)); 
 			coordMax[axis].set(std::max(a.x,b.x), std::max(a.y,b.y),  std::max(a.z,b.z)); 
 
 			// Update global min/max
-// 			printf("Projected %i Coord Min = ", axis); coordMin[axis].print();
-// 			printf("Projected %i Coord Max = ", axis); coordMax[axis].print();
 			for (int n=0; n<3; ++n)
 			{
 				if (coordMin[axis][n] < globalMin[n]) globalMin[n] = coordMin[axis][n];
@@ -882,10 +880,8 @@ void ViewPane::recalculateView(bool force)
 			cuboid = axes_.titlePrimitive(axis).boundingCuboid(*this, false, textZScale_, cuboid);
 
 			// Project cuboid extremes and store projected coordinates
-			a = modelToScreen(cuboid.minima(), viewMat);
-			b = modelToScreen(cuboid.maxima(), viewMat);
-// 			printf("Label %i minima = ", axis); a.print();
-// 			printf("Label %i maxima = ", axis); b.print();
+			a = modelToScreen(cuboid.minima(), projectionMatrix, viewMat);
+			b = modelToScreen(cuboid.maxima(), projectionMatrix, viewMat);
 
 			// Update global and label min/max
 			for (int n=0; n<3; ++n)
@@ -900,7 +896,6 @@ void ViewPane::recalculateView(bool force)
 		}
 
 		// Now have screen coordinates of all necessary objects (axes and labels)
-// 		printf("GlobalMinMax: X = %f/%f, Y=%f/%f\n", globalMin.x, globalMax.x, globalMin.y, globalMax.y);
 
 		// Calculate total width and height of objects as they are arranged
 		double globalWidth = globalMax.x - globalMin.x;
@@ -909,38 +904,31 @@ void ViewPane::recalculateView(bool force)
 		double axisHeight = coordMax[axisY].y - coordMin[axisY].y;
 		double labelWidth = labelMax.x - labelMin.x;
 		double labelHeight = labelMax.y - labelMin.y;
-// 		printf("Global w/h = %f/%f\n", globalWidth, globalHeight);
 
 		// Now, we know the width and height of the axis on its own, and the extra 'added' by the labels, so work out how much we need to shrink the axis by
 		double deltaWidth = (viewportMatrix_[2] - 2*margin) - globalWidth;
 		double deltaHeight = (viewportMatrix_[3] - 2*margin) - globalHeight;
-// 		printf("deltas on width and height are %f and %f\n", deltaWidth, deltaHeight);
 
 		// So, need to lose deltaWidth and deltaHeight pixels from the axis exents - we'll do this by scaling the stretchfactor
 		double factor = axisWidth / (axisWidth - deltaWidth);
-// 		printf("Factor on axisX stretch = %f\n", factor);
 		axes_.setStretch(axisX, axes_.stretch(axisX) * factor);
 		factor = axisHeight / (axisHeight - deltaHeight);
-// 		printf("Factor on axisY stretch = %f\n", factor);
 		axes_.setStretch(axisY, axes_.stretch(axisY) * factor);
-
-// 		printf("New stretch factors at end of cycle %i are %f %f %f\n", cycle, axes_.stretch(0), axes_.stretch(1), axes_.stretch(2));
 	}
 
-	// Set new rotation matrix
-	viewRotation_.setIdentity();
-	if (viewType_ == ViewPane::FlatXZView) viewRotation_.applyRotationX(-90.0);
-	else if (viewType_ == ViewPane::FlatYZView) viewRotation_.applyRotationY(90.0);
+	// Set new rotation matrix and translation vector (if not AutoStretchedView)
+	if (viewType_ != ViewPane::AutoStretchedView)
+	{
+		viewRotation_.setIdentity();
+		if (viewType_ == ViewPane::FlatXZView) viewRotation_.applyRotationX(90.0);
+		else if (viewType_ == ViewPane::FlatYZView) viewRotation_.applyRotationY(-90.0);
 
-	// Set a translation in order to set the margins as requested
-	// The viewTranslation_ is applied in 'normal' coordinate axes, so viewTranslation_.x is along screen x etc.
-// 	printf("Final globalMin = "); globalMin.print();
-// 	printf("Final globalMax = "); globalMax.print();
-// 	printf("Viewport is %i %i %i %i\n", viewportMatrix_[0], viewportMatrix_[1], viewportMatrix_[2], viewportMatrix_[3]);
-	viewTranslation_.zero();
-	viewTranslation_[0] = (margin - (globalMin.x - viewportMatrix_[0])) / unit.x;
-	viewTranslation_[1] = (margin - (globalMin.y - viewportMatrix_[1])) / unit.y;
-// 	viewTranslation_.print();
+		// Set a translation in order to set the margins as requested
+		// The viewTranslation_ is applied in 'normal' coordinate axes, so viewTranslation_.x is along screen x etc.
+		viewTranslation_.zero();
+		viewTranslation_[0] = (margin - (globalMin.x - viewportMatrix_[0])) / unit.x;
+		viewTranslation_[1] = (margin - (globalMin.y - viewportMatrix_[1])) / unit.y;
+	}
 
 	// Store new versions of view
 	viewAxesUsedAt_ = axes().axesVersion();
@@ -954,7 +942,7 @@ void ViewPane::resetViewMatrix()
 	if (viewType_ <= ViewPane::AutoStretchedView)
 	{
 		viewRotation_.setIdentity();
-		viewTranslation_.set(0.0, 0.0, zOffset_);
+		viewTranslation_.set(0.0, 0.0, 0.0);
 
 		// Calculate zoom to show all data
 		viewTranslation_.z = calculateRequiredZoom(axes_.range(0)*0.5, axes_.range(1)*0.5, 0.9);
@@ -1002,24 +990,18 @@ void ViewPane::renderData(const QGLContext* context, GLExtensions* extensions, b
  * Axes
  */
 
-// Return absolute minimum transformed values over all associated collections
+// Return absolute minimum transformed values over all displayed collections
 Vec3<double> ViewPane::transformedDataMinima()
 {
-	if (collectionTargets_.nItems() == 0) return Vec3<double>(0.0,0.0,0.0);
-
 	// Set starting values from first display collection we find
-	bool first = true;
+	int nCounted = 0;
 	Vec3<double> v, minima;
 	for (TargetData* target = collectionTargets_.first(); target != NULL; target = target->next)
 	{
 		// Loop over display targets
 		for (TargetPrimitive* prim = target->displayPrimitives(); prim != NULL; prim = prim->next)
 		{
-			if (first)
-			{
-				minima = prim->collection()->transformMin();
-				first = false;
-			}
+			if (nCounted == 0) minima = prim->collection()->transformMin();
 			else
 			{
 				v = target->collection()->transformMin();
@@ -1027,29 +1009,31 @@ Vec3<double> ViewPane::transformedDataMinima()
 				if (v.y < minima.y) minima.y = v.y;
 				if (v.z < minima.z) minima.z = v.z;
 			}
+			nCounted += prim->collection()->nDataPoints();
 		}
 	}
-	return minima;
+
+	// If we didn't have any data to work with, return the current axis limits
+	if (nCounted == 0) return Vec3<double>(axes_.limitMin(0), axes_.limitMin(1), axes_.limitMin(2));
+	else return minima;
 }
 
 // Return absolute maximum transformed values over all associated collections
 Vec3<double> ViewPane::transformedDataMaxima()
 {
-	if (collectionTargets_.nItems() == 0) return Vec3<double>(0.0,0.0,0.0);
-
 	// Set starting values from first display collection we find
-	bool first = true;
+	int nCounted = 0;
 	Vec3<double> v, maxima;
 	for (TargetData* target = collectionTargets_.first(); target != NULL; target = target->next)
 	{
 		// Loop over display targets
 		for (TargetPrimitive* prim = target->displayPrimitives(); prim != NULL; prim = prim->next)
 		{
-			if (first)
-			{
-				maxima = prim->collection()->transformMax();
-				first = false;
-			}
+			// Check number of datapoints in target
+			if (prim->collection()->nDataPoints() == 0) continue;
+
+			// Set limits...
+			if (nCounted == 0) maxima = prim->collection()->transformMax();
 			else
 			{
 				v = target->collection()->transformMax();
@@ -1057,29 +1041,27 @@ Vec3<double> ViewPane::transformedDataMaxima()
 				if (v.y > maxima.y) maxima.y = v.y;
 				if (v.z > maxima.z) maxima.z = v.z;
 			}
+			nCounted += prim->collection()->nDataPoints();
 		}
 	}
-	return maxima;
+
+	// If we didn't have any data to work with, return the current axis limits
+	if (nCounted == 0) return Vec3<double>(axes_.limitMax(0), axes_.limitMax(1), axes_.limitMax(2));
+	else return maxima;
 }
 
 // Return absolute minimum positive transformed values over all associated collections
 Vec3<double> ViewPane::transformedDataPositiveMinima()
 {
-	if (collectionTargets_.nItems() == 0) return Vec3<double>(0.0,0.0,0.0);
-
 	// Set starting values from first display collection we find
-	bool first = true;
+	int nCounted = 0;
 	Vec3<double> v, minima;
 	for (TargetData* target = collectionTargets_.first(); target != NULL; target = target->next)
 	{
 		// Loop over display targets
 		for (TargetPrimitive* prim = target->displayPrimitives(); prim != NULL; prim = prim->next)
 		{
-			if (first)
-			{
-				minima = prim->collection()->transformMinPositive();
-				first = false;
-			}
+			if (nCounted == 0) minima = prim->collection()->transformMinPositive();
 			else
 			{
 				v = target->collection()->transformMinPositive();
@@ -1087,29 +1069,27 @@ Vec3<double> ViewPane::transformedDataPositiveMinima()
 				if (v.y < minima.y) minima.y = v.y;
 				if (v.z < minima.z) minima.z = v.z;
 			}
+			nCounted += prim->collection()->nDataPoints();
 		}
 	}
-	return minima;
+
+	// If we didn't have any data to work with, return the current axis limits
+	if (nCounted == 0) return Vec3<double>(axes_.limitMin(0), axes_.limitMin(1), axes_.limitMin(2));
+	else return minima;
 }
 
 // Return absolute maximum positive transformed values over all associated collections
 Vec3<double> ViewPane::transformedDataPositiveMaxima()
 {
-	if (collectionTargets_.nItems() == 0) return Vec3<double>(0.0,0.0,0.0);
-
 	// Set starting values from first display collection we find
-	bool first = true;
+	int nCounted = 0;
 	Vec3<double> v, maxima;
 	for (TargetData* target = collectionTargets_.first(); target != NULL; target = target->next)
 	{
 		// Loop over display targets
 		for (TargetPrimitive* prim = target->displayPrimitives(); prim != NULL; prim = prim->next)
 		{
-			if (first)
-			{
-				maxima = prim->collection()->transformMaxPositive();
-				first = false;
-			}
+			if (nCounted == 0) maxima = prim->collection()->transformMaxPositive();
 			else
 			{
 				v = target->collection()->transformMaxPositive();
@@ -1117,9 +1097,13 @@ Vec3<double> ViewPane::transformedDataPositiveMaxima()
 				if (v.y > maxima.y) maxima.y = v.y;
 				if (v.z > maxima.z) maxima.z = v.z;
 			}
+			nCounted += prim->collection()->nDataPoints();
 		}
 	}
-	return maxima;
+
+	// If we didn't have any data to work with, return the current axis limits
+	if (nCounted == 0) return Vec3<double>(axes_.limitMax(0), axes_.limitMax(1), axes_.limitMax(2));
+	else return maxima;
 }
 
 // Return axes for this pane
@@ -1174,7 +1158,7 @@ void ViewPane::collectionsUpdateCurrentSlices(int axis, double axisValue)
 void ViewPane::calculateFontScaling()
 {
 	// Calculate text scaling factor
-	Vec3<double> unit = modelToScreen(Vec3<double>(0.0, 1.0, viewTranslation_.z), Matrix(), Vec3<double>(0.0, 0.0, zOffset_));
+	Vec3<double> unit = modelToScreen(Vec3<double>(0.0, 1.0, viewTranslation_.z), projectionMatrix_, Matrix(), Vec3<double>(0.0, 0.0, zOffset_));
 	unit.y -= viewportMatrix_[1] + viewportMatrix_[3]*0.5;
 	textZScale_ = unit.y;
 }

@@ -84,9 +84,10 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	// GridLines
 	gridLinesMajor_.set(false, false, false);
 	gridLinesMinor_.set(false, false, false);
-	
+
 	// Style override
-	useBestView_ = false;
+	useBestFlatView_ = false;
+	autoPositionTitles_ = false;
 
 	// Versions
 	axesVersion_ = 0;
@@ -183,6 +184,10 @@ void Axes::operator=(const Axes& source)
 	gridLineMinorStyle_[1] = source.gridLineMinorStyle_[1];
 	gridLineMajorStyle_[2] = source.gridLineMajorStyle_[2];
 	gridLineMinorStyle_[2] = source.gridLineMinorStyle_[2];
+
+	// Style helpers
+	useBestFlatView_ = source.useBestFlatView_;
+	autoPositionTitles_ = source.autoPositionTitles_;
 
 	// Versions
 	axesVersion_ = 0;
@@ -661,12 +666,12 @@ void Axes::setTickDirection(int axis, int dir, double value)
 // Return axis tick direction
 Vec3<double> Axes::tickDirection(int axis) const
 {
-	if ((!useBestView_) || (parent_.viewType() == ViewPane::NormalView)) return tickDirection_[axis];
+	if ((!useBestFlatView_) || (parent_.viewType() == ViewPane::NormalView)) return tickDirection_[axis];
 	else switch (parent_.viewType())
 	{
 		case (ViewPane::FlatXYView):	return (axis == 0 ? Vec3<double>(0.0, -1.0, 0.0) : Vec3<double>(-1.0, 0.0, 0.0));
-		case (ViewPane::FlatXZView):	return (axis == 0 ? Vec3<double>(0.0, -1.0, 0.0) : Vec3<double>(-1.0, 0.0, 0.0));
-		case (ViewPane::FlatYZView):	return (axis == 1 ? Vec3<double>(0.0, -1.0, 0.0) : Vec3<double>(-1.0, 0.0, 0.0));
+		case (ViewPane::FlatXZView):	return (axis == 0 ? Vec3<double>(0.0, 0.0, -1.0) : Vec3<double>(-1.0, 0.0, 0.0));
+		case (ViewPane::FlatYZView):	return (axis == 1 ? Vec3<double>(0.0, 0.0, -1.0) : Vec3<double>(0.0, -1.0, 0.0));
 	}
 }
 
@@ -774,12 +779,12 @@ void Axes::setLabelOrientation(int axis, int component, double value)
 // Return orientation of labels for specified axis
 Vec3<double> Axes::labelOrientation(int axis) const
 {
-	if ((!useBestView_) || (parent_.viewType() == ViewPane::NormalView)) return labelOrientation_[axis];
+	if ((!useBestFlatView_) || (parent_.viewType() == ViewPane::NormalView)) return labelOrientation_[axis];
 	else switch (parent_.viewType())
 	{
 		case (ViewPane::FlatXYView):	return (axis == 0 ? Vec3<double>(0.0, 0.0, 0.2) : Vec3<double>(0.0, 0.0, 0.2));
-		case (ViewPane::FlatXZView):	return (axis == 0 ? Vec3<double>(0.0, 0.0, 0.2) : Vec3<double>(0.0, 0.0, 0.2));
-		case (ViewPane::FlatYZView):	return (axis == 1 ? Vec3<double>(0.0, 0.0, 0.2) : Vec3<double>(0.0, 0.0, 0.2));
+		case (ViewPane::FlatXZView):	return (axis == 0 ? Vec3<double>(270.0, 0.0, 0.2) : Vec3<double>(270.0, 0.0, 0.2));
+		case (ViewPane::FlatYZView):	return (axis == 1 ? Vec3<double>(90.0, 0.0, 0.2) : Vec3<double>(90.0, 0.0, 0.2));
 	}
 
 	// Safety catch
@@ -799,6 +804,15 @@ void Axes::setLabelAnchor(int axis, TextPrimitive::TextAnchor anchor)
 // Return axis label text anchor position for specified axis
 TextPrimitive::TextAnchor Axes::labelAnchor(int axis) const
 {
+	if ((!useBestFlatView_) || (parent_.viewType() == ViewPane::NormalView)) return labelAnchor_[axis];
+	else switch (parent_.viewType())
+	{
+		case (ViewPane::FlatXYView):	return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::MiddleRightAnchor);
+		case (ViewPane::FlatXZView):	return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::MiddleRightAnchor);
+		case (ViewPane::FlatYZView):	return (axis == 1 ? TextPrimitive::MiddleRightAnchor : TextPrimitive::TopMiddleAnchor);
+	}
+
+	// Safety catch
 	return labelAnchor_[axis];
 }
 
@@ -831,12 +845,12 @@ void Axes::setTitleOrientation(int axis, int component, double value)
 // Return orientation of titles for specified axis
 Vec4<double> Axes::titleOrientation(int axis) const
 {
-	if ((!useBestView_) || (parent_.viewType() == ViewPane::NormalView)) return titleOrientation_[axis];
+	if ((!useBestFlatView_) || (parent_.viewType() == ViewPane::NormalView)) return titleOrientation_[axis];
 	else switch (parent_.viewType())
 	{
-		case (ViewPane::FlatXYView):	return (axis == 0 ? Vec4<double>(0.0, 0.0, 1.2, 0.5) : Vec4<double>(0.0, 270.0, 1.2, 0.5));
-		case (ViewPane::FlatXZView):	return (axis == 0 ? Vec4<double>(0.0, 0.0, 1.2, 0.5) : Vec4<double>(90.0, 90.0, 1.2, 0.5));
-		case (ViewPane::FlatYZView):	return (axis == 1 ? Vec4<double>(0.0, 0.0, 1.2, 0.5) : Vec4<double>(0.0, 0.0, 1.2, 0.5));
+		case (ViewPane::FlatXYView):	return (axis == 0 ? Vec4<double>(0.0, 0.0, 0.2, 0.5) : Vec4<double>(0.0, 270.0, 0.2, 0.5));
+		case (ViewPane::FlatXZView):	return (axis == 0 ? Vec4<double>(270.0, 0.0, 0.2, 0.5) : Vec4<double>(270.0, 90.0, 0.2, 0.5));
+		case (ViewPane::FlatYZView):	return (axis == 1 ? Vec4<double>(90.0, 90.0, 0.2, 0.5) : Vec4<double>(90.0, 0.0, 0.2, 0.5));
 	}
 
 	// Safety catch
@@ -846,6 +860,7 @@ Vec4<double> Axes::titleOrientation(int axis) const
 // Set axis title text anchor position for specified axis
 void Axes::setTitleAnchor(int axis, TextPrimitive::TextAnchor anchor)
 {
+
 	titleAnchor_[axis] = anchor;
 
 	++axesVersion_;
@@ -856,6 +871,15 @@ void Axes::setTitleAnchor(int axis, TextPrimitive::TextAnchor anchor)
 // Return axis title text anchor position for specified axis
 TextPrimitive::TextAnchor Axes::titleAnchor(int axis) const
 {
+	if ((!useBestFlatView_) || (parent_.viewType() == ViewPane::NormalView)) return titleAnchor_[axis];
+	else switch (parent_.viewType())
+	{
+		case (ViewPane::FlatXYView):	return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::BottomMiddleAnchor);
+		case (ViewPane::FlatXZView):	return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::TopMiddleAnchor);
+		case (ViewPane::FlatYZView):	return (axis == 1 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::TopMiddleAnchor);
+	}
+
+	// Safety catch
 	return titleAnchor_[axis];
 }
 
@@ -863,19 +887,32 @@ TextPrimitive::TextAnchor Axes::titleAnchor(int axis) const
  * Style Overrides
  */
 
-// Set whether to use best tick/label orientation for view
-void Axes::setUseBestView(bool b)
+// Set whether to use best tick/label orientation for flat views
+void Axes::setUseBestFlatView(bool b)
 {
-	useBestView_ = b;
+	useBestFlatView_ = b;
 
-	printf("Use best view is now... %i\n", useBestView_);
 	++axesVersion_;
 }
 
-// Return whether to use best tick/label orientation for view
-bool Axes::useBestView()
+// Return whether to use best tick/label orientation for flat views
+bool Axes::useBestFlatView()
 {
-	return useBestView_;
+	return useBestFlatView_;
+}
+
+// Set whether to automatically place titles at a sensible position after label text
+void Axes::setAutoPositionTitles(bool b)
+{
+	autoPositionTitles_ = b;
+
+	++axesVersion_;
+}
+
+// Return whether to automatically place titles at a sensible position after label text
+bool Axes::autoPositionTitles()
+{
+	return autoPositionTitles_;
 }
 
 /*
@@ -962,14 +999,18 @@ void Axes::updateAxisPrimitives()
 	Vec3<double> centre;
 	double dpX, dpY, textWidth, delta, value, clipPlaneDelta = 0.0001;
 	int n;
-	Vec3<double> u, v1, v2, tickDir;
+	Vec3<double> u, v1, v2, tickDir, adjustment;
 	Matrix labelTransform, titleTransform;
 	Array<double> tickPositions[3];
 	Array<bool> tickIsMajor[3];
-	bool autoPositionTitle[3] = { false, false, false };
 
 	// Make sure coordinates are up-to-date
 	updateCoordinates();
+
+	// Set a flag for in-plane rotation around Y rather than Z axis
+	int inPlaneAxis = 2;
+	if (parent_.viewType() == ViewPane::FlatXZView) inPlaneAxis = 1;
+	else if (parent_.viewType() == ViewPane::FlatYZView) inPlaneAxis = 0;
 
 	// Set Y clip
 	if (logarithmic_.y)
@@ -997,18 +1038,25 @@ void Axes::updateAxisPrimitives()
 
 		// Create tick label transformation matrix
 		labelTransform.setIdentity();
-		// -- 1) Apply axial rotation along X axis (left-to-right direction)
-		labelTransform.applyRotationX(labelOrientation(axis).x);
+		// -- 1) Apply axial rotation along label left-to-right direction
+		if (parent_.viewType() == ViewPane::FlatYZView) labelTransform.applyRotationY(labelOrientation(axis).x);
+		else labelTransform.applyRotationX(labelOrientation(axis).x);
 		// -- 2) Perform in-plane rotation
-		labelTransform.applyRotationZ(labelOrientation(axis).y);
+		if (inPlaneAxis == 0) labelTransform.applyRotationX(labelOrientation(axis).y);
+		else if (inPlaneAxis == 1) labelTransform.applyRotationY(labelOrientation(axis).y);
+		else labelTransform.applyRotationZ(labelOrientation(axis).y);
 
 		// Create axis title transformation matrix
 		titleTransform.setIdentity();
-		// -- 1) Apply axial rotation along X axis (left-to-right direction)
-		titleTransform.applyRotationX(titleOrientation(axis).x);
+		// -- 1) Apply axial rotation along label left-to-right direction
+		if (parent_.viewType() == ViewPane::FlatYZView) titleTransform.applyRotationY(titleOrientation(axis).x);
+		else titleTransform.applyRotationX(titleOrientation(axis).x);
 		// -- 2) Perform in-plane rotation
-		titleTransform.applyRotationZ(titleOrientation(axis).y);
+		if (inPlaneAxis == 0) titleTransform.applyRotationX(titleOrientation(axis).y);
+		else if (inPlaneAxis == 1) titleTransform.applyRotationY(titleOrientation(axis).y);
+		else titleTransform.applyRotationZ(titleOrientation(axis).y);
 
+		// Add axis labels
 		if (logarithmic_[axis])
 		{
 			// For the log axis, the associated surface data coordinate will already be in log form
@@ -1051,7 +1099,7 @@ void Axes::updateAxisPrimitives()
 						// Get formatted value text
 						s = numberFormat_[axis].format(value);
 
-						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor_[axis], tickDir * (tickSize_[axis]+labelOrientation_[axis].z), labelTransform, parent_.labelPointSize());
+						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor(axis), tickDir * labelOrientation(axis).z, labelTransform, parent_.labelPointSize());
 					}
 				}
 
@@ -1065,12 +1113,6 @@ void Axes::updateAxisPrimitives()
 				}
 				else value += pow(10,power);
 			}
-
-			// Add axis title
-			u = coordMin_[axis];
-			value = log10(min_[axis]) + log10(max_[axis]/min_[axis]) * titleOrientation_[axis].w;
-			u.set(axis, (inverted_[axis] ? log10(max_[axis])-value : value) * stretch_[axis]);
-			titlePrimitives_[axis].add(title_[axis], u, titleAnchor_[axis], tickDir * titleOrientation_[axis].z, titleTransform, parent_.titlePointSize());
 		}
 		else
 		{
@@ -1103,7 +1145,7 @@ void Axes::updateAxisPrimitives()
 						// Get formatted label text
 						s = numberFormat_[axis].format(value);
 
-						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor_[axis], tickDir * (tickSize_[axis] + labelOrientation_[axis].z), labelTransform, parent_.labelPointSize());
+						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor(axis), tickDir * labelOrientation(axis).z, labelTransform, parent_.labelPointSize());
 
 						tickIsMajor[axis].add(true);
 
@@ -1119,33 +1161,41 @@ void Axes::updateAxisPrimitives()
 				value += delta;
 				++count;
 			}
-
-			if (autoPositionTitle[axis])
-			{
-				printf("autoPosition %i\n", axis);
-				Cuboid cuboid = labelPrimitives_[axis].boundingCuboid(parent_, false, parent_.textZScale());
-				// Project tick direction onto cuboid width/height
-				Vec3<double> extent = cuboid.maxima() - cuboid.minima();
-				printf("Minima = "); cuboid.minima().print();
-				printf("Maxima = "); cuboid.maxima().print();
-				printf("Extent = "); extent.print();
-				extent.multiply(tickDir);
-				extent *= 10.0;
-				printf("Modified = "); extent.print();
-				u = coordMin_[axis];
-				value = min_[axis] + (max_[axis] - min_[axis]) * titleOrientation_[axis].w;
-				u.set(axis, (inverted_[axis] ? (max_[axis] - value) + min_[axis]: value) * stretch_[axis]);
-				titlePrimitives_[axis].add(title_[axis], u + tickDir*tickSize_[axis], titleAnchor_[axis], extent, titleTransform, parent_.titlePointSize());
-			}
-			else
-			{
-				// Add axis title
-				u = coordMin_[axis];
-				value = min_[axis] + (max_[axis] - min_[axis]) * titleOrientation_[axis].w;
-				u.set(axis, (inverted_[axis] ? (max_[axis] - value) + min_[axis]: value) * stretch_[axis]);
-				titlePrimitives_[axis].add(title_[axis], u, titleAnchor_[axis], tickDir * titleOrientation_[axis].z, titleTransform, parent_.titlePointSize());
-			}
 		}
+
+		// Add axis title
+		// -- Set basic position (corresponding to offset position of tick labels combined with title label axis position to start with...)
+		u = coordMin_[axis];
+		if (logarithmic_[axis])
+		{
+			value = log10(min_[axis]) + log10(max_[axis]/min_[axis]) * titleOrientation_[axis].w;
+			u.set(axis, (inverted_[axis] ? log10(max_[axis])-value : value) * stretch_[axis]);
+		}
+		else
+		{
+			value = min_[axis] + (max_[axis] - min_[axis]) * titleOrientation(axis).w;
+			u.set(axis, (inverted_[axis] ? (max_[axis] - value) + min_[axis]: value) * stretch_[axis]);
+		}
+		// -- Next step depends on whether we are automatically adjusting label positions
+		if (useBestFlatView_ || autoPositionTitles_)
+		{
+			Cuboid cuboid = labelPrimitives_[axis].boundingCuboid(parent_, false, parent_.textZScale());
+			// Project tick direction onto cuboid width/height
+			// TODO This does not account for the fact that the bounding cuboid may only partly extend over the end of ths axis tick mark (e.g. as with in-plane rotations/TopMiddle anchors)...
+			Vec3<double> extent = cuboid.maxima() - cuboid.minima();
+			extent.multiply(tickDir);
+			// -- Add on extra distance from tick mark
+			u += tickDir * (tickSize_[axis]);
+			// -- Create adjustment vector. Start by adding space between tickmark, label text, and title text
+			adjustment = tickDir * (labelOrientation(axis).z + 0.2);
+			// -- Add on label extent in the tickmark direction - we must undo the scaling on the bounding box arising from display scales etc.
+			adjustment += (tickDir * extent.magnitude()) / (FontInstance::fontBaseHeight() * parent_.labelPointSize() / parent_.textZScale());
+			// -- Scaling will be done by the title point size in TextPrimitive, but all our adjustments were done with label point size, so scale it...
+			adjustment *= parent_.labelPointSize() / parent_.titlePointSize();
+		}
+		else adjustment = tickDir * titleOrientation(axis).z;
+		// -- Add primitive
+		titlePrimitives_[axis].add(title_[axis], u, titleAnchor(axis), adjustment, titleTransform, parent_.titlePointSize());
 	}
 
 	// GridLines

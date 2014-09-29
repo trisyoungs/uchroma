@@ -700,6 +700,10 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 		}
 		switch (viewPaneKwd)
 		{
+			// Auto Position Axis Titles
+			case (Keywords::AutoPositionTitlesKeyword):
+				pane->axes().setAutoPositionTitles(parser.argb(1));
+				break;
 			// Axis block
 			case (Keywords::AxisBlockKeyword):
 				// Get target axis...
@@ -783,6 +787,10 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 			// Translation
 			case (Keywords::TranslationKeyword):
 				pane->setViewTranslation(parser.argd(1), parser.argd(2), parser.argd(3));
+				break;
+			// Use best flat view
+			case (Keywords::UseBestFlatViewKeyword):
+				pane->axes().setUseBestFlatView(parser.argb(1));
 				break;
 			// View Type
 			case (Keywords::ViewTypeKeyword):

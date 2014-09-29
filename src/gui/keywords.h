@@ -232,6 +232,7 @@ class Keywords
 	// ViewPane Block Keyword Enum
 	enum ViewPaneKeyword
 	{
+		AutoPositionTitlesKeyword,
 		AxisBlockKeyword,
 		BoundingBoxKeyword,
 		BoundingBoxPlaneYKeyword,
@@ -247,6 +248,7 @@ class Keywords
 		RotationZKeyword,
 		TitlePointSizeKeyword,
 		TranslationKeyword,
+		UseBestFlatViewKeyword,
 		ViewTypeKeyword,
 		nViewPaneKeywords
 	};

@@ -1370,11 +1370,22 @@ void AxesWindow::on_ZGridLineApplyStyleButton_clicked(bool checked)
 
 // Options
 
-void AxesWindow::on_UseBestViewCheck_clicked(bool checked)
+void AxesWindow::on_UseBestFlatViewCheck_clicked(bool checked)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return;
 	
-	currentAxes().setUseBestView(checked);
+	currentAxes().setUseBestFlatView(checked);
+
+	updateControls();
+
+	uChroma_.updateDisplay();
+}
+
+void AxesWindow::on_AutoPositionTitlesCheck_clicked(bool checked)
+{
+	if (refreshing_ || (!haveCurrentAxes())) return;
+	
+	currentAxes().setAutoPositionTitles(checked);
 
 	updateControls();
 
@@ -1588,7 +1599,8 @@ void AxesWindow::updateControls(bool force)
 	ui.ZGridLineFullCheck->setChecked(axes.gridLinesFull(2));
 
 	// Options
-	ui.UseBestViewCheck->setChecked(axes.useBestView());
+	ui.UseBestFlatViewCheck->setChecked(axes.useBestFlatView());
+	ui.AutoPositionTitlesCheck->setChecked(axes.autoPositionTitles());
 
 	refreshing_ = false;
 }
