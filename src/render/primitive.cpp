@@ -202,8 +202,8 @@ void Primitive::popInstance(const QGLContext *context)
 			}
 			else if (pi->listObject() != 0) glDeleteLists(pi->listObject(),1);
 		}
+		instances_.removeLast();
 	}
-	instances_.removeLast();
 }
 
 // Return number of instances available

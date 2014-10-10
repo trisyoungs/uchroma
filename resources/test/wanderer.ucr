@@ -9,19 +9,19 @@ Collection 'Wanderer'
   Interpolate false false
   InterpolateConstrain false false
   InterpolateStep 1.000000 1.000000
-  ColourSource 2
+  ColourSource 'SingleColour'
   ColourSingle 0 0 0 255
   ColourLinearRGBA 0.000000 255 255 255 255
   ColourLinearRGBB 1.000000 0 0 255 255
   ColourLinearHSVA 0.000000 0 255 255 255
   ColourLinearHSVB 1.000000 256 215 255 255
-  ColourAlphaControl 0
-  ColourAlphaFixed 46.000000
+  ColourAlphaControl 'OwnAlpha'
+  ColourAlphaFixed 0.500000
   Style LineXY
   Visible true
   DataSet '/home/tris/src/uchroma/test/gauss00.txt'
-    Source  File  'test/gauss00.txt'
-    Z  0.000000
+    Source File 'test/gauss00.txt'
+    Z 0.000000
     Data
       -4.000000  0.000000
       -3.983970  0.000000
@@ -526,8 +526,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss01.txt'
-    Source  File  'test/gauss01.txt'
-    Z  1.000000
+    Source File 'test/gauss01.txt'
+    Z 1.000000
     Data
       -3.874670  0.000000
       -3.858640  0.000000
@@ -1032,8 +1032,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss02.txt'
-    Source  File  'test/gauss02.txt'
-    Z  2.000000
+    Source File 'test/gauss02.txt'
+    Z 2.000000
     Data
       -3.751310  0.000000
       -3.735280  0.000000
@@ -1538,8 +1538,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss03.txt'
-    Source  File  'test/gauss03.txt'
-    Z  3.000000
+    Source File 'test/gauss03.txt'
+    Z 3.000000
     Data
       -3.631880  0.000000
       -3.615850  0.000000
@@ -2044,8 +2044,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss04.txt'
-    Source  File  'test/gauss04.txt'
-    Z  4.000000
+    Source File 'test/gauss04.txt'
+    Z 4.000000
     Data
       -3.518250  0.000000
       -3.502220  0.000000
@@ -2550,8 +2550,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss05.txt'
-    Source  File  'test/gauss05.txt'
-    Z  5.000000
+    Source File 'test/gauss05.txt'
+    Z 5.000000
     Data
       -3.412220  0.000000
       -3.396190  0.000000
@@ -3056,8 +3056,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss06.txt'
-    Source  File  'test/gauss06.txt'
-    Z  6.000000
+    Source File 'test/gauss06.txt'
+    Z 6.000000
     Data
       -3.315450  0.000000
       -3.299420  0.000000
@@ -3562,8 +3562,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss07.txt'
-    Source  File  'test/gauss07.txt'
-    Z  7.000000
+    Source File 'test/gauss07.txt'
+    Z 7.000000
     Data
       -3.229490  0.000000
       -3.213460  0.000000
@@ -4068,8 +4068,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss08.txt'
-    Source  File  'test/gauss08.txt'
-    Z  8.000000
+    Source File 'test/gauss08.txt'
+    Z 8.000000
     Data
       -3.155670  0.000000
       -3.139640  0.000000
@@ -4574,8 +4574,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss09.txt'
-    Source  File  'test/gauss09.txt'
-    Z  9.000000
+    Source File 'test/gauss09.txt'
+    Z 9.000000
     Data
       -3.095170  0.000000
       -3.079140  0.000000
@@ -5080,8 +5080,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss10.txt'
-    Source  File  'test/gauss10.txt'
-    Z  10.000000
+    Source File 'test/gauss10.txt'
+    Z 10.000000
     Data
       -3.048940  0.000000
       -3.032910  0.000000
@@ -5586,8 +5586,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss11.txt'
-    Source  File  'test/gauss11.txt'
-    Z  11.000000
+    Source File 'test/gauss11.txt'
+    Z 11.000000
     Data
       -3.017710  0.000000
       -3.001680  0.000000
@@ -6092,8 +6092,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss12.txt'
-    Source  File  'test/gauss12.txt'
-    Z  12.000000
+    Source File 'test/gauss12.txt'
+    Z 12.000000
     Data
       -3.001970  0.000000
       -2.985940  0.000000
@@ -6598,8 +6598,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss13.txt'
-    Source  File  'test/gauss13.txt'
-    Z  13.000000
+    Source File 'test/gauss13.txt'
+    Z 13.000000
     Data
       -3.001970  0.000000
       -2.985940  0.000000
@@ -7104,8 +7104,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss14.txt'
-    Source  File  'test/gauss14.txt'
-    Z  14.000000
+    Source File 'test/gauss14.txt'
+    Z 14.000000
     Data
       -3.017710  0.000000
       -3.001680  0.000000
@@ -7610,8 +7610,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss15.txt'
-    Source  File  'test/gauss15.txt'
-    Z  15.000000
+    Source File 'test/gauss15.txt'
+    Z 15.000000
     Data
       -3.048940  0.000000
       -3.032910  0.000000
@@ -8116,8 +8116,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss16.txt'
-    Source  File  'test/gauss16.txt'
-    Z  16.000000
+    Source File 'test/gauss16.txt'
+    Z 16.000000
     Data
       -3.095170  0.000000
       -3.079140  0.000000
@@ -8622,8 +8622,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss17.txt'
-    Source  File  'test/gauss17.txt'
-    Z  17.000000
+    Source File 'test/gauss17.txt'
+    Z 17.000000
     Data
       -3.155670  0.000000
       -3.139640  0.000000
@@ -9128,8 +9128,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss18.txt'
-    Source  File  'test/gauss18.txt'
-    Z  18.000000
+    Source File 'test/gauss18.txt'
+    Z 18.000000
     Data
       -3.229490  0.000000
       -3.213460  0.000000
@@ -9634,8 +9634,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss19.txt'
-    Source  File  'test/gauss19.txt'
-    Z  19.000000
+    Source File 'test/gauss19.txt'
+    Z 19.000000
     Data
       -3.315450  0.000000
       -3.299420  0.000000
@@ -10140,8 +10140,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss20.txt'
-    Source  File  'test/gauss20.txt'
-    Z  20.000000
+    Source File 'test/gauss20.txt'
+    Z 20.000000
     Data
       -3.412210  0.000000
       -3.396180  0.000000
@@ -10646,8 +10646,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss21.txt'
-    Source  File  'test/gauss21.txt'
-    Z  21.000000
+    Source File 'test/gauss21.txt'
+    Z 21.000000
     Data
       -3.518240  0.000000
       -3.502210  0.000000
@@ -11152,8 +11152,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss22.txt'
-    Source  File  'test/gauss22.txt'
-    Z  22.000000
+    Source File 'test/gauss22.txt'
+    Z 22.000000
     Data
       -3.631870  0.000000
       -3.615840  0.000000
@@ -11658,8 +11658,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss23.txt'
-    Source  File  'test/gauss23.txt'
-    Z  23.000000
+    Source File 'test/gauss23.txt'
+    Z 23.000000
     Data
       -3.751310  0.000000
       -3.735280  0.000000
@@ -12164,8 +12164,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss24.txt'
-    Source  File  'test/gauss24.txt'
-    Z  24.000000
+    Source File 'test/gauss24.txt'
+    Z 24.000000
     Data
       -3.874660  0.000000
       -3.858630  0.000000
@@ -12670,8 +12670,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss25.txt'
-    Source  File  'test/gauss25.txt'
-    Z  25.000000
+    Source File 'test/gauss25.txt'
+    Z 25.000000
     Data
       -4.000000  0.000000
       -3.983970  0.000000
@@ -13176,8 +13176,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss26.txt'
-    Source  File  'test/gauss26.txt'
-    Z  26.000000
+    Source File 'test/gauss26.txt'
+    Z 26.000000
     Data
       -4.125330  0.000000
       -4.109300  0.000000
@@ -13682,8 +13682,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss27.txt'
-    Source  File  'test/gauss27.txt'
-    Z  27.000000
+    Source File 'test/gauss27.txt'
+    Z 27.000000
     Data
       -4.248690  0.000000
       -4.232660  0.000000
@@ -14188,8 +14188,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss28.txt'
-    Source  File  'test/gauss28.txt'
-    Z  28.000000
+    Source File 'test/gauss28.txt'
+    Z 28.000000
     Data
       -4.368120  0.000000
       -4.352090  0.000000
@@ -14694,8 +14694,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss29.txt'
-    Source  File  'test/gauss29.txt'
-    Z  29.000000
+    Source File 'test/gauss29.txt'
+    Z 29.000000
     Data
       -4.481750  0.000000
       -4.465720  0.000000
@@ -15200,8 +15200,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss30.txt'
-    Source  File  'test/gauss30.txt'
-    Z  30.000000
+    Source File 'test/gauss30.txt'
+    Z 30.000000
     Data
       -4.587780  0.000000
       -4.571750  0.000000
@@ -15706,8 +15706,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss31.txt'
-    Source  File  'test/gauss31.txt'
-    Z  31.000000
+    Source File 'test/gauss31.txt'
+    Z 31.000000
     Data
       -4.684540  0.000000
       -4.668510  0.000000
@@ -16212,8 +16212,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss32.txt'
-    Source  File  'test/gauss32.txt'
-    Z  32.000000
+    Source File 'test/gauss32.txt'
+    Z 32.000000
     Data
       -4.770510  0.000000
       -4.754480  0.000000
@@ -16718,8 +16718,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss33.txt'
-    Source  File  'test/gauss33.txt'
-    Z  33.000000
+    Source File 'test/gauss33.txt'
+    Z 33.000000
     Data
       -4.844330  0.000000
       -4.828300  0.000000
@@ -17224,8 +17224,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss34.txt'
-    Source  File  'test/gauss34.txt'
-    Z  34.000000
+    Source File 'test/gauss34.txt'
+    Z 34.000000
     Data
       -4.904830  0.000000
       -4.888800  0.000000
@@ -17730,8 +17730,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss35.txt'
-    Source  File  'test/gauss35.txt'
-    Z  35.000000
+    Source File 'test/gauss35.txt'
+    Z 35.000000
     Data
       -4.951060  0.000000
       -4.935030  0.000000
@@ -18236,8 +18236,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss36.txt'
-    Source  File  'test/gauss36.txt'
-    Z  36.000000
+    Source File 'test/gauss36.txt'
+    Z 36.000000
     Data
       -4.982290  0.000000
       -4.966260  0.000000
@@ -18742,8 +18742,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss37.txt'
-    Source  File  'test/gauss37.txt'
-    Z  37.000000
+    Source File 'test/gauss37.txt'
+    Z 37.000000
     Data
       -4.998030  0.000000
       -4.982000  0.000000
@@ -19248,8 +19248,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss38.txt'
-    Source  File  'test/gauss38.txt'
-    Z  38.000000
+    Source File 'test/gauss38.txt'
+    Z 38.000000
     Data
       -4.998030  0.000000
       -4.982000  0.000000
@@ -19754,8 +19754,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss39.txt'
-    Source  File  'test/gauss39.txt'
-    Z  39.000000
+    Source File 'test/gauss39.txt'
+    Z 39.000000
     Data
       -4.982290  0.000000
       -4.966260  0.000000
@@ -20260,8 +20260,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss40.txt'
-    Source  File  'test/gauss40.txt'
-    Z  40.000000
+    Source File 'test/gauss40.txt'
+    Z 40.000000
     Data
       -4.951060  0.000000
       -4.935030  0.000000
@@ -20766,8 +20766,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss41.txt'
-    Source  File  'test/gauss41.txt'
-    Z  41.000000
+    Source File 'test/gauss41.txt'
+    Z 41.000000
     Data
       -4.904830  0.000000
       -4.888800  0.000000
@@ -21272,8 +21272,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss42.txt'
-    Source  File  'test/gauss42.txt'
-    Z  42.000000
+    Source File 'test/gauss42.txt'
+    Z 42.000000
     Data
       -4.844330  0.000000
       -4.828300  0.000000
@@ -21778,8 +21778,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss43.txt'
-    Source  File  'test/gauss43.txt'
-    Z  43.000000
+    Source File 'test/gauss43.txt'
+    Z 43.000000
     Data
       -4.770520  0.000000
       -4.754490  0.000000
@@ -22284,8 +22284,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss44.txt'
-    Source  File  'test/gauss44.txt'
-    Z  44.000000
+    Source File 'test/gauss44.txt'
+    Z 44.000000
     Data
       -4.684550  0.000000
       -4.668520  0.000000
@@ -22790,8 +22790,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss45.txt'
-    Source  File  'test/gauss45.txt'
-    Z  45.000000
+    Source File 'test/gauss45.txt'
+    Z 45.000000
     Data
       -4.587790  0.000000
       -4.571760  0.000000
@@ -23296,8 +23296,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss46.txt'
-    Source  File  'test/gauss46.txt'
-    Z  46.000000
+    Source File 'test/gauss46.txt'
+    Z 46.000000
     Data
       -4.481760  0.000000
       -4.465730  0.000000
@@ -23802,8 +23802,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss47.txt'
-    Source  File  'test/gauss47.txt'
-    Z  47.000000
+    Source File 'test/gauss47.txt'
+    Z 47.000000
     Data
       -4.368130  0.000000
       -4.352100  0.000000
@@ -24308,8 +24308,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss48.txt'
-    Source  File  'test/gauss48.txt'
-    Z  48.000000
+    Source File 'test/gauss48.txt'
+    Z 48.000000
     Data
       -4.248690  0.000000
       -4.232660  0.000000
@@ -24814,8 +24814,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss49.txt'
-    Source  File  'test/gauss49.txt'
-    Z  49.000000
+    Source File 'test/gauss49.txt'
+    Z 49.000000
     Data
       -4.125340  0.000000
       -4.109310  0.000000
@@ -25320,8 +25320,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss50.txt'
-    Source  File  'test/gauss50.txt'
-    Z  50.000000
+    Source File 'test/gauss50.txt'
+    Z 50.000000
     Data
       -4.000010  0.000000
       -3.983980  0.000000
@@ -25826,8 +25826,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss00.txt'
-    Source  File  'test/gauss00.txt'
-    Z  50.000000
+    Source File 'test/gauss00.txt'
+    Z 50.000000
     Data
       -4.000000  0.000000
       -3.983970  0.000000
@@ -26332,8 +26332,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss01.txt'
-    Source  File  'test/gauss01.txt'
-    Z  51.000000
+    Source File 'test/gauss01.txt'
+    Z 51.000000
     Data
       -3.874670  0.000000
       -3.858640  0.000000
@@ -26838,8 +26838,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss02.txt'
-    Source  File  'test/gauss02.txt'
-    Z  52.000000
+    Source File 'test/gauss02.txt'
+    Z 52.000000
     Data
       -3.751310  0.000000
       -3.735280  0.000000
@@ -27344,8 +27344,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss03.txt'
-    Source  File  'test/gauss03.txt'
-    Z  53.000000
+    Source File 'test/gauss03.txt'
+    Z 53.000000
     Data
       -3.631880  0.000000
       -3.615850  0.000000
@@ -27850,8 +27850,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss04.txt'
-    Source  File  'test/gauss04.txt'
-    Z  54.000000
+    Source File 'test/gauss04.txt'
+    Z 54.000000
     Data
       -3.518250  0.000000
       -3.502220  0.000000
@@ -28356,8 +28356,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss05.txt'
-    Source  File  'test/gauss05.txt'
-    Z  55.000000
+    Source File 'test/gauss05.txt'
+    Z 55.000000
     Data
       -3.412220  0.000000
       -3.396190  0.000000
@@ -28862,8 +28862,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss06.txt'
-    Source  File  'test/gauss06.txt'
-    Z  56.000000
+    Source File 'test/gauss06.txt'
+    Z 56.000000
     Data
       -3.315450  0.000000
       -3.299420  0.000000
@@ -29368,8 +29368,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss07.txt'
-    Source  File  'test/gauss07.txt'
-    Z  57.000000
+    Source File 'test/gauss07.txt'
+    Z 57.000000
     Data
       -3.229490  0.000000
       -3.213460  0.000000
@@ -29874,8 +29874,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss08.txt'
-    Source  File  'test/gauss08.txt'
-    Z  58.000000
+    Source File 'test/gauss08.txt'
+    Z 58.000000
     Data
       -3.155670  0.000000
       -3.139640  0.000000
@@ -30380,8 +30380,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss09.txt'
-    Source  File  'test/gauss09.txt'
-    Z  59.000000
+    Source File 'test/gauss09.txt'
+    Z 59.000000
     Data
       -3.095170  0.000000
       -3.079140  0.000000
@@ -30886,8 +30886,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss10.txt'
-    Source  File  'test/gauss10.txt'
-    Z  60.000000
+    Source File 'test/gauss10.txt'
+    Z 60.000000
     Data
       -3.048940  0.000000
       -3.032910  0.000000
@@ -31392,8 +31392,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss11.txt'
-    Source  File  'test/gauss11.txt'
-    Z  61.000000
+    Source File 'test/gauss11.txt'
+    Z 61.000000
     Data
       -3.017710  0.000000
       -3.001680  0.000000
@@ -31898,8 +31898,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss12.txt'
-    Source  File  'test/gauss12.txt'
-    Z  62.000000
+    Source File 'test/gauss12.txt'
+    Z 62.000000
     Data
       -3.001970  0.000000
       -2.985940  0.000000
@@ -32404,8 +32404,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss13.txt'
-    Source  File  'test/gauss13.txt'
-    Z  63.000000
+    Source File 'test/gauss13.txt'
+    Z 63.000000
     Data
       -3.001970  0.000000
       -2.985940  0.000000
@@ -32910,8 +32910,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss14.txt'
-    Source  File  'test/gauss14.txt'
-    Z  64.000000
+    Source File 'test/gauss14.txt'
+    Z 64.000000
     Data
       -3.017710  0.000000
       -3.001680  0.000000
@@ -33416,8 +33416,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss15.txt'
-    Source  File  'test/gauss15.txt'
-    Z  65.000000
+    Source File 'test/gauss15.txt'
+    Z 65.000000
     Data
       -3.048940  0.000000
       -3.032910  0.000000
@@ -33922,8 +33922,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss16.txt'
-    Source  File  'test/gauss16.txt'
-    Z  66.000000
+    Source File 'test/gauss16.txt'
+    Z 66.000000
     Data
       -3.095170  0.000000
       -3.079140  0.000000
@@ -34428,8 +34428,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss17.txt'
-    Source  File  'test/gauss17.txt'
-    Z  67.000000
+    Source File 'test/gauss17.txt'
+    Z 67.000000
     Data
       -3.155670  0.000000
       -3.139640  0.000000
@@ -34934,8 +34934,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss18.txt'
-    Source  File  'test/gauss18.txt'
-    Z  68.000000
+    Source File 'test/gauss18.txt'
+    Z 68.000000
     Data
       -3.229490  0.000000
       -3.213460  0.000000
@@ -35440,8 +35440,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss19.txt'
-    Source  File  'test/gauss19.txt'
-    Z  69.000000
+    Source File 'test/gauss19.txt'
+    Z 69.000000
     Data
       -3.315450  0.000000
       -3.299420  0.000000
@@ -35946,8 +35946,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss20.txt'
-    Source  File  'test/gauss20.txt'
-    Z  70.000000
+    Source File 'test/gauss20.txt'
+    Z 70.000000
     Data
       -3.412210  0.000000
       -3.396180  0.000000
@@ -36452,8 +36452,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss21.txt'
-    Source  File  'test/gauss21.txt'
-    Z  71.000000
+    Source File 'test/gauss21.txt'
+    Z 71.000000
     Data
       -3.518240  0.000000
       -3.502210  0.000000
@@ -36958,8 +36958,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss22.txt'
-    Source  File  'test/gauss22.txt'
-    Z  72.000000
+    Source File 'test/gauss22.txt'
+    Z 72.000000
     Data
       -3.631870  0.000000
       -3.615840  0.000000
@@ -37464,8 +37464,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss23.txt'
-    Source  File  'test/gauss23.txt'
-    Z  73.000000
+    Source File 'test/gauss23.txt'
+    Z 73.000000
     Data
       -3.751310  0.000000
       -3.735280  0.000000
@@ -37970,8 +37970,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss24.txt'
-    Source  File  'test/gauss24.txt'
-    Z  74.000000
+    Source File 'test/gauss24.txt'
+    Z 74.000000
     Data
       -3.874660  0.000000
       -3.858630  0.000000
@@ -38476,8 +38476,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss25.txt'
-    Source  File  'test/gauss25.txt'
-    Z  75.000000
+    Source File 'test/gauss25.txt'
+    Z 75.000000
     Data
       -4.000000  0.000000
       -3.983970  0.000000
@@ -38982,8 +38982,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss26.txt'
-    Source  File  'test/gauss26.txt'
-    Z  76.000000
+    Source File 'test/gauss26.txt'
+    Z 76.000000
     Data
       -4.125330  0.000000
       -4.109300  0.000000
@@ -39488,8 +39488,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss27.txt'
-    Source  File  'test/gauss27.txt'
-    Z  77.000000
+    Source File 'test/gauss27.txt'
+    Z 77.000000
     Data
       -4.248690  0.000000
       -4.232660  0.000000
@@ -39994,8 +39994,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss28.txt'
-    Source  File  'test/gauss28.txt'
-    Z  78.000000
+    Source File 'test/gauss28.txt'
+    Z 78.000000
     Data
       -4.368120  0.000000
       -4.352090  0.000000
@@ -40500,8 +40500,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss29.txt'
-    Source  File  'test/gauss29.txt'
-    Z  79.000000
+    Source File 'test/gauss29.txt'
+    Z 79.000000
     Data
       -4.481750  0.000000
       -4.465720  0.000000
@@ -41006,8 +41006,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss30.txt'
-    Source  File  'test/gauss30.txt'
-    Z  80.000000
+    Source File 'test/gauss30.txt'
+    Z 80.000000
     Data
       -4.587780  0.000000
       -4.571750  0.000000
@@ -41512,8 +41512,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss31.txt'
-    Source  File  'test/gauss31.txt'
-    Z  81.000000
+    Source File 'test/gauss31.txt'
+    Z 81.000000
     Data
       -4.684540  0.000000
       -4.668510  0.000000
@@ -42018,8 +42018,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss32.txt'
-    Source  File  'test/gauss32.txt'
-    Z  82.000000
+    Source File 'test/gauss32.txt'
+    Z 82.000000
     Data
       -4.770510  0.000000
       -4.754480  0.000000
@@ -42524,8 +42524,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss33.txt'
-    Source  File  'test/gauss33.txt'
-    Z  83.000000
+    Source File 'test/gauss33.txt'
+    Z 83.000000
     Data
       -4.844330  0.000000
       -4.828300  0.000000
@@ -43030,8 +43030,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss34.txt'
-    Source  File  'test/gauss34.txt'
-    Z  84.000000
+    Source File 'test/gauss34.txt'
+    Z 84.000000
     Data
       -4.904830  0.000000
       -4.888800  0.000000
@@ -43536,8 +43536,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss35.txt'
-    Source  File  'test/gauss35.txt'
-    Z  85.000000
+    Source File 'test/gauss35.txt'
+    Z 85.000000
     Data
       -4.951060  0.000000
       -4.935030  0.000000
@@ -44042,8 +44042,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss36.txt'
-    Source  File  'test/gauss36.txt'
-    Z  86.000000
+    Source File 'test/gauss36.txt'
+    Z 86.000000
     Data
       -4.982290  0.000000
       -4.966260  0.000000
@@ -44548,8 +44548,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss37.txt'
-    Source  File  'test/gauss37.txt'
-    Z  87.000000
+    Source File 'test/gauss37.txt'
+    Z 87.000000
     Data
       -4.998030  0.000000
       -4.982000  0.000000
@@ -45054,8 +45054,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss38.txt'
-    Source  File  'test/gauss38.txt'
-    Z  88.000000
+    Source File 'test/gauss38.txt'
+    Z 88.000000
     Data
       -4.998030  0.000000
       -4.982000  0.000000
@@ -45560,8 +45560,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss39.txt'
-    Source  File  'test/gauss39.txt'
-    Z  89.000000
+    Source File 'test/gauss39.txt'
+    Z 89.000000
     Data
       -4.982290  0.000000
       -4.966260  0.000000
@@ -46066,8 +46066,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss40.txt'
-    Source  File  'test/gauss40.txt'
-    Z  90.000000
+    Source File 'test/gauss40.txt'
+    Z 90.000000
     Data
       -4.951060  0.000000
       -4.935030  0.000000
@@ -46572,8 +46572,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss41.txt'
-    Source  File  'test/gauss41.txt'
-    Z  91.000000
+    Source File 'test/gauss41.txt'
+    Z 91.000000
     Data
       -4.904830  0.000000
       -4.888800  0.000000
@@ -47078,8 +47078,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss42.txt'
-    Source  File  'test/gauss42.txt'
-    Z  92.000000
+    Source File 'test/gauss42.txt'
+    Z 92.000000
     Data
       -4.844330  0.000000
       -4.828300  0.000000
@@ -47584,8 +47584,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss43.txt'
-    Source  File  'test/gauss43.txt'
-    Z  93.000000
+    Source File 'test/gauss43.txt'
+    Z 93.000000
     Data
       -4.770520  0.000000
       -4.754490  0.000000
@@ -48090,8 +48090,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss44.txt'
-    Source  File  'test/gauss44.txt'
-    Z  94.000000
+    Source File 'test/gauss44.txt'
+    Z 94.000000
     Data
       -4.684550  0.000000
       -4.668520  0.000000
@@ -48596,8 +48596,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss45.txt'
-    Source  File  'test/gauss45.txt'
-    Z  95.000000
+    Source File 'test/gauss45.txt'
+    Z 95.000000
     Data
       -4.587790  0.000000
       -4.571760  0.000000
@@ -49102,8 +49102,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss46.txt'
-    Source  File  'test/gauss46.txt'
-    Z  96.000000
+    Source File 'test/gauss46.txt'
+    Z 96.000000
     Data
       -4.481760  0.000000
       -4.465730  0.000000
@@ -49608,8 +49608,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss47.txt'
-    Source  File  'test/gauss47.txt'
-    Z  97.000000
+    Source File 'test/gauss47.txt'
+    Z 97.000000
     Data
       -4.368130  0.000000
       -4.352100  0.000000
@@ -50114,8 +50114,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss48.txt'
-    Source  File  'test/gauss48.txt'
-    Z  98.000000
+    Source File 'test/gauss48.txt'
+    Z 98.000000
     Data
       -4.248690  0.000000
       -4.232660  0.000000
@@ -50620,8 +50620,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss49.txt'
-    Source  File  'test/gauss49.txt'
-    Z  99.000000
+    Source File 'test/gauss49.txt'
+    Z 99.000000
     Data
       -4.125340  0.000000
       -4.109310  0.000000
@@ -51126,8 +51126,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss50.txt'
-    Source  File  'test/gauss50.txt'
-    Z  100.000000
+    Source File 'test/gauss50.txt'
+    Z 100.000000
     Data
       -4.000010  0.000000
       -3.983980  0.000000
@@ -51632,8 +51632,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss00.txt'
-    Source  File  'test/gauss00.txt'
-    Z  100.000000
+    Source File 'test/gauss00.txt'
+    Z 100.000000
     Data
       -4.000000  0.000000
       -3.983970  0.000000
@@ -52138,8 +52138,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss01.txt'
-    Source  File  'test/gauss01.txt'
-    Z  101.000000
+    Source File 'test/gauss01.txt'
+    Z 101.000000
     Data
       -3.874670  0.000000
       -3.858640  0.000000
@@ -52644,8 +52644,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss02.txt'
-    Source  File  'test/gauss02.txt'
-    Z  102.000000
+    Source File 'test/gauss02.txt'
+    Z 102.000000
     Data
       -3.751310  0.000000
       -3.735280  0.000000
@@ -53150,8 +53150,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss03.txt'
-    Source  File  'test/gauss03.txt'
-    Z  103.000000
+    Source File 'test/gauss03.txt'
+    Z 103.000000
     Data
       -3.631880  0.000000
       -3.615850  0.000000
@@ -53656,8 +53656,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss04.txt'
-    Source  File  'test/gauss04.txt'
-    Z  104.000000
+    Source File 'test/gauss04.txt'
+    Z 104.000000
     Data
       -3.518250  0.000000
       -3.502220  0.000000
@@ -54162,8 +54162,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss05.txt'
-    Source  File  'test/gauss05.txt'
-    Z  105.000000
+    Source File 'test/gauss05.txt'
+    Z 105.000000
     Data
       -3.412220  0.000000
       -3.396190  0.000000
@@ -54668,8 +54668,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss06.txt'
-    Source  File  'test/gauss06.txt'
-    Z  106.000000
+    Source File 'test/gauss06.txt'
+    Z 106.000000
     Data
       -3.315450  0.000000
       -3.299420  0.000000
@@ -55174,8 +55174,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss07.txt'
-    Source  File  'test/gauss07.txt'
-    Z  107.000000
+    Source File 'test/gauss07.txt'
+    Z 107.000000
     Data
       -3.229490  0.000000
       -3.213460  0.000000
@@ -55680,8 +55680,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss08.txt'
-    Source  File  'test/gauss08.txt'
-    Z  108.000000
+    Source File 'test/gauss08.txt'
+    Z 108.000000
     Data
       -3.155670  0.000000
       -3.139640  0.000000
@@ -56186,8 +56186,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss09.txt'
-    Source  File  'test/gauss09.txt'
-    Z  109.000000
+    Source File 'test/gauss09.txt'
+    Z 109.000000
     Data
       -3.095170  0.000000
       -3.079140  0.000000
@@ -56692,8 +56692,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss10.txt'
-    Source  File  'test/gauss10.txt'
-    Z  110.000000
+    Source File 'test/gauss10.txt'
+    Z 110.000000
     Data
       -3.048940  0.000000
       -3.032910  0.000000
@@ -57198,8 +57198,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss11.txt'
-    Source  File  'test/gauss11.txt'
-    Z  111.000000
+    Source File 'test/gauss11.txt'
+    Z 111.000000
     Data
       -3.017710  0.000000
       -3.001680  0.000000
@@ -57704,8 +57704,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss12.txt'
-    Source  File  'test/gauss12.txt'
-    Z  112.000000
+    Source File 'test/gauss12.txt'
+    Z 112.000000
     Data
       -3.001970  0.000000
       -2.985940  0.000000
@@ -58210,8 +58210,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss13.txt'
-    Source  File  'test/gauss13.txt'
-    Z  113.000000
+    Source File 'test/gauss13.txt'
+    Z 113.000000
     Data
       -3.001970  0.000000
       -2.985940  0.000000
@@ -58716,8 +58716,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss14.txt'
-    Source  File  'test/gauss14.txt'
-    Z  114.000000
+    Source File 'test/gauss14.txt'
+    Z 114.000000
     Data
       -3.017710  0.000000
       -3.001680  0.000000
@@ -59222,8 +59222,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss15.txt'
-    Source  File  'test/gauss15.txt'
-    Z  115.000000
+    Source File 'test/gauss15.txt'
+    Z 115.000000
     Data
       -3.048940  0.000000
       -3.032910  0.000000
@@ -59728,8 +59728,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss16.txt'
-    Source  File  'test/gauss16.txt'
-    Z  116.000000
+    Source File 'test/gauss16.txt'
+    Z 116.000000
     Data
       -3.095170  0.000000
       -3.079140  0.000000
@@ -60234,8 +60234,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss17.txt'
-    Source  File  'test/gauss17.txt'
-    Z  117.000000
+    Source File 'test/gauss17.txt'
+    Z 117.000000
     Data
       -3.155670  0.000000
       -3.139640  0.000000
@@ -60740,8 +60740,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss18.txt'
-    Source  File  'test/gauss18.txt'
-    Z  118.000000
+    Source File 'test/gauss18.txt'
+    Z 118.000000
     Data
       -3.229490  0.000000
       -3.213460  0.000000
@@ -61246,8 +61246,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss19.txt'
-    Source  File  'test/gauss19.txt'
-    Z  119.000000
+    Source File 'test/gauss19.txt'
+    Z 119.000000
     Data
       -3.315450  0.000000
       -3.299420  0.000000
@@ -61752,8 +61752,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss20.txt'
-    Source  File  'test/gauss20.txt'
-    Z  120.000000
+    Source File 'test/gauss20.txt'
+    Z 120.000000
     Data
       -3.412210  0.000000
       -3.396180  0.000000
@@ -62258,8 +62258,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss21.txt'
-    Source  File  'test/gauss21.txt'
-    Z  121.000000
+    Source File 'test/gauss21.txt'
+    Z 121.000000
     Data
       -3.518240  0.000000
       -3.502210  0.000000
@@ -62764,8 +62764,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss22.txt'
-    Source  File  'test/gauss22.txt'
-    Z  122.000000
+    Source File 'test/gauss22.txt'
+    Z 122.000000
     Data
       -3.631870  0.000000
       -3.615840  0.000000
@@ -63270,8 +63270,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss23.txt'
-    Source  File  'test/gauss23.txt'
-    Z  123.000000
+    Source File 'test/gauss23.txt'
+    Z 123.000000
     Data
       -3.751310  0.000000
       -3.735280  0.000000
@@ -63776,8 +63776,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss24.txt'
-    Source  File  'test/gauss24.txt'
-    Z  124.000000
+    Source File 'test/gauss24.txt'
+    Z 124.000000
     Data
       -3.874660  0.000000
       -3.858630  0.000000
@@ -64282,8 +64282,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss25.txt'
-    Source  File  'test/gauss25.txt'
-    Z  125.000000
+    Source File 'test/gauss25.txt'
+    Z 125.000000
     Data
       -4.000000  0.000000
       -3.983970  0.000000
@@ -64788,8 +64788,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss26.txt'
-    Source  File  'test/gauss26.txt'
-    Z  126.000000
+    Source File 'test/gauss26.txt'
+    Z 126.000000
     Data
       -4.125330  0.000000
       -4.109300  0.000000
@@ -65294,8 +65294,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss27.txt'
-    Source  File  'test/gauss27.txt'
-    Z  127.000000
+    Source File 'test/gauss27.txt'
+    Z 127.000000
     Data
       -4.248690  0.000000
       -4.232660  0.000000
@@ -65800,8 +65800,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss28.txt'
-    Source  File  'test/gauss28.txt'
-    Z  128.000000
+    Source File 'test/gauss28.txt'
+    Z 128.000000
     Data
       -4.368120  0.000000
       -4.352090  0.000000
@@ -66306,8 +66306,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss29.txt'
-    Source  File  'test/gauss29.txt'
-    Z  129.000000
+    Source File 'test/gauss29.txt'
+    Z 129.000000
     Data
       -4.481750  0.000000
       -4.465720  0.000000
@@ -66812,8 +66812,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss30.txt'
-    Source  File  'test/gauss30.txt'
-    Z  130.000000
+    Source File 'test/gauss30.txt'
+    Z 130.000000
     Data
       -4.587780  0.000000
       -4.571750  0.000000
@@ -67318,8 +67318,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss31.txt'
-    Source  File  'test/gauss31.txt'
-    Z  131.000000
+    Source File 'test/gauss31.txt'
+    Z 131.000000
     Data
       -4.684540  0.000000
       -4.668510  0.000000
@@ -67824,8 +67824,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss32.txt'
-    Source  File  'test/gauss32.txt'
-    Z  132.000000
+    Source File 'test/gauss32.txt'
+    Z 132.000000
     Data
       -4.770510  0.000000
       -4.754480  0.000000
@@ -68330,8 +68330,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss33.txt'
-    Source  File  'test/gauss33.txt'
-    Z  133.000000
+    Source File 'test/gauss33.txt'
+    Z 133.000000
     Data
       -4.844330  0.000000
       -4.828300  0.000000
@@ -68836,8 +68836,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss34.txt'
-    Source  File  'test/gauss34.txt'
-    Z  134.000000
+    Source File 'test/gauss34.txt'
+    Z 134.000000
     Data
       -4.904830  0.000000
       -4.888800  0.000000
@@ -69342,8 +69342,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss35.txt'
-    Source  File  'test/gauss35.txt'
-    Z  135.000000
+    Source File 'test/gauss35.txt'
+    Z 135.000000
     Data
       -4.951060  0.000000
       -4.935030  0.000000
@@ -69848,8 +69848,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss36.txt'
-    Source  File  'test/gauss36.txt'
-    Z  136.000000
+    Source File 'test/gauss36.txt'
+    Z 136.000000
     Data
       -4.982290  0.000000
       -4.966260  0.000000
@@ -70354,8 +70354,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss37.txt'
-    Source  File  'test/gauss37.txt'
-    Z  137.000000
+    Source File 'test/gauss37.txt'
+    Z 137.000000
     Data
       -4.998030  0.000000
       -4.982000  0.000000
@@ -70860,8 +70860,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss38.txt'
-    Source  File  'test/gauss38.txt'
-    Z  138.000000
+    Source File 'test/gauss38.txt'
+    Z 138.000000
     Data
       -4.998030  0.000000
       -4.982000  0.000000
@@ -71366,8 +71366,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss39.txt'
-    Source  File  'test/gauss39.txt'
-    Z  139.000000
+    Source File 'test/gauss39.txt'
+    Z 139.000000
     Data
       -4.982290  0.000000
       -4.966260  0.000000
@@ -71872,8 +71872,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss40.txt'
-    Source  File  'test/gauss40.txt'
-    Z  140.000000
+    Source File 'test/gauss40.txt'
+    Z 140.000000
     Data
       -4.951060  0.000000
       -4.935030  0.000000
@@ -72378,8 +72378,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss41.txt'
-    Source  File  'test/gauss41.txt'
-    Z  141.000000
+    Source File 'test/gauss41.txt'
+    Z 141.000000
     Data
       -4.904830  0.000000
       -4.888800  0.000000
@@ -72884,8 +72884,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss42.txt'
-    Source  File  'test/gauss42.txt'
-    Z  142.000000
+    Source File 'test/gauss42.txt'
+    Z 142.000000
     Data
       -4.844330  0.000000
       -4.828300  0.000000
@@ -73390,8 +73390,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss43.txt'
-    Source  File  'test/gauss43.txt'
-    Z  143.000000
+    Source File 'test/gauss43.txt'
+    Z 143.000000
     Data
       -4.770520  0.000000
       -4.754490  0.000000
@@ -73896,8 +73896,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss44.txt'
-    Source  File  'test/gauss44.txt'
-    Z  144.000000
+    Source File 'test/gauss44.txt'
+    Z 144.000000
     Data
       -4.684550  0.000000
       -4.668520  0.000000
@@ -74402,8 +74402,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss45.txt'
-    Source  File  'test/gauss45.txt'
-    Z  145.000000
+    Source File 'test/gauss45.txt'
+    Z 145.000000
     Data
       -4.587790  0.000000
       -4.571760  0.000000
@@ -74908,8 +74908,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss46.txt'
-    Source  File  'test/gauss46.txt'
-    Z  146.000000
+    Source File 'test/gauss46.txt'
+    Z 146.000000
     Data
       -4.481760  0.000000
       -4.465730  0.000000
@@ -75414,8 +75414,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss47.txt'
-    Source  File  'test/gauss47.txt'
-    Z  147.000000
+    Source File 'test/gauss47.txt'
+    Z 147.000000
     Data
       -4.368130  0.000000
       -4.352100  0.000000
@@ -75920,8 +75920,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss48.txt'
-    Source  File  'test/gauss48.txt'
-    Z  148.000000
+    Source File 'test/gauss48.txt'
+    Z 148.000000
     Data
       -4.248690  0.000000
       -4.232660  0.000000
@@ -76426,8 +76426,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss49.txt'
-    Source  File  'test/gauss49.txt'
-    Z  149.000000
+    Source File 'test/gauss49.txt'
+    Z 149.000000
     Data
       -4.125340  0.000000
       -4.109310  0.000000
@@ -76932,8 +76932,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss50.txt'
-    Source  File  'test/gauss50.txt'
-    Z  150.000000
+    Source File 'test/gauss50.txt'
+    Z 150.000000
     Data
       -4.000010  0.000000
       -3.983980  0.000000
@@ -77438,8 +77438,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss00.txt'
-    Source  File  'test/gauss00.txt'
-    Z  150.000000
+    Source File 'test/gauss00.txt'
+    Z 150.000000
     Data
       -4.000000  0.000000
       -3.983970  0.000000
@@ -77944,8 +77944,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss01.txt'
-    Source  File  'test/gauss01.txt'
-    Z  151.000000
+    Source File 'test/gauss01.txt'
+    Z 151.000000
     Data
       -3.874670  0.000000
       -3.858640  0.000000
@@ -78450,8 +78450,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss02.txt'
-    Source  File  'test/gauss02.txt'
-    Z  152.000000
+    Source File 'test/gauss02.txt'
+    Z 152.000000
     Data
       -3.751310  0.000000
       -3.735280  0.000000
@@ -78956,8 +78956,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss03.txt'
-    Source  File  'test/gauss03.txt'
-    Z  153.000000
+    Source File 'test/gauss03.txt'
+    Z 153.000000
     Data
       -3.631880  0.000000
       -3.615850  0.000000
@@ -79462,8 +79462,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss04.txt'
-    Source  File  'test/gauss04.txt'
-    Z  154.000000
+    Source File 'test/gauss04.txt'
+    Z 154.000000
     Data
       -3.518250  0.000000
       -3.502220  0.000000
@@ -79968,8 +79968,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss05.txt'
-    Source  File  'test/gauss05.txt'
-    Z  155.000000
+    Source File 'test/gauss05.txt'
+    Z 155.000000
     Data
       -3.412220  0.000000
       -3.396190  0.000000
@@ -80474,8 +80474,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss06.txt'
-    Source  File  'test/gauss06.txt'
-    Z  156.000000
+    Source File 'test/gauss06.txt'
+    Z 156.000000
     Data
       -3.315450  0.000000
       -3.299420  0.000000
@@ -80980,8 +80980,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss07.txt'
-    Source  File  'test/gauss07.txt'
-    Z  157.000000
+    Source File 'test/gauss07.txt'
+    Z 157.000000
     Data
       -3.229490  0.000000
       -3.213460  0.000000
@@ -81486,8 +81486,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss08.txt'
-    Source  File  'test/gauss08.txt'
-    Z  158.000000
+    Source File 'test/gauss08.txt'
+    Z 158.000000
     Data
       -3.155670  0.000000
       -3.139640  0.000000
@@ -81992,8 +81992,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss09.txt'
-    Source  File  'test/gauss09.txt'
-    Z  159.000000
+    Source File 'test/gauss09.txt'
+    Z 159.000000
     Data
       -3.095170  0.000000
       -3.079140  0.000000
@@ -82498,8 +82498,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss10.txt'
-    Source  File  'test/gauss10.txt'
-    Z  160.000000
+    Source File 'test/gauss10.txt'
+    Z 160.000000
     Data
       -3.048940  0.000000
       -3.032910  0.000000
@@ -83004,8 +83004,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss11.txt'
-    Source  File  'test/gauss11.txt'
-    Z  161.000000
+    Source File 'test/gauss11.txt'
+    Z 161.000000
     Data
       -3.017710  0.000000
       -3.001680  0.000000
@@ -83510,8 +83510,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss12.txt'
-    Source  File  'test/gauss12.txt'
-    Z  162.000000
+    Source File 'test/gauss12.txt'
+    Z 162.000000
     Data
       -3.001970  0.000000
       -2.985940  0.000000
@@ -84016,8 +84016,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss13.txt'
-    Source  File  'test/gauss13.txt'
-    Z  163.000000
+    Source File 'test/gauss13.txt'
+    Z 163.000000
     Data
       -3.001970  0.000000
       -2.985940  0.000000
@@ -84522,8 +84522,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss14.txt'
-    Source  File  'test/gauss14.txt'
-    Z  164.000000
+    Source File 'test/gauss14.txt'
+    Z 164.000000
     Data
       -3.017710  0.000000
       -3.001680  0.000000
@@ -85028,8 +85028,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss15.txt'
-    Source  File  'test/gauss15.txt'
-    Z  165.000000
+    Source File 'test/gauss15.txt'
+    Z 165.000000
     Data
       -3.048940  0.000000
       -3.032910  0.000000
@@ -85534,8 +85534,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss16.txt'
-    Source  File  'test/gauss16.txt'
-    Z  166.000000
+    Source File 'test/gauss16.txt'
+    Z 166.000000
     Data
       -3.095170  0.000000
       -3.079140  0.000000
@@ -86040,8 +86040,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss17.txt'
-    Source  File  'test/gauss17.txt'
-    Z  167.000000
+    Source File 'test/gauss17.txt'
+    Z 167.000000
     Data
       -3.155670  0.000000
       -3.139640  0.000000
@@ -86546,8 +86546,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss18.txt'
-    Source  File  'test/gauss18.txt'
-    Z  168.000000
+    Source File 'test/gauss18.txt'
+    Z 168.000000
     Data
       -3.229490  0.000000
       -3.213460  0.000000
@@ -87052,8 +87052,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss19.txt'
-    Source  File  'test/gauss19.txt'
-    Z  169.000000
+    Source File 'test/gauss19.txt'
+    Z 169.000000
     Data
       -3.315450  0.000000
       -3.299420  0.000000
@@ -87558,8 +87558,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss20.txt'
-    Source  File  'test/gauss20.txt'
-    Z  170.000000
+    Source File 'test/gauss20.txt'
+    Z 170.000000
     Data
       -3.412210  0.000000
       -3.396180  0.000000
@@ -88064,8 +88064,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss21.txt'
-    Source  File  'test/gauss21.txt'
-    Z  171.000000
+    Source File 'test/gauss21.txt'
+    Z 171.000000
     Data
       -3.518240  0.000000
       -3.502210  0.000000
@@ -88570,8 +88570,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss22.txt'
-    Source  File  'test/gauss22.txt'
-    Z  172.000000
+    Source File 'test/gauss22.txt'
+    Z 172.000000
     Data
       -3.631870  0.000000
       -3.615840  0.000000
@@ -89076,8 +89076,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss23.txt'
-    Source  File  'test/gauss23.txt'
-    Z  173.000000
+    Source File 'test/gauss23.txt'
+    Z 173.000000
     Data
       -3.751310  0.000000
       -3.735280  0.000000
@@ -89582,8 +89582,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss24.txt'
-    Source  File  'test/gauss24.txt'
-    Z  174.000000
+    Source File 'test/gauss24.txt'
+    Z 174.000000
     Data
       -3.874660  0.000000
       -3.858630  0.000000
@@ -90088,8 +90088,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss25.txt'
-    Source  File  'test/gauss25.txt'
-    Z  175.000000
+    Source File 'test/gauss25.txt'
+    Z 175.000000
     Data
       -4.000000  0.000000
       -3.983970  0.000000
@@ -90594,8 +90594,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss26.txt'
-    Source  File  'test/gauss26.txt'
-    Z  176.000000
+    Source File 'test/gauss26.txt'
+    Z 176.000000
     Data
       -4.125330  0.000000
       -4.109300  0.000000
@@ -91100,8 +91100,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss27.txt'
-    Source  File  'test/gauss27.txt'
-    Z  177.000000
+    Source File 'test/gauss27.txt'
+    Z 177.000000
     Data
       -4.248690  0.000000
       -4.232660  0.000000
@@ -91606,8 +91606,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss28.txt'
-    Source  File  'test/gauss28.txt'
-    Z  178.000000
+    Source File 'test/gauss28.txt'
+    Z 178.000000
     Data
       -4.368120  0.000000
       -4.352090  0.000000
@@ -92112,8 +92112,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss29.txt'
-    Source  File  'test/gauss29.txt'
-    Z  179.000000
+    Source File 'test/gauss29.txt'
+    Z 179.000000
     Data
       -4.481750  0.000000
       -4.465720  0.000000
@@ -92618,8 +92618,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss30.txt'
-    Source  File  'test/gauss30.txt'
-    Z  180.000000
+    Source File 'test/gauss30.txt'
+    Z 180.000000
     Data
       -4.587780  0.000000
       -4.571750  0.000000
@@ -93124,8 +93124,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss31.txt'
-    Source  File  'test/gauss31.txt'
-    Z  181.000000
+    Source File 'test/gauss31.txt'
+    Z 181.000000
     Data
       -4.684540  0.000000
       -4.668510  0.000000
@@ -93630,8 +93630,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss32.txt'
-    Source  File  'test/gauss32.txt'
-    Z  182.000000
+    Source File 'test/gauss32.txt'
+    Z 182.000000
     Data
       -4.770510  0.000000
       -4.754480  0.000000
@@ -94136,8 +94136,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss33.txt'
-    Source  File  'test/gauss33.txt'
-    Z  183.000000
+    Source File 'test/gauss33.txt'
+    Z 183.000000
     Data
       -4.844330  0.000000
       -4.828300  0.000000
@@ -94642,8 +94642,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss34.txt'
-    Source  File  'test/gauss34.txt'
-    Z  184.000000
+    Source File 'test/gauss34.txt'
+    Z 184.000000
     Data
       -4.904830  0.000000
       -4.888800  0.000000
@@ -95148,8 +95148,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss35.txt'
-    Source  File  'test/gauss35.txt'
-    Z  185.000000
+    Source File 'test/gauss35.txt'
+    Z 185.000000
     Data
       -4.951060  0.000000
       -4.935030  0.000000
@@ -95654,8 +95654,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss36.txt'
-    Source  File  'test/gauss36.txt'
-    Z  186.000000
+    Source File 'test/gauss36.txt'
+    Z 186.000000
     Data
       -4.982290  0.000000
       -4.966260  0.000000
@@ -96160,8 +96160,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss37.txt'
-    Source  File  'test/gauss37.txt'
-    Z  187.000000
+    Source File 'test/gauss37.txt'
+    Z 187.000000
     Data
       -4.998030  0.000000
       -4.982000  0.000000
@@ -96666,8 +96666,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss38.txt'
-    Source  File  'test/gauss38.txt'
-    Z  188.000000
+    Source File 'test/gauss38.txt'
+    Z 188.000000
     Data
       -4.998030  0.000000
       -4.982000  0.000000
@@ -97172,8 +97172,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss39.txt'
-    Source  File  'test/gauss39.txt'
-    Z  189.000000
+    Source File 'test/gauss39.txt'
+    Z 189.000000
     Data
       -4.982290  0.000000
       -4.966260  0.000000
@@ -97678,8 +97678,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss40.txt'
-    Source  File  'test/gauss40.txt'
-    Z  190.000000
+    Source File 'test/gauss40.txt'
+    Z 190.000000
     Data
       -4.951060  0.000000
       -4.935030  0.000000
@@ -98184,8 +98184,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss41.txt'
-    Source  File  'test/gauss41.txt'
-    Z  191.000000
+    Source File 'test/gauss41.txt'
+    Z 191.000000
     Data
       -4.904830  0.000000
       -4.888800  0.000000
@@ -98690,8 +98690,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss42.txt'
-    Source  File  'test/gauss42.txt'
-    Z  192.000000
+    Source File 'test/gauss42.txt'
+    Z 192.000000
     Data
       -4.844330  0.000000
       -4.828300  0.000000
@@ -99196,8 +99196,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss43.txt'
-    Source  File  'test/gauss43.txt'
-    Z  193.000000
+    Source File 'test/gauss43.txt'
+    Z 193.000000
     Data
       -4.770520  0.000000
       -4.754490  0.000000
@@ -99702,8 +99702,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss44.txt'
-    Source  File  'test/gauss44.txt'
-    Z  194.000000
+    Source File 'test/gauss44.txt'
+    Z 194.000000
     Data
       -4.684550  0.000000
       -4.668520  0.000000
@@ -100208,8 +100208,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss45.txt'
-    Source  File  'test/gauss45.txt'
-    Z  195.000000
+    Source File 'test/gauss45.txt'
+    Z 195.000000
     Data
       -4.587790  0.000000
       -4.571760  0.000000
@@ -100714,8 +100714,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss46.txt'
-    Source  File  'test/gauss46.txt'
-    Z  196.000000
+    Source File 'test/gauss46.txt'
+    Z 196.000000
     Data
       -4.481760  0.000000
       -4.465730  0.000000
@@ -101220,8 +101220,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss47.txt'
-    Source  File  'test/gauss47.txt'
-    Z  197.000000
+    Source File 'test/gauss47.txt'
+    Z 197.000000
     Data
       -4.368130  0.000000
       -4.352100  0.000000
@@ -101726,8 +101726,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss48.txt'
-    Source  File  'test/gauss48.txt'
-    Z  198.000000
+    Source File 'test/gauss48.txt'
+    Z 198.000000
     Data
       -4.248690  0.000000
       -4.232660  0.000000
@@ -102232,8 +102232,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss49.txt'
-    Source  File  'test/gauss49.txt'
-    Z  199.000000
+    Source File 'test/gauss49.txt'
+    Z 199.000000
     Data
       -4.125340  0.000000
       -4.109310  0.000000
@@ -102738,8 +102738,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss50.txt'
-    Source  File  'test/gauss50.txt'
-    Z  200.000000
+    Source File 'test/gauss50.txt'
+    Z 200.000000
     Data
       -4.000010  0.000000
       -3.983980  0.000000
@@ -103244,8 +103244,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss00.txt'
-    Source  File  'test/gauss00.txt'
-    Z  200.000000
+    Source File 'test/gauss00.txt'
+    Z 200.000000
     Data
       -4.000000  0.000000
       -3.983970  0.000000
@@ -103750,8 +103750,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss01.txt'
-    Source  File  'test/gauss01.txt'
-    Z  201.000000
+    Source File 'test/gauss01.txt'
+    Z 201.000000
     Data
       -3.874670  0.000000
       -3.858640  0.000000
@@ -104256,8 +104256,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss02.txt'
-    Source  File  'test/gauss02.txt'
-    Z  202.000000
+    Source File 'test/gauss02.txt'
+    Z 202.000000
     Data
       -3.751310  0.000000
       -3.735280  0.000000
@@ -104762,8 +104762,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss03.txt'
-    Source  File  'test/gauss03.txt'
-    Z  203.000000
+    Source File 'test/gauss03.txt'
+    Z 203.000000
     Data
       -3.631880  0.000000
       -3.615850  0.000000
@@ -105268,8 +105268,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss04.txt'
-    Source  File  'test/gauss04.txt'
-    Z  204.000000
+    Source File 'test/gauss04.txt'
+    Z 204.000000
     Data
       -3.518250  0.000000
       -3.502220  0.000000
@@ -105774,8 +105774,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss05.txt'
-    Source  File  'test/gauss05.txt'
-    Z  205.000000
+    Source File 'test/gauss05.txt'
+    Z 205.000000
     Data
       -3.412220  0.000000
       -3.396190  0.000000
@@ -106280,8 +106280,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss06.txt'
-    Source  File  'test/gauss06.txt'
-    Z  206.000000
+    Source File 'test/gauss06.txt'
+    Z 206.000000
     Data
       -3.315450  0.000000
       -3.299420  0.000000
@@ -106786,8 +106786,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss07.txt'
-    Source  File  'test/gauss07.txt'
-    Z  207.000000
+    Source File 'test/gauss07.txt'
+    Z 207.000000
     Data
       -3.229490  0.000000
       -3.213460  0.000000
@@ -107292,8 +107292,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss08.txt'
-    Source  File  'test/gauss08.txt'
-    Z  208.000000
+    Source File 'test/gauss08.txt'
+    Z 208.000000
     Data
       -3.155670  0.000000
       -3.139640  0.000000
@@ -107798,8 +107798,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss09.txt'
-    Source  File  'test/gauss09.txt'
-    Z  209.000000
+    Source File 'test/gauss09.txt'
+    Z 209.000000
     Data
       -3.095170  0.000000
       -3.079140  0.000000
@@ -108304,8 +108304,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss10.txt'
-    Source  File  'test/gauss10.txt'
-    Z  210.000000
+    Source File 'test/gauss10.txt'
+    Z 210.000000
     Data
       -3.048940  0.000000
       -3.032910  0.000000
@@ -108810,8 +108810,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss11.txt'
-    Source  File  'test/gauss11.txt'
-    Z  211.000000
+    Source File 'test/gauss11.txt'
+    Z 211.000000
     Data
       -3.017710  0.000000
       -3.001680  0.000000
@@ -109316,8 +109316,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss12.txt'
-    Source  File  'test/gauss12.txt'
-    Z  212.000000
+    Source File 'test/gauss12.txt'
+    Z 212.000000
     Data
       -3.001970  0.000000
       -2.985940  0.000000
@@ -109822,8 +109822,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss13.txt'
-    Source  File  'test/gauss13.txt'
-    Z  213.000000
+    Source File 'test/gauss13.txt'
+    Z 213.000000
     Data
       -3.001970  0.000000
       -2.985940  0.000000
@@ -110328,8 +110328,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss14.txt'
-    Source  File  'test/gauss14.txt'
-    Z  214.000000
+    Source File 'test/gauss14.txt'
+    Z 214.000000
     Data
       -3.017710  0.000000
       -3.001680  0.000000
@@ -110834,8 +110834,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss15.txt'
-    Source  File  'test/gauss15.txt'
-    Z  215.000000
+    Source File 'test/gauss15.txt'
+    Z 215.000000
     Data
       -3.048940  0.000000
       -3.032910  0.000000
@@ -111340,8 +111340,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss16.txt'
-    Source  File  'test/gauss16.txt'
-    Z  216.000000
+    Source File 'test/gauss16.txt'
+    Z 216.000000
     Data
       -3.095170  0.000000
       -3.079140  0.000000
@@ -111846,8 +111846,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss17.txt'
-    Source  File  'test/gauss17.txt'
-    Z  217.000000
+    Source File 'test/gauss17.txt'
+    Z 217.000000
     Data
       -3.155670  0.000000
       -3.139640  0.000000
@@ -112352,8 +112352,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss18.txt'
-    Source  File  'test/gauss18.txt'
-    Z  218.000000
+    Source File 'test/gauss18.txt'
+    Z 218.000000
     Data
       -3.229490  0.000000
       -3.213460  0.000000
@@ -112858,8 +112858,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss19.txt'
-    Source  File  'test/gauss19.txt'
-    Z  219.000000
+    Source File 'test/gauss19.txt'
+    Z 219.000000
     Data
       -3.315450  0.000000
       -3.299420  0.000000
@@ -113364,8 +113364,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss20.txt'
-    Source  File  'test/gauss20.txt'
-    Z  220.000000
+    Source File 'test/gauss20.txt'
+    Z 220.000000
     Data
       -3.412210  0.000000
       -3.396180  0.000000
@@ -113870,8 +113870,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss21.txt'
-    Source  File  'test/gauss21.txt'
-    Z  221.000000
+    Source File 'test/gauss21.txt'
+    Z 221.000000
     Data
       -3.518240  0.000000
       -3.502210  0.000000
@@ -114376,8 +114376,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss22.txt'
-    Source  File  'test/gauss22.txt'
-    Z  222.000000
+    Source File 'test/gauss22.txt'
+    Z 222.000000
     Data
       -3.631870  0.000000
       -3.615840  0.000000
@@ -114882,8 +114882,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss23.txt'
-    Source  File  'test/gauss23.txt'
-    Z  223.000000
+    Source File 'test/gauss23.txt'
+    Z 223.000000
     Data
       -3.751310  0.000000
       -3.735280  0.000000
@@ -115388,8 +115388,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss24.txt'
-    Source  File  'test/gauss24.txt'
-    Z  224.000000
+    Source File 'test/gauss24.txt'
+    Z 224.000000
     Data
       -3.874660  0.000000
       -3.858630  0.000000
@@ -115894,8 +115894,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss25.txt'
-    Source  File  'test/gauss25.txt'
-    Z  225.000000
+    Source File 'test/gauss25.txt'
+    Z 225.000000
     Data
       -4.000000  0.000000
       -3.983970  0.000000
@@ -116400,8 +116400,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss26.txt'
-    Source  File  'test/gauss26.txt'
-    Z  226.000000
+    Source File 'test/gauss26.txt'
+    Z 226.000000
     Data
       -4.125330  0.000000
       -4.109300  0.000000
@@ -116906,8 +116906,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss27.txt'
-    Source  File  'test/gauss27.txt'
-    Z  227.000000
+    Source File 'test/gauss27.txt'
+    Z 227.000000
     Data
       -4.248690  0.000000
       -4.232660  0.000000
@@ -117412,8 +117412,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss28.txt'
-    Source  File  'test/gauss28.txt'
-    Z  228.000000
+    Source File 'test/gauss28.txt'
+    Z 228.000000
     Data
       -4.368120  0.000000
       -4.352090  0.000000
@@ -117918,8 +117918,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss29.txt'
-    Source  File  'test/gauss29.txt'
-    Z  229.000000
+    Source File 'test/gauss29.txt'
+    Z 229.000000
     Data
       -4.481750  0.000000
       -4.465720  0.000000
@@ -118424,8 +118424,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss30.txt'
-    Source  File  'test/gauss30.txt'
-    Z  230.000000
+    Source File 'test/gauss30.txt'
+    Z 230.000000
     Data
       -4.587780  0.000000
       -4.571750  0.000000
@@ -118930,8 +118930,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss31.txt'
-    Source  File  'test/gauss31.txt'
-    Z  231.000000
+    Source File 'test/gauss31.txt'
+    Z 231.000000
     Data
       -4.684540  0.000000
       -4.668510  0.000000
@@ -119436,8 +119436,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss32.txt'
-    Source  File  'test/gauss32.txt'
-    Z  232.000000
+    Source File 'test/gauss32.txt'
+    Z 232.000000
     Data
       -4.770510  0.000000
       -4.754480  0.000000
@@ -119942,8 +119942,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss33.txt'
-    Source  File  'test/gauss33.txt'
-    Z  233.000000
+    Source File 'test/gauss33.txt'
+    Z 233.000000
     Data
       -4.844330  0.000000
       -4.828300  0.000000
@@ -120448,8 +120448,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss34.txt'
-    Source  File  'test/gauss34.txt'
-    Z  234.000000
+    Source File 'test/gauss34.txt'
+    Z 234.000000
     Data
       -4.904830  0.000000
       -4.888800  0.000000
@@ -120954,8 +120954,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss35.txt'
-    Source  File  'test/gauss35.txt'
-    Z  235.000000
+    Source File 'test/gauss35.txt'
+    Z 235.000000
     Data
       -4.951060  0.000000
       -4.935030  0.000000
@@ -121460,8 +121460,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss36.txt'
-    Source  File  'test/gauss36.txt'
-    Z  236.000000
+    Source File 'test/gauss36.txt'
+    Z 236.000000
     Data
       -4.982290  0.000000
       -4.966260  0.000000
@@ -121966,8 +121966,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss37.txt'
-    Source  File  'test/gauss37.txt'
-    Z  237.000000
+    Source File 'test/gauss37.txt'
+    Z 237.000000
     Data
       -4.998030  0.000000
       -4.982000  0.000000
@@ -122472,8 +122472,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss38.txt'
-    Source  File  'test/gauss38.txt'
-    Z  238.000000
+    Source File 'test/gauss38.txt'
+    Z 238.000000
     Data
       -4.998030  0.000000
       -4.982000  0.000000
@@ -122978,8 +122978,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss39.txt'
-    Source  File  'test/gauss39.txt'
-    Z  239.000000
+    Source File 'test/gauss39.txt'
+    Z 239.000000
     Data
       -4.982290  0.000000
       -4.966260  0.000000
@@ -123484,8 +123484,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss40.txt'
-    Source  File  'test/gauss40.txt'
-    Z  240.000000
+    Source File 'test/gauss40.txt'
+    Z 240.000000
     Data
       -4.951060  0.000000
       -4.935030  0.000000
@@ -123990,8 +123990,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss41.txt'
-    Source  File  'test/gauss41.txt'
-    Z  241.000000
+    Source File 'test/gauss41.txt'
+    Z 241.000000
     Data
       -4.904830  0.000000
       -4.888800  0.000000
@@ -124496,8 +124496,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss42.txt'
-    Source  File  'test/gauss42.txt'
-    Z  242.000000
+    Source File 'test/gauss42.txt'
+    Z 242.000000
     Data
       -4.844330  0.000000
       -4.828300  0.000000
@@ -125002,8 +125002,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss43.txt'
-    Source  File  'test/gauss43.txt'
-    Z  243.000000
+    Source File 'test/gauss43.txt'
+    Z 243.000000
     Data
       -4.770520  0.000000
       -4.754490  0.000000
@@ -125508,8 +125508,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss44.txt'
-    Source  File  'test/gauss44.txt'
-    Z  244.000000
+    Source File 'test/gauss44.txt'
+    Z 244.000000
     Data
       -4.684550  0.000000
       -4.668520  0.000000
@@ -126014,8 +126014,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss45.txt'
-    Source  File  'test/gauss45.txt'
-    Z  245.000000
+    Source File 'test/gauss45.txt'
+    Z 245.000000
     Data
       -4.587790  0.000000
       -4.571760  0.000000
@@ -126520,8 +126520,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss46.txt'
-    Source  File  'test/gauss46.txt'
-    Z  246.000000
+    Source File 'test/gauss46.txt'
+    Z 246.000000
     Data
       -4.481760  0.000000
       -4.465730  0.000000
@@ -127026,8 +127026,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss47.txt'
-    Source  File  'test/gauss47.txt'
-    Z  247.000000
+    Source File 'test/gauss47.txt'
+    Z 247.000000
     Data
       -4.368130  0.000000
       -4.352100  0.000000
@@ -127532,8 +127532,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss48.txt'
-    Source  File  'test/gauss48.txt'
-    Z  248.000000
+    Source File 'test/gauss48.txt'
+    Z 248.000000
     Data
       -4.248690  0.000000
       -4.232660  0.000000
@@ -128038,8 +128038,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss49.txt'
-    Source  File  'test/gauss49.txt'
-    Z  249.000000
+    Source File 'test/gauss49.txt'
+    Z 249.000000
     Data
       -4.125340  0.000000
       -4.109310  0.000000
@@ -128544,8 +128544,8 @@ Collection 'Wanderer'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/gauss50.txt'
-    Source  File  'test/gauss50.txt'
-    Z  250.000000
+    Source File 'test/gauss50.txt'
+    Z 250.000000
     Data
       -4.000010  0.000000
       -3.983980  0.000000
@@ -129055,68 +129055,94 @@ View
   LabelFaceViewer false
   ViewPane 'Main view'
     Geometry 0 0 4 4
-  Collection 'Wanderer'
+    AutoPositionTitles false
     Axis 0
+      AutoScale None
       AutoTicks true
       FirstTick -4.000000
       FractionalPositioning true
-      TickDelta 1.000000
-      MinorTicks 1
-      TitleAnchor 1
-      PositionFractional 0.000000 0.000000 0.000000
-      PositionReal 0.000000 0.000000 0.000000
-      LabelOrientation 0.000000 0.000000 0.200000
-      Title 'X Axis'
-      TitleOrientation 0.000000 0.000000 0.200000 0.500000
+      GridLines false false false
+      GridLineMajorStyle 1.000000 'Solid' 0.500008 0.500008 0.500008 1.000000
+      GridLineMinorStyle 1.000000 'Quarter Dash' 0.749996 0.749996 0.749996 1.000000
       Invert false
+      LabelAnchor TopMiddle
+      LabelOrientation 0.000000 0.000000 0.200000
       Limits -4.998030 4.998030
       Logarithmic false
-      Visible true
+      MinorTicks 1
+      NumberFormat 'Decimal' 3 true false
+      PositionFractional 0.000000 0.000000 0.000000
+      PositionReal 0.000000 0.000000 0.000000
       Stretch 1.000000
+      TickDelta 1.000000
+      TickDirection 0.000000 -1.000000 0.000000
+      TitleAnchor TopMiddle
+      Title 'X Axis'
+      TitleOrientation 0.000000 0.000000 0.200000 0.500000
+      Visible true
     EndAxis
     Axis 1
+      AutoScale None
       AutoTicks true
       FirstTick -0.800000
       FractionalPositioning true
-      TickDelta 0.200000
-      MinorTicks 1
-      TitleAnchor 1
-      PositionFractional 0.000000 0.000000 0.000000
-      PositionReal 0.000000 0.000000 0.000000
-      LabelOrientation 0.000000 0.000000 0.200000
-      Title 'Y Axis'
-      TitleOrientation 0.000000 0.000000 0.200000 0.500000
+      GridLines false false false
+      GridLineMajorStyle 1.000000 'Solid' 0.500008 0.500008 0.500008 1.000000
+      GridLineMinorStyle 1.000000 'Quarter Dash' 0.749996 0.749996 0.749996 1.000000
       Invert false
+      LabelAnchor MiddleRight
+      LabelOrientation 0.000000 0.000000 0.200000
       Limits -0.999936 0.999936
       Logarithmic false
-      Visible true
+      MinorTicks 1
+      NumberFormat 'Decimal' 3 true false
+      PositionFractional 0.000000 0.000000 0.000000
+      PositionReal 0.000000 0.000000 0.000000
       Stretch 1.000000
+      TickDelta 0.200000
+      TickDirection -1.000000 0.000000 0.000000
+      TitleAnchor BottomMiddle
+      Title 'Y Axis'
+      TitleOrientation 0.000000 0.000000 0.200000 0.500000
+      Visible true
     EndAxis
     Axis 2
+      AutoScale None
       AutoTicks true
       FirstTick 0.000000
       FractionalPositioning true
-      TickDelta 3.000000
-      MinorTicks 1
-      TitleAnchor 1
-      PositionFractional 0.000000 0.000000 0.000000
-      PositionReal 0.000000 0.000000 0.000000
-      LabelOrientation 0.000000 180.000000 0.200000
-      Title 'Z Axis'
-      TitleOrientation 0.000000 0.000000 0.200000 0.500000
+      GridLines false false false
+      GridLineMajorStyle 1.000000 'Solid' 0.500008 0.500008 0.500008 1.000000
+      GridLineMinorStyle 1.000000 'Quarter Dash' 0.749996 0.749996 0.749996 1.000000
       Invert false
+      LabelAnchor MiddleRight
+      LabelOrientation 0.000000 180.000000 0.200000
       Limits 0.000000 25.000000
       Logarithmic false
-      Visible true
+      MinorTicks 1
+      NumberFormat 'Decimal' 3 true false
+      PositionFractional 0.000000 0.000000 0.000000
+      PositionReal 0.000000 0.000000 0.000000
       Stretch 1.000000
+      TickDelta 3.000000
+      TickDirection -1.000000 0.000000 0.000000
+      TitleAnchor TopMiddle
+      Title 'Z Axis'
+      TitleOrientation 0.000000 0.000000 0.200000 0.500000
+      Visible true
     EndAxis
-    LabelScale 0.100000
-    TitleScale 0.120000
+    LabelPointSize 16.000000
+    TitlePointSize 20.000000
     BoundingBox 0
     BoundingBoxPlaneY 0.000000
-    MatrixX 0.894668 0.167117 -0.414296 0.000000
-    MatrixY 0.086952 0.844513 0.528429 0.000000
-    MatrixZ 0.438187 -0.508791 0.741028 0.000000
-    MatrixW 0.000000 -0.400000 -34.500000 1.000000
+    RotationX 0.991046 -0.061371 -0.118580
+    RotationY 0.123630 0.757222 0.641350
+    RotationZ 0.050432 -0.650268 0.758029
+    Translation 0.000000 0.000000 -52.500000
+    Perspective false
+    Role 'Standard'
+    RoleTargetCollection 'Wanderer'
+    UseBestFlatView false
+    ViewType 'Normal'
   EndViewPane
 EndView

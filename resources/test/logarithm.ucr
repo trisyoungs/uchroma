@@ -1,39 +1,178 @@
-SliceDir "/home/tris/src/fqplot/test"
-Slice "logarithm1.txt" 0.000000
-Slice "logarithm2.txt" 1.000000
-TransformX Multiply 1.000000
-TransformY Multiply 0.030000
-TransformZ Multiply 1.000000
-PreTransformShift 0.000000 0.000000 0.000000
-PostTransformShift 0.000000 0.000000 0.000000
-LimitX 0.010000 50.000000
-LimitY -0.270000 0.300000
-LimitZ 0.000000 1.000000
-Interpolate 0 0
-InterpolateConstrain 0 0
-InterpolateStep 1.000000 1.000000
-ColourScalePoint 0.000000 255 255 255 255
-ColourScalePoint 1.000000 255 255 255 255
-LabelScale 0.100000
-TitleScale 0.300000
-AxisAutoTicks 1 1 1
-AxisFirstTick 5.000000 -0.200000 0.000000
-AxisTickDelta 5.000000 0.100000 0.200000
-AxisMinorTicks 8 1 1
-AxisPosition 0 0.000000 -0.090000 1.000000
-AxisLabelDirection 0 0.000000 1.000000 0.000000
-AxisLabelUp 0 -1.000000 0.000000 0.000000
-AxisPosition 1 0.100000 0.000000 0.000000
-AxisLabelDirection 1 1.000000 0.000000 0.000000
-AxisLabelUp 1 0.000000 1.000000 0.000000
-AxisPosition 2 0.100000 0.000000 0.000000
-AxisLabelDirection 2 1.000000 0.000000 0.000000
-AxisLabelUp 2 0.000000 1.000000 0.000000
-AxisLabelRotation 150 0 0
-AxisInvert 0 0 0
-AxisLogarithmic 1 0 0
-AxisVisible 1 1 1
-ViewMatrixX 0.999409 0.032216 -0.012036 0.000000
-ViewMatrixY -0.032296 0.999456 -0.006663 0.000000
-ViewMatrixZ 0.011815 0.007049 0.999905 0.000000
-ViewMatrixW -0.200000 0.133333 -2.461452 1.000000
+Settings
+  ImageExport "image.png" 800 600 png 1
+EndSettings
+Collection 'Empty Collection 1'
+  DataDirectory "/home/tris/src/uchroma"
+  TransformX false x
+  TransformY false y
+  TransformZ false z
+  Interpolate false false
+  InterpolateConstrain false false
+  InterpolateStep 1.000000 1.000000
+  ColourSource 'SingleColour'
+  ColourSingle 170 85 255 255
+  ColourLinearRGBA 0.000000 255 255 255 255
+  ColourLinearRGBB 1.000000 0 0 255 255
+  ColourLinearHSVA 0.000000 0 255 255 255
+  ColourLinearHSVB 1.000000 256 215 255 255
+  ColourAlphaControl 'OwnAlpha'
+  ColourAlphaFixed 0.500000
+  Style Grid
+  Visible true
+  DataSet 'logarithm1.txt'
+    Source File 'resources/test/data/logarithm1.txt'
+    Z 0.000000
+    Data
+      0.010000  0.000000
+      0.020000  0.000000
+      0.030000  0.000000
+      0.040000  0.000000
+      0.050000  0.000000
+      0.060000  0.000000
+      0.070000  0.000000
+      0.080000  0.000000
+      0.090000  0.000000
+      0.100000  -1.000000
+      0.200000  2.000000
+      0.300000  -3.000000
+      0.400000  4.000000
+      0.500000  -5.000000
+      0.600000  6.000000
+      0.700000  -7.000000
+      0.800000  8.000000
+      0.900000  -9.000000
+      1.000000  10.000000
+      10.000000  0.000000
+      20.000000  0.000000
+      30.000000  0.000000
+      40.000000  0.000000
+      50.000000  0.000000
+    EndData
+  EndDataSet
+  DataSet 'logarithm2.txt'
+    Source File 'resources/test/data/logarithm2.txt'
+    Z 1.000000
+    Data
+      0.010000  0.000000
+      0.020000  0.000000
+      0.030000  0.000000
+      0.040000  0.000000
+      0.050000  0.000000
+      0.060000  0.000000
+      0.070000  0.000000
+      0.080000  0.000000
+      0.090000  0.000000
+      0.100000  -1.000000
+      0.200000  2.000000
+      0.300000  -3.000000
+      0.400000  4.000000
+      0.500000  -5.000000
+      0.600000  6.000000
+      0.700000  -7.000000
+      0.800000  8.000000
+      0.900000  -9.000000
+      1.000000  10.000000
+      10.000000  0.000000
+      20.000000  0.000000
+      30.000000  0.000000
+      40.000000  0.000000
+      50.000000  0.000000
+    EndData
+  EndDataSet
+EndCollection
+View
+  Grid 4 4
+  LabelFaceViewer false
+  ViewPane 'Main view'
+    Geometry 0 0 4 4
+    AutoPositionTitles false
+    Axis 0
+      AutoScale None
+      AutoTicks true
+      FirstTick 0.000000
+      FractionalPositioning true
+      GridLines false false false
+      GridLineMajorStyle 1.000000 'Solid' 0.500008 0.500008 0.500008 1.000000
+      GridLineMinorStyle 1.000000 'Quarter Dash' 0.749996 0.749996 0.749996 1.000000
+      Invert false
+      LabelAnchor TopMiddle
+      LabelOrientation 0.000000 0.000000 0.200000
+      Limits 0.010000 50.000000
+      Logarithmic true
+      MinorTicks 1
+      NumberFormat 'Decimal' 3 true false
+      PositionFractional 0.000000 0.000000 0.000000
+      PositionReal 0.000000 0.000000 0.000000
+      Stretch 3.151064
+      TickDelta 5.000000
+      TickDirection 0.000000 0.000000 -nan
+      TitleAnchor TopMiddle
+      Title 'X Axis'
+      TitleOrientation 0.000000 0.000000 1.200000 0.500000
+      Visible true
+    EndAxis
+    Axis 1
+      AutoScale None
+      AutoTicks true
+      FirstTick -8.000000
+      FractionalPositioning true
+      GridLines false false false
+      GridLineMajorStyle 1.000000 'Solid' 0.500008 0.500008 0.500008 1.000000
+      GridLineMinorStyle 1.000000 'Quarter Dash' 0.749996 0.749996 0.749996 1.000000
+      Invert false
+      LabelAnchor MiddleRight
+      LabelOrientation 0.000000 0.000000 0.200000
+      Limits -9.000000 10.000000
+      Logarithmic false
+      MinorTicks 1
+      NumberFormat 'Decimal' 3 true false
+      PositionFractional 0.000000 0.000000 0.000000
+      PositionReal 0.000000 0.000000 0.000000
+      Stretch 0.354408
+      TickDelta 2.000000
+      TickDirection 0.000000 0.000000 -nan
+      TitleAnchor BottomMiddle
+      Title 'Y Axis'
+      TitleOrientation 0.000000 270.000000 1.200000 0.500000
+      Visible true
+    EndAxis
+    Axis 2
+      AutoScale None
+      AutoTicks true
+      FirstTick 0.000000
+      FractionalPositioning true
+      GridLines false false false
+      GridLineMajorStyle 1.000000 'Solid' 0.500008 0.500008 0.500008 1.000000
+      GridLineMinorStyle 1.000000 'Quarter Dash' 0.749996 0.749996 0.749996 1.000000
+      Invert false
+      LabelAnchor MiddleRight
+      LabelOrientation 90.000000 0.000000 0.200000
+      Limits 0.000000 1.000000
+      Logarithmic false
+      MinorTicks 1
+      NumberFormat 'Decimal' 3 true false
+      PositionFractional 0.000000 0.000000 0.000000
+      PositionReal 0.000000 0.000000 0.000000
+      Stretch 7.279405
+      TickDelta 0.200000
+      TickDirection 0.000000 0.000000 -nan
+      TitleAnchor TopMiddle
+      Title 'Z Axis'
+      TitleOrientation 90.000000 90.000000 1.200000 0.500000
+      Visible true
+    EndAxis
+    LabelPointSize 16.000000
+    TitlePointSize 20.000000
+    BoundingBox 0
+    BoundingBoxPlaneY 0.000000
+    RotationX 0.999094 0.008698 -0.041657
+    RotationY -0.009745 0.999641 -0.024976
+    RotationZ 0.041425 0.025359 0.998820
+    Translation 0.000000 0.000000 -12.522084
+    Perspective false
+    Role 'Standard'
+    RoleTargetCollection 'Empty Collection 1'
+    UseBestFlatView true
+    ViewType 'AutoStretched'
+  EndViewPane
+EndView

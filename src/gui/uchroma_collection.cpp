@@ -175,8 +175,6 @@ void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 		action->setData(VariantPointer<ViewPane>(ri->item));
 		removeFromPaneActions << action;
 	}
-	action = paneMenu.addMenu(&removeFromPaneMenu);
-	action->setText("Remove from pane...");
 	// -- ... Now populate addToPaneMenu...
 	for (RefListItem<ViewPane,bool>* ri = displayPanes.first(); ri != NULL; ri = ri->next)
 	{
@@ -185,8 +183,11 @@ void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 		action->setData(VariantPointer<ViewPane>(ri->item));
 		addToPaneActions << action;
 	}
+	// -- Construct parent paneMenu for these submenus, and add them to it
 	action = paneMenu.addMenu(&addToPaneMenu);
 	action->setText("Add to pane...");
+	action = paneMenu.addMenu(&removeFromPaneMenu);
+	action->setText("Remove from pane...");
 	action = contextMenu.addMenu(&paneMenu);
 	action->setText("Display...");
 	// -- Analysis

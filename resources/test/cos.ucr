@@ -1,7 +1,7 @@
 Settings
   ImageExport "image.png" 800 600 png 1
 EndSettings
-Collection 'Empty Collection 1'
+Collection 'Cosine Test Data'
   DataDirectory "/home/tris/src/uchroma"
   TransformX false x
   TransformY false y
@@ -9,19 +9,19 @@ Collection 'Empty Collection 1'
   Interpolate false false
   InterpolateConstrain false false
   InterpolateStep 1.000000 1.000000
-  ColourSource 2
+  ColourSource 'HSVGradient'
   ColourSingle 0 0 0 255
   ColourLinearRGBA 0.000000 255 255 255 255
   ColourLinearRGBB 1.000000 0 0 255 255
   ColourLinearHSVA -1.199990 0 255 255 120
-  ColourLinearHSVB 1.000000 256 215 255 255
-  ColourAlphaControl 0
+  ColourLinearHSVB 1.199930 256 215 255 255
+  ColourAlphaControl 'OwnAlpha'
   ColourAlphaFixed 0.500000
   Style Surface
   Visible true
   DataSet '/home/tris/src/uchroma/test/cos01.txt'
-    Source  File  'test/cos01.txt'
-    Z  0.000000
+    Source File 'test/cos01.txt'
+    Z 0.000000
     Data
       -10.000000  -1.006890
       -9.959920  -1.032240
@@ -526,8 +526,8 @@ Collection 'Empty Collection 1'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/cos02.txt'
-    Source  File  'test/cos02.txt'
-    Z  1.000000
+    Source File 'test/cos02.txt'
+    Z 1.000000
     Data
       -10.000000  -0.839072
       -9.959920  -0.860196
@@ -1032,8 +1032,8 @@ Collection 'Empty Collection 1'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/cos03.txt'
-    Source  File  'test/cos03.txt'
-    Z  2.000000
+    Source File 'test/cos03.txt'
+    Z 2.000000
     Data
       -10.000000  -0.839072
       -9.959920  -0.860196
@@ -1538,8 +1538,8 @@ Collection 'Empty Collection 1'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/cos04.txt'
-    Source  File  'test/cos04.txt'
-    Z  3.000000
+    Source File 'test/cos04.txt'
+    Z 3.000000
     Data
       -10.000000  -0.839072
       -9.959920  -0.860196
@@ -2044,8 +2044,8 @@ Collection 'Empty Collection 1'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/cos05.txt'
-    Source  File  'test/cos05.txt'
-    Z  4.000000
+    Source File 'test/cos05.txt'
+    Z 4.000000
     Data
       -10.000000  -0.839072
       -9.959920  -0.860196
@@ -2550,8 +2550,8 @@ Collection 'Empty Collection 1'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/cos06.txt'
-    Source  File  'test/cos06.txt'
-    Z  5.000000
+    Source File 'test/cos06.txt'
+    Z 5.000000
     Data
       -10.000000  -0.839072
       -9.959920  -0.860196
@@ -3056,8 +3056,8 @@ Collection 'Empty Collection 1'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/cos07.txt'
-    Source  File  'test/cos07.txt'
-    Z  6.000000
+    Source File 'test/cos07.txt'
+    Z 6.000000
     Data
       -10.000000  -0.839072
       -9.959920  -0.860196
@@ -3562,8 +3562,8 @@ Collection 'Empty Collection 1'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/cos08.txt'
-    Source  File  'test/cos08.txt'
-    Z  7.000000
+    Source File 'test/cos08.txt'
+    Z 7.000000
     Data
       -10.000000  -0.839072
       -9.959920  -0.860196
@@ -4068,8 +4068,8 @@ Collection 'Empty Collection 1'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/cos09.txt'
-    Source  File  'test/cos09.txt'
-    Z  8.000000
+    Source File 'test/cos09.txt'
+    Z 8.000000
     Data
       -10.000000  -0.839072
       -9.959920  -0.860196
@@ -4574,8 +4574,8 @@ Collection 'Empty Collection 1'
     EndData
   EndDataSet
   DataSet '/home/tris/src/uchroma/test/cos10.txt'
-    Source  File  'test/cos10.txt'
-    Z  9.000000
+    Source File 'test/cos10.txt'
+    Z 9.000000
     Data
       -10.000000  -0.419536
       -9.959920  -0.430098
@@ -5081,72 +5081,98 @@ Collection 'Empty Collection 1'
   EndDataSet
 EndCollection
 View
-  LabelFaceViewer false
   Grid 4 4
+  LabelFaceViewer false
   ViewPane 'Main view'
-    Collection 'Empty Collection 1'
     Geometry 0 0 4 4
+    AutoPositionTitles false
     Axis 0
+      AutoScale None
       AutoTicks true
       FirstTick -9.000000
       FractionalPositioning true
-      TickDelta 3.000000
-      MinorTicks 1
-      TitleAnchor 1
-      PositionFractional 0.000000 0.000000 0.000000
-      PositionReal 0.000000 0.000000 0.000000
-      LabelOrientation 0.000000 0.000000 0.200000
-      Title 'X Axis'
-      TitleOrientation 0.000000 0.000000 0.200000 0.500000
+      GridLines false false false
+      GridLineMajorStyle 1.000000 'Solid' 0.500008 0.500008 0.500008 1.000000
+      GridLineMinorStyle 1.000000 'Quarter Dash' 0.749996 0.749996 0.749996 1.000000
       Invert false
+      LabelAnchor TopMiddle
+      LabelOrientation 0.000000 0.000000 0.200000
       Limits -10.000000 10.000000
       Logarithmic false
-      Visible true
+      MinorTicks 1
+      NumberFormat 'Decimal' 3 true false
+      PositionFractional 0.000000 0.000000 0.000000
+      PositionReal 0.000000 0.000000 0.000000
       Stretch 1.000000
+      TickDelta 3.000000
+      TickDirection 0.000000 -1.000000 0.000000
+      TitleAnchor TopMiddle
+      Title 'X Axis'
+      TitleOrientation 0.000000 0.000000 0.200000 0.500000
+      Visible true
     EndAxis
     Axis 1
+      AutoScale None
       AutoTicks true
       FirstTick -0.900000
       FractionalPositioning true
-      TickDelta 0.300000
-      MinorTicks 1
-      TitleAnchor 1
-      PositionFractional 0.000000 0.000000 0.000000
-      PositionReal 0.000000 0.000000 0.000000
-      LabelOrientation 0.000000 0.000000 0.200000
-      Title 'Y Axis'
-      TitleOrientation 0.000000 0.000000 0.200000 0.500000
+      GridLines false false false
+      GridLineMajorStyle 1.000000 'Solid' 0.500008 0.500008 0.500008 1.000000
+      GridLineMinorStyle 1.000000 'Quarter Dash' 0.749996 0.749996 0.749996 1.000000
       Invert false
+      LabelAnchor MiddleRight
+      LabelOrientation 0.000000 0.000000 0.200000
       Limits -1.199990 1.199930
       Logarithmic false
-      Visible true
+      MinorTicks 1
+      NumberFormat 'Decimal' 3 true false
+      PositionFractional 0.000000 0.000000 0.000000
+      PositionReal 0.000000 0.000000 0.000000
       Stretch 1.000000
+      TickDelta 0.300000
+      TickDirection -1.000000 0.000000 0.000000
+      TitleAnchor BottomMiddle
+      Title 'Y Axis'
+      TitleOrientation 0.000000 0.000000 0.200000 0.500000
+      Visible true
     EndAxis
     Axis 2
+      AutoScale None
       AutoTicks true
       FirstTick 0.000000
       FractionalPositioning true
-      TickDelta 1.000000
-      MinorTicks 1
-      TitleAnchor 1
-      PositionFractional 0.000000 0.000000 0.000000
-      PositionReal 0.000000 0.000000 0.000000
-      LabelOrientation 0.000000 180.000000 0.200000
-      Title 'Z Axis'
-      TitleOrientation 0.000000 0.000000 0.200000 0.500000
+      GridLines false false false
+      GridLineMajorStyle 1.000000 'Solid' 0.500008 0.500008 0.500008 1.000000
+      GridLineMinorStyle 1.000000 'Quarter Dash' 0.749996 0.749996 0.749996 1.000000
       Invert false
+      LabelAnchor MiddleRight
+      LabelOrientation 0.000000 180.000000 0.200000
       Limits 0.000000 9.000000
       Logarithmic false
-      Visible true
+      MinorTicks 1
+      NumberFormat 'Decimal' 3 true false
+      PositionFractional 0.000000 0.000000 0.000000
+      PositionReal 0.000000 0.000000 0.000000
       Stretch 1.000000
+      TickDelta 1.000000
+      TickDirection -1.000000 0.000000 0.000000
+      TitleAnchor TopMiddle
+      Title 'Z Axis'
+      TitleOrientation 0.000000 0.000000 0.200000 0.500000
+      Visible true
     EndAxis
-    LabelScale 0.100000
-    TitleScale 0.120000
+    LabelPointSize 16.000000
+    TitlePointSize 20.000000
     BoundingBox 0
     BoundingBoxPlaneY 0.000000
-    MatrixX 0.895432 -0.332373 0.296192 0.000000
-    MatrixY 0.071204 0.763659 0.641681 0.000000
-    MatrixZ -0.439467 -0.553491 0.707471 0.000000
-    MatrixW -0.000000 -0.400000 -34.500000 1.000000
+    RotationX 0.980448 -0.033897 0.193837
+    RotationY -0.094266 0.783758 0.613871
+    RotationZ -0.172730 -0.620141 0.765238
+    Translation 0.000000 0.000000 -23.500000
+    Perspective false
+    Role 'Standard'
+    RoleTargetCollection 'Cosine Test Data'
+    UseBestFlatView false
+    ViewType 'Normal'
   EndViewPane
 EndView

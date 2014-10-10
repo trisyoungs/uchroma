@@ -630,6 +630,7 @@ void EditFitKernelDialog::updateControls(bool force)
 	ui.XPointMinSpin->setRange(1, sourceCollection->displayAbscissa().nItems());
 	ui.XPointMaxSpin->setValue(fitKernelTarget_->indexXMax()+1);
 	ui.XPointMaxSpin->setRange(1, sourceCollection->displayAbscissa().nItems());
+	ui.XGroup->setEnabled(sourceCollection->displayAbscissa().nItems() > 0);
 
 	// Source Z
 	if (fitKernelTarget_->zRange() == FitKernel::AbsoluteRange) ui.ZSourceAbsoluteRadio->setChecked(true);
@@ -646,6 +647,7 @@ void EditFitKernelDialog::updateControls(bool force)
 	ui.ZDataSetMinSpin->setRange(1, sourceCollection->nDataSets());
 	ui.ZDataSetMaxSpin->setValue(fitKernelTarget_->indexZMax()+1);
 	ui.ZDataSetMaxSpin->setRange(1, sourceCollection->nDataSets());
+	ui.ZGroup->setEnabled(sourceCollection->nDataSets() > 0);
 
 	// Minimisation Group
 	ui.MinimisationMethodCombo->setCurrentIndex(fitKernelTarget_->method());
@@ -673,15 +675,33 @@ void EditFitKernelDialog::updateLabels()
 
 	// X Source
 	const Array<double>& abscissa = sourceCollection->displayAbscissa();
-	ui.XPointSingleLabel->setText("(X = " + QString::number(abscissa.value(ui.XPointSingleSpin->value())) + ")");
-	ui.XPointMinLabel->setText("(X = " + QString::number(abscissa.value(ui.XPointMinSpin->value())) + ")");
-	ui.XPointMaxLabel->setText("(X = " + QString::number(abscissa.value(ui.XPointMaxSpin->value())) + ")");
+	if (abscissa.nItems() > 0)
+	{
+		ui.XPointSingleLabel->setText("(X = " + QString::number(abscissa.value(ui.XPointSingleSpin->value())) + ")");
+		ui.XPointMinLabel->setText("(X = " + QString::number(abscissa.value(ui.XPointMinSpin->value())) + ")");
+		ui.XPointMaxLabel->setText("(X = " + QString::number(abscissa.value(ui.XPointMaxSpin->value())) + ")");
+	}
+	else
+	{
+		ui.XPointSingleLabel->setText("(X = 0.0)");
+		ui.XPointMinLabel->setText("(X = 0.0)");
+		ui.XPointMaxLabel->setText("(X = 0.0)");
+	}
 
 	// Z Source
-	DataSet* dataSet = sourceCollection->nDataSets() == 0 ? NULL : sourceCollection->dataSet(ui.ZDataSetCombo->currentIndex());
-	ui.ZDataSetSingleLabel->setText("(Z = " + (dataSet ? QString::number(dataSet->data().z()) + ")" : "?)"));
-	dataSet = sourceCollection->nDataSets() == 0 ? NULL : sourceCollection->dataSet(ui.ZDataSetMinSpin->value()-1);
-	ui.ZDataSetMinLabel->setText("(Z = " + (dataSet ? QString::number(dataSet->data().z()) + ")" : "?)"));
-	dataSet = sourceCollection->nDataSets() == 0 ? NULL : sourceCollection->dataSet(ui.ZDataSetMaxSpin->value()-1);
-	ui.ZDataSetMaxLabel->setText("(Z = " + (dataSet ? QString::number(dataSet->data().z()) + ")" : "?)"));
+	if (sourceCollection->nDataSets() > 0)
+	{
+		DataSet* dataSet = sourceCollection->nDataSets() == 0 ? NULL : sourceCollection->dataSet(ui.ZDataSetCombo->currentIndex());
+		ui.ZDataSetSingleLabel->setText("(Z = " + (dataSet ? QString::number(dataSet->data().z()) + ")" : "?)"));
+		dataSet = sourceCollection->nDataSets() == 0 ? NULL : sourceCollection->dataSet(ui.ZDataSetMinSpin->value()-1);
+		ui.ZDataSetMinLabel->setText("(Z = " + (dataSet ? QString::number(dataSet->data().z()) + ")" : "?)"));
+		dataSet = sourceCollection->nDataSets() == 0 ? NULL : sourceCollection->dataSet(ui.ZDataSetMaxSpin->value()-1);
+		ui.ZDataSetMaxLabel->setText("(Z = " + (dataSet ? QString::number(dataSet->data().z()) + ")" : "?)"));
+	}
+	else
+	{
+		ui.ZDataSetSingleLabel->setText("(Z = 0.0)");
+		ui.ZDataSetMinLabel->setText("(Z = 0.0)");
+		ui.ZDataSetMaxLabel->setText("(Z = 0.0)");
+	}
 }

@@ -5085,6 +5085,7 @@ View
   LabelFaceViewer false
   ViewPane 'Normal'
     Geometry 2 0 2 2
+    AutoPositionTitles false
     Axis 0
       AutoScale None
       AutoTicks true
@@ -5106,7 +5107,7 @@ View
       TickDelta 3.000000
       TickDirection 0.000000 -1.000000 0.000000
       TitleAnchor TopMiddle
-      Title 'X AxisÅ'
+      Title 'X Axis'
       TitleOrientation 0.000000 0.000000 1.700000 0.500000
       Visible true
     EndAxis
@@ -5164,17 +5165,19 @@ View
     TitlePointSize 20.000000
     BoundingBox 0
     BoundingBoxPlaneY 0.000000
-    RotationX 0.964477 -0.012063 0.263893
-    RotationY -0.047059 0.975133 0.216565
-    RotationZ -0.259943 -0.221290 0.939925
+    RotationX 0.976614 -0.019317 0.214133
+    RotationY -0.023138 0.980728 0.193999
+    RotationZ -0.213754 -0.194417 0.957345
     Translation 0.000000 0.000000 -16.258081
     Perspective false
     Role 'Standard'
     RoleTargetCollection 'Empty Collection '
+    UseBestFlatView true
     ViewType 'Normal'
   EndViewPane
   ViewPane 'Flat XY'
     Geometry 2 2 2 2
+    AutoPositionTitles false
     Axis 0
       AutoScale None
       AutoTicks true
@@ -5192,12 +5195,12 @@ View
       NumberFormat 'Decimal' 3 true false
       PositionFractional 0.000000 0.000000 0.000000
       PositionReal 0.000000 0.000000 0.000000
-      Stretch 0.535905
+      Stretch 0.520366
       TickDelta 3.000000
       TickDirection 0.000000 -1.000000 0.000000
       TitleAnchor TopMiddle
       Title 'X Axis'
-      TitleOrientation 0.000000 0.000000 1.200000 0.500000
+      TitleOrientation 0.000000 0.000000 0.200000 0.500000
       Visible true
     EndAxis
     Axis 1
@@ -5217,12 +5220,12 @@ View
       NumberFormat 'Decimal' 3 true false
       PositionFractional 0.000000 0.000000 0.000000
       PositionReal 0.000000 0.000000 0.000000
-      Stretch 2.470983
+      Stretch 2.433833
       TickDelta 0.300000
       TickDirection -1.000000 0.000000 0.000000
       TitleAnchor BottomMiddle
       Title 'Y Axis'
-      TitleOrientation 0.000000 270.000000 1.200000 0.500000
+      TitleOrientation 0.000000 270.000000 0.200000 0.500000
       Visible true
     EndAxis
     Axis 2
@@ -5235,7 +5238,7 @@ View
       GridLineMinorStyle 1.000000 'Quarter Dash' 0.749996 0.749996 0.749996 1.000000
       Invert false
       LabelAnchor MiddleRight
-      LabelOrientation 90.000000 0.000000 0.200000
+      LabelOrientation 0.000000 0.000000 0.200000
       Limits 0.000000 9.000000
       Logarithmic false
       MinorTicks 1
@@ -5245,9 +5248,9 @@ View
       Stretch 0.808823
       TickDelta 1.000000
       TickDirection -1.000000 0.000000 0.000000
-      TitleAnchor TopMiddle
+      TitleAnchor BottomMiddle
       Title 'Z Axis'
-      TitleOrientation 90.000000 90.000000 1.200000 0.500000
+      TitleOrientation 0.000000 270.000000 0.200000 0.500000
       Visible true
     EndAxis
     LabelPointSize 16.000000
@@ -5257,14 +5260,16 @@ View
     RotationX 1.000000 0.000000 0.000000
     RotationY 0.000000 1.000000 0.000000
     RotationZ 0.000000 0.000000 1.000000
-    Translation 0.699802 0.404012 0.000000
+    Translation 0.855192 0.448590 0.000000
     Perspective false
     Role 'Standard'
     RoleTargetCollection 'Empty Collection '
+    UseBestFlatView true
     ViewType 'FlatXY'
   EndViewPane
   ViewPane 'Flat XZ'
     Geometry 0 0 2 2
+    AutoPositionTitles false
     Axis 0
       AutoScale None
       AutoTicks true
@@ -5275,7 +5280,7 @@ View
       GridLineMinorStyle 1.000000 'Quarter Dash' 0.749996 0.749996 0.749996 1.000000
       Invert false
       LabelAnchor TopMiddle
-      LabelOrientation 90.000000 0.000000 0.200000
+      LabelOrientation 270.000000 0.000000 0.200000
       Limits -10.000000 10.000000
       Logarithmic false
       MinorTicks 1
@@ -5284,10 +5289,10 @@ View
       PositionReal 0.000000 0.000000 0.000000
       Stretch 0.541226
       TickDelta 3.000000
-      TickDirection 0.000000 0.000000 1.000000
+      TickDirection 0.000000 0.000000 -1.000000
       TitleAnchor TopMiddle
       Title 'X Axis'
-      TitleOrientation 90.000000 0.000000 1.600000 0.500000
+      TitleOrientation 270.000000 0.000000 0.200000 0.500000
       Visible true
     EndAxis
     Axis 1
@@ -5300,7 +5305,7 @@ View
       GridLineMinorStyle 1.000000 'Quarter Dash' 0.749996 0.749996 0.749996 1.000000
       Invert false
       LabelAnchor MiddleRight
-      LabelOrientation 0.000000 0.000000 0.200000
+      LabelOrientation 270.000000 0.000000 0.200000
       Limits -1.199990 1.199930
       Logarithmic false
       MinorTicks 1
@@ -5310,9 +5315,9 @@ View
       Stretch 3.033186
       TickDelta 0.300000
       TickDirection -1.000000 0.000000 0.000000
-      TitleAnchor BottomMiddle
+      TitleAnchor TopMiddle
       Title 'Y Axis'
-      TitleOrientation 0.000000 270.000000 1.200000 0.500000
+      TitleOrientation 270.000000 90.000000 0.200000 0.500000
       Visible true
     EndAxis
     Axis 2
@@ -5325,19 +5330,19 @@ View
       GridLineMinorStyle 1.000000 'Quarter Dash' 0.749996 0.749996 0.749996 1.000000
       Invert true
       LabelAnchor MiddleRight
-      LabelOrientation 90.000000 0.000000 0.200000
+      LabelOrientation 270.000000 0.000000 0.200000
       Limits 0.000000 9.000000
       Logarithmic false
       MinorTicks 1
       NumberFormat 'Decimal' 3 true false
       PositionFractional 0.000000 0.000000 0.000000
       PositionReal 0.000000 0.000000 0.000000
-      Stretch 0.625709
+      Stretch 0.720157
       TickDelta 1.000000
       TickDirection -1.000000 0.000000 0.000000
       TitleAnchor TopMiddle
       Title 'Z Axis'
-      TitleOrientation 90.000000 90.000000 1.200000 0.500000
+      TitleOrientation 270.000000 90.000000 0.200000 0.500000
       Visible true
     EndAxis
     LabelPointSize 16.000000
@@ -5345,16 +5350,18 @@ View
     BoundingBox 0
     BoundingBoxPlaneY 0.000000
     RotationX 1.000000 0.000000 0.000000
-    RotationY 0.000000 0.000000 1.000000
-    RotationZ 0.000000 -1.000000 0.000000
-    Translation 0.644852 0.425016 0.000000
+    RotationY 0.000000 0.000000 -1.000000
+    RotationZ 0.000000 1.000000 0.000000
+    Translation 0.644852 0.000000 0.000000
     Perspective false
     Role 'Standard'
     RoleTargetCollection 'Empty Collection '
+    UseBestFlatView true
     ViewType 'FlatXZ'
   EndViewPane
   ViewPane 'Flat YZ'
     Geometry 0 2 2 2
+    AutoPositionTitles false
     Axis 0
       AutoScale None
       AutoTicks true
@@ -5365,7 +5372,7 @@ View
       GridLineMinorStyle 1.000000 'Quarter Dash' 0.749996 0.749996 0.749996 1.000000
       Invert false
       LabelAnchor TopMiddle
-      LabelOrientation 0.000000 0.000000 0.200000
+      LabelOrientation 90.000000 0.000000 0.200000
       Limits -10.000000 10.000000
       Logarithmic false
       MinorTicks 1
@@ -5377,7 +5384,7 @@ View
       TickDirection 0.000000 -1.000000 0.000000
       TitleAnchor TopMiddle
       Title 'X Axis'
-      TitleOrientation 0.000000 0.000000 1.200000 0.500000
+      TitleOrientation 90.000000 0.000000 0.200000 0.500000
       Visible true
     EndAxis
     Axis 1
@@ -5390,19 +5397,19 @@ View
       GridLineMinorStyle 1.000000 'Quarter Dash' 0.749996 0.749996 0.749996 1.000000
       Invert false
       LabelAnchor MiddleRight
-      LabelOrientation 0.000000 0.000000 0.200000
+      LabelOrientation 90.000000 0.000000 0.200000
       Limits -1.199990 1.199930
       Logarithmic false
       MinorTicks 1
       NumberFormat 'Decimal' 3 true false
       PositionFractional 0.000000 0.000000 0.000000
       PositionReal 0.000000 0.000000 0.000000
-      Stretch 2.806829
+      Stretch 2.431908
       TickDelta 0.300000
-      TickDirection -1.000000 0.000000 0.000000
-      TitleAnchor BottomMiddle
+      TickDirection 0.000000 0.000000 -1.000000
+      TitleAnchor TopMiddle
       Title 'Y Axis'
-      TitleOrientation 0.000000 270.000000 1.200000 0.500000
+      TitleOrientation 90.000000 90.000000 0.200000 0.500000
       Visible true
     EndAxis
     Axis 2
@@ -5414,7 +5421,7 @@ View
       GridLineMajorStyle 1.000000 'Solid' 0.500008 0.500008 0.500008 1.000000
       GridLineMinorStyle 1.000000 'Quarter Dash' 0.749996 0.749996 0.749996 1.000000
       Invert false
-      LabelAnchor MiddleRight
+      LabelAnchor TopMiddle
       LabelOrientation 90.000000 0.000000 0.200000
       Limits 0.000000 9.000000
       Logarithmic false
@@ -5422,25 +5429,26 @@ View
       NumberFormat 'Decimal' 3 true false
       PositionFractional 0.000000 0.000000 0.000000
       PositionReal 0.000000 0.000000 0.000000
-      Stretch 1.261134
+      Stretch 1.137258
       TickDelta 1.000000
-      TickDirection -1.000000 0.000000 0.000000
+      TickDirection 0.000000 -1.000000 0.000000
       TitleAnchor TopMiddle
       Title 'Z Axis'
-      TitleOrientation 90.000000 90.000000 1.200000 0.500000
+      TitleOrientation 90.000000 0.000000 0.200000 0.500000
       Visible true
     EndAxis
     LabelPointSize 16.000000
     TitlePointSize 20.000000
     BoundingBox 0
     BoundingBoxPlaneY 0.000000
-    RotationX 0.000000 0.000000 1.000000
+    RotationX 0.000000 0.000000 -1.000000
     RotationY 0.000000 1.000000 0.000000
-    RotationZ -1.000000 0.000000 0.000000
-    Translation -0.255855 0.000018 0.000000
+    RotationZ 1.000000 0.000000 0.000000
+    Translation 0.462891 0.450038 0.000000
     Perspective false
     Role 'Standard'
     RoleTargetCollection 'Empty Collection '
+    UseBestFlatView true
     ViewType 'FlatYZ'
   EndViewPane
 EndView
