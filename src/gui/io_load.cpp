@@ -25,7 +25,7 @@
 #include "base/lineparser.h"
 #include "base/session.h"
 
-#define CHECKIOFAIL if (hardIOFail_) { return false; } else { break; }
+#define CHECKIOFAIL { if (hardIOFail_) { return false; } else { break; } }
 
 // Parse AxisBlock keywords
 bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
@@ -385,7 +385,6 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 // Read DataSetBlock keywords
 bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Collection* collection)
 {
-	int nPoints;
 	bool foundEnd;
 	DataSet::DataSource source;
 	while (!parser.atEnd())
@@ -836,7 +835,7 @@ bool UChromaWindow::loadInputFile(QString fileName)
 
 	// Read line from file and decide what to do with it
 	Keywords::InputBlock block;
-	int axis, nEmpty;
+	int nEmpty;
 	bool success;
 	while (!parser.atEnd())
 	{
@@ -865,7 +864,7 @@ bool UChromaWindow::loadInputFile(QString fileName)
 						
 						if (nEmpty > 0)
 						{
-							QMessageBox::StandardButton button = QMessageBox::warning(this, "Empty Data", QString("There are still ") + QString::number(nEmpty) + " defined slices which contain no data or whose original files could not be found.\nCheck the slice data directory, and/or the datafiles themselves.");
+							QMessageBox::warning(this, "Empty Data", QString("There are still ") + QString::number(nEmpty) + " defined slices which contain no data or whose original files could not be found.\nCheck the slice data directory, and/or the datafiles themselves.");
 						}
 					}
 				}

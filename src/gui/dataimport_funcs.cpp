@@ -57,6 +57,7 @@ bool DataImportDialog::import()
 {
 	importedDataSets_.clear();
 	int result = exec();
+	return result;
 }
 
 

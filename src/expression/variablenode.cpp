@@ -101,7 +101,6 @@ bool VariableNode::set(double setrv)
 		return false;
 	}
 	bool result = true;
-	double executerv;
 
 	// Call the local variable's set() function
 	result = variable_->set(setrv);

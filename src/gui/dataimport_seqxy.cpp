@@ -49,7 +49,6 @@ bool DataImportDialog::importSequentialXY()
 	if (nStartSkip > 0) parser.skipLines(nStartSkip);
 
 	bool success;
-	int nCols = -1;
 	Vec3<int> count(0, 0, 0);
 	while (!parser.atEnd())
 	{

@@ -185,7 +185,7 @@ bool Node::checkArguments(const char* arglist, const char* funcname)
 // 	msg.print(Messenger::Parse, "...argument list is [%s]\n", altargs);
 	char upc;
 	int count = 0, ngroup = -1, repeat = 0;
-	bool optional = false, requireVar = false, result, cluster = false, reset = true, givesNumber;
+	bool optional = false, requireVar = false, result, cluster = false, reset = true;
 	// If the argument list begins with '_', arguments will have already been checked and added elsewhere...
 	if (*altargs == '_')
 	{

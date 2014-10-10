@@ -3,13 +3,13 @@ project(uChroma)
 set(DESCRIPTION "uChroma")
 set(AUTHOR "Tristan Youngs")
 set(VERSION_MAJOR "0")
-set(VERSION_MINOR "166")
+set(VERSION_MINOR "167")
 
 set(CMAKE_BUILD_TYPE "Release")
 
 if(APPLE)
   cmake_minimum_required(VERSION 2.6.0)
-  set(CMAKE_OSX_ARCHITECTURES "i386")
+  set(CMAKE_OSX_ARCHITECTURES "i386;x86_64")
   ADD_DEFINITIONS(-D_MAC)
 else(APPLE)
   cmake_minimum_required(VERSION 2.4.8)
@@ -62,6 +62,10 @@ if(APPLE)
   # Find OpenGL and GLUT
   find_package(OPENGL REQUIRED)
   find_package(GLUT REQUIRED)
+  # Set libraries for link time
+  set(FTGL_LIBRARIES "-L/usr/local/lib -lftgl")
+  # Add define to suppress gl.h/gl3.h include warnings
+  ADD_DEFINITIONS("-DGL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED")
 endif(APPLE)
 
 # Set output paths for libraries and binaries
@@ -94,7 +98,7 @@ add_subdirectory(${SRCS})
 
 # Set bundle information for Mac
 If(APPLE)
-	set(MACOSX_BUNDLE_ICON_FILE  "uchroma.icns")
+	set(MACOSX_BUNDLE_ICON_FILE  "uChroma.icns")
 	set(MACOSX_BUNDLE_GUI_IDENTIFIER  "uChroma")
 	set(MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}")
 	set(MACOSX_BUNDLE_BUNDLE_NAME  "uChroma" )

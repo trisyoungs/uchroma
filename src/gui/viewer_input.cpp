@@ -57,7 +57,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
 	// Handle button releases (button up) from the mouse
 	msg.enter("Viewer::mouseReleaseEvent");
 	buttonState_ = event->buttons();
-	Qt::KeyboardModifiers km = event->modifiers();
+// 	Qt::KeyboardModifiers km = event->modifiers();
 
 	// Notify uChroma that the mouse button has been released
 	uChroma_->endInteraction(event->x(), contextHeight_-event->y());
@@ -163,7 +163,6 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 	// Check datamodel...
 	bool refresh = false, ignore = true;
 	Qt::KeyboardModifiers km = event->modifiers();
-	int n;
 	
 	switch (event->key())
 	{
@@ -202,7 +201,7 @@ void Viewer::keyReleaseEvent(QKeyEvent *event)
 {
 	// Check datamodel...
 	bool refresh = false, ignore = true;
-	Qt::KeyboardModifiers km = event->modifiers();
+// 	Qt::KeyboardModifiers km = event->modifiers();
 	
 	switch (event->key())
 	{

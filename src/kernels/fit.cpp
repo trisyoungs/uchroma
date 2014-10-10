@@ -648,6 +648,9 @@ bool FitKernel::minimise()
 		case (1):
 			result = simplexMinimise(alpha);
 			break;
+		default:
+			msg.print("FitKernel::minimise() - Method (%i) not handled in switch.\n", method_);
+			break;
 	}
 
 	// Print results...

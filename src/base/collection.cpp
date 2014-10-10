@@ -1292,7 +1292,7 @@ const char* Collection::displayStyle(Collection::DisplayStyle kwd)
 }
 
 // Set whether data is visible
-bool Collection::setVisible(bool visible)
+void Collection::setVisible(bool visible)
 {
 	visible_ = visible;
 }

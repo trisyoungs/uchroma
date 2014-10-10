@@ -387,7 +387,7 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 
 	public:
 	// Set whether data is visible
-	bool setVisible(bool visible);
+	void setVisible(bool visible);
 	// Return hether data is visible
 	bool visible();
 	// Return transformed display abscissa for data

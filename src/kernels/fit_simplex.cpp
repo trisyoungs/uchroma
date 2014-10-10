@@ -40,4 +40,6 @@ bool FitKernel::simplexMinimise(Array<double>& alpha)
 
 	// Perform minimisation
 	Array<double> best = simplex.minimise(100, 10, 0.001, 1.0);
+
+	return true;
 }

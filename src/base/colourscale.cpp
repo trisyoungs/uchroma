@@ -213,7 +213,7 @@ bool ColourScale::interpolated() const
 }
 
 // Set whether or not to use HSV interpolation
-bool ColourScale::setUseHSV(bool b)
+void ColourScale::setUseHSV(bool b)
 {
 	useHSV_ = b;
 	calculateDeltas();

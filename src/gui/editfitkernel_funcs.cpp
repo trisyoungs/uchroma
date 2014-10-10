@@ -104,6 +104,8 @@ bool EditFitKernelDialog::setFitKernel(FitKernel* fitKernel)
 
 	// Store backup in case the dialog is 
 	fitKernelBackup_ = (*fitKernelTarget_);
+
+	return true;
 }
 
 /*
@@ -155,7 +157,6 @@ void EditFitKernelDialog::updateVariableTable()
 	ui.VariablesTable->setRowCount(fitKernelTarget_->nVariablesUsed());
 
 	QTableWidgetItem* item;
-	bool status, isXYZ;
 	int count = 0;
 	for (RefListItem<EquationVariable,bool>* ri = fitKernelTarget_->usedVariables(); ri != NULL; ri = ri->next)
 	{

@@ -181,6 +181,8 @@ bool UChromaWindow::viewTypeChanged(ViewPane::ViewType vt)
 
 	axesWindow_.updateControls();
 	ui.MainView->update();
+
+	return true;
 }
 
 void UChromaWindow::on_actionViewPerspective_triggered(bool checked)

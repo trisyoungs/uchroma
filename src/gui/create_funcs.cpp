@@ -329,8 +329,7 @@ void CreateCollectionDialog::updateVariableTable()
 	ui.VariablesTable->setRowCount(nVariablesUsed_);
 
 	QTableWidgetItem* item;
-	bool status, isXYZ;
-	int count = 0, n;
+	int count = 0;
 	for (int n=0; n<equationVariables_.nItems(); ++n)
 	{
 		// Grab the variable and see if it's used in the current equation?

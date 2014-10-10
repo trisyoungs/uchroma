@@ -75,7 +75,7 @@ then
   sed -i -e "s/set(VERSION_MAJOR \"[0-9]\+\")/set(VERSION_MAJOR \"$MAJOR\")/g" -e "s/set(VERSION_MINOR \"[0-9]\+\")/set(VERSION_MINOR \"$MINOR\")/g"  CMakeLists.txt
   sed -i -e "s/Version: [0-9a-z\.]\+/Version: $MAJOR.$MINOR/g" extra/uchroma.spec
   sed -i -e "s/Version: \([0-9a-z\.]\+\)/Version: $MAJOR.$MINOR/g" extra/uchroma.dsc
-  #sed "s/ [a-f0-9]\+ [0-9]\+ uchroma-[0-9\.]\+.tar.gz/HERE/g" uchroma.dsc
+  sed -i -e "s/APP_VERSION=\"[0-9a-z\.]\+\"/APP_VERSION=\"$MAJOR.$MINOR\"/g" extra/dmginfo.txt
   #sed -i -e "s/Version=[0-9\.]*/Version=$MAJOR.$MINOR/g" extra/JournalViewer.desktop
 else
   sed -e "s/#define UCHROMAREVISION \"[0-9\.]\+\(.*\)\"/#define UCHROMAREVISION \"$REVISION\"/g" src/version.h | grep UCHROMAREVISION
@@ -85,6 +85,7 @@ else
   sed -e "s/set(VERSION_MAJOR \"[0-9]\+\")/set(VERSION_MAJOR \"$MAJOR\")/g" -e "s/set(VERSION_MINOR \"[0-9]\+\")/set(VERSION_MINOR \"$MINOR\")/g"  CMakeLists.txt | head -n 9
   sed -e "s/Version: [0-9a-z\.]\+/Version: $MAJOR.$MINOR/g" extra/uchroma.spec | grep "Version:"
   sed -e "s/Version: \([0-9a-z\.]\+\)/Version: $MAJOR.$MINOR/g" extra/uchroma.dsc | grep "Version:"
+  sed -e "s/APP_VERSION=\"[0-9a-z\.]\+\"/APP_VERSION=\"$MAJOR.$MINOR\"/g" extra/dmginfo.txt | grep "APP_VERSION="
   #sed -e "s/Version=[0-9\.]*/Version=$MAJOR.$MINOR/g" extra/JournalViewer.desktop | grep Version
 fi
 

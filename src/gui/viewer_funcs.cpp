@@ -157,7 +157,6 @@ void Viewer::paintGL()
 	GLfloat colourGray[4] = { 0.8, 0.8, 0.8, 1.0 };
 	GLfloat colourBlue[4] = { 0.88, 0.95, 1.0, 1.0 };
 	GLfloat colourWhite[4] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat colourTransparentGray[4] = { 0.0, 0.0, 0.0, 0.3 };
 
 	// Create a query object to get timing information
 	GLuint timeQuery = 0;

@@ -62,7 +62,7 @@ double UChromaWindow::screenToAxis(int axis, int mouseX, int mouseY)
 	double ratio = am.magnitude() / ab.magnitude();
 	abNorm.normalise();
 	amNorm.normalise();
-	double angle = acos(abNorm.dp(amNorm)) ;
+// 	double angle = acos(abNorm.dp(amNorm));
 //	printf("Angle = %f, %f\n", angle, angle * DEGRAD);
 
 	// Calculate slice axis value - no need to account for inverted axes here, since this is accounted for in the vectors axmin and axmax

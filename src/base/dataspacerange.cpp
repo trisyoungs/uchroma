@@ -301,6 +301,8 @@ bool DataSpaceRange::calculateValues(Expression& equation, Variable* xVariable, 
 			if (!success) return false;
 		}
 	}
+
+	return true;
 }
 
 // Return sos error between stored and reference values

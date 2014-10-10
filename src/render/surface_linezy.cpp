@@ -44,7 +44,7 @@ void Surface::constructLineZY(PrimitiveList& primitiveList, const Axes& axes, co
 
 	// Temporary variables
 	Vec4<GLfloat> colour(0,0,0,1);
-	int n, nPoints;
+	int n;
 	double y;
 	Vec3<double> nrm(0.0, 1.0, 0.0);
 
@@ -56,7 +56,7 @@ void Surface::constructLineZY(PrimitiveList& primitiveList, const Axes& axes, co
 	Primitive* currentPrimitive = primitiveList[0];
 
 	// Create lines for slices
-	GLuint vertexA, vertexB;
+	int vertexA, vertexB;
 	DisplayDataSet* dataSet;
 	for (n=0; n<nX; ++n)
 	{

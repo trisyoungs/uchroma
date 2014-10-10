@@ -122,7 +122,11 @@ void LineStyle::apply()
 	glLineWidth(width_);
 	glEnable(GL_LINE_STIPPLE);
 	LineStipple::stipple[stipple_].apply();
-	GLfloat c[4] = { colour_.redF(), colour_.greenF(), colour_.blueF(), colour_.alphaF() };
+	GLfloat c[4];
+	c[0] = colour_.redF();
+	c[1] = colour_.greenF();
+	c[2] = colour_.blueF();
+	c[3] = colour_.alphaF();
 	glColor4fv(c);
 }
 

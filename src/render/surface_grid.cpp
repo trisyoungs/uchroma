@@ -56,16 +56,15 @@ void Surface::constructGrid(PrimitiveList& primitiveList, const Axes& axes, cons
 	primitiveList.reinitialise(nPrimitives, true, maxVertices, maxIndices*10, GL_LINES, true);
 
 	// Temporary variables
-	int n, nPoints, offset = 0, i, nLimit, nMax, slice;
+	int n, offset = 0, i, nLimit, nMax;
 	Vec4<GLfloat> colour;
-	GLfloat zA, zB;
 	Vec3<double> nrm(0.0, 1.0, 0.0);
 	Array<double> y;
 	Array<DisplayDataSet::DataPointType> yType;
 
 	DisplayDataSet** slices = displayData.array();
 	Primitive* currentPrimitive = primitiveList[0];
-	GLuint verticesA[cacheSize], verticesB[cacheSize];
+	int verticesA[cacheSize], verticesB[cacheSize];
 	double z;
 
 	// Loop over abscissa indices

@@ -120,7 +120,7 @@ class ColourScale
 	// Return whether the colourscale is interpolated
 	bool interpolated() const;
 	// Set whether or not to use HSV interpolation
-	bool setUseHSV(bool b);
+	void setUseHSV(bool b);
 	// Return whether or not to use HSV interpolation
 	bool useHSV() const;
 

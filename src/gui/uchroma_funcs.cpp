@@ -30,8 +30,8 @@
 UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	axesWindow_(*this), dataWindow_(*this), logWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this),
 	createCollectionDialog_(*this), dataImportDialog_(*this), editFitSetupDialog_(*this), saveImageDialog_(*this),
-	viewLayout_(*this),
-	viewTypeActionGroup_(this)
+	viewTypeActionGroup_(this),
+	viewLayout_(*this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -48,7 +48,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 #ifdef WIN32
 	viewerFont_ = QDir::current().absoluteFilePath("bin/wright.ttf");
 #elif __APPLE__
-	viewerFont_ = ui.application()->applicationDirPath() + "/../SharedSupport/resources/wright.ttf");
+	viewerFont_ = QCoreApplication::applicationDirPath() + "/../SharedSupport/resources/wright.ttf";
 #else
 	viewerFont_ = QDir::current().absoluteFilePath("wright.ttf");
 #endif

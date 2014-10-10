@@ -50,7 +50,7 @@ int Expression::lex()
 	int n;
 	bool done, hasExp;
 	static QString token, name;
-	char quotechar, c;
+	char c;
 	token.clear();
 
 	// Skip over whitespace
