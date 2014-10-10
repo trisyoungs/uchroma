@@ -1,0 +1,13 @@
+Source: uchroma
+Section: unknown
+Priority: optional
+Maintainer: Tris Youngs <tris@projectaten.net>
+Build-Depends: debhelper (>= 4.1.16)
+
+Package: uchroma
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: Visualisation / graphing tool for 2D / 3D datasets
+ uChroma is intended for use as a plotting tool for sequences of 2D datasets, e.g. spectra collected
+ as a function of time, temperature etc., generating a 3D surface from the individual datasets.
+ Basic data slicing is implemented, along with function fitting algorithms across the surface.
