@@ -68,7 +68,9 @@ MINOR=`printf "%02i" $(( REVISION%1000 ))`
 
 if [ "$TEST" = "false" ]
 then
-  sed -i -e "s/#define UCHROMAREVISION \"[0-9\.]\+\(.*\)\"/#define UCHROMAREVISION \"$REVISION\"/g" -e "s/#define UCHROMADATE \".\+\"/#define UCHROMADATE \"$DATE\"/g" src/version.h
+  sed -i -e "s/#define UCHROMAREVISION \"[0-9\.]\+\(.*\)\"/#define UCHROMAREVISION \"$REVISION\"/g" src/version.h
+  sed -i -e "s/#define UCHROMAVERSION \"[0-9\.]\+\"/#define UCHROMAVERSION \"$MAJOR.$MINOR\"/g" src/version.h
+  sed -i -e "s/#define UCHROMADATE \".\+\"/#define UCHROMADATE \"$DATE\"/g" src/version.h
   sed -i -e "s/m4_define(\[UCHROMA_VERSION\],\[.\+\])/m4_define([UCHROMA_VERSION],[$MAJOR.$MINOR])/g" configure.ac
   sed -i -e "s/set(VERSION_MAJOR \"[0-9]\+\")/set(VERSION_MAJOR \"$MAJOR\")/g" -e "s/set(VERSION_MINOR \"[0-9]\+\")/set(VERSION_MINOR \"$MINOR\")/g"  CMakeLists.txt
   sed -i -e "s/Version: [0-9a-z\.]\+/Version: $MAJOR.$MINOR/g" extra/uchroma.spec
@@ -76,7 +78,9 @@ then
   #sed "s/ [a-f0-9]\+ [0-9]\+ uchroma-[0-9\.]\+.tar.gz/HERE/g" uchroma.dsc
   #sed -i -e "s/Version=[0-9\.]*/Version=$MAJOR.$MINOR/g" extra/JournalViewer.desktop
 else
-  sed -e "s/#define UCHROMAREVISION \"[0-9\.]\+\(.*\)\"/#define UCHROMAREVISION \"$REVISION\"/g" -e "s/#define UCHROMADATE \".\+\"/#define UCHROMADATE \"$DATE\"/g" src/version.h | grep UCHROMA
+  sed -e "s/#define UCHROMAREVISION \"[0-9\.]\+\(.*\)\"/#define UCHROMAREVISION \"$REVISION\"/g" src/version.h | grep UCHROMAREVISION
+  sed -e "s/#define UCHROMAVERSION \"[0-9\.]\+\"/#define UCHROMAVERSION \"$MAJOR.$MINOR\"/g" src/version.h | grep UCHROMAVERSION
+  sed -e "s/#define UCHROMADATE \".\+\"/#define UCHROMADATE \"$DATE\"/g" src/version.h | grep UCHROMADATE
   sed -e "s/m4_define(\[UCHROMA_VERSION\],\[.\+\])/m4_define([UCHROMA_VERSION],[$MAJOR.$MINOR])/g" configure.ac | head -n 10
   sed -e "s/set(VERSION_MAJOR \"[0-9]\+\")/set(VERSION_MAJOR \"$MAJOR\")/g" -e "s/set(VERSION_MINOR \"[0-9]\+\")/set(VERSION_MINOR \"$MINOR\")/g"  CMakeLists.txt | head -n 9
   sed -e "s/Version: [0-9a-z\.]\+/Version: $MAJOR.$MINOR/g" extra/uchroma.spec | grep "Version:"
