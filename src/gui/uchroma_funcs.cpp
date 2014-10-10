@@ -47,6 +47,8 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	inputFileDirectory_ = getenv("PWD");
 #ifdef WIN32
 	viewerFont_ = QDir::current().absoluteFilePath("bin/wright.ttf");
+#elif __APPLE__
+	viewerFont_ = ui.application()->applicationDirPath() + "/../SharedSupport/resources/wright.ttf");
 #else
 	viewerFont_ = QDir::current().absoluteFilePath("wright.ttf");
 #endif
