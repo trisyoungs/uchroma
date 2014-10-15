@@ -324,10 +324,11 @@ double Axes::max(int axis) const
 	return max_.get(axis);
 }
 
-// Return axis range
+// Return axis range (accounting for logged axes)
 double Axes::range(int axis) const
 {
-	return max_.get(axis) - min_.get(axis);
+	if (logarithmic_.get(axis)) return log10(max_.get(axis)) - log10(min_.get(axis));
+	else return max_.get(axis) - min_.get(axis);
 }
 
 // Set axis to extreme limit
@@ -602,7 +603,6 @@ void Axes::calculateTickDeltas(int axis)
 {
 	const int nBaseValues = 5, maxIterations = 10, maxTicks = 10;
 	int power = 1, baseValues[nBaseValues] = { 1, 2, 3, 4, 5 }, baseValueIndex = 0, nTicks, iteration, minTicks = maxTicks/2;
-	double clampedStartValue;
 
 	baseValueIndex = 0;
 	power = int(log10((max_[axis]-min_[axis]) / maxTicks) - 1);
@@ -617,7 +617,6 @@ void Axes::calculateTickDeltas(int axis)
 
 			// Get first tickmark value
 			tickFirst_[axis] = int(min_[axis] / tickDelta_[axis]) * tickDelta_[axis];
-			clampedStartValue = (tickFirst_[axis] < min_[axis] ? tickFirst_[axis] + tickDelta_[axis] : tickFirst_[axis]);
 
 			// How many ticks now fit between the firstTick and max value?
 			// Add 1 to get total ticks for this delta (i.e. including firstTick)

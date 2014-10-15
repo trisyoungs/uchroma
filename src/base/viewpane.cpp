@@ -738,6 +738,7 @@ double ViewPane::calculateRequiredZoom(double xMax, double yMax, double fraction
 		if (++count == 1000) break;
 
 	} while ((rScreen.x > targetX) || (rScreen.y > targetY));
+
 	return translation.z;
 }
 
