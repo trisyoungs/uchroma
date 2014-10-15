@@ -63,8 +63,8 @@ void Surface::constructLineXY(PrimitiveList& primitiveList, const Axes& axes, co
 	{
 		// Grab y and z values
 		y.copy(slices[slice]->y(), minIndex.x, maxIndex.x);
-		axes.transformY(y);
 		yType.copy(slices[slice]->yType(), minIndex.x, maxIndex.x);
+		axes.transformY(y, yType);
 		z = axes.transformZ(slices[slice]->z());
 
 		// Reset vertexA to -1 so we don't draw a line at n=0

@@ -570,18 +570,26 @@ void Axes::transformX(Array<double>& xArray) const
 // Return supplied data y value in local axes coordinates
 double Axes::transformY(double y) const
 {
-	if (inverted_.y && logarithmic_.y) return log10(max_.y/y) * stretch_.y;
+	if (inverted_.y && logarithmic_.y) return (max_.y/y <= 0.0 ? log10(max_.y/y) * stretch_.y : 0.0);
 	else if (inverted_.y) return ((max_.y - y) + min_.y) * stretch_.y;
-	else if (logarithmic_.y) return log10(y) * stretch_.y;
+	else if (logarithmic_.y) return (y <= 0.0 ? log10(y) * stretch_.y : 0.0);
 	else return y * stretch_.y;
 }
 
 // Transform entire array of values into local axes coordinates
-void Axes::transformY(Array<double>& yArray) const
+void Axes::transformY(Array<double>& yArray, Array<DisplayDataSet::DataPointType>& typeArray) const
 {
-	if (inverted_.y && logarithmic_.y) for (int n=0; n< yArray.nItems(); ++n) yArray[n] = log10(max_.y/ yArray[n]) * stretch_.y;
+	if (inverted_.y && logarithmic_.y) for (int n=0; n< yArray.nItems(); ++n)
+	{
+		if (max_.y / yArray[n] <= 0.0) typeArray[n] = DisplayDataSet::NoPoint;
+		else yArray[n] = log10(max_.y/ yArray[n]) * stretch_.y;
+	}
 	else if (inverted_.y) for (int n=0; n< yArray.nItems(); ++n) yArray[n] = ((max_.y - yArray[n]) + min_.y) * stretch_.y;
-	else if (logarithmic_.y) for (int n=0; n< yArray.nItems(); ++n) yArray[n] = log10(yArray[n]) * stretch_.y;
+	else if (logarithmic_.y) for (int n=0; n<yArray.nItems(); ++n)
+	{
+		if (yArray[n] <= 0.0) typeArray[n] = DisplayDataSet::NoPoint;
+		else yArray[n] = log10(yArray[n]) * stretch_.y;
+	}
 	else yArray *= stretch_.y;
 }
 

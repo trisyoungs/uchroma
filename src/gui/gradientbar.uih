@@ -19,8 +19,8 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FQPLOT_GRADIENTBAR_H
-#define FQPLOT_GRADIENTBAR_H
+#ifndef UCHROMA_GRADIENTBAR_H
+#define UCHROMA_GRADIENTBAR_H
 
 #include "base/colourscale.h"
 #include <QtGui/QWidget>

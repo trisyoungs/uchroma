@@ -100,8 +100,8 @@ void Surface::constructGrid(PrimitiveList& primitiveList, const Axes& axes, cons
 		{
 			// Grab arrays
 			y.copy(slices[slice]->y(), minIndex.x+offset, minIndex.x+offset+nLimit-1);
-			axes.transformY(y);
 			yType.copy(slices[slice]->yType(), minIndex.x+offset, minIndex.x+offset+nLimit-1);
+			axes.transformY(y, yType);
 			z = axes.transformZ(slices[slice]->z());
 
 			// Generate vertices for this row

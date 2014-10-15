@@ -23,6 +23,7 @@
 #define UCHROMA_AXES_H
 
 #include "base/numberformat.h"
+#include "base/displaydataset.h"
 #include "render/primitive.h"
 #include "render/textprimitivelist.h"
 #include "render/linestyle.h"
@@ -176,7 +177,7 @@ class Axes
 	// Return supplied data y value in local axes coordinates
 	double transformY(double y) const;
 	// Transform entire array of values into local axes coordinates
-	void transformY(Array<double>& yArray) const;
+	void transformY(Array< double >& yArray, Array<DisplayDataSet::DataPointType>& typeArray) const;
 	// Return supplied data z value in local axes coordinates
 	double transformZ(double z) const;
 

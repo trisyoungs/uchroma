@@ -86,6 +86,12 @@ double FontInstance::fontBaseHeight()
 	return fontBaseHeight_;
 }
 
+// Return full height of font
+double FontInstance::fontFullHeight()
+{
+	return fontFullHeight_;
+}
+
 // Return bounding box for specified string
 FTBBox FontInstance::boundingBox(QString text)
 {

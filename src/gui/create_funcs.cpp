@@ -203,7 +203,7 @@ void CreateCollectionDialog::on_CreateButton_clicked(bool checked)
 void CreateCollectionDialog::on_EquationEdit_textChanged(QString text)
 {
 	resetEquation();
-	equationValid_ = equation_.generate(qPrintable(text), true);
+	equationValid_ = equation_.generate(text);
 	if (equationValid_)
 	{
 		ui.EquationEdit->setPalette(ui.EquationGroup->palette());

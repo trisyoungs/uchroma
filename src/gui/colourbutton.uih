@@ -19,8 +19,8 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FQPLOT_COLOURBUTTON_H
-#define FQPLOT_COLOURBUTTON_H
+#ifndef UCHROMA_COLOURBUTTON_H
+#define UCHROMA_COLOURBUTTON_H
 
 #include <QtGui/QPushButton>
 

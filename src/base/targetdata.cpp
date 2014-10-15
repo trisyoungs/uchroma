@@ -68,7 +68,7 @@ void TargetData::initialise(Collection* collection)
 	collection_ = collection;
 
 	// Check collection validity
-	if (!Collection::objectValid(collection, "collection in TargetData::initialise()")) return;
+	if (!Collection::objectValid(collection_, "collection in TargetData::initialise()")) return;
 
 	// Set up additional data based on the parent ViewPane's type
 	switch (parent_.role())

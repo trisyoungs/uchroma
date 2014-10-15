@@ -68,7 +68,7 @@ bool Transformer::enabled()
 bool Transformer::setEquation(QString equation)
 {
 	text_ = equation;
-	valid_ = equation_.generate(qPrintable(equation), true);
+	valid_ = equation_.generate(equation);
 	return valid_;
 }
 

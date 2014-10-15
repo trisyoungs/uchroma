@@ -19,8 +19,8 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FQPLOT_VIEWER_H
-#define FQPLOT_VIEWER_H
+#ifndef UCHROMA_VIEWER_H
+#define UCHROMA_VIEWER_H
 
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QObject>

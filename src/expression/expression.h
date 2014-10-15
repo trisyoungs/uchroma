@@ -80,11 +80,9 @@ class Expression
 	// 'Replace' last character read from current input stream
 	void unGetChar();
 	// Perform expression generation for this expression
-	bool generate(QString expressionText, bool quiet = false);
+	bool generate(QString expressionText);
 	// Return current expression target
 	static Expression* target();
-	// Print error information and location
-	void printErrorInfo();
 
 
 	/*

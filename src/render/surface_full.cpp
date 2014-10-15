@@ -68,14 +68,14 @@ void Surface::constructFull(PrimitiveList& primitiveList, const Axes& axes, cons
 
 	// Construct first slice data and set initial min/max values
 	yA.copy(displayData[minIndex.z]->y(), minIndex.x, maxIndex.x);
-	axes.transformY(yA);
 	typeA.copy(displayData[minIndex.z]->yType(), minIndex.x, maxIndex.x);
+	axes.transformY(yA, typeA);
 	zA = axes.transformZ(displayData[minIndex.z]->z());
 	if ((minIndex.z+1) <= maxIndex.z)	// Safety check - this should always be true because of the checks above
 	{
 		yB.copy(displayData[minIndex.z+1]->y(), minIndex.x, maxIndex.x);
-		axes.transformY(yB);
 		typeB.copy(displayData[minIndex.z+1]->yType(), minIndex.x, maxIndex.x);
+		axes.transformY(yB, typeB);
 		zB = axes.transformZ(displayData[minIndex.z+1]->z());
 	}
 	constructSurfaceStrip(x, yA, zA, axes, normA, colourA, colourScale, yC, 0.0, yB, zB);
@@ -90,8 +90,8 @@ void Surface::constructFull(PrimitiveList& primitiveList, const Axes& axes, cons
 		if (index < maxIndex.z)
 		{
 			yC.copy(displayData[index+1]->y(), minIndex.x, maxIndex.x);
-			axes.transformY(yC);
 			typeC.copy(displayData[index+1]->yType(), minIndex.x, maxIndex.x);
+			axes.transformY(yC, typeC);
 			zC = axes.transformZ(displayData[index+1]->z());
 		}
 		else yC.clear();

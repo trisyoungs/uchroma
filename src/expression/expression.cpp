@@ -96,24 +96,6 @@ bool Expression::generateMissingVariables()
 	return generateMissingVariables_;
 }
 
-// Print error information and location
-void Expression::printErrorInfo()
-{
-	printf("Error occurred here:\n");
-	// QUICK'n'DIRTY!
-	int i;
-	char *temp = new char[stringLength_+32];
-	for (i=0; i<stringLength_+32; ++i) temp[i] = '\0';
-	for (i=0; i<tokenStart_; i++) temp[i] = (stringSource_[i] == '\t' ? '\t' : ' ');
-	if (functionStart_ > -1) for (i=functionStart_; i<stringPos_; i++) if (temp[i] != '\t') temp[i] = '-';
-	for (i=tokenStart_; i<stringPos_; i++) temp[i] = '^';
-	temp[stringPos_] = '\0';
-	// Print current string
-	msg.print(" %s\n", qPrintable(stringSource_));
-	msg.print(" %s^\n", temp);
-	delete[] temp;
-}
-
 // Get next character from current input stream
 char Expression::getChar()
 {
@@ -141,7 +123,7 @@ void Expression::unGetChar()
 }
 
 // Generate an expression
-bool Expression::generate(QString expressionText, bool quiet)
+bool Expression::generate(QString expressionText)
 {
 	msg.enter("Expression::generate");
 
@@ -156,7 +138,6 @@ bool Expression::generate(QString expressionText, bool quiet)
 
 	// Perform the parsing
 	int result = ExpressionParser_parse();
-	if ((result != 0) && (!quiet)) printErrorInfo();
 
 	target_ = NULL;
 
@@ -212,7 +193,8 @@ bool Expression::addStatement(Node* leaf)
 Node* Expression::addOperator(Functions::Function func, Node* arg1, Node* arg2)
 {
 	msg.enter("Expression::addOperator");
-	if ((!arg1->returnsNumber()) || (!arg2->returnsNumber())) return NULL;
+	if (arg1 && (!arg1->returnsNumber())) return NULL;
+	if (arg2 && (!arg2->returnsNumber())) return NULL;
 
 	// Create new command node
 	FunctionNode* leaf = new FunctionNode(func);

@@ -172,7 +172,7 @@ void FitKernel::resetEquation()
 bool FitKernel::setEquation(QString equation)
 {
 	equationText_ = equation;
-	equationValid_ = equation_.generate(qPrintable(equationText_), true);
+	equationValid_ = equation_.generate(equationText_);
 
 	updateVariables();
 
