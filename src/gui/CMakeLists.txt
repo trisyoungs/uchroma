@@ -46,6 +46,7 @@ SET(qtproject_SRCS
   axes_funcs.cpp
   create_funcs.cpp
   data_funcs.cpp
+  data_setz_funcs.cpp
   dataimport_funcs.cpp
   dataimport_seqxy.cpp
   log_funcs.cpp
@@ -77,6 +78,7 @@ SET(pro_MOC_HDRS
   uchroma.h
   create.h
   data.h
+  data_setz.h
   dataimport.h
   log.h
   saveimage.h
@@ -101,6 +103,7 @@ SET(pro_UIS
   axes.ui
   create.ui
   data.ui
+  data_setz.ui
   dataimport.ui
   log.ui
   saveimage.ui

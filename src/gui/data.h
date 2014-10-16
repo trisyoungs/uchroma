@@ -77,7 +77,7 @@ class DataWindow : public QWidget
 	void on_DataSetsTable_itemSelectionChanged();
 	void on_DataSetsTable_itemDoubleClicked(QTableWidgetItem* item);
 	void on_DataSetsTable_cellChanged(int row, int column);
-	void on_GetZFromTimeStampButton_clicked(bool checked);
+	void on_SetZButton_clicked(bool checked);
 	void on_ReloadFilesButton_clicked(bool checked);
 	void on_EditDataSetButton_clicked(bool checked);
 

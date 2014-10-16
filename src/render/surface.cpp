@@ -111,7 +111,7 @@ void Surface::constructSurfaceStrip(const Array<double>& x, const Array<double>&
 	{
 		for (n=0; n<nX; ++n)
 		{
-			colour = colourScale.colour(pow(10.0, y.value(n)) / yScale);
+			colour = colourScale.colour(pow(10.0, y.value(n) / yScale));
 			colours.add(Vec4<GLfloat>(colour.redF(), colour.greenF(), colour.blueF(), colour.alphaF()));
 		}
 	}

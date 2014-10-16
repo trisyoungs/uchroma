@@ -453,4 +453,3 @@ void ColourScale::setAllAlpha(double alpha)
 	}
 	calculateDeltas();
 }
-

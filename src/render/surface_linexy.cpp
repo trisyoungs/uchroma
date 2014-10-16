@@ -76,7 +76,7 @@ void Surface::constructLineXY(PrimitiveList& primitiveList, const Axes& axes, co
 			// Define vertex index for this point (if one exists)
 			if (yType.value(n) != DisplayDataSet::NoPoint)
 			{
-				colourScale.colour((yLogarithmic ? pow(10.0, y.value(n)) : y.value(n)) / yStretch, colour);
+				colourScale.colour(yLogarithmic ? pow(10.0, y.value(n) / yStretch) : y.value(n) / yStretch, colour);
 				vertexB = currentPrimitive->defineVertex(x.value(n), y.value(n), z, nrm, colour);
 			}
 			else vertexB = -1;

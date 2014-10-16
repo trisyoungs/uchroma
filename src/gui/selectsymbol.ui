@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>272</width>
-    <height>275</height>
+    <height>296</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -31,7 +31,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Select Equation</string>
+   <string>Select Symbol</string>
   </property>
   <property name="windowIcon">
    <iconset resource="icons.qrc">

@@ -101,9 +101,11 @@ class LineParser
 
 	public:
 	// Skip 'n' lines from internal file
-	   bool skipLines(int nSkip);
+	bool skipLines(int nSkip);
 	// Gets next delimited arg from internal line
 	bool getNextArg(int optionMask, QString& destarg);
+	// Read line from file
+	bool getLine(QString& destination);
 	// Read line from file and do delimited parse
 	bool getArgs(int optionMask);
 	// Returns number of arguments grabbed from last parse

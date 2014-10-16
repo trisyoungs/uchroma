@@ -29,7 +29,7 @@
 template<class ViewPane> RefList<ViewPane,bool> ObjectList<ViewPane>::objects_;
 
 // Constructor
-ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), parent_(parent), axes_(*this), ObjectList<ViewPane>(this), zOffset_(-10.0)
+ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), ObjectList<ViewPane>(this), parent_(parent), zOffset_(-10.0), axes_(*this)
 {
 	// Geometry / position
 	bottomEdge_ = 0;
@@ -249,6 +249,9 @@ Vec4<int> ViewPane::geometryAfterHandleMove(PaneHandle handle, int deltaX, int d
 			if ((deltaX > 0) || ((result.z + deltaX) > 0)) result.z += deltaX;
 			if ((deltaY > 0) || ((result.w + deltaY) > 0)) result.w += deltaY;
 			break;
+		default:
+			msg.print("Unhandled PaneHandle in ViewPane::geometryAfterHandleMove().\n");
+			break;
 	}
 
 	return result;
@@ -268,8 +271,13 @@ void ViewPane::recalculateViewport(int gridPixelWidth, int gridPixelHeight, int 
 	if ((leftEdge_+width_) == nColumns) viewportMatrix_[2] += widthRemainder;
 	if ((bottomEdge_+height_) == nRows) viewportMatrix_[3] += heightRemainder;
 
-	// Recalculate projection matrix and view
-	projectionMatrix_ = calculateProjectionMatrix(zOffset_);
+	// Recalculate projection matrix
+	if ((viewType_ == ViewPane::NormalView) || (viewType_ == ViewPane::AutoStretchedView))
+	{
+		projectionMatrix_ = calculateProjectionMatrix(hasPerspective_);
+	}
+	else projectionMatrix_ = calculateProjectionMatrix(false, zOffset_);
+
 	calculateFontScaling();
 }
 
@@ -282,10 +290,10 @@ GLuint* ViewPane::viewportMatrix()
 // Return whether the specified coordinate is in this pane
 bool ViewPane::containsCoordinate(int layoutX, int layoutY)
 {
-	if (layoutX < viewportMatrix_[0]) return false;
-	if (layoutX > (viewportMatrix_[0]+viewportMatrix_[2])) return false;
-	if (layoutY < viewportMatrix_[1]) return false;
-	if (layoutY > (viewportMatrix_[1]+viewportMatrix_[3])) return false;
+	if (layoutX < int(viewportMatrix_[0])) return false;
+	if (layoutX > int(viewportMatrix_[0]+viewportMatrix_[2])) return false;
+	if (layoutY < int(viewportMatrix_[1])) return false;
+	if (layoutY > int(viewportMatrix_[1]+viewportMatrix_[3])) return false;
 	return true;
 }
 
@@ -304,7 +312,7 @@ bool ViewPane::containsGridReference(int gridX, int gridY)
  */
 
 // Role of pane
-const char* RoleKeywords[ViewPane::nPaneRoles] = { "SliceMonitor", "Standard" };
+const char* RoleKeywords[ViewPane::nPaneRoles] = { "Extractor", "SliceMonitor", "Standard" };
 
 // Convert text string to PaneRole
 ViewPane::PaneRole ViewPane::paneRole(QString s)
@@ -421,7 +429,11 @@ bool ViewPane::processUpdate(Collection* source, Collection::CollectionSignal si
 		// -- Role Relevance : SliceMonitorRole
 		case (Collection::CurrentSliceChangedSignal):
 			if (role_ != ViewPane::SliceMonitorRole) return false;
-			if (!collectionIsTarget(source)) return false;
+			if (!collectionIsTarget(source)) 
+			{
+				addCollectionTarget(source);
+				return false;
+			}
 			// Update axes limits
 			updateAxisLimits();
 			break;
@@ -431,8 +443,11 @@ bool ViewPane::processUpdate(Collection* source, Collection::CollectionSignal si
 			return false;
 			break;
 		// Extracted Data Added
-		// -- Role Relevance : ???
+		// -- Role Relevance : Extractor
 		case (Collection::ExtractedDataAddedSignal):
+			if (role_ != ViewPane::ExtractorRole) return false;
+			addCollectionTarget(source);
+			updateAxisLimits();
 			return false;
 			break;
 		default:
@@ -464,14 +479,14 @@ const char* ViewPane::viewType(ViewPane::ViewType vt)
 }
 
 // Return calculated projection matrix
-Matrix ViewPane::calculateProjectionMatrix(double orthoZoom)
+Matrix ViewPane::calculateProjectionMatrix(bool hasPerspective, double orthoZoom)
 {
 	Matrix result;
 
 	GLdouble top, bottom, right, left;
 	GLdouble nearClip = 0.5, farClip = 2000.0;
 
-	if (hasPerspective_ && (viewType_ <= ViewPane::AutoStretchedView))
+	if (hasPerspective)
 	{
 		// Use reversed top and bottom values so we get y-axis (0,1,0) pointing up
 		top = tan(perspectiveFieldOfView_ / DEGRAD) * 0.5;
@@ -536,7 +551,8 @@ void ViewPane::setHasPerspective(bool perspective)
 {
 	hasPerspective_ = perspective;
 
-	projectionMatrix_ = calculateProjectionMatrix(viewTranslation_.z);
+	projectionMatrix_ = calculateProjectionMatrix(hasPerspective_, viewTranslation_.z);
+
 	calculateFontScaling();
 }
 
@@ -585,7 +601,7 @@ Matrix ViewPane::viewRotation()
 void ViewPane::setViewTranslation(double x, double y, double z)
 {
 	viewTranslation_.set(x, y, z);
-	if (!hasPerspective_) projectionMatrix_ = calculateProjectionMatrix(viewTranslation_.z);
+	if (!hasPerspective_) projectionMatrix_ = calculateProjectionMatrix(false, viewTranslation_.z);
 	calculateFontScaling();
 }
 
@@ -596,7 +612,7 @@ void ViewPane::translateView(double dx, double dy, double dz)
 	if ((viewType_ != ViewPane::NormalView) && (viewType_ != ViewPane::AutoStretchedView)) return;
 
 	viewTranslation_.add(dx, dy, dz);
-	if ((!hasPerspective_) && (fabs(dz) > 1.0e-4)) projectionMatrix_ = calculateProjectionMatrix(viewTranslation_.z);
+	if ((!hasPerspective_) && (fabs(dz) > 1.0e-4)) projectionMatrix_ = calculateProjectionMatrix(false, viewTranslation_.z);
 	calculateFontScaling();
 }
 
@@ -702,7 +718,7 @@ double ViewPane::calculateRequiredZoom(double xMax, double yMax, double fraction
 	// available range on-screen to use, allowing a margin to be added. A value of '1.0' would
 	// put the extent with the highest units on the very edge of the display.
 
-	Matrix viewMatrix, projectionMatrix = calculateProjectionMatrix(zOffset_);
+	Matrix viewMatrix, projectionMatrix = calculateProjectionMatrix(hasPerspective_, zOffset_);
 	Vec4<double> rScreen, rWorld, rModel(xMax, yMax, 0.0, 1.0);
 	Vec3<double> translation(0.0, 0.0, -1.0);
 
@@ -718,7 +734,7 @@ double ViewPane::calculateRequiredZoom(double xMax, double yMax, double fraction
 	do
 	{
 		// If not using perspective, must recalculate the projection matrix
-		if (!hasPerspective_) projectionMatrix = calculateProjectionMatrix(translation.z);
+		if (!hasPerspective_) projectionMatrix = calculateProjectionMatrix(false, translation.z);
 
 		// Project the point : worldr = P x M x modelr
 		viewMatrix.setIdentity();
@@ -807,12 +823,16 @@ void ViewPane::recalculateView(bool force)
 	int axis;
 
 	// Calculate ourselves a 'standard' projection matrix
-	Matrix projectionMatrix = calculateProjectionMatrix(zOffset_);
+	if (viewType_ == ViewPane::AutoStretchedView) projectionMatrix_ = calculateProjectionMatrix(hasPerspective_, viewTranslation_.z);
+	else projectionMatrix_ = calculateProjectionMatrix(false, zOffset_);
+
+	// Create a temporary, orthographic projection matrix
+	Matrix tempProjection = calculateProjectionMatrix(false, zOffset_);
 
 	// To begin, set the stretch factors to our best first estimate, dividing the pane width by the range of the axes
 	// Doing this first will allow us to get much better values for the pixel overlaps we need later on
 	// -- Project a point one unit each along X and Y and subtract off the viewport centre coordinate in order to get literal 'pixels per unit' for (screen) X and Y 
-	Vec3<double> unit = modelToScreen(Vec3<double>(1.0, 1.0, 0.0), projectionMatrix, Matrix());
+	Vec3<double> unit = modelToScreen(Vec3<double>(1.0, 1.0, 0.0), tempProjection, Matrix());
 	unit.x -= viewportMatrix_[0] + viewportMatrix_[2]/2.0;
 	unit.y -= viewportMatrix_[1] + viewportMatrix_[3]/2.0;
 	unit.z = unit.y;
@@ -836,8 +856,8 @@ void ViewPane::recalculateView(bool force)
 	}
 
 	// Set axis stretch factors to fill available pixel width/height
-	for (axis=0; axis<3; ++axis) axes_.setStretch(axis, viewportMatrix_[axisDir[axis]+2] / (unit[axisDir[axis]] * (axisMax[axis] - axisMin[axis])));
-
+	for (axis=0; axis<3; ++axis) axes_.setStretch(axis, viewportMatrix_[axisDir[axis]+2] / (unit[axisDir[axis]] * (axes_.range(axis))));
+	
 	const double margin = 10.0;
 	Matrix viewMat, B;
 	double tempMin, tempMax;
@@ -863,8 +883,8 @@ void ViewPane::recalculateView(bool force)
 			if ((axis != axisX) && (axis != axisY)) continue;
 
 			// Project axis min/max coordinates onto screen
-			a = modelToScreen(axes_.coordMin(axis), projectionMatrix, viewMat);
-			b = modelToScreen(axes_.coordMax(axis), projectionMatrix, viewMat);
+			a = modelToScreen(axes_.coordMin(axis), tempProjection, viewMat);
+			b = modelToScreen(axes_.coordMax(axis), tempProjection, viewMat);
 			coordMin[axis].set(std::min(a.x,b.x), std::min(a.y,b.y),  std::min(a.z,b.z)); 
 			coordMax[axis].set(std::max(a.x,b.x), std::max(a.y,b.y),  std::max(a.z,b.z)); 
 
@@ -881,8 +901,8 @@ void ViewPane::recalculateView(bool force)
 			cuboid = axes_.titlePrimitive(axis).boundingCuboid(*this, false, textZScale_, cuboid);
 
 			// Project cuboid extremes and store projected coordinates
-			a = modelToScreen(cuboid.minima(), projectionMatrix, viewMat);
-			b = modelToScreen(cuboid.maxima(), projectionMatrix, viewMat);
+			a = modelToScreen(cuboid.minima(), tempProjection, viewMat);
+			b = modelToScreen(cuboid.maxima(), tempProjection, viewMat);
 
 			// Update global and label min/max
 			for (int n=0; n<3; ++n)
@@ -897,7 +917,6 @@ void ViewPane::recalculateView(bool force)
 		}
 
 		// Now have screen coordinates of all necessary objects (axes and labels)
-
 		// Calculate total width and height of objects as they are arranged
 		double globalWidth = globalMax.x - globalMin.x;
 		double globalHeight = globalMax.y - globalMin.y;
@@ -918,7 +937,7 @@ void ViewPane::recalculateView(bool force)
 	}
 
 	// Set new rotation matrix and translation vector (if not AutoStretchedView)
-	if (viewType_ != ViewPane::AutoStretchedView)
+	if (viewType_ > ViewPane::AutoStretchedView)
 	{
 		viewRotation_.setIdentity();
 		if (viewType_ == ViewPane::FlatXZView) viewRotation_.applyRotationX(90.0);
@@ -930,6 +949,9 @@ void ViewPane::recalculateView(bool force)
 		viewTranslation_[0] = (margin - (globalMin.x - viewportMatrix_[0])) / unit.x;
 		viewTranslation_[1] = (margin - (globalMin.y - viewportMatrix_[1])) / unit.y;
 	}
+
+	// Recalculate font scaling
+	calculateFontScaling();
 
 	// Store new versions of view
 	viewAxesUsedAt_ = axes().axesVersion();
@@ -949,12 +971,12 @@ void ViewPane::resetViewMatrix()
 		viewTranslation_.z = calculateRequiredZoom(axes_.range(0)*0.5, axes_.range(1)*0.5, 0.9);
 
 		// Recalculate projection matrix
-		projectionMatrix_ = calculateProjectionMatrix(viewTranslation_.z);
+		projectionMatrix_ = calculateProjectionMatrix(hasPerspective_, viewTranslation_.z);
 	}
 	else
 	{
 		// Recalculate projection matrix
-		projectionMatrix_ = calculateProjectionMatrix(zOffset_);
+		projectionMatrix_ = calculateProjectionMatrix(false, zOffset_);
 	}
 
 	calculateFontScaling();
@@ -1125,6 +1147,7 @@ void ViewPane::updateAxisLimits()
 	// Loop over axes
 	for (int axis = 0; axis < 3; ++axis)
 	{
+// 		if (
 		// Set allowable range to avoid negative numbers if axis is now logarithmic
 		if (axes_.logarithmic(axis))
 		{
@@ -1137,6 +1160,8 @@ void ViewPane::updateAxisLimits()
 			axes_.setLimitMax(axis, dataMax[axis]);
 		}
 	}
+
+	recalculateView();
 }
 
 // Update current slices for all collections displayed in this pane

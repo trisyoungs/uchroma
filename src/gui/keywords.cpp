@@ -91,7 +91,7 @@ int Keywords::axisKeywordNArguments(Keywords::AxisKeyword kwd)
 const char* CollectionBlockKeywords[] = { "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearRGBA", "ColourLinearRGBB", "ColourLinearHSVA", "ColourLinearHSVB", "ColourSingle", "ColourSource", "DataDirectory", "DataSet", "EndCollection", "Fit", "FitParameters", "Interpolate", "InterpolateConstrain", "InterpolateStep", "Slice", "Style", "TransformX", "TransformY", "TransformZ", "Visible" };
 
 // Collection Block NArguments
-int CollectionKeywordNArguments[] = { 1, 1, 5, 5, 5, 5, 5, 4, 1, 1, 1, 0, 1, 0, 2, 2, 2, 2, 1, 2, 2, 2, 1 };
+int CollectionKeywordNArguments[] = { 1, 1, 5, 5, 5, 5, 5, 4, 1, 1, 1, 0, 1, 0, 2, 2, 2, 1, 1, 2, 2, 2, 1 };
 
 /*!
  * \brief Convert text string to CollectionKeyword

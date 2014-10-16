@@ -226,11 +226,6 @@ void Axes::updateCoordinates()
 	// Check coordinate version
 	if (coordinateVersion_ == axesVersion_) return;
 
-	// Determine central coordinate within current axes
-	for (int n=0; n<3; ++n)
-	{
-
-	}
 	double position;
 	
 	// Loop over axes
@@ -434,6 +429,8 @@ void Axes::setLogarithmic(int axis, bool b)
 
 	++axesVersion_;
 	++displayVersion_;
+
+	parent_.recalculateView();
 }
 
 // Return whether axis is logarithmic
@@ -673,7 +670,7 @@ void Axes::setTickDirection(int axis, int dir, double value)
 // Return axis tick direction
 Vec3<double> Axes::tickDirection(int axis) const
 {
-	if ((!useBestFlatView_) || (parent_.viewType() == ViewPane::NormalView)) return tickDirection_[axis];
+	if ((!useBestFlatView_) || (parent_.viewType() <= ViewPane::AutoStretchedView)) return tickDirection_[axis];
 	else switch (parent_.viewType())
 	{
 		case (ViewPane::FlatXYView):	return (axis == 0 ? Vec3<double>(0.0, -1.0, 0.0) : Vec3<double>(-1.0, 0.0, 0.0));
@@ -786,7 +783,7 @@ void Axes::setLabelOrientation(int axis, int component, double value)
 // Return orientation of labels for specified axis
 Vec3<double> Axes::labelOrientation(int axis) const
 {
-	if ((!useBestFlatView_) || (parent_.viewType() == ViewPane::NormalView)) return labelOrientation_[axis];
+	if ((!useBestFlatView_) || (parent_.viewType() <= ViewPane::AutoStretchedView)) return labelOrientation_[axis];
 	else switch (parent_.viewType())
 	{
 		case (ViewPane::FlatXYView):	return (axis == 0 ? Vec3<double>(0.0, 0.0, 0.2) : Vec3<double>(0.0, 0.0, 0.2));
@@ -811,7 +808,7 @@ void Axes::setLabelAnchor(int axis, TextPrimitive::TextAnchor anchor)
 // Return axis label text anchor position for specified axis
 TextPrimitive::TextAnchor Axes::labelAnchor(int axis) const
 {
-	if ((!useBestFlatView_) || (parent_.viewType() == ViewPane::NormalView)) return labelAnchor_[axis];
+	if ((!useBestFlatView_) || (parent_.viewType() <= ViewPane::AutoStretchedView)) return labelAnchor_[axis];
 	else switch (parent_.viewType())
 	{
 		case (ViewPane::FlatXYView):	return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::MiddleRightAnchor);
@@ -852,7 +849,7 @@ void Axes::setTitleOrientation(int axis, int component, double value)
 // Return orientation of titles for specified axis
 Vec4<double> Axes::titleOrientation(int axis) const
 {
-	if ((!useBestFlatView_) || (parent_.viewType() == ViewPane::NormalView)) return titleOrientation_[axis];
+	if ((!useBestFlatView_) || (parent_.viewType() <= ViewPane::AutoStretchedView)) return titleOrientation_[axis];
 	else switch (parent_.viewType())
 	{
 		case (ViewPane::FlatXYView):	return (axis == 0 ? Vec4<double>(0.0, 0.0, 0.2, 0.5) : Vec4<double>(0.0, 270.0, 0.2, 0.5));
@@ -878,11 +875,11 @@ void Axes::setTitleAnchor(int axis, TextPrimitive::TextAnchor anchor)
 // Return axis title text anchor position for specified axis
 TextPrimitive::TextAnchor Axes::titleAnchor(int axis) const
 {
-	if ((!useBestFlatView_) || (parent_.viewType() == ViewPane::NormalView)) return titleAnchor_[axis];
+	if ((!useBestFlatView_) || (parent_.viewType() <= ViewPane::AutoStretchedView)) return titleAnchor_[axis];
 	else switch (parent_.viewType())
 	{
 		case (ViewPane::FlatXYView):	return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::BottomMiddleAnchor);
-		case (ViewPane::FlatXZView):	return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::TopMiddleAnchor);
+		case (ViewPane::FlatXZView):	return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::BottomMiddleAnchor);
 		case (ViewPane::FlatYZView):	return (axis == 1 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::TopMiddleAnchor);
 	}
 
@@ -1004,8 +1001,7 @@ void Axes::updateAxisPrimitives()
 	QString s;
 	FTBBox boundingBox;
 	Vec3<double> centre;
-	double dpX, dpY, textWidth, delta, value, clipPlaneDelta = 0.0001;
-	int n;
+	double delta, value, clipPlaneDelta = 0.0001;
 	Vec3<double> u, v1, v2, tickDir, adjustment;
 	Matrix labelTransform, titleTransform;
 	Array<double> tickPositions[3];
@@ -1078,7 +1074,6 @@ void Axes::updateAxisPrimitives()
 
 			// Grab logged min/max values for convenience, enforcing sensible minimum
 			double min = log10(min_[axis] <= 0.0 ? 1.0e-10 : min_[axis]);
-			double max = log10(max_[axis]);
 
 			// Plot tickmarks - Start at floored (ceiling'd) integer of logAxisMin (logAxisMax), and go from there.
 			int nMinorTicks = minorTicks_[axis] > 8 ? 8 : minorTicks_[axis];

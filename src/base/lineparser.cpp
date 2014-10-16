@@ -241,6 +241,26 @@ bool LineParser::getNextArg(int optionMask, QString& destArg)
 	return (destArg.isEmpty() ? (hadquotes ? true : false) : true);
 }
 
+// Read line from file
+bool LineParser::getLine(QString& destination)
+{
+	if (writing_)
+	{
+		msg.print("Internal Error: Tried to read from a LineParser create to write.\n");
+		return false;
+	}
+	if (!stream_)
+	{
+		msg.print("Internal Error: No valid stream in LineParser::getLine().\n");
+		return false;
+	}
+
+	destination = stream_->readLine();
+
+	if (destination.isNull() || atEnd()) return false;
+	return true;
+}
+
 // Parse delimited (from file)
 bool LineParser::getArgs(int optionMask)
 {

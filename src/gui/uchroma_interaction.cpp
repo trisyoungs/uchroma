@@ -145,8 +145,8 @@ void UChromaWindow::updateInteractionPosition(int mouseX, int mouseY)
 		// Calculate axis value
 		currentInteractionValue_ = screenToAxis(interactionAxis_, mouseX, mouseY);
 
-		// Extract slice from collections in current pane
-		currentViewPane_->collectionsUpdateCurrentSlices(interactionAxis_, currentInteractionValue_);
+		// Extract slice from collections in current pane (unless this is a SliceMonitor)
+		if (currentViewPane_->role() != ViewPane::SliceMonitorRole) currentViewPane_->collectionsUpdateCurrentSlices(interactionAxis_, currentInteractionValue_);
 	}
 	else
 	{

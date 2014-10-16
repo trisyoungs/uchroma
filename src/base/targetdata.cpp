@@ -80,6 +80,9 @@ void TargetData::initialise(Collection* collection)
 		case (ViewPane::SliceMonitorRole):
 			addDisplayPrimitive(collection->currentSlice());
 			break;
+		case (ViewPane::ExtractorRole):
+			addDisplayPrimitive(collection);
+			break;
 		default:
 			msg.print("Internal Error: ViewPane role '%s' not accounted for in TargetData::initialise().\n", ViewPane::paneRole(parent_.role()));
 			break;

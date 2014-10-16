@@ -73,28 +73,6 @@ void Surface::constructGrid(PrimitiveList& primitiveList, const Axes& axes, cons
 		// Set nLimit to ensure we don't go beyond the end of the data arrays
 		nLimit = std::min(cacheSize, x.nItems()-offset);
 
-// 		// Grab arrays from first slice
-// 		y.copy(slices[0]->y(), offset, offset+nLimit-1);
-// 		axes.transformY(y);
-// 		yType.copy(slices[0]->yType(), offset, offset+nLimit-1);
-// 		z = axes.transformZ(slices[0]->z());
-// 		
-// 		// Generate lines / vertices for first row
-// 		for (n=0; n<nLimit; ++n)
-// 		{
-// 			i = offset+n;
-// 			if (yType.value(i) != DisplayDataSet::NoPoint)
-// 			{
-// 				// A value exists here, so define a vertex
-// 				colourScale.colour((yLogarithmic ? pow(10.0, y.value(i)) : y.value(i)) / yStretch, colour);
-// 				verticesA[n] = currentPrimitive->defineVertex(x.value(i), y.value(i), z, nrm, colour);
-// 
-// 				// If the previous vertex also exists, draw a line here
-// 				if ((n != 0) && (verticesA[n-1] != -1)) currentPrimitive->defineIndices(verticesA[n-1], verticesA[n]);
-// 			}
-// 			else verticesA[n] = -1;
-// 		}
-
 		// Loop over remaining displayData
 		for (int slice = 0; slice < displayData.nItems(); ++slice)
 		{
@@ -111,7 +89,7 @@ void Surface::constructGrid(PrimitiveList& primitiveList, const Axes& axes, cons
 				if (yType.value(n) != DisplayDataSet::NoPoint)
 				{
 					// A value exists here, so define a vertex
-					colourScale.colour((yLogarithmic ? pow(10.0, y.value(n)) : y.value(n)) / yStretch, colour);
+					colourScale.colour(yLogarithmic ? pow(10.0, y.value(n) / yStretch) : y.value(n) / yStretch, colour);
 					verticesB[n] = currentPrimitive->defineVertex(x.value(i), y.value(n), z, nrm, colour);
 
 					// If the previous vertex on this row also exists, draw a line here

@@ -156,7 +156,7 @@ bool AxesWindow::stretchChanged(int axis, double value)
 bool AxesWindow::limitChanged(int axis, bool minLim, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
-	
+
 	if (minLim) currentAxes().setMin(axis, value);
 	else currentAxes().setMax(axis, value);
 

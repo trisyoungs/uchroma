@@ -171,7 +171,7 @@ void Viewer::paintGL()
 	for (ViewPane* pane = uChroma_->viewLayout().panes(); pane != NULL; pane = pane->next)
 	{
 		// Before we do anything else, make sure the view is up to date
-		pane->recalculateView();
+// 		pane->recalculateView();
 
 		// Set viewport
 		glViewport(pane->viewportMatrix()[0], pane->viewportMatrix()[1], pane->viewportMatrix()[2], pane->viewportMatrix()[3]);

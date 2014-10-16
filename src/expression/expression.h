@@ -59,6 +59,8 @@ class Expression
 	bool useAdditionalConstants_;
 	// Flag to specify that missing variables should be generated
 	bool generateMissingVariables_;
+	// Whether current expression is valid
+	bool isValid_;
 	// Target for expression generation
 	static Expression* target_;
 
@@ -81,6 +83,8 @@ class Expression
 	void unGetChar();
 	// Perform expression generation for this expression
 	bool generate(QString expressionText);
+	// Return whether current expression is valid
+	bool isValid();
 	// Return current expression target
 	static Expression* target();
 

@@ -124,7 +124,7 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	 */
 	public:
 	// Role of pane
-	enum PaneRole { SliceMonitorRole, StandardRole, nPaneRoles };
+	enum PaneRole { ExtractorRole, SliceMonitorRole, StandardRole, nPaneRoles };
 	// Convert text string to PaneRole
 	static PaneRole paneRole(QString s);
 	// Convert PaneRole to text string
@@ -196,7 +196,7 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 
 	private:
 	// Return calculated projection matrix
-	Matrix calculateProjectionMatrix(double zoom);
+	Matrix calculateProjectionMatrix(bool hasPerspective, double orthoZoom = 0.0);
 	// Update primitive
 	void updatePrimitive(Collection* collection, PrimitiveList& primitive, bool forcePrimitiveUpdate = false, bool dontPopInstance = false);
 

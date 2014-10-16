@@ -22,6 +22,7 @@
 #include "gui/data.h"
 #include "gui/uchroma.h"
 #include "gui/editdataset.h"
+#include "gui/data_setz.h"
 #include "base/session.h"
 #include "templates/reflist.h"
 #include "templates/variantpointer.h"
@@ -201,7 +202,7 @@ void DataWindow::on_DataSetsTable_cellChanged(int row, int column)
 	if (refreshing_ || (!currentCollection)) return;
 
 	// Z changed
-	if (column == 1)
+	if (column == 2)
 	{
 		// Get slice and widget item
 		DataSet* dataSet = currentCollection->dataSet(row);
@@ -219,8 +220,7 @@ void DataWindow::on_DataSetsTable_cellChanged(int row, int column)
 	}
 }
 
-// Retrieve relative Z values from timestamps
-void DataWindow::on_GetZFromTimeStampButton_clicked(bool checked)
+void DataWindow::on_SetZButton_clicked(bool checked)
 {
 	// Check for window refreshing or invalid Collection
 	Collection* currentCollection = uChroma_.currentCollection();
@@ -229,37 +229,9 @@ void DataWindow::on_GetZFromTimeStampButton_clicked(bool checked)
 	// Check for no datasets
 	if (currentCollection->nDataSets() == 0) return;
 
-// 	QString dir = QInputDialog::getText(this, "Choose File Location", "Select the location of the files that will be interrogated:", QLineEdit::Normal, 
-	bool ok;
-	QString extension = QInputDialog::getItem(this, "TimeStamp Extraction", "Select the type of file to look for:", QStringList() << "log" << "raw" << "nxs", 0, false, &ok);
-	if (!ok) return;
-
-	QString dirString = QFileDialog::getExistingDirectory(this, "TimeStamp Extraction", "Choose the directory containing the required files:");
-	if (dirString.isEmpty()) return;
-	QDir dir(dirString);
-
-	// Load timestamp data from files - set offset in seconds from an arbitrary point to start with, then adjust afterwards
-	QString s;
-	double earliest = 0.0;
-	QDateTime referenceTime(QDate(1970,1,1));
-	for (DataSet* dataSet = currentCollection->dataSets(); dataSet != NULL; dataSet = dataSet->next)
-	{
-		// Construct filename to search for
-		QFileInfo baseInfo(dataSet->sourceFileName());
-		s = dir.absoluteFilePath(baseInfo.baseName()) + "." + extension;
-		QFileInfo fileInfo(s);
-		if (!fileInfo.exists())
-		{
-			QMessageBox::warning(this, "Failed to Open File", "The file '" + s + "' could not be found.");
-			break;
-		}
-		dataSet->data().setZ(referenceTime.secsTo(fileInfo.lastModified()));
-		
-		if ((earliest == 0) || (dataSet->data().z() < earliest)) earliest = dataSet->data().z();
-	}
-	
-	// Set correct offset
-	for (DataSet* dataSet = currentCollection->dataSets(); dataSet != NULL; dataSet = dataSet->next) dataSet->data().setZ(dataSet->data().z() - earliest);
+	// Create a DataSetZDialog and show it...
+	DataSetZDialog setZDialog(this, currentCollection);
+	if (setZDialog.exec())
 
 	// Need to update now
 	Session::setAsModified();

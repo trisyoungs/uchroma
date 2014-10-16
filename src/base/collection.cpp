@@ -1143,6 +1143,8 @@ void Collection::setColourScalePoint(ColourSource source, QColor colour, double 
 		case (Collection::CustomGradientSource):
 			customColourScale_.setPoint(index, value, colour);
 			break;
+		default:
+			msg.print("Unhandled ColourSoruce in Collection::setColourScalePoint().\n");
 	}
 
 	// Update colourscale?
@@ -1166,6 +1168,8 @@ const ColourScalePoint* Collection::colourScalePoint(ColourSource source, int in
 		case (Collection::CustomGradientSource):
 			return customColourScale_.point(index);
 			break;
+		default:
+			msg.print("Unhandled ColourSoruce in Collection::colourScalePoint().\n");
 	}
 }
 

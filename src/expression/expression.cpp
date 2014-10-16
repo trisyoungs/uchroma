@@ -82,6 +82,8 @@ void Expression::clear()
 	// Clear variables and constants, except those that are flagged as 'permanent'
 	variables_.removeIfData(false);
 	constants_.removeIfData(false);
+
+	isValid_ = false;
 }
 
 // Set flag to specify that missing variables should be generated
@@ -137,12 +139,18 @@ bool Expression::generate(QString expressionText)
 	msg.print(Messenger::Verbose, "Parser source string is '%s', length is %i\n", qPrintable(stringSource_), stringLength_);
 
 	// Perform the parsing
-	int result = ExpressionParser_parse();
+	isValid_ = ExpressionParser_parse() == 0;
 
 	target_ = NULL;
 
 	msg.exit("Expression::generate");
-	return (result != 0 ? false : true);
+	return isValid_;
+}
+
+// Return whether current expression is valid
+bool Expression::isValid()
+{
+	return isValid_;
 }
 
 // Return current expression target

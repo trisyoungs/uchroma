@@ -82,7 +82,11 @@ void ViewLayout::recalculatePixels()
 	// Recalculate pane sizes
 	remainingWidth_ = layoutWidth_ - nColumns_*pixelWidth_;
 	remainingHeight_ = layoutHeight_ - nRows_*pixelHeight_;
-	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next) pane->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
+	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next)
+	{
+		pane->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
+		pane->recalculateView();
+	}
 }
 
 // Clear layout data

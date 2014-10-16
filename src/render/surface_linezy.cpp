@@ -71,7 +71,7 @@ void Surface::constructLineZY(PrimitiveList& primitiveList, const Axes& axes, co
 			if (dataSet->yType().value(n) != DisplayDataSet::NoPoint)
 			{
 				y = axes.transformY(dataSet->y().value(n+minIndex.x));
-				colourScale.colour((yLogarithmic ? pow(10.0, y) : y) / yStretch, colour);
+				colourScale.colour(yLogarithmic ? pow(10.0, y / yStretch) : y / yStretch, colour);
 				vertexB = currentPrimitive->defineVertex(x.value(n), y, axes.transformZ(dataSet->z()), nrm, colour);
 			}
 			else vertexB = -1;
