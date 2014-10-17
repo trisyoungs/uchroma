@@ -967,6 +967,8 @@ void ViewPane::resetViewMatrix()
 		viewRotation_.setIdentity();
 		viewTranslation_.set(0.0, 0.0, 0.0);
 
+		// If a 
+
 		// Calculate zoom to show all data
 		viewTranslation_.z = calculateRequiredZoom(axes_.range(0)*0.5, axes_.range(1)*0.5, 0.9);
 
