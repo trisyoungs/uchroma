@@ -91,6 +91,8 @@ bool DataSpace::initialise(Collection* sourceCollection, int xIndexMin, int xInd
 		}
 		else for (int n = displayDataSetStart_; n<= displayDataSetEnd_; ++n) ranges_.add(*this)->set(sourceCollection_, abscissaStart_, abscissaEnd_, n, n, false);
 	}
+	
+	return true;
 }
 
 // Initialise data space, matching size in source DataSpace

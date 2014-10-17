@@ -24,6 +24,7 @@
 #include "base/viewlayout.h"
 #include "math/cuboid.h"
 #include <algorithm>
+#include <cmath>
 
 // Static Members
 template<class ViewPane> RefList<ViewPane,bool> ObjectList<ViewPane>::objects_;
@@ -856,7 +857,11 @@ void ViewPane::recalculateView(bool force)
 	}
 
 	// Set axis stretch factors to fill available pixel width/height
-	for (axis=0; axis<3; ++axis) axes_.setStretch(axis, viewportMatrix_[axisDir[axis]+2] / (unit[axisDir[axis]] * (axes_.range(axis))));
+	for (axis=0; axis<3; ++axis)
+	{
+		axes_.setStretch(axis, viewportMatrix_[axisDir[axis]+2] / (unit[axisDir[axis]] * (axes_.range(axis))));
+		if (!std::isnormal(axes_.stretch(axis))) axes_.setStretch(axis, 1.0);
+	}
 	
 	const double margin = 10.0;
 	Matrix viewMat, B;
@@ -967,7 +972,13 @@ void ViewPane::resetViewMatrix()
 		viewRotation_.setIdentity();
 		viewTranslation_.set(0.0, 0.0, 0.0);
 
-		// If a 
+		// If a Normal view, reset the stretch factors
+		if (viewType_ == ViewPane::NormalView)
+		{
+			axes_.setStretch(0, 1.0);
+			axes_.setStretch(1, 1.0);
+			axes_.setStretch(2, 1.0);
+		}
 
 		// Calculate zoom to show all data
 		viewTranslation_.z = calculateRequiredZoom(axes_.range(0)*0.5, axes_.range(1)*0.5, 0.9);

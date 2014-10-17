@@ -58,7 +58,7 @@ FitKernel::FitKernel()
 	method_ = FitKernel::SteepestDescentMethod;
 	maxSteps_ = 100;
 	limitStrength_ = 1.0e3;
-	tolerance_ = 1.0e-3;
+	tolerance_ = 1.0e-5;
 }
 
 // Destructor
@@ -653,7 +653,7 @@ bool FitKernel::minimise()
 			break;
 	}
 
-	// Print results...
+	// Print and store results...
 	msg.print("Final, fitted parameters are:\n");
 	int n = 0;
 	for (RefListItem<EquationVariable,bool>* ri = usedVariables_.first(); ri != NULL; ri = ri->next)
@@ -662,6 +662,7 @@ bool FitKernel::minimise()
 		EquationVariable* var = ri->item;
 
 		msg.print("\t%s\t=\t%e\n", qPrintable(var->name()), alpha[n]);
+		var->setValue(alpha[n]);
 
 		++n;
 	}

@@ -175,6 +175,7 @@ bool UChromaWindow::checkBeforeClose()
 bool UChromaWindow::viewTypeChanged(ViewPane::ViewType vt)
 {
 	currentViewPane_->setViewType(vt);
+	currentViewPane_->resetViewMatrix();
 	currentViewPane_->recalculateView(true);
 
 	Session::setAsModified();
