@@ -485,9 +485,6 @@ bool Axes::positionIsFractional(int axis) const
 // Set axis position (in real surface-space coordinates)
 void Axes::setPositionReal(int axis, int dir, double value)
 {
-	// Clamp range to limits
-	if (value > limitMax_[dir]) value = limitMax_[dir];
-	else if (value < limitMin_[dir]) value = limitMin_[dir];
 	positionReal_[axis].set(dir, value);
 
 	++axesVersion_;
@@ -677,6 +674,9 @@ Vec3<double> Axes::tickDirection(int axis) const
 		case (ViewPane::FlatXZView):	return (axis == 0 ? Vec3<double>(0.0, 0.0, -1.0) : Vec3<double>(-1.0, 0.0, 0.0));
 		case (ViewPane::FlatYZView):	return (axis == 1 ? Vec3<double>(0.0, 0.0, -1.0) : Vec3<double>(0.0, -1.0, 0.0));
 	}
+
+	// Safety catch
+	return tickDirection_[axis];
 }
 
 // Set axis tick size (relative to font size)

@@ -184,8 +184,9 @@ void Viewer::paintGL()
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		glDisable(GL_LIGHTING);
-		// Draw graduated background for current pane
-		if (pane == uChroma_->currentViewPane())
+
+		// Draw graduated background for current pane (only if rendering on-screen)
+		if ((pane == uChroma_->currentViewPane()) && (!renderingOffScreen_))
 		{
 			glBegin(GL_QUADS);
 			glColor4fv(colourBlue);
@@ -198,13 +199,16 @@ void Viewer::paintGL()
 		}
 
 		// Draw a box around the pane
-		glColor4fv(colourGray);
-		glBegin(GL_LINE_LOOP);
-		glVertex3i(0, 0, 1);
-		glVertex3i(0, pane->viewportMatrix()[3]-1, 1);
-		glVertex3i(pane->viewportMatrix()[2]-1, pane->viewportMatrix()[3]-1, 1);
-		glVertex3i(pane->viewportMatrix()[2]-1, 0, 1);
-		glEnd();
+		if (!renderingOffScreen_)
+		{
+			glColor4fv(colourGray);
+			glBegin(GL_LINE_LOOP);
+			glVertex3i(0, 0, 1);
+			glVertex3i(0, pane->viewportMatrix()[3]-1, 1);
+			glVertex3i(pane->viewportMatrix()[2]-1, pane->viewportMatrix()[3]-1, 1);
+			glVertex3i(pane->viewportMatrix()[2]-1, 0, 1);
+			glEnd();
+		}
 
 		// Set projection matrix
 		glMatrixMode(GL_PROJECTION);

@@ -203,6 +203,7 @@ void UChromaWindow::updateToolBars()
 	if (ViewPane::objectValid(currentViewPane_, "view pane in UChromaWindow::updateToolBars()"))
 	{
 		ui.actionViewPerspective->setChecked(currentViewPane_->hasPerspective());
+		ui.actionViewPerspective->setEnabled((currentViewPane_->viewType() < ViewPane::FlatXYView) || (currentViewPane_->viewType() > ViewPane::FlatYZView));
 		QAction* action = viewTypeActionGroup_.actions().at(currentViewPane_->viewType());
 		if (action) action->setChecked(true);
 	}

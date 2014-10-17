@@ -181,6 +181,7 @@ bool UChromaWindow::viewTypeChanged(ViewPane::ViewType vt)
 	Session::setAsModified();
 
 	axesWindow_.updateControls();
+	updateToolBars();
 	ui.MainView->update();
 
 	return true;

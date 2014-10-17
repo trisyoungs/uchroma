@@ -34,6 +34,7 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 	LineStipple::StippleType stipple;
 	NumberFormat::FormatType ft;
 	Axes::AutoScaleMethod as;
+
 	while (!parser.atEnd())
 	{
 		// Get line from file

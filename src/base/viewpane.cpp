@@ -53,7 +53,7 @@ ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), ObjectList<ViewPa
 
 	// Role
 	role_ = ViewPane::StandardRole;
-	viewType_ = ViewPane::NormalView;
+	viewType_ = ViewPane::AutoStretchedView;
 
 	// Style
 	boundingBox_ = ViewPane::NoBox;
@@ -533,6 +533,9 @@ Matrix ViewPane::calculateProjectionMatrix(bool hasPerspective, double orthoZoom
 void ViewPane::setViewType(ViewPane::ViewType vt)
 {
 	viewType_ = vt;
+
+	// Forcibly turn off perspective if this is a flat view
+	if ((viewType_ >= ViewPane::FlatXYView) && (viewType_ <= ViewPane::FlatYZView)) setHasPerspective(false);
 }
 
 // Return view type
@@ -973,15 +976,15 @@ void ViewPane::resetViewMatrix()
 		viewTranslation_.set(0.0, 0.0, 0.0);
 
 		// If a Normal view, reset the stretch factors
-		if (viewType_ == ViewPane::NormalView)
-		{
-			axes_.setStretch(0, 1.0);
-			axes_.setStretch(1, 1.0);
-			axes_.setStretch(2, 1.0);
-		}
+// 		if (viewType_ == ViewPane::NormalView)
+// 		{
+// 			axes_.setStretch(0, 1.0);
+// 			axes_.setStretch(1, 1.0);
+// 			axes_.setStretch(2, 1.0);
+// 		}
 
 		// Calculate zoom to show all data
-		viewTranslation_.z = calculateRequiredZoom(axes_.range(0)*0.5, axes_.range(1)*0.5, 0.9);
+		viewTranslation_.z = calculateRequiredZoom(axes_.range(0)*0.5*axes_.stretch(0), axes_.range(1)*0.5*axes_.stretch(1), 0.9);
 
 		// Recalculate projection matrix
 		projectionMatrix_ = calculateProjectionMatrix(hasPerspective_, viewTranslation_.z);
@@ -1197,7 +1200,9 @@ void ViewPane::collectionsUpdateCurrentSlices(int axis, double axisValue)
 void ViewPane::calculateFontScaling()
 {
 	// Calculate text scaling factor
-	Vec3<double> unit = modelToScreen(Vec3<double>(0.0, 1.0, viewTranslation_.z), projectionMatrix_, Matrix(), Vec3<double>(0.0, 0.0, zOffset_));
+	Vec3<double> translate(0.0, 0.0, zOffset_);
+	if (hasPerspective_) translate.z = 0.5;
+	Vec3<double> unit = modelToScreen(Vec3<double>(0.0, 1.0, viewTranslation_.z), projectionMatrix_, Matrix(), translate);
 	unit.y -= viewportMatrix_[1] + viewportMatrix_[3]*0.5;
 	textZScale_ = unit.y;
 }
