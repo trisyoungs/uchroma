@@ -382,8 +382,10 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	DisplayStyle displayStyle_;
 	// Line style
 	LineStyle displayLineStyle_;
+	// Surface shininess
+	int displaySurfaceShininess_;
 	// Style version
-	int styleVersion_;
+	int displayStyleVersion_;
 
 	public:
 	// Set whether data is visible
@@ -400,8 +402,12 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	DisplayStyle displayStyle();
 	// Return line style
 	LineStyle& displayLineStyle();
+	// Set surface shininess
+	void setDisplaySurfaceShininess(int shininess);
+	// Return surface shininess
+	int displaySurfaceShininess();
 	// Return style version
-	int styleVersion();
+	int displayStyleVersion();
 };
 
 #endif

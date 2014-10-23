@@ -83,7 +83,7 @@ Collection::Collection() : ListItem<Collection>(), ObjectList<Collection>(this)
 	displayData_.clear();
 	displayDataGeneratedAt_ = -1;
 	displayStyle_ = Collection::LineXYStyle;
-	styleVersion_ = 0;
+	displayStyleVersion_ = 0;
 
 }
 
@@ -152,7 +152,7 @@ void Collection::operator=(const Collection& source)
 	displayData_.clear();
 	displayDataGeneratedAt_ = -1;
 	displayStyle_ = source.displayStyle_;
-	styleVersion_ = 0;
+	displayStyleVersion_ = 0;
 }
 
 /*
@@ -1276,7 +1276,7 @@ int Collection::colourVersion()
 }
 
 /*
- * Surface
+ * Display
  */
 
 // Suface Style Keywords
@@ -1462,7 +1462,7 @@ void Collection::setDisplayStyle(DisplayStyle style)
 {
 	displayStyle_ = style;
 
-	++styleVersion_;
+	++displayStyleVersion_;
 }
 
 // Return display style of data
@@ -1477,8 +1477,22 @@ LineStyle& Collection::displayLineStyle()
 	return displayLineStyle_;
 }
 
-// Return style version
-int Collection::styleVersion()
+// Set surface shininess
+void Collection::setDisplaySurfaceShininess(int shininess)
 {
-	return styleVersion_;
+	displaySurfaceShininess_ = shininess;
+	
+	++displayStyleVersion_;
+}
+
+// Return surface shininess
+int Collection::displaySurfaceShininess()
+{
+	return displaySurfaceShininess_;
+}
+
+// Return style version
+int Collection::displayStyleVersion()
+{
+	return displayStyleVersion_;
 }

@@ -71,7 +71,7 @@ void TargetPrimitive::updateAndSendPrimitive(const Axes& axes, bool forceUpdate,
 	else if (primitiveAxesUsedAt_ != axes.displayVersion()) upToDate = false;
 	else if (primitiveColourUsedAt_ != collection_->colourVersion()) upToDate = false;
 	else if (primitiveDataUsedAt_ != collection_->dataVersion()) upToDate = false;
-	else if (primitiveStyleUsedAt_ != collection_->styleVersion()) upToDate = false;
+	else if (primitiveStyleUsedAt_ != collection_->displayStyleVersion()) upToDate = false;
 
 	// If the primitive is out of date, recreate it's data.
 	if (!upToDate)
@@ -110,7 +110,7 @@ void TargetPrimitive::updateAndSendPrimitive(const Axes& axes, bool forceUpdate,
 	primitiveAxesUsedAt_ = axes.displayVersion();
 	primitiveColourUsedAt_ = collection_->colourVersion();
 	primitiveDataUsedAt_ = collection_->dataVersion();
-	primitiveStyleUsedAt_ = collection_->styleVersion();
+	primitiveStyleUsedAt_ = collection_->displayStyleVersion();
 
 	return;
 }
