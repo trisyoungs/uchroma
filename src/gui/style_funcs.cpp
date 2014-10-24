@@ -38,6 +38,9 @@ StyleWindow::StyleWindow(UChromaWindow& parent) : QWidget(&parent), uChroma_(par
 	// Add display styles to StyleCombo on Collection->Style tab
 	for (int n=0; n<Collection::nDisplayStyles; ++n) ui.StyleCombo->addItem( Collection::displayStyle((Collection::DisplayStyle) n));
 
+	// Create entries in LineStippleCombo
+	for (int n=0; n<LineStipple::nStippleTypes; ++n) LineStipple::stipple[n].addStippleItem(ui.LineStippleCombo, 3);
+
 	// Create a buttongroup for the main style RadioButtons
 	QButtonGroup* butGroup = new QButtonGroup(this);
 	butGroup->addButton(ui.ColourSingleColourRadio);
@@ -84,7 +87,7 @@ void StyleWindow::on_StyleCombo_currentIndexChanged(int index)
 	uChroma_.updateDisplay();
 }
 
-// Single Colour
+// Colour - Single
 
 void StyleWindow::on_ColourSingleColourRadio_clicked(bool checked)
 {
@@ -117,7 +120,7 @@ void StyleWindow::on_ColourSingleColourButton_clicked(bool checked)
 	}
 }
 
-// RGB Gradient
+// Colour - RGB Gradient
 
 void StyleWindow::on_ColourRGBGradientRadio_clicked(bool checked)
 {
@@ -231,7 +234,7 @@ void StyleWindow::on_ColourRGBGradientBSetMaximumButton_clicked(bool checked)
 	ui.ColourRGBGradientBSpin->setValue(currentCollection->transformMax().y);
 }
 
-// HSV Gradient
+// Colour - HSV Gradient
 
 void StyleWindow::on_ColourHSVGradientRadio_clicked(bool checked)
 {
@@ -345,7 +348,7 @@ void StyleWindow::on_ColourHSVGradientBSetMaximumButton_clicked(bool checked)
 	ui.ColourHSVGradientBSpin->setValue(currentCollection->transformMax().y);
 }
 
-// Custom Gradient
+// Colour - Custom Gradient
 
 void StyleWindow::on_ColourCustomGradientRadio_clicked(bool checked)
 {
@@ -508,6 +511,47 @@ void StyleWindow::on_ColourAlphaFixedAlphaSpin_valueChanged(double value)
 	uChroma_.updateDisplay();
 }
 
+// Surface Options
+void StyleWindow::on_SurfaceShininessSpin_valueChanged(double value)
+{
+	// Check for window refreshing or invalid Collection
+	Collection* currentCollection = uChroma_.currentCollection();
+	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_SurfaceShininessSpin_valueChanged"))) return;
+
+	currentCollection->setDisplaySurfaceShininess(value);
+
+	// Update display
+	Session::setAsModified();
+	uChroma_.updateDisplay();
+}
+
+// -- Line Options
+void StyleWindow::on_LineStippleCombo_currentIndexChanged(int index)
+{
+	// Check for window refreshing or invalid Collection
+	Collection* currentCollection = uChroma_.currentCollection();
+	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_SurfaceShininessSpin_valueChanged"))) return;
+
+	currentCollection->displayLineStyle().setStipple( (LineStipple::StippleType) index );
+
+	// Update display
+	Session::setAsModified();
+	uChroma_.updateDisplay();
+}
+
+void StyleWindow::on_LineWidthSpin_valueChanged(double value)
+{
+	// Check for window refreshing or invalid Collection
+	Collection* currentCollection = uChroma_.currentCollection();
+	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_SurfaceShininessSpin_valueChanged"))) return;
+
+	currentCollection->displayLineStyle().setWidth(value);
+
+	// Update display
+	Session::setAsModified();
+	uChroma_.updateDisplay();
+}
+
 /*
  * Update
  */
@@ -593,6 +637,17 @@ void StyleWindow::updateControls(bool force)
 	if (currentCollection->alphaControl() == Collection::OwnAlpha) ui.ColourAlphaOwnAlphaRadio->setChecked(true);
 	else if (currentCollection->alphaControl() == Collection::FixedAlpha) ui.ColourAlphaFixedAlphaRadio->setChecked(true);
 	ui.ColourAlphaFixedAlphaSpin->setValue(currentCollection->fixedAlpha());
+
+	// Set surface options
+	ui.SurfaceShininessSpin->setValue(currentCollection->displaySurfaceShininess());
+
+	// Set line options
+	ui.LineWidthSpin->setValue(currentCollection->displayLineStyle().width());
+	ui.LineStippleCombo->setCurrentIndex(currentCollection->displayLineStyle().stipple());
+
+	// Enable/disable groups specific to one style
+	ui.SurfaceOptionsGroup->setEnabled(currentCollection->displayStyle() == Collection::SurfaceStyle);
+	ui.LineOptionsGroup->setEnabled(currentCollection->displayStyle() != Collection::SurfaceStyle);
 
 	refreshing_ = false;
 }

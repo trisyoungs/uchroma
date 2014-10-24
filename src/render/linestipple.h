@@ -34,14 +34,14 @@
 #include <QtCore/QString>
 
 // Forward Declarations
-/* none */
+class QComboBox;
 
 // Line Stipple
 class LineStipple
 {
 	public:
 	// Line Stipple Types
-	enum StippleType { NoStipple, DotStipple, FineDashStipple, EighthDashStipple, QuartedDashStipple, HalfDashStipple, DotSDash1Stipple, nStippleTypes };
+	enum StippleType { NoStipple, DotStipple, FineDashStipple, EighthDashStipple, QuarterDashStipple, HalfDashStipple, DotDash1Stipple, nStippleTypes };
 	// Convert text string to StippleType
 	static LineStipple::StippleType stippleType(QString s);
 	// Convert InputBlock to text string
@@ -60,6 +60,8 @@ class LineStipple
 	const char* name;
 
 	public:
+	// Add stipple pattern to specified QComboBox
+	void addStippleItem(QComboBox* combo, int lineHeight);
 	// Return stipple pattern as a Qt-compatible dash pattern
 	QVector<qreal>& dashPattern();
 

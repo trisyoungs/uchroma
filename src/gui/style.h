@@ -70,10 +70,10 @@ class StyleWindow : public QWidget
 	private slots:
 	// -- Style
 	void on_StyleCombo_currentIndexChanged(int index);
-	// -- Single Colour
+	// -- Colour - Single
 	void on_ColourSingleColourRadio_clicked(bool checked);
 	void on_ColourSingleColourButton_clicked(bool checked);
-	// -- RGB Gradient
+	// -- Colour - RGB Gradient
 	void on_ColourRGBGradientRadio_clicked(bool checked);
 	void on_ColourRGBGradientAButton_clicked(bool checked);
 	void on_ColourRGBGradientASpin_valueChanged(double value);
@@ -83,7 +83,7 @@ class StyleWindow : public QWidget
 	void on_ColourRGBGradientBSpin_valueChanged(double value);
 	void on_ColourRGBGradientBSetMinimumButton_clicked(bool checked);
 	void on_ColourRGBGradientBSetMaximumButton_clicked(bool checked);
-	// -- HSV Gradient
+	// -- Colour - HSV Gradient
 	void on_ColourHSVGradientRadio_clicked(bool checked);
 	void on_ColourHSVGradientAButton_clicked(bool checked);
 	void on_ColourHSVGradientASpin_valueChanged(double value);
@@ -93,7 +93,7 @@ class StyleWindow : public QWidget
 	void on_ColourHSVGradientBSpin_valueChanged(double value);
 	void on_ColourHSVGradientBSetMinimumButton_clicked(bool checked);
 	void on_ColourHSVGradientBSetMaximumButton_clicked(bool checked);
-	// -- Custom Gradient
+	// -- Colour - Custom Gradient
 	void on_ColourCustomGradientRadio_clicked(bool checked);
 	void on_ColourCustomGradientTable_itemSelectionChanged();
 	void on_ColourCustomGradientTable_cellDoubleClicked(int row, int column);
@@ -104,6 +104,11 @@ class StyleWindow : public QWidget
 	void on_ColourAlphaOwnAlphaRadio_clicked(bool checked);
 	void on_ColourAlphaFixedAlphaRadio_clicked(bool checked);
 	void on_ColourAlphaFixedAlphaSpin_valueChanged(double value);
+	// -- Surface Options
+	void on_SurfaceShininessSpin_valueChanged(double value);
+	// -- Line Options
+	void on_LineStippleCombo_currentIndexChanged(int index);
+	void on_LineWidthSpin_valueChanged(double value);
 
 
 	/*

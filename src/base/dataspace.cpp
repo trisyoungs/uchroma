@@ -128,6 +128,8 @@ bool DataSpace::initialise(const DataSpace& source, bool referenceDataOnly)
 		DataSpaceRange* newRange = ranges_.add(*this);
 		newRange->set(sourceCollection_, range, referenceDataOnly);
 	}
+
+	return true;
 }
 
 // Return source collection

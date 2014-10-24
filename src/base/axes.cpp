@@ -106,7 +106,7 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	clipPlaneYMin_ = 0.0;
 	clipPlaneYMax_ = 0.0;
 	gridLineMajorStyle_[0].set(1.0, LineStipple::NoStipple, 0.5, 0.5, 0.5, 1.0);
-	gridLineMinorStyle_[0].set(1.0, LineStipple::QuartedDashStipple, 0.75, 0.75, 0.75, 1.0);
+	gridLineMinorStyle_[0].set(1.0, LineStipple::QuarterDashStipple, 0.75, 0.75, 0.75, 1.0);
 	gridLineMajorStyle_[1] = gridLineMajorStyle_[0];
 	gridLineMinorStyle_[1] = gridLineMinorStyle_[0];
 	gridLineMajorStyle_[2] = gridLineMajorStyle_[0];
@@ -670,9 +670,14 @@ Vec3<double> Axes::tickDirection(int axis) const
 	if ((!useBestFlatView_) || (parent_.viewType() <= ViewPane::AutoStretchedView)) return tickDirection_[axis];
 	else switch (parent_.viewType())
 	{
-		case (ViewPane::FlatXYView):	return (axis == 0 ? Vec3<double>(0.0, -1.0, 0.0) : Vec3<double>(-1.0, 0.0, 0.0));
-		case (ViewPane::FlatXZView):	return (axis == 0 ? Vec3<double>(0.0, 0.0, -1.0) : Vec3<double>(-1.0, 0.0, 0.0));
-		case (ViewPane::FlatYZView):	return (axis == 1 ? Vec3<double>(0.0, 0.0, -1.0) : Vec3<double>(0.0, -1.0, 0.0));
+		case (ViewPane::FlatXYView):
+			return (axis == 0 ? Vec3<double>(0.0, -1.0, 0.0) : Vec3<double>(-1.0, 0.0, 0.0));
+		case (ViewPane::FlatXZView):
+			return (axis == 0 ? Vec3<double>(0.0, 0.0, -1.0) : Vec3<double>(-1.0, 0.0, 0.0));
+		case (ViewPane::FlatYZView):
+			return (axis == 1 ? Vec3<double>(0.0, 0.0, -1.0) : Vec3<double>(0.0, -1.0, 0.0));
+		default:
+			break;
 	}
 
 	// Safety catch
@@ -786,9 +791,14 @@ Vec3<double> Axes::labelOrientation(int axis) const
 	if ((!useBestFlatView_) || (parent_.viewType() <= ViewPane::AutoStretchedView)) return labelOrientation_[axis];
 	else switch (parent_.viewType())
 	{
-		case (ViewPane::FlatXYView):	return (axis == 0 ? Vec3<double>(0.0, 0.0, 0.2) : Vec3<double>(0.0, 0.0, 0.2));
-		case (ViewPane::FlatXZView):	return (axis == 0 ? Vec3<double>(270.0, 0.0, 0.2) : Vec3<double>(270.0, 0.0, 0.2));
-		case (ViewPane::FlatYZView):	return (axis == 1 ? Vec3<double>(90.0, 0.0, 0.2) : Vec3<double>(90.0, 0.0, 0.2));
+		case (ViewPane::FlatXYView):
+			return (axis == 0 ? Vec3<double>(0.0, 0.0, 0.2) : Vec3<double>(0.0, 0.0, 0.2));
+		case (ViewPane::FlatXZView):
+			return (axis == 0 ? Vec3<double>(270.0, 0.0, 0.2) : Vec3<double>(270.0, 0.0, 0.2));
+		case (ViewPane::FlatYZView):
+			return (axis == 1 ? Vec3<double>(90.0, 0.0, 0.2) : Vec3<double>(90.0, 0.0, 0.2));
+		default:
+			break;
 	}
 
 	// Safety catch
@@ -811,9 +821,14 @@ TextPrimitive::TextAnchor Axes::labelAnchor(int axis) const
 	if ((!useBestFlatView_) || (parent_.viewType() <= ViewPane::AutoStretchedView)) return labelAnchor_[axis];
 	else switch (parent_.viewType())
 	{
-		case (ViewPane::FlatXYView):	return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::MiddleRightAnchor);
-		case (ViewPane::FlatXZView):	return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::MiddleRightAnchor);
-		case (ViewPane::FlatYZView):	return (axis == 1 ? TextPrimitive::MiddleRightAnchor : TextPrimitive::TopMiddleAnchor);
+		case (ViewPane::FlatXYView):
+			return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::MiddleRightAnchor);
+		case (ViewPane::FlatXZView):
+			return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::MiddleRightAnchor);
+		case (ViewPane::FlatYZView):
+			return (axis == 1 ? TextPrimitive::MiddleRightAnchor : TextPrimitive::TopMiddleAnchor);
+		default:
+			break;
 	}
 
 	// Safety catch
@@ -852,9 +867,14 @@ Vec4<double> Axes::titleOrientation(int axis) const
 	if ((!useBestFlatView_) || (parent_.viewType() <= ViewPane::AutoStretchedView)) return titleOrientation_[axis];
 	else switch (parent_.viewType())
 	{
-		case (ViewPane::FlatXYView):	return (axis == 0 ? Vec4<double>(0.0, 0.0, 0.2, 0.5) : Vec4<double>(0.0, 270.0, 0.2, 0.5));
-		case (ViewPane::FlatXZView):	return (axis == 0 ? Vec4<double>(270.0, 0.0, 0.2, 0.5) : Vec4<double>(270.0, 90.0, 0.2, 0.5));
-		case (ViewPane::FlatYZView):	return (axis == 1 ? Vec4<double>(90.0, 90.0, 0.2, 0.5) : Vec4<double>(90.0, 0.0, 0.2, 0.5));
+		case (ViewPane::FlatXYView):
+			return (axis == 0 ? Vec4<double>(0.0, 0.0, 0.2, 0.5) : Vec4<double>(0.0, 270.0, 0.2, 0.5));
+		case (ViewPane::FlatXZView):
+			return (axis == 0 ? Vec4<double>(270.0, 0.0, 0.2, 0.5) : Vec4<double>(270.0, 90.0, 0.2, 0.5));
+		case (ViewPane::FlatYZView):
+			return (axis == 1 ? Vec4<double>(90.0, 90.0, 0.2, 0.5) : Vec4<double>(90.0, 0.0, 0.2, 0.5));
+		default:
+			break;
 	}
 
 	// Safety catch
@@ -878,9 +898,14 @@ TextPrimitive::TextAnchor Axes::titleAnchor(int axis) const
 	if ((!useBestFlatView_) || (parent_.viewType() <= ViewPane::AutoStretchedView)) return titleAnchor_[axis];
 	else switch (parent_.viewType())
 	{
-		case (ViewPane::FlatXYView):	return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::BottomMiddleAnchor);
-		case (ViewPane::FlatXZView):	return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::BottomMiddleAnchor);
-		case (ViewPane::FlatYZView):	return (axis == 1 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::TopMiddleAnchor);
+		case (ViewPane::FlatXYView):
+			return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::BottomMiddleAnchor);
+		case (ViewPane::FlatXZView):
+			return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::BottomMiddleAnchor);
+		case (ViewPane::FlatYZView):
+			return (axis == 1 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::TopMiddleAnchor);
+		default:
+			break;
 	}
 
 	// Safety catch

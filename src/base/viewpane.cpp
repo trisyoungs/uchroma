@@ -1016,6 +1016,9 @@ void ViewPane::renderData(const QGLContext* context, GLExtensions* extensions, b
 	// Loop over displayTargets_ list...
 	for (TargetData* target = collectionTargets_.first(); target != NULL; target = target->next)
 	{
+		// Set shininess for collection
+		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, target->collection()->displaySurfaceShininess());
+
 		// Loop over display primitives in this target...
 		for (TargetPrimitive* primitive = target->displayPrimitives(); primitive != NULL; primitive = primitive->next)
 		{

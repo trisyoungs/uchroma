@@ -69,28 +69,7 @@ bool EditLineStyleDialog::call(LineStyle target)
 	refreshing_ = true;
 
 	// Create entries in LineStippleCombo
-	int iconWidth = 96, iconHeight = 3;
-	QLine line(0, iconHeight/2, iconWidth, iconHeight/2);
-	QPalette palette = ui.LineStippleCombo->palette();
-	QPen pen;
-	pen.setWidth(iconHeight);
-	pen.setCapStyle(Qt::FlatCap);
-	ui.LineStippleCombo->setIconSize(QSize(iconWidth,iconHeight));
-	for (int n=0; n<LineStipple::nStippleTypes; ++n)
-	{
-		// Create an icon with the stippled line on it
-		QPixmap lineImage(iconWidth, iconHeight);
-		QPainter painter(&lineImage);
-		painter.setRenderHint(QPainter::Antialiasing, false);
-		painter.setRenderHint(QPainter::HighQualityAntialiasing, false);
-		painter.setBackground(QBrush(Qt::white));
-		painter.fillRect(0, 0, iconWidth, iconHeight, QBrush(palette.background()));
-		pen.setDashPattern(LineStipple::stipple[n].dashPattern());
-		painter.setPen(pen);
-		painter.drawLine(line);
-		painter.end();
-		ui.LineStippleCombo->addItem(QIcon(lineImage), LineStipple::stipple[n].name);
-	}
+	for (int n=0; n<LineStipple::nStippleTypes; ++n) LineStipple::stipple[n].addStippleItem(ui.LineStippleCombo, 3);
 
 	// Update widgets
 	ui.LineWidthSpin->setValue(lineStyle_.width());

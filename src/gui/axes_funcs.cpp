@@ -1553,6 +1553,8 @@ void AxesWindow::updateControls(bool force)
 	ui.XTitleInPlaneRotationSlider->setValue(axes.titleOrientation(0).y);
 	ui.XTitleInPlaneRotationSpin->setValue(axes.titleOrientation(0).y);
 	ui.XTitleDistanceSpin->setValue(axes.titleOrientation(0).z);
+	ui.XLabelOrientationGroup->setDisabled(axes.useBestFlatView());
+	ui.XTitleOrientationGroup->setDisabled(axes.autoPositionTitles() || axes.useBestFlatView());
 	// -- Y
 	ui.YNumberFormatTestLabel->setText(axes.numberFormat(1).format(1.23456789));
 	ui.YLabelAnchorCombo->setCurrentIndex(axes.labelAnchor(1));
@@ -1568,6 +1570,8 @@ void AxesWindow::updateControls(bool force)
 	ui.YTitleInPlaneRotationSlider->setValue(axes.titleOrientation(1).y);
 	ui.YTitleInPlaneRotationSpin->setValue(axes.titleOrientation(1).y);
 	ui.YTitleDistanceSpin->setValue(axes.titleOrientation(1).z);
+	ui.YLabelOrientationGroup->setDisabled(axes.useBestFlatView());
+	ui.YTitleOrientationGroup->setDisabled(axes.autoPositionTitles() || axes.useBestFlatView());
 	// -- Z
 	ui.ZNumberFormatTestLabel->setText(axes.numberFormat(2).format(1.23456789));
 	ui.ZLabelAnchorCombo->setCurrentIndex(axes.labelAnchor(2));
@@ -1583,6 +1587,8 @@ void AxesWindow::updateControls(bool force)
 	ui.ZTitleInPlaneRotationSlider->setValue(axes.titleOrientation(2).y);
 	ui.ZTitleInPlaneRotationSpin->setValue(axes.titleOrientation(2).y);
 	ui.ZTitleDistanceSpin->setValue(axes.titleOrientation(2).z);
+	ui.ZLabelOrientationGroup->setDisabled(axes.useBestFlatView());
+	ui.ZTitleOrientationGroup->setDisabled(axes.autoPositionTitles() || axes.useBestFlatView());
 
 	// Grid
 	// -- X

@@ -385,7 +385,7 @@ void Viewer::setupGL()
 	GLfloat spotlightDiffuse[4] = { 0.8f, 0.8f, 0.8f, 1.0f };
 	GLfloat spotlightSpecular[4] = { 0.7f, 0.7f, 0.7f, 1.0f };
 	GLfloat spotlightPosition[4] = { 1.0f, 1.0f, 0.0f, 0.0f };
-	GLfloat specularColour[4] = { 0.9f, 0.9f, 0.9f, 1.0f };
+	GLfloat specularColour[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	// Clear (background) colour
 	glClearColor(backgroundColour[0], backgroundColour[1], backgroundColour[2], backgroundColour[3]);
@@ -414,7 +414,6 @@ void Viewer::setupGL()
 
 	// Set specular reflection colour
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specularColour);
-	glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 127);
 
 	// Configure antialiasing
 	glDisable(GL_MULTISAMPLE);

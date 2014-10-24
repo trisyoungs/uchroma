@@ -21,6 +21,8 @@
 
 #include "render/linestipple.h"
 #include <QtCore/QVector>
+#include <QtGui/QComboBox>
+#include <QtGui/QPainter>
 #include <string.h>
 #include <bitset>
 #include <stdio.h>
@@ -52,6 +54,31 @@ const char* LineStipple::stippleType(LineStipple::StippleType st)
 /*
  * Stipple
  */
+
+// Add stipple pattern to specified QComboBox
+void LineStipple::addStippleItem(QComboBox* combo, int lineHeight)
+{
+	int lineWidth = combo->width() - 8;
+	QLine line(0, lineHeight /2, lineWidth, lineHeight /2);
+	QPalette palette = combo->palette();
+	QPen pen;
+	pen.setWidth(lineHeight);
+	pen.setCapStyle(Qt::FlatCap);
+	combo->setIconSize(QSize(lineWidth, lineHeight));
+
+	// Create an icon with the stippled line on it
+	QPixmap lineImage(lineWidth, lineHeight);
+	QPainter painter(&lineImage);
+	painter.setRenderHint(QPainter::Antialiasing, false);
+	painter.setRenderHint(QPainter::HighQualityAntialiasing, false);
+	painter.setBackground(QBrush(Qt::white));
+	painter.fillRect(0, 0, lineWidth, lineHeight, QBrush(palette.background()));
+	pen.setDashPattern(dashPattern());
+	painter.setPen(pen);
+	painter.drawLine(line);
+	painter.end();
+	combo->addItem(QIcon(lineImage), name);
+}
 
 // Return stipple pattern as a Qt-compatible dash pattern
 QVector<qreal>& LineStipple::dashPattern()

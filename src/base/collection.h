@@ -383,7 +383,7 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	// Line style
 	LineStyle displayLineStyle_;
 	// Surface shininess
-	int displaySurfaceShininess_;
+	double displaySurfaceShininess_;
 	// Style version
 	int displayStyleVersion_;
 
@@ -403,9 +403,9 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	// Return line style
 	LineStyle& displayLineStyle();
 	// Set surface shininess
-	void setDisplaySurfaceShininess(int shininess);
+	void setDisplaySurfaceShininess(double shininess);
 	// Return surface shininess
-	int displaySurfaceShininess();
+	double displaySurfaceShininess();
 	// Return style version
 	int displayStyleVersion();
 };

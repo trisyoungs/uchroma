@@ -1171,6 +1171,8 @@ const ColourScalePoint* Collection::colourScalePoint(ColourSource source, int in
 		default:
 			msg.print("Unhandled ColourSoruce in Collection::colourScalePoint().\n");
 	}
+
+	return NULL;
 }
 
 // Return colour of point specified
@@ -1325,7 +1327,6 @@ List<DisplayDataSet>& Collection::displayData()
 	// Clear old displayData_ and create temporary Data2D list for display data construction
 	List<Data2D> transformedData;
 	displayData_.clear();
-	double x, y;
 
 	// Loop over slices, apply any transforms (X or Y) and check limits
 	for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next)
@@ -1385,7 +1386,6 @@ List<DisplayDataSet>& Collection::displayData()
 	displayAbscissa_.clear();
 
 	// -- Loop over all datasets simultaneously, seeking next lowest point in their x data
-	int test = 0;
 	while (nFinished != nTransformedDataSets)
 	{
 		// Find lowest point of current x values
@@ -1478,15 +1478,13 @@ LineStyle& Collection::displayLineStyle()
 }
 
 // Set surface shininess
-void Collection::setDisplaySurfaceShininess(int shininess)
+void Collection::setDisplaySurfaceShininess(double shininess)
 {
 	displaySurfaceShininess_ = shininess;
-	
-	++displayStyleVersion_;
 }
 
 // Return surface shininess
-int Collection::displaySurfaceShininess()
+double Collection::displaySurfaceShininess()
 {
 	return displaySurfaceShininess_;
 }
