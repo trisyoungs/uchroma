@@ -28,6 +28,10 @@ ViewLayout::ViewLayout(UChromaWindow& parent) : ListItem<ViewLayout>(), parent_(
 {
 	nColumns_ = 1;
 	nRows_ = 1;
+	layoutXOffset_ = 0;
+	layoutYOffset_ = 0;
+	layoutXScale_ = 1.0;
+	layoutYScale_ = 1.0;
 	pixelWidth_ = 0;
 	pixelHeight_ = 0;
 	remainingWidth_ = 0;
@@ -86,6 +90,9 @@ void ViewLayout::recalculatePixels()
 	{
 		pane->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
 		pane->recalculateView();
+
+		// Apply pixel offsets to each pane
+		pane->translateViewport(layoutXOffset_, layoutYOffset_);
 	}
 }
 
@@ -136,15 +143,48 @@ int ViewLayout::nRows() const
 	return nRows_;
 }
 
+// Set pixel offsets and scales to use in layout
+void ViewLayout::setOffsetAndScale(int xOffset, int yOffset, double xScale, double yScale)
+{
+	layoutXOffset_ = xOffset;
+	layoutYOffset_ = yOffset;
+	layoutXScale_ = xScale;
+	layoutYScale_ = yScale;
+}
+
+// Recalculate layout
+void ViewLayout::recalculate(int contextWidth, int contextHeight)
+{
+	layoutWidth_ = contextWidth * layoutXScale_;
+	layoutHeight_ = contextHeight * layoutYScale_;
+
+	recalculatePixels();
+}
+
 /*
  * Pane Functions
  */
+
+// Return unique name based on supplied basename
+QString ViewLayout::uniqueViewPaneName(QString baseName)
+{
+	QString testName = baseName, suffix;
+	int index = 0;
+	do
+	{
+		// Add on suffix (if index > 0)
+		if (index > 0) testName = baseName + " "+QString::number(index);
+		++index;
+	} while (pane(testName));
+
+	return testName;
+}
 
 // Add pane to layout
 ViewPane* ViewLayout::addPane(QString name, int left, int top, int width, int height)
 {
 	ViewPane* pane = panes_.add(*this);
-	pane->setName(name);
+	pane->setName(uniqueViewPaneName(name));
 	pane->setSize(width, height);
 
 	pane->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
@@ -224,15 +264,6 @@ ViewPane* ViewLayout::collectionUsed(Collection* collection, ViewPane::PaneRole 
 bool ViewLayout::containsPane(ViewPane* pane)
 {
 	return panes_.contains(pane);
-}
-
-// Set new layout size
-void ViewLayout::resize(int contextWidth, int contextHeight)
-{
-	layoutWidth_ = contextWidth;
-	layoutHeight_ = contextHeight;
-
-	recalculatePixels();
 }
 
 // Return pane under specified coordinate

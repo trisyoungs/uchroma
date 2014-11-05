@@ -65,13 +65,21 @@ class ViewLayout : public ListItem<ViewLayout>
 	int nColumns_;
 	// Number of rows in layout
 	int nRows_;
-	// Current layout width
+	// Width of layout (in pixels)
 	int layoutWidth_;
-	// Current layout height
+	// Height of layout (in pixels)
 	int layoutHeight_;
-	// Width of grid pixel
+	// Horizontal offset (in pixels)
+	int layoutXOffset_;
+	// Vertical offset (in pixels)
+	int layoutYOffset_;
+	// Horizontal scaling factor
+	double layoutXScale_;
+	// Vertical scaling factor
+	double layoutYScale_;
+	// Width of grid pixel (in pixels)
 	int pixelWidth_;
-	// Height of grid pixel
+	// Height of grid pixel (in pixels_
 	int pixelHeight_;
 	// Remaining width at right edge
 	int remainingWidth_;
@@ -95,8 +103,10 @@ class ViewLayout : public ListItem<ViewLayout>
 	int nColumns() const;
 	// Return number of rows in layout
 	int nRows() const;
+	// Set pixel offsets and scales to use in layout
+	void setOffsetAndScale(int xOffset, int yOffset, double xScale, double yScale);
 	// Set new layout size
-	void resize(int contextWidth, int contextHeight);
+	void recalculate(int contextWidth, int contextHeight);
 
 
 	/*
@@ -107,6 +117,8 @@ class ViewLayout : public ListItem<ViewLayout>
 	ParentList<ViewPane,ViewLayout> panes_;
 
 	public:
+	// Return unique pane name based on name supplied
+	QString uniqueViewPaneName(QString basename);
 	// Add pane to layout
 	ViewPane* addPane(QString name = QString(), int left = 0, int top = 0, int width = 1, int height = 1);
 	// Remove pane from layout

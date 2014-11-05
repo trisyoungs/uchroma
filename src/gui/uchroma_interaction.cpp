@@ -29,7 +29,7 @@
 InteractionMode InteractionMode::interactionModes[] = {
 	{ "Fit (select X)",	"<b>Left-click-drag</b> Select X region for fitting" },
 	{ "Fit (select Z)",	"<b>Left-click-drag</b> Select Z region for fitting" },
-	{ "View",		"<b>Right</b> Rotate view, <b>Middle</b> Translate view, <b>Wheel</b> Zoom view" },
+	{ "View",		"<b>Right</b> Rotate view, <b>Middle</b> Translate view (3D) or shift axis limits (2D), <b>Wheel</b> Zoom view" },
 	{ "Zoom",		"<b>Left-click-drag</b> Zoom to selected region, <b>Ctrl+Left</b> Extract slice" }
 };
 

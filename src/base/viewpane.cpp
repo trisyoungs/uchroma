@@ -282,6 +282,13 @@ void ViewPane::recalculateViewport(int gridPixelWidth, int gridPixelHeight, int 
 	calculateFontScaling();
 }
 
+// Translate viewport by specified pixel amounts
+void ViewPane::translateViewport(int deltaX, int deltaY)
+{
+	viewportMatrix_[0] += deltaX;
+	viewportMatrix_[1] += deltaY;
+}
+
 // Return viewport matrix
 GLuint* ViewPane::viewportMatrix()
 {

@@ -112,6 +112,8 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	Vec4<int> geometryAfterHandleMove(PaneHandle handle, int deltaX, int deltaY);
 	// Recalculate viewport matrix based on grid pixel dimensions provided
 	void recalculateViewport(int gridPixelWidth, int gridPixelHeight, int nColumns, int nRows, int widthRemainder, int heightRemainder);
+	// Translate viewport by specified pixel amounts
+	void translateViewport(int deltaX, int deltaY);
 	// Return viewport matrix
 	GLuint* viewportMatrix();
 	// Return whether the specified coordinate is in this pane

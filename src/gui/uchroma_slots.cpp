@@ -125,6 +125,8 @@ void UChromaWindow::on_actionFilePrint_triggered(bool checked)
 
 void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 {
+	const int maxSize = 3000;
+
 	if (saveImageDialog_.getImageDetails(imageExportFile_, imageExportWidth_, imageExportHeight_, imageExportFormat_, imageExportMaintainAspect_, double(ui.MainView->width()) / double(ui.MainView->height())))
 	{
 		// Check to see if existing image file already exists
@@ -133,16 +135,76 @@ void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 			if (QMessageBox::question(this, "File Exists", "The file '" + saveImageDialog_.imageFileName() + "' already exists.\nOverwrite it?", QMessageBox::No | QMessageBox::Yes, QMessageBox::No) == QMessageBox::No) return;
 		}
 
+		// Grab export information from dialog
 		imageExportFile_ = saveImageDialog_.imageFileName();
 		imageExportFormat_ = saveImageDialog_.imageFormat();
 		imageExportHeight_ = saveImageDialog_.imageHeight();
 		imageExportWidth_ = saveImageDialog_.imageWidth();
 		imageExportMaintainAspect_ = saveImageDialog_.imageAspectRatioMaintained();
-		QPixmap pixmap = ui.MainView->generateImage(imageExportWidth_, imageExportHeight_);
-		pixmap.save(imageExportFile_, Viewer::imageFormatExtension(imageExportFormat_), -1);
 
-		// The sizes of panes may now be incorrect, so trigger a resize event
-		recalculateViewLayout(ui.MainView->contextWidth(), ui.MainView->contextHeight());
+		// If both image dimensions are less than some limiting size, get image in a single shot. If not, tile it...
+		if ((imageExportHeight_ > maxSize) || (imageExportWidth_ > maxSize))
+		{
+// 			ui.MainView->setUseFrameBuffer(true);
+
+			// If we are using the framebuffer, use the current Viewer size as our tile size
+			int tileWidth = (ui.MainView->useFrameBuffer() ? ui.MainView->width() : maxSize);
+			int tileHeight = (ui.MainView->useFrameBuffer() ? ui.MainView->height() : maxSize);
+
+			printf("WH = %i %i, tile WH = %i %i\n", imageExportWidth_, imageExportHeight_, tileWidth, tileHeight);
+			
+			// Create a QPixmap of the desired full size
+			QPixmap pixmap(imageExportWidth_, imageExportHeight_);
+			QPainter painter(&pixmap);
+
+			// Calculate scale factors for ViewLayout, so that the context width/height is scaled to the desired image size
+			double xScale = double(imageExportWidth_) / double(tileWidth);
+			double yScale = double(imageExportHeight_) / double(tileHeight);
+			int nX = imageExportWidth_ / tileWidth + ((imageExportWidth_%tileWidth) ? 1 : 0);
+			int nY = imageExportHeight_ / tileHeight + ((imageExportHeight_%tileHeight) ? 1 : 0);
+			printf("NXY = %i %i  scale = %f %f\n", nX, nY, xScale, yScale);
+
+			// Loop over tiles in x and y
+			QProgressDialog progress("Saving tiled image", "Cancel", 0, nX*nY, this);
+			progress.setWindowTitle("uChroma");
+			for (int x=0; x<nX; ++x)
+			{
+				for (int y=0; y<nY; ++y)
+				{
+					// Set progress value and check for cancellation
+					if (progress.wasCanceled()) break;
+					progress.setValue(x*nY+y);
+
+					// Recalculate view pane sizes to reflect current tile position and tile size
+					if (ui.MainView->useFrameBuffer()) viewLayout_.recalculate(tileWidth, tileHeight);
+					viewLayout_.setOffsetAndScale(-x*tileWidth, -y*tileHeight, xScale, yScale);
+
+					// Generate this tile
+					QPixmap tile = ui.MainView->generateImage(tileWidth, tileHeight);
+					QString s;
+					s.sprintf("tile%02ix%02i.png", x, y);
+					tile.save(s, Viewer::imageFormatExtension(imageExportFormat_), -1);
+
+					// Paste this tile into the main image
+					painter.drawPixmap(x*tileWidth, imageExportHeight_-(y+1)*tileHeight, tile);
+				}
+				if (progress.wasCanceled()) break;
+			}
+
+			// Finalise and save
+			painter.end();
+			pixmap.save(imageExportFile_, Viewer::imageFormatExtension(imageExportFormat_), -1);
+		}
+		else
+		{
+			QPixmap pixmap = ui.MainView->generateImage(imageExportWidth_, imageExportHeight_);
+			pixmap.save(imageExportFile_, Viewer::imageFormatExtension(imageExportFormat_), -1);
+
+		}
+
+		// The sizes of panes may now be incorrect, so reset everything
+		viewLayout_.setOffsetAndScale(0, 0, 1.0, 1.0);
+		viewLayout_.recalculate(ui.MainView->contextWidth(), ui.MainView->contextHeight());
 	}
 }
 
@@ -298,7 +360,7 @@ void UChromaWindow::on_actionViewChangeLayout_triggered(bool checked)
 	{
 		viewLayout_ = layoutDialog.viewLayout();
 		currentViewPane_ = viewLayout_.panes();
-		recalculateViewLayout(ui.MainView->contextWidth(), ui.MainView->contextHeight());
+		viewLayout_.recalculate(ui.MainView->contextWidth(), ui.MainView->contextHeight());
 
 		UChromaSession::setAsModified();
 
