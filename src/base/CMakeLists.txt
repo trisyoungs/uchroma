@@ -15,6 +15,7 @@ add_library(base
   nxs.cpp
   referencevariable.cpp
   session.cpp
+  signal.cpp
   sysfunc.cpp
   targetdata.cpp
   targetprimitive.cpp
@@ -37,6 +38,7 @@ add_library(base
   nxs.h
   referencevariable.h
   session.h
+  signal.h
   sysfunc.h
   targetdata.h
   targetprimitive.h

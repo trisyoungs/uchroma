@@ -81,7 +81,7 @@ void DataWindow::reloadDataSets()
 	progress.setValue(currentCollection->nDataSets());
 
 	// Need to update GUI
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 	uChroma_.updateGUI();
 }
 
@@ -150,7 +150,7 @@ void DataWindow::on_AddFilesButton_clicked(bool checked)
 	}
 
 	// Need to update GUI
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 	uChroma_.updateGUI();
 }
 
@@ -169,7 +169,7 @@ void DataWindow::on_RemoveFilesButton_clicked(bool checked)
 	for (RefListItem<DataSet,int>* ri = dataSetsToRemove.first(); ri != NULL; ri = ri->next) currentCollection->removeDataSet(ri->item);
 
 	// Need to update GUI
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 	uChroma_.updateGUI();
 }
 
@@ -215,7 +215,7 @@ void DataWindow::on_DataSetsTable_cellChanged(int row, int column)
 		currentCollection->setDataSetZ(dataSet, item->text().toDouble());
 
 		// Need to update now
-		Session::setAsModified();
+		UChromaSession::setAsModified();
 		uChroma_.updateGUI();
 	}
 }
@@ -234,7 +234,7 @@ void DataWindow::on_SetZButton_clicked(bool checked)
 	if (setZDialog.exec())
 
 	// Need to update now
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 	uChroma_.updateGUI();
 }
 
@@ -274,7 +274,7 @@ void DataWindow::on_ReloadFilesButton_clicked(bool checked)
 	}
 
 	// Need to update GUI
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 	uChroma_.updateGUI();
 }
 

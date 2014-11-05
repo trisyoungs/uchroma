@@ -78,25 +78,32 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 	delta = delta - rMouseLast_;
 	bool refresh = false;
 
-	if (buttonState_&Qt::RightButton)
+	// Is the current view pane valid?
+	ViewPane* targetPane = uChroma_->currentViewPane();
+	if (ViewPane::objectValid(targetPane, "ViewPane in Viewer::MouseMoveEvent"))
 	{
-		// View manipulation
-		if (km&Qt::ShiftModifier)
+		if (buttonState_&Qt::RightButton)
 		{
+			// View manipulation
+			if (km&Qt::ShiftModifier)
+			{
+			}
+			else if (km&Qt::ControlModifier)
+			{
+			}
+			else 
+			{
+				targetPane->rotateView(delta.y/2.0, delta.x/2.0);
+				refresh = true;
+			}
 		}
-		else if (km&Qt::ControlModifier)
+		else if (buttonState_&Qt::MidButton)
 		{
-		}
-		else 
-		{
-			if (uChroma_->currentViewPane()) uChroma_->currentViewPane()->rotateView(delta.y/2.0, delta.x/2.0);
+			// If this is a flat view, shift the axis limits rather than the view
+			if (targetPane->isFlatView()) targetPane->shiftFlatAxisLimits(delta.x, -delta.y);
+			else targetPane->translateView(delta.x/15.0, -delta.y/15.0, 0.0);
 			refresh = true;
 		}
-	}
-	else if (buttonState_&Qt::MidButton)
-	{
-		if (uChroma_->currentViewPane()) uChroma_->currentViewPane()->translateView(delta.x/15.0, -delta.y/15.0, 0.0);
-		refresh = true;
 	}
 	
 	// Update interaction position
@@ -125,7 +132,7 @@ void Viewer::wheelEvent(QWheelEvent *event)
 	// Perform camera zoom
 	if (uChroma_->currentViewPane())
 	{
-		double zrange = uChroma_->currentViewPane()->axes().stretch(2) * uChroma_->currentViewPane()->axes().range(2);
+		double zrange = uChroma_->currentViewPane()->axes().stretch(2) * uChroma_->currentViewPane()->axes().realRange(2);
 		if (zrange < 1.0) zrange = 1.0;
 		uChroma_->currentViewPane()->translateView(0.0, 0.0, 0.5*zrange*(scrollup ? -1.0 : 1.0));
 	}

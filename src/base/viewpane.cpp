@@ -74,7 +74,7 @@ ViewPane::~ViewPane()
 }
 
 // Copy constructor
-ViewPane::ViewPane(const ViewPane& source) : parent_(parent_), axes_(*this), ObjectList<ViewPane>(NULL), zOffset_(zOffset_)
+ViewPane::ViewPane(const ViewPane& source) : ObjectList<ViewPane>(NULL), parent_(parent_), zOffset_(zOffset_), axes_(*this)
 {
 	(*this) = source;
 }
@@ -408,57 +408,6 @@ TargetData* ViewPane::collectionTargets()
 	return collectionTargets_.first();
 }
 
-// Process supplied Collection changed/update signal if it is relevant to this pane
-bool ViewPane::processUpdate(Collection* source, Collection::CollectionSignal signal)
-{
-	Collection* collection;
-	switch (signal)
-	{
-		// Collection Created
-		// -- Role Relevance : ???
-		case (Collection::CollectionCreatedSignal):
-			return false;
-			break;
-		// Collection Deleted
-		// -- Role Relevance : All
-		case (Collection::CollectionDeletedSignal):
-			// If the emitting collection is a current target, remove it from our list
-			if (!collectionIsTarget(source)) return false;
-			removeCollectionTarget(source);
-			break;
-		// Current Slice Changed
-		// -- Role Relevance : SliceMonitorRole
-		case (Collection::CurrentSliceChangedSignal):
-			if (role_ != ViewPane::SliceMonitorRole) return false;
-			if (!collectionIsTarget(source)) 
-			{
-				addCollectionTarget(source);
-				return false;
-			}
-			// Update axes limits
-			updateAxisLimits();
-			break;
-		// Data Changed
-		// -- Role Relevance : ???
-		case (Collection::DataChangedSignal):
-			return false;
-			break;
-		// Extracted Data Added
-		// -- Role Relevance : Extractor
-		case (Collection::ExtractedDataAddedSignal):
-			if (role_ != ViewPane::ExtractorRole) return false;
-			addCollectionTarget(source);
-			updateAxisLimits();
-			return false;
-			break;
-		default:
-			msg.print("ViewPane::processUpdate - Unrecognised signal %i sent from collection '%s'\n", signal, qPrintable(source->name()));
-			return false;
-	}
-
-	return true;
-}
-
 /*
  * Projection / View
  */
@@ -542,6 +491,12 @@ void ViewPane::setViewType(ViewPane::ViewType vt)
 ViewPane::ViewType ViewPane::viewType()
 {
 	return viewType_;
+}
+
+// Return whether view type is flat
+bool ViewPane::isFlatView()
+{
+	return ((viewType_ >= ViewPane::FlatXYView) && (viewType_ <= ViewPane::FlatYZView));
 }
 
 // Return projection matrix
@@ -862,7 +817,7 @@ void ViewPane::recalculateView(bool force)
 	// Set axis stretch factors to fill available pixel width/height
 	for (axis=0; axis<3; ++axis)
 	{
-		axes_.setStretch(axis, viewportMatrix_[axisDir[axis]+2] / (unit[axisDir[axis]] * (axes_.range(axis))));
+		axes_.setStretch(axis, viewportMatrix_[axisDir[axis]+2] / (unit[axisDir[axis]] * (axes_.realRange(axis))));
 		if (!std::isnormal(axes_.stretch(axis))) axes_.setStretch(axis, 1.0);
 	}
 	
@@ -928,19 +883,19 @@ void ViewPane::recalculateView(bool force)
 		// Calculate total width and height of objects as they are arranged
 		double globalWidth = globalMax.x - globalMin.x;
 		double globalHeight = globalMax.y - globalMin.y;
-		double axisWidth = coordMax[axisX].x - coordMin[axisX].x;
-		double axisHeight = coordMax[axisY].y - coordMin[axisY].y;
-		double labelWidth = labelMax.x - labelMin.x;
-		double labelHeight = labelMax.y - labelMin.y;
+		axisPixelLength_[axisX] = coordMax[axisX].x - coordMin[axisX].x;
+		axisPixelLength_[axisY] = coordMax[axisY].y - coordMin[axisY].y;
+// 		double labelWidth = labelMax.x - labelMin.x;
+// 		double labelHeight = labelMax.y - labelMin.y;
 
 		// Now, we know the width and height of the axis on its own, and the extra 'added' by the labels, so work out how much we need to shrink the axis by
 		double deltaWidth = (viewportMatrix_[2] - 2*margin) - globalWidth;
 		double deltaHeight = (viewportMatrix_[3] - 2*margin) - globalHeight;
 
 		// So, need to lose deltaWidth and deltaHeight pixels from the axis exents - we'll do this by scaling the stretchfactor
-		double factor = axisWidth / (axisWidth - deltaWidth);
+		double factor = axisPixelLength_[axisX] / (axisPixelLength_[axisX]- deltaWidth);
 		axes_.setStretch(axisX, axes_.stretch(axisX) * factor);
-		factor = axisHeight / (axisHeight - deltaHeight);
+		factor = axisPixelLength_[axisY] / (axisPixelLength_[axisY] - deltaHeight);
 		axes_.setStretch(axisY, axes_.stretch(axisY) * factor);
 	}
 
@@ -984,7 +939,7 @@ void ViewPane::resetViewMatrix()
 // 		}
 
 		// Calculate zoom to show all data
-		viewTranslation_.z = calculateRequiredZoom(axes_.range(0)*0.5*axes_.stretch(0), axes_.range(1)*0.5*axes_.stretch(1), 0.9);
+		viewTranslation_.z = calculateRequiredZoom(axes_.realRange(0)*0.5*axes_.stretch(0), axes_.realRange(1)*0.5*axes_.stretch(1), 0.9);
 
 		// Recalculate projection matrix
 		projectionMatrix_ = calculateProjectionMatrix(hasPerspective_, viewTranslation_.z);
@@ -1181,6 +1136,56 @@ void ViewPane::updateAxisLimits()
 	}
 
 	recalculateView();
+}
+
+// Shift flat view axis limits by specified amounts
+void ViewPane::shiftFlatAxisLimits(double deltaH, double deltaV)
+{
+	// If this is not a flat view, return now
+	if (!isFlatView()) return;
+
+	// Set indices for target axes
+	int axes[2];
+	axes[0] = 0;
+	axes[1] = 1;
+	if (viewType_ == ViewPane::FlatXZView) axes[1] = 2;
+	else if (viewType_ == ViewPane::FlatYZView)
+	{
+		axes[0] = 1;
+		axes[1] = 2;
+	}
+
+	// Loop over axis indices, and set new limits
+	double deltas[2];
+	deltas[0] = deltaH;
+	deltas[1] = deltaV;
+	for (int n=0; n<2; ++n)
+	{
+		double range = axes_.realRange(axes[n]);
+		bool logarithmic = axes_.logarithmic(axes[n]);
+		double ppUnit = axisPixelLength_[axes[n]] / range;
+
+		// Flip sign of delta if the axis is inverted
+		if (axes_.inverted(axes[n])) deltas[n] = -deltas[n];
+
+		// Get adjusted min/max values
+		double newMin, newMax;
+		if (logarithmic)
+		{
+// 			printf("LOGTRANS range = %f, delta = %f\n", range, deltas[n]/ppUnit);
+			newMin = pow10(axes_.realMin(axes[n]) - deltas[n]/ppUnit);
+			newMax = pow10(axes_.realMax(axes[n]) - deltas[n]/ppUnit);
+// 			printf("New Range Logged = %f %f\n", log10(newMin), log10(newMax));
+		}
+		else
+		{
+			newMin = axes_.min(axes[n]) - deltas[n]/ppUnit;
+			newMax = axes_.max(axes[n]) - deltas[n]/ppUnit;
+		}
+
+		axes_.setMin(axes[n], newMin);
+		axes_.setMax(axes[n], newMax);
+	}
 }
 
 // Update current slices for all collections displayed in this pane
@@ -1397,4 +1402,57 @@ Primitive& ViewPane::interactionBoxPrimitive()
 Primitive& ViewPane::boundingBoxPrimitive()
 {
 	return boundingBoxPrimitive_;
+}
+
+/*
+ * Signalling
+ */
+
+// Process supplied Collection signal if it is relevant to this pane
+UChromaSignal::SignalAction ViewPane::processCollectionSignal(UChromaSignal::CollectionSignal signal, Collection* collection)
+{
+	switch (signal)
+	{
+		// Collection Created
+		// -- Role Relevance : ???
+		case (UChromaSignal::CollectionCreatedSignal):
+			return UChromaSignal::IgnoreSignal;
+			break;
+		// Collection Deleted
+		// -- Role Relevance : All
+		case (UChromaSignal::CollectionDeletedSignal):
+			// If the emitting collection is a current target, remove it from our list
+			if (!collectionIsTarget(collection)) return UChromaSignal::IgnoreSignal;
+			removeCollectionTarget(collection);
+			break;
+		// Current Slice Changed
+		// -- Role Relevance : SliceMonitorRole
+		case (UChromaSignal::CollectionSliceChangedSignal):
+			if (role_ != ViewPane::SliceMonitorRole) return UChromaSignal::IgnoreSignal;
+			if (!collectionIsTarget(collection)) 
+			{
+				addCollectionTarget(collection);
+				return UChromaSignal::IgnoreSignal;
+			}
+			// Update axes limits
+			updateAxisLimits();
+			break;
+		// Extracted Data Added
+		// -- Role Relevance : Extractor
+		case (UChromaSignal::CollectionSliceExtractedSignal):
+			if (role_ != ViewPane::ExtractorRole) return UChromaSignal::IgnoreSignal;
+			addCollectionTarget(collection);
+			updateAxisLimits();
+			return UChromaSignal::IgnoreSignal;
+			break;
+		// Data Changed
+		// -- Role Relevance : ???
+		case (UChromaSignal::CollectionDataChangedSignal):
+			return UChromaSignal::IgnoreSignal;
+			break;
+		default:
+			return UChromaSignal::IgnoreSignal;
+	}
+
+	return UChromaSignal::AcceptSignal;
 }

@@ -899,8 +899,8 @@ bool UChromaWindow::loadInputFile(QString fileName)
 	currentViewPane_ = viewLayout_.panes();
 
 	// Set current project data
-	Session::setInputFile(fileName);
-	Session::setAsNotModified();
+	UChromaSession::setInputFile(fileName);
+	UChromaSession::setAsNotModified();
 
 	return true;
 }

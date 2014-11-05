@@ -176,7 +176,7 @@ bool FitKernel::setEquation(QString equation)
 
 	updateVariables();
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	return equationValid_;
 }
@@ -321,7 +321,7 @@ void FitKernel::setXRange(FitKernel::RangeType range)
 {
 	xRange_ = range;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return type of x source range
@@ -329,7 +329,7 @@ FitKernel::RangeType FitKernel::xRange()
 {
 	return xRange_;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return minimum absolute x value to use for fitting
@@ -349,7 +349,7 @@ void FitKernel::setAbsoluteXMax(double value)
 {
 	absoluteXMax_ = value;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return maximum absolute x value to use for fitting
@@ -363,7 +363,7 @@ void FitKernel::setIndexXMin(int index)
 {
 	indexXMin_ = index;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return minimum x point index to use for fitting
@@ -377,7 +377,7 @@ void FitKernel::setIndexXMax(int index)
 {
 	indexXMax_ = index;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return maximum x point index to use for fitting
@@ -391,7 +391,7 @@ void FitKernel::setIndexXSingle(int index)
 {
 	indexXSingle_ = index;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return single x point index to use for fitting
@@ -405,7 +405,7 @@ void FitKernel::setZRange(FitKernel::RangeType range)
 {
 	zRange_ = range;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return type of z source range
@@ -419,7 +419,7 @@ void FitKernel::setAbsoluteZMin(double value)
 {
 	absoluteZMin_ = value;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return minimum absolute z value to use for fitting
@@ -433,7 +433,7 @@ void FitKernel::setAbsoluteZMax(double value)
 {
 	absoluteZMax_ = value;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return maximum absolute z value to use for fitting
@@ -447,7 +447,7 @@ void FitKernel::setIndexZMin(int index)
 {
 	indexZMin_ = index;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return minimum z dataset index to use for fitting
@@ -461,7 +461,7 @@ void FitKernel::setIndexZMax(int index)
 {
 	indexZMax_ = index;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return maximum z dataset index to use for fitting
@@ -475,7 +475,7 @@ void FitKernel::setIndexZSingle(int index)
 {
 	indexZSingle_ = index;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return single z dataset index to use for fitting
@@ -489,7 +489,7 @@ void FitKernel::setOrthogonal(bool orthogonal)
 {
 	orthogonal_ = orthogonal;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return whether fit is to be performed across ZY rather than XY
@@ -503,7 +503,7 @@ void FitKernel::setGlobal(bool global)
 {
 	global_ = global;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return whether all available datasets are to be fit simultaneously
@@ -530,7 +530,7 @@ void FitKernel::setSourceCollection(Collection* collection)
 	indexZMax_ = sourceCollection_->nDataSets()-1;
 	indexZSingle_ = 0;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return source collection

@@ -39,8 +39,9 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	// Call the main creation function
 	ui.setupUi(this);
 
-	// Set pointer in CurrentProject
-	Session::setMainWindow(this);
+	// Set pointer in UChromaSession and UChromaSignal
+	UChromaSession::setMainWindow(this);
+	UChromaSignal::setMainWindow(this);
 
 	// Set variable defaults
 	hardIOFail_ = false;
@@ -212,19 +213,6 @@ void UChromaWindow::updateToolBars()
 // Update display
 void UChromaWindow::updateDisplay()
 {
-	// Satisfy all registered collection changes first
-	RefListItem<Collection,Collection::CollectionSignal>* ri = Collection::collectionSignals();
-	while (ri)
-	{
-// 		printf("UChromaWindow::updateDisplay() : Collection %p (%s), signal = %i\n", ri->item, qPrintable(ri->item->name()), ri->data);
-
-		// Pass this change to the viewLayout_...
-		viewLayout_.processUpdate(ri->item, ri->data);
-
-		// Have now dealt with this signal, so delete it and move on to the next
-		ri = Collection::deleteCollectionSignal(ri);
-	}
-
 	ui.MainView->postRedisplay();
 }
 

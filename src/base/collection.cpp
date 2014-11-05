@@ -26,7 +26,6 @@
 #include <limits>
 
 // Static Members
-RefList<Collection,Collection::CollectionSignal> Collection::collectionSignals_;
 template<class Collection> RefList<Collection,bool> ObjectList<Collection>::objects_;
 
 // Constructor
@@ -85,12 +84,16 @@ Collection::Collection() : ListItem<Collection>(), ObjectList<Collection>(this)
 	displayStyle_ = Collection::LineXYStyle;
 	displayStyleVersion_ = 0;
 
+	// Send a signal out to indicate our creation
+	UChromaSignal::send(UChromaSignal::CollectionCreatedSignal, this);
 }
 
 // Destructor
 Collection::~Collection()
 {
-	// Ensure that the collection is removed from the pane it is being displayed in
+	// Send a signal out before we finalise deletion
+	UChromaSignal::send(UChromaSignal::CollectionDeletedSignal, this);
+
 	if (fitKernel_) delete fitKernel_;
 }
 
@@ -194,7 +197,7 @@ DataSet* Collection::addDataSet()
 
 	++dataVersion_;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	return dataSet;
 }
@@ -205,7 +208,7 @@ DataSet* Collection::addDataSet(double z)
 	DataSet* dataSet = dataSets_.add();
 	setDataSetZ(dataSet, z);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	return dataSet;
 }
@@ -219,7 +222,7 @@ void Collection::addDataSet(DataSet* source)
 
 	++dataVersion_;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Copy datasets from specified source collection
@@ -241,7 +244,7 @@ void Collection::removeDataSet(DataSet* dataSet)
 
 	++dataVersion_;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Set z value of specified dataset
@@ -282,7 +285,7 @@ void Collection::setDataSetZ(DataSet* target, double z)
 
 	++dataVersion_;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Set data of specified dataset
@@ -300,7 +303,7 @@ void Collection::setDataSetData(DataSet* target, const Array<double>& x, const A
 
 	++dataVersion_;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Set data for specified dataste (from source DataSet)
@@ -317,7 +320,7 @@ void Collection::setDataSetData(DataSet* target, DataSet& source)
 
 	++dataVersion_;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return first dataset in list
@@ -384,7 +387,7 @@ void Collection::clearDataSets()
 
 	++dataVersion_;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return total number of points across all datasets
@@ -400,7 +403,7 @@ void Collection::setDataFileDirectory(QDir directory)
 {
 	dataFileDirectory_ = directory;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return root directory for datafiles
@@ -414,7 +417,7 @@ bool Collection::loadDataSet(DataSet* dataSet)
 {
 	if (!dataSet) return false;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	return dataSet->loadData(dataFileDirectory_);
 }
@@ -425,7 +428,7 @@ int Collection::loadAllDataSets()
 	int nFailed = 0;
 	for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next) if (!dataSet->loadData(dataFileDirectory_)) ++nFailed;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	return nFailed;
 }
@@ -506,7 +509,7 @@ void Collection::setTransformEquation(int axis, QString transformEquation)
 		updateLimitsAndTransforms();
 	}
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return transform equation for data
@@ -531,7 +534,7 @@ void Collection::setTransformEnabled(int axis, bool enabled)
 	// Make sure limits and transform are up to date
 	updateLimitsAndTransforms();
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return whether specified transform is enabled
@@ -545,7 +548,7 @@ void Collection::setInterpolate(int axis, bool enabled)
 {
 	interpolate_[axis] = enabled;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return whether interpolation is enabled
@@ -559,7 +562,7 @@ void Collection::setInterpolateConstrained(int axis, bool enabled)
 {
 	interpolateConstrained_[axis] = enabled;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return whether interpolation is constrained
@@ -573,7 +576,7 @@ void Collection::setInterpolationStep(int axis, double step)
 {
 	interpolationStep_[axis] = step;
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return interpolation step size
@@ -629,7 +632,8 @@ int Collection::closestBin(int axis, double value)
 		}
 		return closest;
 	}
-	else return -1;
+
+	return -1;
 }
 
 // Get slice at specified axis and bin
@@ -795,7 +799,7 @@ Collection* Collection::addFit(QString name)
 	newFit->setParent(this);
 	newFit->addFitKernel();
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	return newFit;
 }
@@ -805,7 +809,7 @@ void Collection::removeFit(Collection* collection)
 {
 	fits_.remove(collection);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return fits in Collection
@@ -845,7 +849,7 @@ Collection* Collection::addSlice(QString name)
 	newSlice->setParent(this);
 	newSlice->addFitKernel();
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	return newSlice;
 }
@@ -855,7 +859,7 @@ void Collection::removeSlice(Collection* collection)
 {
 	slices_.remove(collection);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return slices in Collection
@@ -876,7 +880,7 @@ void Collection::updateCurrentSlice(int axis, double axisValue)
 {
 	getSlice(axis, closestBin(axis, axisValue));
 
-	registerChange(this, Collection::CurrentSliceChangedSignal);
+	UChromaSignal::send(UChromaSignal::CollectionSliceChangedSignal, this);
 }
 
 // Extract current slice based on specified axis and value
@@ -887,8 +891,7 @@ void Collection::extractCurrentSlice(int axis, double axisValue)
 	Collection* newSlice = addSlice(currentSlice_->name());
 	newSlice->addDataSet(currentSlice_->dataSets());
 
-	registerChange(newSlice, Collection::CollectionCreatedSignal);
-	registerChange(this, Collection::ExtractedDataAddedSignal);
+	UChromaSignal::send(UChromaSignal::CollectionSliceExtractedSignal, this);
 }
 
 // Return current slice
@@ -913,38 +916,13 @@ void Collection::addFitKernel()
 	fitKernel_->setSourceCollection(parent_);
 	fitKernel_->setDestinationCollection(this);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Return FitKernel
 FitKernel* Collection::fitKernel()
 {
 	return fitKernel_;
-}
-
-/*
- * Dependent Data / Signalling
- */
-
-// Register that something in this collection has changed
-void Collection::registerChange(Collection* source, Collection::CollectionSignal signal)
-{
-	// Add signal to list
-	collectionSignals_.add(source, signal);
-}
-
-// Return first signal in lists
-RefListItem<Collection,Collection::CollectionSignal>* Collection::collectionSignals()
-{
-	return collectionSignals_.first();
-}
-
-// Delete specified signal and return next
-RefListItem<Collection,Collection::CollectionSignal>* Collection::deleteCollectionSignal(RefListItem<Collection,Collection::CollectionSignal>* collectionSignal)
-{
-	RefListItem<Collection,Collection::CollectionSignal>* nextSignal = collectionSignal->next;
-	collectionSignals_.remove(collectionSignal);
-	return nextSignal;
 }
 
 /*

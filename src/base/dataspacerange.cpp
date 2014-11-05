@@ -349,8 +349,8 @@ void DataSpaceRange::addCalculatedValues(Collection* target, int sourceZOffset)
 		for (int i=0; i<nPoints_; ++i)
 		{
 			actualX = i + abscissaStart_;
-			dataSet->data().setX(i, x_.value(i));
-			dataSet->data().setY(i, yCalculated_.ref(i,n));
+			dataSet->data().setX(actualX, x_.value(i));
+			dataSet->data().setY(actualX, yCalculated_.ref(i,n));
 		}
 	}
 }

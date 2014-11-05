@@ -28,7 +28,7 @@
 class QMainWindow;
 
 // Session
-class Session
+class UChromaSession
 {
 	/*
 	 * Main Window Link

@@ -290,15 +290,3 @@ void ViewLayout::updateInteractionPrimitives(int axis)
 	// Loop over view panes
 	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next) pane->updateInteractionPrimitive(axis);
 }
-
-/*
- * Signal / Update
- */
-
-// Process supplied Collection changed/update signal
-bool ViewLayout::processUpdate(Collection* source, Collection::CollectionSignal signal)
-{
-	// Search for a pane that is interested in this signal...
-	for (ViewPane* pane = panes_.first(); pane != NULL; pane = pane->next) if (pane->processUpdate(source, signal)) return true;
-	return false;
-}

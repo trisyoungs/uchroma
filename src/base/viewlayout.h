@@ -141,14 +141,6 @@ class ViewLayout : public ListItem<ViewLayout>
 	void resetViewMatrix();
 	// Update interaction primitives for all panes
 	void updateInteractionPrimitives(int axis);
-
-
-	/*
-	 * Signal / Update
-	 */
-	public:
-	// Process supplied Collection changed/update signal
-	bool processUpdate(Collection* source, Collection::CollectionSignal signal);
 };
 
 #endif

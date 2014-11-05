@@ -116,7 +116,7 @@ bool AxesWindow::logarithmicChanged(int axis, bool checked)
 	
 	currentAxes().setLogarithmic(axis, checked);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	updateControls();
@@ -131,7 +131,7 @@ bool AxesWindow::visibleChanged(int axis, bool checked)
 	
 	currentAxes().setVisible(axis, checked);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -145,7 +145,7 @@ bool AxesWindow::stretchChanged(int axis, double value)
 
 	currentAxes().setStretch(axis, value);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -160,7 +160,7 @@ bool AxesWindow::limitChanged(int axis, bool minLim, double value)
 	if (minLim) currentAxes().setMin(axis, value);
 	else currentAxes().setMax(axis, value);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	updateControls();
@@ -175,7 +175,7 @@ bool AxesWindow::limitSetExtreme(int axis, bool minLim)
 	
 	currentAxes().setToLimit(axis, minLim);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	updateControls();
@@ -226,7 +226,7 @@ bool AxesWindow::positionIsFractionalChanged(int axis, bool fractional)
 
 	currentAxes().setPositionIsFractional(axis, fractional);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -241,7 +241,7 @@ bool AxesWindow::positionChanged(bool real, int axis, int dir, double value)
 	if (real) currentAxes().setPositionReal(axis, dir, value);
 	else currentAxes().setPositionFractional(axis, dir, value);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -268,7 +268,7 @@ bool AxesWindow::positionSet(bool real, int axis, int dir, int type)
 		else return false;
 	}
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	updateControls();
@@ -283,7 +283,7 @@ bool AxesWindow::autoTicksChanged(int axis, bool enabled)
 
 	currentAxes().setAutoTicks(axis, enabled);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	updateControls();
@@ -299,7 +299,7 @@ bool AxesWindow::ticksChanged(int axis, bool start, double value)
 	if (start) currentAxes().setFirstTick(axis, value);
 	else currentAxes().setTickDelta(axis, value);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -314,7 +314,7 @@ bool AxesWindow::tickOrientationChanged(int axis, int dir, double value)
 
 	currentAxes().setTickDirection(axis, dir, value);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -328,7 +328,7 @@ bool AxesWindow::labelOrientationChanged(int axis, int component, double value)
 
 	currentAxes().setLabelOrientation(axis, component, value);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -342,7 +342,7 @@ bool AxesWindow::tickSizeChanged(int axis, double value)
 
 	currentAxes().setTickSize(axis, value);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -356,7 +356,7 @@ bool AxesWindow::titleOrientationChanged(int axis, int component, double value)
 
 	currentAxes().setTitleOrientation(axis, component, value);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -370,7 +370,7 @@ bool AxesWindow::minorTicksChanged(int axis, int value)
 
 	currentAxes().setMinorTicks(axis, value);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -384,7 +384,7 @@ bool AxesWindow::titleChanged(int axis, QString& title)
 
 	currentAxes().setTitle(axis, title);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -415,7 +415,7 @@ bool AxesWindow::anchorChanged(int axis, bool titleAnchor, TextPrimitive::TextAn
 	if (titleAnchor) currentAxes().setTitleAnchor(axis, anchor);
 	else currentAxes().setLabelAnchor(axis, anchor);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -430,7 +430,7 @@ bool AxesWindow::gridLineChanged(int axis, bool major, bool on)
 	if (major) currentAxes().setGridLinesMajor(axis, on);
 	else currentAxes().setGridLinesMinor(axis, on);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -444,7 +444,7 @@ bool AxesWindow::gridFullChanged(int axis, bool full)
 
 	currentAxes().setGridLinesFull(axis, full);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -465,7 +465,7 @@ bool AxesWindow::gridStyleClicked(int axis, bool major)
 		if (major) currentAxes().gridLineMajorStyle(axis) = dialog.lineStyle();
 		else currentAxes().gridLineMinorStyle(axis) = dialog.lineStyle();
 
-		Session::setAsModified();
+		UChromaSession::setAsModified();
 
 		currentAxes().setPrimitivesInvalid();
 		uChroma_.updateDisplay();
@@ -485,7 +485,7 @@ bool AxesWindow::gridStyleApplyClicked(int axis)
 		currentAxes().gridLineMinorStyle(n) = currentAxes().gridLineMinorStyle(axis);
 	}
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
 	currentAxes().setPrimitivesInvalid();
@@ -501,7 +501,7 @@ bool AxesWindow::numberFormatChangeClicked(int axis)
 	{
 		currentAxes().numberFormat(axis) = numberDialog.numberFormat();
 
-		Session::setAsModified();
+		UChromaSession::setAsModified();
 
 		// Update relevant parts of gui
 		updateControls();

@@ -70,12 +70,6 @@ TextPrimitive::EscapeSequence TextPrimitive::escapeSequence(QString s)
 // Set data
 void TextPrimitive::set(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize)
 {
-	TextFragment* fragment;
-	Vec3<double> ll, ur, translation;
-	double scale, y;
-	QString fragmentText;
-	int supSub = 0;
-
 	// Call the parser
 	generateFragments(this, text);
 
@@ -126,6 +120,8 @@ Matrix TextPrimitive::transformationMatrix(double baseFontSize, TextFragment* fr
 		case (TextPrimitive::BottomRightAnchor):
 			anchorPos.set(upperRight.x, lowerLeft.y, 0.0);
 			break;
+		default:
+			break;
 	}
 
 	// Rotate anchor position with local rotation matrix
@@ -169,7 +165,7 @@ void TextPrimitive::boundingBox(Vec3<double>& lowerLeft, Vec3<double>& upperRigh
 	
 	// Loop over remaining fragments, keeping track of the total width of the primitive and the max/min y values
 	Vec3<double> ll, ur;
-	double width = upperRight.x - lowerLeft.x;
+// 	double width = upperRight.x - lowerLeft.x;
 	for (TextFragment* fragment = fragments_.first()->next; fragment != NULL; fragment = fragment->next)
 	{
 		// Get bounding box for this fragment
@@ -194,7 +190,6 @@ void TextPrimitive::boundingBox(Vec3<double>& lowerLeft, Vec3<double>& upperRigh
 void TextPrimitive::render(Matrix viewMatrix, bool correctOrientation, double baseFontSize)
 {
 	Matrix textMatrix;
-	GLdouble oldLineWidth;
 
 	// Loop over fragments
 	for (TextFragment* fragment = fragments_.first(); fragment != NULL; fragment = fragment->next)
@@ -398,6 +393,10 @@ bool TextPrimitive::addEscape(TextPrimitive::EscapeSequence escSeq)
 		// Add italic level
 		case (TextPrimitive::ItalicEscape):
 			newFormat->setItalic(true);
+			break;
+		// Newline
+		case (TextPrimitive::NewLineEscape):
+// 			newFormat->		TODO
 			break;
 		// Add subscript level - adjust baseline position and scale of current format
 		case (TextPrimitive::SubScriptEscape):

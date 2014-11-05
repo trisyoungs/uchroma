@@ -72,8 +72,8 @@ void UChromaWindow::startNewSession(bool createDefaults)
 	}
 
 	// Set current project data
-	Session::setAsNotModified();
-	Session::setInputFile(QString());
+	UChromaSession::setAsNotModified();
+	UChromaSession::setInputFile(QString());
 }
 
 // Add new collection
@@ -86,7 +86,7 @@ Collection* UChromaWindow::addCollection(QString name)
 	if (name.isEmpty()) currentCollection_->setName( uniqueCollectionName("Empty Collection") );
 	else currentCollection_->setName(uniqueCollectionName(name));
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	return currentCollection_;
 }
@@ -94,7 +94,8 @@ Collection* UChromaWindow::addCollection(QString name)
 // Remove existing collection
 void UChromaWindow::removeCollection(Collection* collection)
 {
-	if (!collection) return;
+	// Check current Collection
+	if (!Collection::objectValid(collection, "collection in UChromaWindow::removeCollection()")) return;
 
 	// Check parent in order to work out where to delete the collection from
 	if (collection->parent() == NULL)
@@ -117,7 +118,7 @@ void UChromaWindow::removeCollection(Collection* collection)
 			else currentCollection_ = collection->prev;
 			if (currentCollection_ == NULL) currentCollection_ = collection->parent();
 
-			// Remove master collection
+			// Remove collection
 			collection->parent()->removeFit(collection);
 		}
 		else
@@ -127,12 +128,12 @@ void UChromaWindow::removeCollection(Collection* collection)
 			else currentCollection_ = collection->prev;
 			if (currentCollection_ == NULL) currentCollection_ = collection->parent();
 
-			// Remove master collection
+			// Remove collection
 			collection->parent()->removeSlice(collection);
 		}
 	}
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 }
 
 // Move collection focus to next in list

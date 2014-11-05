@@ -249,26 +249,6 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 
 
 	/*
-	 * Dependent Data / Signalling
-	 */
-	public:
-	// Data changed signal
-	enum CollectionSignal { CollectionCreatedSignal, CollectionDeletedSignal, CurrentSliceChangedSignal, DataChangedSignal, ExtractedDataAddedSignal };
-
-	private:
-	// List of notifications over all collections
-	static RefList<Collection,CollectionSignal> collectionSignals_;
-	// Register that something in this collection has changed
-	void registerChange(Collection* source, Collection::CollectionSignal signal);
-
-	public:
-	// Return first signal in lists
-	static RefListItem<Collection,CollectionSignal>* collectionSignals();
-	// Delete specified signal and return next
-	static RefListItem<Collection,CollectionSignal>* deleteCollectionSignal(RefListItem<Collection,CollectionSignal>* collectionSignal);
-
-
-	/*
 	 * Update
 	 */
 	private:

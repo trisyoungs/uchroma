@@ -64,7 +64,7 @@ void ViewWindow::on_ViewBoundingBoxNoneRadio_clicked(bool checked)
 	uChroma_.currentViewPane()->setBoundingBox(ViewPane::NoBox);
 
 	// Update display
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -75,7 +75,7 @@ void ViewWindow::on_ViewBoundingBoxPlaneRadio_clicked(bool checked)
 	uChroma_.currentViewPane()->setBoundingBox(ViewPane::PlaneBox);
 
 	// Update display
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -86,7 +86,7 @@ void ViewWindow::on_ViewBoundingBoxCubeRadio_clicked(bool checked)
 	uChroma_.currentViewPane()->setBoundingBox(ViewPane::CubeBox);
 
 	// Update display
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -97,7 +97,7 @@ void ViewWindow::on_ViewBoundingBoxPlaneYSpin_valueChanged(double value)
 	uChroma_.currentViewPane()->setBoundingBoxPlaneY(value);
 
 	// Update display
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -129,7 +129,7 @@ void ViewWindow::on_ViewLabelsFaceViewerCheck_clicked(bool checked)
 	uChroma_.setLabelFaceViewer(checked);
 
 	// Update display
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -140,7 +140,7 @@ void ViewWindow::on_ViewLabelPointSizeSpin_valueChanged(double value)
 	uChroma_.currentViewPane()->setLabelPointSize(value);
 
 	// Update display
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 	uChroma_.updateDisplay();
 }
 
@@ -151,7 +151,7 @@ void ViewWindow::on_ViewTitlePointSizeSpin_valueChanged(double value)
 	uChroma_.currentViewPane()->setTitlePointSize(value);
 
 	// Update display
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 	uChroma_.updateDisplay();
 }
 

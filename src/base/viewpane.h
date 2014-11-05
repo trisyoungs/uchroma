@@ -25,6 +25,7 @@
 #include "base/axes.h"
 #include "base/collection.h"
 #include "base/targetdata.h"
+#include "base/signal.h"
 #include "math/matrix.h"
 #include "templates/list.h"
 #include "templates/reflist.h"
@@ -159,8 +160,6 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	TargetData* collectionIsTarget(Collection* collection);
 	// Return first target collection for role
 	TargetData* collectionTargets();
-	// Process supplied Collection changed/update signal if it is relevant to this pane
-	bool processUpdate(Collection* source, Collection::CollectionSignal signal);
 
 
 	/*
@@ -205,6 +204,8 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	void setViewType(ViewPane::ViewType vt);
 	// Return view type
 	ViewPane::ViewType viewType();
+	// Return whether view type is flat
+	bool isFlatView();
 	// Return projection matrix
 	Matrix projectionMatrix();
 	// Set whether this pane uses perspective
@@ -253,6 +254,8 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	private:
 	// Axes for this pane
 	Axes axes_;
+	// Pixel 'lengths' of axes in flat views
+	Vec3<double> axisPixelLength_;
 
 	public:
 	// Return absolute minimum transformed values over all associated collections
@@ -267,6 +270,8 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	Axes& axes();
 	// Update axis limits to represent data extent of associated collections
 	void updateAxisLimits();
+	// Shift flat view axis limits by specified amounts
+	void shiftFlatAxisLimits(double deltaH, double deltaV);
 	// Update current slices for all collections displayed in this pane
 	void collectionsUpdateCurrentSlices(int axis, double axisValue);
 
@@ -342,6 +347,13 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	// Return bounding box primitive
 	Primitive& boundingBoxPrimitive();
 
+
+	/*
+	 * Signalling
+	 */
+	public:
+	// Process supplied Collection signal if it is relevant to this pane
+	UChromaSignal::SignalAction processCollectionSignal(UChromaSignal::CollectionSignal signal, Collection* collection);
 };
 
 #endif

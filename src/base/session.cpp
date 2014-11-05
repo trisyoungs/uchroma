@@ -24,17 +24,17 @@
 #include <QtGui/QMainWindow>
 
 // Static variables
-bool Session::modified_ = false;
-QMainWindow* Session::mainWindow_ = NULL;
-bool Session::lastTitleBarModificationStatus_ = false;
-QString Session::inputFile_;
+bool UChromaSession::modified_ = false;
+QMainWindow* UChromaSession::mainWindow_ = NULL;
+bool UChromaSession::lastTitleBarModificationStatus_ = false;
+QString UChromaSession::inputFile_;
 
 /*
  * Main Window Pointer
  */
 
 // Set main window pointer
-void Session::setMainWindow(QMainWindow* ptr)
+void UChromaSession::setMainWindow(QMainWindow* ptr)
 {
 	mainWindow_ = ptr;
 
@@ -42,7 +42,7 @@ void Session::setMainWindow(QMainWindow* ptr)
 }
 
 // Update title bar of main window
-void Session::updateTitleBar()
+void UChromaSession::updateTitleBar()
 {
 	if (!mainWindow_) return;
 
@@ -60,7 +60,7 @@ void Session::updateTitleBar()
  */
 
 // Set name of input file
-void Session::setInputFile(QString fileName)
+void UChromaSession::setInputFile(QString fileName)
 {
 	inputFile_ = fileName;
 
@@ -68,7 +68,7 @@ void Session::setInputFile(QString fileName)
 }
 
 // Return name of input file
-QString Session::inputFile()
+QString UChromaSession::inputFile()
 {
 	return inputFile_;
 }
@@ -78,7 +78,7 @@ QString Session::inputFile()
  */
 
 // Set as modified
-void Session::setAsModified()
+void UChromaSession::setAsModified()
 {
 	modified_ = true;
 
@@ -86,7 +86,7 @@ void Session::setAsModified()
 }
 
 // Set as not modified
-void Session::setAsNotModified()
+void UChromaSession::setAsNotModified()
 {
 	modified_ = false;
 
@@ -94,7 +94,7 @@ void Session::setAsNotModified()
 }
 
 // Return status of flag
-bool Session::isModified()
+bool UChromaSession::isModified()
 {
 	return modified_;
 }

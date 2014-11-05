@@ -40,15 +40,15 @@ void UChromaWindow::closeEvent(QCloseEvent *event)
 
 void UChromaWindow::on_actionFileNewSession_triggered(bool checked)
 {
-	if (Session::isModified())
+	if (UChromaSession::isModified())
 	{
 		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No, QMessageBox::Cancel);
 		if (button == QMessageBox::Cancel) return;
 		else if (button == QMessageBox::Yes)
 		{
-			// Save file, and check Session::isModified() status to make sure it wasn't cancelled.
+			// Save file, and check UChromaSession::isModified() status to make sure it wasn't cancelled.
 			on_actionFileSaveSession_triggered(false);
-			if (Session::isModified()) return;
+			if (UChromaSession::isModified()) return;
 		}
 	}
 
@@ -60,15 +60,15 @@ void UChromaWindow::on_actionFileNewSession_triggered(bool checked)
 
 void UChromaWindow::on_actionFileLoadSession_triggered(bool checked)
 {
-	if (Session::isModified())
+	if (UChromaSession::isModified())
 	{
 		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No, QMessageBox::Cancel);
 		if (button == QMessageBox::Cancel) return;
 		else if (button == QMessageBox::Yes)
 		{
-			// Save file, and check Session::isModified() status to make sure it wasn't cancelled.
+			// Save file, and check UChromaSession::isModified() status to make sure it wasn't cancelled.
 			on_actionFileSaveSession_triggered(false);
-			if (Session::isModified()) return;
+			if (UChromaSession::isModified()) return;
 		}
 	}
 
@@ -90,7 +90,7 @@ void UChromaWindow::on_actionFileLoadSession_triggered(bool checked)
 void UChromaWindow::on_actionFileSaveSession_triggered(bool checked)
 {
 	// Has an input filename already been chosen?
-	if (Session::inputFile().isEmpty())
+	if (UChromaSession::inputFile().isEmpty())
 	{
 		QString fileName = QFileDialog::getSaveFileName(this, "Choose save file name", inputFileDirectory_.absolutePath(), "uChroma files (*.ucr);;All files (*.*)");
 		if (fileName.isEmpty()) return;
@@ -98,10 +98,10 @@ void UChromaWindow::on_actionFileSaveSession_triggered(bool checked)
 		// Make sure the file has the right extension
 		QFileInfo fileInfo(fileName);
 		if (fileInfo.suffix() != "ucr") fileName += ".ucr";
-		Session::setInputFile(fileName);
+		UChromaSession::setInputFile(fileName);
 	}
 
-	if (saveInputFile(Session::inputFile())) Session::setAsNotModified();
+	if (saveInputFile(UChromaSession::inputFile())) UChromaSession::setAsNotModified();
 }
 
 void UChromaWindow::on_actionFileSaveSessionAs_triggered(bool checked)
@@ -113,9 +113,9 @@ void UChromaWindow::on_actionFileSaveSessionAs_triggered(bool checked)
 	// Make sure the file has the right extension
 	QFileInfo fileInfo(fileName);
 	if (fileInfo.suffix() != "ucr") fileName += ".ucr";
-	Session::setInputFile(fileName);
+	UChromaSession::setInputFile(fileName);
 
-	if (saveInputFile(Session::inputFile())) Session::setAsNotModified();
+	if (saveInputFile(UChromaSession::inputFile())) UChromaSession::setAsNotModified();
 }
 
 void UChromaWindow::on_actionFilePrint_triggered(bool checked)
@@ -154,15 +154,15 @@ void UChromaWindow::on_actionFileQuit_triggered(bool checked)
 // Check for modified data before closing
 bool UChromaWindow::checkBeforeClose()
 {
-	if (Session::isModified())
+	if (UChromaSession::isModified())
 	{
 		QMessageBox::StandardButton button = QMessageBox::warning(this, "Warning", "The current file has been modified.\nDo you want to save this data first?", QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No, QMessageBox::Cancel);
 		if (button == QMessageBox::Cancel) return false;
 		else if (button == QMessageBox::Yes)
 		{
-			// Save file, and check Session::isModified() status to make sure it wasn't cancelled.
+			// Save file, and check UChromaSession::isModified() status to make sure it wasn't cancelled.
 			on_actionFileSaveSession_triggered(false);
-			if (Session::isModified()) return false;
+			if (UChromaSession::isModified()) return false;
 		}
 	}
 	return true;
@@ -178,7 +178,7 @@ bool UChromaWindow::viewTypeChanged(ViewPane::ViewType vt)
 	currentViewPane_->resetViewMatrix();
 	currentViewPane_->recalculateView(true);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	axesWindow_.updateControls();
 	updateToolBars();
@@ -194,7 +194,7 @@ void UChromaWindow::on_actionViewPerspective_triggered(bool checked)
 	
 	currentViewPane_->setHasPerspective(checked);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	ui.MainView->update();
 }
@@ -207,7 +207,7 @@ void UChromaWindow::on_actionViewReset_triggered(bool checked)
 	currentViewPane_->resetViewMatrix();
 	currentViewPane_->recalculateView();
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	ui.MainView->update();
 }
@@ -219,7 +219,7 @@ void UChromaWindow::on_actionViewShowAll_triggered(bool checked)
 
 	currentViewPane_->showAllData();
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	updateGUI();
 }
@@ -300,7 +300,7 @@ void UChromaWindow::on_actionViewChangeLayout_triggered(bool checked)
 		currentViewPane_ = viewLayout_.panes();
 		recalculateViewLayout(ui.MainView->contextWidth(), ui.MainView->contextHeight());
 
-		Session::setAsModified();
+		UChromaSession::setAsModified();
 
 		updateGUI();
 	}
@@ -444,12 +444,17 @@ void UChromaWindow::on_actionAnalyseNewFit_triggered(bool checked)
 
 	// Add a new fit collection to the current collection, and add it to a suitable view pane
 	Collection* newFit = currentCollection_->addFit("New Fit");
-	RefList<ViewPane,bool> parentPanes = viewLayout_.panes(currentCollection_, ViewPane::StandardRole);
-	if (parentPanes.contains(currentViewPane_)) currentViewPane_->addCollectionTarget(newFit);
-	else if (parentPanes.nItems() != 0) parentPanes.first()->item->addCollectionTarget(newFit);
-
 	editFitSetupDialog_.setFitKernel(newFit->fitKernel());
-	if (editFitSetupDialog_.updateAndExec()) newFit->fitKernel()->fit();
+	if (editFitSetupDialog_.updateAndExec())
+	{
+		// Perform initial fitting
+		newFit->fitKernel()->fit();
+
+		// Add new fit data to same pane as parent (if possible)
+		RefList<ViewPane,bool> parentPanes = viewLayout_.panes(currentCollection_, ViewPane::StandardRole);
+		if (parentPanes.contains(currentViewPane_)) currentViewPane_->addCollectionTarget(newFit);
+		else if (parentPanes.nItems() != 0) parentPanes.first()->item->addCollectionTarget(newFit);
+	}
 	else currentCollection_->removeFit(newFit);
 
 	updateGUI();

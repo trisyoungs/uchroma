@@ -319,11 +319,23 @@ double Axes::max(int axis) const
 	return max_.get(axis);
 }
 
-// Return axis range (accounting for logged axes)
-double Axes::range(int axis) const
+// Return real axis range (accounting for log axes)
+double Axes::realRange(int axis) const
 {
 	if (logarithmic_.get(axis)) return log10(max_.get(axis)) - log10(min_.get(axis));
 	else return max_.get(axis) - min_.get(axis);
+}
+
+// Return real axis minimum (accounting for log axes)
+double Axes::realMin(int axis) const
+{
+	return (logarithmic_.get(axis) ? log10(min_.get(axis)) : min_.get(axis));
+}
+
+// Return real axis maximum (accounting for log axes)
+double Axes::realMax(int axis) const
+{
+	return (logarithmic_.get(axis) ? log10(max_.get(axis)) : max_.get(axis));
 }
 
 // Set axis to extreme limit

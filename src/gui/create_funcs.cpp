@@ -191,7 +191,7 @@ void CreateCollectionDialog::on_CreateButton_clicked(bool checked)
 	// Make sure the data is up to date
 	createData(target);
 
-	Session::setAsModified();
+	UChromaSession::setAsModified();
 
 	uChroma_.updateGUI();
 }

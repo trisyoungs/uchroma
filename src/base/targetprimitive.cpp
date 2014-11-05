@@ -91,6 +91,9 @@ void TargetPrimitive::updateAndSendPrimitive(const Axes& axes, bool forceUpdate,
 			case (Collection::SurfaceStyle):
 				Surface::constructFull(primitive_, axes, collection_->displayAbscissa(), collection_->displayData(), collection_->colourScale());
 				break;
+			default:
+				printf("Internal Error: Display style %i not accounted for in TargetPrimitive::updateAndSendPrimitive().\n", collection_->displayStyle());
+				break;
 		}
 
 		// Pop old primitive instance (unless flagged not to)

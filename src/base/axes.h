@@ -110,8 +110,12 @@ class Axes
 	void setMax(int axis, double value);
 	// Return maximum value for specified axis
 	double max(int axis) const;
-	// Return axis range
-	double range(int axis) const;
+	// Return real axis range (accounting for log axes)
+	double realRange(int axis) const;
+	// Return real axis minimum (accounting for log axes)
+	double realMin(int axis) const;
+	// Return real axis maximum (accounting for log axes)
+	double realMax(int axis) const;
 	// Set axis to extreme limit
 	void setToLimit(int axis, bool minLim);
 	// Set axis minimum limit for specified axis
