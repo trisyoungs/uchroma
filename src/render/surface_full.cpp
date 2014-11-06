@@ -82,7 +82,7 @@ void Surface::constructFull(PrimitiveList& primitiveList, const Axes& axes, cons
 
 	// Create triangles in strips between the previous and target Y/Z values
 	int nBit, nPlusOneBit, totalBit;
-	GLuint vertexAn = -1, vertexBn = -1, vertexAnPlusOne = -1, vertexBnPlusOne = -1;
+	int vertexAn = -1, vertexBn = -1, vertexAnPlusOne = -1, vertexBnPlusOne = -1;
 	Primitive* currentPrimitive = primitiveList[0];
 	for (int index = minIndex.z+1; index <=maxIndex.z; ++index)
 	{

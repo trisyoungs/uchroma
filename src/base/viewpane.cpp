@@ -420,7 +420,7 @@ TargetData* ViewPane::collectionTargets()
  */
 
 // View types
-const char* ViewTypeKeywords[ViewPane::nViewTypes] = { "Normal", "AutoStretched", "FlatXY", "FlatXZ", "FlatYZ", "Linked" };
+const char* ViewTypeKeywords[ViewPane::nViewTypes] = { "Normal", "AutoStretched", "FlatXY", "FlatXZ", "FlatZY", "Linked" };
 
 // Convert text string to ViewType
 ViewPane::ViewType ViewPane::viewType(QString s)
@@ -491,7 +491,7 @@ void ViewPane::setViewType(ViewPane::ViewType vt)
 	viewType_ = vt;
 
 	// Forcibly turn off perspective if this is a flat view
-	if ((viewType_ >= ViewPane::FlatXYView) && (viewType_ <= ViewPane::FlatYZView)) setHasPerspective(false);
+	if ((viewType_ >= ViewPane::FlatXYView) && (viewType_ <= ViewPane::FlatZYView)) setHasPerspective(false);
 }
 
 // Return view type
@@ -503,7 +503,7 @@ ViewPane::ViewType ViewPane::viewType()
 // Return whether view type is flat
 bool ViewPane::isFlatView()
 {
-	return ((viewType_ >= ViewPane::FlatXYView) && (viewType_ <= ViewPane::FlatYZView));
+	return ((viewType_ >= ViewPane::FlatXYView) && (viewType_ <= ViewPane::FlatZYView));
 }
 
 // Return projection matrix
@@ -815,9 +815,9 @@ void ViewPane::recalculateView(bool force)
 	int axisX = 0, axisY = 1;
 	Vec3<int> axisDir(0,1,1);
 	if (viewType_ == ViewPane::FlatXZView) axisY = 2;
-	else if (viewType_ == ViewPane::FlatYZView)
+	else if (viewType_ == ViewPane::FlatZYView)
 	{
-		axisDir.set(1,0,1);
+		axisDir.set(1,1,0);
 		axisX = 2;
 	}
 
@@ -840,7 +840,7 @@ void ViewPane::recalculateView(bool force)
 		// Project the axis limits on to the screen using the relevant viewmatrix + coordinate centre translation
 		viewMat.createTranslation(-axes().coordCentre());
 		if (viewType_ == ViewPane::FlatXZView) viewMat.applyRotationX(90.0);
-		else if (viewType_ == ViewPane::FlatYZView) viewMat.applyRotationY(-90.0);
+		else if (viewType_ == ViewPane::FlatZYView) viewMat.applyRotationY(-90.0);
 
 		// Calculate coordinates and global extremes over axes and labels
 		globalMin.set(1e9,1e9,1e9);
@@ -900,18 +900,18 @@ void ViewPane::recalculateView(bool force)
 		double deltaHeight = (viewportMatrix_[3] - 2*margin) - globalHeight;
 
 		// So, need to lose deltaWidth and deltaHeight pixels from the axis exents - we'll do this by scaling the stretchfactor
-		double factor = axisPixelLength_[axisX] / (axisPixelLength_[axisX]- deltaWidth);
+		double factor = axisPixelLength_[axisX] / (axisPixelLength_[axisX] - deltaWidth);
 		axes_.setStretch(axisX, axes_.stretch(axisX) * factor);
 		factor = axisPixelLength_[axisY] / (axisPixelLength_[axisY] - deltaHeight);
 		axes_.setStretch(axisY, axes_.stretch(axisY) * factor);
 	}
-
+	
 	// Set new rotation matrix and translation vector (if not AutoStretchedView)
 	if (viewType_ > ViewPane::AutoStretchedView)
 	{
 		viewRotation_.setIdentity();
 		if (viewType_ == ViewPane::FlatXZView) viewRotation_.applyRotationX(90.0);
-		else if (viewType_ == ViewPane::FlatYZView) viewRotation_.applyRotationY(-90.0);
+		else if (viewType_ == ViewPane::FlatZYView) viewRotation_.applyRotationY(-90.0);
 
 		// Set a translation in order to set the margins as requested
 		// The viewTranslation_ is applied in 'normal' coordinate axes, so viewTranslation_.x is along screen x etc.
@@ -1156,7 +1156,7 @@ void ViewPane::shiftFlatAxisLimits(double deltaH, double deltaV)
 	axes[0] = 0;
 	axes[1] = 1;
 	if (viewType_ == ViewPane::FlatXZView) axes[1] = 2;
-	else if (viewType_ == ViewPane::FlatYZView)
+	else if (viewType_ == ViewPane::FlatZYView)
 	{
 		axes[0] = 1;
 		axes[1] = 2;
@@ -1179,10 +1179,8 @@ void ViewPane::shiftFlatAxisLimits(double deltaH, double deltaV)
 		double newMin, newMax;
 		if (logarithmic)
 		{
-// 			printf("LOGTRANS range = %f, delta = %f\n", range, deltas[n]/ppUnit);
-			newMin = pow10(axes_.realMin(axes[n]) - deltas[n]/ppUnit);
-			newMax = pow10(axes_.realMax(axes[n]) - deltas[n]/ppUnit);
-// 			printf("New Range Logged = %f %f\n", log10(newMin), log10(newMax));
+			newMin = pow(10, axes_.realMin(axes[n]) - deltas[n]/ppUnit);
+			newMax = pow(10, axes_.realMax(axes[n]) - deltas[n]/ppUnit);
 		}
 		else
 		{

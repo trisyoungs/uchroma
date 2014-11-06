@@ -49,7 +49,7 @@ void Surface::constructLineXY(PrimitiveList& primitiveList, const Axes& axes, co
 	// Temporary variables
 	GLfloat z;
 	Vec4<GLfloat> colour(0,0,0,1);
-	int n, nPoints;
+	int n;
 	Vec3<double> nrm(0.0, 1.0, 0.0);
 	Array<double> y;
 	Array<DisplayDataSet::DataPointType> yType;

@@ -650,7 +650,7 @@
      <addaction name="separator"/>
      <addaction name="actionViewFlatXY"/>
      <addaction name="actionViewFlatXZ"/>
-     <addaction name="actionViewFlatYZ"/>
+     <addaction name="actionViewFlatZY"/>
      <addaction name="separator"/>
      <addaction name="actionViewLinked"/>
     </widget>
@@ -759,7 +759,7 @@
    <addaction name="actionViewAutoStretched3D"/>
    <addaction name="actionViewFlatXY"/>
    <addaction name="actionViewFlatXZ"/>
-   <addaction name="actionViewFlatYZ"/>
+   <addaction name="actionViewFlatZY"/>
    <addaction name="actionViewLinked"/>
   </widget>
   <widget class="QToolBar" name="InteractToolBar">
@@ -1377,7 +1377,7 @@
     <string>Flat view facing XZ plane</string>
    </property>
   </action>
-  <action name="actionViewFlatYZ">
+  <action name="actionViewFlatZY">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -1386,10 +1386,10 @@
      <normaloff>:/uchroma/icons/view_flatyz.svg</normaloff>:/uchroma/icons/view_flatyz.svg</iconset>
    </property>
    <property name="text">
-    <string>&amp;Flat YZ</string>
+    <string>&amp;Flat ZY</string>
    </property>
    <property name="toolTip">
-    <string>Flat view facing YZ plane</string>
+    <string>Flat view facing ZY plane</string>
    </property>
   </action>
   <action name="actionViewNormal">

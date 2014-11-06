@@ -167,7 +167,7 @@ class UChromaWindow : public QMainWindow
 	void on_actionViewAutoStretched3D_triggered(bool checked);
 	void on_actionViewFlatXY_triggered(bool checked);
 	void on_actionViewFlatXZ_triggered(bool checked);
-	void on_actionViewFlatYZ_triggered(bool checked);
+	void on_actionViewFlatZY_triggered(bool checked);
 	void on_actionViewLinked_triggered(bool checked);
 	void on_actionViewAxes_triggered(bool checked);
 	void on_actionViewChangeLayout_triggered(bool checked);

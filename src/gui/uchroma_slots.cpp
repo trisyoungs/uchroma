@@ -326,14 +326,14 @@ void UChromaWindow::on_actionViewFlatXZ_triggered(bool checked)
 	if (checked) viewTypeChanged(ViewPane::FlatXZView);
 }
 
-void UChromaWindow::on_actionViewFlatYZ_triggered(bool checked)
+void UChromaWindow::on_actionViewFlatZY_triggered(bool checked)
 {
 	if (refreshing_) return;
 
 	// Check current ViewPane
-	if (!ViewPane::objectValid(currentViewPane_, "view pane in UChromaWindow::on_actionViewFlatYZ_triggered()")) return;
+	if (!ViewPane::objectValid(currentViewPane_, "view pane in UChromaWindow::on_actionViewFlatZY_triggered()")) return;
 
-	if (checked) viewTypeChanged(ViewPane::FlatYZView);
+	if (checked) viewTypeChanged(ViewPane::FlatZYView);
 }
 
 void UChromaWindow::on_actionViewLinked_triggered(bool checked)

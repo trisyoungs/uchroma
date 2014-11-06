@@ -620,7 +620,7 @@ bool Data2D::fourierTransformReal(bool forwardTransform, Data2D::WindowFunction 
 	double factor = (forwardTransform ? 1.0 : -1.0);
 	double lambda = x_.last() - x_.first();
 	double k = TWOPI / lambda;
-	double deltaX = x_[1] - x_[0];
+// 	double deltaX = x_[1] - x_[0];
 // 	msg.printVerbose("In Data2D::fourierTransformReal(), period of function is %f, real deltaX is %f, and wavenumber is %f\n", lambda, deltaX, k);
 
 	// Create working arrays
@@ -1372,7 +1372,7 @@ bool Data2D::load(const char* fileName)
 		return false;
 	}
 
-	int success, nCols = -1;
+	int success;
 	double oldZ = z_;
 	clear();
 	while (!parser.atEnd())

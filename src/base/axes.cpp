@@ -267,7 +267,8 @@ void Axes::clamp(int axis)
 {
 	if (logarithmic_[axis])
 	{
-		if (min_[axis] < limitMin_[axis]) setToLimit(axis, true);
+		if (min_[axis] <= 0.0) setToLimit(axis, true);
+// 		if (min_[axis] < limitMin_[axis]) setToLimit(axis, true);
 // 		if (max_[axis] > limitMax_[axis]) setToLimit(axis, false);
 	}
 
@@ -436,6 +437,9 @@ void Axes::setLogarithmic(int axis, bool b)
 {
 	logarithmic_[axis] = b;
 
+	// Update minima / maxima
+	parent_.updateAxisLimits();
+	
 	// Update and clamp axis values according to data
 	clamp(axis);
 
@@ -683,11 +687,11 @@ Vec3<double> Axes::tickDirection(int axis) const
 	else switch (parent_.viewType())
 	{
 		case (ViewPane::FlatXYView):
-			return (axis == 0 ? Vec3<double>(0.0, -1.0, 0.0) : Vec3<double>(-1.0, 0.0, 0.0));
+			return (axis == 0 ? Vec3<double>(0.0, inverted_.y ? 1.0 : -1.0, 0.0) : Vec3<double>(inverted_.x ? 1.0 : -1.0, 0.0, 0.0));
 		case (ViewPane::FlatXZView):
-			return (axis == 0 ? Vec3<double>(0.0, 0.0, -1.0) : Vec3<double>(-1.0, 0.0, 0.0));
-		case (ViewPane::FlatYZView):
-			return (axis == 1 ? Vec3<double>(0.0, 0.0, -1.0) : Vec3<double>(0.0, -1.0, 0.0));
+			return (axis == 0 ? Vec3<double>(0.0, 0.0, inverted_.z ? 1.0 : -1.0) : Vec3<double>(inverted_.x ? 1.0 : -1.0, 0.0, 0.0));
+		case (ViewPane::FlatZYView):
+			return (axis == 1 ? Vec3<double>(0.0, 0.0, inverted_.z ? 1.0 : -1.0) : Vec3<double>(0.0, inverted_.y ? 1.0 : -1.0, 0.0));
 		default:
 			break;
 	}
@@ -807,7 +811,7 @@ Vec3<double> Axes::labelOrientation(int axis) const
 			return (axis == 0 ? Vec3<double>(0.0, 0.0, 0.2) : Vec3<double>(0.0, 0.0, 0.2));
 		case (ViewPane::FlatXZView):
 			return (axis == 0 ? Vec3<double>(270.0, 0.0, 0.2) : Vec3<double>(270.0, 0.0, 0.2));
-		case (ViewPane::FlatYZView):
+		case (ViewPane::FlatZYView):
 			return (axis == 1 ? Vec3<double>(90.0, 0.0, 0.2) : Vec3<double>(90.0, 0.0, 0.2));
 		default:
 			break;
@@ -834,11 +838,11 @@ TextPrimitive::TextAnchor Axes::labelAnchor(int axis) const
 	else switch (parent_.viewType())
 	{
 		case (ViewPane::FlatXYView):
-			return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::MiddleRightAnchor);
+			return (axis == 0 ? (inverted_.y ? TextPrimitive::BottomMiddleAnchor : TextPrimitive::TopMiddleAnchor) : (inverted_.x ? TextPrimitive::MiddleLeftAnchor : TextPrimitive::MiddleRightAnchor));
 		case (ViewPane::FlatXZView):
-			return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::MiddleRightAnchor);
-		case (ViewPane::FlatYZView):
-			return (axis == 1 ? TextPrimitive::MiddleRightAnchor : TextPrimitive::TopMiddleAnchor);
+			return (axis == 0 ? (inverted_.z ? TextPrimitive::BottomMiddleAnchor : TextPrimitive::TopMiddleAnchor) : (inverted_.x ? TextPrimitive::MiddleLeftAnchor : TextPrimitive::MiddleRightAnchor));
+		case (ViewPane::FlatZYView):
+			return (axis == 1 ? (inverted_.z ? TextPrimitive::MiddleLeftAnchor : TextPrimitive::MiddleRightAnchor) : (inverted_.y ? TextPrimitive::BottomMiddleAnchor : TextPrimitive::TopMiddleAnchor));
 		default:
 			break;
 	}
@@ -883,7 +887,7 @@ Vec4<double> Axes::titleOrientation(int axis) const
 			return (axis == 0 ? Vec4<double>(0.0, 0.0, 0.2, 0.5) : Vec4<double>(0.0, 270.0, 0.2, 0.5));
 		case (ViewPane::FlatXZView):
 			return (axis == 0 ? Vec4<double>(270.0, 0.0, 0.2, 0.5) : Vec4<double>(270.0, 90.0, 0.2, 0.5));
-		case (ViewPane::FlatYZView):
+		case (ViewPane::FlatZYView):
 			return (axis == 1 ? Vec4<double>(90.0, 90.0, 0.2, 0.5) : Vec4<double>(90.0, 0.0, 0.2, 0.5));
 		default:
 			break;
@@ -911,11 +915,11 @@ TextPrimitive::TextAnchor Axes::titleAnchor(int axis) const
 	else switch (parent_.viewType())
 	{
 		case (ViewPane::FlatXYView):
-			return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::BottomMiddleAnchor);
+			return (axis == 0 ? (inverted_.y ? TextPrimitive::BottomMiddleAnchor : TextPrimitive::TopMiddleAnchor) : (inverted_.x ? TextPrimitive::TopMiddleAnchor : TextPrimitive::BottomMiddleAnchor));
 		case (ViewPane::FlatXZView):
-			return (axis == 0 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::BottomMiddleAnchor);
-		case (ViewPane::FlatYZView):
-			return (axis == 1 ? TextPrimitive::TopMiddleAnchor : TextPrimitive::TopMiddleAnchor);
+			return (axis == 0 ? (inverted_.z ? TextPrimitive::BottomMiddleAnchor : TextPrimitive::TopMiddleAnchor) : (inverted_.x ? TextPrimitive::TopMiddleAnchor : TextPrimitive::BottomMiddleAnchor));
+		case (ViewPane::FlatZYView):
+			return (axis == 1 ? (inverted_.z ? TextPrimitive::TopMiddleAnchor : TextPrimitive::BottomMiddleAnchor) : (inverted_.y ? TextPrimitive::BottomMiddleAnchor : TextPrimitive::TopMiddleAnchor));
 		default:
 			break;
 	}
@@ -1047,16 +1051,16 @@ void Axes::updateAxisPrimitives()
 	// Make sure coordinates are up-to-date
 	updateCoordinates();
 
-	// Set a flag for in-plane rotation around Y rather than Z axis
+	// Set axis for in-plane (in-screen) rotation
 	int inPlaneAxis = 2;
 	if (parent_.viewType() == ViewPane::FlatXZView) inPlaneAxis = 1;
-	else if (parent_.viewType() == ViewPane::FlatYZView) inPlaneAxis = 0;
+	else if (parent_.viewType() == ViewPane::FlatZYView) inPlaneAxis = 0;
 
 	// Set Y clip
 	if (logarithmic_.y)
 	{
-		clipPlaneYMin_ = (log10(min_.y) * stretch_.y) - clipPlaneDelta;
-		clipPlaneYMax_ = (log10(max_.y) * stretch_.y) + clipPlaneDelta;
+		clipPlaneYMin_ = (inverted_.y ? 0.0 : log10(min_.y)) * stretch_.y - clipPlaneDelta;
+		clipPlaneYMax_ = (inverted_.y ? log10(max_.y/min_.y) : log10(max_.y)) * stretch_.y + clipPlaneDelta;
 	}
 	else
 	{
@@ -1079,7 +1083,7 @@ void Axes::updateAxisPrimitives()
 		// Create tick label transformation matrix
 		labelTransform.setIdentity();
 		// -- 1) Apply axial rotation along label left-to-right direction
-		if (parent_.viewType() == ViewPane::FlatYZView) labelTransform.applyRotationY(labelOrientation(axis).x);
+		if (parent_.viewType() == ViewPane::FlatZYView) labelTransform.applyRotationY(labelOrientation(axis).x);
 		else labelTransform.applyRotationX(labelOrientation(axis).x);
 		// -- 2) Perform in-plane rotation
 		if (inPlaneAxis == 0) labelTransform.applyRotationX(labelOrientation(axis).y);
@@ -1089,7 +1093,7 @@ void Axes::updateAxisPrimitives()
 		// Create axis title transformation matrix
 		titleTransform.setIdentity();
 		// -- 1) Apply axial rotation along label left-to-right direction
-		if (parent_.viewType() == ViewPane::FlatYZView) titleTransform.applyRotationY(titleOrientation(axis).x);
+		if (parent_.viewType() == ViewPane::FlatZYView) titleTransform.applyRotationY(titleOrientation(axis).x);
 		else titleTransform.applyRotationX(titleOrientation(axis).x);
 		// -- 2) Perform in-plane rotation
 		if (inPlaneAxis == 0) titleTransform.applyRotationX(titleOrientation(axis).y);
@@ -1124,7 +1128,7 @@ void Axes::updateAxisPrimitives()
 // 				if (value > max_[axis]) break;
 
 				// If the current value is in range, plot a tick
-				u[axis] = (inverted_[axis] ? log10(max_[axis]/value): log10(value)) * stretch_[axis];
+				u[axis] = (inverted_[axis] ? log10(max_[axis]/value) : log10(value)) * stretch_[axis];
 				if (log10(value) >= min)
 				{
 					// Tick mark

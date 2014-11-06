@@ -227,7 +227,7 @@ void Viewer::paintGL()
 		int skipAxis = -1;
 		if (pane->viewType() == ViewPane::FlatXYView) skipAxis = 2;
 		else if (pane->viewType() == ViewPane::FlatXZView) skipAxis = 1;
-		else if (pane->viewType() == ViewPane::FlatYZView) skipAxis = 0;
+		else if (pane->viewType() == ViewPane::FlatZYView) skipAxis = 0;
 
 		// -- Render axis text
 		glEnable(GL_MULTISAMPLE);

@@ -90,6 +90,7 @@ Vec3<double> Surface::constructVertexNormals(const Array<double>& abscissa, int 
 		// Both previous and next slices available, so use all available data
 	}
 
+	return Vec3<double>();
 }
 
 // Construct normal / colour data for slice specified
@@ -130,7 +131,7 @@ void Surface::constructSurfaceStrip(const Array<double>& x, const Array<double>&
 	if ((yPrev.nItems() != 0) && (yNext.nItems() != 0))
 	{
 		// Grab other array references
-		dz = zPrev- zNext;
+		dz = zPrev - zNext;
 
 		// -- First point
 		v1.set(x.value(1) - x.value(0), y.value(1) - y.value(0), 0);
@@ -185,7 +186,7 @@ void Surface::constructSurfaceStrip(const Array<double>& x, const Array<double>&
 // 			printf("Last %i = (%f %f %f) * (%f %f %f) = (%f %f %f\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		}
 		// -- Last point
-		v1.set(x.value(nX -1) - x.value(nX -2), y.value(nX -1) - y.value(nX -2), 0.0);
+		v1.set(x.value(nX-1) - x.value(nX-2), y.value(nX-1) - y.value(nX-2), 0.0);
 		v2.set(0.0, y.value(nX -1) - yPrev.value(nX -1), dz);
 		normals.add(v1 * v2);
 // 		v3 = v1 * v2;
@@ -218,7 +219,7 @@ void Surface::constructSurfaceStrip(const Array<double>& x, const Array<double>&
 // 			printf("Frst %i = (%f %f %f) * (%f %f %f) = (%f %f %f)\n", n, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z);
 		}
 		// -- Last point
-		v1.set(x.value(nX -1) - x.value(nX -2), y.value(nX -1) - y.value(nX -2), 0.0);
+		v1.set(x.value(nX-1) - x.value(nX-2), y.value(nX-1) - y.value(nX-2), 0.0);
 		v2.set(0.0, yNext.value(nX -1) - y.value(nX -1), dz);
 		normals.add(v1 * v2);
 // 		v3 = v1 * v2;
@@ -259,6 +260,6 @@ bool Surface::calculateExtents(const Axes& axes, const Array<double>& abscissa, 
 	if (minIndex.z == displayData.nItems()) return false;
 	for (maxIndex.z = displayData.nItems()-1; maxIndex.z >= 0; --maxIndex.z)  if (displayData[maxIndex.z]->z() <= axisMax.z) break;
 	if (maxIndex.z < 0) return false;
-	
+
 	return true;
 }

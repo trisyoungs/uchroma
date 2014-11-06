@@ -169,7 +169,7 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	 */
 	public:
 	// View type
-	enum ViewType { NormalView, AutoStretchedView, FlatXYView, FlatXZView, FlatYZView, LinkedView, nViewTypes };
+	enum ViewType { NormalView, AutoStretchedView, FlatXYView, FlatXZView, FlatZYView, LinkedView, nViewTypes };
 	// Convert text string to ViewType
 	static ViewType viewType(QString s);
 	// Convert ViewType to text string

@@ -94,7 +94,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	viewTypeActionGroup_.addAction(ui.actionViewAutoStretched3D);
 	viewTypeActionGroup_.addAction(ui.actionViewFlatXY);
 	viewTypeActionGroup_.addAction(ui.actionViewFlatXZ);
-	viewTypeActionGroup_.addAction(ui.actionViewFlatYZ);
+	viewTypeActionGroup_.addAction(ui.actionViewFlatZY);
 	viewTypeActionGroup_.addAction(ui.actionViewLinked);
 	// -- Interaction mode actions
 	QActionGroup* actionGroup = new QActionGroup(this);
@@ -204,7 +204,7 @@ void UChromaWindow::updateToolBars()
 	if (ViewPane::objectValid(currentViewPane_, "view pane in UChromaWindow::updateToolBars()"))
 	{
 		ui.actionViewPerspective->setChecked(currentViewPane_->hasPerspective());
-		ui.actionViewPerspective->setEnabled((currentViewPane_->viewType() < ViewPane::FlatXYView) || (currentViewPane_->viewType() > ViewPane::FlatYZView));
+		ui.actionViewPerspective->setEnabled((currentViewPane_->viewType() < ViewPane::FlatXYView) || (currentViewPane_->viewType() > ViewPane::FlatZYView));
 		QAction* action = viewTypeActionGroup_.actions().at(currentViewPane_->viewType());
 		if (action) action->setChecked(true);
 	}

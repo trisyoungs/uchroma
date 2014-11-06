@@ -1479,27 +1479,21 @@ void AxesWindow::updateControls(bool force)
 	// -- X
 	ui.XPositionFractionalRadio->setChecked(axes.positionIsFractional(0));
 	positionIsFractionalChanged(0, axes.positionIsFractional(0));
-	ui.XPositionYRealSpin->setRange(axes.logarithmic(1), axes.limitMin(1), false, 0.0);
 	ui.XPositionYRealSpin->setValue(axes.positionReal(0).y);
-	ui.XPositionZRealSpin->setRange(axes.logarithmic(2), axes.limitMin(2), false, 0.0);
 	ui.XPositionZRealSpin->setValue(axes.positionReal(0).z);
 	ui.XPositionYFractionalSpin->setValue(axes.positionFractional(0).y);
 	ui.XPositionZFractionalSpin->setValue(axes.positionFractional(0).z);
 	// -- Y
 	ui.YPositionFractionalRadio->setChecked(axes.positionIsFractional(1));
 	positionIsFractionalChanged(1, axes.positionIsFractional(1));
-	ui.YPositionXRealSpin->setRange(axes.logarithmic(0), axes.limitMin(0), false, 0.0);
 	ui.YPositionXRealSpin->setValue(axes.positionReal(1).x);
-	ui.YPositionZRealSpin->setRange(axes.logarithmic(2), axes.limitMin(2), false, 0.0);
 	ui.YPositionZRealSpin->setValue(axes.positionReal(1).z);
 	ui.YPositionXFractionalSpin->setValue(axes.positionFractional(1).x);
 	ui.YPositionZFractionalSpin->setValue(axes.positionFractional(1).z);
 	// -- Z
 	ui.ZPositionFractionalRadio->setChecked(axes.positionIsFractional(2));
 	positionIsFractionalChanged(2, axes.positionIsFractional(2));
-	ui.ZPositionXRealSpin->setRange(axes.logarithmic(0), axes.limitMin(0), false, 0.0);
 	ui.ZPositionXRealSpin->setValue(axes.positionReal(2).x);
-	ui.ZPositionYRealSpin->setRange(axes.logarithmic(1), axes.limitMin(1), false, 0.0);
 	ui.ZPositionYRealSpin->setValue(axes.positionReal(2).y);
 	ui.ZPositionXFractionalSpin->setValue(axes.positionFractional(2).x);
 	ui.ZPositionYFractionalSpin->setValue(axes.positionFractional(2).y);
