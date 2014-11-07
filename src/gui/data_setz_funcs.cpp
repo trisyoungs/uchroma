@@ -181,7 +181,7 @@ bool DataSetZDialog::setZFromSourceFiles()
 	QDateTime referenceTime(QDate(1970,1,1)), extractedTime;
 	for (DataSet* dataSet = targetCollection_->dataSets(); dataSet != NULL; dataSet = dataSet->next)
 	{
-		if (!dataSet->dataSource() == DataSet::FileSource)
+		if (dataSet->dataSource() != DataSet::FileSource)
 		{
 			++nFailed;
 			continue;

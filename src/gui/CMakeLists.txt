@@ -29,7 +29,6 @@ SET(qtproject_SRCS
   viewer_funcs.cpp
   viewer_input.cpp
   viewer_prefs.cpp
-  viewer_user.cpp
 
   uchroma_collection.cpp
   uchroma_data.cpp

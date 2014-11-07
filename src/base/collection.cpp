@@ -82,6 +82,7 @@ Collection::Collection() : ListItem<Collection>(), ObjectList<Collection>(this)
 	displayData_.clear();
 	displayDataGeneratedAt_ = -1;
 	displayStyle_ = Collection::LineXYStyle;
+	displaySurfaceShininess_ = 128.0;
 	displayStyleVersion_ = 0;
 
 	// Send a signal out to indicate our creation
@@ -155,6 +156,8 @@ void Collection::operator=(const Collection& source)
 	displayData_.clear();
 	displayDataGeneratedAt_ = -1;
 	displayStyle_ = source.displayStyle_;
+	displaySurfaceShininess_ = source.displaySurfaceShininess_;
+	displayLineStyle_ = source.displayLineStyle_;
 	displayStyleVersion_ = 0;
 }
 

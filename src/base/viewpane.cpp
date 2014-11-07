@@ -26,11 +26,12 @@
 #include <algorithm>
 #include <cmath>
 
-// Static Members
+// Static Members and constants
 template<class ViewPane> RefList<ViewPane,bool> ObjectList<ViewPane>::objects_;
+const double ViewPane::zOffset_ = -10.0;
 
 // Constructor
-ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), ObjectList<ViewPane>(this), parent_(parent), zOffset_(-10.0), axes_(*this)
+ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), ObjectList<ViewPane>(this), parent_(parent), axes_(*this)
 {
 	// Geometry / position
 	bottomEdge_ = 0;
@@ -74,7 +75,7 @@ ViewPane::~ViewPane()
 }
 
 // Copy constructor
-ViewPane::ViewPane(const ViewPane& source) : ObjectList<ViewPane>(NULL), parent_(parent_), zOffset_(zOffset_), axes_(*this)
+ViewPane::ViewPane(const ViewPane& source) : ObjectList<ViewPane>(NULL), parent_(parent_), axes_(*this)
 {
 	(*this) = source;
 }
@@ -436,7 +437,7 @@ const char* ViewPane::viewType(ViewPane::ViewType vt)
 }
 
 // Return calculated projection matrix
-Matrix ViewPane::calculateProjectionMatrix(bool hasPerspective, double orthoZoom)
+Matrix ViewPane::calculateProjectionMatrix(bool hasPerspective, double orthoZoom) const
 {
 	Matrix result;
 
@@ -495,7 +496,7 @@ void ViewPane::setViewType(ViewPane::ViewType vt)
 }
 
 // Return view type
-ViewPane::ViewType ViewPane::viewType()
+ViewPane::ViewType ViewPane::viewType() const
 {
 	return viewType_;
 }
@@ -507,7 +508,7 @@ bool ViewPane::isFlatView()
 }
 
 // Return projection matrix
-Matrix ViewPane::projectionMatrix()
+Matrix ViewPane::projectionMatrix() const
 {
 	return projectionMatrix_;
 }
@@ -523,7 +524,7 @@ void ViewPane::setHasPerspective(bool perspective)
 }
 
 // Return whether this pane uses perspective
-bool ViewPane::hasPerspective()
+bool ViewPane::hasPerspective() const
 {
 	return hasPerspective_;
 }
@@ -558,7 +559,7 @@ void ViewPane::rotateView(double dx, double dy)
 }
 
 // Return view rotation
-Matrix ViewPane::viewRotation()
+Matrix ViewPane::viewRotation() const
 {
 	return viewRotation_;
 }
@@ -583,7 +584,7 @@ void ViewPane::translateView(double dx, double dy, double dz)
 }
 
 // Return current view translation
-Vec3<double> ViewPane::viewTranslation()
+Vec3<double> ViewPane::viewTranslation() const
 {
 	return viewTranslation_;
 }

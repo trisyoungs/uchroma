@@ -58,7 +58,7 @@ void Surface::constructLineXY(PrimitiveList& primitiveList, const Axes& axes, co
 	Primitive* currentPrimitive = primitiveList[0];
 
 	// Create lines for slices
-	GLuint vertexA, vertexB;
+	int vertexA, vertexB;
 	for (int slice = minIndex.z; slice <= maxIndex.z; ++slice)
 	{
 		// Grab y and z values

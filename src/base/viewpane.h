@@ -189,7 +189,7 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	// Current translation of view
 	Vec3<double> viewTranslation_;
 	// Standard zOffset for translation matrix
-	const double zOffset_;
+	static const double zOffset_;
 	// Axes version at which view matrix was last calculated (mostly for keeping 2D view correct)
 	int viewAxesUsedAt_;
 	// Viewport version at which view matrix was last calculated
@@ -197,7 +197,7 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 
 	private:
 	// Return calculated projection matrix
-	Matrix calculateProjectionMatrix(bool hasPerspective, double orthoZoom = 0.0);
+	Matrix calculateProjectionMatrix(bool hasPerspective, double orthoZoom = 0.0) const;
 	// Update primitive
 	void updatePrimitive(Collection* collection, PrimitiveList& primitive, bool forcePrimitiveUpdate = false, bool dontPopInstance = false);
 
@@ -205,15 +205,15 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	// Set view type
 	void setViewType(ViewPane::ViewType vt);
 	// Return view type
-	ViewPane::ViewType viewType();
+	ViewPane::ViewType viewType() const;
 	// Return whether view type is flat
 	bool isFlatView();
 	// Return projection matrix
-	Matrix projectionMatrix();
+	Matrix projectionMatrix() const;
 	// Set whether this pane uses perspective
 	void setHasPerspective(bool perspective);
 	// Return whether this pane uses perspective
-	bool hasPerspective();
+	bool hasPerspective() const;
 	// Update view matrix
 	void setViewRotation(Matrix& mat);
 	// Update single column of view matrix
@@ -221,13 +221,13 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	// Rotate view matrix about x and y by amounts specified
 	void rotateView(double dx, double dy);
 	// Return view rotation
-	Matrix viewRotation();
+	Matrix viewRotation() const;
 	// Set view translation
 	void setViewTranslation(double x, double y, double z);
 	// Translate view matrix by amounts specified
 	void translateView(double dx, double dy, double dz);
 	// Return current view translation
-	Vec3<double> viewTranslation();
+	Vec3<double> viewTranslation() const;
 	// Return full view matrix (rotation + translation)
 	Matrix viewMatrix();
 	// Project given model coordinates into world coordinates

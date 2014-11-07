@@ -44,7 +44,7 @@ ViewLayout::~ViewLayout()
 }
 
 // Copy constructor
-ViewLayout::ViewLayout(const ViewLayout& source) : parent_(parent_)
+ViewLayout::ViewLayout(const ViewLayout& source) : parent_(source.parent_)
 {
 	(*this) = source;
 }
