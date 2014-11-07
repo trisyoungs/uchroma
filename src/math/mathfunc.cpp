@@ -26,7 +26,7 @@
 #include <math.h>
 
 // Error Function
-double uChromaMath::erfc(double x)
+double UChromaMath::erfc(double x)
 {
 	// Approximation to the complementary error function.
 	// Ref: Abramowitz and Stegun, Handbook of Mathematical Functions,
@@ -40,13 +40,13 @@ double uChromaMath::erfc(double x)
 }
 
 // Complementary error function
-double uChromaMath::erf(double x)
+double UChromaMath::erf(double x)
 {
 	return (1.0 - erfc(x));
 }
 
 // Random Number Generator (0 - 1)
-double uChromaMath::random()
+double UChromaMath::random()
 {
 	// Simple random number generator from C++ stdlib.
 	// Returns numbers from 0.0 to 1.0 inclusive.
@@ -55,21 +55,21 @@ double uChromaMath::random()
 }
 
 // Random number generator (o - RAND_MAX)
-int uChromaMath::randomimax()
+int UChromaMath::randomimax()
 {
 	// Returns a random number from 0->(range-1) inclusive.
 	return rand();
 }
 
 // Random number generator (0 - range-1)
-int uChromaMath::randomi(int range)
+int UChromaMath::randomi(int range)
 {
 	// Returns a random number from 0->(range-1) inclusive.
 	return int(range * (double(rand()-1) / RAND_MAX));
 }
 
 // Integer power function
-int uChromaMath::power(int i, int p)
+int UChromaMath::power(int i, int p)
 {
 	static int result, n;
 	result = i;
@@ -79,13 +79,13 @@ int uChromaMath::power(int i, int p)
 }
 
 // Sign function
-int uChromaMath::sgn(int x)
+int UChromaMath::sgn(int x)
 {
 	return (x < 0 ? -1 : x > 0);
 }
 
 // Calculate area of triangle from supplied coordinates
-double uChromaMath::triangleArea(double ax, double ay, double bx, double by, double cx, double cy)
+double UChromaMath::triangleArea(double ax, double ay, double bx, double by, double cx, double cy)
 {
 	return fabs( 0.5*( ax*(by-cy) + bx*(cy-ay) + cx*(ay-by)) );
 }

@@ -41,6 +41,7 @@ class Equation
 		Exponential1Equation,
 		Exponential2Equation,
 		Exponential3Equation,
+		NormalDistributionEquation,
 		nEquations
 	};
 	// Name of equation

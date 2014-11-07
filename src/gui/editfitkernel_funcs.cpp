@@ -578,6 +578,13 @@ void EditFitKernelDialog::on_MinimisationLimitStrengthSpin_valueChanged(double v
 	fitKernelTarget_->setLimitStrength(value);
 }
 
+void EditFitKernelDialog::on_OptionModSDNRandomTrialsSpin_valueChanged(int value)
+{
+	if (refreshing_ || (!fitKernelTarget_)) return;
+
+	fitKernelTarget_->setModSDNRandomTrials(value);
+}
+
 /*
  * Update Functions
  */
@@ -654,6 +661,8 @@ void EditFitKernelDialog::updateControls(bool force)
 	ui.MinimisationToleranceSpin->setValue(fitKernelTarget_->tolerance());
 	ui.MinimisationMaxStepsSpin->setValue(fitKernelTarget_->maxSteps());
 	ui.MinimisationLimitStrengthSpin->setValue(fitKernelTarget_->limitStrength());
+	ui.MinimisationOptionsStack->setCurrentIndex(fitKernelTarget_->method());
+	ui.OptionModSDNRandomTrialsSpin->setValue(fitKernelTarget_->modSDNRandomTrials());
 
 	refreshing_ = false;
 

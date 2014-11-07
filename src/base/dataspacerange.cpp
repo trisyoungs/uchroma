@@ -199,6 +199,26 @@ double DataSpaceRange::referenceY(int xIndex, int zIndex)
 	return yReference_.ref(xIndex, zIndex);
 }
 
+// Return minimum of reference y values
+double DataSpaceRange::referenceYMin()
+{
+	if (yReference_.linearArraySize() == 0) return 0.0;
+	
+	double minVal = yReference_.linearArray()[0];
+	for (int n=1; n<yReference_.linearArraySize(); ++n) if (yReference_.linearArray()[n] < minVal) minVal = yReference_.linearArray()[n];
+	return minVal;
+}
+
+// Return maximum of reference y values
+double DataSpaceRange::referenceYMax()
+{
+	if (yReference_.linearArraySize() == 0) return 0.0;
+	
+	double maxVal = yReference_.linearArray()[0];
+	for (int n=1; n<yReference_.linearArraySize(); ++n) if (yReference_.linearArray()[n] > maxVal) maxVal = yReference_.linearArray()[n];
+	return maxVal;
+}
+
 // Return calculated y value specified
 double DataSpaceRange::calculatedY(int xIndex, int zIndex)
 {

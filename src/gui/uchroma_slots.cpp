@@ -504,8 +504,10 @@ void UChromaWindow::on_actionAnalyseNewFit_triggered(bool checked)
 	// Check current Collection
 	if (!Collection::objectValid(currentCollection_, "collection in UChromaWindow::on_actionAnalyseNewFit_triggered()")) return;
 
-	// Add a new fit collection to the current collection, and add it to a suitable view pane
+	// Add a new fit to the current collection
 	Collection* newFit = currentCollection_->addFit("New Fit");
+
+	// Raise the EditFitSetup dialog
 	editFitSetupDialog_.setFitKernel(newFit->fitKernel());
 	if (editFitSetupDialog_.updateAndExec())
 	{
@@ -552,8 +554,10 @@ void UChromaWindow::on_actionAnalyseUpdateFit_triggered(bool checked)
 	}
 	else
 	{
-		msg.print("Error: Current collection '%s' has no associated fit data.\n", qPrintable(currentCollection_->name()));
-		ui.StatusBar->showMessage("Current collection '%s' has no associated fit data!", 3000);
+		QString message;
+		message.sprintf("Error: Current collection '%s' has no associated fit data.\n", qPrintable(currentCollection_->name()));
+		msg.print(qPrintable(message));
+		ui.StatusBar->showMessage(message, 3000);
 	}
 }
 

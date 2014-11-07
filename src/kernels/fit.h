@@ -67,8 +67,10 @@ class FitKernel
 	bool equationValid_;
 	// Standard x and z variables
 	Variable* xVariable_, *zVariable_;
-	// List of variables targetted in fit process
+	// List of variables used in equation
 	RefList<EquationVariable,bool> usedVariables_;
+	// List of variables targetted in fit process
+	RefList<EquationVariable,bool> fitVariables_;
 	// List of data references available
 	List<ReferenceVariable> references_;
 	// List of data reference used in fit
@@ -222,7 +224,7 @@ class FitKernel
 	 */
 	public:
 	// Minimisation methods
-	enum MinimisationMethod { SteepestDescentMethod, SimplexMethod, nMinimisationMethods };
+	enum MinimisationMethod { SteepestDescentMethod, ModifiedSteepestDescentMethod, SimplexMethod, nMinimisationMethods };
 	// Convert text string to MinimisationMethod
 	static FitKernel::MinimisationMethod minimisationMethod(const char* s);
 	// Convert MinimisationMethod to text string
@@ -237,6 +239,8 @@ class FitKernel
 	int maxSteps_;
 	// Strength of variable limits
 	double limitStrength_;
+	// Number of random trials to use in Modified SD method
+	int modSDNRandomTrials_;
 
 
 	private:
@@ -248,6 +252,8 @@ class FitKernel
 	bool simplexMinimise(Array<double>& alpha);
 	// Steepest Descent minimise
 	bool sdMinimise(Array<double>& alpha, double tolerance, int maxSteps);
+	// Modified Steepest Descent minimise
+	bool sdModMinimise(Array< double >& alpha, double tolerance, int maxSteps, int nTryRandom = 0, double randomMin = -1.0, double randomMax = 1.0);
 	// Minimise, calling relevant method
 	bool minimise();
 
@@ -268,6 +274,10 @@ class FitKernel
 	void setLimitStrength(double strength);
 	// Return strength of variable limits
 	double limitStrength();
+	// Set number of random trials to use in Modified SD method
+	void setModSDNRandomTrials(int nTrials);
+	// Return number of random trials to use in Modified SD method
+	int modSDNRandomTrials();
 	// Perform fitting with current settings
 	bool fit();
 };

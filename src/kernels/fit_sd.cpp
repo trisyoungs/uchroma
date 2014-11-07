@@ -1,6 +1,6 @@
 /*
-	*** Fit Widget - Steepest Descent Minimiser
-	*** src/gui/fit_sd.cpp
+	*** FitKernel - Steepest Descent Minimiser
+	*** src/kernels/fit_sd.cpp
 	Copyright T. Youngs 2012-2014
 
 	This file is part of uChroma.

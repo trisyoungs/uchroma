@@ -72,10 +72,10 @@ bool Cuboid::isPointWithinProjection(int x, int y, Matrix viewMatrix, Matrix pro
 	Vec3<double> a, b, c, d;
 	double rectArea, testArea;
 	// XY plane at maximum Z
-// 	a = uChromaMath::glModelToScreen(Vec3<double>(minima_.x, minima_.y, minima_.z), viewMatrix, projectionMatrix, viewPort);
+// 	a = UChromaMath::glModelToScreen(Vec3<double>(minima_.x, minima_.y, minima_.z), viewMatrix, projectionMatrix, viewPort);
 // 	b.set(maxima_.x, minima_.y, minima_.z);
 // 	c.set(maxima_.x, maxima_.y, minima_.z);
 // 	d.set(minima_.x, maxima_.y, minima_.z);
-// 	rectArea = uChromaMath::triangleArea(a.) + 
+// 	rectArea = UChromaMath::triangleArea(a.) + 
 	return false;
 }

@@ -49,7 +49,7 @@ class Variable : public Node
 	// Set name of variable
 	void setName(QString s);
 	// Get name of variable
-		QString name() const;
+	QString name() const;
 	// Set initial value expression
 	bool setInitialValue(Node* node);
 	// Return Node corresponding to initial value

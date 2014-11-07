@@ -25,7 +25,7 @@
 class Matrix;
 
 // Mathematical functions
-class uChromaMath
+class UChromaMath
 {
 	public:
 

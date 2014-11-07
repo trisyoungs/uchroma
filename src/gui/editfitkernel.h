@@ -129,6 +129,7 @@ class EditFitKernelDialog : public QDialog
 	void on_MinimisationToleranceSpin_valueChanged(double value);
 	void on_MinimisationMaxStepsSpin_valueChanged(int value);
 	void on_MinimisationLimitStrengthSpin_valueChanged(double value);
+	void on_OptionModSDNRandomTrialsSpin_valueChanged(int value);
 
 
 	/*

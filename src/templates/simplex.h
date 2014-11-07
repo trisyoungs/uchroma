@@ -113,7 +113,7 @@ template<class T> class Simplex
 		{
 			// Accept with some probability...
 			double deltaCost = trialCost - comparisonCost;
-			if (uChromaMath::random() < exp(-deltaCost/temperature)) return true;
+			if (UChromaMath::random() < exp(-deltaCost/temperature)) return true;
 		}
 		return false;
 	}
@@ -147,17 +147,17 @@ template<class T> class Simplex
 		// ...and then randomly select points in the Simplex which we will trial as new best, worst, and nextworst points
 		do
 		{
-			n = int(uChromaMath::random()*nVertices_);
+			n = int(UChromaMath::random()*nVertices_);
 		} while (n == vWorst_);
-		if (uChromaMath::random() < exp(-fabs(costs_[vBest_]-costs_[n])/temperature))
+		if (UChromaMath::random() < exp(-fabs(costs_[vBest_]-costs_[n])/temperature))
 		{
 			// Swap points if necessary
 			if (vNextWorst_ == n) vNextWorst_ = vBest_;
 			// else if (vWorst_ == n) vWorst_ = vBest_;
 			vBest_ = n;
 		}
-		n = int(uChromaMath::random()*nVertices_);
-		if (uChromaMath::random() < exp(-fabs(costs_[vWorst_]-costs_[n])/temperature))
+		n = int(UChromaMath::random()*nVertices_);
+		if (UChromaMath::random() < exp(-fabs(costs_[vWorst_]-costs_[n])/temperature))
 		{
 			// Swap points if necessary
 			if (vNextWorst_ == n) vNextWorst_ = vWorst_;
@@ -166,9 +166,9 @@ template<class T> class Simplex
 		}
 		do
 		{
-			n = int(uChromaMath::random()*nVertices_);
+			n = int(UChromaMath::random()*nVertices_);
 		} while (n == vWorst_);
-		if (uChromaMath::random() < exp(-fabs(costs_[vNextWorst_]-costs_[n])/temperature))
+		if (UChromaMath::random() < exp(-fabs(costs_[vNextWorst_]-costs_[n])/temperature))
 		{
 			// Swap points if necessary
 			if (vBest_ == n) vBest_ = vNextWorst_;
@@ -358,7 +358,7 @@ template<class T> class Simplex
 			for (n=1; n<nVertices_; ++n)
 			{
 				vertices_[n] = vertices_[0];
-				r = (2.0*uChromaMath::random()) - 1.0;
+				r = (2.0*UChromaMath::random()) - 1.0;
 				vertices_[n][n-1] = (vertices_[n][n-1] - parameterOffset_) * 1.0+initVariation_*r;
 				costs_[n] = cost(vertices_[n]);
 			}

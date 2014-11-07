@@ -30,6 +30,8 @@ Equation Equation::equations[] = {
 		"Double, summed exponential" },
 	{ "Exponential3",		"A1*exp(-x/B1) + A2*exp(-x/B2) + A3*exp(-x/B3)",
 		"Triple, summed exponential" },
+	{ "Normal",			"(1.0/(sigma*sqrt(2*Pi)))*exp(-((x-mu)^2 / (2*sigma^2)))",
+		"Normal distribution" }
 };
 
 // Constructor

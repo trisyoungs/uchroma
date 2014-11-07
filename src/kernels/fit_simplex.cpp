@@ -1,6 +1,6 @@
 /*
-	*** Fit Widget - Simplex Minimiser
-	*** src/gui/fit_simplex.cpp
+	*** FitKernel - Simplex Minimiser
+	*** src/kernels/fit_simplex.cpp
 	Copyright T. Youngs 2012-2014
 
 	This file is part of uChroma.

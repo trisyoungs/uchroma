@@ -1047,7 +1047,7 @@ void Data2D::interpolate(bool constrained)
 		{
 			gradA = (x_[i+1] - x_[i])/(y_[i+1] - y_[i]);
 			gradB = (x_[i] - x_[i-1])/(y_[i] - y_[i-1]);
-			if (uChromaMath::sgn(gradA) != uChromaMath::sgn(gradB)) fp[i] = 0.0;
+			if (UChromaMath::sgn(gradA) != UChromaMath::sgn(gradB)) fp[i] = 0.0;
 			else fp[i] = 2.0 / (gradA + gradB);
 			
 		}

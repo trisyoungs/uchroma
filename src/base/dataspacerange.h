@@ -107,6 +107,10 @@ class DataSpaceRange : public ListItem<DataSpaceRange>
 	public:
 	// Return reference y value specified
 	double referenceY(int xIndex, int zIndex);
+	// Return minimum of reference y values
+	double referenceYMin();
+	// Return maximum of reference y values
+	double referenceYMax();
 	// Return calculated y value specified
 	double calculatedY(int xIndex, int zIndex);
 	// Copy values from stored source collection, using index data provided

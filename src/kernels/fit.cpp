@@ -55,10 +55,11 @@ FitKernel::FitKernel()
 	destinationCollection_ = NULL;
 
 	// Minimisation Setup
-	method_ = FitKernel::SteepestDescentMethod;
+	method_ = FitKernel::ModifiedSteepestDescentMethod;
 	maxSteps_ = 100;
 	limitStrength_ = 1.0e3;
 	tolerance_ = 1.0e-5;
+	modSDNRandomTrials_ = 20;
 }
 
 // Destructor
@@ -529,6 +530,7 @@ void FitKernel::setSourceCollection(Collection* collection)
 	indexZMin_ = 0;
 	indexZMax_ = sourceCollection_->nDataSets()-1;
 	indexZSingle_ = 0;
+	if (sourceCollection_->nDataSets() == 1) zRange_ = FitKernel::SinglePointRange;
 
 	UChromaSession::setAsModified();
 }
@@ -568,7 +570,7 @@ void FitKernel::checkRanges()
  */
 
 // Minimisation methods
-const char* MinimisationMethodKeywords[] = { "SteepestDescent", "Simplex" };
+const char* MinimisationMethodKeywords[] = { "Steepest Descent", "Modified Steepest Descent", "Simplex" };
 
 // Convert text string to MinimisationMethod
 FitKernel::MinimisationMethod FitKernel::minimisationMethod(const char* s)
@@ -588,11 +590,17 @@ double FitKernel::sosError(Array<double>& alpha)
 {
 	// Poke current values back into the equation variables
 	int n = 0;
-	for (RefListItem<EquationVariable,bool>* ri = usedVariables_.first(); ri != NULL; ri = ri->next) ri->item->variable()->set(alpha[n++]);
+	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next) ri->item->variable()->set(alpha[n++]);
 	
 	// Generate new data from current variable values
 	if (!currentFitRange_->calculateValues(equation_, xVariable_, zVariable_, usedReferences_)) return -1.0;
 
+	for (RefListItem<EquationVariable,bool>* ri = usedVariables_.first(); ri != NULL; ri = ri->next)
+	{
+		double x;
+		ri->item->variable()->execute(x);
+	}
+	
 	// Get sos error from current fit target
 	double sos = currentFitRange_->sosError();
 
@@ -600,7 +608,7 @@ double FitKernel::sosError(Array<double>& alpha)
 	double penalty = 1.0;
 	n = 0;
 	EquationVariable* fitVar;
-	for (RefListItem<EquationVariable,bool>* ri = usedVariables_.first(); ri != NULL; ri = ri->next, ++n)
+	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next, ++n)
 	{
 		// Grab variable from reflist item
 		fitVar = ri->item;
@@ -618,7 +626,7 @@ double FitKernel::rmsError(Array<double>& alpha)
 	// Get sos error to start with
 	double rms = sosError(alpha);
 
-	// Normalise  to number of data points, and take sqrt
+	// Normalise to number of data points, and take sqrt
 	int nPoints = currentFitRange_->nDataSets() * currentFitRange_->nPoints();
 
 	return sqrt(rms/nPoints);
@@ -629,23 +637,46 @@ bool FitKernel::minimise()
 {
 	// Construct alpha array (variables to fit) to pass to minimiser
 	Array<double> alpha;
+	fitVariables_.clear();
 	for (RefListItem<EquationVariable,bool>* ri = usedVariables_.first(); ri != NULL; ri = ri->next)
 	{
 		// Grab variable pointer from FitVariable
 		EquationVariable* eqVar = ri->item;
-		alpha.add(eqVar->value());
+
+		// If this is variable is to be fit, add it to fitVariables_
+		if (eqVar->fit())
+		{
+			alpha.add(eqVar->value());
+			fitVariables_.add(eqVar);
+		}
+
+		// Poke the initial value into the variable
+		eqVar->variable()->set(eqVar->value());
 	}
 
 	// Call the minimiser
 	bool result;
+	double randomMin, randomMax;
 	switch (method_)
 	{
 		// Steepest Descent
-		case (0):
+		case (FitKernel::SteepestDescentMethod):
 			result = sdMinimise(alpha, tolerance_, maxSteps_);
 			break;
 		// Simplex
-		case (1):
+		case (FitKernel::ModifiedSteepestDescentMethod):
+			if (modSDNRandomTrials_ > 0)
+			{
+				randomMin = std::min(std::min(currentFitRange_->xStart(), currentFitRange_->xEnd()), std::min(currentFitRange_->zStart(), currentFitRange_->zEnd()));
+				randomMax = std::max(std::max(currentFitRange_->xStart(), currentFitRange_->xEnd()), std::max(currentFitRange_->zStart(), currentFitRange_->zEnd()));
+				double yMin = currentFitRange_->referenceYMin(), yMax = currentFitRange_->referenceYMax();
+				if (yMin < randomMin) randomMin = yMin;
+				if (yMax > randomMax) randomMax = yMax;
+			}
+			result = sdModMinimise(alpha, tolerance_, maxSteps_, modSDNRandomTrials_, randomMin, randomMax);
+			break;
+		// Simplex
+		case (FitKernel::SimplexMethod):
 			result = simplexMinimise(alpha);
 			break;
 		default:
@@ -656,7 +687,7 @@ bool FitKernel::minimise()
 	// Print and store results...
 	msg.print("Final, fitted parameters are:\n");
 	int n = 0;
-	for (RefListItem<EquationVariable,bool>* ri = usedVariables_.first(); ri != NULL; ri = ri->next)
+	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next)
 	{
 		// Grab variable pointer from FitVariable
 		EquationVariable* var = ri->item;
@@ -716,6 +747,18 @@ void FitKernel::setLimitStrength(double strength)
 double FitKernel::limitStrength()
 {
 	return limitStrength_;
+}
+
+// Set number of random trials to use in Modified SD method
+void FitKernel::setModSDNRandomTrials(int nTrials)
+{
+	modSDNRandomTrials_ = nTrials;
+}
+
+// Return number of random trials to use in Modified SD method
+int FitKernel::modSDNRandomTrials()
+{
+	return modSDNRandomTrials_;
 }
 
 // Perform fitting with current settings
