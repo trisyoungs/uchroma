@@ -22,6 +22,7 @@
 #include "gui/editviewlayout.h"
 #include "gui/uchroma.h"
 #include "gui/selecttarget.h"
+#include "session/session.h"
 #include "templates/variantpointer.h"
 
 /*
@@ -29,7 +30,7 @@
  */
 
 // Constructor
-EditViewLayoutDialog::EditViewLayoutDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(parent), layout_(parent)
+EditViewLayoutDialog::EditViewLayoutDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(parent)
 {
 	ui.setupUi(this);
 
@@ -254,7 +255,7 @@ void EditViewLayoutDialog::on_PaneTargetsList_currentRowChanged(int index)
 void EditViewLayoutDialog::on_PaneAddTargetButton_clicked(bool checked)
 {
 	SelectTargetDialog targetDialog(this);
-	targetDialog.populateLists(currentPane_, layout_.panes(), uChroma_.collections());
+	targetDialog.populateLists(currentPane_, layout_.panes(), UChromaSession::collections());
 	if (targetDialog.exec())
 	{
 		// Get lists of panes and collections, and add them to the targets list

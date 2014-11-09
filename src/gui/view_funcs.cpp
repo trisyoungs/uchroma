@@ -1,5 +1,5 @@
 /*
-	*** uChroma View Window
+	*** View Window
 	*** src/gui/view_funcs.cpp
 	Copyright T. Youngs 2013-2014
 
@@ -21,7 +21,7 @@
 
 #include "gui/view.h"
 #include "gui/uchroma.h"
-#include "base/session.h"
+#include "session/session.h"
 #include "templates/reflist.h"
 
 /*
@@ -59,9 +59,13 @@ void ViewWindow::closeEvent(QCloseEvent *event)
 
 void ViewWindow::on_ViewBoundingBoxNoneRadio_clicked(bool checked)
 {
-	if (refreshing_ || (!uChroma_.currentViewPane())) return;
+	if (refreshing_) return;
 
-	uChroma_.currentViewPane()->setBoundingBox(ViewPane::NoBox);
+	// Check for valid ViewPane
+	ViewPane* viewPane = UChromaSession::currentViewPane();
+	if (!ViewPane::objectValid(viewPane, "view pane in ViewWindow::on_ViewBoundingBoxNoneRadio_clicked")) return;
+
+	viewPane->setBoundingBox(ViewPane::NoBox);
 
 	// Update display
 	UChromaSession::setAsModified();
@@ -70,9 +74,13 @@ void ViewWindow::on_ViewBoundingBoxNoneRadio_clicked(bool checked)
 
 void ViewWindow::on_ViewBoundingBoxPlaneRadio_clicked(bool checked)
 {
-	if (refreshing_ || (!uChroma_.currentViewPane())) return;
+	if (refreshing_) return;
 
-	uChroma_.currentViewPane()->setBoundingBox(ViewPane::PlaneBox);
+	// Check for valid ViewPane
+	ViewPane* viewPane = UChromaSession::currentViewPane();
+	if (!ViewPane::objectValid(viewPane, "view pane in ViewWindow::on_ViewBoundingBoxPlaneRadio_clicked")) return;
+
+	viewPane->setBoundingBox(ViewPane::PlaneBox);
 
 	// Update display
 	UChromaSession::setAsModified();
@@ -81,9 +89,13 @@ void ViewWindow::on_ViewBoundingBoxPlaneRadio_clicked(bool checked)
 
 void ViewWindow::on_ViewBoundingBoxCubeRadio_clicked(bool checked)
 {
-	if (refreshing_ || (!uChroma_.currentViewPane())) return;
+	if (refreshing_) return;
 
-	uChroma_.currentViewPane()->setBoundingBox(ViewPane::CubeBox);
+	// Check for valid ViewPane
+	ViewPane* viewPane = UChromaSession::currentViewPane();
+	if (!ViewPane::objectValid(viewPane, "view pane in ViewWindow::on_ViewBoundingBoxCubeRadio_clicked")) return;
+
+	viewPane->setBoundingBox(ViewPane::CubeBox);
 
 	// Update display
 	UChromaSession::setAsModified();
@@ -92,9 +104,13 @@ void ViewWindow::on_ViewBoundingBoxCubeRadio_clicked(bool checked)
 
 void ViewWindow::on_ViewBoundingBoxPlaneYSpin_valueChanged(double value)
 {
-	if (refreshing_ || (!uChroma_.currentViewPane())) return;
+	if (refreshing_) return;
 
-	uChroma_.currentViewPane()->setBoundingBoxPlaneY(value);
+	// Check for valid ViewPane
+	ViewPane* viewPane = UChromaSession::currentViewPane();
+	if (!ViewPane::objectValid(viewPane, "view pane in ViewWindow::on_ViewBoundingBoxPlaneYSpin_valueChanged")) return;
+
+	viewPane->setBoundingBoxPlaneY(value);
 
 	// Update display
 	UChromaSession::setAsModified();
@@ -103,10 +119,13 @@ void ViewWindow::on_ViewBoundingBoxPlaneYSpin_valueChanged(double value)
 
 void ViewWindow::on_ViewBoundingBoxPlaneYSetMinimumButton_clicked(bool checked)
 {
-	// Check current display pane
-	if (!uChroma_.currentViewPane()) return;
+	if (refreshing_) return;
 
-	ui.ViewBoundingBoxPlaneYSpin->setValue(uChroma_.currentViewPane()->axes().min(1));
+	// Check for valid ViewPane
+	ViewPane* viewPane = UChromaSession::currentViewPane();
+	if (!ViewPane::objectValid(viewPane, "view pane in ViewWindow::on_ViewBoundingBoxPlaneYSetMinimumButton_clicked")) return;
+
+	ui.ViewBoundingBoxPlaneYSpin->setValue(viewPane->axes().min(1));
 }
 
 void ViewWindow::on_ViewBoundingBoxPlaneYSetZeroButton_clicked(bool checked)
@@ -116,17 +135,25 @@ void ViewWindow::on_ViewBoundingBoxPlaneYSetZeroButton_clicked(bool checked)
 
 void ViewWindow::on_ViewBoundingBoxPlaneYSetMaximumButton_clicked(bool checked)
 {
-	// Check current display pane
-	if (!uChroma_.currentViewPane()) return;
+	if (refreshing_) return;
 
-	ui.ViewBoundingBoxPlaneYSpin->setValue(uChroma_.currentViewPane()->axes().max(1));
+	// Check for valid ViewPane
+	ViewPane* viewPane = UChromaSession::currentViewPane();
+	if (!ViewPane::objectValid(viewPane, "view pane in ViewWindow::on_ViewBoundingBoxPlaneYSetMaximumButton_clicked")) return;
+
+	ui.ViewBoundingBoxPlaneYSpin->setValue(viewPane->axes().max(1));
 }
 
 // -- General Options
-void ViewWindow::on_ViewLabelsFaceViewerCheck_clicked(bool checked)
+void ViewWindow::on_ViewFlatLabelsCheck_clicked(bool checked)
 {
 	if (refreshing_) return;
-	uChroma_.setLabelFaceViewer(checked);
+
+	// Check for valid ViewPane
+	ViewPane* viewPane = UChromaSession::currentViewPane();
+	if (!ViewPane::objectValid(viewPane, "view pane in ViewWindow::on_ViewBoundingBoxPlaneYSetMaximumButton_clicked")) return;
+
+	viewPane->setFlatLabels(checked);
 
 	// Update display
 	UChromaSession::setAsModified();
@@ -135,9 +162,13 @@ void ViewWindow::on_ViewLabelsFaceViewerCheck_clicked(bool checked)
 
 void ViewWindow::on_ViewLabelPointSizeSpin_valueChanged(double value)
 {
-	if (refreshing_ || (!uChroma_.currentViewPane())) return;
+	if (refreshing_) return;
+
+	// Check for valid ViewPane
+	ViewPane* viewPane = UChromaSession::currentViewPane();
+	if (!ViewPane::objectValid(viewPane, "view pane in ViewWindow::on_ViewLabelPointSizeSpin_valueChanged")) return;
 	
-	uChroma_.currentViewPane()->setLabelPointSize(value);
+	viewPane->setLabelPointSize(value);
 
 	// Update display
 	UChromaSession::setAsModified();
@@ -146,9 +177,13 @@ void ViewWindow::on_ViewLabelPointSizeSpin_valueChanged(double value)
 
 void ViewWindow::on_ViewTitlePointSizeSpin_valueChanged(double value)
 {
-	if (refreshing_ || (!uChroma_.currentViewPane())) return;
+	if (refreshing_) return;
+
+	// Check for valid ViewPane
+	ViewPane* viewPane = UChromaSession::currentViewPane();
+	if (!ViewPane::objectValid(viewPane, "view pane in ViewWindow::on_ViewTitlePointSizeSpin_valueChanged")) return;
 	
-	uChroma_.currentViewPane()->setTitlePointSize(value);
+	viewPane->setTitlePointSize(value);
 
 	// Update display
 	UChromaSession::setAsModified();
@@ -173,20 +208,22 @@ void ViewWindow::updateControls(bool force)
 	// If the window isn't visible, do nothing...
 	if ((!isVisible()) && (!force) ) return;
 
-	if (!uChroma_.currentViewPane()) return;
-	
+	// Check for valid ViewPane
+	ViewPane* viewPane = UChromaSession::currentViewPane();
+	if (!ViewPane::objectValid(viewPane, "view pane in ViewWindow::updateControls")) return;
+
 	refreshing_ = true;
 
 	// Bounding box
-	if (uChroma_.currentViewPane()->boundingBox() == ViewPane::NoBox) ui.ViewBoundingBoxNoneRadio->setChecked(true);
-	else if (uChroma_.currentViewPane()->boundingBox() == ViewPane::PlaneBox) ui.ViewBoundingBoxPlaneRadio->setChecked(true);
-	else if (uChroma_.currentViewPane()->boundingBox() == ViewPane::CubeBox) ui.ViewBoundingBoxCubeRadio->setChecked(true);
-	ui.ViewBoundingBoxPlaneYSpin->setValue(uChroma_.currentViewPane()->boundingBoxPlaneY());
+	if (viewPane->boundingBox() == ViewPane::NoBox) ui.ViewBoundingBoxNoneRadio->setChecked(true);
+	else if (viewPane->boundingBox() == ViewPane::PlaneBox) ui.ViewBoundingBoxPlaneRadio->setChecked(true);
+	else if (viewPane->boundingBox() == ViewPane::CubeBox) ui.ViewBoundingBoxCubeRadio->setChecked(true);
+	ui.ViewBoundingBoxPlaneYSpin->setValue(viewPane->boundingBoxPlaneY());
 
 	// Label Options
-	ui.ViewLabelPointSizeSpin->setValue(uChroma_.currentViewPane()->labelPointSize());
-	ui.ViewTitlePointSizeSpin->setValue(uChroma_.currentViewPane()->titlePointSize());
-	ui.ViewLabelsFaceViewerCheck->setChecked(uChroma_.labelFaceViewer());
+	ui.ViewLabelPointSizeSpin->setValue(viewPane->labelPointSize());
+	ui.ViewTitlePointSizeSpin->setValue(viewPane->titlePointSize());
+	ui.ViewFlatLabelsCheck->setChecked(viewPane->flatLabels());
 
 	refreshing_ = false;
 }

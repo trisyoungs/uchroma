@@ -21,7 +21,7 @@
 
 #include "base/collection.h"
 #include "base/viewpane.h"
-#include "base/session.h"
+#include "session/session.h"
 #include "kernels/fit.h"
 #include <limits>
 

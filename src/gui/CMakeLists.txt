@@ -31,16 +31,10 @@ SET(qtproject_SRCS
   viewer_prefs.cpp
 
   uchroma_collection.cpp
-  uchroma_data.cpp
   uchroma_funcs.cpp
   uchroma_info.cpp
   uchroma_interaction.cpp
   uchroma_slots.cpp
-  uchroma_view.cpp
-
-  io_load.cpp
-  io_save.cpp
-  keywords.cpp
 
   axes_funcs.cpp
   create_funcs.cpp

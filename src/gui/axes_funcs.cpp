@@ -1,5 +1,5 @@
 /*
-	*** Main Window - Axes Functions 
+	*** Axes Window
 	*** src/gui/axes_funcs.cpp
 	Copyright T. Youngs 2013-2014
 
@@ -24,7 +24,7 @@
 #include "gui/editlinestyle.h"
 #include "gui/editnumberformat.h"
 #include "gui/selectsymbol.h"
-#include "base/session.h"
+#include "session/session.h"
 #include "templates/reflist.h"
 #include <limits>
 
@@ -87,14 +87,14 @@ void AxesWindow::closeEvent(QCloseEvent* event)
 bool AxesWindow::haveCurrentAxes()
 {
 	// Get current view pane
-	ViewPane* pane = uChroma_.currentViewPane();
+	ViewPane* pane = UChromaSession::currentViewPane();
 	return (pane != NULL);
 }
 
 Axes& AxesWindow::currentAxes()
 {
 	// Get current view pane
-	ViewPane* pane = uChroma_.currentViewPane();
+	ViewPane* pane = UChromaSession::currentViewPane();
 	return pane->axes();
 }
 
@@ -1411,7 +1411,7 @@ void AxesWindow::updateControls(bool force)
 	if ((!isVisible()) && (!force) ) return;
 
 	// Get current view pane
-	ViewPane* pane = uChroma_.currentViewPane();
+	ViewPane* pane = UChromaSession::currentViewPane();
 	if (pane == NULL) return;
 	Axes& axes = pane->axes();
 

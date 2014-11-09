@@ -44,14 +44,15 @@ double UChromaWindow::screenToAxis(int axis, int mouseX, int mouseY)
 	if (axis == -1) return 0.0;
 
 	// Check for valid interaction pane
-	if (currentViewPane_ == NULL) return 0.0;
+	ViewPane* viewPane = UChromaSession::currentViewPane();
+	if (viewPane == NULL) return 0.0;
 
 // 	printf("Test: min=%f, max=%f\n", min_[0], max_[0]);
 // 	rMouseLast_.print();
 // 	axisCoordMin_[0].print();
 	// Project axis coordinates to get a screen-based yardstick
-	Vec3<double> axmin = currentViewPane_->modelToScreen(currentViewPane_->axes().coordMin(axis));
-	Vec3<double> axmax = currentViewPane_->modelToScreen(currentViewPane_->axes().coordMax(axis));
+	Vec3<double> axmin = viewPane->modelToScreen(viewPane->axes().coordMin(axis));
+	Vec3<double> axmax = viewPane->modelToScreen(viewPane->axes().coordMax(axis));
 // 	axmin.print();
 // 	axmax.print();
 
@@ -66,7 +67,7 @@ double UChromaWindow::screenToAxis(int axis, int mouseX, int mouseY)
 //	printf("Angle = %f, %f\n", angle, angle * DEGRAD);
 
 	// Calculate slice axis value - no need to account for inverted axes here, since this is accounted for in the vectors axmin and axmax
-	Axes& axes = currentViewPane_->axes();
+	Axes& axes = viewPane->axes();
 	double axisValue;
 	if (axes.logarithmic(axis)) axisValue = pow(10, abNorm.dp(amNorm)*ratio * (log10(axes.max(axis)) - log10(axes.min(axis))) + log10(axes.min(axis)));
 	else axisValue = abNorm.dp(amNorm)*ratio * (axes.max(axis) - axes.min(axis)) + axes.min(axis);
@@ -91,7 +92,7 @@ void UChromaWindow::setInteractionMode(InteractionMode::Mode mode, int axis)
 	interactionAxis_ = axis;
 
 	// Generate interaction primitives for all panes
-	viewLayout_.updateInteractionPrimitives(axis);
+	UChromaSession::viewLayout().updateInteractionPrimitives(axis);
 
 	// Update statusbar help text
 	statusBarInfoLabel_->setText(InteractionMode::interactionModes[mode].modeText);
@@ -122,7 +123,7 @@ void UChromaWindow::startInteraction(int mouseX, int mouseY, Qt::KeyboardModifie
 	if (interactionMode_ == InteractionMode::ViewInteraction) return;
 
 	// Check interaction pane
-	if (!ViewPane::objectValid(currentViewPane_))
+	if (!ViewPane::objectValid(UChromaSession::currentViewPane()))
 	{
 		msg.print("Internal Error: Invalid interaction pane - refusing to start interaction.\n");
 		return;
@@ -146,7 +147,7 @@ void UChromaWindow::updateInteractionPosition(int mouseX, int mouseY)
 		currentInteractionValue_ = screenToAxis(interactionAxis_, mouseX, mouseY);
 
 		// Extract slice from collections in current pane (unless this is a SliceMonitor)
-		if (currentViewPane_->role() != ViewPane::SliceMonitorRole) currentViewPane_->collectionsUpdateCurrentSlices(interactionAxis_, currentInteractionValue_);
+		if (UChromaSession::currentViewPane()->role() != ViewPane::SliceMonitorRole) UChromaSession::currentViewPane()->collectionsUpdateCurrentSlices(interactionAxis_, currentInteractionValue_);
 	}
 	else
 	{
@@ -165,7 +166,7 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 	if (!interacting_) return;
 
 	// Check interaction pane
-	if (!ViewPane::objectValid(currentViewPane_))
+	if (!ViewPane::objectValid(UChromaSession::currentViewPane()))
 	{
 		msg.print("Internal Error: Invalid interaction pane - refusing to end interaction.\n");
 		return;
@@ -189,7 +190,7 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 			// Ctrl : Extract slice
 			if (clickedInteractionModifiers_.testFlag(Qt::ControlModifier))
 			{
-				currentCollection_->extractCurrentSlice(interactionAxis_, currentInteractionValue_);
+				UChromaSession::currentCollection()->extractCurrentSlice(interactionAxis_, currentInteractionValue_);
 				refreshCollections();
 			}
 			else
@@ -198,8 +199,8 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 				double newMax = std::max(clickedInteractionValue_, currentInteractionValue_);
 				if ((newMax-newMin) > 1.0e-10)
 				{
-					currentViewPane_->axes().setMin(interactionAxis_, newMin);
-					currentViewPane_->axes().setMax(interactionAxis_, newMax);
+					UChromaSession::currentViewPane()->axes().setMin(interactionAxis_, newMin);
+					UChromaSession::currentViewPane()->axes().setMax(interactionAxis_, newMax);
 					axesWindow_.updateControls();
 				}
 			}
@@ -232,9 +233,9 @@ double UChromaWindow::clickedInteractionCoordinate()
 	if (interactionAxis_ == -1) return 0.0;
 
 	// Check for valid view pane
-	if (currentViewPane_ == NULL) return 0.0;
+	if (UChromaSession::currentViewPane() == NULL) return 0.0;
 
-	Axes& axes = currentViewPane_->axes();
+	Axes& axes = UChromaSession::currentViewPane()->axes();
 	if (axes.logarithmic(interactionAxis_)) return (axes.inverted(interactionAxis_) ? log10(axes.max(interactionAxis_)/clickedInteractionValue_) : log10(clickedInteractionValue_));
 	else return (axes.inverted(interactionAxis_) ? axes.max(interactionAxis_) - clickedInteractionValue_ : clickedInteractionValue_);
 }
@@ -246,9 +247,9 @@ double UChromaWindow::currentInteractionCoordinate()
 	if (interactionAxis_ == -1) return 0.0;
 
 	// Check for valid view pane
-	if (currentViewPane_ == NULL) return 0.0;
+	if (UChromaSession::currentViewPane() == NULL) return 0.0;
 
-	Axes& axes = currentViewPane_->axes();
+	Axes& axes = UChromaSession::currentViewPane()->axes();
 	if (axes.logarithmic(interactionAxis_)) return (axes.inverted(interactionAxis_) ? log10(axes.max(interactionAxis_)/currentInteractionValue_) : log10(currentInteractionValue_));
 	else return (axes.inverted(interactionAxis_) ? axes.max(interactionAxis_) - currentInteractionValue_ : currentInteractionValue_);
 }
@@ -257,7 +258,7 @@ double UChromaWindow::currentInteractionCoordinate()
 void UChromaWindow::doubleClickInteraction(int mouseX, int mouseY)
 {
 	// Determine pane that the event occured in
-	ViewPane* pane = viewLayout_.paneAt(mouseX, mouseY);
+	ViewPane* pane = UChromaSession::viewLayout().paneAt(mouseX, mouseY);
 	if (pane == NULL) return;
 
 	// Now find out what, if anything, was under the mouse...

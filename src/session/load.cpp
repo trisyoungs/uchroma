@@ -1,6 +1,6 @@
 /*
-	*** File I/O - Load
-	*** src/gui/io_load.cpp
+	*** Session Load
+	*** src/session/load.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,16 +19,15 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "session/session.h"
 #include "gui/uchroma.h"
-#include "gui/keywords.h"
 #include "kernels/fit.h"
 #include "base/lineparser.h"
-#include "base/session.h"
 
 #define CHECKIOFAIL { if (hardIOFail_) { return false; } else { break; } }
 
 // Parse AxisBlock keywords
-bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
+bool UChromaSession::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 {
 	TextPrimitive::TextAnchor anchor;
 	LineStipple::StippleType stipple;
@@ -41,16 +40,16 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
 
 		// Get keyword and check number of arguments provided
-		Keywords::AxisKeyword axisKwd = Keywords::axisKeyword(parser.argString(0));
-		if ((axisKwd != Keywords::nAxisKeywords) && (Keywords::axisKeywordNArguments(axisKwd) > (parser.nArgs()-1)))
+		UChromaSession::AxisKeyword axisKwd = UChromaSession::axisKeyword(parser.argString(0));
+		if ((axisKwd != UChromaSession::nAxisKeywords) && (UChromaSession::axisKeywordNArguments(axisKwd) > (parser.nArgs()-1)))
 		{
-			msg.print("Error : Axis keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::axisKeyword(axisKwd), Keywords::axisKeywordNArguments(axisKwd), parser.nArgs()-1);
+			msg.print("Error : Axis keyword '%s' requires %i arguments, but only %i have been provided.\n", UChromaSession::axisKeyword(axisKwd), UChromaSession::axisKeywordNArguments(axisKwd), parser.nArgs()-1);
 			return false;
 		}
 		switch (axisKwd)
 		{
 			// Autoscale method
-			case (Keywords::AutoScaleKeyword):
+			case (UChromaSession::AutoScaleKeyword):
 				as = Axes::autoScaleMethod(parser.argString(1));
 				if (as == Axes::nAutoScaleMethods)
 				{
@@ -61,29 +60,29 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 				axes.setAutoScale(axis, as);
 				break;
 			// Auto ticks
-			case (Keywords::AutoTicksKeyword):
+			case (UChromaSession::AutoTicksKeyword):
 				axes.setAutoTicks(axis, parser.argb(1));
 				break;
 			// End input block
-			case (Keywords::EndAxisKeyword):
+			case (UChromaSession::EndAxisKeyword):
 				return true;
 				break;
 			// First ticks
-			case (Keywords::FirstTickKeyword):
+			case (UChromaSession::FirstTickKeyword):
 				axes.setFirstTick(axis, parser.argd(1));
 				break;
 			// Fractional positioning flag
-			case (Keywords::FractionalPositioningKeyword):
+			case (UChromaSession::FractionalPositioningKeyword):
 				axes.setPositionIsFractional(axis, parser.argb(1));
 				break;
 			// GridLines
-			case (Keywords::GridLinesKeyword):
+			case (UChromaSession::GridLinesKeyword):
 				axes.setGridLinesMajor(axis, parser.argb(1));
 				axes.setGridLinesMinor(axis, parser.argb(2));
 				axes.setGridLinesFull(axis, parser.argb(3));
 				break;
 			// GridLine major style
-			case (Keywords::GridLineMajorStyleKeyword):
+			case (UChromaSession::GridLineMajorStyleKeyword):
 				axes.gridLineMajorStyle(axis).setWidth(parser.argd(1));
 				stipple = LineStipple::stippleType(parser.argString(2));
 				if (stipple == LineStipple::nStippleTypes)
@@ -96,7 +95,7 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 				axes.gridLineMajorStyle(axis).setColour(parser.argd(3), parser.argd(4), parser.argd(5), parser.argd(6));
 				break;
 			// GridLine minor style
-			case (Keywords::GridLineMinorStyleKeyword):
+			case (UChromaSession::GridLineMinorStyleKeyword):
 				axes.gridLineMinorStyle(axis).setWidth(parser.argd(1));
 				stipple = LineStipple::stippleType(parser.argString(2));
 				if (stipple == LineStipple::nStippleTypes)
@@ -109,11 +108,11 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 				axes.gridLineMinorStyle(axis).setColour(parser.argd(3), parser.argd(4), parser.argd(5), parser.argd(6));
 				break;
 			// Invert
-			case (Keywords::InvertKeyword):
+			case (UChromaSession::InvertKeyword):
 				axes.setInverted(axis, parser.argb(1));
 				break;
 			// Axis label anchor
-			case (Keywords::LabelAnchorKeyword):
+			case (UChromaSession::LabelAnchorKeyword):
 				anchor = TextPrimitive::textAnchor(parser.argString(1));
 				if (anchor == TextPrimitive::nTextAnchors)
 				{
@@ -124,26 +123,26 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 				axes.setLabelAnchor(axis, anchor);
 				break;
 			// Axis label orientation
-			case (Keywords::LabelOrientationKeyword):
+			case (UChromaSession::LabelOrientationKeyword):
 				axes.setLabelOrientation(axis, 0, parser.argd(1));
 				axes.setLabelOrientation(axis, 1, parser.argd(2));
 				axes.setLabelOrientation(axis, 2, parser.argd(3));
 				break;
 			// Limits
-			case (Keywords::LimitsKeyword):
+			case (UChromaSession::LimitsKeyword):
 				axes.setMin(axis, parser.argd(1));
 				axes.setMax(axis, parser.argd(2));
 				break;
 			// Axis logarithmic flag
-			case (Keywords::LogarithmicKeyword):
+			case (UChromaSession::LogarithmicKeyword):
 				axes.setLogarithmic(axis, parser.argb(1));
 				break;
 			// Axis minor ticks
-			case (Keywords::MinorTicksKeyword):
+			case (UChromaSession::MinorTicksKeyword):
 				axes.setMinorTicks(axis, parser.argi(1));
 				break;
 			// Number Format
-			case (Keywords::NumberFormatKeyword):
+			case (UChromaSession::NumberFormatKeyword):
 				ft = NumberFormat::formatType(parser.argString(1));
 				if (ft == NumberFormat::nNumberFormats)
 				{
@@ -157,37 +156,37 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 				axes.numberFormat(axis).setForcePrecedingPlus(parser.argb(4));
 				break;
 			// Axis position (in fractional axis coordinates)
-			case (Keywords::PositionFractionalKeyword):
+			case (UChromaSession::PositionFractionalKeyword):
 				axes.setPositionFractional(axis, 0, parser.argd(1));
 				axes.setPositionFractional(axis, 1, parser.argd(2));
 				axes.setPositionFractional(axis, 2, parser.argd(3));
 				break;
 			// Axis position (in real surface-space coordinates)
-			case (Keywords::PositionRealKeyword):
+			case (UChromaSession::PositionRealKeyword):
 				axes.setPositionReal(axis, 0, parser.argd(1));
 				axes.setPositionReal(axis, 1, parser.argd(2));
 				axes.setPositionReal(axis, 2, parser.argd(3));
 				break;
 			// Axis stretch factors
-			case (Keywords::StretchKeyword):
+			case (UChromaSession::StretchKeyword):
 				axes.setStretch(axis, parser.argd(1));
 				break;
 			// Axis tick deltas
-			case (Keywords::TickDeltaKeyword):
+			case (UChromaSession::TickDeltaKeyword):
 				axes.setTickDelta(axis, parser.argd(1));
 				break;
 			// Axis tick direction
-			case (Keywords::TickDirectionKeyword):
+			case (UChromaSession::TickDirectionKeyword):
 				axes.setTickDirection(axis, 0, parser.argd(1));
 				axes.setTickDirection(axis, 1, parser.argd(2));
 				axes.setTickDirection(axis, 2, parser.argd(3));
 				break;
 			// Axis title
-			case (Keywords::TitleKeyword):
+			case (UChromaSession::TitleKeyword):
 				axes.setTitle(axis, parser.argString(1));
 				break;
 			// Axis title anchor
-			case (Keywords::TitleAnchorKeyword):
+			case (UChromaSession::TitleAnchorKeyword):
 				anchor = TextPrimitive::textAnchor(parser.argString(1));
 				if (anchor == TextPrimitive::nTextAnchors)
 				{
@@ -198,14 +197,14 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 				axes.setTitleAnchor(axis, anchor);
 				break;
 			// Axis title orientation
-			case (Keywords::TitleOrientationKeyword):
+			case (UChromaSession::TitleOrientationKeyword):
 				axes.setTitleOrientation(axis, 0, parser.argd(1));
 				axes.setTitleOrientation(axis, 1, parser.argd(2));
 				axes.setTitleOrientation(axis, 2, parser.argd(3));
 				axes.setTitleOrientation(axis, 3, parser.argd(4));
 				break;
 			// Axis visibility
-			case (Keywords::VisibleAxisKeyword):
+			case (UChromaSession::VisibleAxisKeyword):
 				axes.setVisible(axis, parser.argb(1));
 				break;
 			// Unrecognised keyword
@@ -220,7 +219,7 @@ bool UChromaWindow::readAxisBlock(LineParser& parser, Axes& axes, int axis)
 }
 
 // Read CollectionBlock keywords
-bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collection)
+bool UChromaSession::readCollectionBlock(LineParser& parser, Collection* collection)
 {
 	DataSet* dataSet;
 	int xyz;
@@ -228,22 +227,24 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 	Collection::AlphaControl ac;
 	Collection::ColourSource cs;
 	Collection::DisplayStyle ds;
+	LineStipple::StippleType stipple;
+
 	while (!parser.atEnd())
 	{
 		// Get line from file
 		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
 
 		// Get keyword and check number of arguments provided
-		Keywords::CollectionKeyword collectionKwd = Keywords::collectionKeyword(parser.argString(0));
-		if ((collectionKwd != Keywords::nCollectionKeywords) && (Keywords::collectionKeywordNArguments(collectionKwd) > (parser.nArgs()-1)))
+		UChromaSession::CollectionKeyword collectionKwd = collectionKeyword(parser.argString(0));
+		if ((collectionKwd != UChromaSession::nCollectionKeywords) && (collectionKeywordNArguments(collectionKwd) > (parser.nArgs()-1)))
 		{
-			msg.print("Error: Collection keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::collectionKeyword(collectionKwd), Keywords::collectionKeywordNArguments(collectionKwd), parser.nArgs()-1);
+			msg.print("Error: Collection keyword '%s' requires %i arguments, but only %i have been provided.\n", collectionKeyword(collectionKwd), collectionKeywordNArguments(collectionKwd), parser.nArgs()-1);
 			return false;
 		}
 		switch (collectionKwd)
 		{
 			// Colour alpha control
-			case (Keywords::ColourAlphaControlKeyword):
+			case (UChromaSession::ColourAlphaControlKeyword):
 				ac = Collection::alphaControl(parser.argString(1));
 				if (ac == Collection::nAlphaControls)
 				{
@@ -254,36 +255,36 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				collection->setAlphaControl(ac);
 				break;
 			// Colour alpha fixed value
-			case (Keywords::ColourAlphaFixedKeyword):
+			case (UChromaSession::ColourAlphaFixedKeyword):
 				alpha = parser.argd(1);
 				if ((alpha < 0.0) || (alpha > 1.0))
 				{
-					msg.print("Warning: Alpha value (%f) is out of range for %s keyword - it will be reset to 1.0.\n", alpha, Keywords::collectionKeyword(collectionKwd));
+					msg.print("Warning: Alpha value (%f) is out of range for %s keyword - it will be reset to 1.0.\n", alpha, collectionKeyword(collectionKwd));
 					alpha = 1.0;
 					CHECKIOFAIL
 				}
 				collection->setFixedAlpha(alpha);
 				break;
 			// Colour Custom Gradient point definition
-			case (Keywords::ColourCustomGradientKeyword):
+			case (UChromaSession::ColourCustomGradientKeyword):
 				collection->addCustomColourScalePoint(parser.argd(1), QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)));
 				break;
 			// Colour Linear Gradient point definition
-			case (Keywords::ColourRGBGradientAKeyword):
-			case (Keywords::ColourRGBGradientBKeyword):
-				collection->setColourScalePoint(Collection::RGBGradientSource, QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)), parser.argd(1), collectionKwd == Keywords::ColourRGBGradientAKeyword ? 0 : 1);
+			case (UChromaSession::ColourRGBGradientAKeyword):
+			case (UChromaSession::ColourRGBGradientBKeyword):
+				collection->setColourScalePoint(Collection::RGBGradientSource, QColor(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)), parser.argd(1), collectionKwd == UChromaSession::ColourRGBGradientAKeyword ? 0 : 1);
 				break;
 			// Colour Linear HSV Gradient point definition
-			case (Keywords::ColourHSVGradientAKeyword):
-			case (Keywords::ColourHSVGradientBKeyword):
-				collection->setColourScalePoint(Collection::HSVGradientSource, QColor::fromHsv(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)), parser.argd(1), collectionKwd == Keywords::ColourHSVGradientAKeyword ? 0 : 1);
+			case (UChromaSession::ColourHSVGradientAKeyword):
+			case (UChromaSession::ColourHSVGradientBKeyword):
+				collection->setColourScalePoint(Collection::HSVGradientSource, QColor::fromHsv(parser.argi(2), parser.argi(3), parser.argi(4), parser.argi(5)), parser.argd(1), collectionKwd == UChromaSession::ColourHSVGradientAKeyword ? 0 : 1);
 				break;
 			// Colour single colour definition
-			case (Keywords::ColourSingleKeyword):
+			case (UChromaSession::ColourSingleKeyword):
 				collection->setColourScalePoint(Collection::SingleColourSource, QColor(parser.argi(1), parser.argi(2), parser.argi(3), parser.argi(4)));
 				break;
 			// Colour source
-			case (Keywords::ColourSourceKeyword):
+			case (UChromaSession::ColourSourceKeyword):
 				cs = Collection::colourSource(parser.argString(1));
 				if (cs == Collection::nColourSources)
 				{
@@ -294,35 +295,35 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				collection->setColourSource(cs);
 				break;
 			// Dataset directory
-			case (Keywords::DataDirectoryKeyword):
+			case (UChromaSession::DataDirectoryKeyword):
 				collection->setDataFileDirectory(QDir(parser.argString(1)));
 				if (!collection->dataFileDirectory().isReadable())
 				{
-					QMessageBox::StandardButton button = QMessageBox::warning(this, "Error", "The data directory specified (" + collection->dataFileDirectory().absolutePath() + ") does not exist or is unreadable.\nDo you want to reset the datafile location?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+					QMessageBox::StandardButton button = QMessageBox::warning(uChroma_, "Error", "The data directory specified (" + collection->dataFileDirectory().absolutePath() + ") does not exist or is unreadable.\nDo you want to reset the datafile location?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 					if (button == QMessageBox::Yes)
 					{
-						QString dir = QFileDialog::getExistingDirectory(this, "Data Directory", "Choose the directory containing the required files:");
+						QString dir = QFileDialog::getExistingDirectory(uChroma_, "Data Directory", "Choose the directory containing the required files:");
 						if (!dir.isEmpty()) collection->setDataFileDirectory(dir);
 					}
 				}
 				break;
 			// DataSet
-			case (Keywords::DataSetDefinitionKeyword):
+			case (UChromaSession::DataSetDefinitionKeyword):
 				// Create new dataset
 				dataSet = collection->addDataSet();
 				dataSet->setName(parser.argString(1));
 				if (!readDataSetBlock(parser, dataSet, collection)) return false;
 				break;
 			// End input block
-			case (Keywords::EndCollectionKeyword):
+			case (UChromaSession::EndCollectionKeyword):
 				return true;
 				break;
 			// Fit data block
-			case (Keywords::FitBlockKeyword):
+			case (UChromaSession::FitBlockKeyword):
 				if (!readCollectionBlock(parser, collection->addFit(parser.argString(1)))) return false;
 				break;
 			// Fit parameters block
-			case (Keywords::FitParametersBlockKeyword):
+			case (UChromaSession::FitParametersBlockKeyword):
 				// Check that a FitKernel exists in the current collection
 				if (!collection->fitKernel())
 				{
@@ -332,26 +333,42 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				if (!readFitParametersBlock(parser, collection->fitKernel())) return false;
 				break;
 			// Interpolate flags
-			case (Keywords::InterpolateKeyword):
+			case (UChromaSession::InterpolateKeyword):
 				collection->setInterpolate(0, parser.argb(1));
 				collection->setInterpolate(2, parser.argb(2));
 				break;
 			// Interpolate constrain flags
-			case (Keywords::InterpolateConstrainKeyword):
+			case (UChromaSession::InterpolateConstrainKeyword):
 				collection->setInterpolateConstrained(0, parser.argb(1));
 				collection->setInterpolateConstrained(2, parser.argb(2));
 				break;
 			// Interpolation step flags
-			case (Keywords::InterpolateStepKeyword):
+			case (UChromaSession::InterpolateStepKeyword):
 				collection->setInterpolationStep(0, parser.argd(1));
 				collection->setInterpolationStep(2, parser.argd(2));
 				break;
+			// Line style
+			case (UChromaSession::LineStyleKeyword):
+				collection->displayLineStyle().setWidth(parser.argd(1));
+				stipple = LineStipple::stippleType(parser.argString(2));
+				if (stipple == LineStipple::nStippleTypes)
+				{
+					msg.print("Warning: Unrecognised line stipple type '%s'. Defaulting to 'NoStipple'.\n", parser.argChar(2));
+					stipple = LineStipple::NoStipple;
+					CHECKIOFAIL
+				}
+				collection->displayLineStyle().setStipple(stipple);
+				break;
+			// Surface shininess
+			case (UChromaSession::ShininessKeyword):
+				collection->setDisplaySurfaceShininess(parser.argd(1));
+				break;
 			// Slice data block
-			case (Keywords::SliceBlockKeyword):
+			case (UChromaSession::SliceBlockKeyword):
 				if (!readCollectionBlock(parser, collection->addSlice(parser.argString(1)))) return false;
 				break;
 			// Display style
-			case (Keywords::StyleKeyword):
+			case (UChromaSession::StyleKeyword):
 				ds = Collection::displayStyle(parser.argString(1));
 				if (ds == Collection::nDisplayStyles)
 				{
@@ -361,15 +378,15 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 				collection->setDisplayStyle(ds);
 				break;
 			// Data Transform
-			case (Keywords::TransformXKeyword):
-			case (Keywords::TransformYKeyword):
-			case (Keywords::TransformZKeyword):
-				xyz = collectionKwd - Keywords::TransformXKeyword;
+			case (UChromaSession::TransformXKeyword):
+			case (UChromaSession::TransformYKeyword):
+			case (UChromaSession::TransformZKeyword):
+				xyz = collectionKwd - UChromaSession::TransformXKeyword;
 				collection->setTransformEnabled(xyz, parser.argb(1));
 				collection->setTransformEquation(xyz,  parser.argString(2));
 				break;
 			// Visible flag
-			case (Keywords::VisibleCollectionKeyword):
+			case (UChromaSession::VisibleCollectionKeyword):
 				collection->setVisible(parser.argb(1));
 				break;
 			// Unrecognised Keyword
@@ -384,7 +401,7 @@ bool UChromaWindow::readCollectionBlock(LineParser& parser, Collection* collecti
 }
 
 // Read DataSetBlock keywords
-bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Collection* collection)
+bool UChromaSession::readDataSetBlock(LineParser& parser, DataSet* dataSet, Collection* collection)
 {
 	bool foundEnd;
 	DataSet::DataSource source;
@@ -394,15 +411,15 @@ bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Colle
 		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
 
 		// Get keyword and check number of arguments provided
-		Keywords::DataSetKeyword dataSetKwd = Keywords::dataSetKeyword(parser.argString(0));
-		if ((dataSetKwd != Keywords::nDataSetKeywords) && (Keywords::dataSetKeywordNArguments(dataSetKwd) > (parser.nArgs()-1)))
+		UChromaSession::DataSetKeyword dataSetKwd = dataSetKeyword(parser.argString(0));
+		if ((dataSetKwd != UChromaSession::nDataSetKeywords) && (dataSetKeywordNArguments(dataSetKwd) > (parser.nArgs()-1)))
 		{
-			msg.print("Error : DataSet keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::dataSetKeyword(dataSetKwd), Keywords::dataSetKeywordNArguments(dataSetKwd), parser.nArgs()-1);
+			msg.print("Error : DataSet keyword '%s' requires %i arguments, but only %i have been provided.\n", dataSetKeyword(dataSetKwd), dataSetKeywordNArguments(dataSetKwd), parser.nArgs()-1);
 			return false;
 		}
 		switch (dataSetKwd)
 		{
-			case (Keywords::DataKeyword):
+			case (UChromaSession::DataKeyword):
 				dataSet->data().reset();
 				foundEnd = false;
 				do
@@ -418,10 +435,10 @@ bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Colle
 					return false;
 				}
 				break;
-			case (Keywords::EndDataSetKeyword):
+			case (UChromaSession::EndDataSetKeyword):
 				return true;
 				break;
-			case (Keywords::SourceKeyword):
+			case (UChromaSession::SourceKeyword):
 				source = DataSet::dataSource(parser.argString(1));
 				if (source == DataSet::nDataSources)
 				{
@@ -441,7 +458,7 @@ bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Colle
 					}
 				}
 				break;
-			case (Keywords::ZKeyword):
+			case (UChromaSession::ZKeyword):
 				collection->setDataSetZ(dataSet, parser.argd(1));
 				break;
 			// Unrecognised Keyword
@@ -456,7 +473,7 @@ bool UChromaWindow::readDataSetBlock(LineParser& parser, DataSet* dataSet, Colle
 }
 
 // Read FitParametersBlock keywords
-bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKernel)
+bool UChromaSession::readFitParametersBlock(LineParser& parser, FitKernel* fitKernel)
 {
 	FitKernel::RangeType rangeType;
 	IndexData::IndexType indexType;
@@ -468,30 +485,30 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
 
 		// Get keyword and check number of arguments provided
-		Keywords::FitParametersKeyword fitParamsKwd = Keywords::fitParametersKeyword(parser.argString(0));
-		if ((fitParamsKwd != Keywords::nFitParametersKeywords) && (Keywords::fitParametersKeywordNArguments(fitParamsKwd) > (parser.nArgs()-1)))
+		UChromaSession::FitParametersKeyword fitParamsKwd = fitParametersKeyword(parser.argString(0));
+		if ((fitParamsKwd != UChromaSession::nFitParametersKeywords) && (fitParametersKeywordNArguments(fitParamsKwd) > (parser.nArgs()-1)))
 		{
-			msg.print("Error : FitParameters keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::fitParametersKeyword(fitParamsKwd), Keywords::fitParametersKeywordNArguments(fitParamsKwd), parser.nArgs()-1);
+			msg.print("Error : FitParameters keyword '%s' requires %i arguments, but only %i have been provided.\n", fitParametersKeyword(fitParamsKwd), fitParametersKeywordNArguments(fitParamsKwd), parser.nArgs()-1);
 			return false;
 		}
 		switch (fitParamsKwd)
 		{
-			case (Keywords::EndFitParametersKeyword):
+			case (UChromaSession::EndFitParametersKeyword):
 				return true;
 				break;
-			case (Keywords::EquationKeyword):
+			case (UChromaSession::EquationKeyword):
 				fitKernel->setEquation(parser.argString(1));
 				break;
-			case (Keywords::GlobalKeyword):
+			case (UChromaSession::GlobalKeyword):
 				fitKernel->setGlobal(parser.argb(1));
 				break;
-			case (Keywords::LimitStrengthKeyword):
+			case (UChromaSession::LimitStrengthKeyword):
 				fitKernel->setLimitStrength(parser.argd(1));
 				break;
-			case (Keywords::OrthogonalKeyword):
+			case (UChromaSession::OrthogonalKeyword):
 				fitKernel->setOrthogonal(parser.argb(1));
 				break;
-			case (Keywords::ReferenceKeyword):
+			case (UChromaSession::ReferenceKeyword):
 				// Create new reference with this name
 				refVar = fitKernel->addReference(parser.argString(1));
 				if (!refVar) CHECKIOFAIL
@@ -515,7 +532,7 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 				refVar->zIndex().setOffset(parser.argi(7));
 				refVar->setZDataSetName(parser.argString(8));
 				break;
-			case (Keywords::VariableKeyword):
+			case (UChromaSession::VariableKeyword):
 				// First, see if named variable exists
 				eqVar = fitKernel->variable(parser.argString(1));
 				if (!eqVar)
@@ -528,7 +545,7 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 				eqVar->setMinimumLimit(parser.argb(4), parser.argd(5));
 				eqVar->setMaximumLimit(parser.argb(6), parser.argd(7));
 				break;
-			case (Keywords::XRangeTypeKeyword):
+			case (UChromaSession::XRangeTypeKeyword):
 				rangeType = FitKernel::rangeType(parser.argString(1));
 				if (rangeType == FitKernel::nRangeTypes)
 				{
@@ -538,18 +555,18 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 				}
 				fitKernel->setXRange(rangeType);
 				break;
-			case (Keywords::XRangeAbsoluteKeyword):
+			case (UChromaSession::XRangeAbsoluteKeyword):
 				fitKernel->setAbsoluteXMin(parser.argd(1));
 				fitKernel->setAbsoluteXMax(parser.argd(2));
 				break;
-			case (Keywords::XRangeIndexKeyword):
+			case (UChromaSession::XRangeIndexKeyword):
 				fitKernel->setIndexXMin(parser.argi(1)-1);
 				fitKernel->setIndexXMax(parser.argi(2)-1);
 				break;
-			case (Keywords::XRangeIndexSingleKeyword):
+			case (UChromaSession::XRangeIndexSingleKeyword):
 				fitKernel->setIndexXSingle(parser.argi(1)-1);
 				break;
-			case (Keywords::ZRangeTypeKeyword):
+			case (UChromaSession::ZRangeTypeKeyword):
 				rangeType = FitKernel::rangeType(parser.argString(1));
 				if (rangeType == FitKernel::nRangeTypes)
 				{
@@ -559,15 +576,15 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 				}
 				fitKernel->setZRange(rangeType);
 				break;
-			case (Keywords::ZRangeAbsoluteKeyword):
+			case (UChromaSession::ZRangeAbsoluteKeyword):
 				fitKernel->setAbsoluteZMin(parser.argd(1));
 				fitKernel->setAbsoluteZMax(parser.argd(2));
 				break;
-			case (Keywords::ZRangeIndexKeyword):
+			case (UChromaSession::ZRangeIndexKeyword):
 				fitKernel->setIndexZMin(parser.argi(1)-1);
 				fitKernel->setIndexZMax(parser.argi(2)-1);
 				break;
-			case (Keywords::ZRangeIndexSingleKeyword):
+			case (UChromaSession::ZRangeIndexSingleKeyword):
 				fitKernel->setIndexZSingle(parser.argi(1)-1);
 				break;
 			// Unrecognised Keyword
@@ -582,37 +599,37 @@ bool UChromaWindow::readFitParametersBlock(LineParser& parser, FitKernel* fitKer
 }
 
 // Read SettingsBlock keywords
-bool UChromaWindow::readSettingsBlock(LineParser& parser)
+bool UChromaSession::readSettingsBlock(LineParser& parser)
 {
-	Viewer::ImageFormat fmt;
+	UChromaSession::ImageFormat fmt;
 	while (!parser.atEnd())
 	{
 		// Get line from file
 		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
 
 		// Get keyword and check number of arguments provided
-		Keywords::SettingsKeyword settingsKwd = Keywords::settingsKeyword(parser.argString(0));
-		if ((settingsKwd != Keywords::nSettingsKeywords) && (Keywords::settingsKeywordNArguments(settingsKwd) > (parser.nArgs()-1)))
+		UChromaSession::SettingsKeyword settingsKwd = UChromaSession::settingsKeyword(parser.argString(0));
+		if ((settingsKwd != UChromaSession::nSettingsKeywords) && (UChromaSession::settingsKeywordNArguments(settingsKwd) > (parser.nArgs()-1)))
 		{
-			msg.print("Error : Settings keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::settingsKeyword(settingsKwd), Keywords::settingsKeywordNArguments(settingsKwd), parser.nArgs()-1);
+			msg.print("Error : Settings keyword '%s' requires %i arguments, but only %i have been provided.\n", UChromaSession::settingsKeyword(settingsKwd), UChromaSession::settingsKeywordNArguments(settingsKwd), parser.nArgs()-1);
 			return false;
 		}
 		switch (settingsKwd)
 		{
 			// End input block
-			case (Keywords::EndSettingsKeyword):
+			case (UChromaSession::EndSettingsKeyword):
 				return true;
 				break;
 			// Image Export info
-			case (Keywords::ImageExportKeyword):
-				imageExportFile_ = parser.argString(1);
+			case (UChromaSession::ImageExportKeyword):
+				imageExportFileName_ = parser.argString(1);
 				imageExportWidth_ = parser.argi(2);
 				imageExportHeight_ = parser.argi(3);
-				fmt = Viewer::imageFormat(parser.argString(4));
-				if (fmt == Viewer::nImageFormats)
+				fmt = UChromaSession::imageFormat(parser.argString(4));
+				if (fmt == UChromaSession::nImageFormats)
 				{
-					msg.print("Warning: Unrecognised image format '%s'. Defaulting to '%s'.\n", parser.argChar(4), Viewer::imageFormatExtension(Viewer::PNGFormat));
-					fmt = Viewer::PNGFormat;
+					msg.print("Warning: Unrecognised image format '%s'. Defaulting to '%s'.\n", parser.argChar(4), UChromaSession::imageFormatExtension(UChromaSession::PNGFormat));
+					fmt = UChromaSession::PNGFormat;
 					CHECKIOFAIL
 				}
 				imageExportFormat_ = fmt;
@@ -630,7 +647,7 @@ bool UChromaWindow::readSettingsBlock(LineParser& parser)
 }
 
 // Read ViewBlock keywords
-bool UChromaWindow::readViewBlock(LineParser& parser)
+bool UChromaSession::readViewBlock(LineParser& parser)
 {
 	ViewPane* pane;
 	while (!parser.atEnd())
@@ -639,28 +656,24 @@ bool UChromaWindow::readViewBlock(LineParser& parser)
 		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
 
 		// Get keyword and check number of arguments provided
-		Keywords::ViewKeyword viewKwd = Keywords::viewKeyword(parser.argString(0));
-		if ((viewKwd != Keywords::nViewKeywords) && (Keywords::viewKeywordNArguments(viewKwd) > (parser.nArgs()-1)))
+		UChromaSession::ViewKeyword viewKwd = UChromaSession::viewKeyword(parser.argString(0));
+		if ((viewKwd != UChromaSession::nViewKeywords) && (UChromaSession::viewKeywordNArguments(viewKwd) > (parser.nArgs()-1)))
 		{
-			msg.print("Error : View keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::viewKeyword(viewKwd), Keywords::viewKeywordNArguments(viewKwd), parser.nArgs()-1);
+			msg.print("Error : View keyword '%s' requires %i arguments, but only %i have been provided.\n", UChromaSession::viewKeyword(viewKwd), UChromaSession::viewKeywordNArguments(viewKwd), parser.nArgs()-1);
 			return false;
 		}
 		switch (viewKwd)
 		{
 			// End input block
-			case (Keywords::EndViewKeyword):
+			case (UChromaSession::EndViewKeyword):
 				return true;
 				break;
 			// Grid specification
-			case (Keywords::GridKeyword):
+			case (UChromaSession::GridKeyword):
 				viewLayout_.setGrid(parser.argi(1), parser.argi(2));
 				break;
-			// Labels face viewer flag
-			case (Keywords::LabelFaceViewerKeyword):
-				labelFaceViewer_ = parser.argb(1);
-				break;
 			// ViewPane definition
-			case (Keywords::ViewPaneBlockKeyword):
+			case (UChromaSession::ViewPaneBlockKeyword):
 				// Check to see if pane has already been created (through it being referenced by another pane)
 				pane = viewLayout_.pane(parser.argString(1));
 				if (!pane) pane = viewLayout_.addPane(parser.argString(1));
@@ -678,7 +691,7 @@ bool UChromaWindow::readViewBlock(LineParser& parser)
 }
 
 // Read ViewPane keywords
-bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
+bool UChromaSession::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 {
 	int xyz, axis;
 	Collection* collection;
@@ -692,20 +705,20 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
 
 		// Get keyword and check number of arguments provided
-		Keywords::ViewPaneKeyword viewPaneKwd = Keywords::viewPaneKeyword(parser.argString(0));
-		if ((viewPaneKwd != Keywords::nViewPaneKeywords) && (Keywords::viewPaneKeywordNArguments(viewPaneKwd) > (parser.nArgs()-1)))
+		UChromaSession::ViewPaneKeyword viewPaneKwd = UChromaSession::viewPaneKeyword(parser.argString(0));
+		if ((viewPaneKwd != UChromaSession::nViewPaneKeywords) && (UChromaSession::viewPaneKeywordNArguments(viewPaneKwd) > (parser.nArgs()-1)))
 		{
-			msg.print("Error: ViewPane keyword '%s' requires %i arguments, but only %i have been provided.\n", Keywords::viewPaneKeyword(viewPaneKwd), Keywords::viewPaneKeywordNArguments(viewPaneKwd), parser.nArgs()-1);
+			msg.print("Error: ViewPane keyword '%s' requires %i arguments, but only %i have been provided.\n", UChromaSession::viewPaneKeyword(viewPaneKwd), UChromaSession::viewPaneKeywordNArguments(viewPaneKwd), parser.nArgs()-1);
 			return false;
 		}
 		switch (viewPaneKwd)
 		{
 			// Auto Position Axis Titles
-			case (Keywords::AutoPositionTitlesKeyword):
+			case (UChromaSession::AutoPositionTitlesKeyword):
 				pane->axes().setAutoPositionTitles(parser.argb(1));
 				break;
 			// Axis block
-			case (Keywords::AxisBlockKeyword):
+			case (UChromaSession::AxisBlockKeyword):
 				// Get target axis...
 				axis = parser.argi(1);
 				if ((axis < 0) || (axis > 2))
@@ -716,44 +729,48 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				if (!readAxisBlock(parser, pane->axes(), axis)) return false;
 				break;
 			// Bounding Box
-			case (Keywords::BoundingBoxKeyword):
+			case (UChromaSession::BoundingBoxKeyword):
 				if ((parser.argi(1) < 0) || (parser.argi(1) >= ViewPane::nBoundingBoxes))
 				{
-					msg.print("Warning: Value is out of range for %s keyword.\n", Keywords::viewPaneKeyword(viewPaneKwd));
+					msg.print("Warning: Value is out of range for %s keyword.\n", UChromaSession::viewPaneKeyword(viewPaneKwd));
 					CHECKIOFAIL
 				}
 				pane->setBoundingBox((ViewPane::BoundingBox) parser.argi(1));
 				break;
 			// Bounding Box plane y intercept
-			case (Keywords::BoundingBoxPlaneYKeyword):
+			case (UChromaSession::BoundingBoxPlaneYKeyword):
 				pane->setBoundingBoxPlaneY(parser.argd(1));
 				break;
 			// End input block
-			case (Keywords::EndViewPaneKeyword):
+			case (UChromaSession::EndViewPaneKeyword):
 				return true;
 				break;
+			// Flat labels flag
+			case (UChromaSession::FlatLabelsKeyword):
+				pane->setFlatLabels(parser.argb(1));
+				break;
 			// Name
-			case (Keywords::GeometryKeyword):
+			case (UChromaSession::GeometryKeyword):
 				pane->setBottomLeft(parser.argi(1), parser.argi(2));
 				pane->setSize(parser.argi(3), parser.argi(4));
 				break;
 			// Label scale
-			case (Keywords::LabelPointSizeKeyword):
+			case (UChromaSession::LabelPointSizeKeyword):
 				pane->setLabelPointSize(parser.argd(1));
 				break;
 			// Rotation
-			case (Keywords::RotationXKeyword):
-			case (Keywords::RotationYKeyword):
-			case (Keywords::RotationZKeyword):
-				xyz = viewPaneKwd - Keywords::RotationXKeyword;
+			case (UChromaSession::RotationXKeyword):
+			case (UChromaSession::RotationYKeyword):
+			case (UChromaSession::RotationZKeyword):
+				xyz = viewPaneKwd - UChromaSession::RotationXKeyword;
 				pane->setViewRotationColumn(xyz, parser.argd(1), parser.argd(2), parser.argd(3));
 				break;
 			// Perspective
-			case (Keywords::PerspectiveKeyword):
+			case (UChromaSession::PerspectiveKeyword):
 				pane->setHasPerspective(parser.argb(1));
 				break;
 			// Role
-			case (Keywords::RoleKeyword):
+			case (UChromaSession::RoleKeyword):
 				role = ViewPane::paneRole(parser.argString(1));
 				if (role == ViewPane::nPaneRoles)
 				{
@@ -764,7 +781,7 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				pane->setRole(role);
 				break;
 			// Role associated collection
-			case (Keywords::RoleTargetCollectionKeyword):
+			case (UChromaSession::RoleTargetCollectionKeyword):
 				// Locate named collection
 				collection = locateCollection(parser.argString(1));
 				if (!collection)
@@ -775,25 +792,25 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 				pane->addCollectionTarget(collection);
 				break;
 			// Role target pane
-			case (Keywords::RoleTargetPaneKeyword):
+			case (UChromaSession::RoleTargetPaneKeyword):
 				associatedPane = viewLayout_.pane(parser.argString(1));
 				if (!associatedPane) associatedPane = viewLayout_.addPane(parser.argString(1));
 				pane->addPaneTarget(associatedPane);
 				break;
 			// Title scale
-			case (Keywords::TitlePointSizeKeyword):
+			case (UChromaSession::TitlePointSizeKeyword):
 				pane->setTitlePointSize(parser.argd(1));
 				break;
 			// Translation
-			case (Keywords::TranslationKeyword):
+			case (UChromaSession::TranslationKeyword):
 				pane->setViewTranslation(parser.argd(1), parser.argd(2), parser.argd(3));
 				break;
 			// Use best flat view
-			case (Keywords::UseBestFlatViewKeyword):
+			case (UChromaSession::UseBestFlatViewKeyword):
 				pane->axes().setUseBestFlatView(parser.argb(1));
 				break;
 			// View Type
-			case (Keywords::ViewTypeKeyword):
+			case (UChromaSession::ViewTypeKeyword):
 				vt = ViewPane::viewType(parser.argString(1));
 				if (vt == ViewPane::nViewTypes)
 				{
@@ -814,28 +831,37 @@ bool UChromaWindow::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 	return false;
 }
 
+// Return current session file directory
+QDir UChromaSession::sessionFileDirectory()
+{
+	return sessionFileDirectory_;
+}
+
 // Set whether to enforce hard fail on input file error
-void UChromaWindow::setHardIOFail(bool hardFail)
+void UChromaSession::setHardIOFail(bool hardFail)
 {
 	hardIOFail_ = hardFail;
 }
 
-// Load data from file specified
-bool UChromaWindow::loadInputFile(QString fileName)
+// Load session from file specified
+bool UChromaSession::loadSession(QString fileName)
 {
 	LineParser parser(fileName);
 
 	if (!parser.ready())
 	{
-		QMessageBox::warning(this, "Error", "Can't open specified file for reading.");
+		QMessageBox::warning(uChroma_, "Error", "Can't open specified file for reading.");
 		return false;
 	}
 
 	// Clear existing data
 	startNewSession(false);
 
+	// Set input file directory
+	sessionFileDirectory_ = fileName;
+
 	// Read line from file and decide what to do with it
-	Keywords::InputBlock block;
+	UChromaSession::InputBlock block;
 	int nEmpty;
 	bool success;
 	while (!parser.atEnd())
@@ -843,11 +869,11 @@ bool UChromaWindow::loadInputFile(QString fileName)
 		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
 
 		// We expect a block keyword in this loop...
-		block = Keywords::inputBlock(parser.argString(0));
+		block = UChromaSession::inputBlock(parser.argString(0));
 		switch (block)
 		{
 			// Collection Block
-			case (Keywords::CollectionBlock):
+			case (UChromaSession::CollectionBlock):
 				// Create new master Collection and set its title
 				currentCollection_ = addCollection(parser.argString(1));
 
@@ -858,24 +884,24 @@ bool UChromaWindow::loadInputFile(QString fileName)
 				nEmpty = currentCollection_->nEmptyDataSets();
 				if (nEmpty != 0)
 				{
-					QMessageBox::StandardButton button = QMessageBox::warning(this, "Empty Data", QString("There are ") + QString::number(nEmpty) + " defined slices which contain no data in collection '" + currentCollection_->name() + "'.\nWould you like to reload these now from their source files?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+					QMessageBox::StandardButton button = QMessageBox::warning(uChroma_, "Empty Data", QString("There are ") + QString::number(nEmpty) + " defined slices which contain no data in collection '" + currentCollection_->name() + "'.\nWould you like to reload these now from their source files?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 					if (button == QMessageBox::Yes)
 					{
 						nEmpty = currentCollection_->loadAllDataSets();
 						
 						if (nEmpty > 0)
 						{
-							QMessageBox::warning(this, "Empty Data", QString("There are still ") + QString::number(nEmpty) + " defined slices which contain no data or whose original files could not be found.\nCheck the slice data directory, and/or the datafiles themselves.");
+							QMessageBox::warning(uChroma_, "Empty Data", QString("There are still ") + QString::number(nEmpty) + " defined slices which contain no data or whose original files could not be found.\nCheck the slice data directory, and/or the datafiles themselves.");
 						}
 					}
 				}
 				break;
 			// Settings
-			case (Keywords::SettingsBlock):
+			case (UChromaSession::SettingsBlock):
 				success = readSettingsBlock(parser);
 				break;
 			// View
-			case (Keywords::ViewBlock):
+			case (UChromaSession::ViewBlock):
 				success = readViewBlock(parser);
 				break;
 			default:
@@ -892,15 +918,15 @@ bool UChromaWindow::loadInputFile(QString fileName)
 	// Show a message if we encountered problems...
 	if (!success)
 	{
-		QMessageBox::warning(this, "Problems Loading File", "Errors were encountered while loading the file.\nCheck the Log window for possible error messages.");
+		QMessageBox::warning(uChroma_, "Problems Loading File", "Errors were encountered while loading the file.\nCheck the Log window for possible error messages.");
 	}
 
 	// Set necessary variables
 	currentViewPane_ = viewLayout_.panes();
 
 	// Set current project data
-	UChromaSession::setInputFile(fileName);
-	UChromaSession::setAsNotModified();
+	setInputFile(fileName);
+	setAsNotModified();
 
 	return true;
 }

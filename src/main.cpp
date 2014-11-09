@@ -43,6 +43,9 @@ int main(int argc, char *argv[])
 	/* Create the main window */
 	UChromaWindow mainWindow;
 
+	/* Start a new, empty session */
+	UChromaSession::startNewSession(true);
+
 	/* Do we have CLI options? */
 	bool fileLoaded = false;
 	if (argc > 1)
@@ -53,7 +56,7 @@ int main(int argc, char *argv[])
 			if (argv[n][0] != '-')
 			{
 				// Must be an input file to load....
-				fileLoaded = mainWindow.loadInputFile(argv[n]);
+				fileLoaded = UChromaSession::loadSession(argv[n]);
 				if (!fileLoaded) return 1;
 				++n;
 				continue;
@@ -72,7 +75,7 @@ int main(int argc, char *argv[])
 					return 1;
 					break;
 				case ('a'):
-					mainWindow.setHardIOFail(true);
+					UChromaSession::setHardIOFail(true);
 					break;
 				case ('v'):
 					msg.addOutputType(Messenger::Verbose);
@@ -97,9 +100,6 @@ int main(int argc, char *argv[])
 
 	/* Direct Messenger to the LogWindow */
 	msg.setTextBrowser(mainWindow.logWindowBrowser());
-
-	/* If a file was not loaded, create a new, empty session */
-	if (!fileLoaded) mainWindow.startNewSession(true);
 
 	/* Update main window */
 	mainWindow.updateGUI();

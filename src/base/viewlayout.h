@@ -28,31 +28,19 @@
 #include <QtCore/QString>
 
 // Forward Declarations
-class UChromaWindow;
+/* none */
 
 // ViewLayout
 class ViewLayout : public ListItem<ViewLayout>
 {
 	public:
 	// Constructor / Destructor
-	ViewLayout(UChromaWindow& parent);
+	ViewLayout();
 	~ViewLayout();
 	// Copy constructor
 	ViewLayout(const ViewLayout& source);
 	// Assignment operator
 	void operator=(const ViewLayout& source);
-
-
-	/*
-	 * Parent
-	 */
-	private:
-	// Layout in which this pane exists
-	UChromaWindow& parent_;
-
-	public:
-	// Pane has changed
-	void paneChanged(ViewPane* caller = NULL);
 
 
 	/*
@@ -149,6 +137,8 @@ class ViewLayout : public ListItem<ViewLayout>
 	void bringPaneToFront(ViewPane* pane, bool onTop = false);
 	// Send pane to back
 	void sendPaneToBack(ViewPane* pane, bool onBottom = false);
+	// Pane has changed
+	void paneChanged(ViewPane* caller = NULL);
 	// Reset view matrix of all panes
 	void resetViewMatrix();
 	// Update interaction primitives for all panes

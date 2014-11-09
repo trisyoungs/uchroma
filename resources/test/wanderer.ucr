@@ -17,6 +17,8 @@ Collection 'Wanderer'
   ColourLinearHSVB 1.000000 256 215 255 255
   ColourAlphaControl 'OwnAlpha'
   ColourAlphaFixed 0.500000
+  LineStyle 1.000000 'Solid'
+  Shininess 128.000000
   Style LineXY
   Visible true
   DataSet '/home/tris/src/uchroma/test/gauss00.txt'
@@ -129052,9 +129054,7 @@ Collection 'Wanderer'
 EndCollection
 View
   Grid 4 4
-  LabelFaceViewer false
   ViewPane 'Main view'
-    Geometry 0 0 4 4
     AutoPositionTitles false
     Axis 0
       AutoScale None
@@ -129073,7 +129073,7 @@ View
       NumberFormat 'Decimal' 3 true false
       PositionFractional 0.000000 0.000000 0.000000
       PositionReal 0.000000 0.000000 0.000000
-      Stretch 1.000000
+      Stretch 1.543795
       TickDelta 1.000000
       TickDirection 0.000000 -1.000000 0.000000
       TitleAnchor TopMiddle
@@ -129098,7 +129098,7 @@ View
       NumberFormat 'Decimal' 3 true false
       PositionFractional 0.000000 0.000000 0.000000
       PositionReal 0.000000 0.000000 0.000000
-      Stretch 1.000000
+      Stretch 3.369073
       TickDelta 0.200000
       TickDirection -1.000000 0.000000 0.000000
       TitleAnchor BottomMiddle
@@ -129123,7 +129123,7 @@ View
       NumberFormat 'Decimal' 3 true false
       PositionFractional 0.000000 0.000000 0.000000
       PositionReal 0.000000 0.000000 0.000000
-      Stretch 1.000000
+      Stretch 0.291176
       TickDelta 3.000000
       TickDirection -1.000000 0.000000 0.000000
       TitleAnchor TopMiddle
@@ -129131,18 +129131,20 @@ View
       TitleOrientation 0.000000 0.000000 0.200000 0.500000
       Visible true
     EndAxis
-    LabelPointSize 16.000000
-    TitlePointSize 20.000000
     BoundingBox 0
     BoundingBoxPlaneY 0.000000
-    RotationX 0.991046 -0.061371 -0.118580
-    RotationY 0.123630 0.757222 0.641350
-    RotationZ 0.050432 -0.650268 0.758029
-    Translation 0.000000 0.000000 -52.500000
+    FlatLabels true
+    Geometry 0 0 4 4
+    LabelPointSize 16.000000
+    TitlePointSize 20.000000
+    RotationX 0.924028 -0.254262 0.285524
+    RotationY -0.038961 0.680298 0.731899
+    RotationZ -0.380335 -0.687420 0.618708
+    Translation 0.000000 -0.333333 -15.735498
     Perspective false
     Role 'Standard'
     RoleTargetCollection 'Wanderer'
     UseBestFlatView false
-    ViewType 'Normal'
+    ViewType 'AutoStretched'
   EndViewPane
 EndView

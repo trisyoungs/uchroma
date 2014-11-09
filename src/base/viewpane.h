@@ -296,6 +296,8 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	double titlePointSize_;
 	// Text z scaling factor
 	double textZScale_;
+	// Whether axis text labels are drawn flat in 3D views
+	bool flatLabels_;
 
 	private:
 	// Calculate font scaling factor
@@ -320,6 +322,10 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	double titlePointSize();
 	// Return text z scaling factor
 	double textZScale();
+	// Set whether axis text labels are drawn flat in 3D views
+	void setFlatLabels(bool flat);
+	// Whether axis text labels are drawn flat in 3D views
+	bool flatLabels();
 
 
 	/*

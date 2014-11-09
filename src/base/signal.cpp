@@ -40,7 +40,7 @@ UChromaSignal::SignalAction UChromaSignal::send(UChromaSignal::CollectionSignal 
 	// Send to ViewPanes in current ViewLayout....
 	int nAccepted = 0;
 	bool unique = false;
-	for (ViewPane* pane = uChroma_->viewLayout().panes(); pane != NULL; pane = pane->next)
+	for (ViewPane* pane = UChromaSession::viewLayout().panes(); pane != NULL; pane = pane->next)
 	{
 		UChromaSignal::SignalAction result = pane->processCollectionSignal(signal, collection);
 		if (result == UChromaSignal::IgnoreSignal) continue;

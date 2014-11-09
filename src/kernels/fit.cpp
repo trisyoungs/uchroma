@@ -22,7 +22,7 @@
 #include "kernels/fit.h"
 #include "expression/variable.h"
 #include "base/collection.h"
-#include "base/session.h"
+#include "session/session.h"
 #include "templates/variantpointer.h"
 
 // Constructor
@@ -661,7 +661,7 @@ bool FitKernel::minimise()
 	{
 		// Steepest Descent
 		case (FitKernel::SteepestDescentMethod):
-			result = sdMinimise(alpha, tolerance_, maxSteps_);
+			result = sdMinimise(alpha);
 			break;
 		// Simplex
 		case (FitKernel::ModifiedSteepestDescentMethod):
@@ -673,7 +673,7 @@ bool FitKernel::minimise()
 				if (yMin < randomMin) randomMin = yMin;
 				if (yMax > randomMax) randomMax = yMax;
 			}
-			result = sdModMinimise(alpha, tolerance_, maxSteps_, modSDNRandomTrials_, randomMin, randomMax);
+			result = sdModMinimise(alpha, randomMin, randomMax);
 			break;
 		// Simplex
 		case (FitKernel::SimplexMethod):

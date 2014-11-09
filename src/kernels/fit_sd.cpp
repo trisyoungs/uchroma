@@ -22,7 +22,7 @@
 #include "kernels/fit.h"
 
 // Steepest Descent Minimise
-bool FitKernel::sdMinimise(Array<double>& alpha, double tolerance, int maxSteps)
+bool FitKernel::sdMinimise(Array<double>& alpha)
 {
 	// Control variables
 	double gradientDelta = 0.01;
@@ -49,7 +49,7 @@ bool FitKernel::sdMinimise(Array<double>& alpha, double tolerance, int maxSteps)
 	// Do some iterations
 	int n;
 	double currentRMSE, deltaRMSE;
-	for (int step=1; step<=maxSteps; ++step)
+	for (int step=1; step<=maxSteps_; ++step)
 	{
 		// Test stepsize - if it does not decrease the RMSE, decrease it until it does
 		do
@@ -65,9 +65,9 @@ bool FitKernel::sdMinimise(Array<double>& alpha, double tolerance, int maxSteps)
 		alpha = tempAlpha;
 
 		// Check on convergence tolerance
-		if (fabs(deltaRMSE) < tolerance)
+		if (fabs(deltaRMSE) < tolerance_)
 		{
-			msg.print("SD converged (tolerance = %e, delta(RMSE) = %e)\n", tolerance, deltaRMSE);
+			msg.print("SD converged (tolerance = %e, delta(RMSE) = %e)\n", tolerance_, deltaRMSE);
 			break;
 		}
 

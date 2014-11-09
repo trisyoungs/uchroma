@@ -49,9 +49,9 @@ class TextPrimitiveList
 	// Add primitive to list
 	void add(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize);
 	// Update global bounding cuboid for all text primitives in the list
-	Cuboid boundingCuboid(ViewPane& pane, bool correctOrientation, double baseFontSize, Cuboid startingCuboid = Cuboid());
+	Cuboid boundingCuboid(ViewPane& pane, bool flatLabels, double baseFontSize, Cuboid startingCuboid = Cuboid());
 	// Render all primitives in list
-	void renderAll(Matrix viewMatrix, bool correctOrientation, double baseFontSize);
+	void renderAll(Matrix viewMatrix, bool flatLabels, double baseFontSize);
 };
 
 #endif

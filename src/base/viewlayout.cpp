@@ -20,11 +20,11 @@
 */
 
 #include "base/viewlayout.h"
-#include "base/session.h"
+#include "session/session.h"
 #include "gui/uchroma.h"
 
 // Constructor
-ViewLayout::ViewLayout(UChromaWindow& parent) : ListItem<ViewLayout>(), parent_(parent)
+ViewLayout::ViewLayout() : ListItem<ViewLayout>()
 {
 	nColumns_ = 1;
 	nRows_ = 1;
@@ -44,7 +44,7 @@ ViewLayout::~ViewLayout()
 }
 
 // Copy constructor
-ViewLayout::ViewLayout(const ViewLayout& source) : parent_(source.parent_)
+ViewLayout::ViewLayout(const ViewLayout& source)
 {
 	(*this) = source;
 }
@@ -60,16 +60,6 @@ void ViewLayout::operator=(const ViewLayout& source)
 	nColumns_ = source.nColumns_;
 	nRows_ = source.nRows_;
 	panes_ = source.panes_;
-}
-
-/*
- * Parent
- */
-
-// Pane has changed
-void ViewLayout::paneChanged(ViewPane* caller)
-{
-	if (caller) caller->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
 }
 
 /*
@@ -306,6 +296,12 @@ void ViewLayout::sendPaneToBack(ViewPane* pane, bool onBottom)
 	// Sending to back actually means bring to head of list, since this is pane drawing order
 	if (onBottom) panes_.moveToStart(pane);
 	else panes_.shiftUp(pane);
+}
+
+// Pane has changed
+void ViewLayout::paneChanged(ViewPane* caller)
+{
+	if (caller) caller->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
 }
 
 // Reset view of all panes

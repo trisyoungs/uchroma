@@ -1,5 +1,5 @@
 /*
-	*** uChroma Style Window
+	*** Style Window
 	*** src/gui/style_funcs.cpp
 	Copyright T. Youngs 2013-2014
 
@@ -21,7 +21,7 @@
 
 #include "gui/style.h"
 #include "gui/uchroma.h"
-#include "base/session.h"
+#include "session/session.h"
 #include "templates/reflist.h"
 
 /*
@@ -76,11 +76,14 @@ void StyleWindow::closeEvent(QCloseEvent *event)
 
 void StyleWindow::on_StyleCombo_currentIndexChanged(int index)
 {
-	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientAButton_clicked"))) return;
+	if (refreshing_) return;
+
+	// Check for invalid Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_StyleCombo_currentIndexChanged")) return;
 
 	currentCollection->setDisplayStyle( (Collection::DisplayStyle) index );
+	updateControls();
 
 	// Update display
 	UChromaSession::setAsModified();
@@ -91,9 +94,11 @@ void StyleWindow::on_StyleCombo_currentIndexChanged(int index)
 
 void StyleWindow::on_ColourSingleColourRadio_clicked(bool checked)
 {
-	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourSingleColourRadio_clicked"))) return;
+	if (refreshing_) return;
+
+	// Check for invalid Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourSingleColourRadio_clicked")) return;
 
 	currentCollection->setColourSource(Collection::SingleColourSource);
 
@@ -105,9 +110,9 @@ void StyleWindow::on_ColourSingleColourRadio_clicked(bool checked)
 
 void StyleWindow::on_ColourSingleColourButton_clicked(bool checked)
 {
-	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourSingleColourButton_clicked"))) return;
+	// Check for invalid Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourSingleColourButton_clicked")) return;
 
 	if (ui.ColourSingleColourButton->selectColour())
 	{
@@ -124,9 +129,11 @@ void StyleWindow::on_ColourSingleColourButton_clicked(bool checked)
 
 void StyleWindow::on_ColourRGBGradientRadio_clicked(bool checked)
 {
-	// Check for a current Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientRadio_clicked")) return;
+	if (refreshing_) return;
+
+	// Check for invalid Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientRadio_clicked")) return;
 
 	currentCollection->setColourSource(Collection::RGBGradientSource);
 
@@ -138,9 +145,9 @@ void StyleWindow::on_ColourRGBGradientRadio_clicked(bool checked)
 
 void StyleWindow::on_ColourRGBGradientAButton_clicked(bool checked)
 {
-	// Check for a current Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientAButton_clicked")) return;
+	// Check for invalid Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientAButton_clicked")) return;
 
 	if (ui.ColourRGBGradientAButton->selectColour())
 	{
@@ -155,9 +162,11 @@ void StyleWindow::on_ColourRGBGradientAButton_clicked(bool checked)
 
 void StyleWindow::on_ColourRGBGradientASpin_valueChanged(double value)
 {
-	// Check for a current Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientASpin_valueChanged")) return;
+	if (refreshing_) return;
+
+	// Check for invalid Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientASpin_valueChanged")) return;
 
 	currentCollection->setColourScalePoint(Collection::RGBGradientSource, ui.ColourRGBGradientAButton->colour(), ui.ColourRGBGradientASpin->value(), 0);
 
@@ -169,27 +178,27 @@ void StyleWindow::on_ColourRGBGradientASpin_valueChanged(double value)
 
 void StyleWindow::on_ColourRGBGradientASetMinimumButton_clicked(bool checked)
 {
-	// Check for a current Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientASetMinimumButton_clicked")) return;
+	// Check for invalid Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientASetMinimumButton_clicked")) return;
 
 	ui.ColourRGBGradientASpin->setValue(currentCollection->transformMin().y);
 }
 
 void StyleWindow::on_ColourRGBGradientASetMaximumButton_clicked(bool checked)
 {
-	// Check for a current Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientASetMaximumButton_clicked")) return;
+	// Check for invalid Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientASetMaximumButton_clicked")) return;
 
 	ui.ColourRGBGradientASpin->setValue(currentCollection->transformMax().y);
 }
 
 void StyleWindow::on_ColourRGBGradientBButton_clicked(bool checked)
 {
-	// Check for a current Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientBButton_clicked")) return;
+	// Check for invalid Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientBButton_clicked")) return;
 
 	if (ui.ColourRGBGradientBButton->selectColour())
 	{
@@ -204,9 +213,11 @@ void StyleWindow::on_ColourRGBGradientBButton_clicked(bool checked)
 
 void StyleWindow::on_ColourRGBGradientBSpin_valueChanged(double value)
 {
-	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientBSpin_valueChanged"))) return;
+	if (refreshing_) return;
+
+	// Check for invalid Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientBSpin_valueChanged")) return;
 
 	currentCollection->setColourScalePoint(Collection::RGBGradientSource, ui.ColourRGBGradientBButton->colour(), ui.ColourRGBGradientBSpin->value(), 1);
 
@@ -218,18 +229,20 @@ void StyleWindow::on_ColourRGBGradientBSpin_valueChanged(double value)
 
 void StyleWindow::on_ColourRGBGradientBSetMinimumButton_clicked(bool checked)
 {
-	// Check for a current Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientBSetMinimumButton_clicked")) return;
+	if (refreshing_) return;
+
+	// Check for invalid Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientBSetMinimumButton_clicked")) return;
 
 	ui.ColourRGBGradientBSpin->setValue(currentCollection->transformMin().y);
 }
 
 void StyleWindow::on_ColourRGBGradientBSetMaximumButton_clicked(bool checked)
 {
-	// Check for a current Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientBSetMaximumButton_clicked")) return;
+	// Check for invalid Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourRGBGradientBSetMaximumButton_clicked")) return;
 
 	ui.ColourRGBGradientBSpin->setValue(currentCollection->transformMax().y);
 }
@@ -238,9 +251,11 @@ void StyleWindow::on_ColourRGBGradientBSetMaximumButton_clicked(bool checked)
 
 void StyleWindow::on_ColourHSVGradientRadio_clicked(bool checked)
 {
-	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientRadio_clicked"))) return;
+	if (refreshing_) return;
+
+	// Check for invalid Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientRadio_clicked")) return;
 
 	currentCollection->setColourSource(Collection::HSVGradientSource);
 
@@ -253,8 +268,8 @@ void StyleWindow::on_ColourHSVGradientRadio_clicked(bool checked)
 void StyleWindow::on_ColourHSVGradientAButton_clicked(bool checked)
 {
 	// Check for a current Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientAButton_clicked")) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientAButton_clicked")) return;
 
 	if (ui.ColourHSVGradientAButton->selectColour())
 	{
@@ -270,8 +285,8 @@ void StyleWindow::on_ColourHSVGradientAButton_clicked(bool checked)
 void StyleWindow::on_ColourHSVGradientASpin_valueChanged(double value)
 {
 	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientASpin_valueChanged"))) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (refreshing_ || (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientASpin_valueChanged"))) return;
 
 	currentCollection->setColourScalePoint(Collection::HSVGradientSource, ui.ColourHSVGradientAButton->colour(), ui.ColourHSVGradientASpin->value(), 0);
 
@@ -284,8 +299,8 @@ void StyleWindow::on_ColourHSVGradientASpin_valueChanged(double value)
 void StyleWindow::on_ColourHSVGradientASetMinimumButton_clicked(bool checked)
 {
 	// Check for a current Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientASetMinimumButton_clicked")) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientASetMinimumButton_clicked")) return;
 
 	ui.ColourHSVGradientASpin->setValue(currentCollection->transformMin().y);
 }
@@ -293,8 +308,8 @@ void StyleWindow::on_ColourHSVGradientASetMinimumButton_clicked(bool checked)
 void StyleWindow::on_ColourHSVGradientASetMaximumButton_clicked(bool checked)
 {
 	// Check for a current Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientASetMaximumButton_clicked")) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientASetMaximumButton_clicked")) return;
 
 	ui.ColourHSVGradientASpin->setValue(currentCollection->transformMax().y);
 }
@@ -302,8 +317,8 @@ void StyleWindow::on_ColourHSVGradientASetMaximumButton_clicked(bool checked)
 void StyleWindow::on_ColourHSVGradientBButton_clicked(bool checked)
 {
 	// Check for a current Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientBButton_clicked")) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientBButton_clicked")) return;
 
 	if (ui.ColourHSVGradientBButton->selectColour())
 	{
@@ -319,8 +334,8 @@ void StyleWindow::on_ColourHSVGradientBButton_clicked(bool checked)
 void StyleWindow::on_ColourHSVGradientBSpin_valueChanged(double value)
 {
 	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientBSpin_valueChanged"))) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (refreshing_ || (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientBSpin_valueChanged"))) return;
 
 	currentCollection->setColourScalePoint(Collection::HSVGradientSource, ui.ColourHSVGradientBButton->colour(), ui.ColourHSVGradientBSpin->value(), 1);
 
@@ -333,8 +348,8 @@ void StyleWindow::on_ColourHSVGradientBSpin_valueChanged(double value)
 void StyleWindow::on_ColourHSVGradientBSetMinimumButton_clicked(bool checked)
 {
 	// Check for a current Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientBSetMinimumButton_clicked")) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientBSetMinimumButton_clicked")) return;
 
 	ui.ColourHSVGradientBSpin->setValue(currentCollection->transformMin().y);
 }
@@ -342,8 +357,8 @@ void StyleWindow::on_ColourHSVGradientBSetMinimumButton_clicked(bool checked)
 void StyleWindow::on_ColourHSVGradientBSetMaximumButton_clicked(bool checked)
 {
 	// Check for a current Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientBSetMaximumButton_clicked")) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourHSVGradientBSetMaximumButton_clicked")) return;
 
 	ui.ColourHSVGradientBSpin->setValue(currentCollection->transformMax().y);
 }
@@ -353,8 +368,8 @@ void StyleWindow::on_ColourHSVGradientBSetMaximumButton_clicked(bool checked)
 void StyleWindow::on_ColourCustomGradientRadio_clicked(bool checked)
 {
 	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourCustomGradientRadio_clicked"))) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (refreshing_ || (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourCustomGradientRadio_clicked"))) return;
 
 	currentCollection->setColourSource(Collection::CustomGradientSource);
 
@@ -373,9 +388,9 @@ void StyleWindow::on_ColourCustomGradientTable_itemSelectionChanged()
 void StyleWindow::on_ColourCustomGradientTable_cellDoubleClicked(int row, int column)
 {
 	// Check for window refreshing or invalid Collection or invalid table column
-	Collection* currentCollection = uChroma_.currentCollection();
+	Collection* currentCollection = UChromaSession::currentCollection();
 	if (refreshing_ || (column == 0)) return;
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourCustomGradientTable_cellDoubleClicked")) return;
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourCustomGradientTable_cellDoubleClicked")) return;
 
 	// Get colour item data (also contains ColourScalePoint index)
 	QTableWidgetItem* item = ui.ColourCustomGradientTable->item(row, 1);
@@ -405,9 +420,9 @@ void StyleWindow::on_ColourCustomGradientTable_cellDoubleClicked(int row, int co
 void StyleWindow::on_ColourCustomGradientTable_cellChanged(int row, int column)
 {
 	// Check for window refreshing or invalid Collection or invalid table column
-	Collection* currentCollection = uChroma_.currentCollection();
+	Collection* currentCollection = UChromaSession::currentCollection();
 	if (refreshing_ || (column == 1)) return;
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourCustomGradientTable_cellChanged")) return;
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourCustomGradientTable_cellChanged")) return;
 
 	// Get colour item data (also contains ColourScalePoint index)
 	QTableWidgetItem* item = ui.ColourCustomGradientTable->item(row, 1);
@@ -430,8 +445,8 @@ void StyleWindow::on_ColourCustomGradientTable_cellChanged(int row, int column)
 void StyleWindow::on_ColourCustomGradientAddButton_clicked(bool checked)
 {
 	// Check for invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourCustomGradientAddButton_clicked")) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourCustomGradientAddButton_clicked")) return;
 
 	currentCollection->addCustomColourScalePoint();
 
@@ -444,8 +459,8 @@ void StyleWindow::on_ColourCustomGradientAddButton_clicked(bool checked)
 void StyleWindow::on_ColourCustomGradientRemoveButton_clicked(bool checked)
 {
 	// Check for invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourCustomGradientRemoveButton_clicked")) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourCustomGradientRemoveButton_clicked")) return;
 
 	if (ui.ColourCustomGradientTable->selectedItems().count() == 0) return;
 
@@ -475,8 +490,8 @@ void StyleWindow::on_ColourCustomGradientRemoveButton_clicked(bool checked)
 void StyleWindow::on_ColourAlphaOwnAlphaRadio_clicked(bool checked)
 {
 	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourAlphaOwnAlphaRadio_clicked"))) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (refreshing_ || (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourAlphaOwnAlphaRadio_clicked"))) return;
 
 	currentCollection->setAlphaControl(Collection::OwnAlpha);
 
@@ -488,8 +503,8 @@ void StyleWindow::on_ColourAlphaOwnAlphaRadio_clicked(bool checked)
 void StyleWindow::on_ColourAlphaFixedAlphaRadio_clicked(bool checked)
 {
 	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourAlphaFixedAlphaRadio_clicked"))) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (refreshing_ || (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourAlphaFixedAlphaRadio_clicked"))) return;
 
 	currentCollection->setAlphaControl(Collection::FixedAlpha);
 
@@ -501,8 +516,8 @@ void StyleWindow::on_ColourAlphaFixedAlphaRadio_clicked(bool checked)
 void StyleWindow::on_ColourAlphaFixedAlphaSpin_valueChanged(double value)
 {
 	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_ColourAlphaFixedAlphaSpin_valueChanged"))) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (refreshing_ || (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_ColourAlphaFixedAlphaSpin_valueChanged"))) return;
 
 	currentCollection->setFixedAlpha(value);
 
@@ -515,8 +530,8 @@ void StyleWindow::on_ColourAlphaFixedAlphaSpin_valueChanged(double value)
 void StyleWindow::on_SurfaceShininessSpin_valueChanged(double value)
 {
 	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_SurfaceShininessSpin_valueChanged"))) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (refreshing_ || (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_SurfaceShininessSpin_valueChanged"))) return;
 
 	currentCollection->setDisplaySurfaceShininess(value);
 
@@ -529,8 +544,8 @@ void StyleWindow::on_SurfaceShininessSpin_valueChanged(double value)
 void StyleWindow::on_LineStippleCombo_currentIndexChanged(int index)
 {
 	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_SurfaceShininessSpin_valueChanged"))) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (refreshing_ || (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_SurfaceShininessSpin_valueChanged"))) return;
 
 	currentCollection->displayLineStyle().setStipple( (LineStipple::StippleType) index );
 
@@ -542,8 +557,8 @@ void StyleWindow::on_LineStippleCombo_currentIndexChanged(int index)
 void StyleWindow::on_LineWidthSpin_valueChanged(double value)
 {
 	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!Collection::objectValid(uChroma_.currentCollection(), "current collection in StyleWindow::on_SurfaceShininessSpin_valueChanged"))) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (refreshing_ || (!Collection::objectValid(UChromaSession::currentCollection(), "current collection in StyleWindow::on_SurfaceShininessSpin_valueChanged"))) return;
 
 	currentCollection->displayLineStyle().setWidth(value);
 
@@ -560,7 +575,7 @@ void StyleWindow::on_LineWidthSpin_valueChanged(double value)
 void StyleWindow::updateGradientBar()
 {
 	// Check for a current Collection
-	Collection* currentCollection = uChroma_.currentCollection();
+	Collection* currentCollection = UChromaSession::currentCollection();
 	if (!currentCollection) return;
 	
 	ui.ColourGradient->setColourScale(currentCollection->colourScale());
@@ -581,7 +596,7 @@ void StyleWindow::updateControls(bool force)
 	if ((!isVisible()) && (!force) ) return;
 
 	// Check for invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
+	Collection* currentCollection = UChromaSession::currentCollection();
 	if (!currentCollection) return;
 
 	refreshing_ = true;

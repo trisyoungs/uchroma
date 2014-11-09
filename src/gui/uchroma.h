@@ -35,7 +35,6 @@
 #include "gui/dataimport.h"
 #include "base/collection.h"
 #include "base/transformer.h"
-#include "base/lineparser.h"
 #include "base/viewlayout.h"
 
 // Forward Declarations
@@ -285,128 +284,12 @@ class UChromaWindow : public QMainWindow
 	public slots:
 	// Update all aspects of GUI
 	void updateGUI();
-	// Update all subwindows
+	// Update controls in all subwindows
 	void updateSubWindows();
 	// Update tool bars
 	void updateToolBars();
 	// Update main display
 	void updateDisplay();
-
-
-	/*
-	 * Input File
-	 */
-	private:
-	// Current input file directory
-	QDir inputFileDirectory_;
-	// Whether to enforce hard fail on input file error
-	bool hardIOFail_;
-
-	private:
-	// Read AxisBlock keywords
-	bool readAxisBlock(LineParser& parser, Axes& axes, int axis);
-	// Read CollectionBlock keywords
-	bool readCollectionBlock(LineParser& parser, Collection* collection);
-	// Read DataSetBlock keywords
-	bool readDataSetBlock(LineParser& parser, DataSet* dataSet, Collection* collection);
-	// Read FitParametersBlock keywords
-	bool readFitParametersBlock(LineParser& parser, FitKernel* fitKernel);
-	// Read SettingsBlock keywords
-	bool readSettingsBlock(LineParser& parser);
-	// Read ViewBlock keywords
-	bool readViewBlock(LineParser& parser);
-	// Read ViewPaneBlock keywords
-	bool readViewPaneBlock(LineParser& parser, ViewPane* pane);
-	// Write AxisBlock keywords
-	bool writeAxisBlock(LineParser& parser, Axes& axes, int axis);
-	// Write CollectionBlock keywords
-	bool writeCollectionBlock(LineParser& parser, Collection* collection, Collection::CollectionType type = Collection::MasterCollection, int indentLevel = 0);
-	// Write DataSetBlock keywords
-	bool writeDataSetBlock(LineParser& parser, DataSet* dataSet, int indentLevel = 0);
-	// Write FitParametersBlock keywords
-	bool writeFitParametersBlock(LineParser& parser, FitKernel* fitKernel, int indentLevel = 0);
-	// Write SettingsBlock keywords
-	bool writeSettingsBlock(LineParser& parser);
-	// Write ViewBlock keywords
-	bool writeViewBlock(LineParser& parser);
-	// Write ViewPaneBlock keywords
-	bool writeViewPaneBlock(LineParser& parser, ViewPane* pane);
-	
-	public:
-	// Set whether to enforce hard fail on input file error
-	void setHardIOFail(bool hardFail);
-	// Load input from file specified
-	bool loadInputFile(QString fileName);
-	// Save current input to file specified
-	bool saveInputFile(QString fileName);
-
-
-	/*
-	 * Data
-	 */
-	private:
-	// Current image export filename
-	QString imageExportFile_;
-	// Format for exported image
-	Viewer::ImageFormat imageExportFormat_;
-	// Size of exported image
-	int imageExportWidth_, imageExportHeight_;
-	// Whether to maintain current aspect ratio on image export
-	bool imageExportMaintainAspect_;
-	// Font file to use for viewer
-	QString viewerFont_;
-	// List of Collections
-	List<Collection> collections_;
-	// Currently-selected Collection
-	Collection* currentCollection_;
-
-	private:
-	// Return unique name based on supplied baseName
-	QString uniqueCollectionName(QString baseName);
-
-	public:
-	// Setup new, empty session
-	void startNewSession(bool createDefaults);
-	// Add new collection
-	Collection* addCollection(QString name = QString());
-	// Remove existing collection
-	void removeCollection(Collection* collection);
-	// Return first collection in list
-	Collection* collections();
-	// Return nth collection in list
-	Collection* collection(int index);
-	// Locate named collection
-	Collection* locateCollection(QString locator);
-	// Move collection focus to next in list
-	void focusNextCollection();
-	// Move collection focus to previous in list
-	void focusPreviousCollection();
-	// Return currently-selected Collection
-	Collection* currentCollection();
-
-
-	/*
-	 * View Layouts
-	 */
-	private:
-	// List of available view layouts
-	ParentList<ViewLayout,UChromaWindow> viewLayouts_;
-	// Current view layout
-	ViewLayout viewLayout_;
-	// Current view pane
-	ViewPane* currentViewPane_;
-
-	public:
-	// Return curreent view layout
-	ViewLayout& viewLayout();
-	// Set view layout
-	void setViewLayout(ViewLayout& source);
-	// Recalculate layout pane positions / sizes (after context resize etc.)
-	void recalculateViewLayout(int contextWidth, int contextHeight);
-	// Set current view pane to the one under the specified screen coordinates
-	bool setCurrentViewPane(int layoutX, int layoutY);
-	// Return current view pane
-	ViewPane* currentViewPane();
 
 
 	/*
@@ -457,27 +340,6 @@ class UChromaWindow : public QMainWindow
 	DataSet* currentSlice();
 	// Perform relevant double-click action, occurring at specified coordinate
 	void doubleClickInteraction(int mouseX, int mouseY);
-
-
-	/*
-	 * View
-	 * TODO These should eventually be moved to ViewPane, probably, or ViewLayout?
-	 */
-	private:
-	// Whether axis text labels face the viewer automatically
-	bool labelFaceViewer_;
-	// Whether axis text labels are corrected for left-right / up readability
-	bool labelCorrectOrientation_;
-
-	public:
-	// Set whether axis text labels face the viewer automatically
-	void setLabelFaceViewer(bool b);
-	// Return whether axis text labels face the viewer automatically
-	bool labelFaceViewer();
-	// Set whether axis text labels are corrected for left-right / up readability
-	void setLabelCorrectOrientation(bool b);
-	// Return whether axis text labels are corrected for left-right / up readability
-	bool labelCorrectOrientation();
 };
 
 #endif

@@ -177,18 +177,6 @@ class Viewer : public QGLWidget
 	void viewClicked();
 	// Return string containing time taken to do last render
 	QString renderComplete(QString timeTaken);
-
-
-	/*
-	 * Image Formats
-	 */
-	public:
-	// Available image export formats
-        enum ImageFormat { BMPFormat, PGFormat, PNGFormat, PPMFormat, XBMFormat, X11Format, nImageFormats };
-        static ImageFormat imageFormat(QString s);
-        static ImageFormat imageFormatFromFilter(QString s);
-        static const char *imageFormatFilter(ImageFormat bf);
-        static const char *imageFormatExtension(ImageFormat bf);
 };
 
 #endif

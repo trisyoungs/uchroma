@@ -29,7 +29,7 @@ SaveImageDialog::SaveImageDialog(UChromaWindow& parent) : QDialog(&parent), uChr
 	ui.setupUi(this);
 	
 	// Populate format combo
-	for (int n=0; n<Viewer::nImageFormats; ++n) ui.ImageFormatCombo->addItem( QString(Viewer::imageFormatExtension((Viewer::ImageFormat) n)).toUpper());
+	for (int n=0; n<UChromaSession::nImageFormats; ++n) ui.ImageFormatCombo->addItem( QString(UChromaSession::imageFormatExtension((UChromaSession::ImageFormat) n)).toUpper());
 }
 
 // Destructor
@@ -38,48 +38,18 @@ SaveImageDialog::~SaveImageDialog()
 }
 
 // Call dialog to get image save information
-bool SaveImageDialog::getImageDetails(QString currentFilename, int width, int height, Viewer::ImageFormat format, bool maintainAspect, double currentAspect)
+bool SaveImageDialog::getImageDetails(double currentAspect)
 {
-	ui.FileNameEdit->setText(currentFilename);
-	currentDirectory_.setPath(currentFilename);
+	ui.FileNameEdit->setText(UChromaSession::imageExportFileName());
+	currentDirectory_.setPath(UChromaSession::imageExportFileName());
 	aspectRatio_ = currentAspect;
-	ui.MaintainAspectRatioCheck->setChecked(maintainAspect);
-	ui.ImageWidthSpin->setValue(width);
-	ui.ImageHeightSpin->setValue(maintainAspect ? width/aspectRatio_ : height);
-	ui.ImageFormatCombo->setCurrentIndex(format);
+	ui.MaintainAspectRatioCheck->setChecked(UChromaSession::imageExportMaintainAspect());
+	ui.ImageWidthSpin->setValue(UChromaSession::imageExportWidth());
+	ui.ImageHeightSpin->setValue(UChromaSession::imageExportMaintainAspect() ? UChromaSession::imageExportWidth()/aspectRatio_ : UChromaSession::imageExportHeight());
+	ui.ImageFormatCombo->setCurrentIndex(UChromaSession::imageExportFormat());
 
 	int result = exec();
 	return (result == 1);
-}
-
-// Return selected filename
-QString SaveImageDialog::imageFileName()
-{
-	return ui.FileNameEdit->text();
-}
-
-// Return specified width
-int SaveImageDialog::imageWidth()
-{
-	return ui.ImageWidthSpin->value();
-}
-
-// Return specified height
-int SaveImageDialog::imageHeight()
-{
-	return ui.ImageHeightSpin->value();
-}
-
-// Return selected image format
-Viewer::ImageFormat SaveImageDialog::imageFormat()
-{
-	return Viewer::imageFormat(qPrintable(ui.ImageFormatCombo->currentText().toLower()));
-}
-
-// Return whether aspect ratio is maintained
-bool SaveImageDialog::imageAspectRatioMaintained()
-{
-	return ui.MaintainAspectRatioCheck->isChecked();
 }
 
 /*
@@ -88,7 +58,7 @@ bool SaveImageDialog::imageAspectRatioMaintained()
 
 void SaveImageDialog::on_SelectFileNameButton_clicked(bool checked)
 {
-	QString newFile = QFileDialog::getSaveFileName(this, "Choose image save file name", currentDirectory_.absolutePath(), QString(Viewer::imageFormatFilter((Viewer::ImageFormat) ui.ImageFormatCombo->currentIndex())) + ";;All files (*.*)");
+	QString newFile = QFileDialog::getSaveFileName(this, "Choose image save file name", currentDirectory_.absolutePath(), QString(UChromaSession::imageFormatFilter((UChromaSession::ImageFormat) ui.ImageFormatCombo->currentIndex())) + ";;All files (*.*)");
 	if (!newFile.isEmpty()) ui.FileNameEdit->setText(newFile);
 }
 
@@ -105,6 +75,13 @@ void SaveImageDialog::on_MaintainAspectRatioCheck_toggled(bool checked)
 
 void SaveImageDialog::on_SaveImageButton_clicked(bool checked)
 {
+	// Set updated values...
+	UChromaSession::setImageExportFileName(ui.FileNameEdit->text());
+	UChromaSession::setImageExportWidth(ui.ImageWidthSpin->value());
+	UChromaSession::setImageExportHeight(ui.ImageHeightSpin->value());
+	UChromaSession::setImageExportMaintainAspect(ui.MaintainAspectRatioCheck->isChecked());
+	UChromaSession::setImageExportFormat((UChromaSession::ImageFormat) ui.ImageFormatCombo->currentIndex());
+
 	accept();
 }
 

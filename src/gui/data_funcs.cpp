@@ -1,5 +1,5 @@
 /*
-	*** uChroma Data Window
+	*** Data Window
 	*** src/gui/data_funcs.cpp
 	Copyright T. Youngs 2013-2014
 
@@ -23,7 +23,7 @@
 #include "gui/uchroma.h"
 #include "gui/editdataset.h"
 #include "gui/data_setz.h"
-#include "base/session.h"
+#include "session/session.h"
 #include "templates/reflist.h"
 #include "templates/variantpointer.h"
 
@@ -60,8 +60,8 @@ void DataWindow::closeEvent(QCloseEvent* event)
 void DataWindow::reloadDataSets()
 {
 	// Check for valid collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!currentCollection) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in DataWindow::reloadDataSets()")) return;
 
 	QString dir = QFileDialog::getExistingDirectory(this, "Select Data Directory", currentCollection->dataFileDirectory().path());
 	if (dir.isEmpty()) return;
@@ -99,8 +99,8 @@ void DataWindow::on_SourceDirSelectButton_clicked(bool checked)
 void DataWindow::on_AddFilesButton_clicked(bool checked)
 {
 	// Check for valid collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!currentCollection) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in DataWindow::on_AddFilesButton_clicked()")) return;
 
 	QStringList files = QFileDialog::getOpenFileNames(this, QString("Select XY datafiles (importing into '")+currentCollection->name()+"')", currentCollection->dataFileDirectory().path(), "Text files (*.txt);;MINT files (*.mint01);;MDCS files (*.mdcs01);;All files (*)");
 
@@ -145,7 +145,7 @@ void DataWindow::on_AddFilesButton_clicked(bool checked)
 	if (QMessageBox::question(this, "New Data Loaded", "New data has been loaded - expand limits to encompass all data?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
 	{
 		// Get list of panes that are currently displaying this collection...
-		RefList<ViewPane,bool> panes = uChroma_.viewLayout().panes(currentCollection, ViewPane::StandardRole);
+		RefList<ViewPane,bool> panes = UChromaSession::viewLayout().panes(currentCollection, ViewPane::StandardRole);
 		for (RefListItem<ViewPane,bool>* ri = panes.first(); ri != NULL; ri = ri->next) ri->item->showAllData();
 	}
 
@@ -158,8 +158,8 @@ void DataWindow::on_AddFilesButton_clicked(bool checked)
 void DataWindow::on_RemoveFilesButton_clicked(bool checked)
 {
 	// Check for valid collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!currentCollection) return;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in DataWindow::on_RemoveFilesButton_clicked()")) return;
 
 	// From the selected items, construct a list of dataset to remove
 	RefList<DataSet,int> dataSetsToRemove;
@@ -189,7 +189,7 @@ void DataWindow::on_DataSetsTable_itemDoubleClicked(QTableWidgetItem* item)
 		if (!dataSet) return;
 
 		EditDataSetDialog dataSetDialog(this);
-		if (dataSetDialog.call(dataSet)) uChroma_.currentCollection()->setDataSetData(dataSet, dataSetDialog.dataSet());
+		if (dataSetDialog.call(dataSet)) UChromaSession::currentCollection()->setDataSetData(dataSet, dataSetDialog.dataSet());
 
 		updateControls();
 	}
@@ -197,9 +197,11 @@ void DataWindow::on_DataSetsTable_itemDoubleClicked(QTableWidgetItem* item)
 
 void DataWindow::on_DataSetsTable_cellChanged(int row, int column)
 {
-	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!currentCollection)) return;
+	if (refreshing_) return;
+
+	// Check for valid collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in DataWindow::on_DataSetsTable_cellChanged()")) return;
 
 	// Z changed
 	if (column == 2)
@@ -222,9 +224,11 @@ void DataWindow::on_DataSetsTable_cellChanged(int row, int column)
 
 void DataWindow::on_SetZButton_clicked(bool checked)
 {
-	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!currentCollection)) return;
+	if (refreshing_) return;
+
+	// Check for valid collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in DataWindow::on_SetZButton_clicked()")) return;
 
 	// Check for no datasets
 	if (currentCollection->nDataSets() == 0) return;
@@ -240,9 +244,9 @@ void DataWindow::on_SetZButton_clicked(bool checked)
 
 void DataWindow::on_ReloadFilesButton_clicked(bool checked)
 {
-	// Check for invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!currentCollection) return;
+	// Check for valid collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in DataWindow::on_ReloadFilesButton_clicked()")) return;
 	
 	// Reload all data
 	QProgressDialog progress("Reloading data...", "Abort", 0, currentCollection->nDataSets(), this);
@@ -291,7 +295,7 @@ void DataWindow::on_EditDataSetButton_clicked(bool checked)
 		if (!dataSet) continue;
 
 		EditDataSetDialog dataSetDialog(this);
-		if (dataSetDialog.call(dataSet)) uChroma_.currentCollection()->setDataSetData(dataSet, dataSetDialog.dataSet());
+		if (dataSetDialog.call(dataSet)) UChromaSession::currentCollection()->setDataSetData(dataSet, dataSetDialog.dataSet());
 	}
 
 	updateControls();
@@ -315,9 +319,9 @@ void DataWindow::updateControls(bool force)
 	// If the window isn't visible, do nothing...
 	if ((!isVisible()) && (!force) ) return;
 
-	// Check for invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (!currentCollection) return;
+	// Check for valid collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in DataWindow::updateControls()")) return;
 
 	refreshing_ = true;
 

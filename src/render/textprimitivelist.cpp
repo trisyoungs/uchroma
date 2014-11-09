@@ -41,7 +41,7 @@ void TextPrimitiveList::add(QString text, Vec3<double> anchorPoint, TextPrimitiv
 }
 
 // Update global bounding cuboid for all text primitives in the list
-Cuboid TextPrimitiveList::boundingCuboid(ViewPane& pane, bool correctOrientation, double baseFontSize, Cuboid startingCuboid)
+Cuboid TextPrimitiveList::boundingCuboid(ViewPane& pane, bool flatLabels, double baseFontSize, Cuboid startingCuboid)
 {
 	Cuboid result = startingCuboid;
 	Matrix textMatrix;
@@ -67,8 +67,8 @@ Cuboid TextPrimitiveList::boundingCuboid(ViewPane& pane, bool correctOrientation
 }
 
 // Render all primitives in list
-void TextPrimitiveList::renderAll(Matrix viewMatrix, bool correctOrientation, double baseFontSize)
+void TextPrimitiveList::renderAll(Matrix viewMatrix, bool flatLabels, double baseFontSize)
 {
-	for (TextPrimitive* primitive = textPrimitives_.first(); primitive != NULL; primitive = primitive->next) primitive->render(viewMatrix, correctOrientation, baseFontSize);
+	for (TextPrimitive* primitive = textPrimitives_.first(); primitive != NULL; primitive = primitive->next) primitive->render(viewMatrix, flatLabels, baseFontSize);
 }
 

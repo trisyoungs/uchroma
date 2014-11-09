@@ -1285,6 +1285,18 @@ double ViewPane::textZScale()
 	return textZScale_;
 }
 
+// Set whether axis text labels are drawn flat in 3D views
+void ViewPane::setFlatLabels(bool flat)
+{
+	flatLabels_ = flat;
+}
+
+// Whether axis text labels are drawn flat in 3D views
+bool ViewPane::flatLabels()
+{
+	return flatLabels_;
+}
+
 /*
  * Interaction
  */

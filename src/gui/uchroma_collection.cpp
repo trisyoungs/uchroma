@@ -20,6 +20,7 @@
 */
 
 #include "gui/uchroma.h"
+#include "session/session.h"
 #include "templates/reflist.h"
 #include "templates/variantpointer.h"
 
@@ -31,12 +32,12 @@ void UChromaWindow::on_CollectionListButton_clicked(bool checked)
 
 void UChromaWindow::on_CollectionFocusNextButton_clicked(bool checked)
 {
-	focusNextCollection();
+	UChromaSession::focusNextCollection();
 }
 
 void UChromaWindow::on_CollectionFocusPreviousButton_clicked(bool checked)
 {
-	focusPreviousCollection();
+	UChromaSession::focusPreviousCollection();
 }
 
 void UChromaWindow::on_CollectionTree_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous)
@@ -49,7 +50,7 @@ void UChromaWindow::on_CollectionTree_currentItemChanged(QTreeWidgetItem* curren
 	if (!collection) return;
 
 	// Set new current collection
-	currentCollection_ = collection;
+	UChromaSession::setCurrentCollection(collection);
 
 	// Update other parts of the GUI
 	updateSubWindows();
@@ -97,15 +98,16 @@ void UChromaWindow::on_CollectionTree_itemChanged(QTreeWidgetItem* item, int col
 
 void UChromaWindow::on_CollectionAddButton_clicked(bool checked)
 {
-	addCollection();
+	UChromaSession::addCollection();
 
 	updateGUI();
 }
 
 void UChromaWindow::on_CollectionRemoveButton_clicked(bool checked)
 {
-	if (!currentCollection_) return;
-	removeCollection(currentCollection_);
+	if (!UChromaSession::currentCollection()) return;
+
+	UChromaSession::removeCurrentCollection();
 
 	updateGUI();
 }
@@ -125,10 +127,10 @@ void UChromaWindow::updateCollectionTreeItem(QTreeWidgetItem* item)
 	item->setCheckState(0, collection->visible() ? Qt::Checked : Qt::Unchecked);
 
 	// Set icon
-	item->setIcon(0, QIcon(collection->iconString(viewLayout_.collectionUsed(collection, ViewPane::StandardRole))));
+	item->setIcon(0, QIcon(collection->iconString(UChromaSession::viewLayout().collectionUsed(collection, ViewPane::StandardRole))));
 
 	// If this is the current collection, select it
-	if (collection == currentCollection_) item->setSelected(true);
+	if (UChromaSession::isCurrentCollection(collection)) item->setSelected(true);
 }
 
 // Add collection data to CollectionTree under specified item
@@ -165,8 +167,8 @@ void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 	// -- "Display..." pane menu
 	contextMenu.addSeparator();
 	QMenu paneMenu, removeFromPaneMenu, addToPaneMenu;
-	RefList<ViewPane,bool> displayPanes = viewLayout_.panes(ViewPane::StandardRole);
-	RefList<ViewPane,bool> currentPanes = viewLayout_.panes(currentCollection_, ViewPane::StandardRole);
+	RefList<ViewPane,bool> displayPanes = UChromaSession::viewLayout().panes(ViewPane::StandardRole);
+	RefList<ViewPane,bool> currentPanes = UChromaSession::viewLayout().panes(UChromaSession::currentCollection(), ViewPane::StandardRole);
 	QList<QAction*> addToPaneActions, removeFromPaneActions;
 	// -- ... Populate removeFromPaneMenu first...
 	for (RefListItem<ViewPane,bool>* ri = currentPanes.first(); ri != NULL; ri = ri->next)
@@ -205,7 +207,7 @@ void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 	else if (removeFromPaneActions.contains(menuResult))
 	{
 		ViewPane* pane = VariantPointer<ViewPane>(menuResult->data());
-		if (pane) pane->removeCollectionTarget(currentCollection_);
+		if (pane) pane->removeCollectionTarget(UChromaSession::currentCollection());
 
 		// Update the item
 		updateCollectionTreeItem(ui.CollectionTree->currentItem());
@@ -215,7 +217,7 @@ void UChromaWindow::collectionTreeContextMenuRequested(const QPoint& point)
 	else if (addToPaneActions.contains(menuResult))
 	{
 		ViewPane* pane = VariantPointer<ViewPane>(menuResult->data());
-		if (pane) pane->addCollectionTarget(currentCollection_);
+		if (pane) pane->addCollectionTarget(UChromaSession::currentCollection());
 
 		// Update the item
 		updateCollectionTreeItem(ui.CollectionTree->currentItem());
@@ -233,7 +235,7 @@ void UChromaWindow::refreshCollections()
 	refreshing_ = true;
 
 	ui.CollectionTree->clear();
-	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next) addCollectionsToTree(collection, NULL);
+	for (Collection* collection = UChromaSession::collections(); collection != NULL; collection = collection->next) addCollectionsToTree(collection, NULL);
 
 	refreshing_ = false;
 
@@ -245,10 +247,10 @@ void UChromaWindow::refreshCollections()
 void UChromaWindow::updateCollectionInfo()
 {
 	// Update collection stats underneath main Collection list
-	if (currentCollection_)
+	if (UChromaSession::currentCollection())
 	{
-		ui.CollectionNSlicesLabel->setText(QString::number(currentCollection_->nDataSets()));
-		ui.CollectionNPointsLabel->setText(QString::number(currentCollection_->nDataPoints()));
+		ui.CollectionNSlicesLabel->setText(QString::number(UChromaSession::currentCollection()->nDataSets()));
+		ui.CollectionNPointsLabel->setText(QString::number(UChromaSession::currentCollection()->nDataPoints()));
 	}
 	else
 	{
@@ -256,14 +258,14 @@ void UChromaWindow::updateCollectionInfo()
 		ui.CollectionNPointsLabel->setText("0");
 	}
 
-	// Set number of collections in the current session (can use Collection's ObjectList to get number)
-	ui.CollectionNCollectionsLabel->setText("("+QString::number(collections_.nItems())+")");
+	// Set number of collections in the current session
+	ui.CollectionNCollectionsLabel->setText("("+QString::number(UChromaSession::nCollections())+")");
 
 	// Update collection info label
-	if (currentCollection_)
+	if (UChromaSession::currentCollection())
 	{
-		ui.InfoCurrentCollectionLabel->setText(currentCollection_->name());
-		ui.InfoCurrentCollectionIconLabel->setPixmap(QPixmap(currentCollection_->iconString(viewLayout_.collectionUsed(currentCollection_, ViewPane::StandardRole))));
+		ui.InfoCurrentCollectionLabel->setText(UChromaSession::currentCollection()->name());
+		ui.InfoCurrentCollectionIconLabel->setPixmap(QPixmap(UChromaSession::currentCollection()->iconString(UChromaSession::viewLayout().collectionUsed(UChromaSession::currentCollection(), ViewPane::StandardRole))));
 	}
 	else ui.InfoCurrentCollectionLabel->setText("<No Current Collection>");
 }

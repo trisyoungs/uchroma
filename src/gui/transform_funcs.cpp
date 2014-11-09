@@ -1,5 +1,5 @@
 /*
-	*** uChroma Transform Window
+	*** Transform Window
 	*** src/gui/transform_funcs.cpp
 	Copyright T. Youngs 2013-2014
 
@@ -21,7 +21,7 @@
 
 #include "gui/transform.h"
 #include "gui/uchroma.h"
-#include "base/session.h"
+#include "session/session.h"
 #include "templates/reflist.h"
 
 /*
@@ -60,9 +60,11 @@ void TransformWindow::closeEvent(QCloseEvent *event)
 
 bool TransformWindow::transformEnabledChanged(int axis, bool enabled)
 {
+	if (refreshing_) return false;;
+
 	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!currentCollection)) return false;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in TransformWindow::transformEnabledChanged()")) return false;
 
 	currentCollection->setTransformEnabled(axis, enabled);
 
@@ -75,9 +77,11 @@ bool TransformWindow::transformEnabledChanged(int axis, bool enabled)
 
 bool TransformWindow::transformEquationChanged(int axis, QString equation)
 {
+	if (refreshing_) return false;
+
 	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!currentCollection)) return false;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in TransformWindow::transformEquationChanged()")) return false;
 
 	currentCollection->setTransformEquation(axis, equation);
 
@@ -90,9 +94,11 @@ bool TransformWindow::transformEquationChanged(int axis, QString equation)
 
 bool TransformWindow::transformInterpolateChanged(int axis, bool checked)
 {
+	if (refreshing_) return false;
+
 	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!currentCollection)) return false;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in TransformWindow::transformInterpolateChanged()")) return false;
 
 	currentCollection->setInterpolate(axis, checked);
 
@@ -105,9 +111,11 @@ bool TransformWindow::transformInterpolateChanged(int axis, bool checked)
 
 bool TransformWindow::transformInterpolateStepChanged(int axis, double step)
 {
+	if (refreshing_) return false;
+
 	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!currentCollection)) return false;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in TransformWindow::transformInterpolateStepChanged()")) return false;
 
 	currentCollection->setInterpolationStep(axis, step);
 
@@ -120,9 +128,11 @@ bool TransformWindow::transformInterpolateStepChanged(int axis, double step)
 
 bool TransformWindow::transformInterpolateConstrainChanged(int axis, bool checked)
 {
+	if (refreshing_) return false;
+
 	// Check for window refreshing or invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
-	if (refreshing_ || (!currentCollection)) return false;
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in TransformWindow::transformInterpolateConstrainChanged()")) return false;
 
 	currentCollection->setInterpolateConstrained(axis, checked);
 
@@ -215,7 +225,7 @@ void TransformWindow::updateControls(bool force)
 	if ((!isVisible()) && (!force) ) return;
 
 	// Check for invalid Collection
-	Collection* currentCollection = uChroma_.currentCollection();
+	Collection* currentCollection = UChromaSession::currentCollection();
 	if (!currentCollection) return;
 
 	refreshing_ = true;

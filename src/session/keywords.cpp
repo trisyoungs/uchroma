@@ -1,6 +1,6 @@
 /*
-	*** Keyword Definitions
-	*** src/gui/keywords.cpp
+	*** Session Keywords
+	*** src/session/keywords.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,7 +19,7 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/keywords.h"
+#include "session/session.h"
 #include "base/sysfunc.h"
 #include "base/messenger.h"
 #include <string.h>
@@ -34,16 +34,16 @@ const char* InputBlockKeywords[] = { "Collection", "Settings", "View" };
 /*!
  * \brief Convert text string to InputBlock
  */
-Keywords::InputBlock Keywords::inputBlock(QString s)
+UChromaSession::InputBlock UChromaSession::inputBlock(QString s)
 {
-	for (int n=0; n<Keywords::nInputBlocks; ++n) if (s == InputBlockKeywords[n]) return (Keywords::InputBlock) n;
-	return Keywords::nInputBlocks;
+	for (int n=0; n<UChromaSession::nInputBlocks; ++n) if (s == InputBlockKeywords[n]) return (UChromaSession::InputBlock) n;
+	return UChromaSession::nInputBlocks;
 }
 
 /*!
  * \brief Convert InputBlock to text string
  */
-const char* Keywords::inputBlock(Keywords::InputBlock id)
+const char* UChromaSession::inputBlock(UChromaSession::InputBlock id)
 {
 	return InputBlockKeywords[id];
 }
@@ -61,16 +61,16 @@ int AxisKeywordNArguments[] = { 1, 1, 0, 1, 1, 3, 6, 6, 1, 1, 3, 2, 1, 1, 4, 3, 
 /*!
  * \brief Convert text string to AxisKeyword
  */
-Keywords::AxisKeyword Keywords::axisKeyword(QString s)
+UChromaSession::AxisKeyword UChromaSession::axisKeyword(QString s)
 {
-	for (int n=0; n<nAxisKeywords; ++n) if (s == AxisBlockKeywords[n]) return (Keywords::AxisKeyword) n;
+	for (int n=0; n<nAxisKeywords; ++n) if (s == AxisBlockKeywords[n]) return (UChromaSession::AxisKeyword) n;
 	return nAxisKeywords;
 }
 
 /*!
  * \brief Convert AxisBlockKeywords to text string
  */
-const char* Keywords::axisKeyword(Keywords::AxisKeyword kwd)
+const char* UChromaSession::axisKeyword(UChromaSession::AxisKeyword kwd)
 {
 	return AxisBlockKeywords[kwd];
 }
@@ -78,7 +78,7 @@ const char* Keywords::axisKeyword(Keywords::AxisKeyword kwd)
 /*!
  * \brief Return minimum number of expected arguments
  */
-int Keywords::axisKeywordNArguments(Keywords::AxisKeyword kwd)
+int UChromaSession::axisKeywordNArguments(UChromaSession::AxisKeyword kwd)
 {
 	return AxisKeywordNArguments[kwd];
 }
@@ -88,24 +88,24 @@ int Keywords::axisKeywordNArguments(Keywords::AxisKeyword kwd)
  */
 
 // Collection Block Keywords
-const char* CollectionBlockKeywords[] = { "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearRGBA", "ColourLinearRGBB", "ColourLinearHSVA", "ColourLinearHSVB", "ColourSingle", "ColourSource", "DataDirectory", "DataSet", "EndCollection", "Fit", "FitParameters", "Interpolate", "InterpolateConstrain", "InterpolateStep", "Slice", "Style", "TransformX", "TransformY", "TransformZ", "Visible" };
+const char* CollectionBlockKeywords[] = { "ColourAlphaControl", "ColourAlphaFixed", "ColourCustomGradient", "ColourLinearRGBA", "ColourLinearRGBB", "ColourLinearHSVA", "ColourLinearHSVB", "ColourSingle", "ColourSource", "DataDirectory", "DataSet", "EndCollection", "Fit", "FitParameters", "Interpolate", "InterpolateConstrain", "InterpolateStep", "LineStyle", "Shininess", "Slice", "Style", "TransformX", "TransformY", "TransformZ", "Visible" };
 
 // Collection Block NArguments
-int CollectionKeywordNArguments[] = { 1, 1, 5, 5, 5, 5, 5, 4, 1, 1, 1, 0, 1, 0, 2, 2, 2, 1, 1, 2, 2, 2, 1 };
+int CollectionKeywordNArguments[] = { 1, 1, 5, 5, 5, 5, 5, 4, 1, 1, 1, 0, 1, 0, 2, 2, 2, 2, 1, 1, 1, 2, 2, 2, 1 };
 
 /*!
  * \brief Convert text string to CollectionKeyword
  */
-Keywords::CollectionKeyword Keywords::collectionKeyword(QString s)
+UChromaSession::CollectionKeyword UChromaSession::collectionKeyword(QString s)
 {
-	for (int n=0; n<nCollectionKeywords; ++n) if (s == CollectionBlockKeywords[n]) return (Keywords::CollectionKeyword) n;
+	for (int n=0; n<nCollectionKeywords; ++n) if (s == CollectionBlockKeywords[n]) return (UChromaSession::CollectionKeyword) n;
 	return nCollectionKeywords;
 }
 
 /*!
  * \brief Convert CollectionKeyword to text string
  */
-const char* Keywords::collectionKeyword(Keywords::CollectionKeyword kwd)
+const char* UChromaSession::collectionKeyword(UChromaSession::CollectionKeyword kwd)
 {
 	return CollectionBlockKeywords[kwd];
 }
@@ -113,7 +113,7 @@ const char* Keywords::collectionKeyword(Keywords::CollectionKeyword kwd)
 /*!
  * \brief Return minimum number of expected arguments
  */
-int Keywords::collectionKeywordNArguments(Keywords::CollectionKeyword kwd)
+int UChromaSession::collectionKeywordNArguments(UChromaSession::CollectionKeyword kwd)
 {
 	return CollectionKeywordNArguments[kwd];
 }
@@ -131,16 +131,16 @@ int FitParametersKeywordNArguments[] = { 0, 1, 1, 1, 1, 7, 7, 1, 2, 2, 1, 1, 2, 
 /*!
  * \brief Convert text string to FitParametersKeyword
  */
-Keywords::FitParametersKeyword Keywords::fitParametersKeyword(QString s)
+UChromaSession::FitParametersKeyword UChromaSession::fitParametersKeyword(QString s)
 {
-	for (int n=0; n<nFitParametersKeywords; ++n) if (s == FitParametersBlockKeywords[n]) return (Keywords::FitParametersKeyword) n;
+	for (int n=0; n<nFitParametersKeywords; ++n) if (s == FitParametersBlockKeywords[n]) return (UChromaSession::FitParametersKeyword) n;
 	return nFitParametersKeywords;
 }
 
 /*!
  * \brief Convert FitParametersKeyword to text string
  */
-const char* Keywords::fitParametersKeyword(Keywords::FitParametersKeyword kwd)
+const char* UChromaSession::fitParametersKeyword(UChromaSession::FitParametersKeyword kwd)
 {
 	return FitParametersBlockKeywords[kwd];
 }
@@ -148,7 +148,7 @@ const char* Keywords::fitParametersKeyword(Keywords::FitParametersKeyword kwd)
 /*!
  * \brief Return minimum number of expected arguments
  */
-int Keywords::fitParametersKeywordNArguments(Keywords::FitParametersKeyword kwd)
+int UChromaSession::fitParametersKeywordNArguments(UChromaSession::FitParametersKeyword kwd)
 {
 	return FitParametersKeywordNArguments[kwd];
 }
@@ -166,16 +166,16 @@ int SettingsKeywordNArguments[] = { 0, 5 };
 /*!
  * \brief Convert text string to SettingsKeyword
  */
-Keywords::SettingsKeyword Keywords::settingsKeyword(QString s)
+UChromaSession::SettingsKeyword UChromaSession::settingsKeyword(QString s)
 {
-	for (int n=0; n<nSettingsKeywords; ++n) if (s == SettingsBlockKeywords[n]) return (Keywords::SettingsKeyword) n;
+	for (int n=0; n<nSettingsKeywords; ++n) if (s == SettingsBlockKeywords[n]) return (UChromaSession::SettingsKeyword) n;
 	return nSettingsKeywords;
 }
 
 /*!
  * \brief Convert SettingsKeyword to text string
  */
-const char* Keywords::settingsKeyword(Keywords::SettingsKeyword kwd)
+const char* UChromaSession::settingsKeyword(UChromaSession::SettingsKeyword kwd)
 {
 	return SettingsBlockKeywords[kwd];
 }
@@ -183,7 +183,7 @@ const char* Keywords::settingsKeyword(Keywords::SettingsKeyword kwd)
 /*!
  * \brief Return minimum number of expected arguments
  */
-int Keywords::settingsKeywordNArguments(Keywords::SettingsKeyword kwd)
+int UChromaSession::settingsKeywordNArguments(UChromaSession::SettingsKeyword kwd)
 {
 	return SettingsKeywordNArguments[kwd];
 }
@@ -201,16 +201,16 @@ int DataSetKeywordNArguments[] = { 0, 0, 1, 1 };
 /*!
  * \brief Convert text string to DataSetKeyword
  */
-Keywords::DataSetKeyword Keywords::dataSetKeyword(QString s)
+UChromaSession::DataSetKeyword UChromaSession::dataSetKeyword(QString s)
 {
-	for (int n=0; n<nDataSetKeywords; ++n) if (s == DataSetBlockKeywords[n]) return (Keywords::DataSetKeyword) n;
+	for (int n=0; n<nDataSetKeywords; ++n) if (s == DataSetBlockKeywords[n]) return (UChromaSession::DataSetKeyword) n;
 	return nDataSetKeywords;
 }
 
 /*!
  * \brief Convert DataSetKeyword to text string
  */
-const char* Keywords::dataSetKeyword(Keywords::DataSetKeyword kwd)
+const char* UChromaSession::dataSetKeyword(UChromaSession::DataSetKeyword kwd)
 {
 	return DataSetBlockKeywords[kwd];
 }
@@ -218,7 +218,7 @@ const char* Keywords::dataSetKeyword(Keywords::DataSetKeyword kwd)
 /*!
  * \brief Return minimum number of expected arguments
  */
-int Keywords::dataSetKeywordNArguments(Keywords::DataSetKeyword kwd)
+int UChromaSession::dataSetKeywordNArguments(UChromaSession::DataSetKeyword kwd)
 {
 	return DataSetKeywordNArguments[kwd];
 }
@@ -228,24 +228,24 @@ int Keywords::dataSetKeywordNArguments(Keywords::DataSetKeyword kwd)
  */
 
 // View Block Keywords
-const char* ViewBlockKeywords[] = { "EndView", "Grid", "LabelFaceViewer", "ViewPane" };
+const char* ViewBlockKeywords[] = { "EndView", "Grid", "ViewPane" };
 
 // View Block NArguments
-int ViewKeywordNArguments[] = { 0, 2, 1, 1 };
+int ViewKeywordNArguments[] = { 0, 2, 1 };
 
 /*!
  * \brief Convert text string to ViewKeyword
  */
-Keywords::ViewKeyword Keywords::viewKeyword(QString s)
+UChromaSession::ViewKeyword UChromaSession::viewKeyword(QString s)
 {
-	for (int n=0; n<nViewKeywords; ++n) if (s == ViewBlockKeywords[n]) return (Keywords::ViewKeyword) n;
+	for (int n=0; n<nViewKeywords; ++n) if (s == ViewBlockKeywords[n]) return (UChromaSession::ViewKeyword) n;
 	return nViewKeywords;
 }
 
 /*!
  * \brief Convert ViewKeyword to text string
  */
-const char* Keywords::viewKeyword(Keywords::ViewKeyword kwd)
+const char* UChromaSession::viewKeyword(UChromaSession::ViewKeyword kwd)
 {
 	return ViewBlockKeywords[kwd];
 }
@@ -253,7 +253,7 @@ const char* Keywords::viewKeyword(Keywords::ViewKeyword kwd)
 /*!
  * \brief Return minimum number of expected arguments
  */
-int Keywords::viewKeywordNArguments(Keywords::ViewKeyword kwd)
+int UChromaSession::viewKeywordNArguments(UChromaSession::ViewKeyword kwd)
 {
 	return ViewKeywordNArguments[kwd];
 }
@@ -263,24 +263,24 @@ int Keywords::viewKeywordNArguments(Keywords::ViewKeyword kwd)
  */
 
 // ViewPane Block Keywords
-const char* ViewPaneBlockKeywords[] = { "AutoPositionTitles", "Axis", "BoundingBox", "BoundingBoxPlaneY", "EndViewPane", "Geometry", "LabelPointSize", "Perspective", "Role", "RoleTargetCollection", "RoleTargetPane", "RotationX", "RotationY", "RotationZ", "TitlePointSize", "Translation", "UseBestFlatView", "ViewType" };
+const char* ViewPaneBlockKeywords[] = { "AutoPositionTitles", "Axis", "BoundingBox", "BoundingBoxPlaneY", "EndViewPane", "FlatLabels", "Geometry", "LabelPointSize", "Perspective", "Role", "RoleTargetCollection", "RoleTargetPane", "RotationX", "RotationY", "RotationZ", "TitlePointSize", "Translation", "UseBestFlatView", "ViewType" };
 
 // ViewPane Block NArguments
-int ViewPaneKeywordNArguments[] = { 1, 1, 1, 1, 0, 4, 1, 1, 1, 1, 1, 3, 3, 3, 1, 3, 1, 1 };
+int ViewPaneKeywordNArguments[] = { 1, 1, 1, 1, 0, 1, 4, 1, 1, 1, 1, 1, 3, 3, 3, 1, 3, 1, 1 };
 
 /*!
  * \brief Convert text string to ViewPaneKeyword
  */
-Keywords::ViewPaneKeyword Keywords::viewPaneKeyword(QString s)
+UChromaSession::ViewPaneKeyword UChromaSession::viewPaneKeyword(QString s)
 {
-	for (int n=0; n<nViewPaneKeywords; ++n) if (s == ViewPaneBlockKeywords[n]) return (Keywords::ViewPaneKeyword) n;
+	for (int n=0; n<nViewPaneKeywords; ++n) if (s == ViewPaneBlockKeywords[n]) return (UChromaSession::ViewPaneKeyword) n;
 	return nViewPaneKeywords;
 }
 
 /*!
  * \brief Convert ViewPaneKeyword to text string
  */
-const char* Keywords::viewPaneKeyword(Keywords::ViewPaneKeyword kwd)
+const char* UChromaSession::viewPaneKeyword(UChromaSession::ViewPaneKeyword kwd)
 {
 	return ViewPaneBlockKeywords[kwd];
 }
@@ -288,7 +288,7 @@ const char* Keywords::viewPaneKeyword(Keywords::ViewPaneKeyword kwd)
 /*!
  * \brief Return minimum number of expected arguments
  */
-int Keywords::viewPaneKeywordNArguments(Keywords::ViewPaneKeyword kwd)
+int UChromaSession::viewPaneKeywordNArguments(UChromaSession::ViewPaneKeyword kwd)
 {
 	return ViewPaneKeywordNArguments[kwd];
 }

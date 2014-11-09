@@ -1,5 +1,5 @@
 /*
-	*** Create Widget Functions
+	*** Create Dialog Functions
 	*** src/gui/create_funcs.cpp
 	Copyright T. Youngs 2012-2014
 
@@ -23,7 +23,7 @@
 #include "gui/uchroma.h"
 #include "gui/selectequation.h"
 #include "expression/variable.h"
-#include "base/session.h"
+#include "session/session.h"
 
 // Constructor
 CreateCollectionDialog::CreateCollectionDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(parent)
@@ -185,8 +185,8 @@ void CreateCollectionDialog::on_CancelButton_clicked(bool checked)
 void CreateCollectionDialog::on_CreateButton_clicked(bool checked)
 {
 	// Create a new collection
-	Collection* target = uChroma_.addCollection(ui.EquationEdit->text());
-	if (uChroma_.currentViewPane()) uChroma_.currentViewPane()->addCollectionTarget(target);
+	Collection* target = UChromaSession::addCollection(ui.EquationEdit->text());
+	if (UChromaSession::currentViewPane()) UChromaSession::currentViewPane()->addCollectionTarget(target);
 	
 	// Make sure the data is up to date
 	createData(target);
@@ -242,7 +242,7 @@ void CreateCollectionDialog::updateGridGroup(bool refreshList)
 	{
 		int currentIndex = ui.GridTakeFromCollectionCombo->currentIndex();
 		ui.GridTakeFromCollectionCombo->clear();
-		for (Collection* c = uChroma_.collections(); c != NULL; c = c->next) ui.GridTakeFromCollectionCombo->addItem(c->name());
+		for (Collection* c = UChromaSession::collections(); c != NULL; c = c->next) ui.GridTakeFromCollectionCombo->addItem(c->name());
 		if ((currentIndex != -1) && (currentIndex < ui.GridTakeFromCollectionCombo->count())) ui.GridTakeFromCollectionCombo->setCurrentIndex(currentIndex);
 		else ui.GridTakeFromCollectionCombo->setCurrentIndex(0);
 	}

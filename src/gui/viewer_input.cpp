@@ -39,7 +39,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 	rMouseDown_.set(event->x(), event->y(), 0.0);
 
 	// The clicked pane will now become the current pane
-	if (uChroma_->setCurrentViewPane(event->x(), height()-event->y())) postRedisplay();
+	if (UChromaSession::setCurrentViewPane(event->x(), height()-event->y())) postRedisplay();
 
 	// Do something with the button press event (e.g. context menu function, or interaction start)
 	if (buttonState_&Qt::LeftButton) uChroma_->startInteraction(event->x(), contextHeight_-event->y(), km);
@@ -79,7 +79,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 	bool refresh = false;
 
 	// Is the current view pane valid?
-	ViewPane* targetPane = uChroma_->currentViewPane();
+	ViewPane* targetPane = UChromaSession::currentViewPane();
 	if (ViewPane::objectValid(targetPane, "ViewPane in Viewer::MouseMoveEvent"))
 	{
 		if (buttonState_&Qt::RightButton)
@@ -127,14 +127,14 @@ void Viewer::wheelEvent(QWheelEvent *event)
 	bool scrollup = event->delta() > 0;
 
 	// The pane underneath the mouse will now become the current pane
-	if (uChroma_->setCurrentViewPane(event->x(), height()-event->y())) postRedisplay();
+	if (UChromaSession::setCurrentViewPane(event->x(), height()-event->y())) postRedisplay();
 
 	// Perform camera zoom
-	if (uChroma_->currentViewPane())
+	if (UChromaSession::currentViewPane())
 	{
-		double zrange = uChroma_->currentViewPane()->axes().stretch(2) * uChroma_->currentViewPane()->axes().realRange(2);
+		double zrange = UChromaSession::currentViewPane()->axes().stretch(2) * UChromaSession::currentViewPane()->axes().realRange(2);
 		if (zrange < 1.0) zrange = 1.0;
-		uChroma_->currentViewPane()->translateView(0.0, 0.0, 0.5*zrange*(scrollup ? -1.0 : 1.0));
+		UChromaSession::currentViewPane()->translateView(0.0, 0.0, 0.5*zrange*(scrollup ? -1.0 : 1.0));
 	}
 
 	postRedisplay();
@@ -174,22 +174,22 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 	switch (event->key())
 	{
 		case (Qt::Key_Left):
-			if (uChroma_->currentViewPane()) uChroma_->currentViewPane()->rotateView(0.0, km.testFlag(Qt::ShiftModifier) ? -1.0 : -10.0);
+			if (UChromaSession::currentViewPane()) UChromaSession::currentViewPane()->rotateView(0.0, km.testFlag(Qt::ShiftModifier) ? -1.0 : -10.0);
 			refresh = true;
 			ignore = false;
 			break;
 		case (Qt::Key_Right):
-			if (uChroma_->currentViewPane()) uChroma_->currentViewPane()->rotateView(0.0, km.testFlag(Qt::ShiftModifier) ? 1.0 : 10.0);
+			if (UChromaSession::currentViewPane()) UChromaSession::currentViewPane()->rotateView(0.0, km.testFlag(Qt::ShiftModifier) ? 1.0 : 10.0);
 			refresh = true;
 			ignore = false;
 			break;
 		case (Qt::Key_Up):
-			if (uChroma_->currentViewPane()) uChroma_->currentViewPane()->rotateView(km.testFlag(Qt::ShiftModifier) ? -1.0 : -10.0, 0.0);
+			if (UChromaSession::currentViewPane()) UChromaSession::currentViewPane()->rotateView(km.testFlag(Qt::ShiftModifier) ? -1.0 : -10.0, 0.0);
 			refresh = true;
 			ignore = false;
 			break;
 		case (Qt::Key_Down):
-			if (uChroma_->currentViewPane()) uChroma_->currentViewPane()->rotateView(km.testFlag(Qt::ShiftModifier) ? 1.0 : 10.0, 0.0);
+			if (UChromaSession::currentViewPane()) UChromaSession::currentViewPane()->rotateView(km.testFlag(Qt::ShiftModifier) ? 1.0 : 10.0, 0.0);
 			refresh = true;
 			ignore = false;
 			break;

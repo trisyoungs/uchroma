@@ -14,7 +14,6 @@ add_library(base
   numberformat.cpp
   nxs.cpp
   referencevariable.cpp
-  session.cpp
   signal.cpp
   sysfunc.cpp
   targetdata.cpp
@@ -37,7 +36,6 @@ add_library(base
   numberformat.h
   nxs.h
   referencevariable.h
-  session.h
   signal.h
   sysfunc.h
   targetdata.h

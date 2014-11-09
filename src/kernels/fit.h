@@ -251,9 +251,9 @@ class FitKernel
 	// Simplex minimise
 	bool simplexMinimise(Array<double>& alpha);
 	// Steepest Descent minimise
-	bool sdMinimise(Array<double>& alpha, double tolerance, int maxSteps);
+	bool sdMinimise(Array<double>& alpha);
 	// Modified Steepest Descent minimise
-	bool sdModMinimise(Array< double >& alpha, double tolerance, int maxSteps, int nTryRandom = 0, double randomMin = -1.0, double randomMax = 1.0);
+	bool sdModMinimise(Array<double>& alpha, double randomMin, double randomMax);
 	// Minimise, calling relevant method
 	bool minimise();
 

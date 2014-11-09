@@ -23,7 +23,7 @@
 #include "math/mathfunc.h"
 
 // Modified Steepest Descent Minimiser
-bool FitKernel::sdModMinimise(Array<double>& alpha, double tolerance, int maxSteps, int nTryRandom, double randomMin, double randomMax)
+bool FitKernel::sdModMinimise(Array<double>& alpha, double randomMin, double randomMax)
 {
 	// Control variables
 	double gradientDelta = 0.01;
@@ -42,14 +42,21 @@ bool FitKernel::sdModMinimise(Array<double>& alpha, double tolerance, int maxSte
 		double oldRMSE = rmsError(alpha);
 		msg.print("Initial RMSE = %e\n", oldRMSE);
 
-		// Randomise initial parameters to try and find better initial set?
-		if (nTryRandom > 0)
+		// Check for RMSE being less than current tolerance
+		if (oldRMSE < tolerance_)
 		{
-			msg.print("Generating %i random values per alpha, within the range %e < alpha < %e.\n", nTryRandom, randomMin, randomMax);
+			msg.print("Current RMSE (%e) is below tolerance value (%e) so no point continuing minimisation.\n", oldRMSE, tolerance_);
+			break;
+		}
+
+		// Randomise initial parameters to try and find better initial set?
+		if (modSDNRandomTrials_ > 0)
+		{
+			msg.print("Generating %i random values per alpha, within the range %e < alpha < %e.\n", modSDNRandomTrials_, randomMin, randomMax);
 			for (n=0; n<alpha.nItems(); ++n)
 			{
 				tempAlpha = alpha;
-				for (i=0; i<nTryRandom; ++i)
+				for (i=0; i<modSDNRandomTrials_; ++i)
 				{
 					tempAlpha[n] = UChromaMath::random() * (randomMax - randomMin) + randomMin;
 					currentRMSE = rmsError(tempAlpha);
@@ -144,9 +151,9 @@ bool FitKernel::sdModMinimise(Array<double>& alpha, double tolerance, int maxSte
 			deltaRMSE = currentRMSE - oldRMSE;
 
 			// Check on convergence tolerance
-			if (fabs(deltaRMSE) < tolerance)
+			if (fabs(deltaRMSE) < tolerance_)
 			{
-				msg.print("Step %04i RMSE = %e (delta = %e) [CONVERGED, tolerance = %e]\n", step, currentRMSE, deltaRMSE, tolerance);
+				msg.print("Step %04i RMSE = %e (delta = %e) [CONVERGED, tolerance = %e]\n", step, currentRMSE, deltaRMSE, tolerance_);
 				converged = true;
 				break;
 			}
@@ -164,12 +171,12 @@ bool FitKernel::sdModMinimise(Array<double>& alpha, double tolerance, int maxSte
 
 			oldRMSE = currentRMSE;
 			msg.print("Step %04i RMSE = %e (delta = %e)\n", step, oldRMSE, deltaRMSE);
-		} while (step < maxSteps);
+		} while (step < maxSteps_);
 
 		// Check for convergence
 		if (converged) break;
 
-	} while (step < maxSteps);
+	} while (step < maxSteps_);
 
 	// Get final cost
 	msg.print("Final RMSE = %e\n", rmsError(alpha));

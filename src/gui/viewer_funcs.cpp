@@ -32,32 +32,6 @@
 #include "render/glextensions.h"
 #endif
 
-/*
- * Image Formats
- */
-
-// Available image export formats
-const char* imageFormatFilters[Viewer::nImageFormats] = { "Windows Image (*.bmp)", "Joint Photographic Experts Group (*.jpg)", "Portable Network Graphics (*.png)", "Portable Pixmap (*.ppm)", "X11 Bitmap (*.xbm)", "X11 Pixmap (*.xpm)" };
-const char* imageFormatExtensions[Viewer::nImageFormats] = { "bmp", "jpg", "png", "ppm", "xbm", "xpm" };
-Viewer::ImageFormat Viewer::imageFormat(QString s)
-{
-	for (int n=0; n<Viewer::nImageFormats; ++n) if (s == imageFormatExtensions[n]) return (Viewer::ImageFormat) n;
-	return Viewer::nImageFormats;
-}
-Viewer::ImageFormat Viewer::imageFormatFromFilter(QString s)
-{
-	for (int n=0; n<Viewer::nImageFormats; ++n) if (s == imageFormatFilters[n]) return (Viewer::ImageFormat) n;
-	return Viewer::nImageFormats;
-}
-const char* Viewer::imageFormatFilter(Viewer::ImageFormat bf)
-{
-        return imageFormatFilters[bf];
-}
-const char* Viewer::imageFormatExtension(Viewer::ImageFormat bf)
-{
-        return imageFormatExtensions[bf];
-}
-
 // Constructor
 Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 {
@@ -118,7 +92,7 @@ void Viewer::initializeGL()
 	}
 
 	// Recalculate view layouts
-	uChroma_->recalculateViewLayout(contextWidth_, contextHeight_);
+	UChromaSession::recalculateViewLayout(contextWidth_, contextHeight_);
 
 	msg.exit("Viewer::initializeGL");
 }
@@ -168,7 +142,7 @@ void Viewer::paintGL()
 
 	// Loop over defined viewpanes
 	GLdouble clipPlaneBottom[4] = { 0.0, 1.0, 0.0, 0.0 }, clipPlaneTop[4] = { 0.0, -1.0, 0.0, 0.0 };
-	for (ViewPane* pane = uChroma_->viewLayout().panes(); pane != NULL; pane = pane->next)
+	for (ViewPane* pane = UChromaSession::viewLayout().panes(); pane != NULL; pane = pane->next)
 	{
 		// Before we do anything else, make sure the view is up to date
 		pane->recalculateView();
@@ -186,7 +160,7 @@ void Viewer::paintGL()
 		glDisable(GL_LIGHTING);
 
 		// Draw graduated background for current pane (only if rendering on-screen)
-		if ((pane == uChroma_->currentViewPane()) && (!renderingOffScreen_))
+		if ((pane == UChromaSession::currentViewPane()) && (!renderingOffScreen_))
 		{
 			glBegin(GL_QUADS);
 			glColor4fv(colourBlue);
@@ -237,8 +211,8 @@ void Viewer::paintGL()
 			FontInstance::font()->FaceSize(1);
 			for (int n=0; n<3; ++n) if (pane->axes().visible(n) && (n != skipAxis))
 			{
-				pane->axes().labelPrimitive(n).renderAll(viewMatrix, uChroma_->labelCorrectOrientation(), pane->textZScale());
-				pane->axes().titlePrimitive(n).renderAll(viewMatrix, uChroma_->labelCorrectOrientation(), pane->textZScale());
+				pane->axes().labelPrimitive(n).renderAll(viewMatrix, pane->flatLabels(), pane->textZScale());
+				pane->axes().titlePrimitive(n).renderAll(viewMatrix, pane->flatLabels(), pane->textZScale());
 			}
 		}
 
@@ -267,7 +241,7 @@ void Viewer::paintGL()
 		// Render current selection marker
 		glLoadMatrixd(viewMatrix.matrix());
 		int sliceAxis = uChroma_->interactionAxis();
-		if ((pane == uChroma_->currentViewPane()) && (sliceAxis != -1))
+		if ((pane == UChromaSession::currentViewPane()) && (sliceAxis != -1))
 		{
 			// Note - we do not need to check for inverted or logarithmic axes here, since the transformation matrix A takes care of that
 			Vec3<double> v;
@@ -370,8 +344,8 @@ void Viewer::resizeGL(int newwidth, int newheight)
 	contextWidth_ = (GLsizei) newwidth;
 	contextHeight_ = (GLsizei) newheight;
 
-	// Recalculate viewlayouts
-	uChroma_->recalculateViewLayout(contextWidth_, contextHeight_);
+	// Recalculate view layout
+	UChromaSession::recalculateViewLayout(contextWidth_, contextHeight_);
 }
 
 // Setup basic GL properties (called each time before renderScene())

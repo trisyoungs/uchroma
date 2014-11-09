@@ -21,7 +21,7 @@
 
 #include "gui/uchroma.h"
 #include "render/fontinstance.h"
-#include "base/session.h"
+#include "session/session.h"
 #include "templates/reflist.h"
 #include "templates/variantpointer.h"
 #include "version.h"
@@ -30,8 +30,7 @@
 UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	axesWindow_(*this), dataWindow_(*this), logWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this),
 	createCollectionDialog_(*this), dataImportDialog_(*this), editFitSetupDialog_(*this), saveImageDialog_(*this),
-	viewTypeActionGroup_(this),
-	viewLayout_(*this)
+	viewTypeActionGroup_(this)
 {
 	// Initialise the icon resource
 	Q_INIT_RESOURCE(icons);
@@ -44,21 +43,11 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	UChromaSignal::setMainWindow(this);
 
 	// Set variable defaults
-	hardIOFail_ = false;
-	inputFileDirectory_ = getenv("PWD");
-#ifdef WIN32
-	viewerFont_ = QDir::current().absoluteFilePath("bin/wright.ttf");
-#elif __APPLE__
-	viewerFont_ = QCoreApplication::applicationDirPath() + "/../SharedSupport/resources/wright.ttf";
-#else
-	viewerFont_ = QDir::current().absoluteFilePath("wright.ttf");
-#endif
-	imageExportFile_ = "image.png";
-	imageExportWidth_ = 800;
-	imageExportHeight_ = 600;
-	imageExportMaintainAspect_ = true;
-	imageExportFormat_ = Viewer::PNGFormat;
-
+	interacting_ = false;
+	interactionMode_ = InteractionMode::ViewInteraction;
+	interactionAxis_ = -1;
+	clickedInteractionValue_ = 0.0;
+	currentInteractionValue_ = 0.0;
 	refreshing_ = false;
 
 	// Load settings...
@@ -68,8 +57,8 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	ui.MainView->setUChroma(this);
 
 	// Load font for viewer
-	if (!QFile::exists(viewerFont_)) QMessageBox::warning(this, "Font Error", "The specified font file '" + viewerFont_ + "' does not exist.");
-	else if (!FontInstance::setupFont(viewerFont_)) QMessageBox::warning(this, "Font Error", "Failed to create a font from the specified font file '" + viewerFont_ +"'.");
+	if (!QFile::exists(UChromaSession::viewerFontFileName())) QMessageBox::warning(this, "Font Error", "The specified font file '" + UChromaSession::viewerFontFileName() + "' does not exist.");
+	else if (!FontInstance::setupFont(UChromaSession::viewerFontFileName())) QMessageBox::warning(this, "Font Error", "Failed to create a font from the specified font file '" + UChromaSession::viewerFontFileName() +"'.");
 
 	// Connect signals / slots between the Viewer and uChroma
 	connect(ui.MainView, SIGNAL(renderComplete(QString)), this, SLOT(updateRenderTimeLabel(QString)));
@@ -116,8 +105,6 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 // Destructor
 UChromaWindow::~UChromaWindow()
 {
-	// Delete all collections explicitly, before the ViewLayout (and ViewPanes) are deleted
-	collections_.clear();
 }
 
 /*
@@ -144,7 +131,7 @@ void UChromaWindow::loadSettings()
 	QSettings settings;
 
 	// Viewer font
-	if (settings.contains("ViewerFont")) viewerFont_ = settings.value("ViewerFont").toString();
+	if (settings.contains("ViewerFont")) UChromaSession::setViewerFontFileName(settings.value("ViewerFont").toString());
 }
 
 // Save settings
@@ -153,7 +140,7 @@ void UChromaWindow::saveSettings()
 	QSettings settings;
 
 	// Viewer font
-	settings.setValue("ViewerFont", viewerFont_);
+	settings.setValue("ViewerFont", UChromaSession::viewerFontFileName());
 }
 
 /*
@@ -178,7 +165,8 @@ void UChromaWindow::updateGUI()
 void UChromaWindow::updateSubWindows()
 {
 	// Make sure limits are up to date
-	currentViewPane_->updateAxisLimits();
+	ViewPane* viewPane = UChromaSession::currentViewPane();
+	if (ViewPane::objectValid(viewPane, "view pane in UChromaWindow::updateSubWindows()")) viewPane->updateAxisLimits();
 
 	axesWindow_.updateControls();
 	dataWindow_.updateControls();
@@ -187,25 +175,27 @@ void UChromaWindow::updateSubWindows()
 	viewWindow_.updateControls();
 
 	// Set titles of each subwindow to reflect current collection and viewpane
-	if (currentCollection_  != NULL)
+	Collection* collection = UChromaSession::currentCollection();
+	if (Collection::objectValid(collection, "collection in UChromaWindow::updateSubWindows"))
 	{
-		dataWindow_.setWindowTitle("Data (" + currentCollection_->name() + ")");
-		styleWindow_.setWindowTitle("Style (" + currentCollection_->name() + ")");
-		transformWindow_.setWindowTitle("Transform (" + currentCollection_->name() + ")");
-		viewWindow_.setWindowTitle("View (" + currentCollection_->name() + ")");
+		dataWindow_.setWindowTitle("Data (" + collection->name() + ")");
+		styleWindow_.setWindowTitle("Style (" + collection->name() + ")");
+		transformWindow_.setWindowTitle("Transform (" + collection->name() + ")");
+		viewWindow_.setWindowTitle("View (" + collection->name() + ")");
 	}
-	axesWindow_.setWindowTitle("Axes (" + currentViewPane_->name() + ")");
+	if (ViewPane::objectValid(viewPane, "view pane in UChromaWindow::updateSubWindows()")) axesWindow_.setWindowTitle("Axes (" + viewPane->name() + ")");
 }
 
 // Update tool bars
 void UChromaWindow::updateToolBars()
 {
 	// Update controls related to current ViewPane
-	if (ViewPane::objectValid(currentViewPane_, "view pane in UChromaWindow::updateToolBars()"))
+	ViewPane* viewPane = UChromaSession::currentViewPane();
+	if (ViewPane::objectValid(viewPane, "view pane in UChromaWindow::updateToolBars()"))
 	{
-		ui.actionViewPerspective->setChecked(currentViewPane_->hasPerspective());
-		ui.actionViewPerspective->setEnabled((currentViewPane_->viewType() < ViewPane::FlatXYView) || (currentViewPane_->viewType() > ViewPane::FlatZYView));
-		QAction* action = viewTypeActionGroup_.actions().at(currentViewPane_->viewType());
+		ui.actionViewPerspective->setChecked(viewPane->hasPerspective());
+		ui.actionViewPerspective->setEnabled((viewPane->viewType() < ViewPane::FlatXYView) || (viewPane->viewType() > ViewPane::FlatZYView));
+		QAction* action = viewTypeActionGroup_.actions().at(viewPane->viewType());
 		if (action) action->setChecked(true);
 	}
 }
@@ -214,32 +204,4 @@ void UChromaWindow::updateToolBars()
 void UChromaWindow::updateDisplay()
 {
 	ui.MainView->postRedisplay();
-}
-
-/*
- * View
- */
-
-// Set whether axis text labels face the viewer automatically
-void UChromaWindow::setLabelFaceViewer(bool b)
-{
-	labelFaceViewer_ = b;
-}
-
-// Return whether axis text labels face the viewer automatically
-bool UChromaWindow::labelFaceViewer()
-{
-	return labelFaceViewer_;
-}
-
-// Set whether axis text labels are corrected for left-right / up readability
-void UChromaWindow::setLabelCorrectOrientation(bool b)
-{
-	labelCorrectOrientation_ = b;
-}
-
-// Return whether axis text labels are corrected for left-right / up readability
-bool UChromaWindow::labelCorrectOrientation()
-{
-	return labelCorrectOrientation_;
 }

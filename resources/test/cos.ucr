@@ -17,6 +17,8 @@ Collection 'Cosine Test Data'
   ColourLinearHSVB 1.199930 256 215 255 255
   ColourAlphaControl 'OwnAlpha'
   ColourAlphaFixed 0.500000
+  LineStyle 1.000000 'Solid'
+  Shininess 128.000000
   Style Surface
   Visible true
   DataSet '/home/tris/src/uchroma/test/cos01.txt'
@@ -5082,9 +5084,7 @@ Collection 'Cosine Test Data'
 EndCollection
 View
   Grid 4 4
-  LabelFaceViewer false
   ViewPane 'Main view'
-    Geometry 0 0 4 4
     AutoPositionTitles false
     Axis 0
       AutoScale None
@@ -5103,7 +5103,7 @@ View
       NumberFormat 'Decimal' 3 true false
       PositionFractional 0.000000 0.000000 0.000000
       PositionReal 0.000000 0.000000 0.000000
-      Stretch 1.000000
+      Stretch 0.568363
       TickDelta 3.000000
       TickDirection 0.000000 -1.000000 0.000000
       TitleAnchor TopMiddle
@@ -5128,7 +5128,7 @@ View
       NumberFormat 'Decimal' 3 true false
       PositionFractional 0.000000 0.000000 0.000000
       PositionReal 0.000000 0.000000 0.000000
-      Stretch 1.000000
+      Stretch 2.716688
       TickDelta 0.300000
       TickDirection -1.000000 0.000000 0.000000
       TitleAnchor BottomMiddle
@@ -5153,7 +5153,7 @@ View
       NumberFormat 'Decimal' 3 true false
       PositionFractional 0.000000 0.000000 0.000000
       PositionReal 0.000000 0.000000 0.000000
-      Stretch 1.000000
+      Stretch 0.808823
       TickDelta 1.000000
       TickDirection -1.000000 0.000000 0.000000
       TitleAnchor TopMiddle
@@ -5161,18 +5161,20 @@ View
       TitleOrientation 0.000000 0.000000 0.200000 0.500000
       Visible true
     EndAxis
-    LabelPointSize 16.000000
-    TitlePointSize 20.000000
     BoundingBox 0
     BoundingBoxPlaneY 0.000000
-    RotationX 0.980448 -0.033897 0.193837
-    RotationY -0.094266 0.783758 0.613871
-    RotationZ -0.172730 -0.620141 0.765238
-    Translation 0.000000 0.000000 -23.500000
+    FlatLabels true
+    Geometry 0 0 4 4
+    LabelPointSize 16.000000
+    TitlePointSize 20.000000
+    RotationX 0.990289 -0.011000 0.138587
+    RotationY -0.008430 0.990279 0.138839
+    RotationZ -0.138767 -0.138659 0.980570
+    Translation 0.000000 0.000000 -11.542568
     Perspective false
     Role 'Standard'
     RoleTargetCollection 'Cosine Test Data'
     UseBestFlatView false
-    ViewType 'Normal'
+    ViewType 'AutoStretched'
   EndViewPane
 EndView

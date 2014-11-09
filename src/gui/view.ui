@@ -54,9 +54,9 @@
        <number>4</number>
       </property>
       <item>
-       <widget class="QCheckBox" name="ViewLabelsFaceViewerCheck">
+       <widget class="QCheckBox" name="ViewFlatLabelsCheck">
         <property name="text">
-         <string>Face viewer</string>
+         <string>Force flat labels in 3D views</string>
         </property>
        </widget>
       </item>

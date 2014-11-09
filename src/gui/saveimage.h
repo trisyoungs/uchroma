@@ -23,7 +23,7 @@
 #define UCHROMA_SAVEIMAGEDIALOG_H
 
 #include "gui/ui_saveimage.h"
-#include "gui/viewer.uih"
+#include "session/session.h"
 #include <QtGui/QDialog>
 
 // Forward Declarations
@@ -50,18 +50,8 @@ class SaveImageDialog : public QDialog
 	double aspectRatio_;
 
 	public:
-	// Call dialog to get image save information
-	bool getImageDetails(QString currentFilename, int width, int height, Viewer::ImageFormat format, bool maintainAspect, double currentAspect);
-	// Return selected filename
-	QString imageFileName();
-	// Return specified width
-	int imageWidth();
-	// Return specified height
-	int imageHeight();
-	// Return selected image format
-	Viewer::ImageFormat imageFormat();
-	// Return whether aspect ratio is maintained
-	bool imageAspectRatioMaintained();
+	// Call dialog to get/update image save information in UChromaSession
+	bool getImageDetails(double currentAspect);
 
 
 	/*

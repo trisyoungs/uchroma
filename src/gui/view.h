@@ -1,5 +1,5 @@
 /*
-	*** uChroma View Window
+	*** View Window
 	*** src/gui/view.h
 	Copyright T. Youngs 2013-2014
 
@@ -77,7 +77,7 @@ class ViewWindow : public QWidget
 	void on_ViewBoundingBoxPlaneYSetZeroButton_clicked(bool checked);
 	void on_ViewBoundingBoxPlaneYSetMaximumButton_clicked(bool checked);
 	// -- Label Facing
-	void on_ViewLabelsFaceViewerCheck_clicked(bool checked);
+	void on_ViewFlatLabelsCheck_clicked(bool checked);
 	void on_ViewLabelPointSizeSpin_valueChanged(double value);
 	void on_ViewTitlePointSizeSpin_valueChanged(double value);
 
