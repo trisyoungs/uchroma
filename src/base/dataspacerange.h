@@ -23,6 +23,7 @@
 #define UCHROMA_DATASPACERANGE_H
 
 #include "base/indexdata.h"
+#include "base/equationvariable.h"
 #include "templates/array.h"
 #include "templates/list.h"
 #include "templates/reflist.h"
@@ -103,6 +104,8 @@ class DataSpaceRange : public ListItem<DataSpaceRange>
 	Array2D<double> yTypes_;
 	// Calculated Y values
 	Array2D<double> yCalculated_;
+	// Fitted variable values
+	List<EquationVariable> fittedValues_;
 
 	public:
 	// Return reference y value specified
@@ -120,7 +123,15 @@ class DataSpaceRange : public ListItem<DataSpaceRange>
 	// Return sos error between stored and referenced values
 	double sosError();
 	// Add values to datasets in specified Collection
-	void addCalculatedValues(Collection* target, int sourceZOffset);
+	void addCalculatedValues(Collection* target);
+	// Add / set fitted variable value
+	void setFittedValue(QString name, double value);
+	// Return whether named fitted variable exists
+	EquationVariable* hasFittedValue(QString name);
+	// Return value of named fitted variable
+	double fittedValue(QString name);
+	// Return first in list of fitted variable values
+	EquationVariable* fittedValues();
 };
 
 #endif

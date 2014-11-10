@@ -54,6 +54,9 @@ FitKernel::FitKernel()
 	sourceCollection_ = NULL;
 	destinationCollection_ = NULL;
 
+	// Strategy
+	rollOnValues_ = false;
+
 	// Minimisation Setup
 	method_ = FitKernel::ModifiedSteepestDescentMethod;
 	maxSteps_ = 100;
@@ -93,6 +96,9 @@ void FitKernel::operator=(const FitKernel& source)
 	global_ = source.global_;
 	sourceCollection_ = source.sourceCollection_;
 	destinationCollection_ = source.destinationCollection_;
+
+	// Strategy
+	rollOnValues_ = source.rollOnValues_;
 
 	// Minimisation Setup
 	method_ = source.method_;
@@ -565,6 +571,80 @@ void FitKernel::checkRanges()
 	else if (indexZMax_ >= sourceCollection_->nDataSets()) indexZMax_ = sourceCollection_->nDataSets()-1;
 }
 
+// Initialise data space
+bool FitKernel::initialiseDataSpace()
+{
+	// Determine X bin index range
+	int firstXPoint, lastXPoint;
+	const Array<double>& abscissa = sourceCollection_->displayAbscissa();
+	if (xRange_ == FitKernel::AbsoluteRange)
+	{
+		for (firstXPoint = 0; firstXPoint < (abscissa.nItems()-1); ++firstXPoint) if (abscissa.value(firstXPoint) >= absoluteXMin_) break;
+		for (lastXPoint = abscissa.nItems()-1; lastXPoint > 0; --lastXPoint) if (abscissa.value(lastXPoint) <= absoluteXMax_) break;
+	}
+	else if (xRange_ == FitKernel::SinglePointRange)
+	{
+		firstXPoint = indexXSingle_;
+		lastXPoint = firstXPoint;
+	}
+	else
+	{
+		firstXPoint = indexXMin_;
+		lastXPoint = indexXMax_;
+	}
+
+	// Determine Z (dataset) bin index range
+	int firstZPoint = 0, lastZPoint = 0;
+	if (zRange_ == FitKernel::AbsoluteRange)
+	{
+		for (firstZPoint = 0; firstZPoint < (sourceCollection_->nDataSets()-1); ++firstZPoint) if (sourceCollection_->dataSet(firstZPoint)->data().z() >= absoluteZMin_) break;
+		for (lastZPoint = sourceCollection_->nDataSets()-1; lastZPoint > 0; --lastZPoint) if (sourceCollection_->dataSet(lastZPoint)->data().z() <= absoluteZMax_) break;
+	}
+	else if (zRange_ == FitKernel::SinglePointRange)
+	{
+		firstZPoint = indexZSingle_;
+		lastZPoint = firstZPoint;
+	}
+	else
+	{
+		firstZPoint = indexZMin_;
+		lastZPoint = indexZMax_;
+	}
+
+	// Construct source data
+	if (!fitSpace_.initialise(sourceCollection_, firstXPoint, lastXPoint, firstZPoint, lastZPoint, orthogonal_, global_)) return false;
+
+	return true;
+}
+
+// Return data space range with index specified
+DataSpaceRange* FitKernel::dataSpaceRange(int index)
+{
+	return fitSpace_.range(index);
+}
+
+// Return first data space range in list
+DataSpaceRange* FitKernel::dataSpaceRanges()
+{
+	return fitSpace_.ranges();
+}
+
+/*
+ * Strategy
+ */
+
+// Set whether to roll on values between ranges
+void FitKernel::setRollOnValues(bool b)
+{
+	rollOnValues_ = b;
+}
+
+// Return whether to roll-on variable values between ranges
+bool FitKernel::rollOnValues()
+{
+	return rollOnValues_;
+}
+
 /*
  * Minimisation Setup
  */
@@ -633,27 +713,8 @@ double FitKernel::rmsError(Array<double>& alpha)
 }
 
 // Minimise, calling relevant method
-bool FitKernel::minimise()
+bool FitKernel::minimise(Array<double>& alpha)
 {
-	// Construct alpha array (variables to fit) to pass to minimiser
-	Array<double> alpha;
-	fitVariables_.clear();
-	for (RefListItem<EquationVariable,bool>* ri = usedVariables_.first(); ri != NULL; ri = ri->next)
-	{
-		// Grab variable pointer from FitVariable
-		EquationVariable* eqVar = ri->item;
-
-		// If this is variable is to be fit, add it to fitVariables_
-		if (eqVar->fit())
-		{
-			alpha.add(eqVar->value());
-			fitVariables_.add(eqVar);
-		}
-
-		// Poke the initial value into the variable
-		eqVar->variable()->set(eqVar->value());
-	}
-
 	// Call the minimiser
 	bool result;
 	double randomMin, randomMax;
@@ -684,20 +745,6 @@ bool FitKernel::minimise()
 			break;
 	}
 
-	// Print and store results...
-	msg.print("Final, fitted parameters are:\n");
-	int n = 0;
-	for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next)
-	{
-		// Grab variable pointer from FitVariable
-		EquationVariable* var = ri->item;
-
-		msg.print("\t%s\t=\t%e\n", qPrintable(var->name()), alpha[n]);
-		var->setValue(alpha[n]);
-
-		++n;
-	}
-	
 	return result;
 }
 
@@ -762,7 +809,7 @@ int FitKernel::modSDNRandomTrials()
 }
 
 // Perform fitting with current settings
-bool FitKernel::fit()
+bool FitKernel::fit(bool startFromUnity)
 {
 	// Check number of variables to fit
 	if (usedVariables_.nItems() == 0)
@@ -770,49 +817,11 @@ bool FitKernel::fit()
 		msg.print("Error: No variables to fit!\n");
 		return false;
 	}
-
 	// Check source collection
 	if (!Collection::objectValid(sourceCollection_, "source collection in FitKernel::fit()")) return false;
 
-	// Determine X bin index range
-	int firstXPoint, lastXPoint;
-	const Array<double>& abscissa = sourceCollection_->displayAbscissa();
-	if (xRange_ == FitKernel::AbsoluteRange)
-	{
-		for (firstXPoint = 0; firstXPoint < (abscissa.nItems()-1); ++firstXPoint) if (abscissa.value(firstXPoint) >= absoluteXMin_) break;
-		for (lastXPoint = abscissa.nItems()-1; lastXPoint > 0; --lastXPoint) if (abscissa.value(lastXPoint) <= absoluteXMax_) break;
-	}
-	else if (xRange_ == FitKernel::SinglePointRange)
-	{
-		firstXPoint = indexXSingle_;
-		lastXPoint = firstXPoint;
-	}
-	else
-	{
-		firstXPoint = indexXMin_;
-		lastXPoint = indexXMax_;
-	}
-
-	// Determine Z (dataset) bin index range
-	int firstZPoint = 0, lastZPoint = 0;
-	if (zRange_ == FitKernel::AbsoluteRange)
-	{
-		for (firstZPoint = 0; firstZPoint < (sourceCollection_->nDataSets()-1); ++firstZPoint) if (sourceCollection_->dataSet(firstZPoint)->data().z() >= absoluteZMin_) break;
-		for (lastZPoint = sourceCollection_->nDataSets()-1; lastZPoint > 0; --lastZPoint) if (sourceCollection_->dataSet(lastZPoint)->data().z() <= absoluteZMax_) break;
-	}
-	else if (zRange_ == FitKernel::SinglePointRange)
-	{
-		firstZPoint = indexZSingle_;
-		lastZPoint = firstZPoint;
-	}
-	else
-	{
-		firstZPoint = indexZMin_;
-		lastZPoint = indexZMax_;
-	}
-
-	// Construct source data
-	if (!fitSpace_.initialise(sourceCollection_, firstXPoint, lastXPoint, firstZPoint, lastZPoint, orthogonal_, global_)) return false;
+	// Initialise data space
+	if (!initialiseDataSpace()) return false;
 	
 	// Clear existing data in destination collection
 	if (!Collection::objectValid(destinationCollection_, "destination collection in FitKernel::fit()")) return false;
@@ -826,21 +835,63 @@ bool FitKernel::fit()
 		refVar->resetCurrentDataSpaceRange();
 	}
 
+	// Construct list of variables that will be fitted
+	fitVariables_.clear();
+	for (RefListItem<EquationVariable,bool>* ri = usedVariables_.first(); ri != NULL; ri = ri->next)
+	{
+		// Grab variable pointer from FitVariable
+		EquationVariable* eqVar = ri->item;
+
+		// If this is variable is to be fit, add it to fitVariables_
+		if (eqVar->fit()) fitVariables_.add(eqVar);
+
+		// Poke the initial value into the variable
+		eqVar->variable()->set(eqVar->value());
+	}
+
 	// Loop over defined DataSpaceRanges (including those in any reference variables)
 	bool result;
 	for (currentFitRange_ = fitSpace_.ranges(); currentFitRange_ != NULL; currentFitRange_ = currentFitRange_->next)
 	{
 		msg.print("Fitting range (%e < x < %e) (%e < z < %e)\n", currentFitRange_->xStart(), currentFitRange_->xEnd(), currentFitRange_->zStart(), currentFitRange_->zEnd());
 
+		// Set-up / retrieve variables from the current range
+		Array<double> alpha;
+		for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next)
+		{
+			EquationVariable* eqVar = ri->item;
+			if (startFromUnity) alpha.add(1.0);
+			else if (rollOnValues_) alpha.add(eqVar->value());
+			else if (currentFitRange_->hasFittedValue(eqVar->name())) alpha.add(currentFitRange_->fittedValue(eqVar->name()));
+			else alpha.add(1.0);
+		}
+		
 		// Call the minimiser
-		result = minimise();
+		result = minimise(alpha);
+
+		// Print results...
+		if (result)
+		{
+			msg.print("Final, fitted parameters are:\n");
+			int n = 0;
+			for (RefListItem<EquationVariable,bool>* ri = fitVariables_.first(); ri != NULL; ri = ri->next)
+			{
+				// Grab variable pointer from FitVariable
+				EquationVariable* eqVar = ri->item;
+
+				msg.print("\t%s\t=\t%e\n", qPrintable(eqVar->name()), alpha[n]);
+				eqVar->setValue(alpha[n]);
+				currentFitRange_->setFittedValue(eqVar->name(), alpha[n]);
+
+				++n;
+			}
+		}
 
 		// Loop DataSpaceRange pointers in reference variable
 		for (RefListItem<ReferenceVariable,bool>* ri = usedReferences_.first(); ri != NULL; ri = ri->next) ri->item->moveToNextDataSpaceRange();
 	}
 
-	// Clear destination datasets, and copy final fitted data over
-	destinationCollection_->clearDataSets();
+	// Copy final fitted data over
 	fitSpace_.copy(destinationCollection_);
 
 	return result;

@@ -367,13 +367,17 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	// Style version
 	int displayStyleVersion_;
 
+	private:
+	// Generate display data
+	void updateDisplayData();
+
 	public:
 	// Set whether data is visible
 	void setVisible(bool visible);
 	// Return hether data is visible
 	bool visible();
 	// Return transformed display abscissa for data
-	const Array<double>& displayAbscissa() const;
+	const Array<double>& displayAbscissa();
 	// Return transformed data to display
 	List<DisplayDataSet>& displayData();
 	// Set display style of data

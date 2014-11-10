@@ -349,28 +349,58 @@ double DataSpaceRange::sosError()
 }
 
 // Add calculated data into specified Collection
-void DataSpaceRange::addCalculatedValues(Collection* target, int sourceZOffset)
+void DataSpaceRange::addCalculatedValues(Collection* target)
 {
 	// Target collection should already have had DataSet 'space' created in it
-	int actualX, actualZ;
 
 	for (int n=0; n<nDataSets_; ++n)
 	{
 		// Grab DataSet pointer
-		actualZ = n+displayDataSetStart_+sourceZOffset;
-		DataSet* dataSet = target->dataSet(actualZ);
+		DataSet* dataSet = target->dataSet(n+displayDataSetStart_);
 		if (!dataSet)
 		{
-			msg.print("Internal Error: Couldn't retrieve dataset index %i from target collection.\n", actualZ);
+			msg.print("Internal Error: Couldn't retrieve dataset index %i from target collection.\n", n);
 			return;
 		}
 
 		// Loop over x values
 		for (int i=0; i<nPoints_; ++i)
 		{
-			actualX = i + abscissaStart_;
-			dataSet->data().setX(actualX, x_.value(i));
-			dataSet->data().setY(actualX, yCalculated_.ref(i,n));
+			dataSet->data().setX(i+abscissaStart_, x_.value(i));
+			dataSet->data().setY(i+abscissaStart_, yCalculated_.ref(i,n));
 		}
 	}
+}
+
+// Add / set fitted variable value
+void DataSpaceRange::setFittedValue(QString name, double value)
+{
+	EquationVariable* eqVar = NULL;
+	for (eqVar = fittedValues_.first(); eqVar != NULL; eqVar = eqVar->next) if (eqVar->name() == name) break;
+	if (eqVar == NULL)
+	{
+		eqVar = fittedValues_.add();
+		eqVar->setName(name);
+	}
+	eqVar->setValue(value);
+}
+
+// Return whether named fitted variable exists
+EquationVariable* DataSpaceRange::hasFittedValue(QString name)
+{
+	for (EquationVariable* eqVar = fittedValues_.first(); eqVar != NULL; eqVar = eqVar->next) if (eqVar->name() == name) return eqVar;
+	return NULL;
+}
+
+// Return value of named fitted variable
+double DataSpaceRange::fittedValue(QString name)
+{
+	for (EquationVariable* eqVar = fittedValues_.first(); eqVar != NULL; eqVar = eqVar->next) if (eqVar->name() == name) return eqVar->value();
+	return 0.0;
+}
+
+// Return first in list of fitted variable values
+EquationVariable* DataSpaceRange::fittedValues()
+{
+	return fittedValues_.first();
 }

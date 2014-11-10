@@ -46,6 +46,8 @@ class DataSpace
 	private:
 	// Source collection
 	Collection* sourceCollection_;
+	// Data version of source collection when it was used to construct data
+	int sourceCollectionDataUsedAt_;
 	// Range of datasets spanned by this instance
 	int displayDataSetStart_, displayDataSetEnd_;
 	// Total number of sequential DisplayDataSet covered
@@ -54,6 +56,10 @@ class DataSpace
 	int abscissaStart_, abscissaEnd_;
 	// Total number of sequential abscissa values covered
 	int nPoints_;
+	// Whether the fit data is orthogonal
+	bool orthogonal_;
+	// Whether the fit data is global
+	bool global_;
 	// List of individual fitting targets / slices / ranges
 	ParentList<DataSpaceRange,DataSpace> ranges_;
 
@@ -66,6 +72,8 @@ class DataSpace
 	Collection* sourceCollection();
 	// Return range list
 	DataSpaceRange* ranges();
+	// Return range specified
+	DataSpaceRange* range(int index);
 	// Copy calculated y data to destination collection specified
 	void copy(Collection* destinationCollection);
 };

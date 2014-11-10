@@ -88,6 +88,9 @@ double UChromaWindow::screenToAxis(int axis, int mouseX, int mouseY)
 // Set interaction mode and axis
 void UChromaWindow::setInteractionMode(InteractionMode::Mode mode, int axis)
 {
+	// Cancel any previous interaction mode...
+	cancelInteraction();
+
 	interactionMode_ = mode;
 	interactionAxis_ = axis;
 
@@ -114,6 +117,25 @@ int UChromaWindow::interactionAxis()
 bool UChromaWindow::interacting()
 {
 	return interacting_;
+}
+
+// Cancel current interaction
+void UChromaWindow::cancelInteraction()
+{
+	// Finalise interaction type
+	switch (interactionMode_)
+	{
+		case (InteractionMode::FitSetupSelectXInteraction):
+		case (InteractionMode::FitSetupSelectZInteraction):
+			editFitSetupDialog_.updateAndExec();
+			break;
+		case (InteractionMode::ViewInteraction):
+		case (InteractionMode::ZoomInteraction):
+			break;
+		default:
+			printf("Internal Error: Don't know how to complete interaction mode %i\n", interactionMode_);
+			break;
+	}
 }
 
 // Start interaction at the specified screen coordinates
@@ -178,12 +200,12 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 		case (InteractionMode::FitSetupSelectXInteraction):
 			editFitSetupDialog_.ui.XAbsoluteMinSpin->setValue(std::min(clickedInteractionValue_, currentInteractionValue_));
 			editFitSetupDialog_.ui.XAbsoluteMaxSpin->setValue(std::max(clickedInteractionValue_, currentInteractionValue_));
-			editFitSetupDialog_.show();
+			editFitSetupDialog_.updateAndExec();
 			break;
 		case (InteractionMode::FitSetupSelectZInteraction):
 			editFitSetupDialog_.ui.ZAbsoluteMinSpin->setValue(std::min(clickedInteractionValue_, currentInteractionValue_));
 			editFitSetupDialog_.ui.ZAbsoluteMaxSpin->setValue(std::max(clickedInteractionValue_, currentInteractionValue_));
-			editFitSetupDialog_.show();
+			editFitSetupDialog_.updateAndExec();
 			break;
 		case (InteractionMode::ZoomInteraction):
 			// None : Zoom to defined region
@@ -210,6 +232,10 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 			printf("Internal Error: Don't know how to complete interaction mode %i\n", interactionMode_);
 			break;
 	}
+
+	// Reset mode back to View interaction
+	interactionMode_ = InteractionMode::ViewInteraction;
+	interactionAxis_ = -1;
 
 	interacting_ = false;
 }
@@ -262,6 +288,6 @@ void UChromaWindow::doubleClickInteraction(int mouseX, int mouseY)
 	if (pane == NULL) return;
 
 	// Now find out what, if anything, was under the mouse...
-	int axis = pane->axisTitleAt(mouseX, mouseY);
-	if (axis != -1) printf("Here's axis %i\n", axis);
+// 	int axis = pane->axisTitleAt(mouseX, mouseY);
+// 	if (axis != -1) printf("Here's axis %i\n", axis);
 }

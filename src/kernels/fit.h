@@ -217,6 +217,26 @@ class FitKernel
 	Collection* destinationCollection();
 	// Update ranges to ensure sensible limits for current collection
 	void checkRanges();
+	// Initialise data space
+	bool initialiseDataSpace();
+	// Return data space range with index specified
+	DataSpaceRange* dataSpaceRange(int index);
+	// Return first data space range in list
+	DataSpaceRange* dataSpaceRanges();
+
+
+	/*
+	 * Strategy
+	 */
+	private:
+	// Whether to roll-on variable values between ranges
+	bool rollOnValues_;
+
+	public:
+	// Set whether to roll on values between ranges
+	void setRollOnValues(bool b);
+	// Return whether to roll-on variable values between ranges
+	bool rollOnValues();
 
 
 	/*
@@ -242,7 +262,6 @@ class FitKernel
 	// Number of random trials to use in Modified SD method
 	int modSDNRandomTrials_;
 
-
 	private:
 	// Calculate SOS error for current targets
 	double sosError(Array<double>& alpha);
@@ -255,7 +274,7 @@ class FitKernel
 	// Modified Steepest Descent minimise
 	bool sdModMinimise(Array<double>& alpha, double randomMin, double randomMax);
 	// Minimise, calling relevant method
-	bool minimise();
+	bool minimise(Array< double >& alpha);
 
 	public:
 	// Set minimisation method to use
@@ -279,7 +298,7 @@ class FitKernel
 	// Return number of random trials to use in Modified SD method
 	int modSDNRandomTrials();
 	// Perform fitting with current settings
-	bool fit();
+	bool fit(bool startFromUnity = false);
 };
 
 #endif

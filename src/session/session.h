@@ -32,6 +32,7 @@ class QMainWindow;
 class LineParser;
 class Axes;
 class ViewPane;
+class DataSpaceRange;
 
 // Session
 class UChromaSession
@@ -305,6 +306,7 @@ class UChromaSession
 	{
 		EndFitParametersKeyword,
 		EquationKeyword,
+		FitResultsBlockKeyword,
 		GlobalKeyword,
 		LimitStrengthKeyword,
 		OrthogonalKeyword,
@@ -326,6 +328,20 @@ class UChromaSession
 	static const char* fitParametersKeyword(FitParametersKeyword kwd);
 	// Return minimum number of expected arguments
 	static int fitParametersKeywordNArguments(FitParametersKeyword kwd);
+
+	// FitResults Block Keyword Enum
+	enum FitResultsKeyword
+	{
+		EndFitResultsKeyword,
+		FittedValueKeyword,
+		nFitResultsKeywords
+	};
+	// Convert text string to FitResultsKeyword
+	static FitResultsKeyword fitResultsKeyword(QString s);
+	// Convert FitResultsKeyword to text string
+	static const char* fitResultsKeyword(FitResultsKeyword kwd);
+	// Return minimum number of expected arguments
+	static int fitResultsKeywordNArguments(FitResultsKeyword kwd);
 
 	// Settings Block Keyword Enum
 	enum SettingsKeyword
@@ -396,6 +412,8 @@ class UChromaSession
 	static bool readDataSetBlock(LineParser& parser, DataSet* dataSet, Collection* collection);
 	// Read FitParametersBlock keywords
 	static bool readFitParametersBlock(LineParser& parser, FitKernel* fitKernel);
+	// Read FitResultsBlock keywords
+	static bool readFitResultsBlock(LineParser& parser, DataSpaceRange* range);
 	// Read SettingsBlock keywords
 	static bool readSettingsBlock(LineParser& parser);
 	// Read ViewBlock keywords
@@ -410,6 +428,8 @@ class UChromaSession
 	static bool writeDataSetBlock(LineParser& parser, DataSet* dataSet, int indentLevel = 0);
 	// Write FitParametersBlock keywords
 	static bool writeFitParametersBlock(LineParser& parser, FitKernel* fitKernel, int indentLevel = 0);
+	// Write FitResultsBlock keywords
+	static bool writeFitResultsBlock(LineParser& parser, DataSpaceRange* range, int rangeID = 0, int indentLevel = 0);
 	// Write SettingsBlock keywords
 	static bool writeSettingsBlock(LineParser& parser);
 	// Write ViewBlock keywords

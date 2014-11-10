@@ -1278,29 +1278,10 @@ const char* Collection::displayStyle(Collection::DisplayStyle kwd)
 	return SurfaceStyleKeywords[kwd];
 }
 
-// Set whether data is visible
-void Collection::setVisible(bool visible)
+// Generate display data
+void Collection::updateDisplayData()
 {
-	visible_ = visible;
-}
-
-// Return hether data is visible
-bool Collection::visible()
-{
-	return visible_;
-}
-
-// Return transformed display abscissa for data
-const Array<double>& Collection::displayAbscissa() const
-{
-	return displayAbscissa_;
-}
-
-// Return transformed data to display
-List<DisplayDataSet>& Collection::displayData()
-{
-	// Is surface reconstruction necessary?
-	if (dataVersion_ == displayDataGeneratedAt_) return displayData_;
+	if (dataVersion_ == displayDataGeneratedAt_) return;
 
 	// Make sure transforms are up to date
 	updateLimitsAndTransforms();
@@ -1434,6 +1415,32 @@ List<DisplayDataSet>& Collection::displayData()
 	
 	// Store new version 
 	displayDataGeneratedAt_ = dataVersion_;
+}
+
+// Set whether data is visible
+void Collection::setVisible(bool visible)
+{
+	visible_ = visible;
+}
+
+// Return hether data is visible
+bool Collection::visible()
+{
+	return visible_;
+}
+
+// Return transformed display abscissa for data
+const Array<double>& Collection::displayAbscissa()
+{
+	updateDisplayData();
+
+	return displayAbscissa_;
+}
+
+// Return transformed data to display
+List<DisplayDataSet>& Collection::displayData()
+{
+	updateDisplayData();
 
 	return displayData_;
 }

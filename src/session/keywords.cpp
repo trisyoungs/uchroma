@@ -123,10 +123,10 @@ int UChromaSession::collectionKeywordNArguments(UChromaSession::CollectionKeywor
  */
 
 // FitParameters Block Keywords
-const char* FitParametersBlockKeywords[] = { "EndFitParameters", "Equation", "Global", "LimitStrength", "Orthogonal", "Reference", "Variable", "XRangeType", "XRangeAbsolute", "XRangeIndex", "XRangeSingle", "ZRangeType", "ZRangeAbsolute", "ZRangeIndex", "ZRangeSingle" };
+const char* FitParametersBlockKeywords[] = { "EndFitParameters", "Equation", "FitResults", "Global", "LimitStrength", "Orthogonal", "Reference", "Variable", "XRangeType", "XRangeAbsolute", "XRangeIndex", "XRangeSingle", "ZRangeType", "ZRangeAbsolute", "ZRangeIndex", "ZRangeSingle" };
 
 // FitParameters Block NArguments
-int FitParametersKeywordNArguments[] = { 0, 1, 1, 1, 1, 7, 7, 1, 2, 2, 1, 1, 2, 2, 1 };
+int FitParametersKeywordNArguments[] = { 0, 1, 1, 1, 1, 1, 7, 7, 1, 2, 2, 1, 1, 2, 2, 1 };
 
 /*!
  * \brief Convert text string to FitParametersKeyword
@@ -151,6 +151,41 @@ const char* UChromaSession::fitParametersKeyword(UChromaSession::FitParametersKe
 int UChromaSession::fitParametersKeywordNArguments(UChromaSession::FitParametersKeyword kwd)
 {
 	return FitParametersKeywordNArguments[kwd];
+}
+
+/*
+ * FitResults Keywords
+ */
+
+// FitResults Block Keywords
+const char* FitResultsBlockKeywords[] = { "EndFitResults", "Variable" };
+
+// FitResults Block NArguments
+int FitResultsKeywordNArguments[] = { 0, 1 };
+
+/*!
+ * \brief Convert text string to FitResultsKeyword
+ */
+UChromaSession::FitResultsKeyword UChromaSession::fitResultsKeyword(QString s)
+{
+	for (int n=0; n<nFitResultsKeywords; ++n) if (s == FitResultsBlockKeywords[n]) return (UChromaSession::FitResultsKeyword) n;
+	return nFitResultsKeywords;
+}
+
+/*!
+ * \brief Convert FitResultsKeyword to text string
+ */
+const char* UChromaSession::fitResultsKeyword(UChromaSession::FitResultsKeyword kwd)
+{
+	return FitResultsBlockKeywords[kwd];
+}
+
+/*!
+ * \brief Return minimum number of expected arguments
+ */
+int UChromaSession::fitResultsKeywordNArguments(UChromaSession::FitResultsKeyword kwd)
+{
+	return FitResultsKeywordNArguments[kwd];
 }
 
 /*

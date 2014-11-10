@@ -81,7 +81,6 @@ void EditFitKernelDialog::on_CancelButton_clicked(bool checked)
 
 void EditFitKernelDialog::on_OKButton_clicked(bool checked)
 {
-	fitKernelTarget_ = NULL;
 	accept();
 }
 
@@ -324,6 +323,17 @@ void EditFitKernelDialog::on_DataGlobalFitCheck_clicked(bool checked)
 	if (refreshing_ || (!fitKernelTarget_)) return;
 
 	fitKernelTarget_->setGlobal(checked);
+}
+
+/*
+ * Strategy
+ */
+
+void EditFitKernelDialog::on_RollOnValuesCheck_clicked(bool checked)
+{
+	if (refreshing_ || (!fitKernelTarget_)) return;
+
+	fitKernelTarget_->setRollOnValues(checked);
 }
 
 /*
@@ -594,7 +604,18 @@ int EditFitKernelDialog::updateAndExec()
 {
 	updateControls(true);
 	move(uChroma_.centrePos() - QPoint(width()/2, height()/2));
-	return exec();
+
+	// Get return result from dialog
+	int result = exec();
+
+	if (result)
+	{
+		// Update fitting
+		fitKernelTarget_->fit();
+		fitKernelTarget_ = NULL;
+	}
+
+	return result;
 }
 
 // Update controls
@@ -618,11 +639,6 @@ void EditFitKernelDialog::updateControls(bool force)
 	// Equation Group
 	ui.EquationEdit->setText(fitKernelTarget_->equationText());
 
-	// Source Data Group
-	if (fitKernelTarget_->orthogonal()) ui.DataOrthogonalFitRadio->setChecked(true);
-	else ui.DataNormalFitRadio->setChecked(true);
-	ui.DataGlobalFitCheck->setChecked(fitKernelTarget_->global());
-
 	// Source X
 	if (fitKernelTarget_->xRange() == FitKernel::AbsoluteRange) ui.XSourceAbsoluteRadio->setChecked(true);
 	else if (fitKernelTarget_->xRange() == FitKernel::SinglePointRange) ui.XSourceSinglePointRadio->setChecked(true);
@@ -637,7 +653,7 @@ void EditFitKernelDialog::updateControls(bool force)
 	ui.XPointMinSpin->setRange(1, sourceCollection->displayAbscissa().nItems());
 	ui.XPointMaxSpin->setValue(fitKernelTarget_->indexXMax()+1);
 	ui.XPointMaxSpin->setRange(1, sourceCollection->displayAbscissa().nItems());
-	ui.XGroup->setEnabled(sourceCollection->displayAbscissa().nItems() > 0);
+	ui.SourceXTab->setEnabled(sourceCollection->displayAbscissa().nItems() > 0);
 
 	// Source Z
 	if (fitKernelTarget_->zRange() == FitKernel::AbsoluteRange) ui.ZSourceAbsoluteRadio->setChecked(true);
@@ -654,7 +670,15 @@ void EditFitKernelDialog::updateControls(bool force)
 	ui.ZDataSetMinSpin->setRange(1, sourceCollection->nDataSets());
 	ui.ZDataSetMaxSpin->setValue(fitKernelTarget_->indexZMax()+1);
 	ui.ZDataSetMaxSpin->setRange(1, sourceCollection->nDataSets());
-	ui.ZGroup->setEnabled(sourceCollection->nDataSets() > 0);
+	ui.SourceZTab->setEnabled(sourceCollection->nDataSets() > 0);
+
+	// Source Data Group
+	if (fitKernelTarget_->orthogonal()) ui.DataOrthogonalFitRadio->setChecked(true);
+	else ui.DataNormalFitRadio->setChecked(true);
+	ui.DataGlobalFitCheck->setChecked(fitKernelTarget_->global());
+
+	// Strategy Group
+	ui.RollOnValuesCheck->setChecked(fitKernelTarget_->rollOnValues());
 
 	// Minimisation Group
 	ui.MinimisationMethodCombo->setCurrentIndex(fitKernelTarget_->method());

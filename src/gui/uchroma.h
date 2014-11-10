@@ -218,6 +218,7 @@ class UChromaWindow : public QMainWindow
 	void on_actionAnalyseNewFit_triggered(bool checked);
 	void on_actionAnalyseEditFit_triggered(bool checked);
 	void on_actionAnalyseUpdateFit_triggered(bool checked);
+	void on_actionAnalyseResetAndRestartFit_triggered(bool checked);
 
 
 	/*
@@ -322,6 +323,8 @@ class UChromaWindow : public QMainWindow
 	int interactionAxis();
 	// Return whether the user is currently interacting with the display
 	bool interacting();
+	// Cancel current interaction
+	void cancelInteraction();
 	// Start interaction at the specified screen coordinates
 	void startInteraction(int mouseX, int mouseY, Qt::KeyboardModifiers modifiers);
 	// Update current interaction value

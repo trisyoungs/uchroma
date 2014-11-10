@@ -105,7 +105,6 @@ void Primitive::pushInstance(const QGLContext* context, GLExtensions* extensions
 	if (PrimitiveInstance::globalInstanceType() == PrimitiveInstance::VBOInstance)
 	{
 		// Prepare local array of data to pass to VBO
-		int offset;
 		GLuint vertexVBO = 0, indexVBO = 0;
 		if (vertexChunk_.nDefinedVertices() <= 0)
 		{

@@ -27,12 +27,15 @@ DataSpace::DataSpace()
 {
 	// Private variables
 	sourceCollection_ = NULL;
+	sourceCollectionDataUsedAt_ = -1;
 	displayDataSetStart_ = -1;
 	displayDataSetEnd_ = -1;
 	nDataSets_ = 0;
 	abscissaStart_ = -1;
 	abscissaEnd_ = -1;
 	nPoints_ = 0;
+	global_ = false;
+	orthogonal_ = false;
 }
 
 // Destructor
@@ -43,8 +46,44 @@ DataSpace::~DataSpace()
 // Initialise ranges
 bool DataSpace::initialise(Collection* sourceCollection, int xIndexMin, int xIndexMax, int zIndexMin, int zIndexMax, bool orthogonal, bool global)
 {
-	sourceCollection_ = sourceCollection;
+	// Check source collection
+	if (!Collection::objectValid(sourceCollection, "collection in DataSpace::initialise()")) return false;
 
+	// We will only reinitialise everything if we really have to.
+	// If only the x or z-ranges have changed, we can prune/extend accordingly 
+	bool startFromScratch = false, resizeX = false, resizeZ = false;
+	if (sourceCollection_ != sourceCollection) startFromScratch = true;
+	else if (sourceCollectionDataUsedAt_ != sourceCollection_->dataVersion()) startFromScratch = true;
+	else if (orthogonal_ != orthogonal) startFromScratch = true;
+	else if (global_ != global) startFromScratch = true;
+	else if ((xIndexMin != abscissaStart_) || (xIndexMax != abscissaEnd_)) resizeX = true;
+	else if ((zIndexMin != displayDataSetStart_) || (zIndexMax != displayDataSetEnd_)) resizeZ = true;
+
+	// Resize list?
+	DataSpaceRange* range;
+	if ((!startFromScratch) && (!global))
+	{
+		int deltaStart = 0, deltaEnd = 0;
+		if ((!orthogonal) && resizeZ)
+		{
+			deltaStart = displayDataSetStart_ - zIndexMin;
+			deltaEnd = zIndexMax - displayDataSetEnd_;
+		}
+		else if (orthogonal && resizeX)
+		{
+			deltaStart = abscissaStart_ - xIndexMin;
+			deltaEnd = xIndexMax - abscissaEnd_;
+		}
+		for (int n = 0; n < deltaStart; ++n) { range = ranges_.add(*this); ranges_.moveToStart(range); }
+		for (int n = deltaStart; n < 0; ++n) ranges_.removeFirst();
+		for (int n = 0; n < deltaEnd; ++n) range = ranges_.add(*this);
+		for (int n = deltaEnd; n < 0; ++n) ranges_.removeLast();
+	}
+
+	sourceCollection_ = sourceCollection;
+	sourceCollectionDataUsedAt_ = sourceCollection_->dataVersion();
+	orthogonal_ = orthogonal;
+	global_ = global;
 	const Array<double>& abscissa = sourceCollection_->displayAbscissa();
 
 	// Store indices and check limits
@@ -66,30 +105,44 @@ bool DataSpace::initialise(Collection* sourceCollection, int xIndexMin, int xInd
 	}
 
 	// Clear old ranges before adding new ones
-	ranges_.clear();
+	DataSpaceRange* currentRange = NULL;
+	if (startFromScratch) ranges_.clear();
+	else currentRange = ranges_.first();
 
-	if (orthogonal)
+	if (orthogonal_)
 	{
 		msg.print("Setting up orthogonal (ZY) data over %e < x < %e and %e < z < %e\n", abscissa.value(abscissaStart_), abscissa.value(abscissaEnd_), sourceCollection_->dataSet(displayDataSetStart_)->data().z(), sourceCollection_->dataSet(displayDataSetEnd_)->data().z());
 
-		if (global)
+		if (global_)
 		{
-			DataSpaceRange* range = ranges_.add(*this);
+			if (startFromScratch) currentRange = ranges_.add(*this);
 			range->set(sourceCollection_, abscissaStart_, abscissaEnd_, displayDataSetStart_, displayDataSetEnd_, false);
+			currentRange = currentRange->next;
 		}
-		else for (int n = abscissaStart_; n<= abscissaEnd_; ++n) ranges_.add(*this)->set(sourceCollection_, n, n, displayDataSetStart_, displayDataSetEnd_, false);
+		else for (int n = abscissaStart_; n<= abscissaEnd_; ++n)
+		{
+			if (startFromScratch) currentRange = ranges_.add(*this);
+			currentRange->set(sourceCollection_, n, n, displayDataSetStart_, displayDataSetEnd_, false);
+			currentRange = currentRange->next;
+		}
 	}
 	else
 	{
 		// Source data is normal XY slices from the current collection
 		msg.print("Setting up normal (XY) data over %e < x < %e and %e < z < %e\n", abscissa.value(abscissaStart_), abscissa.value(abscissaEnd_), sourceCollection_->dataSet(displayDataSetStart_)->data().z(), sourceCollection_->dataSet(displayDataSetEnd_)->data().z());
 
-		if (global)
+		if (global_)
 		{
-			DataSpaceRange* range = ranges_.add(*this);
+			if (startFromScratch) currentRange = ranges_.add(*this);
 			range->set(sourceCollection_, abscissaStart_, abscissaEnd_, displayDataSetStart_, displayDataSetEnd_, false);
+			currentRange = currentRange->next;
 		}
-		else for (int n = displayDataSetStart_; n<= displayDataSetEnd_; ++n) ranges_.add(*this)->set(sourceCollection_, abscissaStart_, abscissaEnd_, n, n, false);
+		else for (int n = displayDataSetStart_; n<= displayDataSetEnd_; ++n)
+		{
+			if (startFromScratch) currentRange = ranges_.add(*this);
+			currentRange->set(sourceCollection_, abscissaStart_, abscissaEnd_, n, n, false);
+			currentRange = currentRange->next;
+		}
 	}
 	
 	return true;
@@ -101,7 +154,7 @@ bool DataSpace::initialise(const DataSpace& source, bool referenceDataOnly)
 	sourceCollection_ = source.sourceCollection_;
 
 	// Check for a valid source collection before we start...
-	if (!Collection::objectValid(sourceCollection_, "source collection in DataSpace::initialise()")) return false;
+	if (!Collection::objectValid(sourceCollection_, "source collection in DataSpace::initialise(DataSpace&)")) return false;
 
 	// Store indices and check limits
 	displayDataSetStart_ = source.displayDataSetStart_;
@@ -144,6 +197,12 @@ DataSpaceRange* DataSpace::ranges()
 	return ranges_.first();
 }
 
+// Return range specified
+DataSpaceRange* DataSpace::range(int index)
+{
+	return ranges_[index];
+}
+
 // Copy calculated y data to destination collection specified
 void DataSpace::copy(Collection* destinationCollection)
 {
@@ -157,12 +216,13 @@ void DataSpace::copy(Collection* destinationCollection)
 	// Create destination datasets using those in the sourceCollection_ to get the z values, and size the x/y arrays
 	for (int n=displayDataSetStart_; n<=displayDataSetEnd_; ++n)
 	{
-		DataSet* dataSet = sourceCollection_->dataSet(n);
+		DataSet* originalDataSet = sourceCollection_->dataSet(n);
 		DataSet* newDataSet = destinationCollection->addDataSet();
 		newDataSet->data().initialise(nPoints_);
-		destinationCollection->setDataSetZ(newDataSet, dataSet->data().z());
+		destinationCollection->setDataSetZ(newDataSet, originalDataSet->data().z());
+		newDataSet->setName("Fit to: "+ originalDataSet->name());
 	}
 
 	// Copy data from DataSpaceRanges/DataSpaceData into the new datasets
-	for (DataSpaceRange* fitRange = ranges_.first(); fitRange != NULL; fitRange = fitRange->next) fitRange->addCalculatedValues(destinationCollection, displayDataSetStart_);
+	for (DataSpaceRange* fitRange = ranges_.first(); fitRange != NULL; fitRange = fitRange->next) fitRange->addCalculatedValues(destinationCollection);
 }

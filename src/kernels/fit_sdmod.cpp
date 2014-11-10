@@ -50,7 +50,7 @@ bool FitKernel::sdModMinimise(Array<double>& alpha, double randomMin, double ran
 		}
 
 		// Randomise initial parameters to try and find better initial set?
-		if (modSDNRandomTrials_ > 0)
+		if ((modSDNRandomTrials_ > 0) && (step < modSDNRandomTrials_))
 		{
 			msg.print("Generating %i random values per alpha, within the range %e < alpha < %e.\n", modSDNRandomTrials_, randomMin, randomMax);
 			for (n=0; n<alpha.nItems(); ++n)

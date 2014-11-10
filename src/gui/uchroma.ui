@@ -704,6 +704,7 @@
     <addaction name="actionAnalyseNewFit"/>
     <addaction name="actionAnalyseEditFit"/>
     <addaction name="actionAnalyseUpdateFit"/>
+    <addaction name="actionAnalyseResetAndRestartFit"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -1443,6 +1444,14 @@
   <action name="actionCollectionPromoteToMaster">
    <property name="text">
     <string>Promote to &amp;Master</string>
+   </property>
+  </action>
+  <action name="actionAnalyseResetAndRestartFit">
+   <property name="text">
+    <string>&amp;Reset and Restart Fit</string>
+   </property>
+   <property name="shortcut">
+    <string>F10</string>
    </property>
   </action>
  </widget>

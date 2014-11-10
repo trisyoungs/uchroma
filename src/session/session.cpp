@@ -365,7 +365,7 @@ void UChromaSession::focusPreviousCollection()
 // Set current Collection
 void UChromaSession::setCurrentCollection(Collection* collection)
 {
-	if (!Collection::objectValid(collection, "collection in UChromaSession::setCurrentCollection()")) currentCollection_ = collection;
+	if (Collection::objectValid(collection, "collection in UChromaSession::setCurrentCollection()")) currentCollection_ = collection;
 }
 
 // Return nth collection in list

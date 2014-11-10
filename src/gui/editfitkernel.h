@@ -122,6 +122,13 @@ class EditFitKernelDialog : public QDialog
 
 
 	/*
+	 * Strategy
+	 */
+	public slots:
+	void on_RollOnValuesCheck_clicked(bool checked);
+	
+
+	/*
 	 * Minimisation
 	 */
 	public slots:

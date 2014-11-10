@@ -479,6 +479,7 @@ bool UChromaSession::readFitParametersBlock(LineParser& parser, FitKernel* fitKe
 	IndexData::IndexType indexType;
 	EquationVariable* eqVar;
 	ReferenceVariable* refVar;
+	DataSpaceRange* dataSpaceRange;
 	while (!parser.atEnd())
 	{
 		// Get line from file
@@ -498,6 +499,18 @@ bool UChromaSession::readFitParametersBlock(LineParser& parser, FitKernel* fitKe
 				break;
 			case (UChromaSession::EquationKeyword):
 				fitKernel->setEquation(parser.argString(1));
+				break;
+			case (UChromaSession::FitResultsBlockKeyword):
+				// Make sure that the DataSpace has been initialised....
+				dataSpaceRange = NULL;
+				if (!fitKernel->initialiseDataSpace()) msg.print("Warning: Failed to create DataSpace for FitKernel, so cannot store FitResults.\n");
+				else
+				{
+					// Get DataSpaceRange with index specified
+					dataSpaceRange = fitKernel->dataSpaceRange(parser.argi(1)-1);
+					if (dataSpaceRange == NULL) msg.print("Warning: Failed to get range with index %i in FitKernel. FitResults will be ignored.\n", parser.argi(1));
+				}
+				if (!readFitResultsBlock(parser, dataSpaceRange)) return false;
 				break;
 			case (UChromaSession::GlobalKeyword):
 				fitKernel->setGlobal(parser.argb(1));
@@ -595,6 +608,41 @@ bool UChromaSession::readFitParametersBlock(LineParser& parser, FitKernel* fitKe
 		}
 	}
 	msg.print("Error : Unterminated 'FitParameters' block.\n");
+	return false;
+}
+
+// Read FitResultsBlock keywords
+bool UChromaSession::readFitResultsBlock(LineParser& parser, DataSpaceRange* dataSpaceRange)
+{
+	while (!parser.atEnd())
+	{
+		// Get line from file
+		parser.getArgs(LineParser::UseQuotes + LineParser::SkipBlanks);
+
+		// Get keyword and check number of arguments provided
+		UChromaSession::FitResultsKeyword fitParamsKwd = fitResultsKeyword(parser.argString(0));
+		if ((fitParamsKwd != UChromaSession::nFitResultsKeywords) && (fitResultsKeywordNArguments(fitParamsKwd) > (parser.nArgs()-1)))
+		{
+			msg.print("Error : FitResults keyword '%s' requires %i arguments, but only %i have been provided.\n", fitResultsKeyword(fitParamsKwd), fitResultsKeywordNArguments(fitParamsKwd), parser.nArgs()-1);
+			return false;
+		}
+		switch (fitParamsKwd)
+		{
+			case (UChromaSession::EndFitResultsKeyword):
+				return true;
+				break;
+			case (UChromaSession::FittedValueKeyword):
+				if (!dataSpaceRange) continue;
+				dataSpaceRange->setFittedValue(parser.argString(1), parser.argd(2));
+				break;
+			// Unrecognised Keyword
+			default:
+				msg.print("Warning: Unrecognised FitResults keyword: %s\n", parser.argChar(0));
+				CHECKIOFAIL
+				break;
+		}
+	}
+	msg.print("Error : Unterminated 'FitResults' block.\n");
 	return false;
 }
 

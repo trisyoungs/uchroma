@@ -199,7 +199,27 @@ bool UChromaSession::writeFitParametersBlock(LineParser& parser, FitKernel* fitK
 	parser.writeLineF("%s    %s %f %f\n", indent, UChromaSession::fitParametersKeyword(UChromaSession::ZRangeAbsoluteKeyword), fitKernel->absoluteZMin(), fitKernel->absoluteZMax());
 	parser.writeLineF("%s    %s %i %i\n", indent, UChromaSession::fitParametersKeyword(UChromaSession::ZRangeIndexKeyword), fitKernel->indexZMin()+1, fitKernel->indexZMax()+1);
 	parser.writeLineF("%s    %s %i\n", indent, UChromaSession::fitParametersKeyword(UChromaSession::ZRangeIndexSingleKeyword), fitKernel->indexZSingle()+1);
+
+	// Write fit results for each range
+	int count = 1;
+	for (DataSpaceRange* range = fitKernel->dataSpaceRanges(); range != NULL; range = range->next) writeFitResultsBlock(parser, range, count++, indentLevel+1);
+
 	parser.writeLineF("%s  %s\n", indent, UChromaSession::fitParametersKeyword(UChromaSession::EndFitParametersKeyword));
+
+	return true;
+}
+
+// Write FitResultsBlock keywords
+bool UChromaSession::writeFitResultsBlock(LineParser& parser, DataSpaceRange* range, int rangeID, int indentLevel)
+{
+	// Construct indent string
+	char* indent = new char[indentLevel*2+1];
+	for (int n=0; n<indentLevel*2; ++n) indent[n] = ' ';
+	indent[indentLevel*2] = '\0';
+
+	parser.writeLineF("%s  %s %i\n", indent, UChromaSession::fitParametersKeyword(UChromaSession::FitResultsBlockKeyword), rangeID);
+	for (EquationVariable* eqVar = range->fittedValues(); eqVar != NULL; eqVar = eqVar->next) parser.writeLineF("%s    %s %s %e\n", indent, UChromaSession::fitResultsKeyword(UChromaSession::FittedValueKeyword), qPrintable(eqVar->name()), eqVar->value());
+	parser.writeLineF("%s  %s\n", indent, UChromaSession::fitResultsKeyword(UChromaSession::EndFitResultsKeyword));
 
 	return true;
 }

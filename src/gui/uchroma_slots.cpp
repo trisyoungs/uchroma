@@ -509,9 +509,6 @@ void UChromaWindow::on_actionAnalyseNewFit_triggered(bool checked)
 	editFitSetupDialog_.setFitKernel(newFit->fitKernel());
 	if (editFitSetupDialog_.updateAndExec())
 	{
-		// Perform initial fitting
-		newFit->fitKernel()->fit();
-
 		// Add new fit data to same pane as parent (if possible)
 		RefList<ViewPane,bool> parentPanes = UChromaSession::viewLayout().panes(currentCollection, ViewPane::StandardRole);
 		if (parentPanes.contains(UChromaSession::currentViewPane())) UChromaSession::currentViewPane()->addCollectionTarget(newFit);
@@ -531,10 +528,7 @@ void UChromaWindow::on_actionAnalyseEditFit_triggered(bool checked)
 	if (currentCollection->fitKernel())
 	{
 		editFitSetupDialog_.setFitKernel(currentCollection->fitKernel());
-		if (editFitSetupDialog_.updateAndExec())
-		{
-			if (currentCollection->fitKernel()->fit()) updateGUI();
-		}
+		if (editFitSetupDialog_.updateAndExec()) updateGUI();
 	}
 	else
 	{
@@ -551,6 +545,25 @@ void UChromaWindow::on_actionAnalyseUpdateFit_triggered(bool checked)
 	if (currentCollection->fitKernel())
 	{
 		if (currentCollection->fitKernel()->fit()) updateGUI();
+	}
+	else
+	{
+		QString message;
+		message.sprintf("Error: Current collection '%s' has no associated fit data.\n", qPrintable(currentCollection->name()));
+		msg.print(qPrintable(message));
+		ui.StatusBar->showMessage(message, 3000);
+	}
+}
+
+void UChromaWindow::on_actionAnalyseResetAndRestartFit_triggered(bool checked)
+{
+	// Check current Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in UChromaWindow::on_actionAnalyseResetAndRestartFit_triggered()")) return;
+
+	if (currentCollection->fitKernel())
+	{
+		if (currentCollection->fitKernel()->fit(true)) updateGUI();
 	}
 	else
 	{
