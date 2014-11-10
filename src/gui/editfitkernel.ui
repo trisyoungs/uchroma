@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>467</width>
-    <height>575</height>
+    <width>483</width>
+    <height>580</height>
    </rect>
   </property>
   <property name="font">
@@ -345,6 +345,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::TabFocus</enum>
+           </property>
           </widget>
          </item>
          <item row="5" column="1" colspan="8">
@@ -397,6 +400,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::TabFocus</enum>
            </property>
           </widget>
          </item>
@@ -614,6 +620,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::TabFocus</enum>
+           </property>
           </widget>
          </item>
          <item row="0" column="0" colspan="6">
@@ -633,6 +642,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::TabFocus</enum>
            </property>
           </widget>
          </item>
@@ -951,6 +963,9 @@
                 <height>0</height>
                </size>
               </property>
+              <property name="focusPolicy">
+               <enum>Qt::TabFocus</enum>
+              </property>
              </widget>
             </item>
             <item row="2" column="0">
@@ -997,6 +1012,9 @@
                 <height>0</height>
                </size>
               </property>
+              <property name="focusPolicy">
+               <enum>Qt::TabFocus</enum>
+              </property>
               <property name="toolTip">
                <string>Strength with which to enforce minimum / maximum parameter limits</string>
               </property>
@@ -1039,6 +1057,9 @@
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
+                  </property>
+                  <property name="maximum">
+                   <number>1000</number>
                   </property>
                  </widget>
                 </item>
@@ -1129,6 +1150,43 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>EquationEdit</tabstop>
+  <tabstop>SelectEquationButton</tabstop>
+  <tabstop>VariablesTable</tabstop>
+  <tabstop>VariableAddReferenceButton</tabstop>
+  <tabstop>VariableReferenceList</tabstop>
+  <tabstop>MainTabs</tabstop>
+  <tabstop>XSourceAbsoluteRadio</tabstop>
+  <tabstop>XAbsoluteMinSpin</tabstop>
+  <tabstop>XAbsoluteMaxSpin</tabstop>
+  <tabstop>XAbsoluteSelectButton</tabstop>
+  <tabstop>XSourceSinglePointRadio</tabstop>
+  <tabstop>XPointSingleSpin</tabstop>
+  <tabstop>XSourcePointRangeRadio</tabstop>
+  <tabstop>XPointMinSpin</tabstop>
+  <tabstop>XPointMaxSpin</tabstop>
+  <tabstop>ZSourceAbsoluteRadio</tabstop>
+  <tabstop>ZAbsoluteMinSpin</tabstop>
+  <tabstop>ZAbsoluteMaxSpin</tabstop>
+  <tabstop>ZAbsoluteSelectButton</tabstop>
+  <tabstop>ZSourceSingleDataSetRadio</tabstop>
+  <tabstop>ZDataSetCombo</tabstop>
+  <tabstop>ZSourceDataSetRangeRadio</tabstop>
+  <tabstop>ZDataSetMinSpin</tabstop>
+  <tabstop>ZDataSetMaxSpin</tabstop>
+  <tabstop>DataNormalFitRadio</tabstop>
+  <tabstop>DataOrthogonalFitRadio</tabstop>
+  <tabstop>DataGlobalFitCheck</tabstop>
+  <tabstop>RollOnValuesCheck</tabstop>
+  <tabstop>MinimisationMethodCombo</tabstop>
+  <tabstop>MinimisationToleranceSpin</tabstop>
+  <tabstop>MinimisationMaxStepsSpin</tabstop>
+  <tabstop>MinimisationLimitStrengthSpin</tabstop>
+  <tabstop>OptionModSDNRandomTrialsSpin</tabstop>
+  <tabstop>CancelButton</tabstop>
+  <tabstop>OKButton</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>

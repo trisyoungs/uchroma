@@ -368,6 +368,17 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>DataTypeList</tabstop>
+  <tabstop>DataFileEdit</tabstop>
+  <tabstop>DataFileSelectButton</tabstop>
+  <tabstop>SeqXYNSkip</tabstop>
+  <tabstop>SeqXYColumnXSpin</tabstop>
+  <tabstop>SeqXYColumnYSpin</tabstop>
+  <tabstop>SeqXYColumnZSpin</tabstop>
+  <tabstop>CancelButton</tabstop>
+  <tabstop>ImportButton</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

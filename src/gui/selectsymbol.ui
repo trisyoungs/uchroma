@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>272</width>
-    <height>296</height>
+    <height>298</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -188,6 +188,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>SearchEdit</tabstop>
+  <tabstop>ClearSearchButton</tabstop>
+  <tabstop>SymbolTable</tabstop>
+  <tabstop>CancelButton</tabstop>
+  <tabstop>SelectButton</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>

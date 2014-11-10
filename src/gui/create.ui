@@ -209,6 +209,9 @@
                  <height>0</height>
                 </size>
                </property>
+               <property name="focusPolicy">
+                <enum>Qt::TabFocus</enum>
+               </property>
               </widget>
              </item>
              <item row="0" column="2">
@@ -238,6 +241,9 @@
                  <height>0</height>
                 </size>
                </property>
+               <property name="focusPolicy">
+                <enum>Qt::TabFocus</enum>
+               </property>
               </widget>
              </item>
              <item row="0" column="4">
@@ -260,6 +266,9 @@
                  <width>90</width>
                  <height>0</height>
                 </size>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::TabFocus</enum>
                </property>
               </widget>
              </item>
@@ -290,6 +299,9 @@
                  <height>0</height>
                 </size>
                </property>
+               <property name="focusPolicy">
+                <enum>Qt::TabFocus</enum>
+               </property>
               </widget>
              </item>
              <item row="1" column="2">
@@ -319,6 +331,9 @@
                  <height>0</height>
                 </size>
                </property>
+               <property name="focusPolicy">
+                <enum>Qt::TabFocus</enum>
+               </property>
               </widget>
              </item>
              <item row="1" column="4">
@@ -341,6 +356,9 @@
                  <width>90</width>
                  <height>0</height>
                 </size>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::TabFocus</enum>
                </property>
               </widget>
              </item>
@@ -443,6 +461,22 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>GridSpecifyRadio</tabstop>
+  <tabstop>GridSpecifyXMinSpin</tabstop>
+  <tabstop>GridSpecifyXMaxSpin</tabstop>
+  <tabstop>GridSpecifyXDeltaSpin</tabstop>
+  <tabstop>GridSpecifyZMinSpin</tabstop>
+  <tabstop>GridSpecifyZMaxSpin</tabstop>
+  <tabstop>GridSpecifyZDeltaSpin</tabstop>
+  <tabstop>GridTakeFromRadio</tabstop>
+  <tabstop>GridTakeFromCollectionCombo</tabstop>
+  <tabstop>CancelButton</tabstop>
+  <tabstop>CreateButton</tabstop>
+  <tabstop>EquationSelectButton</tabstop>
+  <tabstop>VariablesTable</tabstop>
+  <tabstop>EquationEdit</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>

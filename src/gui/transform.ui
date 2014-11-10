@@ -233,6 +233,20 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>TransformXCheck</tabstop>
+  <tabstop>TransformXEquationEdit</tabstop>
+  <tabstop>TransformYCheck</tabstop>
+  <tabstop>TransformYEquationEdit</tabstop>
+  <tabstop>TransformZCheck</tabstop>
+  <tabstop>TransformZEquationEdit</tabstop>
+  <tabstop>TransformXInterpolateCheck</tabstop>
+  <tabstop>TransformXInterpolateStepSpin</tabstop>
+  <tabstop>TransformXInterpolateConstrainCheck</tabstop>
+  <tabstop>TransformZInterpolateCheck</tabstop>
+  <tabstop>TransformZInterpolateStepSpin</tabstop>
+  <tabstop>TransformZInterpolateConstrainCheck</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>

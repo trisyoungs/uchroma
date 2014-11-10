@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>406</height>
+    <width>372</width>
+    <height>410</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -225,6 +225,17 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>IntegerFormatRadio</tabstop>
+  <tabstop>DecimalFormatRadio</tabstop>
+  <tabstop>ScientificFormatRadio</tabstop>
+  <tabstop>DecimalsSpin</tabstop>
+  <tabstop>UpperCaseExponentCheck</tabstop>
+  <tabstop>UseENotationCheck</tabstop>
+  <tabstop>PrecedeWithPlusCheck</tabstop>
+  <tabstop>CancelButton</tabstop>
+  <tabstop>OKButton</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>

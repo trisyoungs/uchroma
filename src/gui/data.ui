@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>324</width>
+    <width>329</width>
     <height>410</height>
    </rect>
   </property>
@@ -316,6 +316,16 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>SourceDirEdit</tabstop>
+  <tabstop>SourceDirSelectButton</tabstop>
+  <tabstop>AddFilesButton</tabstop>
+  <tabstop>RemoveFilesButton</tabstop>
+  <tabstop>DataSetsTable</tabstop>
+  <tabstop>SetZButton</tabstop>
+  <tabstop>ReloadFilesButton</tabstop>
+  <tabstop>EditDataSetButton</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>

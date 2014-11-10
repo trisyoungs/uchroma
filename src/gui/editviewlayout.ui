@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>622</width>
-    <height>515</height>
+    <width>632</width>
+    <height>568</height>
    </rect>
   </property>
   <property name="font">
@@ -646,6 +646,28 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>GridNColumnsSpin</tabstop>
+  <tabstop>GridNRowsSpin</tabstop>
+  <tabstop>Organiser</tabstop>
+  <tabstop>PaneAddButton</tabstop>
+  <tabstop>PaneRemoveButton</tabstop>
+  <tabstop>PaneBringToFrontButton</tabstop>
+  <tabstop>PaneSendToBackButton</tabstop>
+  <tabstop>PaneNameEdit</tabstop>
+  <tabstop>PaneNextButton</tabstop>
+  <tabstop>PaneRoleCombo</tabstop>
+  <tabstop>PanePreviousButton</tabstop>
+  <tabstop>PaneViewTypeCombo</tabstop>
+  <tabstop>PaneAutoScaleXCombo</tabstop>
+  <tabstop>PaneAutoScaleYCombo</tabstop>
+  <tabstop>PaneAutoScaleZCombo</tabstop>
+  <tabstop>PaneAddTargetButton</tabstop>
+  <tabstop>PaneRemoveTargetButton</tabstop>
+  <tabstop>PaneTargetsList</tabstop>
+  <tabstop>CancelButton</tabstop>
+  <tabstop>OKButton</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>

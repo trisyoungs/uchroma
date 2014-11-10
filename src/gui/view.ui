@@ -290,6 +290,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>ViewFlatLabelsCheck</tabstop>
+  <tabstop>ViewLabelPointSizeSpin</tabstop>
+  <tabstop>ViewTitlePointSizeSpin</tabstop>
+  <tabstop>ViewBoundingBoxNoneRadio</tabstop>
+  <tabstop>ViewBoundingBoxPlaneRadio</tabstop>
+  <tabstop>ViewBoundingBoxPlaneYSpin</tabstop>
+  <tabstop>ViewBoundingBoxPlaneYSetMinimumButton</tabstop>
+  <tabstop>ViewBoundingBoxPlaneYSetZeroButton</tabstop>
+  <tabstop>ViewBoundingBoxPlaneYSetMaximumButton</tabstop>
+  <tabstop>ViewBoundingBoxCubeRadio</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>

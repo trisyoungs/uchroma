@@ -405,6 +405,21 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>NameEdit</tabstop>
+  <tabstop>XNormalRadio</tabstop>
+  <tabstop>XFixedRadio</tabstop>
+  <tabstop>XFixedSpin</tabstop>
+  <tabstop>XRelativeRadio</tabstop>
+  <tabstop>XRelativeSpin</tabstop>
+  <tabstop>ZNormalRadio</tabstop>
+  <tabstop>ZFixedRadio</tabstop>
+  <tabstop>ZDataSetCombo</tabstop>
+  <tabstop>ZRelativeRadio</tabstop>
+  <tabstop>ZRelativeSpin</tabstop>
+  <tabstop>CancelButton</tabstop>
+  <tabstop>OKButton</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>

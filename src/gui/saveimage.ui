@@ -168,6 +168,16 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>FileNameEdit</tabstop>
+  <tabstop>SelectFileNameButton</tabstop>
+  <tabstop>ImageFormatCombo</tabstop>
+  <tabstop>ImageWidthSpin</tabstop>
+  <tabstop>ImageHeightSpin</tabstop>
+  <tabstop>MaintainAspectRatioCheck</tabstop>
+  <tabstop>CancelButton</tabstop>
+  <tabstop>SaveImageButton</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>

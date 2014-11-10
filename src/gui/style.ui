@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>513</width>
-    <height>577</height>
+    <width>530</width>
+    <height>591</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -151,6 +151,9 @@
               <height>25</height>
              </size>
             </property>
+            <property name="focusPolicy">
+             <enum>Qt::TabFocus</enum>
+            </property>
            </widget>
           </item>
           <item row="4" column="2">
@@ -166,6 +169,9 @@
               <width>90</width>
               <height>25</height>
              </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::TabFocus</enum>
             </property>
            </widget>
           </item>
@@ -259,6 +265,9 @@
               <width>0</width>
               <height>25</height>
              </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::TabFocus</enum>
             </property>
            </widget>
           </item>
@@ -443,6 +452,9 @@
               <width>0</width>
               <height>25</height>
              </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::TabFocus</enum>
             </property>
            </widget>
           </item>
@@ -899,17 +911,50 @@
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>ColourButton</class>
+   <extends>QPushButton</extends>
+   <header>gui/colourbutton.uih</header>
+  </customwidget>
+  <customwidget>
    <class>GradientBar</class>
    <extends>QWidget</extends>
    <header>gui/gradientbar.uih</header>
    <container>1</container>
   </customwidget>
-  <customwidget>
-   <class>ColourButton</class>
-   <extends>QPushButton</extends>
-   <header>gui/colourbutton.uih</header>
-  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>StyleCombo</tabstop>
+  <tabstop>ColourSingleColourRadio</tabstop>
+  <tabstop>ColourSingleColourButton</tabstop>
+  <tabstop>ColourRGBGradientRadio</tabstop>
+  <tabstop>ColourRGBGradientASetMinimumButton</tabstop>
+  <tabstop>ColourRGBGradientASpin</tabstop>
+  <tabstop>ColourRGBGradientASetMaximumButton</tabstop>
+  <tabstop>ColourRGBGradientAButton</tabstop>
+  <tabstop>ColourRGBGradientBSetMinimumButton</tabstop>
+  <tabstop>ColourRGBGradientBSpin</tabstop>
+  <tabstop>ColourRGBGradientBSetMaximumButton</tabstop>
+  <tabstop>ColourRGBGradientBButton</tabstop>
+  <tabstop>ColourHSVGradientRadio</tabstop>
+  <tabstop>ColourHSVGradientASetMinimumButton</tabstop>
+  <tabstop>ColourHSVGradientASpin</tabstop>
+  <tabstop>ColourHSVGradientASetMaximumButton</tabstop>
+  <tabstop>ColourHSVGradientAButton</tabstop>
+  <tabstop>ColourHSVGradientBSetMinimumButton</tabstop>
+  <tabstop>ColourHSVGradientBSpin</tabstop>
+  <tabstop>ColourHSVGradientBSetMaximumButton</tabstop>
+  <tabstop>ColourHSVGradientBButton</tabstop>
+  <tabstop>ColourCustomGradientRadio</tabstop>
+  <tabstop>ColourCustomGradientTable</tabstop>
+  <tabstop>ColourCustomGradientAddButton</tabstop>
+  <tabstop>ColourCustomGradientRemoveButton</tabstop>
+  <tabstop>ColourAlphaOwnAlphaRadio</tabstop>
+  <tabstop>ColourAlphaFixedAlphaRadio</tabstop>
+  <tabstop>ColourAlphaFixedAlphaSpin</tabstop>
+  <tabstop>SurfaceShininessSpin</tabstop>
+  <tabstop>LineWidthSpin</tabstop>
+  <tabstop>LineStippleCombo</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>

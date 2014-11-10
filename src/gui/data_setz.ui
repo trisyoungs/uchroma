@@ -399,6 +399,29 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>FromEquationRadio</tabstop>
+  <tabstop>FromEquationEdit</tabstop>
+  <tabstop>FromSourceFilesRadio</tabstop>
+  <tabstop>FromSourceFilesLineSpin</tabstop>
+  <tabstop>FromSourceFilesTestTextEdit</tabstop>
+  <tabstop>FromSourceFilesRegExpEdit</tabstop>
+  <tabstop>FromSourceFilesDateTimeCheck</tabstop>
+  <tabstop>FromSourceFilesDateTimeEdit</tabstop>
+  <tabstop>FromSourceFilesResultTextEdit</tabstop>
+  <tabstop>FromTimeStampsRadio</tabstop>
+  <tabstop>FromTimeStampsExtensionEdit</tabstop>
+  <tabstop>FromTimeStampsDirEdit</tabstop>
+  <tabstop>FromTimeStampsChooseButton</tabstop>
+  <tabstop>FromListFileRadio</tabstop>
+  <tabstop>FromListFileEdit</tabstop>
+  <tabstop>FromListFileChooseButton</tabstop>
+  <tabstop>FromIndexFileRadio</tabstop>
+  <tabstop>FromIndexFileEdit</tabstop>
+  <tabstop>FromIndexFileChooseButton</tabstop>
+  <tabstop>CancelButton</tabstop>
+  <tabstop>ApplyButton</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>
