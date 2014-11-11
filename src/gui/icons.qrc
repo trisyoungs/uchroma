@@ -1,5 +1,9 @@
 <RCC>
   <qresource prefix="/uchroma">
+    <file>icons/interact_rangeselect.svg</file>
+    <file>icons/interact_valueselect.svg</file>
+    <file>icons/tolowerlimit.svg</file>
+    <file>icons/toupperlimit.svg</file>
     <file>icons/view_normal.svg</file>
     <file>icons/symbol.svg</file>
     <file>icons/windows_log.svg</file>
