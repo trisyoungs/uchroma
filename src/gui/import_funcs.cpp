@@ -1,6 +1,6 @@
 /*
-	*** Data Import Dialog - Functions 
-	*** src/gui/dataimport_funcs.cpp
+	*** Import Dialog - Functions 
+	*** src/gui/import_funcs.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -19,12 +19,12 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/dataimport.h"
+#include "gui/import.h"
 #include "gui/uchroma.h"
 #include <QtGui/QFileDialog>
 
 // Constructor
-DataImportDialog::DataImportDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(parent)
+ImportDialog::ImportDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(parent)
 {
 	// Call the main creation function
 	ui.setupUi(this);
@@ -38,12 +38,12 @@ DataImportDialog::DataImportDialog(UChromaWindow& parent) : QDialog(&parent), uC
 }
 
 // Destructor
-DataImportDialog::~DataImportDialog()
+ImportDialog::~ImportDialog()
 {
 }
 
 // Window close event
-void DataImportDialog::closeEvent(QCloseEvent *event)
+void ImportDialog::closeEvent(QCloseEvent *event)
 {
 	reject();
 }
@@ -53,7 +53,7 @@ void DataImportDialog::closeEvent(QCloseEvent *event)
  */
 
 // Run the import, showing the dialog
-bool DataImportDialog::import()
+bool ImportDialog::import()
 {
 	importedDataSets_.clear();
 	int result = exec();
@@ -62,7 +62,7 @@ bool DataImportDialog::import()
 
 
 // Return first imported slice
-DataSet* DataImportDialog::importedSlices()
+DataSet* ImportDialog::importedSlices()
 {
 	return importedDataSets_.first();
 }
@@ -71,7 +71,7 @@ DataSet* DataImportDialog::importedSlices()
  * Private Slots
  */
 
-void DataImportDialog::on_DataFileSelectButton_clicked(bool checked)
+void ImportDialog::on_DataFileSelectButton_clicked(bool checked)
 {
 	QString newFile = QFileDialog::getOpenFileName(this, "Choose import file name", currentDirectory_.absolutePath(), "All files (*.*)");
 	if (!newFile.isEmpty())
@@ -81,7 +81,7 @@ void DataImportDialog::on_DataFileSelectButton_clicked(bool checked)
 	}
 }
 
-void DataImportDialog::on_ImportButton_clicked(bool checked)
+void ImportDialog::on_ImportButton_clicked(bool checked)
 {
 	// Based on the current data type selected, call the correct import function
 	bool result;
@@ -91,7 +91,7 @@ void DataImportDialog::on_ImportButton_clicked(bool checked)
 	else reject();
 }
 
-void DataImportDialog::on_CancelButton_clicked(bool checked)
+void ImportDialog::on_CancelButton_clicked(bool checked)
 {
 	reject();
 }

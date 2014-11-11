@@ -32,7 +32,7 @@
 #include "gui/transform.h"
 #include "gui/view.h"
 #include "gui/saveimage.h"
-#include "gui/dataimport.h"
+#include "gui/import.h"
 #include "base/collection.h"
 #include "base/transformer.h"
 #include "base/viewlayout.h"
@@ -98,8 +98,8 @@ class UChromaWindow : public QMainWindow
 	ViewWindow viewWindow_;
 	// Create Collection Dialog
 	CreateCollectionDialog createCollectionDialog_;
-	// Data Import Dialog
-	DataImportDialog dataImportDialog_;
+	// Import Dialog
+	ImportDialog importDialog_;
 	// Fit Window
 	EditFitKernelDialog editFitSetupDialog_;
 	// Save Image Dialog
@@ -198,17 +198,11 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
-	 * Interact Actions
+	 * Operate Actions
 	 */
-	private:
-	// Change interaction axis target
-	void interactionActionTriggered(int axis);
-
 	private slots:
-	void on_actionInteractX_triggered(bool checked);
-	void on_actionInteractY_triggered(bool checked);
-	void on_actionInteractZ_triggered(bool checked);
-	void on_actionInteractNone_triggered(bool checked);
+	void on_actionOperateConstantBackgroundSubtraction_triggered(bool checked);
+	void on_actionOperateSetZValues_triggered(bool checked);
 
 
 	/*
@@ -227,6 +221,20 @@ class UChromaWindow : public QMainWindow
 	 */
 	private slots:
 	void on_actionSettingsChooseFont_triggered(bool checked);
+
+
+	/*
+	 * Interact Actions
+	 */
+	private:
+	// Change interaction axis target
+	void interactionActionTriggered(int axis);
+
+	private slots:
+	void on_actionInteractX_triggered(bool checked);
+	void on_actionInteractY_triggered(bool checked);
+	void on_actionInteractZ_triggered(bool checked);
+	void on_actionInteractNone_triggered(bool checked);
 
 
 	/*

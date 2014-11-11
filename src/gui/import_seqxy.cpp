@@ -19,11 +19,11 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/dataimport.h"
+#include "gui/import.h"
 #include "base/lineparser.h"
 
 // Import sequential XY data
-bool DataImportDialog::importSequentialXY()
+bool ImportDialog::importSequentialXY()
 {
 	// Clear any old imported slices
 	importedDataSets_.clear();

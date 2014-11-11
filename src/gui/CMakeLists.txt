@@ -19,6 +19,9 @@ SET(qtproject_SRCS
   editreference_funcs.cpp
   editviewlayout_funcs.cpp
 
+  operate_setz_funcs.cpp
+  operate_bgsub_funcs.cpp
+
   selectequation_funcs.cpp
   selectsymbol_funcs.cpp
   selecttarget_funcs.cpp
@@ -40,9 +43,8 @@ SET(qtproject_SRCS
   axes_funcs.cpp
   create_funcs.cpp
   data_funcs.cpp
-  data_setz_funcs.cpp
-  dataimport_funcs.cpp
-  dataimport_seqxy.cpp
+  import_funcs.cpp
+  import_seqxy.cpp
   log_funcs.cpp
   saveimage_funcs.cpp
   style_funcs.cpp
@@ -65,6 +67,9 @@ SET(pro_MOC_HDRS
   editreference.h
   editviewlayout.h
 
+  operate_setz.h
+  operate_bgsub.h
+
   selectequation.h
   selectsymbol.h
   selecttarget.h
@@ -73,8 +78,7 @@ SET(pro_MOC_HDRS
   uchroma.h
   create.h
   data.h
-  data_setz.h
-  dataimport.h
+  import.h
   log.h
   saveimage.h
   style.h
@@ -92,6 +96,9 @@ SET(pro_UIS
   editreference.ui
   editviewlayout.ui
 
+  operate_bgsub.ui
+  operate_setz.ui
+
   selectequation.ui
   selectsymbol.ui
   selecttarget.ui
@@ -99,8 +106,7 @@ SET(pro_UIS
   axes.ui
   create.ui
   data.ui
-  data_setz.ui
-  dataimport.ui
+  import.ui
   log.ui
   saveimage.ui
   style.ui

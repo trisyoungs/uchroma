@@ -29,7 +29,7 @@
 // Constructor
 UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	axesWindow_(*this), dataWindow_(*this), logWindow_(*this), styleWindow_(*this), transformWindow_(*this), viewWindow_(*this),
-	createCollectionDialog_(*this), dataImportDialog_(*this), editFitSetupDialog_(*this), saveImageDialog_(*this),
+	createCollectionDialog_(*this), importDialog_(*this), editFitSetupDialog_(*this), saveImageDialog_(*this),
 	viewTypeActionGroup_(this)
 {
 	// Initialise the icon resource

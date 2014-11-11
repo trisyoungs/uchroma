@@ -19,7 +19,7 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/data_setz.h"
+#include "gui/operate_setz.h"
 #include "base/collection.h"
 #include "base/lineparser.h"
 #include "expression/variable.h"
@@ -27,7 +27,7 @@
 #include <QtGui/QMessageBox>
 
 // Constructor
-DataSetZDialog::DataSetZDialog(QWidget* parent, Collection* targetCollection) : QDialog(parent)
+OperateSetZDialog::OperateSetZDialog(QWidget* parent, Collection* targetCollection) : QDialog(parent)
 {
 	ui.setupUi(this);
 
@@ -46,7 +46,7 @@ DataSetZDialog::DataSetZDialog(QWidget* parent, Collection* targetCollection) : 
 }
 
 // Destructor
-DataSetZDialog::~DataSetZDialog()
+OperateSetZDialog::~OperateSetZDialog()
 {
 }
 
@@ -54,12 +54,12 @@ DataSetZDialog::~DataSetZDialog()
  * Slots
  */
 
-void DataSetZDialog::on_FromEquationRadio_toggled(bool checked)
+void OperateSetZDialog::on_FromEquationRadio_toggled(bool checked)
 {
 	updateControls();
 }
 
-void DataSetZDialog::on_FromEquationEdit_textChanged(QString text)
+void OperateSetZDialog::on_FromEquationEdit_textChanged(QString text)
 {
 	if (equation_.generate(text)) ui.FromEquationEdit->setPalette(ui.FromEquationRadio->palette());
 	else
@@ -72,64 +72,64 @@ void DataSetZDialog::on_FromEquationEdit_textChanged(QString text)
 	updateControls();
 }
 
-void DataSetZDialog::on_FromSourceFilesRadio_toggled(bool checked)
+void OperateSetZDialog::on_FromSourceFilesRadio_toggled(bool checked)
 {
 	updateControls();
 }
 
-void DataSetZDialog::on_FromSourceFilesLineSpin_valueChanged(int value)
+void OperateSetZDialog::on_FromSourceFilesLineSpin_valueChanged(int value)
 {
 	updateFromSourceFilesData(true);
 }
 
-void DataSetZDialog::on_FromSourceFilesRegExpEdit_textChanged(QString text)
+void OperateSetZDialog::on_FromSourceFilesRegExpEdit_textChanged(QString text)
 {
 	updateFromSourceFilesData(false);
 }
 
-void DataSetZDialog::on_FromSourceFilesDateTimeCheck_clicked(bool checked)
+void OperateSetZDialog::on_FromSourceFilesDateTimeCheck_clicked(bool checked)
 {
 	ui.FromSourceFilesDateTimeEdit->setEnabled(checked);
 }
 
-void DataSetZDialog::on_FromTimeStampsRadio_toggled(bool checked)
+void OperateSetZDialog::on_FromTimeStampsRadio_toggled(bool checked)
 {
 	updateControls();
 }
 
-void DataSetZDialog::on_FromTimeStampsChooseButton_clicked(bool checked)
+void OperateSetZDialog::on_FromTimeStampsChooseButton_clicked(bool checked)
 {
 	QString dir = QFileDialog::getExistingDirectory(this, "Select directory containing source files", ui.FromTimeStampsDirEdit->text());
 	if (dir.isEmpty()) return;
 	ui.FromTimeStampsDirEdit->setText(dir);
 }
 
-void DataSetZDialog::on_FromListFileRadio_toggled(bool checked)
+void OperateSetZDialog::on_FromListFileRadio_toggled(bool checked)
 {
 	updateControls();
 }
 
-void DataSetZDialog::on_FromListFileChooseButton_clicked(bool checked)
+void OperateSetZDialog::on_FromListFileChooseButton_clicked(bool checked)
 {
 	// TODO
 }
 
-void DataSetZDialog::on_FromIndexFileRadio_toggled(bool checked)
+void OperateSetZDialog::on_FromIndexFileRadio_toggled(bool checked)
 {
 	updateControls();
 }
 
-void DataSetZDialog::on_FromIndexFileChooseButton_clicked(bool checked)
+void OperateSetZDialog::on_FromIndexFileChooseButton_clicked(bool checked)
 {
 	// TODO
 }
 
-void DataSetZDialog::on_CancelButton_clicked(bool checked)
+void OperateSetZDialog::on_CancelButton_clicked(bool checked)
 {
 	reject();
 }
 
-void DataSetZDialog::on_ApplyButton_clicked(bool checked)
+void OperateSetZDialog::on_ApplyButton_clicked(bool checked)
 {
 	// Set some z's!
 	bool result;
@@ -145,7 +145,7 @@ void DataSetZDialog::on_ApplyButton_clicked(bool checked)
  */
 
 // Set Z based on defined equation
-bool DataSetZDialog::setZFromEquation()
+bool OperateSetZDialog::setZFromEquation()
 {
 	if (!equation_.isValid()) return false;
 
@@ -169,7 +169,7 @@ bool DataSetZDialog::setZFromEquation()
 }
 
 // Set Z from source files
-bool DataSetZDialog::setZFromSourceFiles()
+bool OperateSetZDialog::setZFromSourceFiles()
 {
 	if (!sourceFilesAvailable_) return false;
 	if (!sourceFilesRegExp_.isValid()) return false;
@@ -238,7 +238,7 @@ bool DataSetZDialog::setZFromSourceFiles()
 }
 
 // Set Z from file timestamp
-bool DataSetZDialog::setZFromTimeStamps()
+bool OperateSetZDialog::setZFromTimeStamps()
 {
 	QString extension = ui.FromTimeStampsExtensionEdit->text();
 	if (!extension.isEmpty()) return false;
@@ -277,7 +277,7 @@ bool DataSetZDialog::setZFromTimeStamps()
  */
 
 // Update controls
-void DataSetZDialog::updateControls()
+void OperateSetZDialog::updateControls()
 {
 	// Set status of controls for each option
 	ui.FromEquationEdit->setEnabled(ui.FromEquationRadio->isChecked());
@@ -307,7 +307,7 @@ void DataSetZDialog::updateControls()
 }
 
 // Update data
-void DataSetZDialog::updateFromSourceFilesData(bool reReadLine)
+void OperateSetZDialog::updateFromSourceFilesData(bool reReadLine)
 {
 	sourceFilesAvailable_ = false;
 	sourceFilesTestText_ = "";

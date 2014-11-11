@@ -709,10 +709,18 @@
     <addaction name="separator"/>
     <addaction name="actionAnalyseViewFitResults"/>
    </widget>
+   <widget class="QMenu" name="menuOperations">
+    <property name="title">
+     <string>Operations</string>
+    </property>
+    <addaction name="actionOperateConstantBackgroundSubtraction"/>
+    <addaction name="actionOperateSetZValues"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
    <addaction name="menuCollections"/>
    <addaction name="menuData"/>
+   <addaction name="menuOperations"/>
    <addaction name="menuAnalyse"/>
    <addaction name="menuSettings"/>
   </widget>
@@ -1463,6 +1471,16 @@
    </property>
    <property name="shortcut">
     <string>F11</string>
+   </property>
+  </action>
+  <action name="actionOperateConstantBackgroundSubtraction">
+   <property name="text">
+    <string>Constant Background Subtraction</string>
+   </property>
+  </action>
+  <action name="actionOperateSetZValues">
+   <property name="text">
+    <string>Set Z Values</string>
    </property>
   </action>
  </widget>

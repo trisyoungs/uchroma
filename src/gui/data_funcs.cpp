@@ -22,7 +22,7 @@
 #include "gui/data.h"
 #include "gui/uchroma.h"
 #include "gui/editdataset.h"
-#include "gui/data_setz.h"
+#include "gui/operate_setz.h"
 #include "session/session.h"
 #include "templates/reflist.h"
 #include "templates/variantpointer.h"
@@ -214,7 +214,7 @@ void DataWindow::on_SetZButton_clicked(bool checked)
 	if (currentCollection->nDataSets() == 0) return;
 
 	// Create a DataSetZDialog and show it...
-	DataSetZDialog setZDialog(this, currentCollection);
+	OperateSetZDialog setZDialog(this, currentCollection);
 	if (setZDialog.exec())
 
 	// Need to update now

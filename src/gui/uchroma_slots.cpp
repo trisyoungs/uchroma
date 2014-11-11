@@ -22,6 +22,8 @@
 #include "gui/uchroma.h"
 #include "gui/editviewlayout.h"
 #include "gui/editfitresults.h"
+#include "gui/operate_bgsub.h"
+#include "gui/operate_setz.h"
 #include "render/fontinstance.h"
 #include "session/session.h"
 #include "templates/reflist.h"
@@ -470,11 +472,11 @@ void UChromaWindow::on_actionDataImport_triggered(bool checked)
 	if (!Collection::objectValid(currentCollection, "collection in UChromaWindow::on_actionDataImport_triggered()")) return;
 
 	// Raise the Data Import dialog
-	bool result = dataImportDialog_.import();
+	bool result = importDialog_.import();
 	if (!result) return;
 
 	// Loop over list of imported slices and copy them to our local list
-	for (DataSet* dataSet = dataImportDialog_.importedSlices(); dataSet != NULL; dataSet = dataSet->next) currentCollection->addDataSet(dataSet);
+	for (DataSet* dataSet = importDialog_.importedSlices(); dataSet != NULL; dataSet = dataSet->next) currentCollection->addDataSet(dataSet);
 
 	// Update subwindows
 	updateSubWindows();
@@ -491,6 +493,30 @@ void UChromaWindow::on_actionDataReload_triggered(bool checked)
 void UChromaWindow::on_actionDataView_triggered(bool checked)
 {
 	ui.actionWindowData->trigger();
+}
+
+/*
+ * Operate Actions
+ */
+
+void UChromaWindow::on_actionOperateConstantBackgroundSubtraction_triggered(bool checked)
+{
+	// Check current Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in UChromaWindow::on_actionOperateConstantBackgroundSubtraction_triggered()")) return;
+
+	OperateBGSubDialog bgSubDialog(this, currentCollection);
+	if (bgSubDialog.exec()) updateGUI();
+}
+
+void UChromaWindow::on_actionOperateSetZValues_triggered(bool checked)
+{
+	// Check current Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in UChromaWindow::on_actionOperateSetZValues_triggered()")) return;
+
+	OperateSetZDialog setZDialog(this, currentCollection);
+	if (setZDialog.exec()) updateGUI();
 }
 
 /*

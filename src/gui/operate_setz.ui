@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DataSetZDialog</class>
- <widget class="QDialog" name="DataSetZDialog">
+ <class>OperateSetZDialog</class>
+ <widget class="QDialog" name="OperateSetZDialog">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>436</width>
-    <height>784</height>
+    <width>429</width>
+    <height>633</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -65,7 +65,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>('index' variable represents position of dataset in list, starting from zero)</string>
+        <string>('index' variable represents integer position of dataset in list, starting from zero)</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
