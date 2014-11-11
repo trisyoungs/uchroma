@@ -415,6 +415,23 @@ QDir Collection::dataFileDirectory()
 	return dataFileDirectory_;
 }
 
+// Append dataset to collection
+bool Collection::appendDataSet(QString fileName)
+{
+	// Get fileinfo to extract pure filename part
+	QFileInfo fileInfo(fileName);
+	
+	double z = 0.0;
+	if (nDataSets() > 0) z = lastDataSet()->data().z() + 1.0;
+
+	DataSet* dataSet = addDataSet(z);
+	dataSet->setName(fileInfo.fileName());
+	dataSet->setDataSource(DataSet::FileSource);
+	dataSet->setSourceFileName(dataFileDirectory().relativeFilePath(fileName));
+
+	return loadDataSet(dataSet);
+}
+
 // Load data for specified dataset index
 bool Collection::loadDataSet(DataSet* dataSet)
 {

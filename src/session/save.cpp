@@ -218,7 +218,7 @@ bool UChromaSession::writeFitResultsBlock(LineParser& parser, DataSpaceRange* ra
 	indent[indentLevel*2] = '\0';
 
 	parser.writeLineF("%s  %s %i\n", indent, UChromaSession::fitParametersKeyword(UChromaSession::FitResultsBlockKeyword), rangeID);
-	for (EquationVariable* eqVar = range->fittedValues(); eqVar != NULL; eqVar = eqVar->next) parser.writeLineF("%s    %s %s %e\n", indent, UChromaSession::fitResultsKeyword(UChromaSession::FittedValueKeyword), qPrintable(eqVar->name()), eqVar->value());
+	for (NamedValue* value = range->fittedValues(); value != NULL; value = value->next) parser.writeLineF("%s    %s %s %e\n", indent, UChromaSession::fitResultsKeyword(UChromaSession::FittedValueKeyword), qPrintable(value->name()), value->value());
 	parser.writeLineF("%s  %s\n", indent, UChromaSession::fitResultsKeyword(UChromaSession::EndFitResultsKeyword));
 
 	return true;

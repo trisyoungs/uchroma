@@ -108,6 +108,8 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	void setDataFileDirectory(QDir directory);
 	// Return root directory for datafiles
 	QDir dataFileDirectory();
+	// Append dataset to collection
+	bool appendDataSet(QString fileName);
 	// Load specified dataset
 	bool loadDataSet(DataSet* dataSet);
 	// Reload data for all dataset

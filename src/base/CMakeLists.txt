@@ -10,6 +10,7 @@ add_library(base
   equationvariable.cpp
   indexdata.cpp
   lineparser.cpp
+  namedvalue.cpp
   messenger.cpp
   numberformat.cpp
   nxs.cpp
@@ -32,6 +33,7 @@ add_library(base
   equationvariable.h
   indexdata.h
   lineparser.h
+  namedvalue.h
   messenger.h
   numberformat.h
   nxs.h

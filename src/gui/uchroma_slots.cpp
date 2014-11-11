@@ -21,6 +21,7 @@
 
 #include "gui/uchroma.h"
 #include "gui/editviewlayout.h"
+#include "gui/editfitresults.h"
 #include "render/fontinstance.h"
 #include "session/session.h"
 #include "templates/reflist.h"
@@ -513,6 +514,9 @@ void UChromaWindow::on_actionAnalyseNewFit_triggered(bool checked)
 		RefList<ViewPane,bool> parentPanes = UChromaSession::viewLayout().panes(currentCollection, ViewPane::StandardRole);
 		if (parentPanes.contains(UChromaSession::currentViewPane())) UChromaSession::currentViewPane()->addCollectionTarget(newFit);
 		else if (parentPanes.nItems() != 0) parentPanes.first()->item->addCollectionTarget(newFit);
+
+		// Set current collection to be the new fit
+		UChromaSession::setCurrentCollection(newFit);
 	}
 	else currentCollection->removeFit(newFit);
 
@@ -564,6 +568,26 @@ void UChromaWindow::on_actionAnalyseResetAndRestartFit_triggered(bool checked)
 	if (currentCollection->fitKernel())
 	{
 		if (currentCollection->fitKernel()->fit(true)) updateGUI();
+	}
+	else
+	{
+		QString message;
+		message.sprintf("Error: Current collection '%s' has no associated fit data.\n", qPrintable(currentCollection->name()));
+		msg.print(qPrintable(message));
+		ui.StatusBar->showMessage(message, 3000);
+	}
+}
+
+void UChromaWindow::on_actionAnalyseViewFitResults_triggered(bool checked)
+{
+	// Check current Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in UChromaWindow::on_actionAnalyseResetAndRestartFit_triggered()")) return;
+
+	if (currentCollection->fitKernel())
+	{
+		EditFitResultsDialog fitValuesDialog(this);
+		fitValuesDialog.call(currentCollection);
 	}
 	else
 	{

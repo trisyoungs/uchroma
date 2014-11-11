@@ -617,16 +617,22 @@ bool FitKernel::initialiseDataSpace()
 	return true;
 }
 
+// Return number of data space ranges in the list
+int FitKernel::nDataSpaceRanges()
+{
+	return fitSpace_.nDataSpaceRanges();
+}
+
 // Return data space range with index specified
 DataSpaceRange* FitKernel::dataSpaceRange(int index)
 {
-	return fitSpace_.range(index);
+	return fitSpace_.dataSpaceRange(index);
 }
 
 // Return first data space range in list
 DataSpaceRange* FitKernel::dataSpaceRanges()
 {
-	return fitSpace_.ranges();
+	return fitSpace_.dataSpaceRanges();
 }
 
 /*
@@ -851,7 +857,7 @@ bool FitKernel::fit(bool startFromUnity)
 
 	// Loop over defined DataSpaceRanges (including those in any reference variables)
 	bool result;
-	for (currentFitRange_ = fitSpace_.ranges(); currentFitRange_ != NULL; currentFitRange_ = currentFitRange_->next)
+	for (currentFitRange_ = fitSpace_.dataSpaceRanges(); currentFitRange_ != NULL; currentFitRange_ = currentFitRange_->next)
 	{
 		msg.print("Fitting range (%e < x < %e) (%e < z < %e)\n", currentFitRange_->xStart(), currentFitRange_->xEnd(), currentFitRange_->zStart(), currentFitRange_->zEnd());
 

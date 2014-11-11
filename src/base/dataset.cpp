@@ -111,7 +111,11 @@ QString DataSet::name()
 bool DataSet::loadData(QDir sourceDir)
 {
 	// Check that a fileName is specified - otherwise there is nothing to do
-	if (dataSource_ != DataSet::FileSource) return false;
+	if (dataSource_ != DataSet::FileSource)
+	{
+		msg.print("DataSet::loadData() - Datasource != FileSource\n");
+		return false;
+	}
 
 	// Clear any existing data
 	data_.arrayX().clear();
@@ -120,7 +124,7 @@ bool DataSet::loadData(QDir sourceDir)
 	// Check file exists
 	if (!QFile::exists(sourceDir.absoluteFilePath(sourceFileName_)))
 	{
-// 		QMessageBox::warning(NULL, "File Not Found", QString("The file ") + sourceFileName_ + " could not be found.");
+		msg.print("Error: File '%s' not found.\n", qPrintable(sourceFileName_));
 		return false;
 	}
 

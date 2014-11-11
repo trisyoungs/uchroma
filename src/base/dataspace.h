@@ -70,10 +70,12 @@ class DataSpace
 	bool initialise(const DataSpace& source, bool referenceDataOnly);
 	// Return source collection
 	Collection* sourceCollection();
+	// Return number of ranges in list
+	int nDataSpaceRanges();
 	// Return range list
-	DataSpaceRange* ranges();
+	DataSpaceRange* dataSpaceRanges();
 	// Return range specified
-	DataSpaceRange* range(int index);
+	DataSpaceRange* dataSpaceRange(int index);
 	// Copy calculated y data to destination collection specified
 	void copy(Collection* destinationCollection);
 };

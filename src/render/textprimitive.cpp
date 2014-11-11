@@ -408,6 +408,10 @@ bool TextPrimitive::addEscape(TextPrimitive::EscapeSequence escSeq)
 			newFormat->adjustY( FontInstance::fontBaseHeight() * newFormat->scale() * (2.0/3.0) );
 			newFormat->setScale( 0.583 * newFormat->scale() );
 			break;
+		default:
+			msg.print("Escape %i not handled in TextPrimitive::addEscape().\n", escSeq);
+			return false;
+			break;
 	}
 
 	return true;

@@ -460,4 +460,6 @@ bool NexusHelper::loadSlice(QString fileName, QString root, QString xAxisValues,
 
 	// Done
 	H5Fclose(file);
+	
+	return true;
 }

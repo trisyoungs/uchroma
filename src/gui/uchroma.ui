@@ -703,8 +703,11 @@
     </property>
     <addaction name="actionAnalyseNewFit"/>
     <addaction name="actionAnalyseEditFit"/>
+    <addaction name="separator"/>
     <addaction name="actionAnalyseUpdateFit"/>
     <addaction name="actionAnalyseResetAndRestartFit"/>
+    <addaction name="separator"/>
+    <addaction name="actionAnalyseViewFitResults"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -1452,6 +1455,14 @@
    </property>
    <property name="shortcut">
     <string>F10</string>
+   </property>
+  </action>
+  <action name="actionAnalyseViewFitResults">
+   <property name="text">
+    <string>View Fit Results...</string>
+   </property>
+   <property name="shortcut">
+    <string>F11</string>
    </property>
   </action>
  </widget>

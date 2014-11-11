@@ -86,7 +86,7 @@ Axes::Axes(ViewPane& parent) : parent_(parent)
 	gridLinesMinor_.set(false, false, false);
 
 	// Style override
-	useBestFlatView_ = false;
+	useBestFlatView_ = true;
 	autoPositionTitles_ = false;
 
 	// Versions

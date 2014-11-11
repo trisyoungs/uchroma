@@ -373,34 +373,34 @@ void DataSpaceRange::addCalculatedValues(Collection* target)
 }
 
 // Add / set fitted variable value
-void DataSpaceRange::setFittedValue(QString name, double value)
+void DataSpaceRange::setFittedValue(QString name, double fittedValue)
 {
-	EquationVariable* eqVar = NULL;
-	for (eqVar = fittedValues_.first(); eqVar != NULL; eqVar = eqVar->next) if (eqVar->name() == name) break;
-	if (eqVar == NULL)
+	NamedValue* value = NULL;
+	for (value = fittedValues_.first(); value != NULL; value = value->next) if (value->name() == name) break;
+	if (value == NULL)
 	{
-		eqVar = fittedValues_.add();
-		eqVar->setName(name);
+		value = fittedValues_.add();
+		value->setName(name);
 	}
-	eqVar->setValue(value);
+	value->setValue(fittedValue);
 }
 
-// Return whether named fitted variable exists
-EquationVariable* DataSpaceRange::hasFittedValue(QString name)
+// Return whether named fitted value exists
+NamedValue* DataSpaceRange::hasFittedValue(QString name)
 {
-	for (EquationVariable* eqVar = fittedValues_.first(); eqVar != NULL; eqVar = eqVar->next) if (eqVar->name() == name) return eqVar;
+	for (NamedValue* value = fittedValues_.first(); value != NULL; value = value->next) if (value->name() == name) return value;
 	return NULL;
 }
 
-// Return value of named fitted variable
+// Return value of named fitted value
 double DataSpaceRange::fittedValue(QString name)
 {
-	for (EquationVariable* eqVar = fittedValues_.first(); eqVar != NULL; eqVar = eqVar->next) if (eqVar->name() == name) return eqVar->value();
+	for (NamedValue* value = fittedValues_.first(); value != NULL; value = value->next) if (value->name() == name) return value->value();
 	return 0.0;
 }
 
-// Return first in list of fitted variable values
-EquationVariable* DataSpaceRange::fittedValues()
+// Return first in list of fitted values
+NamedValue* DataSpaceRange::fittedValues()
 {
 	return fittedValues_.first();
 }

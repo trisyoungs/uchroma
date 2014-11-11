@@ -24,6 +24,7 @@
 
 #include "base/indexdata.h"
 #include "base/equationvariable.h"
+#include "base/namedvalue.h"
 #include "templates/array.h"
 #include "templates/list.h"
 #include "templates/reflist.h"
@@ -105,7 +106,7 @@ class DataSpaceRange : public ListItem<DataSpaceRange>
 	// Calculated Y values
 	Array2D<double> yCalculated_;
 	// Fitted variable values
-	List<EquationVariable> fittedValues_;
+	List<NamedValue> fittedValues_;
 
 	public:
 	// Return reference y value specified
@@ -126,12 +127,12 @@ class DataSpaceRange : public ListItem<DataSpaceRange>
 	void addCalculatedValues(Collection* target);
 	// Add / set fitted variable value
 	void setFittedValue(QString name, double value);
-	// Return whether named fitted variable exists
-	EquationVariable* hasFittedValue(QString name);
-	// Return value of named fitted variable
+	// Return whether named fitted value exists
+	NamedValue* hasFittedValue(QString name);
+	// Return value of named fitted value
 	double fittedValue(QString name);
-	// Return first in list of fitted variable values
-	EquationVariable* fittedValues();
+	// Return first in list of fitted values
+	NamedValue* fittedValues();
 };
 
 #endif

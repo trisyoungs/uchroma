@@ -161,7 +161,7 @@ QString ReferenceVariable::zDataSetName()
 // Reset current reference DataSpaceRange to the first available
 void ReferenceVariable::resetCurrentDataSpaceRange()
 {
-	currentReferenceRange_ = referenceSpace_.ranges();
+	currentReferenceRange_ = referenceSpace_.dataSpaceRanges();
 }
 
 // Set internal pointer to the next available DataSpaceRange
@@ -184,7 +184,7 @@ bool ReferenceVariable::initialiseDataSpace(Collection* fitCollection, DataSpace
 	if (!referenceSpace_.initialise(fitDataSpace, true)) return false;
 
 	// Generate values within the dataspace, employing offsets defined in the ReferenceVariable
-	for (DataSpaceRange* range = referenceSpace_.ranges(); range != NULL; range = range->next)
+	for (DataSpaceRange* range = referenceSpace_.dataSpaceRanges(); range != NULL; range = range->next)
 	{
 		range->copyValues(xIndex_, zIndex_);
 	}

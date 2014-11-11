@@ -219,6 +219,7 @@ class UChromaWindow : public QMainWindow
 	void on_actionAnalyseEditFit_triggered(bool checked);
 	void on_actionAnalyseUpdateFit_triggered(bool checked);
 	void on_actionAnalyseResetAndRestartFit_triggered(bool checked);
+	void on_actionAnalyseViewFitResults_triggered(bool checked);
 
 
 	/*

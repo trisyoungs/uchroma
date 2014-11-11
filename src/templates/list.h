@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <QtCore/QString>
 
 /*!
  * \brief ListItem Class
@@ -106,6 +107,8 @@ template <class T> class List
 	void removeLast();
 	// Return whether the item is owned by the list
 	bool contains(T* item) const;
+	// Return whether list contains named item
+	T* contains(QString name) const;
 	// Remove an item from the list, and return the next in the list
 	T* removeAndGetNext(T* item);
 	// Cut item from list
@@ -388,6 +391,15 @@ template <class T> bool List<T>::contains(T* searchItem) const
 	T* item;
 	for (item = listHead_; item != NULL; item = item->next) if (searchItem == item) break;
 	return (item != NULL);
+}
+
+/*!
+ * \brief Return whether list contains named item (requires T::isNamed(QString name) function)
+ */
+template <class T> T* List<T>::contains(QString name) const
+{
+	for (T* item = listHead_; item != NULL; item = item->next) if (item->isNamed(name)) return item;
+	return NULL;
 }
 
 /*!

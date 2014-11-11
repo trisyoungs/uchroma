@@ -22,6 +22,7 @@
 #ifndef UCHROMA_GLEXTENSIONS_H
 #define UCHROMA_GLEXTENSIONS_H
 
+#include "templates/list.h"
 #ifdef _WIN32
 #include <windows.h>
 #include <GL/gl.h>
@@ -31,7 +32,6 @@
 #else
 #include <GL/glx.h>
 #endif
-#include "templates/list.h"
  
 // GL Extensions
 class GLExtensions : public ListItem<GLExtensions>

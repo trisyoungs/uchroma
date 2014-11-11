@@ -13,6 +13,7 @@ ${CMAKE_BINARY_DIR}/src/
 SET(qtproject_SRCS
   editdataset_funcs.cpp
   editfitkernel_funcs.cpp
+  editfitresults_funcs.cpp
   editlinestyle_funcs.cpp
   editnumberformat_funcs.cpp
   editreference_funcs.cpp
@@ -58,6 +59,7 @@ SET(pro_MOC_HDRS
 
   editdataset.h
   editfitkernel.h
+  editfitresults.h
   editlinestyle.h
   editnumberformat.h
   editreference.h
@@ -84,6 +86,7 @@ QT4_WRAP_CPP(pro_MOC_SRCS ${pro_MOC_HDRS} OPTIONS -f)
 SET(pro_UIS
   editdataset.ui
   editfitkernel.ui
+  editfitresults.ui
   editlinestyle.ui
   editnumberformat.ui
   editreference.ui

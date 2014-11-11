@@ -185,6 +185,12 @@ bool DataSpace::initialise(const DataSpace& source, bool referenceDataOnly)
 	return true;
 }
 
+// Return number of ranges in list
+int DataSpace::nDataSpaceRanges()
+{
+	return ranges_.nItems(); 
+}
+
 // Return source collection
 Collection* DataSpace::sourceCollection()
 {
@@ -192,13 +198,13 @@ Collection* DataSpace::sourceCollection()
 }
 
 // Return range list
-DataSpaceRange* DataSpace::ranges()
+DataSpaceRange* DataSpace::dataSpaceRanges()
 {
 	return ranges_.first();
 }
 
 // Return range specified
-DataSpaceRange* DataSpace::range(int index)
+DataSpaceRange* DataSpace::dataSpaceRange(int index)
 {
 	return ranges_[index];
 }

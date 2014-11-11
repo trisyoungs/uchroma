@@ -107,34 +107,14 @@ void DataWindow::on_AddFilesButton_clicked(bool checked)
 	QProgressDialog progress("Loading data...", "Abort Loading", 0, files.count(), this);
 	progress.setWindowModality(Qt::WindowModal);
 	int count = 0;
-	
-	// Determine automatic Z placement for dataset
-	double z = 0.0, delta = 1.0;
-	if (currentCollection->nDataSets() == 1) z = currentCollection->lastDataSet()->data().z() + 1.0;
-	else if (currentCollection->nDataSets() > 1)
-	{
-		delta = currentCollection->lastDataSet()->data().z() - currentCollection->lastDataSet()->prev->data().z();
-		z = currentCollection->lastDataSet()->prev->data().z() + delta;
-	}
 
+	// Loop	over filenames and append datasets
 	foreach (QString fileName, files)
 	{
 		progress.setValue(count);
 		if (progress.wasCanceled()) break;
 
-		// Get FileInfo for fileName
-		QFileInfo fileInfo(fileName);
-
-		DataSet* dataSet = currentCollection->addDataSet(z);
-		dataSet->setName(fileInfo.fileName());
-		dataSet->setDataSource(DataSet::FileSource);
-		dataSet->setSourceFileName(currentCollection->dataFileDirectory().relativeFilePath(fileName));
-
-		if (dataSet && currentCollection->loadDataSet(dataSet)) ++count;
-
-		currentCollection->setDataSetZ(dataSet, z);
-
-		z += delta;
+		if (currentCollection->appendDataSet(fileName)) ++count;
 	}
 	progress.setValue(files.count());
 

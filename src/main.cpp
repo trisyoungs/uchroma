@@ -47,7 +47,6 @@ int main(int argc, char *argv[])
 	UChromaSession::startNewSession(true);
 
 	/* Do we have CLI options? */
-	bool fileLoaded = false;
 	if (argc > 1)
 	{
 		int n = 1;
@@ -55,9 +54,24 @@ int main(int argc, char *argv[])
 		{
 			if (argv[n][0] != '-')
 			{
-				// Must be an input file to load....
-				fileLoaded = UChromaSession::loadSession(argv[n]);
-				if (!fileLoaded) return 1;
+				// Could be an input file, or could be a dataset
+				QFileInfo info(argv[n]);
+				if (info.suffix() == "ucr")
+				{
+					msg.print("Loading input file '%s'...\n", argv[n]);
+					if (!UChromaSession::loadSession(argv[n])) return 1;
+				}
+				else
+				{
+					if (!UChromaSession::currentCollection())
+					{
+						msg.print("No collection exists to load data into.\n");
+						return 1;
+					}
+					msg.print("Loading dataset '%s'...\n", argv[n]);
+					if (!UChromaSession::currentCollection()->appendDataSet(argv[n])) return 1;
+				}
+
 				++n;
 				continue;
 			}

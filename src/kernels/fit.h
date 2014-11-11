@@ -219,6 +219,8 @@ class FitKernel
 	void checkRanges();
 	// Initialise data space
 	bool initialiseDataSpace();
+	// Return number of data space ranges in the list
+	int nDataSpaceRanges();
 	// Return data space range with index specified
 	DataSpaceRange* dataSpaceRange(int index);
 	// Return first data space range in list
