@@ -138,15 +138,18 @@ void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 
 		int imageWidth = UChromaSession::imageExportWidth();
 		int imageHeight = UChromaSession::imageExportHeight();
+		bool useFrameBuffer = true; //UChromaSession::imageExportUseFrameBuffer.
+
+		// Scale current line width to reflect size of exported image
+// 		double oldLineWidth = lineWidth_;
+// 		lineWidth_ *= double(w) / width();
 
 		// If both image dimensions are less than some limiting size, get image in a single shot. If not, tile it...
 		if ((imageHeight > maxSize) || (imageWidth > maxSize))
 		{
-// 			ui.MainView->setUseFrameBuffer(true);
-
 			// If we are using the framebuffer, use the current Viewer size as our tile size
-			int tileWidth = (ui.MainView->useFrameBuffer() ? ui.MainView->width() : maxSize);
-			int tileHeight = (ui.MainView->useFrameBuffer() ? ui.MainView->height() : maxSize);
+			int tileWidth = (useFrameBuffer ? ui.MainView->width() : maxSize);
+			int tileHeight = (useFrameBuffer ? ui.MainView->height() : maxSize);
 
 			printf("WH = %i %i, tile WH = %i %i\n", imageWidth, imageHeight, tileWidth, tileHeight);
 			
@@ -173,11 +176,12 @@ void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 					progress.setValue(x*nY+y);
 
 					// Recalculate view pane sizes to reflect current tile position and tile size
-					if (ui.MainView->useFrameBuffer()) UChromaSession::viewLayout().recalculate(tileWidth, tileHeight);
+					if (useFrameBuffer) UChromaSession::viewLayout().recalculate(tileWidth, tileHeight);
 					UChromaSession::viewLayout().setOffsetAndScale(-x*tileWidth, -y*tileHeight, xScale, yScale);
 
 					// Generate this tile
-					QPixmap tile = ui.MainView->generateImage(tileWidth, tileHeight);
+					if (useFrameBuffer) ui.MainView->repaint();
+					QPixmap tile = ui.MainView->generateImage(tileWidth, tileHeight, useFrameBuffer);
 					QString s;
 					s.sprintf("tile%02ix%02i.png", x, y);
 					tile.save(s, UChromaSession::imageFormatExtension(UChromaSession::imageExportFormat()), -1);
@@ -194,7 +198,7 @@ void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 		}
 		else
 		{
-			QPixmap pixmap = ui.MainView->generateImage(imageWidth, imageHeight);
+			QPixmap pixmap = ui.MainView->generateImage(imageWidth, imageHeight, useFrameBuffer);
 			pixmap.save(UChromaSession::imageExportFileName(), UChromaSession::imageFormatExtension(UChromaSession::imageExportFormat()), -1);
 
 		}

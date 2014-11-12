@@ -3,8 +3,8 @@
 AC_PREREQ(2.60)
 
 # Set program name, version, bug-address and source directory
-m4_define([UCHROMA_VERSION],[0.189])
-AC_INIT(uchroma,UCHROMA_VERSION,tris@projectaten.net)
+m4_define([UCHROMA_VERSION],[0.190])
+AC_INIT([uchroma],[UCHROMA_VERSION])
 AC_CONFIG_SRCDIR([src/])
 
 # Check system type and set defines
@@ -19,7 +19,7 @@ if test "$target_vendor" = "apple"; then
 fi
 AC_SUBST(MAC_LIBS)
 
-AM_INIT_AUTOMAKE(uchroma,UCHROMA_VERSION)
+AM_INIT_AUTOMAKE
 
 # Checks for programs.
 AC_PROG_CXX

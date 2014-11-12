@@ -165,8 +165,6 @@ void OperateBGSubDialog::on_CancelButton_clicked(bool checked)
 
 void OperateBGSubDialog::on_ApplyButton_clicked(bool checked)
 {
-	bool result;
-
 	if (ui.ConstantValueRadio->isChecked()) targetCollection_->addConstantValue(1, -constantValue_);
 	else if (ui.AverageOverXRadio->isChecked())
 	{
@@ -180,8 +178,7 @@ void OperateBGSubDialog::on_ApplyButton_clicked(bool checked)
 // 	else if (ui.AverageOverZRadio->isChecked()) result = setZFromSourceFiles();
 
 	targetCollection_ = NULL;
-	if (result) accept();
-	else reject();
+	accept();
 }
 
 /*

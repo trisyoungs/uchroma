@@ -41,12 +41,12 @@ libgui_a_SOURCES += colourbutton.uih colourbutton_funcs.cpp
 libgui_a_SOURCES += gradientbar.uih gradientbar_funcs.cpp
 libgui_a_SOURCES += paneorganiser.uih paneorganiser_funcs.cpp
 
-libgui_a_SOURCES += viewer.uih viewer_funcs.cpp viewer_input.cpp viewer_prefs.cpp
+libgui_a_SOURCES += viewer.uih viewer_funcs.cpp viewer_input.cpp
 
 noinst_HEADERS = uchroma.h axes.h create.h data.h import.h log.h saveimage.h style.h transform.h view.h
 noinst_HEADERS += editdataset.h editfitkernel.h editfitresults.h editlinestyle.h editnumberformat.h editreference.h editviewlayout.h
 noinst_HEADERS += operate_bgsub.h operate_setz.h
 noinst_HEADERS += selectequation.h selectsymbol.h selecttarget.h
 
-INCLUDES = -I$(top_srcdir)/src -I$(top_srcdir)/src/gui @GUI_CFLAGS@
+libgui_a_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/gui @GUI_CFLAGS@
 

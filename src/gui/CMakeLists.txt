@@ -32,7 +32,6 @@ SET(qtproject_SRCS
   texponentialspin_funcs.cpp
   viewer_funcs.cpp
   viewer_input.cpp
-  viewer_prefs.cpp
 
   uchroma_collection.cpp
   uchroma_funcs.cpp

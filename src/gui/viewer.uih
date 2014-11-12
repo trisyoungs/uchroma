@@ -63,7 +63,6 @@ class Viewer : public QGLWidget
 
 	/*
 	 * Character / Setup
-	 * (in viewer_funcs.cpp)
 	 */
 	private:
 	// GLExtension pointer stack
@@ -103,7 +102,7 @@ class Viewer : public QGLWidget
 	// Refresh widget / scene
 	void postRedisplay();
 	// Render or grab image
-	QPixmap generateImage(int w, int h);
+	QPixmap generateImage(int w, int h, bool useFrameBuffer);
 
 
 	/*
@@ -145,27 +144,20 @@ class Viewer : public QGLWidget
 
 	/*
 	 * Rendering Preferences
-	 * (in viewer_prefs.cpp)
 	 */ 
 	private:
-	// Flag specifying whether framebuffer should be used for offscreen rendering
-	bool useFrameBuffer_;
 	// Flag specifying whether to correct transparency artefacts
 	bool correctTransparency_;
-	// Line width to use for line primitives
-	double lineWidth_;
+	// Line width scaling factor to use (to adjust line width when saving images)
+	double lineWidthScaling_;
 	
 	public:
-	// Set whether framebuffer should be used for offscreen rendering
-	void setUseFrameBuffer(bool b);
-	// Return whether framebuffer should be used for offscreen rendering
-	bool useFrameBuffer();
 	// Set whether to correct transparency artefacts
 	void setCorrectTransparency(bool b);
 	// Return whether to correct transparency artefacts
 	bool correctTransparency();
-	// Set line width to use for line primitives
-	void setLineWidth(double lineWidth);
+	// Set line width scaling to use
+	void setLineWidthScaling(double scaling);
 
 
 	/*

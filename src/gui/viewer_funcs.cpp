@@ -52,8 +52,6 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 
 	// Engine Setup
 	correctTransparency_ = false;
-	useFrameBuffer_ = false;
-	lineWidth_ = 2.0;
 
 	// Prevent QPainter from autofilling widget background
 	setAutoFillBackground(false);
@@ -475,23 +473,21 @@ void Viewer::postRedisplay()
 }
 
 // Render or grab image
-QPixmap Viewer::generateImage(int w, int h)
+QPixmap Viewer::generateImage(int w, int h, bool useFrameBuffer)
 {
 	renderingOffScreen_ = true;
-	if (useFrameBuffer_)
+	if (useFrameBuffer)
 	{
-		postRedisplay();
+// 		repaint();
+// 		postRedisplay();
 		QImage image = grabFrameBuffer();
 
 		renderingOffScreen_ = false;
+		printf("Now here...\n");
 		return QPixmap::fromImage(image);
 	}
 	else
 	{
-		// Scale current line width to reflect size of exported image
-		double oldLineWidth = lineWidth_;
-		lineWidth_ *= double(w) / width();
-
 		// Generate offscreen bitmap (a temporary context will be created)
 		QPixmap pixmap = renderPixmap(w, h, false);
 		
@@ -499,10 +495,30 @@ QPixmap Viewer::generateImage(int w, int h)
 		contextWidth_ = (GLsizei) width();
 		contextHeight_ = (GLsizei) height();
 
-		// Reset everything back to normal
-		lineWidth_ = oldLineWidth;
 		renderingOffScreen_ = false;
 
 		return pixmap;
 	}
+}
+
+/*
+ * Preferences
+ */
+
+// Set whether to correct transparency artefacts
+void Viewer::setCorrectTransparency(bool b)
+{
+	correctTransparency_ = b;
+}
+
+// Return whether to correct transparency artefacts
+bool Viewer::correctTransparency()
+{
+	return correctTransparency_;
+}
+
+// Set line width scaling to use
+void Viewer::setLineWidthScaling(double scaling)
+{
+	lineWidthScaling_ = scaling;
 }

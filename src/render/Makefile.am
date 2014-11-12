@@ -10,5 +10,5 @@ librender_a_SOURCES += fontinstance.cpp glextensions.cpp linestipple.cpp linesty
 
 noinst_HEADERS = fontinstance.h glextensions.h linestipple.h linestyle.h primitive.h primitiveinfo.h primitiveinstance.h primitivelist.h surface.h textformat.h textfragment.h textprimitive.h textprimitivelist.h vertexchunk.h
 
-INCLUDES = -I$(top_srcdir)/src -I$(top_srcdir)/src/gui @GUI_CFLAGS@
+librender_a_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/gui @GUI_CFLAGS@
 
