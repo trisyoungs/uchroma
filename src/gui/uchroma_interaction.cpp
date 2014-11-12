@@ -20,6 +20,7 @@
 */
 
 #include "gui/uchroma.h"
+#include "gui/operate_bgsub.h"
 
 /*
  * Interaction Modes
@@ -27,10 +28,13 @@
 
 // Static list of interaction modes
 InteractionMode InteractionMode::interactionModes[] = {
-	{ "Fit (select X)",	"<b>Left-click-drag</b> Select X region for fitting" },
-	{ "Fit (select Z)",	"<b>Left-click-drag</b> Select Z region for fitting" },
-	{ "View",		"<b>Right</b> Rotate view, <b>Middle</b> Translate view (3D) or shift axis limits (2D), <b>Wheel</b> Zoom view" },
-	{ "Zoom",		"<b>Left-click-drag</b> Zoom to selected region, <b>Ctrl+Left</b> Extract slice" }
+	{ "Fit (select X)",			"<b>Left-click-drag</b> Select X region for fitting" },
+	{ "Fit (select Z)",			"<b>Left-click-drag</b> Select Z region for fitting" },
+	{ "BG Subtraction (select Y)",	  	"<b>Left-click</b> select Y value for subtraction"  },
+	{ "BG Subtraction (select X range)", 	"<b>Left-click-drag</b> select X range for determination of average value"  },	
+	{ "BG Subtraction (select Z range)", 	"<b>Left-click-drag</b> select Z range for determination of average value"  },	
+	{ "View",				"<b>Right</b> Rotate view, <b>Middle</b> Translate view (3D) or shift axis limits (2D), <b>Wheel</b> Zoom view" },
+	{ "Zoom",				"<b>Left-click-drag</b> Zoom to selected region, <b>Ctrl+Left</b> Extract slice" }
 };
 
 /*
@@ -122,12 +126,17 @@ bool UChromaWindow::interacting()
 // Cancel current interaction
 void UChromaWindow::cancelInteraction()
 {
-	// Finalise interaction type
+	// Cancel interaction type
 	switch (interactionMode_)
 	{
 		case (InteractionMode::FitSetupSelectXInteraction):
 		case (InteractionMode::FitSetupSelectZInteraction):
 			editFitSetupDialog_.updateAndExec();
+			break;
+		case (InteractionMode::OperateBGSubSelectYValueInteraction):
+		case (InteractionMode::OperateBGSubSelectXRangeInteraction):
+		case (InteractionMode::OperateBGSubSelectZRangeInteraction):
+			OperateBGSubDialog(*this).updateAndExec();
 			break;
 		case (InteractionMode::ViewInteraction):
 		case (InteractionMode::ZoomInteraction):
@@ -194,8 +203,14 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 		return;
 	}
 
+	// Copy current interaction mode, and reset back to ViewInteraction
+	InteractionMode::Mode currentMode = interactionMode_;
+	int currentAxis = interactionAxis_;
+	interactionMode_ = InteractionMode::ViewInteraction;
+	interactionAxis_ = -1;
+
 	// Finalise interaction type
-	switch (interactionMode_)
+	switch (currentMode)
 	{
 		case (InteractionMode::FitSetupSelectXInteraction):
 			editFitSetupDialog_.ui.XAbsoluteMinSpin->setValue(std::min(clickedInteractionValue_, currentInteractionValue_));
@@ -207,12 +222,24 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 			editFitSetupDialog_.ui.ZAbsoluteMaxSpin->setValue(std::max(clickedInteractionValue_, currentInteractionValue_));
 			editFitSetupDialog_.updateAndExec();
 			break;
+		case (InteractionMode::OperateBGSubSelectYValueInteraction):
+			OperateBGSubDialog::setConstantValue(currentInteractionValue_);
+			OperateBGSubDialog(*this).updateAndExec();
+			break;
+		case (InteractionMode::OperateBGSubSelectXRangeInteraction):
+			OperateBGSubDialog::setXRange(std::min(clickedInteractionValue_, currentInteractionValue_), std::max(clickedInteractionValue_, currentInteractionValue_));
+			OperateBGSubDialog(*this).updateAndExec();
+			break;
+		case (InteractionMode::OperateBGSubSelectZRangeInteraction):
+			OperateBGSubDialog::setZRange(std::min(clickedInteractionValue_, currentInteractionValue_), std::max(clickedInteractionValue_, currentInteractionValue_));
+			OperateBGSubDialog(*this).updateAndExec();
+			break;
 		case (InteractionMode::ZoomInteraction):
 			// None : Zoom to defined region
 			// Ctrl : Extract slice
 			if (clickedInteractionModifiers_.testFlag(Qt::ControlModifier))
 			{
-				UChromaSession::currentCollection()->extractCurrentSlice(interactionAxis_, currentInteractionValue_);
+				UChromaSession::currentCollection()->extractCurrentSlice(currentAxis, currentInteractionValue_);
 				refreshCollections();
 			}
 			else
@@ -221,21 +248,17 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 				double newMax = std::max(clickedInteractionValue_, currentInteractionValue_);
 				if ((newMax-newMin) > 1.0e-10)
 				{
-					UChromaSession::currentViewPane()->axes().setMin(interactionAxis_, newMin);
-					UChromaSession::currentViewPane()->axes().setMax(interactionAxis_, newMax);
+					UChromaSession::currentViewPane()->axes().setMin(currentAxis, newMin);
+					UChromaSession::currentViewPane()->axes().setMax(currentAxis, newMax);
 					axesWindow_.updateControls();
 				}
 			}
 			updateDisplay();
 			break;
 		default:
-			printf("Internal Error: Don't know how to complete interaction mode %i\n", interactionMode_);
+			printf("Internal Error: Don't know how to complete interaction mode %i\n", currentMode);
 			break;
 	}
-
-	// Reset mode back to View interaction
-	interactionMode_ = InteractionMode::ViewInteraction;
-	interactionAxis_ = -1;
 
 	interacting_ = false;
 }

@@ -212,7 +212,7 @@ bool OperateSetZDialog::setZFromSourceFiles()
 				extractedTime = QDateTime::fromString(sourceFilesRegExp_.cap(1), ui.FromSourceFilesDateTimeEdit->text());
 				if (extractedTime.isValid())
 				{
-					dataSet->data().setZ(referenceTime.secsTo(extractedTime));
+					dataSet->setZ(referenceTime.secsTo(extractedTime));
 					if ((earliest == 0) || (dataSet->data().z() < earliest)) earliest = dataSet->data().z();
 				}
 				else
@@ -261,7 +261,7 @@ bool OperateSetZDialog::setZFromTimeStamps()
 			QMessageBox::warning(this, "Failed to Open File", "The file '" + s + "' could not be found.");
 			break;
 		}
-		dataSet->data().setZ(referenceTime.secsTo(fileInfo.lastModified()));
+		dataSet->setZ(referenceTime.secsTo(fileInfo.lastModified()));
 
 		if ((earliest == 0) || (dataSet->data().z() < earliest)) earliest = dataSet->data().z();
 	}

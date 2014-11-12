@@ -82,8 +82,6 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	void removeDataSet(DataSet* dataSet);
 	// Set z value of specified dataset
 	void setDataSetZ(DataSet* target, double z);
-	// Set data for specified dataset (from arrays);
-	void setDataSetData(DataSet* target, const Array<double>& x, const Array<double>& y);
 	// Set data for specified dataste (from source DataSet)
 	void setDataSetData(DataSet* target, DataSet& source);
 	// Return first dataset in list
@@ -118,6 +116,8 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	Vec3<double> dataMin();
 	// Return data maxima, calculating if necessary
 	Vec3<double> dataMax();
+	// Increase data version (i.e. notify that data has been changed)
+	void notifyDataChanged();
 	// Return version counter for changes to data
 	int dataVersion();
 
@@ -168,6 +168,14 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	void setInterpolationStep(int axis, double step);
 	// Return interpolation step size
 	double interpolationStep(int axis);
+
+
+	/*
+	 * Data Operations
+	 */
+	public:
+	// Add to specified axis value`
+	void addConstantValue(int axis, double value);
 
 
 	/*

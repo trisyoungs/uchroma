@@ -64,7 +64,7 @@ class Data2D : public ListItem<Data2D>
 	// Initialise arrays to specified size
 	void initialise(int size);
 	// Return current array size
-	int arraySize();
+	int arraySize() const;
 	// Set data point 
 	void setPoint(int index, double x, double y);
 	// Return number of defined datapoints
@@ -77,6 +77,8 @@ class Data2D : public ListItem<Data2D>
 	double x(int index) const;
 	// Return x Array
 	Array<double>& arrayX();
+	// Return const x Array
+	const Array<double>& constArrayX() const;
 	// Set y value
 	void setY(int index, double y);
 	// Add to y value
@@ -89,12 +91,16 @@ class Data2D : public ListItem<Data2D>
 	double y(int index) const;
 	// Return y Array
 	Array<double>& arrayY();
+	// Return const y Array
+	const Array<double>& constArrayY() const;
 	// Add new data point
 	void addPoint(double x, double y);
 	// Set z data
 	void setZ(double z);
 	// Return z data
-	double z();
+	double z() const;
+	// Add to z value
+	void addZ(double value);
 	// Set name of data
 	void setName(QString name);
 	// Return name of data
@@ -193,13 +199,13 @@ class Data2D : public ListItem<Data2D>
 	 */
 	public:
 	// Return minumum x value in data
-	double xMin();
-	// Return maxumum x value in data
-	double xMax();
+	double xMin() const;
+	// Return maximum x value in data
+	double xMax() const;
 	// Return minumum y value in data
-	double yMin();
-	// Return maxumum y value in data
-	double yMax();
+	double yMin() const;
+	// Return maximum y value in data
+	double yMax() const;
 	// Compute integral of the data
 	double integral();
 	// Compute absolute integral of the data
@@ -210,6 +216,8 @@ class Data2D : public ListItem<Data2D>
 	bool convoluteProduct(Data2D& data);
 	// Trim data to X-range specified
 	void trim(double minX, double maxX);
+	// Calculate average y value over x range specified
+	double averageY(double xMin, double xMax) const;
 
 
 	/*!

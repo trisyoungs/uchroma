@@ -29,6 +29,7 @@
 
 // Forward Declarations
 class QTreeWidgetItem;
+class Collection;
 
 // DataSet
 class DataSet: public ListItem<DataSet>
@@ -50,8 +51,26 @@ class DataSet: public ListItem<DataSet>
 
 
 	/*
-	// Data
-	*/
+	 * Parent Collection
+	 */
+	private:
+	// Parent collection
+	Collection* parent_;
+
+	private:
+	// Notify parent that data has changed
+	void notifyParent();
+
+	public:
+	// Set parent
+	void setParent(Collection* parent);
+	// Return parent
+	Collection* parent();
+
+
+	/*
+	 * Data
+	 */
 	private:
 	// Source of data
 	DataSource dataSource_;
@@ -80,11 +99,41 @@ class DataSet: public ListItem<DataSet>
 	// Load data from file
 	bool loadData(QDir sourceDir);
 	// Return data
-	Data2D& data();
+	const Data2D& data() const;
+	// Return X array from data
+	const Array<double>& x() const;
+	// Return Y array from data
+	const Array<double>& y() const;
+	// Return z value from data
+	double z() const;
 	// Transform original data with supplied transformers
 	void transform(Transformer& xTransformer, Transformer& yTransformer, Transformer& zTransformer);
 	// Return transformed data
 	Data2D& transformedData();
+
+
+	/*
+	 * Data Operations
+	 */
+	public:
+	// Reset (zero) data
+	void resetData();
+	// Initialise data to specified number of points
+	void initialiseData(int nPoints);
+	// Set data from supplied Data2D
+	void setData(Data2D& source);
+	// Add point to data
+	void addPoint(double x, double y);
+	// Set x value
+	void setX(int index, double newX);
+	// Set y value
+	void setY(int index, double newY);
+	// Set z data
+	void setZ(double z);
+	// Add to specified axis value`
+	void addConstantValue(int axis, double value);
+	// Calculate average y value over x range specified
+	double averageY(double xMin, double xMax) const;
 };
 
 #endif

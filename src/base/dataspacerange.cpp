@@ -352,7 +352,6 @@ double DataSpaceRange::sosError()
 void DataSpaceRange::addCalculatedValues(Collection* target)
 {
 	// Target collection should already have had DataSet 'space' created in it
-
 	for (int n=0; n<nDataSets_; ++n)
 	{
 		// Grab DataSet pointer
@@ -366,8 +365,8 @@ void DataSpaceRange::addCalculatedValues(Collection* target)
 		// Loop over x values
 		for (int i=0; i<nPoints_; ++i)
 		{
-			dataSet->data().setX(i+abscissaStart_, x_.value(i));
-			dataSet->data().setY(i+abscissaStart_, yCalculated_.ref(i,n));
+			dataSet->setX(i+abscissaStart_, x_.value(i));
+			dataSet->setY(i+abscissaStart_, yCalculated_.ref(i,n));
 		}
 	}
 }

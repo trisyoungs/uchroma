@@ -27,19 +27,20 @@
 #include <QtGui/QMessageBox>
 
 //.Static members
+Collection* OperateBGSubDialog::targetCollection_ = NULL;
 double OperateBGSubDialog::constantValue_ = 1.0;
 double OperateBGSubDialog::xRangeMin_ = 0.0;
 double OperateBGSubDialog::xRangeMax_ = 10.0;
 double OperateBGSubDialog::zRangeMin_ = 0.0;
 double OperateBGSubDialog::zRangeMax_ = 10.0;
+int OperateBGSubDialog::subtractionMethod_ = 0;
 
 // Constructor
-OperateBGSubDialog::OperateBGSubDialog(UChromaWindow& parent, Collection* targetCollection) : QDialog(&parent), uChroma_(parent)
+OperateBGSubDialog::OperateBGSubDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(parent)
 {
 	ui.setupUi(this);
 
 	refreshing_ = false;
-	targetCollection_ = targetCollection;
 
 	updateControls();
 }
@@ -79,7 +80,11 @@ void OperateBGSubDialog::setZRange(double zMin, double zMax)
 
 void OperateBGSubDialog::on_ConstantValueRadio_toggled(bool checked)
 {
-	if (checked) toggleControls(0);
+	if (checked)
+	{
+		toggleControls(0);
+		subtractionMethod_ = 0;
+	}
 }
 
 void OperateBGSubDialog::on_ConstantValueSpin_valueChanged(double value)
@@ -89,19 +94,27 @@ void OperateBGSubDialog::on_ConstantValueSpin_valueChanged(double value)
 
 void OperateBGSubDialog::on_ConstantValueSelectButton_clicked(bool checked)
 {
+	uChroma_.setInteractionMode(InteractionMode::OperateBGSubSelectYValueInteraction, 1);
+	reject();
 }
 
 void OperateBGSubDialog::on_ConstantValueSetYMinimumButton_clicked(bool checked)
 {
+	ui.ConstantValueSpin->setValue(targetCollection_->transformMin().y);
 }
 
 void OperateBGSubDialog::on_ConstantValueSetYMaximumButton_clicked(bool checked)
 {
+	ui.ConstantValueSpin->setValue(targetCollection_->transformMax().y);
 }
 
 void OperateBGSubDialog::on_AverageOverXRadio_toggled(bool checked)
 {
-	if (checked) toggleControls(1);
+	if (checked)
+	{
+		toggleControls(1);
+		subtractionMethod_= 1;
+	}
 }
 
 void OperateBGSubDialog::on_XRangeMinSpin_valueChanged(double value)
@@ -116,13 +129,17 @@ void OperateBGSubDialog::on_XRangeMaxSpin_valueChanged(double value)
 
 void OperateBGSubDialog::on_XRangeSelectButton_clicked(bool checked)
 {
-	uChroma_.setInteractionMode(InteractionMode::FitSetupSelectXInteraction, 0);
+	uChroma_.setInteractionMode(InteractionMode::OperateBGSubSelectXRangeInteraction, 0);
 	reject();
 }
 
 void OperateBGSubDialog::on_AverageOverZRadio_toggled(bool checked)
 {
-	if (checked) toggleControls(2);
+	if (checked)
+	{
+		toggleControls(2);
+		subtractionMethod_ = 2;
+	}
 }
 
 void OperateBGSubDialog::on_ZRangeMinSpin_valueChanged(double value)
@@ -137,6 +154,8 @@ void OperateBGSubDialog::on_ZRangeMaxSpin_valueChanged(double value)
 
 void OperateBGSubDialog::on_ZRangeSelectButton_clicked(bool checked)
 {
+	uChroma_.setInteractionMode(InteractionMode::OperateBGSubSelectXRangeInteraction, 2);
+	reject();
 }
 
 void OperateBGSubDialog::on_CancelButton_clicked(bool checked)
@@ -147,9 +166,20 @@ void OperateBGSubDialog::on_CancelButton_clicked(bool checked)
 void OperateBGSubDialog::on_ApplyButton_clicked(bool checked)
 {
 	bool result;
-// 	if (ui.ConstantValueRadio->isChecked()) result = setZFromEquation();
-// 	else if (ui.AverageOverXRadio->isChecked()) result = setZFromTimeStamps();
+
+	if (ui.ConstantValueRadio->isChecked()) targetCollection_->addConstantValue(1, -constantValue_);
+	else if (ui.AverageOverXRadio->isChecked())
+	{
+		for (DataSet* dataSet = targetCollection_->dataSets(); dataSet != NULL; dataSet = dataSet->next)
+		{
+			double avg = dataSet->averageY(xRangeMin_, xRangeMax_);
+			msg.print("Average level (%e < x  %e) for dataset '%s' is %e\n", xRangeMin_, xRangeMax_, qPrintable(dataSet->name()), avg);
+			dataSet->addConstantValue(1, -avg);
+		}
+	}
 // 	else if (ui.AverageOverZRadio->isChecked()) result = setZFromSourceFiles();
+
+	targetCollection_ = NULL;
 	if (result) accept();
 	else reject();
 }
@@ -174,13 +204,45 @@ void OperateBGSubDialog::toggleControls(int index)
 }
 
 /*
- * Update
+ * Update / Show
  */
+
+// Show dialog, targetting specified collection
+bool OperateBGSubDialog::updateAndExec(Collection* targetCollection)
+{
+	targetCollection_ = targetCollection;
+	if (!Collection::objectValid(targetCollection_, "target collection in OperateBGSubDialog::updateAndExec(Collection*)")) return false;
+
+	updateControls();
+
+	return exec();
+}
+
+// Show dialog, targetting previously-set collection
+bool OperateBGSubDialog::updateAndExec()
+{
+	if (!Collection::objectValid(targetCollection_, "target collection in OperateBGSubDialog::updateAndExec()")) return false;
+
+	updateControls();
+
+	return exec();
+}
 
 // Update controls
 void OperateBGSubDialog::updateControls()
 {
 	refreshing_ = true;
+
+	if (subtractionMethod_ == 0) ui.ConstantValueRadio->setChecked(true);
+	else if (subtractionMethod_ == 1) ui.AverageOverXRadio->setChecked(true);
+	else if (subtractionMethod_ == 2) ui.AverageOverZRadio->setChecked(true);
+	ui.ConstantValueSpin->setValue(constantValue_);
+	ui.XRangeMinSpin->setValue(xRangeMin_);
+	ui.XRangeMaxSpin->setValue(xRangeMax_);
+	ui.ZRangeMinSpin->setValue(zRangeMin_);
+	ui.ZRangeMaxSpin->setValue(zRangeMax_);
+
+	if (targetCollection_) setWindowTitle("Background Subtraction ("+targetCollection_->name()+")");
 
 	refreshing_ = false;
 }

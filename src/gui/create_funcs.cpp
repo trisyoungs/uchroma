@@ -149,7 +149,6 @@ void CreateCollectionDialog::createData(Collection* target)
 			// Create new dataset at this z
 			DataSet* newDataSet = target->addDataSet();
 			target->setDataSetZ(newDataSet, z);
-			Data2D& newData = newDataSet->data();
 
 			double x = ui.GridSpecifyXMinSpin->value();
 			while (x <= ui.GridSpecifyXMaxSpin->value())
@@ -157,7 +156,7 @@ void CreateCollectionDialog::createData(Collection* target)
 				// Set equation variables
 				xVariable_->set(x);
 				zVariable_->set(z);
-				newData.addPoint(x, equation_.execute(success));
+				newDataSet->addPoint(x, equation_.execute(success));
 
 				x += ui.GridSpecifyXDeltaSpin->value();
 			}

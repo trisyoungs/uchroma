@@ -83,10 +83,10 @@ bool ImportDialog::importSequentialXY()
 		if (maxColumn >= parser.nArgs()) msg.print("Not enough columns in file.\n");
 
 		// Add datapoint
-		dataSet->data().addPoint(columns.x == -1 ? count.x : parser.argd(columns.x), parser.argd(columns.y));
+		dataSet->addPoint(columns.x == -1 ? count.x : parser.argd(columns.x), parser.argd(columns.y));
 
 		// Set z value for slice
-		dataSet->data().setZ(columns.z == -1 ? count.z : parser.argd(columns.z));
+		dataSet->setZ(columns.z == -1 ? count.z : parser.argd(columns.z));
 
 		// Increase x count
 		++count.x;

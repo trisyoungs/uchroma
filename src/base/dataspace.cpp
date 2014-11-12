@@ -224,8 +224,8 @@ void DataSpace::copy(Collection* destinationCollection)
 	{
 		DataSet* originalDataSet = sourceCollection_->dataSet(n);
 		DataSet* newDataSet = destinationCollection->addDataSet();
-		newDataSet->data().initialise(nPoints_);
-		destinationCollection->setDataSetZ(newDataSet, originalDataSet->data().z());
+		newDataSet->initialiseData(nPoints_);
+		destinationCollection->setDataSetZ(newDataSet, originalDataSet->z());
 		newDataSet->setName("Fit to: "+ originalDataSet->name());
 	}
 

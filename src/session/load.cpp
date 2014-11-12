@@ -405,6 +405,7 @@ bool UChromaSession::readDataSetBlock(LineParser& parser, DataSet* dataSet, Coll
 {
 	bool foundEnd;
 	DataSet::DataSource source;
+	Data2D data;
 	while (!parser.atEnd())
 	{
 		// Get line from file
@@ -420,14 +421,14 @@ bool UChromaSession::readDataSetBlock(LineParser& parser, DataSet* dataSet, Coll
 		switch (dataSetKwd)
 		{
 			case (UChromaSession::DataKeyword):
-				dataSet->data().reset();
+				data.reset();
 				foundEnd = false;
 				do
 				{
 					parser.getArgs(LineParser::Defaults);
 					// Check for 'EndData'
 					if (parser.argString(0) == "EndData") foundEnd = true;
-					else dataSet->data().addPoint(parser.argd(0), parser.argd(1));
+					else data.addPoint(parser.argd(0), parser.argd(1));
 				} while ((!foundEnd) && (!parser.atEnd()));
 				if (!foundEnd)
 				{
@@ -436,6 +437,8 @@ bool UChromaSession::readDataSetBlock(LineParser& parser, DataSet* dataSet, Coll
 				}
 				break;
 			case (UChromaSession::EndDataSetKeyword):
+				// Store acquired data before we return
+				dataSet->setData(data);
 				return true;
 				break;
 			case (UChromaSession::SourceKeyword):
@@ -459,6 +462,7 @@ bool UChromaSession::readDataSetBlock(LineParser& parser, DataSet* dataSet, Coll
 				}
 				break;
 			case (UChromaSession::ZKeyword):
+				data.setZ(parser.argd(1));
 				collection->setDataSetZ(dataSet, parser.argd(1));
 				break;
 			// Unrecognised Keyword

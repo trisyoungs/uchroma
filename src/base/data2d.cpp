@@ -106,7 +106,7 @@ void Data2D::initialise(int size)
 /*!
  * \brief Return current array size
  */
-int Data2D::arraySize()
+int Data2D::arraySize() const
 {
 	return x_.nItems();
 }
@@ -194,6 +194,14 @@ double Data2D::x(int index) const
 Array<double>& Data2D::arrayX()
 {
 	splineInterval_ = -1;
+	return x_;
+}
+
+/*!
+ * \brief Return const x Array
+ */
+const Array<double>& Data2D::constArrayX() const
+{
 	return x_;
 }
 
@@ -286,6 +294,14 @@ Array<double>& Data2D::arrayY()
 }
 
 /*!
+ * \brief Return const Y Array
+ */
+const Array<double>& Data2D::constArrayY() const
+{
+	return y_;
+}
+
+/*!
  * \brief Add new data point
  */
 void Data2D::addPoint(double x, double y)
@@ -306,12 +322,20 @@ void Data2D::setZ(double z)
 /*
  * \brief Return z data
  */
-double Data2D::z()
+double Data2D::z() const
 {
 	return z_;
 }
 
 /*!
+ * \brief Add to z value
+ */
+void Data2D::addZ(double value)
+{
+	z_ += value;
+}
+
+/*
  * \brief Set name of data
  */
 void Data2D::setName(QString name)
@@ -1184,44 +1208,44 @@ void Data2D::subtractInterpolated(Data2D& source)
 /*!
  * \brief Return minumum x value in data
  */
-double Data2D::xMin()
+double Data2D::xMin() const
 {
 	if (x_.nItems() == 0) return 0.0;
-	double result = x_[0];
-	for (int n=1; n<x_.nItems(); ++n) if (x_[n] < result) result = x_[n];
+	double result = x_.value(0);
+	for (int n=1; n<x_.nItems(); ++n) if (x_.value(n) < result) result = x_.value(n);
 	return result;
 }
 
 /*!
  * \brief Return maxumum x value in data
  */
-double Data2D::xMax()
+double Data2D::xMax() const
 {
 	if (x_.nItems() == 0) return 0.0;
-	double result = x_[0];
-	for (int n=1; n<x_.nItems(); ++n) if (x_[n] > result) result = x_[n];
+	double result = x_.value(0);
+	for (int n=1; n<x_.nItems(); ++n) if (x_.value(n) > result) result = x_.value(n);
 	return result;
 }
 
 /*!
  * \brief Return minumum y value in data
  */
-double Data2D::yMin()
+double Data2D::yMin() const
 {
 	if (y_.nItems() == 0) return 0.0;
-	double result = y_[0];
-	for (int n=1; n<y_.nItems(); ++n) if (y_[n] < result) result = y_[n];
+	double result = y_.value(0);
+	for (int n=1; n<y_.nItems(); ++n) if (y_.value(n) < result) result = y_.value(n);
 	return result;
 }
 
 /*!
  * \brief Return maxumum y value in data
  */
-double Data2D::yMax()
+double Data2D::yMax() const
 {
 	if (y_.nItems() == 0) return 0.0;
-	double result = y_[0];
-	for (int n=1; n<y_.nItems(); ++n) if (y_[n] > result) result = y_[n];
+	double result = y_.value(0);
+	for (int n=1; n<y_.nItems(); ++n) if (y_.value(n) > result) result = y_.value(n);
 	return result;
 }
 

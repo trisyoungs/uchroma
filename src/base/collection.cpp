@@ -197,6 +197,7 @@ DataSet* Collection::addDataSet()
 {
 	// Create new dataset
 	DataSet* dataSet = dataSets_.add();
+	dataSet->setParent(this);
 
 	++dataVersion_;
 
@@ -209,6 +210,7 @@ DataSet* Collection::addDataSet()
 DataSet* Collection::addDataSet(double z)
 {
 	DataSet* dataSet = dataSets_.add();
+	dataSet->setParent(this);
 	setDataSetZ(dataSet, z);
 
 	UChromaSession::setAsModified();
@@ -222,6 +224,7 @@ void Collection::addDataSet(DataSet* source)
 	// Create new dataset
 	DataSet* dataSet = dataSets_.add();
 	(*dataSet) = (*source);
+	dataSet->setParent(this);
 
 	++dataVersion_;
 
@@ -262,7 +265,7 @@ void Collection::setDataSetZ(DataSet* target, double z)
 		msg.print("Internal Error : Tried to set the Z value of a dataset using the wrong collection.\n");
 		return;
 	}
-	target->data().setZ(z);
+	target->setZ(z);
 
 	// Adjust position of the dataset in the list if necessary
 	do
@@ -285,24 +288,6 @@ void Collection::setDataSetZ(DataSet* target, double z)
 		if (++dummy == 10) break;
 		
 	} while (minBad || maxBad);
-
-	++dataVersion_;
-
-	UChromaSession::setAsModified();
-}
-
-// Set data of specified dataset
-void Collection::setDataSetData(DataSet* target, const Array<double>& x, const Array<double>& y)
-{
-	// Check that this DataSet is owned by the collection
-	if (!dataSets_.contains(target))
-	{
-		msg.print("Internal Error : Tried to set the data of a dataset using the wrong collection.\n");
-		return;
-	}
-
-	target->data().clear();
-	for (int n=0; n<x.nItems(); ++n) target->data().addPoint(x.value(n), y.value(n));
 
 	++dataVersion_;
 
@@ -471,6 +456,12 @@ Vec3<double> Collection::dataMax()
 	return dataMax_;
 }
 
+// Increase data version (i.e. notify that data has been changed)
+void Collection::notifyDataChanged()
+{
+	++dataVersion_;
+}
+
 // Return version counter for changes to data
 int Collection::dataVersion()
 {
@@ -606,6 +597,21 @@ double Collection::interpolationStep(int axis)
 }
 
 /*
+ * Data Operations
+ */
+
+// Add to specified axis value`
+void Collection::addConstantValue(int axis, double value)
+{
+	// Loop over datasets
+	for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next) dataSet->addConstantValue(axis, value);
+
+	++dataVersion_;
+
+	updateLimitsAndTransforms();
+}
+
+/*
  * Associated Data
  */
 
@@ -670,7 +676,7 @@ void Collection::getSlice(int axis, int bin)
 		DataSet* newDataSet = currentSlice_->addDataSet();
 
 		// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated - TODO)
-		for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next) newDataSet->data().addPoint(dataSet->transformedData().z(), dataSet->transformedData().y(bin));
+		for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next) newDataSet->addPoint(dataSet->transformedData().z(), dataSet->transformedData().y(bin));
 		currentSlice_->setName("X = " + QString::number(dataSets_.first()->transformedData().x(bin)));
 	}
 	else if (axis == 1)

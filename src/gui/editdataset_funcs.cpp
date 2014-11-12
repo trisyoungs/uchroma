@@ -77,8 +77,8 @@ bool EditDataSetDialog::call(DataSet* target)
 	ui.DataTable->clearContents();
 	ui.DataTable->setRowCount(dataSet_.data().nPoints());
 
-	const Array<double>& x = dataSet_.data().arrayX();
-	const Array<double>& y = dataSet_.data().arrayY();
+	const Array<double>& x = dataSet_.x();
+	const Array<double>& y = dataSet_.y();
 	QTableWidgetItem* item;
 	for (int n=0; n<dataSet_.data().nPoints(); ++n)
 	{
@@ -117,5 +117,6 @@ void EditDataSetDialog::on_DataTable_cellChanged(int row, int column)
 	if (!item) return;
 	
 	// Set relevant entry in dataSet_
-	if (column == 1) dataSet_.data().setY(row, item->text().toDouble());
+	if (column == 0) dataSet_.setX(row, item->text().toDouble());
+	else if (column == 1) dataSet_.setY(row, item->text().toDouble());
 }

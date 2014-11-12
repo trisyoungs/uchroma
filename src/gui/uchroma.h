@@ -51,6 +51,9 @@ class InteractionMode
 	{
 		FitSetupSelectXInteraction,
 		FitSetupSelectZInteraction,
+		OperateBGSubSelectYValueInteraction,
+		OperateBGSubSelectXRangeInteraction,
+		OperateBGSubSelectZRangeInteraction,
 		ViewInteraction,
 		ZoomInteraction,
 		nInteractionModes

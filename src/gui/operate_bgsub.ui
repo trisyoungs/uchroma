@@ -141,10 +141,10 @@
      <item row="2" column="0" colspan="10">
       <widget class="QRadioButton" name="AverageOverXRadio">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="text">
-        <string>Average over X</string>
+        <string>Average over X (per dataset)</string>
        </property>
        <property name="checked">
         <bool>false</bool>
@@ -397,7 +397,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="OKButton">
+      <widget class="QPushButton" name="ApplyButton">
        <property name="font">
         <font>
          <weight>75</weight>
@@ -405,7 +405,7 @@
         </font>
        </property>
        <property name="text">
-        <string>&amp;OK</string>
+        <string>&amp;Apply</string>
        </property>
        <property name="default">
         <bool>true</bool>
@@ -429,7 +429,7 @@
   <tabstop>XRangeMinSpin</tabstop>
   <tabstop>XRangeMaxSpin</tabstop>
   <tabstop>CancelButton</tabstop>
-  <tabstop>OKButton</tabstop>
+  <tabstop>ApplyButton</tabstop>
  </tabstops>
  <resources>
   <include location="icons.qrc"/>

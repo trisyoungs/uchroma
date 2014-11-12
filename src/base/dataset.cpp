@@ -20,7 +20,7 @@
 */
 
 #include "base/dataset.h"
-#include <QtGui/QMessageBox>
+#include "collection.h"
 
 // Data Sources
 const char* DataSourceKeywords[] = { "File", "Internal" };
@@ -48,6 +48,7 @@ DataSet::DataSet() : ListItem<DataSet>()
 	sourceFileName_ = "";
 	dataSource_ = DataSet::InternalSource;
 	name_ = "New DataSet";
+	parent_ = NULL;
 }
 
 // Destructor
@@ -70,6 +71,32 @@ void DataSet::operator=(const DataSet& source)
 	transformedData_ = source.transformedData_;
 	dataSource_ = source.dataSource_;
 }
+
+/*
+ * Parent Collection
+ */
+
+// Set parent
+void DataSet::setParent(Collection* parent)
+{
+	parent_ = parent;
+}
+
+// Return parent
+Collection* DataSet::parent()
+{
+	return parent_;
+}
+
+// Notify parent that data has changed
+void DataSet::notifyParent()
+{
+	if (parent_) parent_->notifyDataChanged();
+}
+
+/* 
+ * Data
+ */
 
 // Set source of data
 void DataSet::setDataSource(DataSet::DataSource source)
@@ -133,9 +160,27 @@ bool DataSet::loadData(QDir sourceDir)
 }
 
 // Return data
-Data2D& DataSet::data()
+const Data2D& DataSet::data() const
 {
 	return data_;
+}
+
+// Return X array from data
+const Array<double>& DataSet::x() const
+{
+	return data_.constArrayX();
+}
+
+// Return Y array from data
+const Array<double>& DataSet::y() const
+{
+	return data_.constArrayY();
+}
+
+// Return z value from data
+double DataSet::z() const
+{
+	return data_.z();
 }
 
 // Transform original data with supplied transformers
@@ -158,4 +203,89 @@ void DataSet::transform(Transformer& xTransformer, Transformer& yTransformer, Tr
 Data2D& DataSet::transformedData()
 {
 	return transformedData_;
+}
+
+/*
+ * Data Operations
+ */
+
+// Reset (zero) data
+void DataSet::resetData()
+{
+	data_.reset();
+
+	notifyParent();
+}
+
+// Initialise data to specified number of points
+void DataSet::initialiseData(int nPoints)
+{
+	data_.initialise(nPoints);
+
+	notifyParent();
+}
+
+// Set data from supplied Data2D
+void DataSet::setData(Data2D& source)
+{
+	data_ = source;
+
+	notifyParent();
+}
+
+// Add point to data
+void DataSet::addPoint(double x, double y)
+{
+	data_.addPoint(x, y);
+
+	notifyParent();
+}
+
+// Set x value
+void DataSet::setX(int index, double newX)
+{
+	data_.setX(index, newX);
+
+	notifyParent();
+}
+
+// Set y value
+void DataSet::setY(int index, double newY)
+{
+	data_.setY(index, newY);
+
+	notifyParent();
+}
+
+// Set z data
+void DataSet::setZ(double z)
+{
+	data_.setZ(z);
+
+	notifyParent();
+}
+
+// Add to specified axis value
+void DataSet::addConstantValue(int axis, double value)
+{
+	if (axis == 0) data_.arrayX() += value;
+	else if (axis == 1) data_.arrayY() += value;
+	else if (axis == 2) data_.addZ(value);
+
+	notifyParent();
+}
+
+// Calculate average y value over x range specified
+double DataSet::averageY(double xMin, double xMax) const
+{
+	double result = 0.0;
+	int nAdded = 0;
+	for (int n=0; n<data_.nPoints(); ++n)
+	{
+		if (data_.x(n) < xMin) continue;
+		else if (data_.x(n) > xMax) break;
+		++nAdded;
+		result += data_.y(n);
+	}
+	return (nAdded == 0 ? 0.0 : result / nAdded);
 }

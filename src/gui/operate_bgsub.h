@@ -39,7 +39,7 @@ class OperateBGSubDialog : public QDialog
 
 	public:
 	// Constructor
-	OperateBGSubDialog(UChromaWindow& parent, Collection* targetCollection);
+	OperateBGSubDialog(UChromaWindow& parent);
 	// Destructor
 	~OperateBGSubDialog();
 	// Main form declaration
@@ -55,13 +55,15 @@ class OperateBGSubDialog : public QDialog
 	// Whether window is currently refreshing
 	bool refreshing_;
 	// Collection whose data should be modified
-	Collection* targetCollection_;
+	static Collection* targetCollection_;
 	// Constant y value
 	static double constantValue_;
 	// X range
 	static double xRangeMin_, xRangeMax_;
 	// Z range
 	static double zRangeMin_, zRangeMax_;
+	// Selected method
+	static int subtractionMethod_;
 
 	public:
 	// Set constant y value to show
@@ -109,11 +111,17 @@ class OperateBGSubDialog : public QDialog
 
 
 	/*
-	 * Update
+	 * Update / Show
 	 */
 	private:
 	// Update controls
 	void updateControls();
+
+	public:
+	// Show dialog, targetting specified collection
+	bool updateAndExec(Collection* targetCollection);
+	// Show dialog, targetting previously-set collection
+	bool updateAndExec();
 };
 
 #endif

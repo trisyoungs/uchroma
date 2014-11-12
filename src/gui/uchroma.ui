@@ -711,7 +711,7 @@
    </widget>
    <widget class="QMenu" name="menuOperations">
     <property name="title">
-     <string>Operations</string>
+     <string>&amp;Operations</string>
     </property>
     <addaction name="actionOperateConstantBackgroundSubtraction"/>
     <addaction name="actionOperateSetZValues"/>

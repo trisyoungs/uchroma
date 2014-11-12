@@ -505,8 +505,8 @@ void UChromaWindow::on_actionOperateConstantBackgroundSubtraction_triggered(bool
 	Collection* currentCollection = UChromaSession::currentCollection();
 	if (!Collection::objectValid(currentCollection, "collection in UChromaWindow::on_actionOperateConstantBackgroundSubtraction_triggered()")) return;
 
-	OperateBGSubDialog bgSubDialog(*this, currentCollection);
-	if (bgSubDialog.exec()) updateGUI();
+	OperateBGSubDialog bgSubDialog(*this);
+	if (bgSubDialog.updateAndExec(currentCollection)) updateGUI();
 }
 
 void UChromaWindow::on_actionOperateSetZValues_triggered(bool checked)
