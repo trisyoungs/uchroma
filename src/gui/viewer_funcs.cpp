@@ -472,33 +472,28 @@ void Viewer::postRedisplay()
 	update();
 }
 
+// Grab current contents of framebuffer
+QPixmap Viewer::frameBuffer()
+{
+	QImage image = grabFrameBuffer();
+	return QPixmap::fromImage(image);
+}
+
 // Render or grab image
-QPixmap Viewer::generateImage(int w, int h, bool useFrameBuffer)
+QPixmap Viewer::generateImage(int w, int h)
 {
 	renderingOffScreen_ = true;
-	if (useFrameBuffer)
-	{
-// 		repaint();
-// 		postRedisplay();
-		QImage image = grabFrameBuffer();
 
-		renderingOffScreen_ = false;
-		printf("Now here...\n");
-		return QPixmap::fromImage(image);
-	}
-	else
-	{
-		// Generate offscreen bitmap (a temporary context will be created)
-		QPixmap pixmap = renderPixmap(w, h, false);
-		
-		// Ensure correct widget context size is stored
-		contextWidth_ = (GLsizei) width();
-		contextHeight_ = (GLsizei) height();
+	// Generate offscreen bitmap (a temporary context will be created)
+	QPixmap pixmap = renderPixmap(w, h, false);
 
-		renderingOffScreen_ = false;
+	// Ensure correct widget context size is stored
+	contextWidth_ = (GLsizei) width();
+	contextHeight_ = (GLsizei) height();
 
-		return pixmap;
-	}
+	renderingOffScreen_ = false;
+
+	return pixmap;
 }
 
 /*
@@ -521,4 +516,7 @@ bool Viewer::correctTransparency()
 void Viewer::setLineWidthScaling(double scaling)
 {
 	lineWidthScaling_ = scaling;
+
+	// Pass this value on to those that depend on it
+	LineStyle::setLineWidthScale(lineWidthScaling_);
 }

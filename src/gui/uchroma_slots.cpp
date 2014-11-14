@@ -126,7 +126,7 @@ void UChromaWindow::on_actionFilePrint_triggered(bool checked)
 
 void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 {
-	const int maxSize = 3000;
+	const int maxSize = 2000;
 
 	if (saveImageDialog_.getImageDetails(double(ui.MainView->width()) / double(ui.MainView->height())))
 	{
@@ -141,8 +141,7 @@ void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 		bool useFrameBuffer = true; //UChromaSession::imageExportUseFrameBuffer.
 
 		// Scale current line width to reflect size of exported image
-// 		double oldLineWidth = lineWidth_;
-// 		lineWidth_ *= double(w) / width();
+		ui.MainView->setLineWidthScaling( double(imageHeight) / double(ui.MainView->height()) );
 
 		// If both image dimensions are less than some limiting size, get image in a single shot. If not, tile it...
 		if ((imageHeight > maxSize) || (imageWidth > maxSize))
@@ -151,8 +150,6 @@ void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 			int tileWidth = (useFrameBuffer ? ui.MainView->width() : maxSize);
 			int tileHeight = (useFrameBuffer ? ui.MainView->height() : maxSize);
 
-			printf("WH = %i %i, tile WH = %i %i\n", imageWidth, imageHeight, tileWidth, tileHeight);
-			
 			// Create a QPixmap of the desired full size
 			QPixmap pixmap(imageWidth, imageHeight);
 			QPainter painter(&pixmap);
@@ -162,7 +159,6 @@ void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 			double yScale = double(imageHeight) / double(tileHeight);
 			int nX = imageWidth / tileWidth + ((imageWidth%tileWidth) ? 1 : 0);
 			int nY = imageHeight / tileHeight + ((imageHeight%tileHeight) ? 1 : 0);
-			printf("NXY = %i %i  scale = %f %f\n", nX, nY, xScale, yScale);
 
 			// Loop over tiles in x and y
 			QProgressDialog progress("Saving tiled image", "Cancel", 0, nX*nY, this);
@@ -176,15 +172,12 @@ void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 					progress.setValue(x*nY+y);
 
 					// Recalculate view pane sizes to reflect current tile position and tile size
-					if (useFrameBuffer) UChromaSession::viewLayout().recalculate(tileWidth, tileHeight);
 					UChromaSession::viewLayout().setOffsetAndScale(-x*tileWidth, -y*tileHeight, xScale, yScale);
+					if (useFrameBuffer) UChromaSession::viewLayout().recalculate(tileWidth, tileHeight);
 
 					// Generate this tile
 					if (useFrameBuffer) ui.MainView->repaint();
-					QPixmap tile = ui.MainView->generateImage(tileWidth, tileHeight, useFrameBuffer);
-					QString s;
-					s.sprintf("tile%02ix%02i.png", x, y);
-					tile.save(s, UChromaSession::imageFormatExtension(UChromaSession::imageExportFormat()), -1);
+					QPixmap tile = ui.MainView->frameBuffer();
 
 					// Paste this tile into the main image
 					painter.drawPixmap(x*tileWidth, imageHeight-(y+1)*tileHeight, tile);
@@ -198,10 +191,13 @@ void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 		}
 		else
 		{
-			QPixmap pixmap = ui.MainView->generateImage(imageWidth, imageHeight, useFrameBuffer);
+			QPixmap pixmap = ui.MainView->generateImage(imageWidth, imageHeight);
 			pixmap.save(UChromaSession::imageExportFileName(), UChromaSession::imageFormatExtension(UChromaSession::imageExportFormat()), -1);
 
 		}
+
+		// Reset line width and text size?
+		ui.MainView->setLineWidthScaling( double(ui.MainView->height()) / double(imageHeight));
 
 		// The sizes of panes may now be incorrect, so reset everything
 		UChromaSession::viewLayout().setOffsetAndScale(0, 0, 1.0, 1.0);

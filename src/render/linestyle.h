@@ -76,7 +76,13 @@ class LineStyle
 	/*
 	 * GL
 	 */
+	private:
+	// Scaling to use for line width
+	static double lineWidthScale_;
+
 	public:
+	// Set line width scaling to use
+	static void setLineWidthScale(double lineWidthScale);
 	// Apply line style
 	void apply();
 	// Revert to normal line style (black, solid, 1.0px)

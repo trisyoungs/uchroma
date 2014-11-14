@@ -22,6 +22,9 @@
 #include "render/linestyle.h"
 #include <stdio.h>
 
+// Static members
+double LineStyle::lineWidthScale_ = 1.0;
+
 // Constructor
 LineStyle::LineStyle()
 {
@@ -115,11 +118,17 @@ QColor LineStyle::colour()
  * GL
  */
 
+// Set line width scaling to use
+void LineStyle::setLineWidthScale(double lineWidthScale)
+{
+	lineWidthScale_ = lineWidthScale;
+}
+
 // Apply line style
 void LineStyle::apply()
 {
 	// -- Render axis (grid) lines
-	glLineWidth(width_);
+	glLineWidth(width_ * lineWidthScale_);
 	glEnable(GL_LINE_STIPPLE);
 	LineStipple::stipple[stipple_].apply();
 	GLfloat c[4];
@@ -133,7 +142,7 @@ void LineStyle::apply()
 // Revert to normal line style (black, solid, 1.0px)
 void LineStyle::revert()
 {
-	glLineWidth(1.0);
+	glLineWidth(lineWidthScale_);
 	LineStipple::stipple[LineStipple::NoStipple].apply();
 	glDisable(GL_LINE_STIPPLE);
 	GLfloat c[4] = { 0.0, 0.0, 0.0, 1.0 };

@@ -101,8 +101,10 @@ class Viewer : public QGLWidget
 	void checkGlError();
 	// Refresh widget / scene
 	void postRedisplay();
+	// Grab current contents of framebuffer
+	QPixmap frameBuffer();
 	// Render or grab image
-	QPixmap generateImage(int w, int h, bool useFrameBuffer);
+	QPixmap generateImage(int w, int h);
 
 
 	/*
@@ -150,7 +152,7 @@ class Viewer : public QGLWidget
 	bool correctTransparency_;
 	// Line width scaling factor to use (to adjust line width when saving images)
 	double lineWidthScaling_;
-	
+
 	public:
 	// Set whether to correct transparency artefacts
 	void setCorrectTransparency(bool b);
