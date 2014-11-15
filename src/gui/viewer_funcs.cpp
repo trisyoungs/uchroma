@@ -472,6 +472,12 @@ void Viewer::postRedisplay()
 	update();
 }
 
+// Set whether we are currently rendering offscreen
+void Viewer::setRenderingOffScreen(bool b)
+{
+	renderingOffScreen_ = b;
+}
+
 // Grab current contents of framebuffer
 QPixmap Viewer::frameBuffer()
 {
@@ -512,11 +518,12 @@ bool Viewer::correctTransparency()
 	return correctTransparency_;
 }
 
-// Set line width scaling to use
-void Viewer::setLineWidthScaling(double scaling)
+// Set line width and text scaling to use
+void Viewer::setObjectScaling(double scaling)
 {
 	lineWidthScaling_ = scaling;
 
 	// Pass this value on to those that depend on it
-	LineStyle::setLineWidthScale(lineWidthScaling_);
+	LineStyle::setLineWidthScale(scaling);
+	TextPrimitive::setTextSizeScale(scaling);
 }

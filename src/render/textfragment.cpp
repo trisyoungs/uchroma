@@ -32,7 +32,6 @@ TextFragment::TextFragment() : ListItem<TextFragment>()
 // Destructor
 TextFragment::~TextFragment()
 {
-
 }
 
 // Set fragment data

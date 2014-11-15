@@ -30,6 +30,7 @@ QString TextPrimitive::stringSource_;
 int TextPrimitive::stringPos_, TextPrimitive::stringLength_;
 List<TextFormat> TextPrimitive::formatStack_;
 double TextPrimitive::horizontalPosition_;
+double TextPrimitive::textSizeScale_ = 1.0;
 
 // Constructor
 TextPrimitive::TextPrimitive() : ListItem<TextPrimitive>()
@@ -67,6 +68,12 @@ TextPrimitive::EscapeSequence TextPrimitive::escapeSequence(QString s)
 	return TextPrimitive::nEscapeSequences;
 }
 
+// Set text scaling facotor
+void TextPrimitive::setTextSizeScale(double textSizeScale)
+{
+	textSizeScale_ = textSizeScale;
+}
+
 // Set data
 void TextPrimitive::set(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize)
 {
@@ -87,7 +94,7 @@ Matrix TextPrimitive::transformationMatrix(double baseFontSize, TextFragment* fr
 	Vec3<double> lowerLeft, upperRight, anchorPos, anchorPosRotated, textCentre;
 
 	// Calculate scaling factor for font
-	double scale = FontInstance::fontBaseHeight() * textSize_ / baseFontSize;
+	double scale = FontInstance::fontBaseHeight() * textSizeScale_ * textSize_ / baseFontSize;
 	
 	// Calculate bounding box and anchor position on it
 	boundingBox(lowerLeft, upperRight);

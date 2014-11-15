@@ -140,8 +140,11 @@ void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 		int imageHeight = UChromaSession::imageExportHeight();
 		bool useFrameBuffer = true; //UChromaSession::imageExportUseFrameBuffer.
 
-		// Scale current line width to reflect size of exported image
-		ui.MainView->setLineWidthScaling( double(imageHeight) / double(ui.MainView->height()) );
+		// Scale current line width and text scaling to reflect size of exported image
+		ui.MainView->setObjectScaling( double(imageHeight) / double(ui.MainView->height()) );
+
+		// Make sure the Viewer knows we want offscreen rendering
+		ui.MainView->setRenderingOffScreen(true); 
 
 		// If both image dimensions are less than some limiting size, get image in a single shot. If not, tile it...
 		if ((imageHeight > maxSize) || (imageWidth > maxSize))
@@ -163,6 +166,7 @@ void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 			// Loop over tiles in x and y
 			QProgressDialog progress("Saving tiled image", "Cancel", 0, nX*nY, this);
 			progress.setWindowTitle("uChroma");
+			progress.show();
 			for (int x=0; x<nX; ++x)
 			{
 				for (int y=0; y<nY; ++y)
@@ -196,8 +200,11 @@ void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 
 		}
 
-		// Reset line width and text size?
-		ui.MainView->setLineWidthScaling( double(ui.MainView->height()) / double(imageHeight));
+		// Reset line width and text size
+		ui.MainView->setObjectScaling(1.0);
+
+		// Make sure the Viewer knows we no longer want offscreen rendering
+		ui.MainView->setRenderingOffScreen(false); 
 
 		// The sizes of panes may now be incorrect, so reset everything
 		UChromaSession::viewLayout().setOffsetAndScale(0, 0, 1.0, 1.0);

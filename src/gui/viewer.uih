@@ -101,6 +101,8 @@ class Viewer : public QGLWidget
 	void checkGlError();
 	// Refresh widget / scene
 	void postRedisplay();
+	// Set whether we are currently rendering offscreen
+	void setRenderingOffScreen(bool b); 
 	// Grab current contents of framebuffer
 	QPixmap frameBuffer();
 	// Render or grab image
@@ -158,8 +160,8 @@ class Viewer : public QGLWidget
 	void setCorrectTransparency(bool b);
 	// Return whether to correct transparency artefacts
 	bool correctTransparency();
-	// Set line width scaling to use
-	void setLineWidthScaling(double scaling);
+	// Set line width and text scaling to use
+	void setObjectScaling(double scaling);
 
 
 	/*
