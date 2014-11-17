@@ -1,6 +1,6 @@
 Format: 1.0
 Source: uchroma
-Version: 0.193
+Version: 0.194
 Binary: uchroma
 Maintainer: Tristan Youngs <tris@projectaten.net>
 Architecture: any
