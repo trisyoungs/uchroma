@@ -246,8 +246,6 @@ class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
 	void resetViewMatrix();
 	// Set display limits to show all available data
 	void showAllData();
-	// Render all data associated with this pane
-	void renderData(const QGLContext* context, GLExtensions* extensions, bool forcePrimitiveUpdate = false, bool dontPopInstance = false);
 
 
 	/*

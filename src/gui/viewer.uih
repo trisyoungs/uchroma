@@ -74,7 +74,9 @@ class Viewer : public QGLWidget
 	// Flag indicating if we are currently drawing to this context
 	bool drawing_;
 	// Flag specifying whether we are currently rendering offscreen
-	bool renderingOffScreen_; 
+	bool renderingOffScreen_;
+	// Line width scaling factor to use (to adjust line width when saving images)
+	double lineWidthScaling_;
 	// String containing time taken to do last render
 	QString renderTime_;
 
@@ -102,11 +104,47 @@ class Viewer : public QGLWidget
 	// Refresh widget / scene
 	void postRedisplay();
 	// Set whether we are currently rendering offscreen
-	void setRenderingOffScreen(bool b); 
+	void setRenderingOffScreen(bool b);
+	// Set line width and text scaling to use
+	void setObjectScaling(double scaling);
 	// Grab current contents of framebuffer
 	QPixmap frameBuffer();
 	// Render or grab image
 	QPixmap generateImage(int w, int h);
+
+
+	/*
+	 * Object Querying
+	 */
+	public:
+	// Drawing object type
+	enum ViewObject { AxisTickLabelObject, AxisLineObject, AxisTitleLabelObject, CollectionObject, GridLineMinorObject, GridLineMajorObject, NoObject };
+
+	private:
+	// View coordinates to probe for objects at next redraw
+	int objectQueryX_, objectQueryY_;
+	// Width and height of area about clicked position
+	int objectQueryWidth_, objectQueryHeight_;
+	// Maximum depth value found at query pixel
+	GLfloat depthAtQueryCoordinates_;
+	// Type of object found at query coordinates
+	Viewer::ViewObject objectAtQueryCoordinates_;
+	// Information describing object at query coordinates
+	QString infoAtQueryCoordinates_;
+
+	private:
+	// Update depth at query coordinates, returning whether it is closer
+	bool updateQueryDepth();
+	// Set information of query object
+	void setQueryObject(Viewer::ViewObject objectType, QString info);
+
+	public:
+	// Set coordinates to query at next redraw
+	void setQueryCoordinates(int mouseX, int mouseY);
+	// Return object type at query coordinates
+	Viewer::ViewObject objectAtQueryCoordinates();
+	// Info for object at query coordinates
+	QString infoAtQueryCoordinates();
 
 
 	/*
@@ -147,30 +185,9 @@ class Viewer : public QGLWidget
 
 
 	/*
-	 * Rendering Preferences
-	 */ 
-	private:
-	// Flag specifying whether to correct transparency artefacts
-	bool correctTransparency_;
-	// Line width scaling factor to use (to adjust line width when saving images)
-	double lineWidthScaling_;
-
-	public:
-	// Set whether to correct transparency artefacts
-	void setCorrectTransparency(bool b);
-	// Return whether to correct transparency artefacts
-	bool correctTransparency();
-	// Set line width and text scaling to use
-	void setObjectScaling(double scaling);
-
-
-	/*
-	 * User Functions / Data
-	 * (in viewer_user.cpp)
+	 * Signals
 	 */
 	signals:
-	// View was clicked on
-	void viewClicked();
 	// Return string containing time taken to do last render
 	QString renderComplete(QString timeTaken);
 };

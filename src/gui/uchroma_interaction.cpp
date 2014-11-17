@@ -310,6 +310,11 @@ void UChromaWindow::doubleClickInteraction(int mouseX, int mouseY)
 	ViewPane* pane = UChromaSession::viewLayout().paneAt(mouseX, mouseY);
 	if (pane == NULL) return;
 
+	ui.MainView->setQueryCoordinates(mouseX, mouseY);
+	ui.MainView->repaint();
+
+// 	printf("Object at clicked position = %i, '%s'\n", ui.MainView->objectAtQueryCoordinates(), qPrintable(ui.MainView->infoAtQueryCoordinates()));
+
 	// Now find out what, if anything, was under the mouse...
 // 	int axis = pane->axisTitleAt(mouseX, mouseY);
 // 	if (axis != -1) printf("Here's axis %i\n", axis);

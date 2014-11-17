@@ -30,6 +30,7 @@
 #include "render/fontinstance.h"
 #ifndef __APPLE__
 #include "render/glextensions.h"
+#include <../../aten/src/base/sginfo.h>
 #endif
 
 // Constructor
@@ -50,8 +51,11 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	drawing_ = false;
 	renderingOffScreen_ = false;
 
-	// Engine Setup
-	correctTransparency_ = false;
+	// Query
+	objectQueryX_ = -1;
+	objectQueryY_ = -1;
+	depthAtQueryCoordinates_ = 1.0;
+	objectAtQueryCoordinates_ = Viewer::NoObject;
 
 	// Prevent QPainter from autofilling widget background
 	setAutoFillBackground(false);
@@ -69,8 +73,8 @@ void Viewer::setUChroma(UChromaWindow* ptr)
 }
 
 /*
-// Protected Qt Virtuals
-*/
+ * Protected Qt Virtuals
+ */
 
 // Initialise context widget (when created by Qt)
 void Viewer::initializeGL()
@@ -98,6 +102,8 @@ void Viewer::initializeGL()
 void Viewer::paintGL()
 {
 	msg.enter("Viewer::paintGL");
+
+	int axis;
 
 	// Do nothing if the canvas is not valid, or we are still drawing from last time, or the uChroma pointer has not been set
 	if ((!valid_) || drawing_ || (!uChroma_))
@@ -207,10 +213,12 @@ void Viewer::paintGL()
 		if (FontInstance::fontOK())
 		{
 			FontInstance::font()->FaceSize(1);
-			for (int n=0; n<3; ++n) if (pane->axes().visible(n) && (n != skipAxis))
+			for (axis=0; axis<3; ++axis) if (pane->axes().visible(axis) && (axis != skipAxis))
 			{
-				pane->axes().labelPrimitive(n).renderAll(viewMatrix, pane->flatLabels(), pane->textZScale());
-				pane->axes().titlePrimitive(n).renderAll(viewMatrix, pane->flatLabels(), pane->textZScale());
+				pane->axes().labelPrimitive(axis).renderAll(viewMatrix, pane->flatLabels(), pane->textZScale());
+				if (updateQueryDepth()) setQueryObject(Viewer::AxisTickLabelObject, QString::number(axis));
+				pane->axes().titlePrimitive(axis).renderAll(viewMatrix, pane->flatLabels(), pane->textZScale());
+				if (updateQueryDepth()) setQueryObject(Viewer::AxisTitleLabelObject, QString::number(axis));
 			}
 		}
 
@@ -218,18 +226,24 @@ void Viewer::paintGL()
 		glLoadMatrixd(viewMatrix.matrix());
 		glDisable(GL_LIGHTING);
 		glEnable(GL_LINE_SMOOTH);
-		for (int axis=0; axis<3; ++axis) if (pane->axes().visible(axis) && (axis != skipAxis))
+		for (axis=0; axis<3; ++axis) if (pane->axes().visible(axis) && (axis != skipAxis))
 		{
 			pane->axes().gridLineMinorStyle(axis).apply();
 			pane->axes().gridLineMinorPrimitive(axis).sendToGL();
+			if (updateQueryDepth()) setQueryObject(Viewer::GridLineMinorObject, QString::number(axis));
 		}
-		for (int axis=0; axis<3; ++axis) if (pane->axes().visible(axis) && (axis != skipAxis))
+		for (axis=0; axis<3; ++axis) if (pane->axes().visible(axis) && (axis != skipAxis))
 		{
 			pane->axes().gridLineMajorStyle(axis).apply();
 			pane->axes().gridLineMajorPrimitive(axis).sendToGL();
+			if (updateQueryDepth()) setQueryObject(Viewer::GridLineMajorObject, QString::number(axis));
 		}
 		LineStyle::revert();
-		for (int axis=0; axis<3; ++axis) if (pane->axes().visible(axis) && (axis != skipAxis)) pane->axes().axisPrimitive(axis).sendToGL();
+		for (axis=0; axis<3; ++axis) if (pane->axes().visible(axis) && (axis != skipAxis))
+		{
+			pane->axes().axisPrimitive(axis).sendToGL();
+			if (updateQueryDepth()) setQueryObject(Viewer::AxisLineObject, QString::number(axis));
+		}
 		glEnable(GL_LIGHTING);
 		glDisable(GL_LINE_SMOOTH);
 
@@ -275,9 +289,23 @@ void Viewer::paintGL()
 		glEnable(GL_CLIP_PLANE1);
 		glPopMatrix();
 
-		// Render pane data
-		if (renderingOffScreen_) pane->renderData(context(), extensionsStack_.last(), true, true);
-		else pane->renderData(context(), extensionsStack_.last());
+		// Render pane data - loop over collection targets
+		for (TargetData* target = pane->collectionTargets(); target != NULL; target = target->next)
+		{
+			// Set shininess for collection
+			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, target->collection()->displaySurfaceShininess());
+
+			// Loop over display primitives in this target...
+			for (TargetPrimitive* primitive = target->displayPrimitives(); primitive != NULL; primitive = primitive->next)
+			{
+				// Make sure the primitive is up to date and send it to GL
+				primitive->updateAndSendPrimitive(pane->axes(), renderingOffScreen_, renderingOffScreen_, context(), extensions);
+			}
+
+			// Update query
+			if (updateQueryDepth()) setQueryObject(Viewer::CollectionObject, target->collection()->locator());
+
+		}
 
 		// Disable current clip planes
 		glDisable(GL_CLIP_PLANE0);
@@ -325,6 +353,10 @@ void Viewer::paintGL()
 		emit(renderComplete(renderTime_));
 	}
 	else renderTime_ = "";
+
+	// Set query coordinate
+	objectQueryX_ = -1;
+	objectQueryY_ = -1;
 
 	// Set the rendering flag to false
 	drawing_ = false;
@@ -478,6 +510,16 @@ void Viewer::setRenderingOffScreen(bool b)
 	renderingOffScreen_ = b;
 }
 
+// Set line width and text scaling to use
+void Viewer::setObjectScaling(double scaling)
+{
+	lineWidthScaling_ = scaling;
+
+	// Pass this value on to those that depend on it
+	LineStyle::setLineWidthScale(scaling);
+	TextPrimitive::setTextSizeScale(scaling);
+}
+
 // Grab current contents of framebuffer
 QPixmap Viewer::frameBuffer()
 {
@@ -503,27 +545,84 @@ QPixmap Viewer::generateImage(int w, int h)
 }
 
 /*
- * Preferences
+ * Object Querying
  */
 
-// Set whether to correct transparency artefacts
-void Viewer::setCorrectTransparency(bool b)
+// Update depth at query coordinates, returning whether it is closer
+bool Viewer::updateQueryDepth()
 {
-	correctTransparency_ = b;
+	// Return immediately if we are not querying
+	if (objectQueryX_ == -1) return false;
+
+	// Sample a small area centred at the supplied position
+	GLfloat depth[9];
+	
+	glReadPixels(objectQueryX_, objectQueryY_, objectQueryWidth_, objectQueryHeight_, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+
+	bool result = false;
+	for (int i=0; i<objectQueryWidth_*objectQueryHeight_; ++i)
+	{
+		if (depth[i] < depthAtQueryCoordinates_)
+		{
+			depthAtQueryCoordinates_ = depth[i];
+			result = true;
+		}
+	}
+	// 	printf("Current averageDepth at %i,%i is now %f\n", objectQueryX_, objectQueryY_, averageDepth);
+
+	return result;
 }
 
-// Return whether to correct transparency artefacts
-bool Viewer::correctTransparency()
+// Set information of query object
+void Viewer::setQueryObject(Viewer::ViewObject objectType, QString info)
 {
-	return correctTransparency_;
+	objectAtQueryCoordinates_ = objectType;
+	infoAtQueryCoordinates_ = info;
 }
 
-// Set line width and text scaling to use
-void Viewer::setObjectScaling(double scaling)
+// Set coordinates to query at next redraw
+void Viewer::setQueryCoordinates(int mouseX, int mouseY)
 {
-	lineWidthScaling_ = scaling;
+	depthAtQueryCoordinates_ = 1.0;
+	objectAtQueryCoordinates_ = Viewer::NoObject;
+	infoAtQueryCoordinates_.clear();
 
-	// Pass this value on to those that depend on it
-	LineStyle::setLineWidthScale(scaling);
-	TextPrimitive::setTextSizeScale(scaling);
+	// Check for invalid coordinates
+	if ((mouseX < 0) || (mouseX >= width()) || (mouseY < 0) || (mouseY >= height()))
+	{
+		objectQueryX_ = -1;
+		objectQueryY_ = -1;
+		return;
+	}
+
+	// Setup area to sample around central pixel
+	objectQueryWidth_ = 3;
+	objectQueryX_ = mouseX-1;
+	if (mouseX == 0)
+	{
+		--objectQueryWidth_;
+		++mouseX;
+	}
+	else if (mouseX == (width()-1)) --objectQueryWidth_;
+
+	objectQueryHeight_ = 3;
+	objectQueryY_ = mouseY-1;
+	if (mouseY == 0)
+	{
+		--objectQueryHeight_;
+		++mouseY;
+	}
+	else if (mouseY == (height()-1)) --objectQueryHeight_;
+}
+
+// Return object type at query coordinates
+Viewer::ViewObject Viewer::objectAtQueryCoordinates()
+{
+	return objectAtQueryCoordinates_;
+}
+
+// Info for object at query coordinates
+QString Viewer::infoAtQueryCoordinates()
+{
+	return infoAtQueryCoordinates_;
 }

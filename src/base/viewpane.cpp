@@ -973,24 +973,6 @@ void ViewPane::showAllData()
 	}
 }
 
-// Render all data associated with this pane
-void ViewPane::renderData(const QGLContext* context, GLExtensions* extensions, bool forcePrimitiveUpdate, bool pushAndPop)
-{
-	// Loop over displayTargets_ list...
-	for (TargetData* target = collectionTargets_.first(); target != NULL; target = target->next)
-	{
-		// Set shininess for collection
-		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, target->collection()->displaySurfaceShininess());
-
-		// Loop over display primitives in this target...
-		for (TargetPrimitive* primitive = target->displayPrimitives(); primitive != NULL; primitive = primitive->next)
-		{
-			// Make sure the primitive is up to date and send it to GL
-			primitive->updateAndSendPrimitive(axes_, forcePrimitiveUpdate, pushAndPop, context, extensions);
-		}
-	}
-}
-
 /*
  * Axes
  */
