@@ -618,7 +618,7 @@
      <x>0</x>
      <y>0</y>
      <width>947</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -670,7 +670,7 @@
     </property>
     <addaction name="actionSettingsChooseFont"/>
    </widget>
-   <widget class="QMenu" name="menuCollections">
+   <widget class="QMenu" name="menuCollection">
     <property name="title">
      <string>&amp;Collections</string>
     </property>
@@ -686,6 +686,8 @@
     <addaction name="actionCollectionTransform"/>
     <addaction name="separator"/>
     <addaction name="actionCollectionDelete"/>
+    <addaction name="separator"/>
+    <addaction name="actionCollectionExport"/>
    </widget>
    <widget class="QMenu" name="menuData">
     <property name="title">
@@ -716,9 +718,17 @@
     <addaction name="actionOperateConstantBackgroundSubtraction"/>
     <addaction name="actionOperateSetZValues"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionEditUndo"/>
+    <addaction name="actionEditRedo"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuView"/>
-   <addaction name="menuCollections"/>
+   <addaction name="menuCollection"/>
    <addaction name="menuData"/>
    <addaction name="menuOperations"/>
    <addaction name="menuAnalyse"/>
@@ -1014,7 +1024,7 @@
   </action>
   <action name="actionCollectionNew">
    <property name="text">
-    <string>&amp;New</string>
+    <string>N&amp;ew</string>
    </property>
    <property name="toolTip">
     <string>Create new, empty collection</string>
@@ -1481,6 +1491,30 @@
   <action name="actionOperateSetZValues">
    <property name="text">
     <string>Set Z Values</string>
+   </property>
+  </action>
+  <action name="actionEditUndo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionEditRedo">
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Z</string>
+   </property>
+  </action>
+  <action name="actionCollectionExport">
+   <property name="text">
+    <string>E&amp;xport...</string>
+   </property>
+   <property name="toolTip">
+    <string>Export current collection</string>
    </property>
   </action>
  </widget>

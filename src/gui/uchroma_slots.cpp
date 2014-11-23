@@ -231,7 +231,28 @@ bool UChromaWindow::checkBeforeClose()
 			if (UChromaSession::isModified()) return false;
 		}
 	}
+
+	// Nullify pointer in UChromaSession, so it doesn't try and call anything to do with the main window
+	UChromaSession::setMainWindow(NULL);
+
 	return true;
+}
+
+/*
+ * Edit Actions
+ */
+void UChromaWindow::on_actionEditUndo_triggered(bool checked)
+{
+	UChromaSession::undo();
+
+	updateGUI();
+}
+
+void UChromaWindow::on_actionEditRedo_triggered(bool checked)
+{
+	UChromaSession::redo();
+
+	updateGUI();
 }
 
 /*
@@ -387,7 +408,13 @@ void UChromaWindow::on_actionCollectionFocusPrevious_triggered(bool checked)
 
 void UChromaWindow::on_actionCollectionNew_triggered(bool checked)
 {
+	// Start edit state group
+	UChromaSession::beginEditStateGroup("create new collection");
+
 	UChromaSession::addCollection();
+
+	// End edit state group
+	UChromaSession::endEditStateGroup();
 
 	updateGUI();
 }
@@ -415,6 +442,16 @@ void UChromaWindow::on_actionCollectionDuplicate_triggered(bool checked)
 	QString name = newCollection->name();
 	(*newCollection) = (*currentCollection);
 	newCollection->setName(name);
+
+	// Create editstate
+	UChromaSession::beginEditStateGroup("duplicate collection '%s'", qPrintable(currentCollection->name()));
+	if (UChromaSession::addEditState(newCollection->objectInfo(), EditState::CollectionAddQuantity))
+	{
+		UChromaSession::addEditStateData(true, "collection", newCollection);
+		UChromaSession::addEditStateData(true, "locator", newCollection->locator());
+		UChromaSession::addEditStateData(true, "position", newCollection->listIndex());
+	}
+	UChromaSession::endEditStateGroup();
 
 	updateGUI();
 }
@@ -452,12 +489,37 @@ void UChromaWindow::on_actionCollectionDelete_triggered(bool checked)
 	Collection* currentCollection = UChromaSession::currentCollection();
 	if (!Collection::objectValid(currentCollection, "collection in UChromaWindow::on_actionCollectionDelete_triggered()")) return;
 
-	if (QMessageBox::question(this, "Confirm Delete", "Are you sure you want to delete collection '"+currentCollection->name()+"' and all of its associated data?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
-	{
-		UChromaSession::removeCollection(currentCollection);
-		
-		updateGUI();
-	}
+	// Start edit state group
+	UChromaSession::beginEditStateGroup("delete collection '%s'", qPrintable(currentCollection->name()));
+
+	// Remove specified collection
+	UChromaSession::removeCollection(currentCollection);
+
+	// Add new empty collection if there is now no current collection
+	if (UChromaSession::currentCollection() == NULL) UChromaSession::addCollection();
+
+	// End edit state group
+	UChromaSession::endEditStateGroup();
+
+	// Update GUI
+	updateGUI();
+}
+
+void UChromaWindow::on_actionCollectionExport_triggered(bool checked)
+{
+	// Check current Collection
+	Collection* currentCollection = UChromaSession::currentCollection();
+	if (!Collection::objectValid(currentCollection, "collection in UChromaWindow::on_actionCollectionDelete_triggered()")) return;
+
+	static QDir currentDirectory = UChromaSession::sessionFileDirectory();
+
+	// Get a filename from the user
+	QString fileName = QFileDialog::getSaveFileName(this, "Choose export file name", currentDirectory.absolutePath(), "All files (*.*)");
+	if (fileName.isEmpty()) return;
+
+	currentCollection->exportData(fileName);
+
+	currentDirectory = fileName;
 }
 
 /*

@@ -90,15 +90,23 @@ void UChromaWindow::on_CollectionTree_itemChanged(QTreeWidgetItem* item, int col
 	Collection* collection = VariantPointer<Collection>(item->data(0, Qt::UserRole));
 	if (!collection) return;
 
+	UChromaSession::beginEditStateGroup("change collection title");
+
 	// Set name of collection
 	collection->setName(item->text(0));
+
+	UChromaSession::endEditStateGroup();
 
 	updateCollectionInfo();
 }
 
 void UChromaWindow::on_CollectionAddButton_clicked(bool checked)
 {
-	UChromaSession::addCollection();
+	UChromaSession::beginEditStateGroup("add new collection");
+
+	Collection* collection = UChromaSession::addCollection();
+
+	UChromaSession::endEditStateGroup();
 
 	updateGUI();
 }
@@ -107,7 +115,14 @@ void UChromaWindow::on_CollectionRemoveButton_clicked(bool checked)
 {
 	if (!UChromaSession::currentCollection()) return;
 
+	UChromaSession::beginEditStateGroup("remove collection");
+
 	UChromaSession::removeCurrentCollection();
+
+	// Add new empty collection if there is now no current collection
+	if (UChromaSession::currentCollection() == NULL) UChromaSession::addCollection();
+
+	UChromaSession::endEditStateGroup();
 
 	updateGUI();
 }

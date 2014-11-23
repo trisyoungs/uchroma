@@ -32,7 +32,7 @@ class Messenger
 	// Constructor
 	Messenger();
 	// Messaging output types
-	enum OutputType { All, Calls, Force, Verbose, nOutputTypes };
+	enum OutputType { All, Calls, Force, Verbose, UndoRedo, nOutputTypes };
 	// Convert text string to debug mode
 	static OutputType outputType(const char* name, bool reportError = 0);
 	// Convert debug mode to text string

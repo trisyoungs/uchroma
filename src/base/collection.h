@@ -28,12 +28,12 @@
 #include "base/colourscale.h"
 #include "render/linestyle.h"
 #include "render/primitivelist.h"
-#include "templates/objectlist.h"
+#include "templates/objectstore.h"
 
 // Forward Declarations
 class FitKernel;
 
-class Collection : public ListItem<Collection>, public ObjectList<Collection>
+class Collection : public ListItem<Collection>, public ObjectStore<Collection>
 {
 	public:
 	// Constructor
@@ -229,7 +229,7 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	// Return locally-unique fit name based on basename provided
 	QString uniqueFitName(QString baseName);
 	// Add fit to Collection
-	Collection* addFit(QString name);
+	Collection* addFit(QString name, int position = -1);
 	// Remove specified fit from list
 	void removeFit(Collection* collection);
 	// Return fit data
@@ -239,7 +239,7 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	// Return locally-unique slice name based on basename provided
 	QString uniqueSliceName(QString baseName);
 	// Add slice to Collection
-	Collection* addSlice(QString name);
+	Collection* addSlice(QString name, int position = -1);
 	// Remove specified slice
 	void removeSlice(Collection* collection);
 	// Return slices
@@ -402,6 +402,14 @@ class Collection : public ListItem<Collection>, public ObjectList<Collection>
 	double displaySurfaceShininess();
 	// Return style version
 	int displayStyleVersion();
+
+
+	/*
+	 * File
+	 */
+	public:
+	// Export data to plain text file
+	bool exportData(QString fileName);
 };
 
 #endif

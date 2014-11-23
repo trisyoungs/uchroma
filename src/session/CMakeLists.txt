@@ -1,8 +1,17 @@
 add_library(session
+  editstate.cpp
+  editstate_axes.cpp
+  editstate_collection.cpp
+  editstate_viewpane.cpp
+  editstatesdata.cpp
+  editstategroup.cpp
   keywords.cpp
   load.cpp
   save.cpp
   session.cpp
+  editstate.h
+  editstatedata.h
+  editstategroup.h
   session.h
 )
 

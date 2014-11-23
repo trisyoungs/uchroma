@@ -3,7 +3,7 @@ project(uChroma)
 set(DESCRIPTION "uChroma")
 set(AUTHOR "Tristan Youngs")
 set(VERSION_MAJOR "0")
-set(VERSION_MINOR "194")
+set(VERSION_MINOR "195")
 
 set(CMAKE_BUILD_TYPE "Release")
 
@@ -115,9 +115,9 @@ add_executable(${target_name}  MACOSX_BUNDLE
 # Link line
 link_directories (${LIBRARY_OUTPUT_PATH})
 IF(WIN32 OR APPLE)
-	target_link_libraries(${target_name} gui session base render math expression kernels ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${FTGL_LIBRARIES} ${OPENGL_LIBRARIES} ${FT2_LIBRARIES} ${HDF5_LIBS})
+	target_link_libraries(${target_name} gui base render math expression kernels session ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${FTGL_LIBRARIES} ${OPENGL_LIBRARIES} ${FT2_LIBRARIES} ${HDF5_LIBS})
 ELSE(WIN32 OR APPLE)
-	target_link_libraries(${target_name} gui session base render math expression kernels ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${HDF5_LIBRARIES} -lGL -lftgl)
+	target_link_libraries(${target_name} gui base render math expression kernels session ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTOPENGL_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${HDF5_LIBRARIES} -lGL -lftgl)
 ENDIF(WIN32 OR APPLE)
 
 # -----------------------------------

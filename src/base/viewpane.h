@@ -40,7 +40,7 @@
 class ViewLayout;
 
 // ViewPane
-class ViewPane : public ListItem<ViewPane>, public ObjectList<ViewPane>
+class ViewPane : public ListItem<ViewPane>, public ObjectStore<ViewPane>
 {
 	public:
 	// Constructor / Destructor

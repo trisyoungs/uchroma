@@ -30,7 +30,7 @@
 Messenger msg;
 
 // Message output types
-const char* OutputTypeKeywords[] = { "all", "calls", "_ERROR_", "verbose" };
+const char* OutputTypeKeywords[] = { "all", "calls", "_ERROR_", "verbose", "undoredo" };
 Messenger::OutputType Messenger::outputType(const char* s, bool reportError)
 {
 	Messenger::OutputType ot = (Messenger::OutputType) enumSearch("output type",Messenger::nOutputTypes,OutputTypeKeywords,s);
@@ -137,13 +137,13 @@ void Messenger::print(Messenger::OutputType ot, const char* fmt, ...) const
 	if (ot == Messenger::Force) printf("%s",msgs);
 	else if (isOutputActive(ot) && (!quiet_))
 	{
+		printf("%s",msgs);
 		if (textBrowser_)
 		{
 			int n = strlen(msgs);
 			if ((n > 0) && (msgs[n-1] == '\n')) msgs[n-1] = '\0';
 			textBrowser_->append(msgs);
 		}
-		else printf("%s",msgs);
 	}
 	va_end(arguments);
 }

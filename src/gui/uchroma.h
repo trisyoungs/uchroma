@@ -152,6 +152,14 @@ class UChromaWindow : public QMainWindow
 
 
 	/*
+	 * Edit Actions
+	 */
+	private slots:
+	void on_actionEditUndo_triggered(bool checked);
+	void on_actionEditRedo_triggered(bool checked);
+
+
+	/*
 	 * View Actions
 	 */
 	private:
@@ -188,6 +196,7 @@ class UChromaWindow : public QMainWindow
 	void on_actionCollectionStyle_triggered(bool checked);
 	void on_actionCollectionTransform_triggered(bool checked);
 	void on_actionCollectionDelete_triggered(bool checked);
+	void on_actionCollectionExport_triggered(bool checked);
 
 
 	/*
@@ -303,6 +312,8 @@ class UChromaWindow : public QMainWindow
 	void updateToolBars();
 	// Update main display
 	void updateDisplay();
+	// Update undo/redo menu
+	void updateUndoRedo();
 
 
 	/*
@@ -311,14 +322,18 @@ class UChromaWindow : public QMainWindow
 	private:
 	// Current interaction mode
 	InteractionMode::Mode interactionMode_;
-	// Whether the user is currently interacting with the display
-	bool interacting_;
 	// Current axis target for interaction
 	int interactionAxis_;
+	// Whether interaction has started (i.e. mouse is down)
+	bool interactionStarted_;
 	// Starting (clicked) value when interacting
 	double clickedInteractionValue_;
 	// Starting (clicked) keyboard modifiers when interacting
 	Qt::KeyboardModifiers clickedInteractionModifiers_;
+	// Object at clicked position (if ViewInteraction)
+	Viewer::ViewObject clickedObject_;
+	// Info for object at clicked position (if ViewInteraction)
+	QString clickedObjectInfo_;
 	// Current interaction position on axis
 	double currentInteractionValue_;
 
@@ -333,8 +348,8 @@ class UChromaWindow : public QMainWindow
 	InteractionMode::Mode interactionMode();
 	// Return current axis target for interaction
 	int interactionAxis();
-	// Return whether the user is currently interacting with the display
-	bool interacting();
+	// Return whether interaction has started (i.e. mouse is down)
+	bool interactionStarted();
 	// Cancel current interaction
 	void cancelInteraction();
 	// Start interaction at the specified screen coordinates

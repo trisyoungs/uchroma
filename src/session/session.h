@@ -24,6 +24,9 @@
 
 #include <QtCore/QString>
 #include <QtCore/QDir>
+#include "session/editstate.h"
+#include "session/editstatedata.h"
+#include "session/editstategroup.h"
 #include "base/collection.h"
 #include "base/viewlayout.h"
 
@@ -138,7 +141,9 @@ class UChromaSession
 	// Setup new, empty session
 	static void startNewSession(bool createDefaults);
 	// Add new collection
-	static Collection* addCollection(QString name = QString());
+	static Collection* addCollection(QString name = QString(), int index = -1);
+	// Add new collection at the specified location
+	static Collection* addCollectionFromLocator(QString locator, Collection::CollectionType type, int listIndex);
 	// Remove existing collection
 	static void removeCollection(Collection* collection);
 	// Remove current collection
@@ -450,6 +455,58 @@ class UChromaSession
 	static bool loadSession(QString fileName);
 	// Save session input to file specified
 	static bool saveSession(QString fileName);
+
+
+	/*
+	 * Undo / Redo
+	 */
+	private:
+	// List of EditStateGroups
+	static List<EditStateGroup> editStateGroups_;
+	// Current EditStateGroup being created
+	static EditStateGroup* currentEditStateGroup_;
+	// Last EditState created in this group
+	static EditState* currentEditState_;
+	// Target EditStateGroup for Undo
+	static EditStateGroup* undoEditStateGroup_;
+
+	public:
+	// Begin a new edit state group
+	static EditStateGroup* beginEditStateGroup(const char* format, ...);
+	// Add edit state to group
+	static bool addEditState(ObjectInfo target, int quantity, int index = -1, int subIndex = -1);
+	// Add edit state to group with basic integer data
+	static bool addEditState(ObjectInfo target, int quantity, int oldData, int newData, int index, int subIndex = -1);
+	// Add edit state to group with basic double data
+	static bool addEditState(ObjectInfo target, int quantity, double oldData, double newData, int index = -1, int subIndex = -1);
+	// Add edit state to group with basic QString data
+	static bool addEditState(ObjectInfo target, int quantity, QString oldData, QString newData, int index = -1, int subIndex = -1);
+	// Add edit state to group with LineStyle data
+	static bool addEditState(ObjectInfo target, int quantity, LineStyle oldData, LineStyle newData, int index = -1, int subIndex = -1);
+	// Add data to current EditState (int)
+	static void addEditStateData(bool newData, QString name, int value);
+	// Add data to current EditState  (double)
+	static void addEditStateData(bool newData, QString name, double value);
+	// Add data to current EditState  (QString)
+	static void addEditStateData(bool newData, QString name, QString value);
+	// Add data to current EditState  (from Collection*)
+	static void addEditStateData(bool newData, QString name, Collection* value);
+	// Add data to current EditState  (from Data2D*)
+	static void addEditStateData(bool newData, QString name, Data2D* value);
+	// Add data to current EditState  (from LineStyle&)
+	static void addEditStateData(bool newData, QString name, LineStyle& value);
+	// End the new edit state group
+	static void endEditStateGroup();
+	// Return current EditStateGroup being created
+	static EditStateGroup* currentEditStateGroup();
+	// Return target EditStateGroup for undo
+	static EditStateGroup* undoEditStateGroup();
+	// Return first in list of EditStateGroups
+	static EditStateGroup* editStateGroups();
+	// Perform undo
+	static bool undo();
+	// Perform redo
+	static bool redo();
 };
 
 #endif

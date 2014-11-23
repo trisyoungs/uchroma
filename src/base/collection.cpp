@@ -21,15 +21,17 @@
 
 #include "base/collection.h"
 #include "base/viewpane.h"
+#include "base/lineparser.h"
 #include "session/session.h"
 #include "kernels/fit.h"
 #include <limits>
 
 // Static Members
-template<class Collection> RefList<Collection,bool> ObjectList<Collection>::objects_;
+template<class Collection> RefList<Collection,int> ObjectStore<Collection>::objects_;
+template<class Collection> int ObjectStore<Collection>::objectCount_ = 0;
 
 // Constructor
-Collection::Collection() : ListItem<Collection>(), ObjectList<Collection>(this)
+Collection::Collection() : ListItem<Collection>(), ObjectStore<Collection>(this, ObjectTypes::CollectionObject)
 {
 	// Set variable defaults
 	dataSets_.clear();
@@ -84,22 +86,20 @@ Collection::Collection() : ListItem<Collection>(), ObjectList<Collection>(this)
 	displayStyle_ = Collection::LineXYStyle;
 	displaySurfaceShininess_ = 128.0;
 	displayStyleVersion_ = 0;
-
-	// Send a signal out to indicate our creation
-	UChromaSignal::send(UChromaSignal::CollectionCreatedSignal, this);
 }
 
 // Destructor
 Collection::~Collection()
 {
-	// Send a signal out before we finalise deletion
-	UChromaSignal::send(UChromaSignal::CollectionDeletedSignal, this);
+	// Delete sub-collections from the bottom-up (in order to create the undo state correctly)
+	while (fits_.last()) removeFit(fits_.last());
+	while (slices_.last()) removeSlice(slices_.last());
 
 	if (fitKernel_) delete fitKernel_;
 }
 
 // Copy constructor
-Collection::Collection(const Collection& source) : ObjectList<Collection>(NULL)
+Collection::Collection(const Collection& source) : ObjectStore<Collection>(NULL, ObjectTypes::CollectionObject)
 {
 	(*this) = source;
 }
@@ -145,8 +145,30 @@ void Collection::operator=(const Collection& source)
 	// Associated data
 	parent_ = source.parent_;
 	type_ = source.type_;
-	// currentSlice_ = NULL;
-	// fitKernel_ = NULL;
+	fits_.clear();
+	for (Collection* fit = source.fits_.first(); fit != NULL; fit = fit->next)
+	{
+		Collection* newFit = fits_.add();
+		(*newFit) = (*fit);
+	}
+	slices_.clear();
+	for (Collection* slice = source.slices_.first(); slice != NULL; slice = slice->next)
+	{
+		Collection* newSlice = slices_.add();
+		(*newSlice) = (*slice);
+	}
+	if (currentSlice_) delete currentSlice_;
+	currentSlice_ = NULL;
+	if (source.fitKernel_)
+	{
+		if (!fitKernel_) fitKernel_ = new FitKernel;
+		(*fitKernel_) = (*source.fitKernel_);
+	}
+	else
+	{
+		if (fitKernel_) delete fitKernel_;
+		fitKernel_ = NULL;
+	}
 
 	// Update
 	limitsAndTransformsVersion_ = -1;
@@ -161,6 +183,8 @@ void Collection::operator=(const Collection& source)
 	displayStyleVersion_ = 0;
 }
 
+// Prepare for 
+
 /*
  * Data
  */
@@ -168,6 +192,8 @@ void Collection::operator=(const Collection& source)
 // Set name
 void Collection::setName(QString name)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::CollectionTitleQuantity, name_, name);
+
 	name_ = name;
 }
 
@@ -352,7 +378,7 @@ QString Collection::uniqueDataSetName(QString baseName)
 	do
 	{
 		// Add on suffix (if index > 0)
-		if (index > 0) testName = baseName + " "+QString::number(index);
+		if (index > 0) testName = baseName + " ("+QString::number(index)+")";
 		++index;
 	} while (dataSet(testName));
 
@@ -809,7 +835,7 @@ QString Collection::uniqueFitName(QString baseName)
 	do
 	{
 		// Add on suffix (if index > 0)
-		if (index > 0) testName = baseName + " "+QString::number(index);
+		if (index > 0) testName = baseName + " ("+QString::number(index)+")";
 		++index;
 	} while (fit(testName));
 
@@ -817,13 +843,27 @@ QString Collection::uniqueFitName(QString baseName)
 }
 
 // Add fit to Collection
-Collection* Collection::addFit(QString name)
+Collection* Collection::addFit(QString name, int position)
 {
 	Collection* newFit = fits_.add();
-	newFit->setName(uniqueFitName(name));
 	newFit->type_ = Collection::FitCollection;
 	newFit->setParent(this);
+
+	// Create editstate data
+	if (UChromaSession::addEditState(newFit->objectInfo(), EditState::CollectionAddQuantity))
+	{
+		UChromaSession::addEditStateData(true, "collection", newFit);
+		UChromaSession::addEditStateData(true, "locator", newFit->locator());
+		UChromaSession::addEditStateData(true, "position", newFit->listIndex());
+	}
+
 	newFit->addFitKernel();
+
+	// Set name, and add fit kernel
+	newFit->setName(uniqueFitName(name));
+
+	// Send a signal out
+	UChromaSignal::send(UChromaSignal::CollectionCreatedSignal, newFit);
 
 	UChromaSession::setAsModified();
 
@@ -833,6 +873,17 @@ Collection* Collection::addFit(QString name)
 // Remove specified fit from list
 void Collection::removeFit(Collection* collection)
 {
+	// Send a signal out before we finalise deletion
+	UChromaSignal::send(UChromaSignal::CollectionDeletedSignal, collection);
+
+	// Create editstate data
+	if (UChromaSession::addEditState(collection->objectInfo(), EditState::CollectionRemoveQuantity))
+	{
+		UChromaSession::addEditStateData(false, "collection", collection);
+		UChromaSession::addEditStateData(false, "locator", collection->locator());
+		UChromaSession::addEditStateData(false, "position", collection->listIndex());
+	}
+
 	fits_.remove(collection);
 
 	UChromaSession::setAsModified();
@@ -859,7 +910,7 @@ QString Collection::uniqueSliceName(QString baseName)
 	do
 	{
 		// Add on suffix (if index > 0)
-		if (index > 0) testName = baseName + " "+QString::number(index);
+		if (index > 0) testName = baseName + " ("+QString::number(index)+")";
 		++index;
 	} while (slice(testName));
 
@@ -867,13 +918,25 @@ QString Collection::uniqueSliceName(QString baseName)
 }
 
 // Add slice to Collection
-Collection* Collection::addSlice(QString name)
+Collection* Collection::addSlice(QString name, int position)
 {
-	Collection* newSlice = slices_.add();
-	newSlice->setName(uniqueSliceName(name));
+	Collection* newSlice = slices_.addAt(position);
 	newSlice->type_ = Collection::ExtractedCollection;
 	newSlice->setParent(this);
-	newSlice->addFitKernel();
+
+	// Create editstate data
+	if (UChromaSession::addEditState(newSlice->objectInfo(), EditState::CollectionAddQuantity))
+	{
+		UChromaSession::addEditStateData(true, "collection", newSlice);
+		UChromaSession::addEditStateData(true, "locator", newSlice->locator());
+		UChromaSession::addEditStateData(true, "position", newSlice->listIndex());
+	}
+
+	// Set name
+	newSlice->setName(uniqueSliceName(name));
+
+	// Send a signal out
+	UChromaSignal::send(UChromaSignal::CollectionCreatedSignal, newSlice);
 
 	UChromaSession::setAsModified();
 
@@ -883,6 +946,17 @@ Collection* Collection::addSlice(QString name)
 // Remove specified slice from list
 void Collection::removeSlice(Collection* collection)
 {
+	// Send a signal out before we finalise deletion
+	UChromaSignal::send(UChromaSignal::CollectionDeletedSignal, collection);
+
+	// Create editstate data
+	if (UChromaSession::addEditState(collection->objectInfo(), EditState::CollectionRemoveQuantity))
+	{
+		UChromaSession::addEditStateData(false, "collection", collection);
+		UChromaSession::addEditStateData(false, "locator", collection->locator());
+		UChromaSession::addEditStateData(false, "position", collection->listIndex());
+	}
+
 	slices_.remove(collection);
 
 	UChromaSession::setAsModified();
@@ -1504,4 +1578,34 @@ double Collection::displaySurfaceShininess()
 int Collection::displayStyleVersion()
 {
 	return displayStyleVersion_;
+}
+
+/*
+ * File
+ */
+
+// Export data to plain text file
+bool Collection::exportData(QString fileName)
+{
+	LineParser parser(fileName, true);
+
+	if (!parser.ready()) return false;
+
+	parser.writeLineF("# Exported data: '%s'\n", qPrintable(name_));
+
+	for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next)
+	{
+		parser.writeLineF("# Z = %e\n", dataSet->z());
+		for (int n=0; n<dataSet->data().nPoints(); ++n)
+		{
+			const Array<double>& x = dataSet->data().constArrayX();
+			const Array<double>& y = dataSet->data().constArrayY();
+			parser.writeLineF("%e  %e\n", x.value(n), y.value(n));
+		}
+		parser.writeLineF("\n");
+	}
+
+	parser.closeFiles();
+
+	return true;
 }

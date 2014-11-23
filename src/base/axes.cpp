@@ -21,10 +21,15 @@
 
 #include "base/axes.h"
 #include "base/viewpane.h"
+#include "session/session.h"
 #include "render/fontinstance.h"
 
+// Static Members
+template<class Axes> RefList<Axes,int> ObjectStore<Axes>::objects_;
+template<class Axes> int ObjectStore<Axes>::objectCount_ = 0;
+
 // Constructor
-Axes::Axes(ViewPane& parent) : parent_(parent)
+Axes::Axes(ViewPane& parent) : parent_(parent), ObjectStore<Axes>(this, ObjectTypes::AxesObject)
 {
 	// Definition
 	limitMin_.zero();
@@ -120,7 +125,7 @@ Axes::~Axes()
 }
 
 // Copy constructor
-Axes::Axes(const Axes& source) : parent_(parent_)
+Axes::Axes(const Axes& source) : parent_(parent_), ObjectStore<Axes>(NULL, ObjectTypes::AxesObject)
 {
 	(*this) = source;
 }
@@ -293,6 +298,8 @@ void Axes::clamp(int axis)
 // Set minimum value for specified axis
 void Axes::setMin(int axis, double value)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesMinimumQuantity, min_[axis], value, axis);
+
 	min_[axis] = value;
 
 	++axesVersion_;
@@ -308,6 +315,8 @@ double Axes::min(int axis) const
 // Set maximum value for specified axis
 void Axes::setMax(int axis, double value)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesMaximumQuantity, max_[axis], value, axis);
+
 	max_[axis] = value;
 
 	++axesVersion_;
@@ -342,8 +351,18 @@ double Axes::realMax(int axis) const
 // Set axis to extreme limit
 void Axes::setToLimit(int axis, bool minLim)
 {
-	if (minLim) min_[axis] = limitMin_[axis];
-	else max_[axis] = limitMax_[axis];
+	if (minLim)
+	{
+		UChromaSession::addEditState(objectInfo(), EditState::AxesMinimumQuantity, min_[axis], limitMin_[axis], axis);
+
+		min_[axis] = limitMin_[axis];
+	}
+	else
+	{
+		UChromaSession::addEditState(objectInfo(), EditState::AxesMaximumQuantity, max_[axis], limitMax_[axis], axis);
+
+		max_[axis] = limitMax_[axis];
+	}
 
 	++axesVersion_;
 	++displayVersion_;
@@ -420,6 +439,8 @@ Vec3<double> Axes::coordMax(int axis)
 // Set whether axis is inverted
 void Axes::setInverted(int axis, bool b)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesInvertedQuantity, inverted_[axis], b, axis);
+
 	inverted_[axis] = b;
 
 	++axesVersion_;
@@ -435,6 +456,8 @@ bool Axes::inverted(int axis) const
 // Set whether axis is logarithmic
 void Axes::setLogarithmic(int axis, bool b)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesLogarithmicQuantity, logarithmic_[axis], b, axis);
+
 	logarithmic_[axis] = b;
 
 	// Update minima / maxima
@@ -458,6 +481,8 @@ bool Axes::logarithmic(int axis) const
 // Set whether axis is visible
 void Axes::setVisible(int axis, bool b)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesVisibleQuantity, visible_[axis], b, axis);
+
 	visible_[axis] = b;
 }
 
@@ -470,6 +495,8 @@ bool Axes::visible(int axis) const
 // Set stretch factor for axis
 void Axes::setStretch(int axis, double value)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesStretchQuantity, stretch_[axis], value, axis);
+
 	stretch_[axis] = value;
 
 	++axesVersion_;
@@ -485,6 +512,8 @@ double Axes::stretch(int axis) const
 // Set fractional position flag for axis
 void Axes::setPositionIsFractional(int axis, bool b)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesPositionIsFractionalQuantity, positionIsFractional_[axis], b, axis);
+
 	positionIsFractional_[axis] = b;
 
 	++axesVersion_;
@@ -501,6 +530,8 @@ bool Axes::positionIsFractional(int axis) const
 // Set axis position (in real surface-space coordinates)
 void Axes::setPositionReal(int axis, int dir, double value)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesPositionFractionalQuantity, positionReal_[axis].get(dir), value, axis, dir);
+
 	positionReal_[axis].set(dir, value);
 
 	++axesVersion_;
@@ -511,11 +542,8 @@ void Axes::setPositionReal(int axis, int dir, double value)
 // Set axis position to axis limit (in real surface-space coordinates)
 void Axes::setPositionRealToLimit(int axis, int dir, bool minLim)
 {
-	positionReal_[axis].set(dir, minLim ? limitMin_[dir] : limitMax_[dir]);
-
-	++axesVersion_;
-
-	parent_.paneChanged();
+	if (minLim) setPositionReal(axis, dir, limitMin_[dir]);
+	else setPositionReal(axis, dir, limitMax_[dir]);
 }
 
 // Return axis position (in real surface-space coordinates)
@@ -530,6 +558,9 @@ void Axes::setPositionFractional(int axis, int dir, double value)
 	// Clamp range to limits
 	if (value > 1.0) value = 1.0;
 	else if (value < 0.0) value = 0.0;
+
+	UChromaSession::addEditState(objectInfo(), EditState::AxesPositionFractionalQuantity, positionReal_[axis].get(dir), value, axis, dir);
+
 	positionFractional_[axis].set(dir, value);
 
 	++axesVersion_;
@@ -673,6 +704,8 @@ void Axes::calculateTickDeltas(int axis)
 // Set axis tick direction
 void Axes::setTickDirection(int axis, int dir, double value)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesTickDirectionQuantity, tickDirection_[axis].get(dir), value, axis, dir);
+
 	tickDirection_[axis].set(dir, value);
 
 	++axesVersion_;
@@ -703,6 +736,8 @@ Vec3<double> Axes::tickDirection(int axis) const
 // Set axis tick size (relative to font size)
 void Axes::setTickSize(int axis, double size)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesTickSizeQuantity, tickSize_[axis], size, axis);
+
 	tickSize_[axis] = size;
 
 	++axesVersion_;
@@ -719,6 +754,8 @@ double Axes::tickSize(int axis)
 // Set position of first tick delta on axes
 void Axes::setFirstTick(int axis, double value)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesTickFirstQuantity, tickFirst_[axis], value, axis);
+
 	tickFirst_[axis] = value;
 
 	++axesVersion_;
@@ -736,6 +773,8 @@ double Axes::tickFirst(int axis)
 // Set tick delta for axes
 void Axes::setTickDelta(int axis, double value)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesTickDeltaQuantity, tickDelta_[axis], value, axis);
+
 	tickDelta_[axis] = value;
 
 	++axesVersion_;
@@ -752,6 +791,8 @@ double Axes::tickDelta(int axis)
 // Set whether to calculate ticks automatically
 void Axes::setAutoTicks(int axis, bool b)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesAutoTicksQuantity, autoTicks_[axis], b, axis);
+
 	autoTicks_[axis] = b;
 
 	++axesVersion_;
@@ -768,6 +809,8 @@ bool Axes::autoTicks(int axis)
 // Set number of minor ticks in major tick intervals
 void Axes::setMinorTicks(int axis, int value)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesMinorTicksQuantity, minorTicks_[axis], value, axis);
+
 	minorTicks_[axis] = value;
 
 	++axesVersion_;
@@ -794,6 +837,8 @@ NumberFormat& Axes::numberFormat(int axis)
 // Set orientation of labels for specified axis
 void Axes::setLabelOrientation(int axis, int component, double value)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesLabelOrientationQuantity, labelOrientation_[axis].get(component), value, axis, component);
+
 	labelOrientation_[axis].set(component, value);
 
 	++axesVersion_;
@@ -824,6 +869,8 @@ Vec3<double> Axes::labelOrientation(int axis) const
 // Set axis label text anchor position for specified axis
 void Axes::setLabelAnchor(int axis, TextPrimitive::TextAnchor anchor)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesLabelAnchorQuantity, labelAnchor_[axis], anchor, axis);
+
 	labelAnchor_[axis] = anchor;
 
 	++axesVersion_;
@@ -854,6 +901,8 @@ TextPrimitive::TextAnchor Axes::labelAnchor(int axis) const
 // Set title for specified axis
 void Axes::setTitle(int axis, QString title)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesTitleQuantity, title_[axis], title, axis);
+
 	title_[axis] = title;
 
 	++axesVersion_;
@@ -870,6 +919,8 @@ QString Axes::title(int axis) const
 // Set orientation of titles for specified axis
 void Axes::setTitleOrientation(int axis, int component, double value)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesTitleOrientationQuantity, titleOrientation_[axis].get(component), value, axis, component);
+
 	titleOrientation_[axis].set(component, value);
 
 	++axesVersion_;
@@ -900,6 +951,7 @@ Vec4<double> Axes::titleOrientation(int axis) const
 // Set axis title text anchor position for specified axis
 void Axes::setTitleAnchor(int axis, TextPrimitive::TextAnchor anchor)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesTitleAnchorQuantity, titleAnchor_[axis], anchor, axis);
 
 	titleAnchor_[axis] = anchor;
 
@@ -967,6 +1019,8 @@ bool Axes::autoPositionTitles()
 // Set whether gridlines cover entire volume or just at axis lines
 void Axes::setGridLinesFull(int axis, bool b)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesGridLinesFullQuantity, gridLinesFull_[axis], b, axis);
+
 	gridLinesFull_[axis] = b;
 
 	++axesVersion_;
@@ -983,6 +1037,8 @@ bool Axes::gridLinesFull(int axis) const
 // Set whether gridLines at major tick intervals are active for specified axis
 void Axes::setGridLinesMajor(int axis, bool on)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesGridLinesMajorQuantity, gridLinesMajor_[axis], on, axis);
+
 	gridLinesMajor_[axis] = on;
 
 	++axesVersion_;
@@ -999,6 +1055,8 @@ bool Axes::gridLinesMajor(int axis) const
 // Set whether gridLines at minor tick intervals are active for specified axis
 void Axes::setGridLinesMinor(int axis, bool on)
 {
+	UChromaSession::addEditState(objectInfo(), EditState::AxesGridLinesMinorQuantity, gridLinesMinor_[axis], on, axis);
+
 	gridLinesMinor_[axis] = on;
 
 	++axesVersion_;
@@ -1372,10 +1430,26 @@ Primitive& Axes::gridLineMajorPrimitive(int axis)
 	return gridLineMajorPrimitives_[axis];
 }
 
+// Set major gridline style
+void Axes::setGridLineMajorStyle(int axis, LineStyle style)
+{
+	UChromaSession::addEditState(objectInfo(), EditState::AxesGridLinesMajorStyleQuantity, gridLineMajorStyle_[axis], style, axis);
+
+	gridLineMajorStyle_[axis] = style;
+}
+
 // Return major GridLine style
 LineStyle& Axes::gridLineMajorStyle(int axis)
 {
 	return gridLineMajorStyle_[axis];
+}
+
+// Set minor gridline style
+void Axes::setGridLineMinorStyle(int axis, LineStyle style)
+{
+	UChromaSession::addEditState(objectInfo(), EditState::AxesGridLinesMinorStyleQuantity, gridLineMinorStyle_[axis], style, axis);
+
+	gridLineMinorStyle_[axis] = style;
 }
 
 // Return minor GridLine style

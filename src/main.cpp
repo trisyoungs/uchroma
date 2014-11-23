@@ -25,7 +25,7 @@
 int main(int argc, char *argv[])
 {	
 	/* Uncomment here for extra debug output */
-// 	msg.addOutputType(Messenger::Verbose);
+// 	msg.addOutputType(Messenger::UndoRedo);
 
 	/* Create the main QApplication */
 	QApplication app(argc, argv, QApplication::GuiClient);

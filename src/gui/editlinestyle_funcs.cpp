@@ -84,7 +84,7 @@ bool EditLineStyleDialog::call(LineStyle target)
 }
 
 // Return edited data
-LineStyle& EditLineStyleDialog::lineStyle()
+LineStyle EditLineStyleDialog::lineStyle()
 {
 	return lineStyle_;
 }

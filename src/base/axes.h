@@ -27,6 +27,7 @@
 #include "render/primitive.h"
 #include "render/textprimitivelist.h"
 #include "render/linestyle.h"
+#include "templates/objectstore.h"
 #include "templates/vector3.h"
 #include "templates/vector4.h"
 #include "templates/array.h"
@@ -36,7 +37,7 @@
 class ViewPane;
 
 // Axes
-class Axes
+class Axes : public ObjectStore<Axes>
 {
 	public:
 	// Constructor / Destructor
@@ -151,7 +152,7 @@ class Axes
 	// Return stretch factor for axis
 	double stretch(int axis) const;
 	// Set fractional position flag for axis
-	void setPositionIsFractional(int axis, bool value);
+	void setPositionIsFractional(int axis, bool b);
 	// Return fractional position flag for axis
 	bool positionIsFractional(int axis) const;
 	// Set axis position (in real surface-space coordinates)
@@ -378,9 +379,13 @@ class Axes
 	Primitive& gridLineMajorPrimitive(int axis);
 	// Return major gridline primitive for axis specified
 	Primitive& gridLineMinorPrimitive(int axis);
-	// Return major GridLine style
+	// Set major gridline style
+	void setGridLineMajorStyle(int axis, LineStyle style);
+	// Return major gridline style
 	LineStyle& gridLineMajorStyle(int axis);
-	// Return minor GridLine style
+	// Set minor gridline style
+	void setGridLineMinorStyle(int axis, LineStyle style);
+	// Return minor gridline style
 	LineStyle& gridLineMinorStyle(int axis);
 };
 

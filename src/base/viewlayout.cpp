@@ -163,7 +163,7 @@ QString ViewLayout::uniqueViewPaneName(QString baseName)
 	do
 	{
 		// Add on suffix (if index > 0)
-		if (index > 0) testName = baseName + " "+QString::number(index);
+		if (index > 0) testName = baseName + " ("+QString::number(index)+")";
 		++index;
 	} while (pane(testName));
 
@@ -301,6 +301,7 @@ void ViewLayout::sendPaneToBack(ViewPane* pane, bool onBottom)
 // Pane has changed
 void ViewLayout::paneChanged(ViewPane* caller)
 {
+// 	printf("Caller = %p, %i %i %i %i %i %i\n", caller, pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
 	if (caller) caller->recalculateViewport(pixelWidth_, pixelHeight_, nColumns_, nRows_, remainingWidth_, remainingHeight_);
 }
 

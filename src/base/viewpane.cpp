@@ -23,15 +23,17 @@
 #include "base/collection.h"
 #include "base/viewlayout.h"
 #include "math/cuboid.h"
+#include "session/session.h"
 #include <algorithm>
 #include <cmath>
 
 // Static Members and constants
-template<class ViewPane> RefList<ViewPane,bool> ObjectList<ViewPane>::objects_;
+template<class ViewPane> RefList<ViewPane,int> ObjectStore<ViewPane>::objects_;
+template<class ViewPane> int ObjectStore<ViewPane>::objectCount_;
 const double ViewPane::zOffset_ = -10.0;
 
 // Constructor
-ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), ObjectList<ViewPane>(this), parent_(parent), axes_(*this)
+ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), ObjectStore<ViewPane>(this, ObjectTypes::ViewPaneObject), parent_(parent), axes_(*this)
 {
 	// Geometry / position
 	bottomEdge_ = 0;
@@ -75,7 +77,7 @@ ViewPane::~ViewPane()
 }
 
 // Copy constructor
-ViewPane::ViewPane(const ViewPane& source) : ObjectList<ViewPane>(NULL), parent_(parent_), axes_(*this)
+ViewPane::ViewPane(const ViewPane& source) : ObjectStore<ViewPane>(NULL, ObjectTypes::ViewPaneObject), parent_(parent_), axes_(*this)
 {
 	(*this) = source;
 }
@@ -384,6 +386,8 @@ void ViewPane::addCollectionTarget(Collection* collection)
 	TargetData* target = collectionTargets_.add(*this);
 	target->initialise(collection);
 
+	if (UChromaSession::currentEditStateGroup()) UChromaSession::addEditState(objectInfo(), EditState::ViewPaneAddCollectionTargetQuantity, collection->objectId(), collection->objectId(), -1, -1);
+
 	paneChanged();
 }
 
@@ -396,6 +400,8 @@ void ViewPane::removeCollectionTarget(Collection* collection)
 		msg.print(Messenger::Verbose, "Internal Error: Tried to remove collection '%s' from pane '%s', but it is not a target there.\n", qPrintable(collection->name()), qPrintable(name_));
 		return;
 	}
+
+	if (UChromaSession::currentEditStateGroup()) UChromaSession::addEditState(objectInfo(), EditState::ViewPaneRemoveCollectionTargetQuantity, collection->objectId(), collection->objectId(), -1, -1);
 
 	// Remove the target
 	collectionTargets_.remove(target);

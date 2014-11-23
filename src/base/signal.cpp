@@ -44,7 +44,6 @@ UChromaSignal::SignalAction UChromaSignal::send(UChromaSignal::CollectionSignal 
 	{
 		UChromaSignal::SignalAction result = pane->processCollectionSignal(signal, collection);
 		if (result == UChromaSignal::IgnoreSignal) continue;
-		
 		++nAccepted;
 
 		// If the object wants sole acceptance of this signal, break now

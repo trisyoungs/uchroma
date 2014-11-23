@@ -43,10 +43,11 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	UChromaSignal::setMainWindow(this);
 
 	// Set variable defaults
-	interacting_ = false;
 	interactionMode_ = InteractionMode::ViewInteraction;
 	interactionAxis_ = -1;
+	interactionStarted_ = false;
 	clickedInteractionValue_ = 0.0;
+	clickedObject_ = Viewer::NoObject;
 	currentInteractionValue_ = 0.0;
 	refreshing_ = false;
 
@@ -157,6 +158,7 @@ void UChromaWindow::updateGUI()
 	updateToolBars();
 	updateSubWindows();
 	updateDisplay();
+	updateUndoRedo();
 
 	refreshing_ = false;
 }
@@ -204,4 +206,17 @@ void UChromaWindow::updateToolBars()
 void UChromaWindow::updateDisplay()
 {
 	ui.MainView->postRedisplay();
+}
+
+// Update undo/redo menu
+void UChromaWindow::updateUndoRedo()
+{
+	EditStateGroup* currentUndoState = UChromaSession::undoEditStateGroup();
+	EditStateGroup* currentRedoState = (currentUndoState ? currentUndoState->next : UChromaSession::editStateGroups());
+
+	ui.actionEditUndo->setText(currentUndoState ? "Undo " + currentUndoState->title() : "Undo");
+	ui.actionEditUndo->setEnabled(currentUndoState);
+
+	ui.actionEditRedo->setText(currentRedoState ? "Redo " + currentRedoState->title() : "Redo");
+	ui.actionEditRedo->setEnabled(currentRedoState);
 }

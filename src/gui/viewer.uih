@@ -79,6 +79,8 @@ class Viewer : public QGLWidget
 	double lineWidthScaling_;
 	// String containing time taken to do last render
 	QString renderTime_;
+	// Collection to highlight in this pass
+	Collection* highlightCollection_;
 
 	protected:
 	// Initialise context widget (when created by Qt)
@@ -111,6 +113,8 @@ class Viewer : public QGLWidget
 	QPixmap frameBuffer();
 	// Render or grab image
 	QPixmap generateImage(int w, int h);
+	// Set collection to highlight in this pass
+	void setHighlightCollection(Collection* collection);
 
 
 	/*

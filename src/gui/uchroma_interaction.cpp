@@ -117,10 +117,10 @@ int UChromaWindow::interactionAxis()
 	return interactionAxis_;
 }
 
-// Return whether the user is currently interacting with the display
-bool UChromaWindow::interacting()
+// Return whether interaction has started (i.e. mouse is down)
+bool UChromaWindow::interactionStarted()
 {
-	return interacting_;
+	return interactionStarted_;
 }
 
 // Cancel current interaction
@@ -150,9 +150,6 @@ void UChromaWindow::cancelInteraction()
 // Start interaction at the specified screen coordinates
 void UChromaWindow::startInteraction(int mouseX, int mouseY, Qt::KeyboardModifiers modifiers)
 {
-	// Check that an interaction mode is currently set
-	if (interactionMode_ == InteractionMode::ViewInteraction) return;
-
 	// Check interaction pane
 	if (!ViewPane::objectValid(UChromaSession::currentViewPane()))
 	{
@@ -166,7 +163,20 @@ void UChromaWindow::startInteraction(int mouseX, int mouseY, Qt::KeyboardModifie
 	// Store keyboard modifiers
 	clickedInteractionModifiers_ = modifiers;
 
-	interacting_ = true;
+	// Get the clicked object (if interaction mode is ViewInteraction)
+	if (interactionMode_ == InteractionMode::ViewInteraction)
+	{
+		ui.MainView->setQueryCoordinates(mouseX, mouseY);
+		ui.MainView->repaint();
+		clickedObject_ = ui.MainView->objectAtQueryCoordinates();
+		clickedObjectInfo_ = ui.MainView->infoAtQueryCoordinates();
+		if (clickedObject_ == Viewer::CollectionObject)
+		{
+			ui.MainView->setHighlightCollection(UChromaSession::locateCollection(clickedObjectInfo_));
+		}
+	}
+
+	interactionStarted_ = true;
 }
 
 // Update current interaction position
@@ -193,9 +203,6 @@ void UChromaWindow::updateInteractionPosition(int mouseX, int mouseY)
 // End interaction at the specified screen coordinates
 void UChromaWindow::endInteraction(int mouseX, int mouseY)
 {
-	// If we are not interacting, exit now
-	if (!interacting_) return;
-
 	// Check interaction pane
 	if (!ViewPane::objectValid(UChromaSession::currentViewPane()))
 	{
@@ -203,14 +210,8 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 		return;
 	}
 
-	// Copy current interaction mode, and reset back to ViewInteraction
-	InteractionMode::Mode currentMode = interactionMode_;
-	int currentAxis = interactionAxis_;
-	interactionMode_ = InteractionMode::ViewInteraction;
-	interactionAxis_ = -1;
-
 	// Finalise interaction type
-	switch (currentMode)
+	switch (interactionMode_)
 	{
 		case (InteractionMode::FitSetupSelectXInteraction):
 			editFitSetupDialog_.ui.XAbsoluteMinSpin->setValue(std::min(clickedInteractionValue_, currentInteractionValue_));
@@ -234,12 +235,22 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 			OperateBGSubDialog::setZRange(std::min(clickedInteractionValue_, currentInteractionValue_), std::max(clickedInteractionValue_, currentInteractionValue_));
 			OperateBGSubDialog(*this).updateAndExec();
 			break;
+		case (InteractionMode::ViewInteraction):
+			if (clickedObject_ == Viewer::CollectionObject)
+			{
+				ui.MainView->setHighlightCollection(NULL);
+				Collection* collection = UChromaSession::locateCollection(clickedObjectInfo_);
+				if (collection) UChromaSession::setCurrentCollection(collection);
+			}
+			break;
 		case (InteractionMode::ZoomInteraction):
 			// None : Zoom to defined region
 			// Ctrl : Extract slice
 			if (clickedInteractionModifiers_.testFlag(Qt::ControlModifier))
 			{
-				UChromaSession::currentCollection()->extractCurrentSlice(currentAxis, currentInteractionValue_);
+				UChromaSession::beginEditStateGroup("extract slice (%c = %e)", char(88+interactionAxis_), currentInteractionValue_);
+				UChromaSession::currentCollection()->extractCurrentSlice(interactionAxis_, currentInteractionValue_);
+				UChromaSession::endEditStateGroup();
 				refreshCollections();
 			}
 			else
@@ -248,19 +259,21 @@ void UChromaWindow::endInteraction(int mouseX, int mouseY)
 				double newMax = std::max(clickedInteractionValue_, currentInteractionValue_);
 				if ((newMax-newMin) > 1.0e-10)
 				{
-					UChromaSession::currentViewPane()->axes().setMin(currentAxis, newMin);
-					UChromaSession::currentViewPane()->axes().setMax(currentAxis, newMax);
+					UChromaSession::currentViewPane()->axes().setMin(interactionAxis_, newMin);
+					UChromaSession::currentViewPane()->axes().setMax(interactionAxis_, newMax);
 					axesWindow_.updateControls();
 				}
 			}
 			updateDisplay();
 			break;
 		default:
-			printf("Internal Error: Don't know how to complete interaction mode %i\n", currentMode);
+			printf("Internal Error: Don't know how to complete interaction mode %i\n", interactionMode_);
 			break;
 	}
 
-	interacting_ = false;
+	interactionStarted_ = false;
+	clickedObject_ = Viewer::NoObject;
+	clickedObjectInfo_.clear();
 }
 
 // Return clicked interaction value on axis
@@ -306,16 +319,33 @@ double UChromaWindow::currentInteractionCoordinate()
 // Perform relevant double-click action, occurring at specified coordinate
 void UChromaWindow::doubleClickInteraction(int mouseX, int mouseY)
 {
-	// Determine pane that the event occured in
-	ViewPane* pane = UChromaSession::viewLayout().paneAt(mouseX, mouseY);
-	if (pane == NULL) return;
-
 	ui.MainView->setQueryCoordinates(mouseX, mouseY);
 	ui.MainView->repaint();
+	clickedObject_ = ui.MainView->objectAtQueryCoordinates();
+	clickedObjectInfo_ = ui.MainView->infoAtQueryCoordinates();
 
-// 	printf("Object at clicked position = %i, '%s'\n", ui.MainView->objectAtQueryCoordinates(), qPrintable(ui.MainView->infoAtQueryCoordinates()));
+	int i;
+	switch (clickedObject_)
+	{
+		case (Viewer::AxisLineObject):
+			i = clickedObjectInfo_.toInt();
+// 			axesWindow_.updateAndShow();
+// 			axesWindow_.ui.AxesTabs->setCurrentIndex(i);
+// 			axesWindow_.ui.
+			break;
+		case (Viewer::AxisTickLabelObject):
+			break;
+		case (Viewer::AxisTitleLabelObject):
+			break;
+		case (Viewer::CollectionObject):
+			break;
+		case (Viewer::GridLineMajorObject):
+			break;
+		case (Viewer::GridLineMinorObject):
+			break;
+	}
 
-	// Now find out what, if anything, was under the mouse...
-// 	int axis = pane->axisTitleAt(mouseX, mouseY);
-// 	if (axis != -1) printf("Here's axis %i\n", axis);
+	// Reset clicked object info
+	clickedObject_ = Viewer::NoObject;
+	clickedObjectInfo_.clear();
 }

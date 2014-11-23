@@ -50,6 +50,7 @@ Viewer::Viewer(QWidget *parent) : QGLWidget(parent)
 	valid_ = false;
 	drawing_ = false;
 	renderingOffScreen_ = false;
+	highlightCollection_ = NULL;
 
 	// Query
 	objectQueryX_ = -1;
@@ -153,6 +154,7 @@ void Viewer::paintGL()
 
 		// Set viewport
 		glViewport(pane->viewportMatrix()[0], pane->viewportMatrix()[1], pane->viewportMatrix()[2], pane->viewportMatrix()[3]);
+// 		printf("Viewport for pane '%s' is %i %i %i %i\n" , qPrintable(pane->name()), pane->viewportMatrix()[0], pane->viewportMatrix()[1], pane->viewportMatrix()[2], pane->viewportMatrix()[3]);
 
 		// Setup an orthographic matrix
 		glMatrixMode(GL_PROJECTION);
@@ -250,18 +252,18 @@ void Viewer::paintGL()
 		// Render bounding box
 		pane->boundingBoxPrimitive().sendToGL();
 
-		// Render current selection marker
+		// Render selection markers (if needed)
 		glLoadMatrixd(viewMatrix.matrix());
-		int sliceAxis = uChroma_->interactionAxis();
-		if ((pane == UChromaSession::currentViewPane()) && (sliceAxis != -1))
+		int interactionAxis = uChroma_->interactionAxis();
+		if ((pane == UChromaSession::currentViewPane()) && (interactionAxis != -1))
 		{
 			// Note - we do not need to check for inverted or logarithmic axes here, since the transformation matrix A takes care of that
 			Vec3<double> v;
 
-			// Draw starting interaction point (if we are interacting)
-			if (uChroma_->interacting())
+			// Draw starting interaction point (if the interaction has been started)
+			if (uChroma_->interactionStarted())
 			{
-				v[sliceAxis] = uChroma_->clickedInteractionCoordinate() * pane->axes().stretch(sliceAxis);
+				v[interactionAxis] = uChroma_->clickedInteractionCoordinate() * pane->axes().stretch(interactionAxis);
 				glTranslated(v.x, v.y, v.z);
 				glColor4d(0.0, 0.0, 1.0, 0.5);
 				pane->interactionPrimitive().sendToGL();
@@ -269,7 +271,7 @@ void Viewer::paintGL()
 			}
 
 			// Draw current selection position
-			v[sliceAxis] = 	uChroma_->currentInteractionCoordinate() * pane->axes().stretch(sliceAxis) - v[sliceAxis];
+			v[interactionAxis] = 	uChroma_->currentInteractionCoordinate() * pane->axes().stretch(interactionAxis) - v[interactionAxis];
 			glTranslated(v.x, v.y, v.z);
 			glColor4d(1.0, 0.0, 0.0, 0.5);
 			pane->interactionPrimitive().sendToGL();
@@ -292,6 +294,13 @@ void Viewer::paintGL()
 		// Render pane data - loop over collection targets
 		for (TargetData* target = pane->collectionTargets(); target != NULL; target = target->next)
 		{
+			// If this is the collection to highlight, set color to transparent grey and disable material colouring....
+			if (target->collection() == highlightCollection_)
+			{
+				glColor4f(1.0f, 1.0f, 1.0f, 0.5f);
+				glDisable(GL_COLOR_MATERIAL);
+			}
+
 			// Set shininess for collection
 			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, target->collection()->displaySurfaceShininess());
 
@@ -305,6 +314,7 @@ void Viewer::paintGL()
 			// Update query
 			if (updateQueryDepth()) setQueryObject(Viewer::CollectionObject, target->collection()->locator());
 
+			glEnable(GL_COLOR_MATERIAL);
 		}
 
 		// Disable current clip planes
@@ -354,9 +364,10 @@ void Viewer::paintGL()
 	}
 	else renderTime_ = "";
 
-	// Set query coordinate
+	// Reset query coordinate
 	objectQueryX_ = -1;
 	objectQueryY_ = -1;
+
 
 	// Set the rendering flag to false
 	drawing_ = false;
@@ -542,6 +553,12 @@ QPixmap Viewer::generateImage(int w, int h)
 	renderingOffScreen_ = false;
 
 	return pixmap;
+}
+
+// Set collection to highlight in this pass
+void Viewer::setHighlightCollection(Collection* collection)
+{
+	highlightCollection_ = collection;
 }
 
 /*

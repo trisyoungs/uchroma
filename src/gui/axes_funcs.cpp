@@ -101,8 +101,12 @@ Axes& AxesWindow::currentAxes()
 bool AxesWindow::invertChanged(int axis, bool checked)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
-	
-	if (haveCurrentAxes()) currentAxes().setInverted(axis, checked);
+
+	UChromaSession::beginEditStateGroup("toggle %c axis inverted", char(88+axis));
+
+	currentAxes().setInverted(axis, checked);
+
+	UChromaSession::endEditStateGroup();
 
 	// Update relevant parts of gui
 	uChroma_.updateDisplay();
@@ -113,8 +117,12 @@ bool AxesWindow::invertChanged(int axis, bool checked)
 bool AxesWindow::logarithmicChanged(int axis, bool checked)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
-	
+
+	UChromaSession::beginEditStateGroup("toggle %c axis logarithmic", char(88+axis));
+
 	currentAxes().setLogarithmic(axis, checked);
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -128,8 +136,12 @@ bool AxesWindow::logarithmicChanged(int axis, bool checked)
 bool AxesWindow::visibleChanged(int axis, bool checked)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
-	
+
+	UChromaSession::beginEditStateGroup("toggle %c axis visibility", char(88+axis));
+
 	currentAxes().setVisible(axis, checked);
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -143,7 +155,11 @@ bool AxesWindow::stretchChanged(int axis, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
+	UChromaSession::beginEditStateGroup("set %c axis stretch", char(88+axis));
+
 	currentAxes().setStretch(axis, value);
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -157,8 +173,12 @@ bool AxesWindow::limitChanged(int axis, bool minLim, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
+	UChromaSession::beginEditStateGroup("set %c axis limit", char(88+axis));
+
 	if (minLim) currentAxes().setMin(axis, value);
 	else currentAxes().setMax(axis, value);
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -172,8 +192,12 @@ bool AxesWindow::limitChanged(int axis, bool minLim, double value)
 bool AxesWindow::limitSetExtreme(int axis, bool minLim)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
-	
+
+	UChromaSession::beginEditStateGroup("set %c axis limit", char(88+axis));
+
 	currentAxes().setToLimit(axis, minLim);
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -224,7 +248,11 @@ bool AxesWindow::positionIsFractionalChanged(int axis, bool fractional)
 	// Don't do anything else if we are currently refreshing
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
+	UChromaSession::beginEditStateGroup("toggle %c axis position fractional", char(88+axis));
+
 	currentAxes().setPositionIsFractional(axis, fractional);
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -238,8 +266,12 @@ bool AxesWindow::positionChanged(bool real, int axis, int dir, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
+	UChromaSession::beginEditStateGroup("set %c axis position", char(88+axis));
+
 	if (real) currentAxes().setPositionReal(axis, dir, value);
 	else currentAxes().setPositionFractional(axis, dir, value);
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -252,6 +284,8 @@ bool AxesWindow::positionChanged(bool real, int axis, int dir, double value)
 bool AxesWindow::positionSet(bool real, int axis, int dir, int type)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
+
+	UChromaSession::beginEditStateGroup("set %c axis position", char(88+axis));
 
 	if (real)
 	{
@@ -268,6 +302,8 @@ bool AxesWindow::positionSet(bool real, int axis, int dir, int type)
 		else return false;
 	}
 
+	UChromaSession::endEditStateGroup();
+
 	UChromaSession::setAsModified();
 
 	// Update relevant parts of gui
@@ -281,7 +317,11 @@ bool AxesWindow::autoTicksChanged(int axis, bool enabled)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
+	UChromaSession::beginEditStateGroup("toggle %c axis autoticks", char(88+axis));
+
 	currentAxes().setAutoTicks(axis, enabled);
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -296,8 +336,18 @@ bool AxesWindow::ticksChanged(int axis, bool start, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
-	if (start) currentAxes().setFirstTick(axis, value);
-	else currentAxes().setTickDelta(axis, value);
+	if (start)
+	{
+		UChromaSession::beginEditStateGroup("set %c axis first tick", char(88+axis));
+		currentAxes().setFirstTick(axis, value);
+	}
+	else
+	{
+		UChromaSession::beginEditStateGroup("set %c axis tick delta", char(88+axis));
+		currentAxes().setTickDelta(axis, value);
+	}
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -312,7 +362,11 @@ bool AxesWindow::tickOrientationChanged(int axis, int dir, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
+	UChromaSession::beginEditStateGroup("set %c axis tick orientation", char(88+axis));
+
 	currentAxes().setTickDirection(axis, dir, value);
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -326,7 +380,11 @@ bool AxesWindow::labelOrientationChanged(int axis, int component, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
+	UChromaSession::beginEditStateGroup("set %c axis label orientation", char(88+axis));
+
 	currentAxes().setLabelOrientation(axis, component, value);
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -340,7 +398,11 @@ bool AxesWindow::tickSizeChanged(int axis, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
+	UChromaSession::beginEditStateGroup("set %c axis tick size", char(88+axis));
+
 	currentAxes().setTickSize(axis, value);
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -354,7 +416,11 @@ bool AxesWindow::titleOrientationChanged(int axis, int component, double value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
+	UChromaSession::beginEditStateGroup("set %c axis title orientation", char(88+axis));
+
 	currentAxes().setTitleOrientation(axis, component, value);
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -368,7 +434,11 @@ bool AxesWindow::minorTicksChanged(int axis, int value)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
+	UChromaSession::beginEditStateGroup("set %c axis minor ticks", char(88+axis));
+
 	currentAxes().setMinorTicks(axis, value);
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -382,7 +452,11 @@ bool AxesWindow::titleChanged(int axis, QString& title)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
+	UChromaSession::beginEditStateGroup("set %c axis title", char(88+axis));
+
 	currentAxes().setTitle(axis, title);
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -411,9 +485,19 @@ bool AxesWindow::titleAddSymbolButtonClicked(int axis)
 bool AxesWindow::anchorChanged(int axis, bool titleAnchor, TextPrimitive::TextAnchor anchor)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
+	
+	if (titleAnchor)
+	{
+		UChromaSession::beginEditStateGroup("set %c axis title anchor", char(88+axis));
+		currentAxes().setTitleAnchor(axis, anchor);
+	}
+	else 
+	{
+		UChromaSession::beginEditStateGroup("set %c axis label anchor", char(88+axis));
+		currentAxes().setLabelAnchor(axis, anchor);
+	}
 
-	if (titleAnchor) currentAxes().setTitleAnchor(axis, anchor);
-	else currentAxes().setLabelAnchor(axis, anchor);
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -427,8 +511,12 @@ bool AxesWindow::gridLineChanged(int axis, bool major, bool on)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
+	UChromaSession::beginEditStateGroup("toggle %c axis %s gridlines", char(88+axis), major ? "major" : "minor");
+
 	if (major) currentAxes().setGridLinesMajor(axis, on);
 	else currentAxes().setGridLinesMinor(axis, on);
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -442,7 +530,11 @@ bool AxesWindow::gridFullChanged(int axis, bool full)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
+	UChromaSession::beginEditStateGroup("toggle %c axis full gridlines", char(88+axis));
+
 	currentAxes().setGridLinesFull(axis, full);
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 
@@ -462,8 +554,12 @@ bool AxesWindow::gridStyleClicked(int axis, bool major)
 	// Update relevant parts of gui
 	if (success)
 	{
-		if (major) currentAxes().gridLineMajorStyle(axis) = dialog.lineStyle();
-		else currentAxes().gridLineMinorStyle(axis) = dialog.lineStyle();
+		UChromaSession::beginEditStateGroup("set %c axis %s gridline style", char(88+axis), major ? "major" : "minor");
+
+		if (major) currentAxes().setGridLineMajorStyle(axis, dialog.lineStyle());
+		else currentAxes().setGridLineMinorStyle(axis, dialog.lineStyle());
+
+		UChromaSession::endEditStateGroup();
 
 		UChromaSession::setAsModified();
 
@@ -478,12 +574,16 @@ bool AxesWindow::gridStyleApplyClicked(int axis)
 {
 	if (refreshing_ || (!haveCurrentAxes())) return false;
 
+	UChromaSession::beginEditStateGroup("apply gridline style to all axes");
+
 	for (int n=0; n<3; ++n)
 	{
 		if (n == axis) continue;
-		currentAxes().gridLineMajorStyle(n) = currentAxes().gridLineMajorStyle(axis);
-		currentAxes().gridLineMinorStyle(n) = currentAxes().gridLineMinorStyle(axis);
+		currentAxes().setGridLineMajorStyle(n, currentAxes().gridLineMajorStyle(axis));
+		currentAxes().setGridLineMinorStyle(n, currentAxes().gridLineMinorStyle(axis));
 	}
+
+	UChromaSession::endEditStateGroup();
 
 	UChromaSession::setAsModified();
 

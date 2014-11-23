@@ -1,6 +1,6 @@
 /*
 	*** Session Statics
-	*** src/io/session.cpp
+	*** src/session/session.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -52,6 +52,12 @@ ViewPane* UChromaSession::currentViewPane_ = NULL;
 QDir UChromaSession::sessionFileDirectory_;
 QString UChromaSession::inputFile_;
 bool UChromaSession::hardIOFail_ = false;
+// -- Edit states
+List<EditStateGroup> UChromaSession::editStateGroups_;
+// Current EditStateGroup (for undo)
+EditStateGroup* UChromaSession::currentEditStateGroup_ = NULL;
+EditStateGroup* UChromaSession::undoEditStateGroup_ = NULL;
+EditState* UChromaSession::currentEditState_ = NULL;
 
 /*
  * Main Window Pointer
@@ -234,7 +240,7 @@ QString UChromaSession::uniqueCollectionName(QString baseName)
 	do
 	{
 		// Add on suffix (if index > 0)
-		if (index > 0) testName = baseName + " "+QString::number(index);
+		if (index > 0) testName = baseName + " ("+QString::number(index)+")";
 		++index;
 		for (collection = collections_.first(); collection != NULL; collection = collection->next) if (collection->name() == testName) break;
 	} while (collection);
@@ -269,18 +275,63 @@ void UChromaSession::startNewSession(bool createDefaults)
 }
 
 // Add new collection
-Collection* UChromaSession::addCollection(QString name)
+Collection* UChromaSession::addCollection(QString name, int listIndex)
 {
 	// Add an empty collection
-	currentCollection_ = collections_.add();
+	currentCollection_ = (listIndex == -1 ? collections_.add() : collections_.addAt(listIndex));
+
+	// Create EditState data
+	if (UChromaSession::addEditState(currentCollection_->objectInfo(), EditState::CollectionAddQuantity))
+	{
+		UChromaSession::addEditStateData(true, "collection", currentCollection_);
+		UChromaSession::addEditStateData(true, "locator", currentCollection_->locator());
+		UChromaSession::addEditStateData(true, "position", currentCollection_->listIndex());
+	}
 
 	// Set the title
 	if (name.isEmpty()) currentCollection_->setName( uniqueCollectionName("Empty Collection") );
 	else currentCollection_->setName(uniqueCollectionName(name));
 
+	// Send a signal out
+	UChromaSignal::send(UChromaSignal::CollectionCreatedSignal, currentCollection_);
+
 	setAsModified();
 
 	return currentCollection_;
+}
+
+// Add new collection at the specified location
+Collection* UChromaSession::addCollectionFromLocator(QString locator, Collection::CollectionType type, int listIndex)
+{
+	// First, split up the supplied string by the delimiter '//'
+	QStringList locatorParts = locator.split("//");
+
+	// Remove the last one (the target collection itself)
+	QString collectionName = locatorParts.last();
+	locatorParts.removeLast();
+
+	// If there are no parts left in the list, then it must have been a master collection
+	if (locatorParts.count() == 0)
+	{
+		Collection* collection = addCollection(collectionName, listIndex);
+		printf("Added collectionFromLocator '%s', its objectId is %i\n", qPrintable(collectionName), collection->objectId());
+		return collection;
+	}
+
+	// Loop over main collections, passing parts list
+	for (Collection* collection = collections_.first(); collection != NULL; collection = collection->next)
+	{
+		Collection* foundCollection = collection->locateCollection(locatorParts, 0);
+		if (foundCollection)
+		{
+			Collection* collection = NULL;
+			if (type == Collection::FitCollection) collection = foundCollection->addFit(collectionName, listIndex);
+			else if (type == Collection::ExtractedCollection) collection = foundCollection->addSlice(collectionName, listIndex);
+			else printf("Don't know how to add currentSlice from locator.\n");
+			return collection;
+		}
+	}
+	return NULL;
 }
 
 // Remove existing collection
@@ -295,7 +346,17 @@ void UChromaSession::removeCollection(Collection* collection)
 		// Set new currentCollection_
 		if (collection->next) currentCollection_ = collection->next;
 		else currentCollection_ = collection->prev;
-		if (currentCollection_ == NULL) currentCollection_ = addCollection();
+
+		// Send a signal out before we finalise deletion
+		UChromaSignal::send(UChromaSignal::CollectionDeletedSignal, collection);
+
+		// Create EditState data
+		if (UChromaSession::addEditState(collection->objectInfo(), EditState::CollectionRemoveQuantity))
+		{
+			UChromaSession::addEditStateData(false, "collection", collection);
+			UChromaSession::addEditStateData(false, "locator", collection->locator());
+			UChromaSession::addEditStateData(false, "position", collection->listIndex());
+		}
 
 		// Remove master collection
 		collections_.remove(collection);
@@ -450,4 +511,220 @@ bool UChromaSession::setCurrentViewPane(int layoutX, int layoutY)
 ViewPane* UChromaSession::currentViewPane()
 {
 	return currentViewPane_;
+}
+
+/*
+ * Undo / Redo
+ */
+
+// Begin a new edit state group
+EditStateGroup* UChromaSession::beginEditStateGroup(const char* format, ...)
+{
+	// If there are any groups after the current undo group, we must delete them before adding the new one
+	if (undoEditStateGroup_)
+	{
+		while (undoEditStateGroup_->next) editStateGroups_.remove(undoEditStateGroup_->next);
+	}
+	else editStateGroups_.clear();
+
+	va_list arguments;
+	static char title[8096];
+	title[0] = '\0';
+	// Parse the argument list (...) and internally write the output string into title[]
+	va_start(arguments, format);
+	vsprintf(title, format, arguments);
+
+	currentEditStateGroup_ = editStateGroups_.add();
+	currentEditStateGroup_->setTitle(title);
+	currentEditState_ = NULL;
+
+	va_end(arguments);
+}
+
+// Add edit state to group
+bool UChromaSession::addEditState(ObjectInfo target, int quantity, int index, int subIndex)
+{
+	if (!currentEditStateGroup_) return false;
+	currentEditState_ = currentEditStateGroup_->addEditState(target, quantity);
+	currentEditState_->setTargetIndices(index, subIndex);
+	return true;
+}
+
+// Add edit state to group with basic integer data
+bool UChromaSession::addEditState(ObjectInfo target, int quantity, int oldData, int newData, int index, int subIndex)
+{
+	if (!addEditState(target, quantity, index, subIndex)) return false;
+	addEditStateData(false, "value", oldData);
+	addEditStateData(true, "value", newData);
+	return true;
+}
+
+// Add edit state to group with basic double data
+bool UChromaSession::addEditState(ObjectInfo target, int quantity, double oldData, double newData, int index, int subIndex)
+{
+	if (!addEditState(target, quantity, index, subIndex)) return false;
+	addEditStateData(false, "value", oldData);
+	addEditStateData(true, "value", newData);
+	return true;
+}
+
+// Add edit state to group with basic QString data
+bool UChromaSession::addEditState(ObjectInfo target, int quantity, QString oldData, QString newData, int index, int subIndex)
+{
+	if (!addEditState(target, quantity, index, subIndex)) return false;
+	addEditStateData(false, "value", oldData);
+	addEditStateData(true, "value", newData);
+	return true;
+}
+
+// Add edit state to group with LineStyle data
+bool UChromaSession::addEditState(ObjectInfo target, int quantity, LineStyle oldData, LineStyle newData, int index, int subIndex)
+{
+	if (!addEditState(target, quantity, index, subIndex)) return false;
+	addEditStateData(false, "value", oldData);
+	addEditStateData(true, "value", newData);
+	return true;
+}
+
+// Add data to current EditState (int)
+void UChromaSession::addEditStateData(bool newData, QString name, int value)
+{
+	if (!currentEditState_)
+	{
+		printf("Internal Error: Attempted to addEditStateData(int) with no currentEditState_.\n");
+		return;
+	}
+	if (newData) currentEditState_->addNewData()->set(name, value);
+	else currentEditState_->addOldData()->set(name, value);
+}
+
+// Add data to current EditState  (double)
+void UChromaSession::addEditStateData(bool newData, QString name, double value)
+{
+	if (!currentEditState_)
+	{
+		printf("Internal Error: Attempted to addEditStateData(double) with no currentEditState_.\n");
+		return;
+	}
+	if (newData) currentEditState_->addNewData()->set(name, value);
+	else currentEditState_->addOldData()->set(name, value);
+}
+
+// Add data to current EditState  (QString)
+void UChromaSession::addEditStateData(bool newData, QString name, QString value)
+{
+	if (!currentEditState_)
+	{
+		printf("Internal Error: Attempted to addEditStateData(QString) with no currentEditState_.\n");
+		return;
+	}
+	if (newData) currentEditState_->addNewData()->set(name, value);
+	else currentEditState_->addOldData()->set(name, value);
+}
+
+// Add data to current EditState  (from Collection*)
+void UChromaSession::addEditStateData(bool newData, QString name, Collection* value)
+{
+	if (!currentEditState_)
+	{
+		printf("Internal Error: Attempted to addEditStateData(Collection*) with no currentEditState_.\n");
+		return;
+	}
+	if (newData) currentEditState_->addNewData()->set(name, value);
+	else currentEditState_->addOldData()->set(name, value);
+}
+
+// Add data to current EditState  (from Data2D*)
+void UChromaSession::addEditStateData(bool newData, QString name, Data2D* value)
+{
+	if (!currentEditState_)
+	{
+		printf("Internal Error: Attempted to addEditStateData(Data2D*) with no currentEditState_.\n");
+		return;
+	}
+	if (newData) currentEditState_->addNewData()->set(name, value);
+	else currentEditState_->addOldData()->set(name, value);
+}
+
+// Add data to current EditState  (from LineStyle&)
+void UChromaSession::addEditStateData(bool newData, QString name, LineStyle& value)
+{
+	if (!currentEditState_)
+	{
+		printf("Internal Error: Attempted to addEditStateData(LineStyle) with no currentEditState_.\n");
+		return;
+	}
+	if (newData) currentEditState_->addNewData()->set(name, value);
+	else currentEditState_->addOldData()->set(name, value);
+}
+
+// End the new edit state group
+void UChromaSession::endEditStateGroup()
+{
+	if (!currentEditStateGroup_)
+	{
+		msg.print("Internal Error - No currentEditStateGroup_ to end.\n");
+		return;
+	}
+
+	undoEditStateGroup_ = currentEditStateGroup_;
+	currentEditStateGroup_ = NULL;
+
+	// Update Edit menu
+	uChroma_->updateUndoRedo();
+}
+
+// Return current EditStateGroup
+EditStateGroup* UChromaSession::currentEditStateGroup()
+{
+	return currentEditStateGroup_;
+}
+
+// Return target EditStateGroup for undo
+EditStateGroup* UChromaSession::undoEditStateGroup()
+{
+	return undoEditStateGroup_;
+}
+
+// Return first in list of EditStateGroups
+EditStateGroup* UChromaSession::editStateGroups()
+{
+	return editStateGroups_.first();
+}
+
+// Perform undo
+bool UChromaSession::undo()
+{
+	bool result = false;
+	if (undoEditStateGroup_)
+	{
+		// Revert changes in current group
+		result = undoEditStateGroup_->revert();
+
+		// Set new current undo state
+		undoEditStateGroup_ = undoEditStateGroup_->prev;
+	}
+
+	return result;
+}
+
+// Perform redo
+bool UChromaSession::redo()
+{
+	bool result = false;
+
+	EditStateGroup* redoState = NULL;
+	if (undoEditStateGroup_) redoState = undoEditStateGroup_->next;
+	else redoState = editStateGroups_.first();
+
+	if (redoState)
+	{
+		// Apply changes in redoState
+		result = redoState->apply();
+
+		// Set new current undo state
+		undoEditStateGroup_ = redoState;
+	}
+
+	return result;
 }
