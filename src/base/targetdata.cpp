@@ -75,13 +75,13 @@ void TargetData::initialise(Collection* collection)
 	{
 		// Standard view pane - add a primitive for the target collection
 		case (ViewPane::StandardRole):
-			addDisplayPrimitive(collection);
+			addDisplayPrimitive(collection_);
 			break;
 		case (ViewPane::SliceMonitorRole):
-			addDisplayPrimitive(collection->currentSlice());
+			addDisplayPrimitive(collection_->currentSlice());
 			break;
 		case (ViewPane::ExtractorRole):
-			addDisplayPrimitive(collection);
+			addDisplayPrimitive(collection_);
 			break;
 		default:
 			msg.print("Internal Error: ViewPane role '%s' not accounted for in TargetData::initialise().\n", ViewPane::paneRole(parent_.role()));

@@ -991,7 +991,7 @@ void Collection::extractCurrentSlice(int axis, double axisValue)
 	Collection* newSlice = addSlice(currentSlice_->name());
 	newSlice->addDataSet(currentSlice_->dataSets());
 
-	UChromaSignal::send(UChromaSignal::CollectionSliceExtractedSignal, this);
+	UChromaSignal::send(UChromaSignal::CollectionSliceExtractedSignal, newSlice);
 }
 
 // Return current slice

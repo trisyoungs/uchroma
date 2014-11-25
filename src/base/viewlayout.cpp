@@ -59,7 +59,21 @@ void ViewLayout::operator=(const ViewLayout& source)
 	name_ = source.name_;
 	nColumns_ = source.nColumns_;
 	nRows_ = source.nRows_;
-	panes_ = source.panes_;
+	layoutXOffset_ = source.layoutXOffset_;
+	layoutYOffset_ = source.layoutYOffset_;
+	layoutXScale_ = source.layoutXScale_;
+	layoutYScale_ = source.layoutYScale_;
+	pixelWidth_ = source.pixelWidth_;
+	pixelHeight_ = source.pixelHeight_;
+	remainingWidth_ = source.remainingWidth_;
+	remainingHeight_ = source.remainingHeight_;
+
+	// Copy panes...
+	for (ViewPane* pane = source.panes_.first(); pane != NULL; pane = pane->next)
+	{
+		ViewPane* newPane = panes_.add(*this);
+		(*newPane) = (*pane);
+	}
 }
 
 /*

@@ -19,7 +19,7 @@ SUFFIXES: .ui .uih .qrc
 	rm $*.cpp
 
 clean-local:
-	-rm -f ui_* colourbutton.cpp gradientbar.cpp icons.cpp paneorganiser.cpp texponentialspin.cpp viewer.cpp 
+	-rm -f ui_* *.o colourbutton.cpp gradientbar.cpp icons.cpp paneorganiser.cpp texponentialspin.cpp viewer.cpp 
 
 libgui_a_SOURCES = icons.qrc texponentialspin.uih
 

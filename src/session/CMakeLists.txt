@@ -3,7 +3,7 @@ add_library(session
   editstate_axes.cpp
   editstate_collection.cpp
   editstate_viewpane.cpp
-  editstatesdata.cpp
+  editstatedata.cpp
   editstategroup.cpp
   keywords.cpp
   load.cpp

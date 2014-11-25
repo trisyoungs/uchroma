@@ -481,6 +481,7 @@ ViewLayout& UChromaSession::viewLayout()
 // Set view layout
 void UChromaSession::setViewLayout(ViewLayout& source)
 {
+	printf("Prior to copy, session viewLayout_ is %p\n", &viewLayout_);
 	viewLayout_ = source;
 	currentViewPane_ = viewLayout_.panes();
 }

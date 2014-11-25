@@ -278,7 +278,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="TExponentialSpin" name="XMinSpin" native="true">
+                 <widget class="TExponentialSpin" name="XMinSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -292,7 +292,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>Minimum value to display on the X axis</string>
@@ -300,7 +300,7 @@
                  </widget>
                 </item>
                 <item row="0" column="4">
-                 <widget class="TExponentialSpin" name="XMaxSpin" native="true">
+                 <widget class="TExponentialSpin" name="XMaxSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -314,7 +314,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>Maximum value to display on the X axis</string>
@@ -396,7 +396,7 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="TExponentialSpin" name="XPositionYRealSpin" native="true">
+                 <widget class="TExponentialSpin" name="XPositionYRealSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -410,7 +410,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>Y axis value at which the X axis crosses</string>
@@ -418,7 +418,7 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="TExponentialSpin" name="XPositionZRealSpin" native="true">
+                 <widget class="TExponentialSpin" name="XPositionZRealSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -432,7 +432,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>Z axis value at which the X axis crosses</string>
@@ -580,7 +580,7 @@
                  </widget>
                 </item>
                 <item row="1" column="2">
-                 <widget class="TExponentialSpin" name="XPositionYFractionalSpin" native="true">
+                 <widget class="TExponentialSpin" name="XPositionYFractionalSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -594,7 +594,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>Y axis fraction at which the X axis crosses</string>
@@ -602,7 +602,7 @@
                  </widget>
                 </item>
                 <item row="2" column="2">
-                 <widget class="TExponentialSpin" name="XPositionZFractionalSpin" native="true">
+                 <widget class="TExponentialSpin" name="XPositionZFractionalSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -616,7 +616,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>Z axis fraction at which the X axis crosses</string>
@@ -1487,7 +1487,7 @@
                  </widget>
                 </item>
                 <item row="0" column="4">
-                 <widget class="TExponentialSpin" name="YMaxSpin" native="true">
+                 <widget class="TExponentialSpin" name="YMaxSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1501,7 +1501,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>Maximum value to display on the Y axis</string>
@@ -1548,7 +1548,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="TExponentialSpin" name="YMinSpin" native="true">
+                 <widget class="TExponentialSpin" name="YMinSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1562,7 +1562,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>Minimum value to display on the Y axis</string>
@@ -1670,7 +1670,7 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="TExponentialSpin" name="YPositionXRealSpin" native="true">
+                 <widget class="TExponentialSpin" name="YPositionXRealSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1684,7 +1684,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>X axis value at which the Y axis crosses</string>
@@ -1692,7 +1692,7 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="TExponentialSpin" name="YPositionZRealSpin" native="true">
+                 <widget class="TExponentialSpin" name="YPositionZRealSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1706,7 +1706,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>Z axis value at which the Y axis crosses</string>
@@ -1854,7 +1854,7 @@
                  </widget>
                 </item>
                 <item row="1" column="2">
-                 <widget class="TExponentialSpin" name="YPositionXFractionalSpin" native="true">
+                 <widget class="TExponentialSpin" name="YPositionXFractionalSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1868,7 +1868,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>X axis fraction at which the Y axis crosses</string>
@@ -1876,7 +1876,7 @@
                  </widget>
                 </item>
                 <item row="2" column="2">
-                 <widget class="TExponentialSpin" name="YPositionZFractionalSpin" native="true">
+                 <widget class="TExponentialSpin" name="YPositionZFractionalSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1890,7 +1890,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>Z axis fraction at which the Y axis crosses</string>
@@ -2767,7 +2767,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="TExponentialSpin" name="ZMinSpin" native="true">
+                 <widget class="TExponentialSpin" name="ZMinSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -2781,7 +2781,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>Minimum value to display on the Z axis</string>
@@ -2840,7 +2840,7 @@
                  </widget>
                 </item>
                 <item row="0" column="4">
-                 <widget class="TExponentialSpin" name="ZMaxSpin" native="true">
+                 <widget class="TExponentialSpin" name="ZMaxSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -2854,7 +2854,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>Maximum value to display on the Z axis</string>
@@ -2962,7 +2962,7 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="TExponentialSpin" name="ZPositionXRealSpin" native="true">
+                 <widget class="TExponentialSpin" name="ZPositionXRealSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -2976,7 +2976,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>X axis value at which the Z axis crosses</string>
@@ -2984,7 +2984,7 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="TExponentialSpin" name="ZPositionYRealSpin" native="true">
+                 <widget class="TExponentialSpin" name="ZPositionYRealSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -2998,7 +2998,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>Y axis value at which the Z axis crosses</string>
@@ -3146,7 +3146,7 @@
                  </widget>
                 </item>
                 <item row="1" column="2">
-                 <widget class="TExponentialSpin" name="ZPositionXFractionalSpin" native="true">
+                 <widget class="TExponentialSpin" name="ZPositionXFractionalSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -3160,7 +3160,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>X axis fraction at which the Z axis crosses</string>
@@ -3168,7 +3168,7 @@
                  </widget>
                 </item>
                 <item row="2" column="2">
-                 <widget class="TExponentialSpin" name="ZPositionYFractionalSpin" native="true">
+                 <widget class="TExponentialSpin" name="ZPositionYFractionalSpin">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -3182,7 +3182,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
                    <string>Y axis fraction at which the Y axis crosses</string>
@@ -4261,7 +4261,7 @@
  <customwidgets>
   <customwidget>
    <class>TExponentialSpin</class>
-   <extends>QWidget</extends>
+   <extends>QDoubleSpinBox</extends>
    <header>gui/texponentialspin.uih</header>
    <container>1</container>
   </customwidget>
