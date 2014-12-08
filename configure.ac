@@ -3,7 +3,7 @@
 AC_PREREQ(2.60)
 
 # Set program name, version, bug-address and source directory
-m4_define([UCHROMA_VERSION],[0.196])
+m4_define([UCHROMA_VERSION],[0.197])
 AC_INIT([uchroma],[UCHROMA_VERSION])
 AC_CONFIG_SRCDIR([src/])
 

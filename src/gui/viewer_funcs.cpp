@@ -118,6 +118,13 @@ void Viewer::paintGL()
 
 	// Grab topmost GLExtensions pointer
 	GLExtensions* extensions = extensionsStack_.last();
+	if (extensions == NULL)
+	{
+		printf("Internal Error: No GLExtensions object on stack.\n");
+		drawing_ = false;
+		msg.exit("Viewer::paintGL");
+		return;
+	}
 
 	// Setup basic GL stuff
 	setupGL();
@@ -367,7 +374,6 @@ void Viewer::paintGL()
 	// Reset query coordinate
 	objectQueryX_ = -1;
 	objectQueryY_ = -1;
-
 
 	// Set the rendering flag to false
 	drawing_ = false;

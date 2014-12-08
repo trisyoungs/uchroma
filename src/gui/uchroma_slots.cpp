@@ -143,9 +143,6 @@ void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 		// Scale current line width and text scaling to reflect size of exported image
 		ui.MainView->setObjectScaling( double(imageHeight) / double(ui.MainView->height()) );
 
-		// Make sure the Viewer knows we want offscreen rendering
-		ui.MainView->setRenderingOffScreen(true); 
-
 		// If both image dimensions are less than some limiting size, get image in a single shot. If not, tile it...
 		if ((imageHeight > maxSize) || (imageWidth > maxSize))
 		{
