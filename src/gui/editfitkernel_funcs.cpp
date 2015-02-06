@@ -81,6 +81,21 @@ void EditFitKernelDialog::on_CancelButton_clicked(bool checked)
 
 void EditFitKernelDialog::on_OKButton_clicked(bool checked)
 {
+	if (fitKernelTarget_)
+	{
+		for (RefListItem<EquationVariable,bool>* ri = fitKernelTarget_->usedVariables(); ri != NULL; ri = ri->next)
+		{
+			// Grab the fit variable and see if it's used in the current equation?
+			EquationVariable* eqVar = ri->item;
+			if (!eqVar->used()) continue;
+			for (DataSpaceRange* range = fitKernelTarget_->dataSpaceRanges(); range != NULL; range = range->next)
+			{
+				NamedValue* value = range->hasFittedValue(eqVar->name());
+				if (value) value->setValue(eqVar->value());
+			}
+		}
+	}
+
 	accept();
 }
 
