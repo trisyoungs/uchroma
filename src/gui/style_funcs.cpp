@@ -661,8 +661,9 @@ void StyleWindow::updateControls(bool force)
 	ui.LineStippleCombo->setCurrentIndex(currentCollection->displayLineStyle().stipple());
 
 	// Enable/disable groups specific to one style
-	ui.SurfaceOptionsGroup->setEnabled(currentCollection->displayStyle() == Collection::SurfaceStyle);
-	ui.LineOptionsGroup->setEnabled(currentCollection->displayStyle() != Collection::SurfaceStyle);
+	bool isSurface = ((currentCollection->displayStyle() == Collection::SurfaceStyle) || (currentCollection->displayStyle() == Collection::UnlitSurfaceStyle));
+	ui.SurfaceOptionsGroup->setEnabled(isSurface);
+	ui.LineOptionsGroup->setEnabled(!isSurface);
 
 	refreshing_ = false;
 }

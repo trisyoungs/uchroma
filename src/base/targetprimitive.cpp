@@ -89,6 +89,7 @@ void TargetPrimitive::updateAndSendPrimitive(const Axes& axes, bool forceUpdate,
 				Surface::constructGrid(primitive_, axes, collection_->displayAbscissa(), collection_->displayData(), collection_->colourScale());
 				break;
 			case (Collection::SurfaceStyle):
+			case (Collection::UnlitSurfaceStyle):
 				Surface::constructFull(primitive_, axes, collection_->displayAbscissa(), collection_->displayData(), collection_->colourScale());
 				break;
 			default:

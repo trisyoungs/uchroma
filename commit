@@ -1,17 +1,18 @@
 #!/bin/bash
 
-# Script to 'wrap' around svn and update version info before commit.
+# Script to 'wrap' around git and update ChangeLog and version / date in file.
 
 COMMITFILE="none"
 COMMITMSG="none"
 COMMITTYPE="none"
-TEST="false"
-UPDATE="false"
+BUMP="false"
+PUSH="false"
+ALL="false"
 
 # Parse CLI arguments / options
-USAGE1="commit [-F <filename>] [-m <text>] [-t]"
+USAGE1="commit [-F <filename>] [-m <text>] [-p] [-b]"
 
-while getopts "F:m:tu" options; do
+while getopts "F:m:bp" options; do
   case $options in
     F ) COMMITFILE=$OPTARG
 	COMMITTYPE="file"
@@ -19,10 +20,10 @@ while getopts "F:m:tu" options; do
     m ) COMMITMSG=$OPTARG
 	COMMITTYPE="msg"
         echo "Using supplied text for commit message.";;
-    t ) TEST="true"
-	echo "Test only - no file changes will be made.";;
-    u ) UPDATE="true"
-	echo "Local source will be updated before commit.";;
+    b ) BUMP="true"
+	echo "Version (patch) number will be bumped.";;
+    p ) PUSH="true"
+	echo "Files will be committed and local changes pushed to server.";;
     \? ) echo -e $USAGE1
          exit 1;;
     * ) echo -e $USAGE1
@@ -31,79 +32,34 @@ while getopts "F:m:tu" options; do
 done
 
 # Check that a commit type was given
-if [ "$COMMITTYPE" = "none" ] && [ "$TEST" = "false" ]
+if [ "$COMMITTYPE" = "none" ]
 then
   echo "No commit message/file was given."
   exit 0
 fi
 
-# Update if requested
-if [ "$UPDATE" = "true" ]
+# Bump version if requested
+if [ "$BUMP" = "true" ]
 then
-  svn update
-fi
-
-# Determine current svn version number and increase it by one.
-OLDREV=`svn info -r HEAD | grep Revision | sed "s/Revision: \([0-9]*\)/\1/g"`
-let REVISION=OLDREV+1
-# Check for failed svn command
-if [ "$REVISION" = "1" ]
-then
-  echo "Failed."
-  exit 1
-fi
-echo "Current version is revision $OLDREV - committed version will be revision $REVISION..."
-
-# Determine svn URL
-URL=`svn info | grep URL | sed -e "s/URL: \(.*\)/\1/g" -e "s/https/http/g"`
-echo "Subversion repository is: "$URL
-
-# Get current date and time
-DATE=`date "+%a %d %b %Y - %H:%M"`
-
-# Change URL revision information
-echo "Setting revision information..."
-MAJOR=$(( REVISION/1000 ))
-MINOR=`printf "%02i" $(( REVISION%1000 ))`
-
-if [ "$TEST" = "false" ]
-then
-  sed -i -e "s/#define UCHROMAREVISION \"[0-9\.]\+\(.*\)\"/#define UCHROMAREVISION \"$REVISION\"/g" src/version.h
-  sed -i -e "s/#define UCHROMAVERSION \"[0-9\.]\+\"/#define UCHROMAVERSION \"$MAJOR.$MINOR\"/g" src/version.h
-  sed -i -e "s/#define UCHROMADATE \".\+\"/#define UCHROMADATE \"$DATE\"/g" src/version.h
-  sed -i -e "s/m4_define(\[UCHROMA_VERSION\],\[.\+\])/m4_define([UCHROMA_VERSION],[$MAJOR.$MINOR])/g" configure.ac
-  sed -i -e "s/set(VERSION_MAJOR \"[0-9]\+\")/set(VERSION_MAJOR \"$MAJOR\")/g" -e "s/set(VERSION_MINOR \"[0-9]\+\")/set(VERSION_MINOR \"$MINOR\")/g"  CMakeLists.txt
-  sed -i -e "s/Version: [0-9a-z\.]\+/Version: $MAJOR.$MINOR/g" extra/uchroma.spec
-  sed -i -e "s/Version: \([0-9a-z\.]\+\)/Version: $MAJOR.$MINOR/g" extra/uchroma.dsc
-  sed -i -e "s/APP_VERSION=\"[0-9a-z\.]\+\"/APP_VERSION=\"$MAJOR.$MINOR\"/g" extra/dmginfo.txt
-  #sed -i -e "s/Version=[0-9\.]*/Version=$MAJOR.$MINOR/g" extra/JournalViewer.desktop
+  ./changeversion bump
 else
-  sed -e "s/#define UCHROMAREVISION \"[0-9\.]\+\(.*\)\"/#define UCHROMAREVISION \"$REVISION\"/g" src/version.h | grep UCHROMAREVISION
-  sed -e "s/#define UCHROMAVERSION \"[0-9\.]\+\"/#define UCHROMAVERSION \"$MAJOR.$MINOR\"/g" src/version.h | grep UCHROMAVERSION
-  sed -e "s/#define UCHROMADATE \".\+\"/#define UCHROMADATE \"$DATE\"/g" src/version.h | grep UCHROMADATE
-  sed -e "s/m4_define(\[UCHROMA_VERSION\],\[.\+\])/m4_define([UCHROMA_VERSION],[$MAJOR.$MINOR])/g" configure.ac | head -n 10
-  sed -e "s/set(VERSION_MAJOR \"[0-9]\+\")/set(VERSION_MAJOR \"$MAJOR\")/g" -e "s/set(VERSION_MINOR \"[0-9]\+\")/set(VERSION_MINOR \"$MINOR\")/g"  CMakeLists.txt | head -n 9
-  sed -e "s/Version: [0-9a-z\.]\+/Version: $MAJOR.$MINOR/g" extra/uchroma.spec | grep "Version:"
-  sed -e "s/Version: \([0-9a-z\.]\+\)/Version: $MAJOR.$MINOR/g" extra/uchroma.dsc | grep "Version:"
-  sed -e "s/APP_VERSION=\"[0-9a-z\.]\+\"/APP_VERSION=\"$MAJOR.$MINOR\"/g" extra/dmginfo.txt | grep "APP_VERSION="
-  #sed -e "s/Version=[0-9\.]*/Version=$MAJOR.$MINOR/g" extra/JournalViewer.desktop | grep Version
-fi
-
-# If this was just a test we're done at this point
-if [ "$TEST" = "true" ]
-then
-  exit 0
+  ./changeversion
 fi
 
 # Commit changes
 if [ "$COMMITTYPE" = "file" ]
 then
-  svn commit -F $COMMITFILE
+  git commit -a -F $COMMITFILE
 fi
 if [ "$COMMITTYPE" = "msg" ]
 then
-  svn commit -m "$COMMITMSG"
+  git commit -a -m "$COMMITMSG"
+fi
+
+# Push changes to server?
+if [ "$PUSH" = "true" ]
+then
+  git push origin master --tags
 fi
 
 exit 0
-

@@ -30,7 +30,6 @@
 #include "render/fontinstance.h"
 #ifndef __APPLE__
 #include "render/glextensions.h"
-#include <../../aten/src/base/sginfo.h>
 #endif
 
 // Constructor

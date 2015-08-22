@@ -353,7 +353,7 @@ class Collection : public ListItem<Collection>, public ObjectStore<Collection>
 	 */
 	public:
 	// Display types enum
-	enum DisplayStyle { LineXYStyle, LineZYStyle, GridStyle, SurfaceStyle, nDisplayStyles };
+	enum DisplayStyle { LineXYStyle, LineZYStyle, GridStyle, SurfaceStyle, UnlitSurfaceStyle, nDisplayStyles };
 	// Convert text string to DisplayStyle
 	static DisplayStyle displayStyle(QString s);
 	// Convert DisplayStyle to text string

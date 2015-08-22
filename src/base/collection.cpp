@@ -1360,7 +1360,7 @@ int Collection::colourVersion()
  */
 
 // Suface Style Keywords
-const char* SurfaceStyleKeywords[] = { "LineXY", "LineZY", "Grid", "Surface" };
+const char* SurfaceStyleKeywords[] = { "LineXY", "LineZY", "Grid", "Surface", "UnlitSurface" };
 
 // Convert text string to DisplayStyle
 Collection::DisplayStyle Collection::displayStyle(QString s)
