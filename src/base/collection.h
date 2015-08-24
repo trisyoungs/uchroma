@@ -72,8 +72,10 @@ class Collection : public ListItem<Collection>, public ObjectStore<Collection>
 	DataSet* addDataSet();
 	// Add dataset at specified z
 	DataSet* addDataSet(double z);
-	// Add dataset, copying from supplied data
+	// Add dataset, copying from supplied DataSet
 	void addDataSet(DataSet* source);
+	// Add dataset, copying from supplied DisplayDataSet
+	void addDataSet(const Array<double>& abscissa, DisplayDataSet* source, bool pruneEmpty = true);
 	// Copy datasets from specified source collection
 	void copyDataSets(Collection* source);
 	// Return number of datasets

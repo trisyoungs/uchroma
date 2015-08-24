@@ -474,7 +474,9 @@ bool AxesWindow::titleAddSymbolButtonClicked(int axis)
 	if (symbolDialog.exec())
 	{
 		QString newTitle = currentAxes().title(axis) + symbolDialog.selectedSymbol();
-		ui.XTitleEdit->setText(newTitle);
+		if (axis == 0) ui.XTitleEdit->setText(newTitle);
+		else if (axis == 1) ui.YTitleEdit->setText(newTitle);
+		else ui.ZTitleEdit->setText(newTitle);
 
 		return true;
 	}
