@@ -443,6 +443,8 @@ class UChromaSession
 	static bool writeViewPaneBlock(LineParser& parser, ViewPane* pane);
 	
 	public:
+	// Current session file directory
+	static void setSessionFileDirectory(QDir dir);
 	// Return current session file directory
 	static QDir sessionFileDirectory();
 	// Set name of input file

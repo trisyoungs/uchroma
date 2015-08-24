@@ -45,6 +45,7 @@ int main(int argc, char *argv[])
 
 	/* Start a new, empty session */
 	UChromaSession::startNewSession(true);
+	UChromaSession::setSessionFileDirectory(QDir::current());
 
 	/* Do we have CLI options? */
 	if (argc > 1)

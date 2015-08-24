@@ -30,7 +30,7 @@ ImportDialog::ImportDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(p
 	ui.setupUi(this);
 
 	// Set widget values
-	currentDirectory_ = QDir::homePath();
+	currentDirectory_ = QDir::currentPath();
 	ui.DataFileEdit->setText(currentDirectory_.path());
 
 	// Set variable defaults

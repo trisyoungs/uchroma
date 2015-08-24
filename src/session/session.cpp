@@ -89,6 +89,18 @@ void UChromaSession::updateTitleBar()
  * Input File
  */
 
+// Current session file directory
+void UChromaSession::setSessionFileDirectory(QDir dir)
+{
+	sessionFileDirectory_ = dir;
+}
+
+// Return current session file directory
+QDir UChromaSession::sessionFileDirectory()
+{
+	return sessionFileDirectory_;
+}
+
 // Set name of input file
 void UChromaSession::setInputFile(QString fileName)
 {

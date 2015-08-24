@@ -883,12 +883,6 @@ bool UChromaSession::readViewPaneBlock(LineParser& parser, ViewPane* pane)
 	return false;
 }
 
-// Return current session file directory
-QDir UChromaSession::sessionFileDirectory()
-{
-	return sessionFileDirectory_;
-}
-
 // Set whether to enforce hard fail on input file error
 void UChromaSession::setHardIOFail(bool hardFail)
 {
