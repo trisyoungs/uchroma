@@ -244,13 +244,44 @@ DataSet* Collection::addDataSet(double z)
 	return dataSet;
 }
 
-// Add dataset, copying from supplied data
+// Add dataset, copying from supplied DataSet
 void Collection::addDataSet(DataSet* source)
 {
 	// Create new dataset
-	DataSet* dataSet = dataSets_.add();
+	DataSet* dataSet = addDataSet();
+
+	// Copy existing dataset data, overwriting parent just to make sure
 	(*dataSet) = (*source);
 	dataSet->setParent(this);
+
+	++dataVersion_;
+
+	UChromaSession::setAsModified();
+}
+
+// Add dataset, copying from supplied DisplayDataSet
+void Collection::addDataSet(const Array<double>& abscissa, DisplayDataSet* source, bool pruneEmpty)
+{
+	// Create new dataset
+	DataSet* dataSet = addDataSet();
+
+	// Grab references
+	const Array<double>& y = source->y();
+	const Array<DisplayDataSet::DataPointType>& yType = source->yType();
+
+	// Check sizes
+	if (abscissa.nItems() != y.nItems())
+	{
+		msg.print("Collection::addDataSet() : Abscissa and y arrays are of different sizes.\n");
+		return;
+	}
+
+	// Loop over points, adding points as we go (and pruning truly empty points if necessary)
+	for (int n=0; n<abscissa.nItems(); ++n)
+	{
+		if (pruneEmpty && (yType.value(n) == DisplayDataSet::NoPoint)) continue;
+		dataSet->addPoint(abscissa.value(n), y.value(n));
+	}
 
 	++dataVersion_;
 
@@ -646,21 +677,23 @@ int Collection::closestBin(int axis, double value)
 {
 	if (dataSets_.nItems() == 0) return -1;
 
+	// Make sure that display data is up-to-date
+	updateDisplayData();
+
 	if (axis == 0)
 	{
-		// Check X array of first slice
-		Array<double>& x = dataSets_.first()->transformedData().arrayX();
-		int midIndex, loIndex = 0, hiIndex = x.nItems() - 1;
-		if (value < x.value(0)) return 0;
-		if (value > x.value(hiIndex)) return hiIndex;
+		// Check display data abscissa for closest value
+		int midIndex, loIndex = 0, hiIndex = displayAbscissa_.nItems() - 1;
+		if (value < displayAbscissa_.value(0)) return 0;
+		if (value > displayAbscissa_.value(hiIndex)) return hiIndex;
 		// Binary... chop!
 		while ((hiIndex - loIndex) > 1)
 		{
 			midIndex = (hiIndex + loIndex) / 2;
-			if (x.value(midIndex) <= value) loIndex = midIndex;
+			if (displayAbscissa_.value(midIndex) <= value) loIndex = midIndex;
 			else hiIndex = midIndex;
 		}
-		if (fabs(x.value(loIndex) - value) < fabs(x.value(hiIndex) - value)) return loIndex;
+		if (fabs(displayAbscissa_.value(loIndex) - value) < fabs(displayAbscissa_.value(hiIndex) - value)) return loIndex;
 		else return hiIndex;
 	}
 	else if (axis == 1)
@@ -671,10 +704,10 @@ int Collection::closestBin(int axis, double value)
 	{
 		// Check z-values
 		int closest = 0, n = 0;
-		double delta, closestDelta = fabs(dataSets_.first()->transformedData().z() - value);
-		for (DataSet* dataSet = dataSets_.first()->next; dataSet != NULL; dataSet = dataSet->next)
+		double delta, closestDelta = fabs(displayData_.first()->z() - value);
+		for (DisplayDataSet* displayDataSet = displayData_.first()->next; displayDataSet != NULL; displayDataSet = displayDataSet->next)
 		{
-			delta = fabs(dataSet->transformedData().z() - value);
+			delta = fabs(displayDataSet->z() - value);
 			++n;
 			if (delta < closestDelta)
 			{
@@ -701,9 +734,9 @@ void Collection::getSlice(int axis, int bin)
 	{
 		DataSet* newDataSet = currentSlice_->addDataSet();
 
-		// Slice at fixed X, passing through closest point (if not interpolated) or actual value (if interpolated - TODO)
-		for (DataSet* dataSet = dataSets_.first(); dataSet != NULL; dataSet = dataSet->next) newDataSet->addPoint(dataSet->transformedData().z(), dataSet->transformedData().y(bin));
-		currentSlice_->setName("X = " + QString::number(dataSets_.first()->transformedData().x(bin)));
+		// Slice at fixed X - the bin will be an index from the displayAbscissa_ / displayData_ data.
+		for (DisplayDataSet* displayDataSet = displayData_.first(); displayDataSet != NULL; displayDataSet = displayDataSet->next) newDataSet->addPoint(displayDataSet->z(), displayDataSet->y().value(bin));
+		currentSlice_->setName("X = " + QString::number(displayAbscissa_.value(bin)));
 	}
 	else if (axis == 1)
 	{
@@ -711,9 +744,13 @@ void Collection::getSlice(int axis, int bin)
 	}
 	else if (axis == 2)
 	{
-		// Slice through Z - i.e. original slice data
-		currentSlice_->addDataSet(dataSets_[bin]);
-		currentSlice_->setName("Z = " + QString::number(dataSets_[bin]->transformedData().z()));
+		// Slice through Z
+		DisplayDataSet* displayDataSet = displayData_[bin];
+		if (displayDataSet)
+		{
+			currentSlice_->addDataSet(displayAbscissa_, displayDataSet);
+			currentSlice_->setName("Z = " + QString::number(displayDataSet->z()));
+		}
 	}
 }
 

@@ -60,7 +60,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
 // 	Qt::KeyboardModifiers km = event->modifiers();
 
 	// Notify uChroma that the mouse button has been released
-	uChroma_->endInteraction(event->x(), contextHeight_-event->y());
+	if (buttonState_&Qt::LeftButton) uChroma_->endInteraction(event->x(), contextHeight_-event->y());
 
 	uChroma_->updateGUI();
 	
