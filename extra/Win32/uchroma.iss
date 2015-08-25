@@ -8,7 +8,7 @@
 #define MyAppExeName "uChroma.exe"
 
 ; Locations of bin directories of Qt, GnuWin(32), and MinGW(32)
-#define QtDir "C:\Qt\4.8.4\qtbase"
+#define QtDir "C:\Qt\4.8.6"
 #define GnuWinDir "C:\GnuWin32"
 #define MinGWDir "C:\MinGW32"
 
@@ -16,7 +16,7 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{8DF93A4D-C712-41C4-B8EE-75484080B32F}
+AppId={{AF7D8DF6-2330-477E-A1F6-9DDB44BB1B1C}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
@@ -50,6 +50,13 @@ Source: "{#GnuWinDir}\bin\zlib1.dll"; DestDir: "{app}\bin"
 Source: "{#MinGWDir}\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\bin"
 Source: "{#MinGWDir}\bin\libstdc++-6.dll"; DestDir: "{app}\bin"
 Source: "{#MinGWDir}\bin\libwinpthread-1.dll"; DestDir: "{app}\bin"
+Source: "{#QtDir}\bin\QtCore4.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#QtDir}\bin\QtGui4.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#QtDir}\bin\QtOpenGL4.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#QtDir}\bin\QtSvg4.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#QtDir}\bin\QtXml4.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#QtDir}\plugins\iconengines\qsvgicon4.dll"; DestDir: "{app}\bin\iconengines"; Flags: ignoreversion
+Source: "{#QtDir}\plugins\imageformats\qsvg4.dll"; DestDir: "{app}\bin\imageformats"; Flags: ignoreversion
 ; Source: "{#QtDir}\bin\Qt5Gui.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 ; Source: "{#QtDir}\bin\Qt5Core.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 ; Source: "{#QtDir}\bin\Qt5OpenGL.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
@@ -61,7 +68,7 @@ Source: "{#MinGWDir}\bin\libwinpthread-1.dll"; DestDir: "{app}\bin"
 ; Source: "{#QtDir}\plugins\platforms\qwindows.dll"; DestDir: "{app}\bin\platforms"; Flags: ignoreversion
 ; Source: "{#QtDir}\plugins\imageformats\*.dll"; DestDir: "{app}\bin\imageformats"; Flags: ignoreversion
 ; Source: "C:\Windows\System32\D3DCompiler_43.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "Aten.ico"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "uChroma.ico"; DestDir: "{app}\bin"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\bin\uChroma.ico"
