@@ -38,7 +38,6 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
 Source: "..\..\build\bin\uChroma.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
@@ -47,6 +46,7 @@ Source: "uChroma.ico"; DestDir: "{app}\bin"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 Source: "{#GnuWinDir}\bin\freetype6.dll"; DestDir: "{app}\bin"
 Source: "{#GnuWinDir}\bin\zlib1.dll"; DestDir: "{app}\bin"
+Source: "{#GnuWinDir}\bin\libftgl.dll"; DestDir: "{app}\bin"
 Source: "{#MinGWDir}\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}\bin"
 Source: "{#MinGWDir}\bin\libstdc++-6.dll"; DestDir: "{app}\bin"
 Source: "{#MinGWDir}\bin\libwinpthread-1.dll"; DestDir: "{app}\bin"
@@ -68,12 +68,10 @@ Source: "{#QtDir}\plugins\imageformats\qsvg4.dll"; DestDir: "{app}\bin\imageform
 ; Source: "{#QtDir}\plugins\platforms\qwindows.dll"; DestDir: "{app}\bin\platforms"; Flags: ignoreversion
 ; Source: "{#QtDir}\plugins\imageformats\*.dll"; DestDir: "{app}\bin\imageformats"; Flags: ignoreversion
 ; Source: "C:\Windows\System32\D3DCompiler_43.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "uChroma.ico"; DestDir: "{app}\bin"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\bin\uChroma.ico"
-Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\bin\uChroma.ico"; Tasks: desktopicon
-Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\bin\uChroma.ico"; Tasks: quicklaunchicon
+Name: "{group}\{#MyAppName}"; IconFilename: "{app}\bin\uChroma.ico"; Filename: "{app}\bin\{#MyAppExeName}"; WorkingDir: "{app}"
+Name: "{commondesktop}\{#MyAppName}"; IconFilename: "{app}\bin\uChroma.ico"; Filename: "{app}\bin\{#MyAppExeName}"; WorkingDir: "{app}"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\bin\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
