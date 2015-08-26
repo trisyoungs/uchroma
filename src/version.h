@@ -1,7 +1,7 @@
 /*
 	*** uChroma version information
 	*** src/version.h
-	Copyright T. Youngs 2013-2014
+	Copyright T. Youngs 2013-2015
 
 	This file is part of uChroma.
 
@@ -22,9 +22,7 @@
 #ifndef UCHROMA_VERSION_H
 #define UCHROMA_VERSION_H
 
-#define UCHROMAREVISION "198"
 #define UCHROMAVERSION "0.2.0"
-#define UCHROMADATE "Fri 06 Feb 2015 - 13:56"
 #define UCHROMAURL "http://www.projectaten.net/uchroma"
 
 #endif
