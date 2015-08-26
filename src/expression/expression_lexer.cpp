@@ -1,7 +1,7 @@
 /*
 	*** Expression Parser Lexer
 	*** src/expression/expression_lexer.cpp
-	Copyright T. Youngs 2014
+	Copyright T. Youngs 2015
 
 	This file is part of uChroma.
 

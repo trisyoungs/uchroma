@@ -1,7 +1,7 @@
 /*
 	*** Column-Major (OpenGL-friendly) 4x4 Matrix class
 	*** src/math/matrix.h
-	Copyright T. Youngs 2013-2014
+	Copyright T. Youngs 2013-2015
 
 	This file is part of uChroma.
 

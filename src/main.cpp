@@ -1,7 +1,7 @@
 /*
 	*** uChroma Main
 	*** src/main.cpp
-	Copyright T. Youngs 2013-2014
+	Copyright T. Youngs 2013-2015
 
 	This file is part of uChroma.
 
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 			switch (argv[n][1])
 			{
 				case ('h'):
-					printf("UChroma version %s\n\nAvailable CLI options are:\n\n", UCHROMAVERSION);
+					printf("UChroma revision %s\n\nAvailable CLI options are:\n\n", UCHROMAVERSION);
 					printf("\t-h\t\tShow this help\n");
 					printf("\t-a\tForce warnings generated during input file read to be treated as errors.\n");
 					printf("\t-v\tEnable verbosity (for debugging purposes).\n");

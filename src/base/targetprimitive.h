@@ -1,7 +1,7 @@
 /*
 	*** Target Primitive
 	*** src/base/targetprimitive.h
-	Copyright T. Youngs 2013-2014
+	Copyright T. Youngs 2013-2015
 
 	This file is part of uChroma.
 
