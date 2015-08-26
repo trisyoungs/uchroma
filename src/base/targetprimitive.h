@@ -68,7 +68,7 @@ class TargetPrimitive : public ListItem<TargetPrimitive>
 
 	public:
 	// Update primitive for target collection, returning if data was changed
-	void updateAndSendPrimitive(const Axes& axes, bool forceUpdate, bool pushAndPop, const QGLContext* context, GLExtensions* extensions);
+	void updateAndSendPrimitive(const Axes& axes, bool forceUpdate, bool pushAndPop, const QOpenGLContext* context);
 	// Send primitive to GL
 	void sendToGL();
 };

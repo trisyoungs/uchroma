@@ -25,6 +25,8 @@
 #include "templates/reflist.h"
 #include "templates/variantpointer.h"
 #include "version.h"
+#include <QMessageBox>
+#include <QSettings>
 
 // Constructor
 UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
@@ -55,7 +57,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	loadSettings();
 
 	// Set UChroma pointers in widgets/dialogs where necessary
-	ui.MainView->setUChroma(this);
+	ui.MainView->setUChromaWindow(this);
 
 	// Load font for viewer
 	if (!QFile::exists(UChromaSession::viewerFontFileName())) QMessageBox::warning(this, "Font Error", "The specified font file '" + UChromaSession::viewerFontFileName() + "' does not exist.");

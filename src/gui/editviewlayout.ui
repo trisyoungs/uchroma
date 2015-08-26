@@ -642,7 +642,7 @@
   <customwidget>
    <class>PaneOrganiser</class>
    <extends>QWidget</extends>
-   <header>gui/paneorganiser.uih</header>
+   <header>gui/paneorganiser.hui</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -1,6 +1,6 @@
 /*
-	*** OpenGL Viewer Widget (subclassing QGLWidget)
-	*** src/gui/viewer.uih
+	*** OpenGL Viewer Widget (subclassing QOpenGLWidget)
+	*** src/gui/viewer.hui
 	Copyright T. Youngs 2013
 
 	This file is part of uChroma.
@@ -22,7 +22,9 @@
 #ifndef UCHROMA_VIEWER_H
 #define UCHROMA_VIEWER_H
 
-#include <QGLWidget>
+#include <QOpenGLWidget>
+#include <QOpenGLFunctions>
+#include <QOffscreenSurface>
 #include <QObject>
 #include "render/primitive.h"
 #include "base/axes.h"
@@ -39,7 +41,7 @@ class DisplayDataSet;
 class ViewPane;
 
 // Base rendering widget
-class Viewer : public QGLWidget
+class Viewer : public QOpenGLWidget, protected QOpenGLFunctions
 {
 	Q_OBJECT
 
@@ -54,33 +56,23 @@ class Viewer : public QGLWidget
 	 */
 	private:
 	// UChromaWindow pointer
-	UChromaWindow* uChroma_;
+	UChromaWindow* uChromaWindow_;
 	
 	public:
 	// Set UChromaWindow pointer
-	void setUChroma(UChromaWindow* ptr);
+	void setUChromaWindow(UChromaWindow* ptr);
 
 
 	/*
-	 * Character / Setup
+	 * Context / Character
 	 */
 	private:
-	// GLExtension pointer stack
-	List<GLExtensions> extensionsStack_;
 	// Width, height, and aspect ratio of the context
 	GLsizei contextWidth_, contextHeight_;
 	// Flag to indicate whether we may draw to the context
 	bool valid_;
 	// Flag indicating if we are currently drawing to this context
 	bool drawing_;
-	// Flag specifying whether we are currently rendering offscreen
-	bool renderingOffScreen_;
-	// Line width scaling factor to use (to adjust line width when saving images)
-	double lineWidthScaling_;
-	// String containing time taken to do last render
-	QString renderTime_;
-	// Collection to highlight in this pass
-	Collection* highlightCollection_;
 
 	protected:
 	// Initialise context widget (when created by Qt)
@@ -90,31 +82,49 @@ class Viewer : public QGLWidget
 	// Resize function
 	void resizeGL(int, int);
 
-	private:
-	// Setup basic GL properties
-	void setupGL();
-
 	public:
 	// Return the current height of the drawing area
 	GLsizei contextHeight() const;
 	// Return the current width of the drawing area
 	GLsizei contextWidth() const;
-	// Probe widget/context/format features
-	void probeFeatures();
 	// Check for GL error
 	void checkGlError();
 	// Refresh widget / scene
 	void postRedisplay();
+
+
+	/*
+	 * Scene Rendering
+	 */
+	private:
+	// Flag specifying whether we are currently rendering offscreen
+	bool renderingOffScreen_;
+	// Line width scaling factor to use (to adjust line width when saving images)
+	double lineWidthScaling_;
+	// Collection to highlight in this pass
+	Collection* highlightCollection_;
+	// Offscreen context
+        QOpenGLContext offscreenContext_;
+	// Offscreen surface
+	QOffscreenSurface offscreenSurface_;
+
+	private:
+	// Setup basic GL properties
+	void setupGL();
+	// Draw full scene
+	void renderFullScene();
+
+	public:
 	// Set whether we are currently rendering offscreen
 	void setRenderingOffScreen(bool b);
 	// Set line width and text scaling to use
 	void setObjectScaling(double scaling);
-	// Grab current contents of framebuffer
-	QPixmap frameBuffer();
-	// Render or grab image
-	QPixmap generateImage(int w, int h);
 	// Set collection to highlight in this pass
 	void setHighlightCollection(Collection* collection);
+	// Grab current contents of framebuffer
+	QPixmap frameBuffer();
+	// Render current scene at supplied size
+	QPixmap generateImage(int width, int height);
 
 
 	/*

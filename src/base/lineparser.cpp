@@ -141,10 +141,9 @@ bool LineParser::getNextArg(int optionMask, QString& destArg)
 	// Get the next input chunk from the internal string and put into argument specified.
 	msg.enter("LineParser::getNextArg");
 	bool done, hadquotes;
-	QChar c, quotechar;
+	char c, quotechar = '\0';
 	done = false;
 	hadquotes = false;
-	quotechar = QChar('\0');
 	endOfLine_ = false;
 
 	// Reset destArg
@@ -159,8 +158,8 @@ bool LineParser::getNextArg(int optionMask, QString& destArg)
 
 	while (linePos_ < lineLength_)
 	{
-		c = line_.at(linePos_);
-		switch (c.toAscii())
+		c = line_.at(linePos_).toLatin1();
+		switch (c)
 		{
 			// End of line markers
 			case (10):	// Line feed (\n)
@@ -186,7 +185,7 @@ bool LineParser::getNextArg(int optionMask, QString& destArg)
 			case (34):	// Double quotes
 			case (39):	// Single quotes
 				if (!(optionMask&LineParser::UseQuotes)) break;
-				if (quotechar == QChar('\0')) quotechar = c;
+				if (quotechar == '\0') quotechar = c;
 				else if (quotechar == c)
 				{
 					quotechar = '\0';
@@ -203,15 +202,15 @@ bool LineParser::getNextArg(int optionMask, QString& destArg)
 				else
 				{
 					// If the quotechar is a left brace and we have a right brace, stop quoting
-					if ((quotechar == QChar('{')) && (c == QChar('}')))
+					if ((quotechar == '{') && (c == '}'))
 					{
-						quotechar = QChar('\0');
+						quotechar = '\0';
 						break;
 					}
 					// If we are already quoting by some other means, add character and exit
-					if (quotechar != QChar('\0')) destArg += c;
+					if (quotechar != '\0') destArg += c;
 					// No previous quoting, so begin quoting if '{'
-					if (c == QChar('{')) quotechar = c;
+					if (c == '{') quotechar = c;
 				}
 				break;
 			// Parentheses

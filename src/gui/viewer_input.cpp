@@ -19,7 +19,7 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/viewer.uih"
+#include "gui/viewer.hui"
 #include "gui/uchroma.h"
 #include <QMouseEvent>
 
@@ -42,7 +42,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 	if (UChromaSession::setCurrentViewPane(event->x(), height()-event->y())) postRedisplay();
 
 	// Do something with the button press event (e.g. context menu function, or interaction start)
-	if (buttonState_&Qt::LeftButton) uChroma_->startInteraction(event->x(), contextHeight_-event->y(), km);
+	if (buttonState_&Qt::LeftButton) uChromaWindow_->startInteraction(event->x(), contextHeight_-event->y(), km);
 	else if (buttonState_&Qt::RightButton)
 	{
 
@@ -60,9 +60,9 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
 // 	Qt::KeyboardModifiers km = event->modifiers();
 
 	// Notify uChroma that the mouse button has been released
-	if (buttonState_&Qt::LeftButton) uChroma_->endInteraction(event->x(), contextHeight_-event->y());
+	if (buttonState_&Qt::LeftButton) uChromaWindow_->endInteraction(event->x(), contextHeight_-event->y());
 
-	uChroma_->updateGUI();
+	uChromaWindow_->updateGUI();
 	
 	msg.exit("Viewer::mouseReleaseEvent");
 }
@@ -107,9 +107,9 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 	}
 	
 	// Update interaction position
-	if (uChroma_->interactionAxis() != -1)
+	if (uChromaWindow_->interactionAxis() != -1)
 	{
-		uChroma_->updateInteractionPosition(event->x(), contextHeight_-event->y());
+		uChromaWindow_->updateInteractionPosition(event->x(), contextHeight_-event->y());
 		refresh = true;
 	}
 
@@ -117,7 +117,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 
 	setFocus();
 
-	if (refresh) uChroma_->updateGUI();
+	if (refresh) uChromaWindow_->updateGUI();
 }
 
 // Qt Signal (mouse wheel event)
@@ -145,7 +145,7 @@ void Viewer::wheelEvent(QWheelEvent *event)
 // Qt Virtual (mouse double click event)
 void Viewer::mouseDoubleClickEvent(QMouseEvent* event)
 {
-	uChroma_->doubleClickInteraction(event->x(), height()-event->y());
+	uChromaWindow_->doubleClickInteraction(event->x(), height()-event->y());
 }
 
 // Return mouse coordinates at last mousedown event

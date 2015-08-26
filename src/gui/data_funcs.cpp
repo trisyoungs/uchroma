@@ -26,6 +26,9 @@
 #include "session/session.h"
 #include "templates/reflist.h"
 #include "templates/variantpointer.h"
+#include <QFileDialog>
+#include <QProgressDialog>
+#include <QMessageBox>
 
 /*
  * Window Functions

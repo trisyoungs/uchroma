@@ -25,6 +25,7 @@
 #include "expression/variable.h"
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QDateTime>
 
 // Constructor
 OperateSetZDialog::OperateSetZDialog(QWidget* parent, Collection* targetCollection) : QDialog(parent)

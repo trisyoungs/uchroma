@@ -60,7 +60,7 @@ Collection* TargetPrimitive::collection()
  */
 
 // Update and send primitive
-void TargetPrimitive::updateAndSendPrimitive(const Axes& axes, bool forceUpdate, bool pushAndPop, const QGLContext* context, GLExtensions* extensions)
+void TargetPrimitive::updateAndSendPrimitive(const Axes& axes, bool forceUpdate, bool pushAndPop, const QOpenGLContext* context)
 {
 	// Check collection validity
 	if (!Collection::objectValid(collection_, "collection in TargetPrimitive::updateAndSendPrimitive")) return;
@@ -101,7 +101,7 @@ void TargetPrimitive::updateAndSendPrimitive(const Axes& axes, bool forceUpdate,
 		if ((!pushAndPop) && (primitive_.nInstances() != 0)) primitive_.popInstance(context);
 	
 		// Push a new instance to create the new display list / vertex array
-		primitive_.pushInstance(context, extensions);
+		primitive_.pushInstance(context);
 	}
 
 	// Send primitive

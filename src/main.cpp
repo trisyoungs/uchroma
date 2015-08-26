@@ -28,17 +28,15 @@ int main(int argc, char *argv[])
 // 	msg.addOutputType(Messenger::UndoRedo);
 
 	/* Create the main QApplication */
-	QApplication app(argc, argv, QApplication::GuiClient);
+	QApplication app(argc, argv);
 	QCoreApplication::setOrganizationName("uChroma");
 	QCoreApplication::setOrganizationDomain("www.projectaten.net");
 	QCoreApplication::setApplicationName("uChroma");
 
-	#if QT_VERSION >= 0x040600
-	QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
-	#endif
-
-	/* Tweak the default QGLFormat */
-	QGLFormat::defaultFormat().setSampleBuffers(true);
+	/* Tweak the default QSurfaceFormat */
+	QSurfaceFormat surfaceFormat;
+	surfaceFormat.setSamples(2);
+	QSurfaceFormat::setDefaultFormat(surfaceFormat);
 
 	/* Create the main window */
 	UChromaWindow mainWindow;

@@ -1,6 +1,6 @@
 /*
-	*** Viewer Functions
-	*** src/gui/viewer_funcs.cpp
+	*** Viewer - Main scene rendering
+	*** src/gui/viewer_scene.cpp
 	Copyright T. Youngs 2013-2014
 
 	This file is part of uChroma.
@@ -23,95 +23,80 @@
 #include "gui/uchroma.h"
 #include "base/messenger.h"
 #include "render/fontinstance.h"
+#include <QOpenGLFramebufferObjectFormat>
+#include <QPainter>
+#include <QProgressDialog>
 
-// Constructor
-Viewer::Viewer(QWidget *parent) : QOpenGLWidget(parent)
+// Setup basic GL properties (called each time before renderScene())
+void Viewer::setupGL()
 {
-	uChromaWindow_ = NULL;
+	msg.enter("Viewer::setupGL");
 
-	// Character / Setup
-	contextWidth_ = 0;
-	contextHeight_ = 0;
-	valid_ = false;
-	drawing_ = false;
-	renderingOffScreen_ = false;
-	highlightCollection_ = NULL;
+	// Define colours etc.
+	GLfloat backgroundColour[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	GLfloat spotlightAmbient[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	GLfloat spotlightDiffuse[4] = { 0.8f, 0.8f, 0.8f, 1.0f };
+	GLfloat spotlightSpecular[4] = { 0.7f, 0.7f, 0.7f, 1.0f };
+	GLfloat spotlightPosition[4] = { 1.0f, 1.0f, 0.0f, 0.0f };
+	GLfloat specularColour[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	// Query
-	objectQueryX_ = -1;
-	objectQueryY_ = -1;
-	depthAtQueryCoordinates_ = 1.0;
-	objectAtQueryCoordinates_ = Viewer::NoObject;
+	// Clear (background) colour
+	glClearColor(backgroundColour[0], backgroundColour[1], backgroundColour[2], backgroundColour[3]);
 
-	// Prevent QPainter from autofilling widget background
-	setAutoFillBackground(false);
+	// Perspective hint
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+
+	// Enable depth buffer
+	glEnable(GL_DEPTH_TEST);
+
+	// Smooth shading
+	glShadeModel(GL_SMOOTH);
+
+	// Auto-normalise surface normals
+	glEnable(GL_NORMALIZE);	
+
+	// Set up the light model
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glEnable(GL_LIGHTING);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, spotlightAmbient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, spotlightDiffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, spotlightSpecular);
+	glLightfv(GL_LIGHT0, GL_POSITION, spotlightPosition);
+	glEnable(GL_LIGHT0);
+
+	// Set specular reflection colour
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specularColour);
+
+	// Configure antialiasing
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+
+	// Configure fog effects
+//	glFogi(GL_FOG_MODE, GL_LINEAR);
+//	prefs.copyColour(Prefs::BackgroundColour, col);
+//	glFogfv(GL_FOG_COLOR, col);
+//	glFogf(GL_FOG_DENSITY, 0.35f);
+//	glHint(GL_FOG_HINT, GL_NICEST);
+//	glFogi(GL_FOG_START, prefs.depthNear());
+//	glFogi(GL_FOG_END, prefs.depthFar());
+//	glEnable(GL_FOG);
+	glDisable(GL_FOG);
+
+	// Configure face culling
+// 	glCullFace(GL_BACK);
+// 	glEnable(GL_CULL_FACE);
+
+	msg.exit("Viewer::setupGL");
 }
 
-// Destructor
-Viewer::~Viewer()
+// Draw full scene
+void Viewer::renderFullScene()
 {
-}
-
-// Set UChromaWindow pointer
-void Viewer::setUChromaWindow(UChromaWindow* ptr)
-{
-	uChromaWindow_ = ptr;
-}
-
-/*
- * Protected Qt Virtuals
- */
-
-// Initialise context widget (when created by Qt)
-void Viewer::initializeGL()
-{
-	msg.enter("Viewer::initializeGL");
-
-	// Setup function pointers to OpenGL extension functions
-	initializeOpenGLFunctions();
-
-	// Setup offscreen context
-	msg.print(Messenger::Verbose, "Setting up offscreen context and surface...");
-        offscreenContext_.setShareContext(context());
-        offscreenContext_.setFormat(context()->format());
-        offscreenContext_.create();
-        offscreenSurface_.setFormat(context()->format());
-	offscreenSurface_.create();
-	msg.print(Messenger::Verbose, "Done.");
-
-	// Check for vertex buffer extensions
-        if ((!hasOpenGLFeature(QOpenGLFunctions::Buffers)) && (PrimitiveInstance::globalInstanceType() == PrimitiveInstance::VBOInstance))
-	{
-		printf("VBO extension is requested but not available, so reverting to display lists instead.\n");
-		PrimitiveInstance::setGlobalInstanceType(PrimitiveInstance::ListInstance);
-	}
-
-	valid_ = true;
-
-	// Recalculate view layouts
-	UChromaSession::recalculateViewLayout(contextWidth_, contextHeight_);
-
-	msg.exit("Viewer::initializeGL");
-}
-
-void Viewer::paintGL()
-{
-	msg.enter("Viewer::paintGL");
+	msg.enter("Viewer::renderFullScene");
 
 	int axis;
-
-	// Do nothing if the canvas is not valid, or we are still drawing from last time, or the uChroma pointer has not been set
-	if ((!valid_) || drawing_ || (!uChromaWindow_))
-	{
-		msg.exit("Viewer::paintGL");
-		return;
-	}
-
-	// Set the drawing flag so we don't have any rendering clashes
-	drawing_ = true;
-
-	// Setup basic GL stuff
-	setupGL();
 
 	// Set colour mode
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
@@ -328,152 +313,123 @@ void Viewer::paintGL()
 // 		glVertex2i(pane->viewportMatrix()[2]-16, pane->viewportMatrix()[3]-2);
 // 		glEnd();
 	}
-
-	// Reset query coordinate
-	objectQueryX_ = -1;
-	objectQueryY_ = -1;
-
-	// Set the rendering flag to false
-	drawing_ = false;
 	
-	msg.exit("Viewer::paintGL");
+	msg.exit("Viewer::renderFullScene");
 }
 
-// Resize function
-void Viewer::resizeGL(int newwidth, int newheight)
-{
-	// Store the new width and height of the widget
-	contextWidth_ = (GLsizei) newwidth;
-	contextHeight_ = (GLsizei) newheight;
 
-	// Recalculate view layout
-	UChromaSession::recalculateViewLayout(contextWidth_, contextHeight_);
+// Set whether we are currently rendering offscreen
+void Viewer::setRenderingOffScreen(bool b)
+{
+	renderingOffScreen_ = b;
 }
 
-/*
-// Character / Setup
-*/
-
-// Return the current height of the drawing area
-GLsizei Viewer::contextHeight() const
+// Set line width and text scaling to use
+void Viewer::setObjectScaling(double scaling)
 {
-	return contextHeight_;
+	lineWidthScaling_ = scaling;
+
+	// Pass this value on to those that depend on it
+	LineStyle::setLineWidthScale(scaling);
+	TextPrimitive::setTextSizeScale(scaling);
 }
 
-// Return the current width of the drawing area
-GLsizei Viewer::contextWidth() const
+// Grab current contents of framebuffer
+QPixmap Viewer::frameBuffer()
 {
-	return contextWidth_;
+	return QPixmap::fromImage(grabFramebuffer());
 }
 
-// Check for GL error
-void Viewer::checkGlError()
+// Render or grab image
+QPixmap Viewer::generateImage(int width, int height)
 {
-	GLenum glerr = GL_NO_ERROR;
-	do
+	msg.print("Viewer::generateImage");
+
+	// Flag that we are rendering offscreen, and that we want high quality primitives
+	renderingOffScreen_ = true;
+
+	// Scale current line width and text scaling to reflect size of exported image
+	setObjectScaling( double(height) / double(contextHeight()) );
+
+	// Make the offscreen surface the current context
+	offscreenContext_.makeCurrent(&offscreenSurface_);
+
+	// Set tile size
+	int tileWidth = 512;
+	int tileHeight = 512;
+
+	// Initialise framebuffer format and object
+	QOpenGLFramebufferObjectFormat fboFormat;
+	fboFormat.setMipmap(true);
+	fboFormat.setSamples(4);
+	fboFormat.setAttachment(QOpenGLFramebufferObject::Depth);
+	QOpenGLFramebufferObject frameBufferObject(tileWidth, tileHeight, fboFormat);
+
+	if (!frameBufferObject.bind())
 	{
-		switch (glGetError())
-		{
-			case (GL_INVALID_ENUM): msg.print(Messenger::Verbose, "GLenum argument out of range\n"); break;
-			case (GL_INVALID_VALUE): msg.print(Messenger::Verbose, "Numeric argument out of range\n"); break;
-			case (GL_INVALID_OPERATION): msg.print(Messenger::Verbose, "Operation illegal in current state\n"); break;
-			case (GL_STACK_OVERFLOW): msg.print(Messenger::Verbose, "Command would cause a stack overflow\n"); break;
-			case (GL_STACK_UNDERFLOW): msg.print(Messenger::Verbose, "Command would cause a stack underflow\n"); break;
-			case (GL_OUT_OF_MEMORY): msg.print(Messenger::Verbose, "Not enough memory left to execute command\n"); break;
-			case (GL_NO_ERROR): msg.print(Messenger::Verbose, "No GL error\n"); break;
-			default:
-				msg.print(Messenger::Verbose, "Unknown GL error?\n");
-				break;
-		}
-	} while (glerr != GL_NO_ERROR);
-}
+		msg.print("Failed to bind framebuffer object when generating image.");
+		msg.exit("Viewer::generateImage");
+		return QPixmap();
+	}
 
-// Refresh widget / scene
-void Viewer::postRedisplay()
-{
-	if ((!valid_) || drawing_) return;
-	update();
-}
+	// Create a QPixmap of the desired full size and a QPainter for it
+	QPixmap pixmap = QPixmap(width, height);
+	QPainter painter(&pixmap);
 
-/*
- * Object Querying
- */
-
-// Update depth at query coordinates, returning whether it is closer
-bool Viewer::updateQueryDepth()
-{
-	// Return immediately if we are not querying
-	if (objectQueryX_ == -1) return false;
-
-	// Sample a small area centred at the supplied position
-	GLfloat depth[9];
+	// Calculate scale factors for ViewLayout, so that the context width/height is scaled to the desired image size
+	double xScale = double(width) / double(tileWidth);
+	double yScale = double(height) / double(tileHeight);
+	int nX = width / tileWidth + ((width%tileWidth) ? 1 : 0);
+	int nY = height / tileHeight + ((height%tileHeight) ? 1 : 0);
 	
-	glReadPixels(objectQueryX_, objectQueryY_, objectQueryWidth_, objectQueryHeight_, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+// 	UChromaSession::viewLayout().recalculate(tileWidth, tileHeight);  MAYBE?
 
-	bool result = false;
-	for (int i=0; i<objectQueryWidth_*objectQueryHeight_; ++i)
+	// Loop over tiles in x and y
+	QProgressDialog progress("Generating tiled image", "Cancel", 0, nX*nY, uChromaWindow_);
+	progress.setWindowTitle("uChroma");
+	progress.show();
+	for (int x=0; x<nX; ++x)
 	{
-		if (depth[i] < depthAtQueryCoordinates_)
+		for (int y=0; y<nY; ++y)
 		{
-			depthAtQueryCoordinates_ = depth[i];
-			result = true;
+			// Set progress value and check for cancellation
+			if (progress.wasCanceled()) break;
+			progress.setValue(x*nY+y);
+
+			// Recalculate view pane sizes to reflect current tile position and tile size
+			UChromaSession::viewLayout().setOffsetAndScale(-x*tileWidth, -y*tileHeight, xScale, yScale);
+
+			// Generate this tile
+			renderFullScene();
+			QPixmap tile = QPixmap::fromImage(frameBufferObject.toImage());
+
+			// Paste this tile into the main image
+			painter.drawPixmap(x*tileWidth, height-(y+1)*tileHeight, tile);
 		}
-	}
-	// 	printf("Current averageDepth at %i,%i is now %f\n", objectQueryX_, objectQueryY_, averageDepth);
-
-	return result;
-}
-
-// Set information of query object
-void Viewer::setQueryObject(Viewer::ViewObject objectType, QString info)
-{
-	objectAtQueryCoordinates_ = objectType;
-	infoAtQueryCoordinates_ = info;
-}
-
-// Set coordinates to query at next redraw
-void Viewer::setQueryCoordinates(int mouseX, int mouseY)
-{
-	depthAtQueryCoordinates_ = 1.0;
-	objectAtQueryCoordinates_ = Viewer::NoObject;
-	infoAtQueryCoordinates_.clear();
-
-	// Check for invalid coordinates
-	if ((mouseX < 0) || (mouseX >= width()) || (mouseY < 0) || (mouseY >= height()))
-	{
-		objectQueryX_ = -1;
-		objectQueryY_ = -1;
-		return;
+		if (progress.wasCanceled()) break;
 	}
 
-	// Setup area to sample around central pixel
-	objectQueryWidth_ = 3;
-	objectQueryX_ = mouseX-1;
-	if (mouseX == 0)
-	{
-		--objectQueryWidth_;
-		++mouseX;
-	}
-	else if (mouseX == (width()-1)) --objectQueryWidth_;
+	// Finalise and save
+	painter.end();
 
-	objectQueryHeight_ = 3;
-	objectQueryY_ = mouseY-1;
-	if (mouseY == 0)
-	{
-		--objectQueryHeight_;
-		++mouseY;
-	}
-	else if (mouseY == (height()-1)) --objectQueryHeight_;
+	// Reset line width and text size
+	setObjectScaling(1.0);
+
+	// Make sure the Viewer knows we no longer want offscreen rendering, and revert to normal quality primitives
+	renderingOffScreen_ = false;
+
+	// The sizes of panes may now be incorrect, so reset everything
+	UChromaSession::viewLayout().setOffsetAndScale(0, 0, 1.0, 1.0);
+	UChromaSession::viewLayout().recalculate(contextWidth_, contextHeight_);
+
+	// Reset context back to main view
+	makeCurrent();
+
+	return pixmap;
 }
 
-// Return object type at query coordinates
-Viewer::ViewObject Viewer::objectAtQueryCoordinates()
+// Set collection to highlight in this pass
+void Viewer::setHighlightCollection(Collection* collection)
 {
-	return objectAtQueryCoordinates_;
-}
-
-// Info for object at query coordinates
-QString Viewer::infoAtQueryCoordinates()
-{
-	return infoAtQueryCoordinates_;
+	highlightCollection_ = collection;
 }

@@ -34,7 +34,7 @@
 #include "templates/list.h"
 
 // Forward Declarations
-class QGLContext;
+class QOpenGLContext;
 class GLExtensions;
 
 // Primitive Instance
@@ -50,7 +50,7 @@ class PrimitiveInstance : public ListItem<PrimitiveInstance>
 	// Global instance type to use
 	static PrimitiveInstance::InstanceType globalInstanceType_;
 	// Context to which primitive instance is associated
-	const QGLContext *context_;
+	const QOpenGLContext* context_;
 	// GL extension function pointers for this context
 	GLExtensions* extensions_;
 	// Type of instance
@@ -68,23 +68,21 @@ class PrimitiveInstance : public ListItem<PrimitiveInstance>
 	// Set global instance type to use
 	static void setGlobalInstanceType(PrimitiveInstance::InstanceType instanceType);
 	// Return context to which primitive instance is associated
-	const QGLContext *context();
-	// Set exensions object
-	void setExtensions(GLExtensions* extensions);
+	const QOpenGLContext* context();
 	// Return GL extensions
 	const GLExtensions* extensions() const;
 	// Set display list data
-	void setDisplayList(const QGLContext *context, GLuint listObject);
+	void setDisplayList(const QOpenGLContext* context, GLuint listObject);
 	// Set vbo object data
-	void setVBO(const QGLContext *context, GLuint vertexObject, GLuint indexObject);
+	void setVBO(const QOpenGLContext* context, GLuint vertexObject, GLuint indexObject);
 	// Return type of instance
-	InstanceType type();
+	InstanceType type() const;
 	// Return display list object for instance
-	GLuint listObject();
+	GLuint listObject() const;
 	// Return VBO ID of vertex array for instance
-	GLuint vboVertexObject();
+	GLuint vboVertexObject() const;
 	// Return VBO ID of index array for instance
-	GLuint vboIndexObject();
+	GLuint vboIndexObject() const;
 };
 
 #endif

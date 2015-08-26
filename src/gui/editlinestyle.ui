@@ -152,7 +152,7 @@
   <customwidget>
    <class>ColourButton</class>
    <extends>QPushButton</extends>
-   <header>gui/colourbutton.uih</header>
+   <header>gui/colourbutton.hui</header>
   </customwidget>
  </customwidgets>
  <tabstops>

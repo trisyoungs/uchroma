@@ -457,7 +457,7 @@
   <customwidget>
    <class>TExponentialSpin</class>
    <extends>QWidget</extends>
-   <header>gui/texponentialspin.uih</header>
+   <header>gui/texponentialspin.hui</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

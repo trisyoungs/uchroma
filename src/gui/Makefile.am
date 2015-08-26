@@ -41,7 +41,7 @@ libgui_a_SOURCES += colourbutton.hui colourbutton_funcs.cpp
 libgui_a_SOURCES += gradientbar.hui gradientbar_funcs.cpp
 libgui_a_SOURCES += paneorganiser.hui paneorganiser_funcs.cpp
 
-libgui_a_SOURCES += viewer.hui viewer_funcs.cpp viewer_input.cpp
+libgui_a_SOURCES += viewer.hui viewer_funcs.cpp viewer_input.cpp viewer_scene.cpp
 
 noinst_HEADERS = uchroma.h axes.h create.h data.h import.h log.h saveimage.h style.h transform.h view.h
 noinst_HEADERS += editdataset.h editfitkernel.h editfitresults.h editlinestyle.h editnumberformat.h editreference.h editviewlayout.h

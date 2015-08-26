@@ -26,7 +26,7 @@
 #include "templates/list.h"
 
 // Forward Declarations
-class QGLContext;
+class QOpenGLContext;
 class Viewer;
 
 // Rendering Primitive List
@@ -59,9 +59,9 @@ class PrimitiveList
 	// Return total number of defined indices
 	int nDefinedIndices();
 	// Push instance layer
-	void pushInstance(const QGLContext *context, GLExtensions* extensions);
+	void pushInstance(const QOpenGLContext* context);
 	// Pop topmost instance layer
-	void popInstance(const QGLContext *context);
+	void popInstance(const QOpenGLContext* context);
 	// Return number of instances of topmost primitive
 	int nInstances();
 	// Send to OpenGL (i.e. render)

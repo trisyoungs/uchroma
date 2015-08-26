@@ -19,7 +19,7 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/texponentialspin.uih"
+#include "gui/texponentialspin.hui"
 #include <QLineEdit>
 
 // Constructor

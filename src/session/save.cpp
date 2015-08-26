@@ -23,6 +23,7 @@
 #include "gui/uchroma.h"
 #include "kernels/fit.h"
 #include "base/lineparser.h"
+#include <QMessageBox>
 
 // Return boolean string based on integer value
 const char* stringBool(int i)

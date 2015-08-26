@@ -89,13 +89,13 @@ int PrimitiveList::nDefinedIndices()
 }
 
 // Push instance layer
-void PrimitiveList::pushInstance(const QGLContext* context, GLExtensions* extensions)
+void PrimitiveList::pushInstance(const QOpenGLContext* context)
 {
-	for (Primitive* prim = primitives_.first(); prim != NULL; prim = prim->next) prim->pushInstance(context, extensions);
+	for (Primitive* prim = primitives_.first(); prim != NULL; prim = prim->next) prim->pushInstance(context);
 }
 
 // Pop topmost instance layer
-void PrimitiveList::popInstance(const QGLContext *context)
+void PrimitiveList::popInstance(const QOpenGLContext* context)
 {
 	for (Primitive* prim = primitives_.first(); prim != NULL; prim = prim->next) prim->popInstance(context);
 }

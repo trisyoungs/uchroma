@@ -19,7 +19,7 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/gradientbar.uih"
+#include "gui/gradientbar.hui"
 #include <QPainter>
 
 /*

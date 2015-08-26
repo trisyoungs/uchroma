@@ -3,7 +3,6 @@ bison_target(TextPrimitiveParser textprimitive_grammar.yy ${CMAKE_CURRENT_BINARY
 add_library(render
   ${BISON_TextPrimitiveParser_OUTPUTS}
   fontinstance.cpp
-  glextensions.cpp
   linestipple.cpp
   linestyle.cpp
   primitive.cpp
@@ -21,7 +20,6 @@ add_library(render
   textprimitivelist.cpp
   vertexchunk.cpp
   fontinstance.h
-  glextensions.h
   linestipple.h
   linestyle.h
   primitive.h

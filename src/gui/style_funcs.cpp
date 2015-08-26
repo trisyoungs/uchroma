@@ -23,6 +23,7 @@
 #include "gui/uchroma.h"
 #include "session/session.h"
 #include "templates/reflist.h"
+#include <QColorDialog>
 
 /*
  * Window Functions

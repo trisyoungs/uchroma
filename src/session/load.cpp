@@ -23,6 +23,8 @@
 #include "gui/uchroma.h"
 #include "kernels/fit.h"
 #include "base/lineparser.h"
+#include <QMessageBox>
+#include <QFileDialog>
 
 #define CHECKIOFAIL { if (hardIOFail_) { return false; } else { break; } }
 

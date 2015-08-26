@@ -20,6 +20,7 @@
 */
 
 #include "gui/selectsymbol.h"
+#include <qt5/QtWidgets/qheaderview.h>
 #include "templates/variantpointer.h"
 #include <QScrollBar>
 
@@ -225,7 +226,7 @@ void SelectSymbolDialog::updateTable(bool force)
 
 	// Flag the last column to absorb any extra space
 	QHeaderView *header = ui.SymbolTable->horizontalHeader();
-	if (header) header->setResizeMode(nDisplayColumns-1, QHeaderView::Stretch);
+	if (header) header->setStretchLastSection(true);
 
 	// Set sizes of all columns except the last
 	for (int n=0; n<nDisplayColumns; ++n) ui.SymbolTable->setColumnWidth(n, itemSize_ + widthRemainder/nDisplayColumns);

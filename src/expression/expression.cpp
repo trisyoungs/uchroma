@@ -107,7 +107,7 @@ char Expression::getChar()
 	if (stringPos_ == stringLength_) return 0;
 
 	// Return current char
-	c = stringSource_.at(stringPos_).toAscii();
+	c = stringSource_.at(stringPos_).toLatin1();
 	stringPos_++;
 	return c;
 }
@@ -115,7 +115,7 @@ char Expression::getChar()
 // Peek next character from current input stream
 char Expression::peekChar()
 {
-	return (stringPos_ == stringLength_ ? 0 : stringSource_.at(stringPos_).toAscii());
+	return (stringPos_ == stringLength_ ? 0 : stringSource_.at(stringPos_).toLatin1());
 }
 
 // 'Replace' last character read from current input stream

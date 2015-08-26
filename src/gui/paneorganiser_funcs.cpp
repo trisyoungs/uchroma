@@ -19,10 +19,12 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gui/paneorganiser.uih"
+#include "gui/paneorganiser.hui"
 #include "base/viewlayout.h"
 #include <QPainter>
 #include <QMouseEvent>
+#include <QMimeData>
+#include <QDrag>
 
 // Constructor
 PaneOrganiser::PaneOrganiser(QWidget* parent) : QWidget(parent)

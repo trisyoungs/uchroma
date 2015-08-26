@@ -32,6 +32,7 @@ SET(qtproject_SRCS
   texponentialspin_funcs.cpp
   viewer_funcs.cpp
   viewer_input.cpp
+  viewer_scene.cpp
 
   uchroma_collection.cpp
   uchroma_funcs.cpp
@@ -52,11 +53,11 @@ SET(qtproject_SRCS
 )
 
 SET(pro_MOC_HDRS
-  colourbutton.uih
-  gradientbar.uih
-  paneorganiser.uih
-  texponentialspin.uih
-  viewer.uih
+  colourbutton.hui
+  gradientbar.hui
+  paneorganiser.hui
+  texponentialspin.hui
+  viewer.hui
 
   editdataset.h
   editfitkernel.h

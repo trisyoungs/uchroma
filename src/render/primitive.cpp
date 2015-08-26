@@ -20,9 +20,9 @@
 */
 
 #include "base/messenger.h"
-#include "render/glextensions.h"
 #include "render/primitive.h"
 #include <string.h>
+#include <QOpenGLContext>
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
 #endif
@@ -89,7 +89,7 @@ void Primitive::setNoInstances()
 }
 
 // Push instance of primitive
-void Primitive::pushInstance(const QGLContext* context, GLExtensions* extensions)
+void Primitive::pushInstance(const QOpenGLContext* context)
 {
 	// Does this primitive use instances?
 	if (!useInstances_) return;
@@ -98,8 +98,10 @@ void Primitive::pushInstance(const QGLContext* context, GLExtensions* extensions
 	glGetError();
 
 	// Create new instance
-	PrimitiveInstance *pi = instances_.add();
-	pi->setExtensions(extensions);
+	PrimitiveInstance* pi = instances_.add();
+
+	// Get QOpenGLFunctions object from supplied context
+	QOpenGLFunctions* functions = context->functions();
 
 	// Vertex buffer object or plain old display list?
 	if (PrimitiveInstance::globalInstanceType() == PrimitiveInstance::VBOInstance)
@@ -118,43 +120,43 @@ void Primitive::pushInstance(const QGLContext* context, GLExtensions* extensions
 		int vboSize = vertexChunk_.nDefinedVertices() * (colouredVertexData_ ? 10 : 6) * sizeof(GLfloat);
 		
 		// Generate vertex array object
-		extensions->glGenBuffers(1, &vertexVBO);
+		functions->glGenBuffers(1, &vertexVBO);
 
 		// Bind VBO
-		extensions->glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
+		functions->glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
 		
 		// Initialise vertex array data
-		extensions->glBufferData(GL_ARRAY_BUFFER, vboSize, vertexChunk_.vertexData(), GL_STATIC_DRAW);
-		if (glGetError() != GL_NO_ERROR)
+		functions->glBufferData(GL_ARRAY_BUFFER, vboSize, vertexChunk_.vertexData(), GL_STATIC_DRAW);
+		if (functions->glGetError() != GL_NO_ERROR)
 		{
-			extensions->glBindBuffer(GL_ARRAY_BUFFER, 0);
+			functions->glBindBuffer(GL_ARRAY_BUFFER, 0);
 			printf("Error occurred while generating vertex buffer object for Primitive.\n");
-			extensions->glDeleteBuffers(1, &vertexVBO);
+			functions->glDeleteBuffers(1, &vertexVBO);
 			vertexVBO = 0;
 			return;
 		}
-		extensions->glBindBuffer(GL_ARRAY_BUFFER, 0);
+		functions->glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		// Generate index array object (if using indices)
 		if (vertexChunk_.hasIndices())
 		{
 			// Generate index array object
-			extensions->glGenBuffers(1, &indexVBO);
+			functions->glGenBuffers(1, &indexVBO);
 
 			// Bind VBO
-			extensions->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBO);
+			functions->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBO);
 			
 			// Initialise index array data
-			extensions->glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexChunk_.nDefinedIndices()*sizeof(GLuint), vertexChunk_.indexData(), GL_STATIC_DRAW);
-			if (glGetError() != GL_NO_ERROR)
+			functions->glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexChunk_.nDefinedIndices()*sizeof(GLuint), vertexChunk_.indexData(), GL_STATIC_DRAW);
+			if (functions->glGetError() != GL_NO_ERROR)
 			{
-				extensions->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+				functions->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 				printf("Error occurred while generating index buffer object for Primitive.\n");
-				extensions->glDeleteBuffers(1, &indexVBO);
+				functions->glDeleteBuffers(1, &indexVBO);
 				indexVBO = 0;
 				return;
 			}
-			extensions->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			functions->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
 		// Store instance data
@@ -164,7 +166,7 @@ void Primitive::pushInstance(const QGLContext* context, GLExtensions* extensions
 	{
 		// Generate display list
 		int listId = glGenLists(1);
-		if (listId == 0) msg.print("Primitive::pushInstance - glGenLists(1) returned 0!\n!");
+		if (listId == 0) msg.print("Primitive::pushInstance - functions->glGenLists(1) returned 0!\n!");
 		else
 		{
 			glNewList(listId, GL_COMPILE);
@@ -178,10 +180,14 @@ void Primitive::pushInstance(const QGLContext* context, GLExtensions* extensions
 }
 
 // Pop topmost instance on primitive's stack
-void Primitive::popInstance(const QGLContext *context)
+void Primitive::popInstance(const QOpenGLContext* context)
 {
 	// Does this primitive use instances?
 	if (!useInstances_) return;
+
+	// Get QOpenGLFunctions object from supplied context
+	QOpenGLFunctions* functions = context->functions();
+
 	PrimitiveInstance *pi = instances_.last();
 	if (pi != NULL)
 	{
@@ -190,13 +196,12 @@ void Primitive::popInstance(const QGLContext *context)
 			// Vertex buffer object or plain old display list?
 			if (pi->type() == PrimitiveInstance::VBOInstance)
 			{
-				const GLExtensions* extensions = pi->extensions();
 				GLuint bufid  = pi->vboVertexObject();
-				if (bufid != 0) extensions->glDeleteBuffers(1, &bufid);
+				if (bufid != 0) functions->glDeleteBuffers(1, &bufid);
 				if (vertexChunk_.hasIndices())
 				{
 					bufid = pi->vboIndexObject();
-					if (bufid != 0) extensions->glDeleteBuffers(1, &bufid);
+					if (bufid != 0) functions->glDeleteBuffers(1, &bufid);
 				}
 			}
 			else if (pi->listObject() != 0) glDeleteLists(pi->listObject(),1);
@@ -212,7 +217,7 @@ int Primitive::nInstances()
 }
 
 // Send to OpenGL (i.e. render)
-void Primitive::sendToGL() const
+void Primitive::sendToGL()
 {
 	// If no vertices are defined, nothing to do...
 	if (vertexChunk_.nDefinedVertices() == 0) return;
@@ -225,7 +230,9 @@ void Primitive::sendToGL() const
 		if (pi == NULL) printf("Internal Error: No instance on stack in primitive %p.\n", this);
 		else if (pi->type() == PrimitiveInstance::VBOInstance)
 		{
-			const GLExtensions* extensions = pi->extensions();
+			// Get QOpenGLFunctions object from supplied context
+			QOpenGLFunctions* functions = pi->context()->functions();
+
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glEnableClientState(GL_NORMAL_ARRAY);
 			glEnableClientState(GL_COLOR_ARRAY);
@@ -233,16 +240,16 @@ void Primitive::sendToGL() const
 			else glDisableClientState(GL_INDEX_ARRAY);
 
 			// Bind VBO and index buffer (if using it)
-			extensions->glBindBuffer(GL_ARRAY_BUFFER, pi->vboVertexObject());
-			if (vertexChunk_.hasIndices()) extensions->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pi->vboIndexObject());
+			functions->glBindBuffer(GL_ARRAY_BUFFER, pi->vboVertexObject());
+			if (vertexChunk_.hasIndices()) functions->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pi->vboIndexObject());
 
 			glInterleavedArrays(colouredVertexData_ ? GL_C4F_N3F_V3F : GL_N3F_V3F, 0, NULL);
 			if (vertexChunk_.hasIndices()) glDrawElements(type_, vertexChunk_.nDefinedIndices(), GL_UNSIGNED_INT, 0);
 			else glDrawArrays(type_, 0, vertexChunk_.nDefinedVertices());
 
 			// Revert to normal operation - pass 0 as VBO index
-			extensions->glBindBuffer(GL_ARRAY_BUFFER, 0);
-			if (vertexChunk_.hasIndices()) extensions->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			functions->glBindBuffer(GL_ARRAY_BUFFER, 0);
+			if (vertexChunk_.hasIndices()) functions->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glDisableClientState(GL_VERTEX_ARRAY);
 			glDisableClientState(GL_NORMAL_ARRAY);
 			glDisableClientState(GL_COLOR_ARRAY);
