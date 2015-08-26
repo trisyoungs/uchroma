@@ -79,8 +79,8 @@ void UChromaSession::updateTitleBar()
 	// Do nothing if the modification status is the same as it was last time we were called
 	if (modified_ == lastTitleBarModificationStatus_) return;
 
-	if (modified_) uChroma_->setWindowTitle("uChroma v" + QString(UCHROMAREVISION) + " - " + inputFile_ + " (modified) ");
-	else uChroma_->setWindowTitle("uChroma v" + QString(UCHROMAREVISION) + " - " + inputFile_);
+	if (modified_) uChroma_->setWindowTitle("uChroma v" + QString(UCHROMAVERSION) + " - " + inputFile_ + " (modified) ");
+	else uChroma_->setWindowTitle("uChroma v" + QString(UCHROMAVERSION) + " - " + inputFile_);
 
 	lastTitleBarModificationStatus_ = modified_;
 }

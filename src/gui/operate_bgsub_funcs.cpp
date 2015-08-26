@@ -1,7 +1,7 @@
 /*
 	*** Operate - Background Subtraction Functions
 	*** src/gui/operate_bgsub_funcs.cpp
-	Copyright T. Youngs 2012-2014
+	Copyright T. Youngs 2012-2015
 
 	This file is part of uChroma.
 

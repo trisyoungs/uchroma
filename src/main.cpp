@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 			switch (argv[n][1])
 			{
 				case ('h'):
-					printf("UChroma revision %s, %s\n\nAvailable CLI options are:\n\n", UCHROMAREVISION, UCHROMADATE);
+					printf("UChroma version %s\n\nAvailable CLI options are:\n\n", UCHROMAVERSION);
 					printf("\t-h\t\tShow this help\n");
 					printf("\t-a\tForce warnings generated during input file read to be treated as errors.\n");
 					printf("\t-v\tEnable verbosity (for debugging purposes).\n");
