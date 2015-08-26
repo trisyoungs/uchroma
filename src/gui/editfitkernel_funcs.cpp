@@ -27,7 +27,7 @@
 #include "expression/variable.h"
 #include "kernels/fit.h"
 #include "templates/variantpointer.h"
-#include <QtGui/QMessageBox>
+#include <QMessageBox>
 
 // Constructor
 EditFitKernelDialog::EditFitKernelDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(parent)

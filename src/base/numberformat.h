@@ -22,7 +22,7 @@
 #ifndef UCHROMA_NUMBERFORMAT_H
 #define UCHROMA_NUMBERFORMAT_H
 
-#include <QtCore/QString>
+#include <QString>
 
 // Forward Declarations
 /* none */

@@ -20,8 +20,8 @@
 */
 
 #include "gui/colourbutton.uih"
-#include <QtGui/QPainter>
-#include <QtGui/QColorDialog>
+#include <QPainter>
+#include <QColorDialog>
 
 /*
  * ColourButton

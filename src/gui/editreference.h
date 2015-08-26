@@ -24,7 +24,7 @@
 
 #include "gui/ui_editreference.h"
 #include "base/referencevariable.h"
-#include <QtGui/QDialog>
+#include <QDialog>
 
 // Forward Declarations
 class FitKernel;

@@ -25,7 +25,7 @@
 #include "base/data2d.h"
 #include "base/transformer.h"
 #include "templates/list.h"
-#include <QtCore/QDir>
+#include <QDir>
 
 // Forward Declarations
 class QTreeWidgetItem;

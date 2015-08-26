@@ -21,7 +21,7 @@
 
 #include "gui/saveimage.h"
 #include "gui/uchroma.h"
-#include <QtGui/QFileDialog>
+#include <QFileDialog>
 
 // Constructor
 SaveImageDialog::SaveImageDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(parent)

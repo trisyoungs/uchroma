@@ -24,7 +24,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <QtCore/QString>
+#include <QString>
 
 // Forward declarations
 template <class T> class List;

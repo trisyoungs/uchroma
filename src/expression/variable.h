@@ -23,7 +23,7 @@
 #define UCHROMA_VARIABLE_H
 
 #include "expression/node.h"
-#include <QtCore/QString>
+#include <QString>
 
 // Variable
 class Variable : public Node

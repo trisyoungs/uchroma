@@ -23,8 +23,8 @@
 #include "base/collection.h"
 #include "base/lineparser.h"
 #include "expression/variable.h"
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <QFileDialog>
+#include <QMessageBox>
 
 // Constructor
 OperateSetZDialog::OperateSetZDialog(QWidget* parent, Collection* targetCollection) : QDialog(parent)

@@ -24,7 +24,7 @@
 
 #include "gui/ui_editlinestyle.h"
 #include "render/linestyle.h"
-#include <QtGui/QDialog>
+#include <QDialog>
 
 // Forward Declarations
 /* none */

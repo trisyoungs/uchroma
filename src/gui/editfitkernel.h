@@ -22,8 +22,8 @@
 #ifndef UCHROMA_EDITFITKERNELDIALOG_H
 #define UCHROMA_EDITFITKERNELDIALOG_H
 
-#include <QtGui/QDialog>
-#include <QtCore/QObject>
+#include <QDialog>
+#include <QObject>
 #include "gui/ui_editfitkernel.h"
 #include "base/data2d.h"
 #include "base/equationvariable.h"

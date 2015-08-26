@@ -22,7 +22,7 @@
 #ifndef UCHROMA_EDITSTATE_H
 #define UCHROMA_EDITSTATE_H
 
-#include <QtCore/QString>
+#include <QString>
 #include "session/editstatedata.h"
 #include "templates/objectstore.h"
 #include "templates/vector3.h"

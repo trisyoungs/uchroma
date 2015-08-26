@@ -23,7 +23,7 @@
 #define UCHROMA_EDITFITRESULTSDIALOG_H
 
 #include "gui/ui_editfitresults.h"
-#include <QtGui/QDialog>
+#include <QDialog>
 
 // Forward Declarations
 class Collection;

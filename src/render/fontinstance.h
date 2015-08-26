@@ -24,7 +24,7 @@
 
 #include "templates/vector3.h"
 #include <FTGL/ftgl.h>
-#include <QtCore/QString>
+#include <QString>
 
 // Forward Declarations
 /* none */

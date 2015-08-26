@@ -22,7 +22,7 @@
 #ifndef UCHROMA_EDITSTATEGROUP_H
 #define UCHROMA_EDITSTATEGROUP_H
 
-#include <QtCore/QString>
+#include <QString>
 #include "session/editstate.h"
 #include "session/editstatedata.h"
 

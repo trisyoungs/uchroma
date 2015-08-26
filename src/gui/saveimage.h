@@ -24,7 +24,7 @@
 
 #include "gui/ui_saveimage.h"
 #include "session/session.h"
-#include <QtGui/QDialog>
+#include <QDialog>
 
 // Forward Declarations
 /* None */

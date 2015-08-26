@@ -27,7 +27,7 @@
 #include "math/cuboid.h"
 #include "templates/vector3.h"
 #include "templates/list.h"
-#include <QtCore/QString>
+#include <QString>
 
 // Forward Declarations
 class ViewPane;

@@ -10,5 +10,5 @@ libexpression_a_SOURCES += expression.cpp expression_lexer.cpp functionnode.cpp 
 
 noinst_HEADERS = expression.h functionnode.h functions.h node.h variable.h variablenode.h
 
-libexpression_a_CPPFLAGS = -I$(top_srcdir)/src -I../  @GUI_CFLAGS@
+libexpression_a_CPPFLAGS = -I$(top_srcdir)/src -I../  @UCHROMA_CFLAGS@
 

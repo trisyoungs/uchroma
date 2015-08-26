@@ -24,7 +24,7 @@
 #include "math/constants.h"
 #include <stdarg.h>
 #include <stdio.h>
-#include <QtGui/QTextBrowser>
+#include <QTextBrowser>
 
 // Singleton
 Messenger msg;

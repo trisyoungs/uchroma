@@ -25,7 +25,7 @@
 #include "base/viewpane.h"
 #include "base/collection.h"
 #include "templates/list.h"
-#include <QtCore/QString>
+#include <QString>
 
 // Forward Declarations
 /* none */

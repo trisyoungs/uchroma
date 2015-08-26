@@ -21,7 +21,7 @@
 
 #include "gui/viewer.uih"
 #include "gui/uchroma.h"
-#include <QtGui/QMouseEvent>
+#include <QMouseEvent>
 
 /*
  * Mouse Input

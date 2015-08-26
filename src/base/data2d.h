@@ -22,7 +22,7 @@
 #ifndef UCHROMA_DATA2D_H
 #define UCHROMA_DATA2D_H
 
-#include <QtCore/QString>
+#include <QString>
 #include "templates/array.h"
 
 #define OPTOLERANCE 1.0e-6

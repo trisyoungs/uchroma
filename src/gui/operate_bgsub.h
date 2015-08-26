@@ -23,8 +23,8 @@
 #define UCHROMA_OPERATE_BGSUB_H
 
 #include "gui/ui_operate_bgsub.h"
-#include <QtGui/QDialog>
-#include <QtCore/QObject>
+#include <QDialog>
+#include <QObject>
 
 // Forward Declarations
 class UChromaWindow;

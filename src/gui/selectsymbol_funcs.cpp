@@ -21,7 +21,7 @@
 
 #include "gui/selectsymbol.h"
 #include "templates/variantpointer.h"
-#include <QtGui/QScrollBar>
+#include <QScrollBar>
 
 // Static list of symbols
 Symbol Symbol::symbols[] = {

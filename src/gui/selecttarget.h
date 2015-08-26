@@ -23,8 +23,8 @@
 #define UCHROMA_SELECTTARGET_H
 
 #include "gui/ui_selecttarget.h"
-#include <QtGui/QDialog>
-#include <QtCore/QObject>
+#include <QDialog>
+#include <QObject>
 #include "templates/reflist.h"
 
 // Forward Declarations

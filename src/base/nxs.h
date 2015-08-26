@@ -24,7 +24,7 @@
 
 #include "base/data2d.h"
 #include <hdf5.h>
-#include <QtCore/QString>
+#include <QString>
 
 // Forward Declarations
 /* none */

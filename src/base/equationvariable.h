@@ -22,7 +22,7 @@
 #ifndef UCHROMA_EQUATIONVARIABLE_H
 #define UCHROMA_EQUATIONVARIABLE_H
 
-#include <QtCore/QString>
+#include <QString>
 #include "templates/list.h"
 
 // Forward Declarations

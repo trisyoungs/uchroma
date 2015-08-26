@@ -25,8 +25,8 @@
 #include "templates/list.h"
 #include "templates/reflist.h"
 #include "templates/vector4.h"
-#include <QtGui/QColor>
-#include <QtOpenGL/QtOpenGL>
+#include <QColor>
+#include <QOpenGLFunctions>
 
 // Forward declarations
 /* none */

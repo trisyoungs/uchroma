@@ -24,7 +24,7 @@
 
 #include "base/dataspace.h"
 #include "base/indexdata.h"
-#include <QtCore/QString>
+#include <QString>
 
 // Forward Declarations
 class Variable;

@@ -22,7 +22,7 @@
 #ifndef UCHROMA_TEXPONENTIALSPIN_H
 #define UCHROMA_TEXPONENTIALSPIN_H
 
-#include <QtGui/QAbstractSpinBox>
+#include <QAbstractSpinBox>
 #include "math/doubleexp.h"
 
 class TExponentialSpin : public QAbstractSpinBox

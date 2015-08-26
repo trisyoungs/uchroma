@@ -21,7 +21,7 @@
 
 #include "gui/editnumberformat.h"
 #include "base/messenger.h"
-#include <QtGui/QPainter>
+#include <QPainter>
 
 // Constructor
 EditNumberFormatDialog::EditNumberFormatDialog(QWidget *parent) : QDialog(parent)

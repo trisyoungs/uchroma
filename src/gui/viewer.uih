@@ -22,8 +22,8 @@
 #ifndef UCHROMA_VIEWER_H
 #define UCHROMA_VIEWER_H
 
-#include <QtOpenGL/QGLWidget>
-#include <QtCore/QObject>
+#include <QGLWidget>
+#include <QObject>
 #include "render/primitive.h"
 #include "base/axes.h"
 #include "base/colourscale.h"

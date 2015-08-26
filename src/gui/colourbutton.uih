@@ -22,7 +22,7 @@
 #ifndef UCHROMA_COLOURBUTTON_H
 #define UCHROMA_COLOURBUTTON_H
 
-#include <QtGui/QPushButton>
+#include <QPushButton>
 
 // Forward declarations
 /* none */

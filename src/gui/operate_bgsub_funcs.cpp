@@ -23,8 +23,8 @@
 #include "gui/uchroma.h"
 #include "base/collection.h"
 #include "expression/variable.h"
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <QFileDialog>
+#include <QMessageBox>
 
 //.Static members
 Collection* OperateBGSubDialog::targetCollection_ = NULL;

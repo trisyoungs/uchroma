@@ -4,7 +4,7 @@ AC_PREREQ(2.60)
 
 # Set program name, version, bug-address and source directory
 m4_define([UCHROMA_VERSION],[0.2.0])
-AC_INIT([uchroma],[UCHROMA_VERSION])
+AC_INIT(uchroma,UCHROMA_VERSION,tris@projectaten.net)
 AC_CONFIG_SRCDIR([src/])
 
 # Check system type and set defines
@@ -12,14 +12,8 @@ AC_CONFIG_SRCDIR([src/])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_HEADER(config.h)
 AC_CANONICAL_TARGET
-MAC_LIBS=""
-if test "$target_vendor" = "apple"; then
-  AC_DEFINE([IS_MAC], [], [Whether operating system is an Apple])
-  MAC_LIBS="-framework OpenGL"
-fi
-AC_SUBST(MAC_LIBS)
 
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE(uchroma,UCHROMA_VERSION)
 
 # Checks for programs.
 AC_PROG_CXX
@@ -33,28 +27,18 @@ AC_PROG_YACC
 #
 
 # QT Tools
-QTMOC="moc"
-QTRCC="rcc"
-QTUIC="uic"
 AC_ARG_WITH([qtmoc],[AC_HELP_STRING([--with-qtmoc=<executable>],
-    [Specify Qt4 Meta-Object Compiler tool (moc) [default="moc"]])], ,
-    [with_qtmoc="moc"])
+    [Specify Qt5 Meta-Object Compiler tool (moc) [default="moc-qt5"]])], ,
+    [with_qtmoc="moc-qt5"])
 AC_ARG_WITH([qtuic],[AC_HELP_STRING([--with-qtuic=<executable>],
-    [Specify Qt4 User Interface Compiler tool (uic) [default="uic"]])], ,
-    [with_qtuic="uic"])
+    [Specify Qt5 User Interface Compiler tool (uic) [default="uic-qt5"]])], ,
+    [with_qtuic="uic-qt5"])
 AC_ARG_WITH([qtrcc],[AC_HELP_STRING([--with-qtrcc=<executable],
-    [Specify Qt4 Resource Compiler tool (rcc) [default="rcc"]])], ,
-    [with_qtrcc="rcc"])
+    [Specify Qt5 Resource Compiler tool (rcc) [default="rcc-qt5"]])], ,
+    [with_qtrcc="rcc-qt5"])
 QTMOC="$with_qtmoc"
 QTRCC="$with_qtrcc"
 QTUIC="$with_qtuic"
-
-# Readline include dir
-RLINCDIR=""
-AC_ARG_WITH([readline-includes],[AC_HELP_STRING([--with-readline-includes=<dir>],
-    [Specify location of readline includes [default="/usr/include/readline"]])], ,
-    [with_readline_includes="/usr/include/readline"])
-RLINCDIR="$with_readline_includes"
 
 # Build Directory (used when packaging)
 BUILDDIR=""
@@ -77,13 +61,14 @@ if test "$with_install_dir" != "/usr/local"; then
   INSTALLDIR="$with_install_dir"
 fi
 
+# Find Freetype and FTGL (with pkgconfig)
 PKG_CHECK_MODULES(FREETYPE, freetype2 >= 2.0)
 PKG_CHECK_MODULES(FTGL, ftgl >= 2.0)
 
 
 # QT-FRAMEWORK  (Mac only)
 AC_ARG_WITH([qt],[AC_HELP_STRING([--with-qt=framework|fink|<none>],
-    [Determines which installation of Qt4 to use on OS X (should not be set for Linux)[default=<none>]])], ,
+    [Determines which installation of Qt5 to use on OS X (should not be set for Linux)[default=<none>]])], ,
     [with_qt=])
 
 # Pre-initialise pkg-config  (unless using Qt framework on the Mac)
@@ -93,35 +78,25 @@ fi
 
 # Set up compilation for Qt GUI
 if test "$with_qt" = "framework"; then
-  QTGUI_LIBS="-framework QtGui -framework QtOpenGL -framework QtCore"
+  QTGUI_LIBS="-framework QtGui -framework QtOpenGL -framework QtCore -framework OpenGL"
   QTGUI_CFLAGS="-F QtGui -F QtOpenGl -F QtCore"
 fi
-if test "$with_qt" = "fink"; then
-  QTGUI_LIBS="-L/sw/lib/qt4-x11/lib -lQtGui -lQtCore -lQtOpenGL"
-  QTGUI_CFLAGS="-I/sw/lib/qt4-x11/include -I/usr/X11R6/include"
-  QTOPENGL_CFLAGS="-I/sw/lib/qt4-x11/include"
-  QTOPENGL_LIBS="-I/sw/lib/qt4-x11/lib"
-  PKG_CHECK_MODULES(QTGUI, QtGui >= 4.1.0)
-  PKG_CHECK_MODULES(QTOPENGL, QtOpenGL >= 4.1.0)
-fi
 if test "x$with_qt" = "x"; then
-  PKG_CHECK_MODULES(QTGUI, QtGui >= 4.1.0)
-  PKG_CHECK_MODULES(QTOPENGL, QtOpenGL >= 4.1.0)
+  PKG_CHECK_MODULES(QTGUI, Qt5Gui >= 5.0.0)
+  PKG_CHECK_MODULES(QTOPENGL, Qt5OpenGL >= 5.0.0)
+  PKG_CHECK_MODULES(QTWIDGETS, Qt5Widgets >= 5.0.0)
 fi
-GUI_LDLIBS="$FTGL_LIBS $FREETYPE_LIBS $QTGUI_LIBS $QTOPENGL_LIBS -lreadline -lncurses -lGL -lfreetype -lhdf5"
-GUI_CFLAGS="$FREETYPE_CFLAGS $QTGUI_CFLAGS -I$RLINCDIR"
+UCHROMA_LDLIBS="$FTGL_LIBS $FREETYPE_LIBS $QTGUI_LIBS $QTOPENGL_LIBS -lGL -lfreetype"
+UCHROMA_CFLAGS="-fPIC $FREETYPE_CFLAGS $QTGUI_CFLAGS $QTWIDGETS_CFLAGS"
 
-
-VERSION=UCHROMA_VERSION
 # Perform Makefile substitutions
-AC_SUBST(GUI_LDLIBS)
-AC_SUBST(GUI_CFLAGS)
+AC_SUBST(UCHROMA_LDLIBS)
+AC_SUBST(UCHROMA_CFLAGS)
 AC_SUBST(QTMOC)
 AC_SUBST(QTUIC)
 AC_SUBST(QTRCC)
 AC_SUBST(BUILDDIR)
 AC_SUBST(INSTALLDIR)
-AC_SUBST(VERSION)
 
 
 # Checks for typedefs, structures, and compiler characteristics.

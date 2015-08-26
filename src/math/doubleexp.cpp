@@ -20,7 +20,7 @@
 */
 
 #include "math/doubleexp.h"
-#include <QtCore/QStringList>
+#include <QStringList>
 #include <math.h>
 #include <stdio.h>
 #include <limits>

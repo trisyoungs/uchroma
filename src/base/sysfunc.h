@@ -22,7 +22,7 @@
 #ifndef UCHROMA_SYSFUNC_H
 #define UCHROMA_SYSFUNC_H
 
-#include <QtCore/QString>
+#include <QString>
 
 // Enum search and print
 int enumSearch(QString name, int nitems, const char* *list, QString query, bool reportError = 1);

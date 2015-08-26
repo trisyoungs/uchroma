@@ -24,7 +24,7 @@
 
 #include "expression/node.h"
 #include "expression/functions.h"
-#include <QtCore/QString>
+#include <QString>
 
 // External declarations
 extern int ExpressionParser_parse();

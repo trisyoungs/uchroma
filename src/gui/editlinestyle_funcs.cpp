@@ -21,7 +21,7 @@
 
 #include "gui/editlinestyle.h"
 #include "base/messenger.h"
-#include <QtGui/QPainter>
+#include <QPainter>
 
 // Constructor
 EditLineStyleDialog::EditLineStyleDialog(QWidget *parent) : QDialog(parent)

@@ -20,7 +20,7 @@
 */
 
 #include "base/displaydataset.h"
-#include <QtGui/QMessageBox>
+#include <QMessageBox>
 
 // Constructor
 DisplayDataSet::DisplayDataSet() : ListItem<DisplayDataSet>()

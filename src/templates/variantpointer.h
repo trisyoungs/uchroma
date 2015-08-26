@@ -19,7 +19,7 @@
 	along with uChroma.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QtCore/QVariant>
+#include <QVariant>
 
 #ifndef UCHROMA_VARIANTPOINTER_H
 #define UCHROMA_VARIANTPOINTER_H

@@ -23,7 +23,7 @@
 #define UCHROMA_GRADIENTBAR_H
 
 #include "base/colourscale.h"
-#include <QtGui/QWidget>
+#include <QWidget>
 
 // Forward declarations
 /* none */

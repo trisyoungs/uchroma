@@ -34,7 +34,7 @@
 #else
 #include <OpenGL/gl3.h>
 #endif
-#include <QtCore/QString>
+#include <QString>
 
 // Forward Declarations
 class ViewLayout;

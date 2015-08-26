@@ -23,8 +23,8 @@
 #define UCHROMA_SELECTEQUATION_H
 
 #include "gui/ui_selectequation.h"
-#include <QtGui/QDialog>
-#include <QtCore/QObject>
+#include <QDialog>
+#include <QObject>
 
 // Forward Declarations
 /* none */

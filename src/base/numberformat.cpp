@@ -22,7 +22,7 @@
 #include "base/numberformat.h"
 #include <math/doubleexp.h>
 #include <stdio.h>
-#include <QtCore/QString>
+#include <QString>
 
 // FormatType Keywords
 const char* FormatTypeKeywords[] = { "Decimal", "Integer", "Scientific" };

@@ -5,17 +5,17 @@ SUFFIXES: .ui .uih .qrc
 .ui.o:
 	$(QTUIC) -o ui_$*.h $<
 	$(QTMOC) -o moc_$*.cpp $(top_srcdir)/src/gui/$*.h
-	$(CXX) -I$(top_srcdir)/src -I$(top_srcdir)/src/gui/ $(CXXFLAGS) @GUI_CFLAGS@ -c -o $@ moc_$*.cpp
+	$(CXX) -I$(top_srcdir)/src -I$(top_srcdir)/src/gui/ $(CXXFLAGS) @UCHROMA_CFLAGS@ -c -o $@ moc_$*.cpp
 	rm moc_$*.cpp
 
 .uih.o:
 	$(QTMOC) -o $*.cpp -f$< $<
-	$(CXX) -I$(top_srcdir)/src -I../ -I./ $(CXXFLAGS) @GUI_CFLAGS@ -c -o $@ $*.cpp
+	$(CXX) -I$(top_srcdir)/src -I../ -I./ $(CXXFLAGS) @UCHROMA_CFLAGS@ -c -o $@ $*.cpp
 	rm $*.cpp
 
 .qrc.o:
 	$(QTRCC) -o $*.cpp -name $* $<
-	$(CXX) -I$(top_srcdir)/src -I../ -I./ $(CXXFLAGS) $(QTGUI_CFLAGS) -c -o $@ $*.cpp
+	$(CXX) -I$(top_srcdir)/src -I../ -I./ $(CXXFLAGS) $(QTUCHROMA_CFLAGS) -c -o $@ $*.cpp
 	rm $*.cpp
 
 clean-local:
@@ -48,5 +48,5 @@ noinst_HEADERS += editdataset.h editfitkernel.h editfitresults.h editlinestyle.h
 noinst_HEADERS += operate_bgsub.h operate_setz.h
 noinst_HEADERS += selectequation.h selectsymbol.h selecttarget.h
 
-libgui_a_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/gui @GUI_CFLAGS@
+libgui_a_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/gui @UCHROMA_CFLAGS@
 

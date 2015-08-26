@@ -24,7 +24,7 @@
 
 #include "gui/ui_editdataset.h"
 #include "base/dataset.h"
-#include <QtGui/QDialog>
+#include <QDialog>
 
 // Forward Declarations
 /* none */

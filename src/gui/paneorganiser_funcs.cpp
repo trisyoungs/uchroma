@@ -21,8 +21,8 @@
 
 #include "gui/paneorganiser.uih"
 #include "base/viewlayout.h"
-#include <QtGui/QPainter>
-#include <QtGui/QMouseEvent>
+#include <QPainter>
+#include <QMouseEvent>
 
 // Constructor
 PaneOrganiser::PaneOrganiser(QWidget* parent) : QWidget(parent)

@@ -20,7 +20,7 @@
 */
 
 #include "gui/texponentialspin.uih"
-#include <QtGui/QLineEdit>
+#include <QLineEdit>
 
 // Constructor
 TExponentialSpin::TExponentialSpin(QWidget *parent) : QAbstractSpinBox(parent)

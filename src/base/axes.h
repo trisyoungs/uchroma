@@ -31,7 +31,7 @@
 #include "templates/vector3.h"
 #include "templates/vector4.h"
 #include "templates/array.h"
-#include <QtCore/QString>
+#include <QString>
 
 // Forward Declarations
 class ViewPane;

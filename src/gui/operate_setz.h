@@ -24,8 +24,8 @@
 
 #include "gui/ui_operate_setz.h"
 #include "expression/expression.h"
-#include <QtGui/QDialog>
-#include <QtCore/QObject>
+#include <QDialog>
+#include <QObject>
 #include <bitset>
 
 // Forward Declarations

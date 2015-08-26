@@ -24,7 +24,7 @@
 
 #include "gui/ui_editnumberformat.h"
 #include "base/numberformat.h"
-#include <QtGui/QDialog>
+#include <QDialog>
 
 // Forward Declarations
 /* none */

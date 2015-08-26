@@ -4,4 +4,4 @@ libsession_a_SOURCES = editstate.cpp editstatedata.cpp editstate_axes.cpp editst
 
 noinst_HEADERS = editstate.h editstatedata.h editstategroup.h session.h
 
-libsession_a_CPPFLAGS = -I$(top_srcdir)/src -I../ @GUI_CFLAGS@
+libsession_a_CPPFLAGS = -I$(top_srcdir)/src -I../ @UCHROMA_CFLAGS@

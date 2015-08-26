@@ -22,7 +22,7 @@
 #ifndef UCHROMA_INDEXDATA_H
 #define UCHROMA_INDEXDATA_H
 
-#include <QtCore/QString>
+#include <QString>
 
 // Forward Declarations
 /* none */

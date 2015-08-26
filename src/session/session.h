@@ -22,8 +22,8 @@
 #ifndef UCHROMA_SESSION_H
 #define UCHROMA_SESSION_H
 
-#include <QtCore/QString>
-#include <QtCore/QDir>
+#include <QString>
+#include <QDir>
 #include "session/editstate.h"
 #include "session/editstatedata.h"
 #include "session/editstategroup.h"

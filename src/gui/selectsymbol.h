@@ -23,8 +23,8 @@
 #define UCHROMA_SELECTSYMBOL_H
 
 #include "gui/ui_selectsymbol.h"
-#include <QtGui/QDialog>
-#include <QtCore/QObject>
+#include <QDialog>
+#include <QObject>
 
 // Forward Declarations
 /* none */

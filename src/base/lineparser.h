@@ -22,9 +22,9 @@
 #ifndef UCHROMA_LINEPARSER_H
 #define UCHROMA_LINEPARSER_H
 
-#include <QtCore/QStringList>
-#include <QtCore/QFile>
-#include <QtCore/QTextStream>
+#include <QStringList>
+#include <QFile>
+#include <QTextStream>
 
 // Forward Declarations
 /* none */

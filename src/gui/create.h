@@ -22,8 +22,8 @@
 #ifndef UCHROMA_CREATE_H
 #define UCHROMA_CREATE_H
 
-#include <QtGui/QDialog>
-#include <QtCore/QObject>
+#include <QDialog>
+#include <QObject>
 #include "gui/ui_create.h"
 #include "base/equationvariable.h"
 #include "expression/expression.h"

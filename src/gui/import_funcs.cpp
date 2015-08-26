@@ -21,7 +21,7 @@
 
 #include "gui/import.h"
 #include "gui/uchroma.h"
-#include <QtGui/QFileDialog>
+#include <QFileDialog>
 
 // Constructor
 ImportDialog::ImportDialog(UChromaWindow& parent) : QDialog(&parent), uChroma_(parent)

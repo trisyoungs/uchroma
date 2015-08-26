@@ -20,7 +20,7 @@
 */
 
 #include "gui/gradientbar.uih"
-#include <QtGui/QPainter>
+#include <QPainter>
 
 /*
  * Gradient Bar

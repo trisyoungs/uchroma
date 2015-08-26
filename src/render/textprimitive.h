@@ -28,7 +28,7 @@
 #include "math/cuboid.h"
 #include "templates/vector3.h"
 #include "templates/list.h"
-#include <QtCore/QString>
+#include <QString>
 
 // External Declarations
 extern int TextPrimitiveParser_parse();

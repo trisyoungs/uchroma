@@ -23,7 +23,7 @@
 #define UCHROMA_PANEORGANISER_H
 
 #include "base/viewpane.h"
-#include <QtGui/QWidget>
+#include <QWidget>
 
 // Forward declarations
 class ViewLayout;

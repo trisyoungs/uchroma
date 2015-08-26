@@ -22,7 +22,7 @@
 #ifndef UCHROMA_DOUBLEEXP_H
 #define UCHROMA_DOUBLEEXP_H
 
-#include <QtCore/QString>
+#include <QString>
 
 // Mantissa/exponent class
 class DoubleExp

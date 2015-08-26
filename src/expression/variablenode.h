@@ -23,7 +23,7 @@
 #define UCHROMA_VARIABLENODE_H
 
 #include "expression/node.h"
-#include <QtCore/QString>
+#include <QString>
 
 // Forward Declarations
 class Variable;
