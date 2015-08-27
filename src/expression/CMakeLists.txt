@@ -17,12 +17,10 @@ add_library(expression
   variablenode.h
 )
 
-include_directories(
-../
-${QT_INCLUDE_DIR}
-${CMAKE_SOURCE_DIR}
-${CMAKE_CURRENT_BINARY_DIR}
-${CMAKE_BINARY_DIR}
-${CMAKE_BINARY_DIR}/src
-${CMAKE_SOURCE_DIR}/src/gui
+target_include_directories(expression PRIVATE
+  ${PROJECT_SOURCE_DIR}/src
+  ${PROJECT_BINARY_DIR}/src
+  ${Qt5Core_INCLUDE_DIRS}
+  ${Qt5Widgets_INCLUDE_DIRS}
+  ${Qt5Gui_INCLUDE_DIRS}
 )
