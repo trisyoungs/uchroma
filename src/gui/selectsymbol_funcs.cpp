@@ -20,7 +20,6 @@
 */
 
 #include "gui/selectsymbol.h"
-#include <qt5/QtWidgets/qheaderview.h>
 #include "templates/variantpointer.h"
 #include <QScrollBar>
 

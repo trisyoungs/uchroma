@@ -54,4 +54,5 @@ target_include_directories(base PRIVATE
   ${Qt5Widgets_INCLUDE_DIRS}
   ${Qt5Gui_INCLUDE_DIRS}
   ${FREETYPE_INCLUDE_DIRS}
+  ${HDF5_INCLUDE_DIRS}
 )
