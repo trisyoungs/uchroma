@@ -22,3 +22,5 @@ target_include_directories(session PRIVATE
   ${Qt5Widgets_INCLUDE_DIRS}
   ${Qt5Gui_INCLUDE_DIRS}
 )
+
+target_link_libraries(session gui)
