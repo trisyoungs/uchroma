@@ -21,7 +21,6 @@
 
 #include "gui/viewer.hui"
 #include "gui/uchroma.h"
-#include <qt5/QtGui/qopenglframebufferobject.h>
 #include "base/messenger.h"
 #include "render/fontinstance.h"
 #include <QOpenGLFramebufferObjectFormat>
