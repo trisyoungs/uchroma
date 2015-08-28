@@ -21,6 +21,7 @@
 
 #include "gui/viewer.hui"
 #include "gui/uchroma.h"
+#include <qt5/QtGui/qopenglframebufferobject.h>
 #include "base/messenger.h"
 #include "render/fontinstance.h"
 #include <QOpenGLFramebufferObjectFormat>
@@ -92,7 +93,7 @@ void Viewer::setupGL()
 }
 
 // Draw full scene
-void Viewer::renderFullScene()
+void Viewer::renderFullScene(int xOffset, int yOffset)
 {
 	msg.enter("Viewer::renderFullScene");
 
@@ -121,7 +122,7 @@ void Viewer::renderFullScene()
 		pane->recalculateView();
 
 		// Set viewport
-		glViewport(pane->viewportMatrix()[0], pane->viewportMatrix()[1], pane->viewportMatrix()[2], pane->viewportMatrix()[3]);
+		glViewport(pane->viewportMatrix()[0] + xOffset, pane->viewportMatrix()[1] + yOffset, pane->viewportMatrix()[2], pane->viewportMatrix()[3]);
 // 		printf("Viewport for pane '%s' is %i %i %i %i\n" , qPrintable(pane->name()), pane->viewportMatrix()[0], pane->viewportMatrix()[1], pane->viewportMatrix()[2], pane->viewportMatrix()[3]);
 
 		// Setup an orthographic matrix
@@ -341,7 +342,7 @@ QPixmap Viewer::frameBuffer()
 }
 
 // Render or grab image
-QPixmap Viewer::generateImage(int width, int height)
+QPixmap Viewer::generateImage(int imageWidth, int imageHeight)
 {
 	msg.print("Viewer::generateImage");
 
@@ -349,7 +350,7 @@ QPixmap Viewer::generateImage(int width, int height)
 	renderingOffScreen_ = true;
 
 	// Scale current line width and text scaling to reflect size of exported image
-	setObjectScaling( double(height) / double(contextHeight()) );
+	setObjectScaling( double(imageHeight) / double(contextHeight()) );
 
 	// Make the offscreen surface the current context
 	offscreenContext_.makeCurrent(&offscreenSurface_);
@@ -373,21 +374,26 @@ QPixmap Viewer::generateImage(int width, int height)
 	}
 
 	// Create a QPixmap of the desired full size and a QPainter for it
-	QPixmap pixmap = QPixmap(width, height);
+	QPixmap pixmap = QPixmap(imageWidth, imageHeight);
+// 	pixmap.fill();
 	QPainter painter(&pixmap);
+	painter.setPen(Qt::NoPen);
+	painter.setBrush(Qt::white);
+	painter.drawRect(0,0,imageWidth, imageHeight);
 
 	// Calculate scale factors for ViewLayout, so that the context width/height is scaled to the desired image size
-	double xScale = double(width) / double(tileWidth);
-	double yScale = double(height) / double(tileHeight);
-	int nX = width / tileWidth + ((width%tileWidth) ? 1 : 0);
-	int nY = height / tileHeight + ((height%tileHeight) ? 1 : 0);
-	
-// 	UChromaSession::viewLayout().recalculate(tileWidth, tileHeight);  MAYBE?
+	double xScale = double(imageWidth) / double(tileWidth);
+	double yScale = double(imageHeight) / double(tileHeight);
+	int nX = imageWidth / tileWidth + ((imageWidth %tileWidth) ? 1 : 0);
+	int nY = imageHeight / tileHeight + ((imageHeight %tileHeight) ? 1 : 0);
+
+	// Recalculate view layout - no offset or scaling, just to the desired full image size
+	UChromaSession::viewLayout().setOffsetAndScale(0, 0, 1.0, 1.0);
+	UChromaSession::viewLayout().recalculate(imageWidth, imageHeight);
 
 	// Loop over tiles in x and y
 	QProgressDialog progress("Generating tiled image", "Cancel", 0, nX*nY, uChromaWindow_);
 	progress.setWindowTitle("uChroma");
-	progress.show();
 	for (int x=0; x<nX; ++x)
 	{
 		for (int y=0; y<nY; ++y)
@@ -396,15 +402,15 @@ QPixmap Viewer::generateImage(int width, int height)
 			if (progress.wasCanceled()) break;
 			progress.setValue(x*nY+y);
 
-			// Recalculate view pane sizes to reflect current tile position and tile size
-			UChromaSession::viewLayout().setOffsetAndScale(-x*tileWidth, -y*tileHeight, xScale, yScale);
-
 			// Generate this tile
-			renderFullScene();
-			QPixmap tile = QPixmap::fromImage(frameBufferObject.toImage());
+			frameBufferObject.bind();
+			setupGL();
+			renderFullScene(-x*tileWidth, -y*tileHeight);
+			QImage fboImage(frameBufferObject.toImage());
+			QImage tile(fboImage.constBits(), fboImage.width(), fboImage.height(), QImage::Format_ARGB32);
 
 			// Paste this tile into the main image
-			painter.drawPixmap(x*tileWidth, height-(y+1)*tileHeight, tile);
+			painter.drawImage(x*tileWidth, imageHeight-(y+1)*tileHeight, tile);
 		}
 		if (progress.wasCanceled()) break;
 	}

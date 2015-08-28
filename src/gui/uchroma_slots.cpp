@@ -131,8 +131,7 @@ void UChromaWindow::on_actionFilePrint_triggered(bool checked)
 
 void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 {
-	const int maxSize = 2000;
-
+	static bool firstRun = true;
 	if (saveImageDialog_.getImageDetails(double(ui.MainView->width()) / double(ui.MainView->height())))
 	{
 		// Check to see if existing image file already exists
@@ -148,6 +147,8 @@ void UChromaWindow::on_actionFileExportImage_triggered(bool checked)
 		QPixmap pixmap = ui.MainView->generateImage(imageWidth, imageHeight);
 		pixmap.save(UChromaSession::imageExportFileName(), UChromaSession::imageFormatExtension(UChromaSession::imageExportFormat()), -1);
 	}
+
+	firstRun = false;
 }
 
 void UChromaWindow::on_actionFileQuit_triggered(bool checked)

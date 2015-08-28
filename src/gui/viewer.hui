@@ -112,7 +112,7 @@ class Viewer : public QOpenGLWidget, protected QOpenGLFunctions
 	// Setup basic GL properties
 	void setupGL();
 	// Draw full scene
-	void renderFullScene();
+	void renderFullScene(int xOffset = 0, int yOffset = 0);
 
 	public:
 	// Set whether we are currently rendering offscreen
@@ -124,7 +124,7 @@ class Viewer : public QOpenGLWidget, protected QOpenGLFunctions
 	// Grab current contents of framebuffer
 	QPixmap frameBuffer();
 	// Render current scene at supplied size
-	QPixmap generateImage(int width, int height);
+	QPixmap generateImage(int imageWidth, int imageHeight);
 
 
 	/*

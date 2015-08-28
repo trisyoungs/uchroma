@@ -61,6 +61,7 @@ class SaveImageDialog : public QDialog
 	void on_SelectFileNameButton_clicked(bool checked);
 	void on_ImageWidthSpin_valueChanged(int value);
 	void on_MaintainAspectRatioCheck_toggled(bool checked);
+	void on_GetCurrentButton_clicked(bool checked);
 	void on_SaveImageButton_clicked(bool checked);
 	void on_CancelButton_clicked(bool checked);
 };

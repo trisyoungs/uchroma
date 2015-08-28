@@ -73,6 +73,14 @@ void SaveImageDialog::on_MaintainAspectRatioCheck_toggled(bool checked)
 	if (checked) ui.ImageHeightSpin->setValue(ui.ImageWidthSpin->value() / aspectRatio_);
 }
 
+void SaveImageDialog::on_GetCurrentButton_clicked(bool checked)
+{
+	ui.MaintainAspectRatioCheck->setChecked(true);
+	aspectRatio_ = double(uChroma_.ui.MainView->contextWidth()) / double(uChroma_.ui.MainView->contextHeight());
+	ui.ImageWidthSpin->setValue(uChroma_.ui.MainView->contextWidth());
+	ui.ImageHeightSpin->setValue(uChroma_.ui.MainView->contextHeight());	
+}
+
 void SaveImageDialog::on_SaveImageButton_clicked(bool checked)
 {
 	// Set updated values...
