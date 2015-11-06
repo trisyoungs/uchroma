@@ -928,21 +928,22 @@ bool UChromaSession::loadSession(QString fileName)
 				// Load the collection data
 				success = readCollectionBlock(parser, currentCollection_);
 
-				// Check for empty slices
-				nEmpty = currentCollection_->nEmptyDataSets();
-				if (nEmpty != 0)
-				{
-					QMessageBox::StandardButton button = QMessageBox::warning(uChroma_, "Empty Data", QString("There are ") + QString::number(nEmpty) + " defined slices which contain no data in collection '" + currentCollection_->name() + "'.\nWould you like to reload these now from their source files?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-					if (button == QMessageBox::Yes)
-					{
-						nEmpty = currentCollection_->loadAllDataSets();
-						
-						if (nEmpty > 0)
-						{
-							QMessageBox::warning(uChroma_, "Empty Data", QString("There are still ") + QString::number(nEmpty) + " defined slices which contain no data or whose original files could not be found.\nCheck the slice data directory, and/or the datafiles themselves.");
-						}
-					}
-				}
+				// TODO Commented out 06/11/2015 - To Be Removed
+// 				// Check for empty slices
+// 				nEmpty = currentCollection_->nEmptyDataSets();
+// 				if (nEmpty != 0)
+// 				{
+// 					QMessageBox::StandardButton button = QMessageBox::warning(uChroma_, "Empty Data", QString("There are ") + QString::number(nEmpty) + " defined slices which contain no data in collection '" + currentCollection_->name() + "'.\nWould you like to reload these now from their source files?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+// 					if (button == QMessageBox::Yes)
+// 					{
+// 						nEmpty = currentCollection_->loadAllDataSets();
+// 						
+// 						if (nEmpty > 0)
+// 						{
+// 							QMessageBox::warning(uChroma_, "Empty Data", QString("There are still ") + QString::number(nEmpty) + " defined slices which contain no data or whose original files could not be found.\nCheck the slice data directory, and/or the datafiles themselves.");
+// 						}
+// 					}
+// 				}
 				break;
 			// Settings
 			case (UChromaSession::SettingsBlock):

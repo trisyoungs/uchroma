@@ -45,15 +45,13 @@ void Surface::constructGrid(PrimitiveList& primitiveList, const Axes& axes, cons
 	// of one gridpoint between adjacent strips).
 	const int cacheSize = 12;
 	int nPrimitives = x.nItems()/(cacheSize-1) + 1;
-	int maxVertices = cacheSize*nZ;
-	int maxIndices = nZ*(cacheSize-1) + (nZ-1)*cacheSize;
 
 	// Get some values from axes so we can calculate colours properly
 	bool yLogarithmic = axes.logarithmic(1);
 	double yStretch = axes.stretch(1);
 
 	// Reinitialise primitive list
-	primitiveList.reinitialise(nPrimitives, true, maxVertices, maxIndices*10, GL_LINES, true);
+	primitiveList.reinitialise(nPrimitives, true, GL_LINES, true);
 
 	// Temporary variables
 	int n, offset = 0, i, nLimit, nMax;
@@ -74,7 +72,7 @@ void Surface::constructGrid(PrimitiveList& primitiveList, const Axes& axes, cons
 		nLimit = std::min(cacheSize, x.nItems()-offset);
 
 		// Loop over remaining displayData
-		for (int slice = 0; slice < displayData.nItems(); ++slice)
+		for (int slice = minIndex.z; slice <= maxIndex.z; ++slice)
 		{
 			// Grab arrays
 			y.copy(slices[slice]->y(), minIndex.x+offset, minIndex.x+offset+nLimit-1);

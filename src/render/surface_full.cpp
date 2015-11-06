@@ -53,9 +53,7 @@ void Surface::constructFull(PrimitiveList& primitiveList, const Axes& axes, cons
 	}
 
 	// Resize primitive list so it's large enough for our needs
-	int maxVertices = (x.nItems()+1)*2;
-	int maxIndices = (x.nItems()-1)*6;
-	primitiveList.reinitialise(nZ-1, false, maxVertices, maxIndices, GL_TRIANGLES, true);
+	primitiveList.reinitialise(nZ-1, false, GL_TRIANGLES, true);
 
 	// Temporary variables
 	Array< Vec3<double> > normA, normB;

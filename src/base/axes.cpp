@@ -101,11 +101,11 @@ Axes::Axes(ViewPane& parent) : parent_(parent), ObjectStore<Axes>(this, ObjectTy
 	// GL
 	for (int n=0; n<3; ++n)
 	{
-		axisPrimitives_[n].initialise(1020, 0, GL_LINES, false);
+		axisPrimitives_[n].initialise(GL_LINES, false);
 		axisPrimitives_[n].setNoInstances();
-		gridLineMajorPrimitives_[n].initialise(1020, 0, GL_LINES, false);
+		gridLineMajorPrimitives_[n].initialise(GL_LINES, false);
 		gridLineMajorPrimitives_[n].setNoInstances();
-		gridLineMinorPrimitives_[n].initialise(1020, 0, GL_LINES, false);
+		gridLineMinorPrimitives_[n].initialise(GL_LINES, false);
 		gridLineMinorPrimitives_[n].setNoInstances();
 	}
 	clipPlaneYMin_ = 0.0;
@@ -1300,12 +1300,12 @@ void Axes::updateAxisPrimitives()
 	}
 
 	// GridLines
-	gridLineMinorPrimitives_[0].initialise(tickPositions[1].nItems()*tickPositions[2].nItems()*2, 0, GL_LINES, false);
-	gridLineMajorPrimitives_[0].initialise(tickPositions[1].nItems()*tickPositions[2].nItems()*2, 0, GL_LINES, false);
-	gridLineMinorPrimitives_[1].initialise(tickPositions[0].nItems()*tickPositions[2].nItems()*2, 0, GL_LINES, false);
-	gridLineMajorPrimitives_[1].initialise(tickPositions[0].nItems()*tickPositions[2].nItems()*2, 0, GL_LINES, false);
-	gridLineMinorPrimitives_[2].initialise(tickPositions[0].nItems()*tickPositions[1].nItems()*2, 0, GL_LINES, false);
-	gridLineMajorPrimitives_[2].initialise(tickPositions[0].nItems()*tickPositions[1].nItems()*2, 0, GL_LINES, false);
+	gridLineMinorPrimitives_[0].initialise(GL_LINES, false);
+	gridLineMajorPrimitives_[0].initialise(GL_LINES, false);
+	gridLineMinorPrimitives_[1].initialise(GL_LINES, false);
+	gridLineMajorPrimitives_[1].initialise(GL_LINES, false);
+	gridLineMinorPrimitives_[2].initialise(GL_LINES, false);
+	gridLineMajorPrimitives_[2].initialise(GL_LINES, false);
 
 	// The 'axis' variable indicates the vector we are drawing lines along, and the relevant primitive store them in
 	for (int axis = 0; axis < 3; ++axis)

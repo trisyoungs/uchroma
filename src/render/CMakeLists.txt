@@ -18,7 +18,6 @@ add_library(render
   textfragment.cpp
   textprimitive.cpp
   textprimitivelist.cpp
-  vertexchunk.cpp
   fontinstance.h
   linestipple.h
   linestyle.h
@@ -31,7 +30,6 @@ add_library(render
   textfragment.h
   textprimitive.h
   textprimitivelist.h
-  vertexchunk.h
 )
 
 target_include_directories(render PRIVATE

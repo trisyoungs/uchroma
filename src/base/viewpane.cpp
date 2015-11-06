@@ -1335,9 +1335,9 @@ void ViewPane::updateInteractionPrimitive(int axis)
 {
 	const int nPoints = 16;
 	
-	interactionPrimitive_.initialise(nPoints*nPoints*4, nPoints*nPoints*6, GL_TRIANGLES, false);
+	interactionPrimitive_.initialise(GL_TRIANGLES, false);
 	interactionPrimitive_.forgetAll();
-	interactionBoxPrimitive_.initialise(4, 8, GL_LINES, false);
+	interactionBoxPrimitive_.initialise(GL_LINES, false);
 	interactionBoxPrimitive_.forgetAll();
 
 	if (axis == -1) return;
