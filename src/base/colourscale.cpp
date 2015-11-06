@@ -133,7 +133,7 @@ QColor ColourScaleDelta::colour(double value, bool useHSV) const
 		col.setGreenF(startColour_.greenF() + deltaColourF_[1] * clampv);
 		col.setBlueF(startColour_.blueF() + deltaColourF_[2]* clampv);
 	}
-	col.setAlpha(startColour_.alphaF() + deltaColourF_[3] * clampv);
+	col.setAlphaF(startColour_.alphaF() + deltaColourF_[3] * clampv);
 	return col;
 }
 
@@ -230,7 +230,7 @@ void ColourScale::calculateDeltas()
 {
 	// Clear old list of deltas
 	deltas_.clear();
-	ColourScaleDelta *delta;
+	ColourScaleDelta* delta;
 	for (ColourScalePoint* csp = points_.first(); csp != points_.last(); csp = csp->next)
 	{
 		delta = deltas_.add();
@@ -356,7 +356,7 @@ QColor ColourScale::colour(double value) const
 	if (value < csp->value()) return csp->colour();
 	
 	// Find the correct delta to use
-	for (ColourScaleDelta *delta = deltas_.first(); delta != NULL; delta = delta->next)
+	for (ColourScaleDelta* delta = deltas_.first(); delta != NULL; delta = delta->next)
 	{
 		if (delta->containsValue(value)) return delta->colour(interpolated_ ? value : delta->start(), useHSV_);
 	}
@@ -388,7 +388,7 @@ void ColourScale::colour(double value, Vec4<GLfloat>& target) const
 	}
 	
 	// Find the correct delta to use
-	for (ColourScaleDelta *delta = deltas_.first(); delta != NULL; delta = delta->next)
+	for (ColourScaleDelta* delta = deltas_.first(); delta != NULL; delta = delta->next)
 	{
 		if (delta->containsValue(value))
 		{
@@ -427,7 +427,7 @@ ColourScalePoint* ColourScale::point(int id)
 }
 
 // Return first delta in colourscale
-ColourScaleDelta *ColourScale::firstDelta() const
+ColourScaleDelta* ColourScale::firstDelta() const
 {
 	return deltas_.first();
 }
