@@ -122,7 +122,7 @@ void Viewer::renderFullScene(int xOffset, int yOffset)
 
 		// Set viewport
 		glViewport(pane->viewportMatrix()[0] + xOffset, pane->viewportMatrix()[1] + yOffset, pane->viewportMatrix()[2], pane->viewportMatrix()[3]);
-// 		printf("Viewport for pane '%s' is %i %i %i %i\n" , qPrintable(pane->name()), pane->viewportMatrix()[0], pane->viewportMatrix()[1], pane->viewportMatrix()[2], pane->viewportMatrix()[3]);
+// 		printf("Viewport for pane '%s' is %i %i %i %i (offset = %i %i)\n" , qPrintable(pane->name()), pane->viewportMatrix()[0], pane->viewportMatrix()[1], pane->viewportMatrix()[2], pane->viewportMatrix()[3], xOffset, yOffset);
 
 		// Setup an orthographic matrix
 		glMatrixMode(GL_PROJECTION);
@@ -374,7 +374,6 @@ QPixmap Viewer::generateImage(int imageWidth, int imageHeight)
 
 	// Create a QPixmap of the desired full size and a QPainter for it
 	QPixmap pixmap = QPixmap(imageWidth, imageHeight);
-// 	pixmap.fill();
 	QPainter painter(&pixmap);
 	painter.setPen(Qt::NoPen);
 	painter.setBrush(Qt::white);
@@ -402,7 +401,7 @@ QPixmap Viewer::generateImage(int imageWidth, int imageHeight)
 			progress.setValue(x*nY+y);
 
 			// Generate this tile
-			frameBufferObject.bind();
+			if (!frameBufferObject.bind()) printf("Failed to bind framebuffer object.\n");
 			setupGL();
 			renderFullScene(-x*tileWidth, -y*tileHeight);
 			QImage fboImage(frameBufferObject.toImage());
@@ -410,6 +409,7 @@ QPixmap Viewer::generateImage(int imageWidth, int imageHeight)
 
 			// Paste this tile into the main image
 			painter.drawImage(x*tileWidth, imageHeight-(y+1)*tileHeight, tile);
+			tile.save(QString("tile-%1%2.png").arg(x).arg(y), "png");
 		}
 		if (progress.wasCanceled()) break;
 	}

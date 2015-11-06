@@ -277,14 +277,12 @@ void Primitive::sendToGL()
 	}
 	else
 	{
-// 		printf("HKJHKJH %i %i\n", nDefinedVertices_, indexData_.nItems());
 		// Does the vertex data contain colour-per-vertex information?
 		glInterleavedArrays(colouredVertexData_ ? GL_C4F_N3F_V3F : GL_N3F_V3F, 0, vertexData_.array());
 
 		// Check if we are using indices
 		if (indexData_.nItems() != 0) glDrawElements(type_, indexData_.nItems(), GL_UNSIGNED_INT, indexData_.array());
 		else glDrawArrays(type_, 0, nDefinedVertices_);
-// 		printf("kjjjj\n");
 	}
 }
 

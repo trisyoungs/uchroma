@@ -278,7 +278,7 @@ void ViewPane::recalculateViewport(int gridPixelWidth, int gridPixelHeight, int 
 	// Recalculate projection matrix
 	if ((viewType_ == ViewPane::NormalView) || (viewType_ == ViewPane::AutoStretchedView))
 	{
-		projectionMatrix_ = calculateProjectionMatrix(hasPerspective_);
+		projectionMatrix_ = calculateProjectionMatrix(hasPerspective_, zOffset_);
 	}
 	else projectionMatrix_ = calculateProjectionMatrix(false, zOffset_);
 
