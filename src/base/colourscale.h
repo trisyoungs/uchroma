@@ -76,7 +76,7 @@ class ColourScaleDelta : public ListItem<ColourScaleDelta>
 	// Colour of this starting point
 	QColor startColour_;
 	// Delta between the starting point and the final point
-	int deltaColour_[4];
+	float deltaColourF_[4];
 
 	public:
 	// Check whether the delta 'contains' the supplied value

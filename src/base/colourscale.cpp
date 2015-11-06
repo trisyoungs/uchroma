@@ -101,17 +101,17 @@ void ColourScaleDelta::set(ColourScalePoint* point1, ColourScalePoint* point2, b
 	startColour_ = point1->colour();
 	if (useHSV)
 	{
-		deltaColour_[0] = point2->colour_.hue() - startColour_.hue();
-		deltaColour_[1] = point2->colour_.saturation() - startColour_.saturation();
-		deltaColour_[2] = point2->colour_.value() - startColour_.value();
+		deltaColourF_[0] = point2->colour_.hueF() - startColour_.hueF();
+		deltaColourF_[1] = point2->colour_.saturationF() - startColour_.saturationF();
+		deltaColourF_[2] = point2->colour_.valueF() - startColour_.valueF();
 	}
 	else
 	{
-		deltaColour_[0] = point2->colour_.red() - startColour_.red();
-		deltaColour_[1] = point2->colour_.green() - startColour_.green();
-		deltaColour_[2] = point2->colour_.blue() - startColour_.blue();
+		deltaColourF_[0] = point2->colour_.redF() - startColour_.redF();
+		deltaColourF_[1] = point2->colour_.greenF() - startColour_.greenF();
+		deltaColourF_[2] = point2->colour_.blueF() - startColour_.blueF();
 	}
-	deltaColour_[3] = point2->colour_.alpha() - startColour_.alpha();
+	deltaColourF_[3] = point2->colour_.alphaF() - startColour_.alphaF();
 	delta_ = point2->value_ - start_;
 }
 
@@ -125,19 +125,19 @@ QColor ColourScaleDelta::colour(double value, bool useHSV) const
 	QColor col;
 	if (useHSV)
 	{
-		col.setHsv(startColour_.hue() + deltaColour_[0] * clampv, startColour_.saturation() + deltaColour_[1] * clampv, startColour_.value() + deltaColour_[2] * clampv);
+		col.setHsvF(startColour_.hue() + deltaColourF_[0] * clampv, startColour_.saturationF() + deltaColourF_[1] * clampv, startColour_.valueF() + deltaColourF_[2] * clampv);
 	}
 	else
 	{
-		col.setRed(startColour_.red() + deltaColour_[0] * clampv);
-		col.setGreen(startColour_.green() + deltaColour_[1] * clampv);
-		col.setBlue(startColour_.blue() + deltaColour_[2]* clampv);
+		col.setRedF(startColour_.redF() + deltaColourF_[0] * clampv);
+		col.setGreenF(startColour_.greenF() + deltaColourF_[1] * clampv);
+		col.setBlueF(startColour_.blueF() + deltaColourF_[2]* clampv);
 	}
-	col.setAlpha(startColour_.alpha() + deltaColour_[3] * clampv);
+	col.setAlpha(startColour_.alphaF() + deltaColourF_[3] * clampv);
 	return col;
 }
 
-// Get colour for value as GLfloat*, assuming that v is within the range 0 -> value_
+// Get colour for value as GLfloat* ranged from 0.0-1.0, assuming that v is within the range 0 -> value_
 void ColourScaleDelta::colour(double v, bool useHSV, Vec4<GLfloat>& target) const
 {
 	// Clamp 'v' to range 0.0 - 1.0 to span range of delta
@@ -147,18 +147,18 @@ void ColourScaleDelta::colour(double v, bool useHSV, Vec4<GLfloat>& target) cons
 	if (useHSV)
 	{
 		QColor col;
-		col.setHsv(startColour_.hue() + deltaColour_[0] * clampv, startColour_.saturation() + deltaColour_[1] * clampv, startColour_.value() + deltaColour_[2] * clampv);
+		col.setHsvF(startColour_.hueF() + deltaColourF_[0] * clampv, startColour_.saturationF() + deltaColourF_[1] * clampv, startColour_.valueF() + deltaColourF_[2] * clampv);
 		target.x = col.redF();
 		target.y = col.greenF();
 		target.z = col.blueF();
 	}
 	else
 	{
-		target.x = startColour_.red() + deltaColour_[0] * clampv;
-		target.y = startColour_.green() + deltaColour_[1] * clampv;
-		target.z = startColour_.blue() + deltaColour_[2]* clampv;
+		target.x = startColour_.redF() + deltaColourF_[0] * clampv;
+		target.y = startColour_.greenF() + deltaColourF_[1] * clampv;
+		target.z = startColour_.blueF() + deltaColourF_[2]* clampv;
 	}
-	target.w = startColour_.alpha() + deltaColour_[3] * clampv;
+	target.w = startColour_.alphaF() + deltaColourF_[3] * clampv;
 }
 
 // Return the starting value of the range
@@ -231,7 +231,7 @@ void ColourScale::calculateDeltas()
 	// Clear old list of deltas
 	deltas_.clear();
 	ColourScaleDelta *delta;
-	for (ColourScalePoint *csp = points_.first(); csp != points_.last(); csp = csp->next)
+	for (ColourScalePoint* csp = points_.first(); csp != points_.last(); csp = csp->next)
 	{
 		delta = deltas_.add();
 		delta->set(csp, csp->next, useHSV_);
@@ -239,9 +239,9 @@ void ColourScale::calculateDeltas()
 }
 
 // Add point to scale
-ColourScalePoint *ColourScale::addPoint(double value, QColor colour)
+ColourScalePoint* ColourScale::addPoint(double value, QColor colour)
 {
-	ColourScalePoint *csp = NULL;
+	ColourScalePoint* csp = NULL;
 	
 	// If supplied value is less than that at the start of the list, add it at the beginning.
 	// If larget than the one at the end, then append it to the end of the list.
@@ -351,7 +351,7 @@ QColor ColourScale::colour(double value) const
 	// Check for no points being defined
 	if (points_.nItems() == 0) return QColor(0,0,0);
 
-	ColourScalePoint *csp = points_.first();	
+	ColourScalePoint* csp = points_.first();	
 	// Is supplied value less than the value at the first point?
 	if (value < csp->value()) return csp->colour();
 	
@@ -379,7 +379,7 @@ void ColourScale::colour(double value, Vec4<GLfloat>& target) const
 		return;
 	}
 
-	ColourScalePoint *csp = points_.first();	
+	ColourScalePoint* csp = points_.first();	
 	// Is supplied value less than the value at the first point?
 	if (value < csp->value())
 	{
@@ -398,6 +398,7 @@ void ColourScale::colour(double value, Vec4<GLfloat>& target) const
 	}
 
 	// If we get to here then the supplied value is outside the range of all values, so take colour from the endpoint
+	printf("OUTSIDE RANGE\n");
 	points_.last()->colour(target);
 }
 
@@ -408,19 +409,19 @@ int ColourScale::nPoints() const
 }
 
 // Return first point in colourscale
-ColourScalePoint *ColourScale::firstPoint() const
+ColourScalePoint* ColourScale::firstPoint() const
 {
 	return points_.first();
 }
 
 // Return last point in colourscale
-ColourScalePoint *ColourScale::lastPoint() const
+ColourScalePoint* ColourScale::lastPoint() const
 {
 	return points_.last();
 }
 
 // Return specific point in colourscale
-ColourScalePoint *ColourScale::point(int id)
+ColourScalePoint* ColourScale::point(int id)
 {
 	return points_[id];
 }
@@ -442,7 +443,7 @@ void ColourScale::clear()
 void ColourScale::setAllAlpha(double alpha)
 {
 	QColor color;
-	for (ColourScalePoint *csp = points_.first(); csp != NULL; csp = csp->next)
+	for (ColourScalePoint* csp = points_.first(); csp != NULL; csp = csp->next)
 	{
 		color = csp->colour();
 		int alphai = alpha*255;
