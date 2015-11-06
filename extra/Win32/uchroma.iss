@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "uChroma"
-#define MyAppVersion "0.2.0"
+#define MyAppVersion "0.2.1"
 #define MyAppPublisher "Tristan Youngs"
 #define MyAppURL "http://www.projectaten.net/"
 #define MyAppExeName "uChroma.exe"
@@ -28,7 +28,7 @@ DefaultDirName={pf}\uChroma
 DefaultGroupName={#MyAppName}
 LicenseFile=..\..\COPYING
 OutputDir=..\..\
-OutputBaseFilename=uChroma-0.2.0
+OutputBaseFilename=uChroma-0.2.1
 SetupIconFile=uChroma.ico
 Compression=lzma
 SolidCompression=yes
