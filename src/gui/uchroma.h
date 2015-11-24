@@ -233,6 +233,7 @@ class UChromaWindow : public QMainWindow
 	 */
 	private slots:
 	void on_actionSettingsChooseFont_triggered(bool checked);
+	void on_actionSettingsResetFont_triggered(bool checked);
 
 
 	/*

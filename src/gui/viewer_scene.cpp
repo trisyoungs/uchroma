@@ -122,7 +122,7 @@ void Viewer::renderFullScene(int xOffset, int yOffset)
 
 		// Set viewport
 		glViewport(pane->viewportMatrix()[0] + xOffset, pane->viewportMatrix()[1] + yOffset, pane->viewportMatrix()[2], pane->viewportMatrix()[3]);
-// 		printf("Viewport for pane '%s' is %i %i %i %i (offset = %i %i)\n" , qPrintable(pane->name()), pane->viewportMatrix()[0], pane->viewportMatrix()[1], pane->viewportMatrix()[2], pane->viewportMatrix()[3], xOffset, yOffset);
+		printf("Viewport for pane '%s' is %i %i %i %i (offset = %i %i)\n" , qPrintable(pane->name()), pane->viewportMatrix()[0], pane->viewportMatrix()[1], pane->viewportMatrix()[2], pane->viewportMatrix()[3], xOffset, yOffset);
 
 		// Setup an orthographic matrix
 		glMatrixMode(GL_PROJECTION);
@@ -168,6 +168,7 @@ void Viewer::renderFullScene(int xOffset, int yOffset)
 
 		// Get the pane's view matrix
 		Matrix viewMatrix = pane->viewMatrix();
+		viewMatrix.print();
 
 		// Send axis primitives to the display first
 		glLoadMatrixd(viewMatrix.matrix());
@@ -409,7 +410,7 @@ QPixmap Viewer::generateImage(int imageWidth, int imageHeight)
 
 			// Paste this tile into the main image
 			painter.drawImage(x*tileWidth, imageHeight-(y+1)*tileHeight, tile);
-			tile.save(QString("tile-%1%2.png").arg(x).arg(y), "png");
+// 			tile.save(QString("tile-%1%2.png").arg(x).arg(y), "png");
 		}
 		if (progress.wasCanceled()) break;
 	}

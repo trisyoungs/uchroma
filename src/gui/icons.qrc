@@ -60,4 +60,11 @@
     <file>icons/clear.svg</file>
     <file>icons/refresh.svg</file>
   </qresource>
+  <qresource prefix="freefont">
+    <file>freefont/AUTHORS</file>
+    <file>freefont/COPYING</file>
+    <file>freefont/CREDITS</file>
+    <file>freefont/FreeSans.ttf</file>
+    <file>freefont/FreeSerif.ttf</file>
+  </qresource>
 </RCC>
