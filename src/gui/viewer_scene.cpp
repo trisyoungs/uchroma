@@ -168,6 +168,8 @@ void Viewer::renderFullScene(int xOffset, int yOffset)
 
 		// Get the pane's view matrix
 		Matrix viewMatrix = pane->viewMatrix();
+		Matrix viewMatrixInverse = viewMatrix;
+		viewMatrixInverse.invert();
 
 		// Send axis primitives to the display first
 		glLoadMatrixd(viewMatrix.matrix());
@@ -185,9 +187,9 @@ void Viewer::renderFullScene(int xOffset, int yOffset)
 			FontInstance::font()->FaceSize(1);
 			for (axis=0; axis<3; ++axis) if (pane->axes().visible(axis) && (axis != skipAxis))
 			{
-				pane->axes().labelPrimitive(axis).renderAll(viewMatrix, pane->flatLabels(), pane->textZScale());
+				pane->axes().labelPrimitive(axis).renderAll(viewMatrix, viewMatrixInverse, pane->textZScale());
 				if (updateQueryDepth()) setQueryObject(Viewer::AxisTickLabelObject, QString::number(axis));
-				pane->axes().titlePrimitive(axis).renderAll(viewMatrix, pane->flatLabels(), pane->textZScale());
+				pane->axes().titlePrimitive(axis).renderAll(viewMatrix, viewMatrixInverse, pane->textZScale());
 				if (updateQueryDepth()) setQueryObject(Viewer::AxisTitleLabelObject, QString::number(axis));
 			}
 		}

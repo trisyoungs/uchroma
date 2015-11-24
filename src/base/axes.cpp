@@ -1200,7 +1200,7 @@ void Axes::updateAxisPrimitives()
 						// Get formatted value text
 						s = numberFormat_[axis].format(value);
 
-						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor(axis), tickDir * labelOrientation(axis).z, labelTransform, parent_.labelPointSize());
+						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor(axis), tickDir * labelOrientation(axis).z, labelTransform, parent_.labelPointSize(), false);
 					}
 				}
 
@@ -1246,7 +1246,7 @@ void Axes::updateAxisPrimitives()
 						// Get formatted label text
 						s = numberFormat_[axis].format(value);
 
-						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor(axis), tickDir * labelOrientation(axis).z, labelTransform, parent_.labelPointSize());
+						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor(axis), tickDir * labelOrientation(axis).z, labelTransform, parent_.labelPointSize(), false);
 
 						tickIsMajor[axis].add(true);
 
@@ -1295,8 +1295,9 @@ void Axes::updateAxisPrimitives()
 			adjustment *= parent_.labelPointSize() / parent_.titlePointSize();
 		}
 		else adjustment = tickDir * titleOrientation(axis).z;
+
 		// -- Add primitive
-		titlePrimitives_[axis].add(title_[axis], u, titleAnchor(axis), adjustment, titleTransform, parent_.titlePointSize());
+		titlePrimitives_[axis].add(title_[axis], u, titleAnchor(axis), adjustment, titleTransform, parent_.titlePointSize(), false);
 	}
 
 	// GridLines

@@ -75,7 +75,7 @@ void TextPrimitive::setTextSizeScale(double textSizeScale)
 }
 
 // Set data
-void TextPrimitive::set(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize)
+void TextPrimitive::set(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& localRotation, double textSize, bool flat)
 {
 	// Call the parser
 	generateFragments(this, text);
@@ -83,8 +83,9 @@ void TextPrimitive::set(QString text, Vec3<double> anchorPoint, TextPrimitive::T
 	anchorPoint_ = anchorPoint;
 	anchorPosition_ = anchorPosition;
 	adjustmentVector_ = adjustmentVector;
-	localRotation_ = rotation;
+	localRotation_ = localRotation;
 	textSize_ = textSize;
+	flat_ = flat;
 }
 
 // Return transformation matrix to use when rendering the text
@@ -194,7 +195,7 @@ void TextPrimitive::boundingBox(Vec3<double>& lowerLeft, Vec3<double>& upperRigh
 }
 
 // Render primitive
-void TextPrimitive::render(Matrix viewMatrix, bool correctOrientation, double baseFontSize)
+void TextPrimitive::render(const Matrix& viewMatrix, const Matrix& viewMatrixInverse, double baseFontSize)
 {
 	Matrix textMatrix;
 

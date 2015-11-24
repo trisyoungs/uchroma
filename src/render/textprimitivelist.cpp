@@ -34,10 +34,10 @@ void TextPrimitiveList::clear()
 }
 
 // Set data from literal coordinates and text
-void TextPrimitiveList::add(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize)
+void TextPrimitiveList::add(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& localRotation, double textSize, bool flat)
 {
 	TextPrimitive* primitive = textPrimitives_.add();
-	primitive->set(text, anchorPoint, anchorPosition, adjustmentVector, rotation, textSize);
+	primitive->set(text, anchorPoint, anchorPosition, adjustmentVector, localRotation, textSize, flat);
 }
 
 // Update global bounding cuboid for all text primitives in the list
@@ -67,8 +67,8 @@ Cuboid TextPrimitiveList::boundingCuboid(ViewPane& pane, bool flatLabels, double
 }
 
 // Render all primitives in list
-void TextPrimitiveList::renderAll(Matrix viewMatrix, bool flatLabels, double baseFontSize)
+void TextPrimitiveList::renderAll(const Matrix& viewMatrix, const Matrix& viewMatrixInverse, double baseFontSize)
 {
-	for (TextPrimitive* primitive = textPrimitives_.first(); primitive != NULL; primitive = primitive->next) primitive->render(viewMatrix, flatLabels, baseFontSize);
+	for (TextPrimitive* primitive = textPrimitives_.first(); primitive != NULL; primitive = primitive->next) primitive->render(viewMatrix, viewMatrixInverse, baseFontSize);
 }
 
