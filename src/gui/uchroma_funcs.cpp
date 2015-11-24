@@ -59,9 +59,8 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 	// Set UChroma pointers in widgets/dialogs where necessary
 	ui.MainView->setUChromaWindow(this);
 
-	// Load font for viewer
-	if (!QFile::exists(UChromaSession::viewerFontFileName())) QMessageBox::warning(this, "Font Error", "The specified font file '" + UChromaSession::viewerFontFileName() + "' does not exist.");
-	else if (!FontInstance::setupFont(UChromaSession::viewerFontFileName())) QMessageBox::warning(this, "Font Error", "Failed to create a font from the specified font file '" + UChromaSession::viewerFontFileName() +"'.");
+	// Load font 
+	if (!FontInstance::setup(UChromaSession::viewerFontFileName())) QMessageBox::warning(0, "Font Error", "Failed to setup font '" + UChromaSession::viewerFontFileName() + "'.");
 
 	// Connect signals / slots between the Viewer and uChroma
 	connect(ui.MainView, SIGNAL(renderComplete(QString)), this, SLOT(updateRenderTimeLabel(QString)));

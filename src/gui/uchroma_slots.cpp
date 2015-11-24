@@ -695,10 +695,17 @@ void UChromaWindow::on_actionSettingsChooseFont_triggered(bool checked)
 	if (!newFont.isEmpty())
 	{
 		if (!QFile::exists(newFont)) QMessageBox::warning(this, "Font Error", "The specified font file '" + newFont + "' does not exist.");
-		else if (!FontInstance::setupFont(newFont)) QMessageBox::warning(this, "Font Error", "Failed to create a font from the specified font file '" + newFont +"'.");
+		else if (!FontInstance::setup(newFont)) QMessageBox::warning(this, "Font Error", "Failed to create a font from the specified font file '" + newFont +"'.");
 		UChromaSession::setViewerFontFileName(newFont);
 		saveSettings();
 	}
+}
+
+void UChromaWindow::on_actionSettingsResetFont_triggered(bool checked)
+{
+	UChromaSession::setViewerFontFileName(QString());
+	FontInstance::setup(UChromaSession::viewerFontFileName());
+	saveSettings();
 }
 
 /*

@@ -35,13 +35,7 @@ int UChromaSession::imageExportWidth_ = 800;
 int UChromaSession::imageExportHeight_ = 600;
 bool UChromaSession::imageExportMaintainAspect_ = true;
 UChromaSession::ImageFormat UChromaSession::imageExportFormat_ = UChromaSession::PNGFormat;
-#ifdef WIN32
-	QString UChromaSession::viewerFontFileName_ = QDir::current().absoluteFilePath("resources/wright.ttf");
-#elif __APPLE__
-	QString UChromaSession::viewerFontFileName_ = QCoreApplication::applicationDirPath() + "/../SharedSupport/resources/wright.ttf";
-#else
-	QString UChromaSession::viewerFontFileName_ = QDir::current().absoluteFilePath("wright.ttf");
-#endif
+QString UChromaSession::viewerFontFileName_;
 // -- Collections
 List<Collection> UChromaSession::collections_;
 Collection* UChromaSession::currentCollection_ = NULL;

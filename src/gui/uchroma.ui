@@ -618,7 +618,7 @@
      <x>0</x>
      <y>0</y>
      <width>947</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -668,7 +668,14 @@
     <property name="title">
      <string>&amp;Settings</string>
     </property>
-    <addaction name="actionSettingsChooseFont"/>
+    <widget class="QMenu" name="menuFont">
+     <property name="title">
+      <string>Font</string>
+     </property>
+     <addaction name="actionSettingsChooseFont"/>
+     <addaction name="actionSettingsResetFont"/>
+    </widget>
+    <addaction name="menuFont"/>
    </widget>
    <widget class="QMenu" name="menuCollection">
     <property name="title">
@@ -1515,6 +1522,11 @@
    </property>
    <property name="toolTip">
     <string>Export current collection</string>
+   </property>
+  </action>
+  <action name="actionSettingsResetFont">
+   <property name="text">
+    <string>Reset to Default</string>
    </property>
   </action>
  </widget>
