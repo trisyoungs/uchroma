@@ -122,7 +122,7 @@ void Viewer::renderFullScene(int xOffset, int yOffset)
 
 		// Set viewport
 		glViewport(pane->viewportMatrix()[0] + xOffset, pane->viewportMatrix()[1] + yOffset, pane->viewportMatrix()[2], pane->viewportMatrix()[3]);
-		printf("Viewport for pane '%s' is %i %i %i %i (offset = %i %i)\n" , qPrintable(pane->name()), pane->viewportMatrix()[0], pane->viewportMatrix()[1], pane->viewportMatrix()[2], pane->viewportMatrix()[3], xOffset, yOffset);
+// 		printf("Viewport for pane '%s' is %i %i %i %i (offset = %i %i)\n" , qPrintable(pane->name()), pane->viewportMatrix()[0], pane->viewportMatrix()[1], pane->viewportMatrix()[2], pane->viewportMatrix()[3], xOffset, yOffset);
 
 		// Setup an orthographic matrix
 		glMatrixMode(GL_PROJECTION);
@@ -166,10 +166,9 @@ void Viewer::renderFullScene(int xOffset, int yOffset)
 		glMatrixMode(GL_MODELVIEW);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		// Get the pane's view matrix
+		// Get the pane's view matrix and rotation matrix inverse
 		Matrix viewMatrix = pane->viewMatrix();
-		Matrix viewMatrixInverse = viewMatrix;
-		viewMatrixInverse.invert();
+		Matrix viewRotationInverse = pane->viewRotationInverse();
 
 		// Send axis primitives to the display first
 		glLoadMatrixd(viewMatrix.matrix());
@@ -187,9 +186,9 @@ void Viewer::renderFullScene(int xOffset, int yOffset)
 			FontInstance::font()->FaceSize(1);
 			for (axis=0; axis<3; ++axis) if (pane->axes().visible(axis) && (axis != skipAxis))
 			{
-				pane->axes().labelPrimitive(axis).renderAll(viewMatrix, viewMatrixInverse, pane->textZScale());
+				pane->axes().labelPrimitive(axis).renderAll(viewMatrix, viewRotationInverse, pane->textZScale());
 				if (updateQueryDepth()) setQueryObject(Viewer::AxisTickLabelObject, QString::number(axis));
-				pane->axes().titlePrimitive(axis).renderAll(viewMatrix, viewMatrixInverse, pane->textZScale());
+				pane->axes().titlePrimitive(axis).renderAll(viewMatrix, viewRotationInverse, pane->textZScale());
 				if (updateQueryDepth()) setQueryObject(Viewer::AxisTitleLabelObject, QString::number(axis));
 			}
 		}

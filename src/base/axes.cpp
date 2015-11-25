@@ -1109,6 +1109,9 @@ void Axes::updateAxisPrimitives()
 	// Make sure coordinates are up-to-date
 	updateCoordinates();
 
+	// Get view matrix inverse
+	Matrix viewRotationInverse = parent_.viewRotationInverse();
+
 	// Set axis for in-plane (in-screen) rotation
 	int inPlaneAxis = 2;
 	if (parent_.viewType() == ViewPane::FlatXZView) inPlaneAxis = 1;
@@ -1200,7 +1203,7 @@ void Axes::updateAxisPrimitives()
 						// Get formatted value text
 						s = numberFormat_[axis].format(value);
 
-						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor(axis), tickDir * labelOrientation(axis).z, labelTransform, parent_.labelPointSize(), false);
+						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor(axis), tickDir * labelOrientation(axis).z, labelTransform, parent_.labelPointSize(), parent_.flatLabels());
 					}
 				}
 
@@ -1246,7 +1249,7 @@ void Axes::updateAxisPrimitives()
 						// Get formatted label text
 						s = numberFormat_[axis].format(value);
 
-						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor(axis), tickDir * labelOrientation(axis).z, labelTransform, parent_.labelPointSize(), false);
+						labelPrimitives_[axis].add(s, u+tickDir*tickSize_[axis], labelAnchor(axis), tickDir * labelOrientation(axis).z, labelTransform, parent_.labelPointSize(), parent_.flatLabels());
 
 						tickIsMajor[axis].add(true);
 
@@ -1280,7 +1283,7 @@ void Axes::updateAxisPrimitives()
 		// -- Next step depends on whether we are automatically adjusting label positions
 		if (useBestFlatView_ || autoPositionTitles_)
 		{
-			Cuboid cuboid = labelPrimitives_[axis].boundingCuboid(parent_, false, parent_.textZScale());
+			Cuboid cuboid = labelPrimitives_[axis].boundingCuboid(viewRotationInverse, parent_.textZScale());
 			// Project tick direction onto cuboid width/height
 			// TODO This does not account for the fact that the bounding cuboid may only partly extend over the end of ths axis tick mark (e.g. as with in-plane rotations/TopMiddle anchors)...
 			Vec3<double> extent = cuboid.maxima() - cuboid.minima();
@@ -1297,7 +1300,7 @@ void Axes::updateAxisPrimitives()
 		else adjustment = tickDir * titleOrientation(axis).z;
 
 		// -- Add primitive
-		titlePrimitives_[axis].add(title_[axis], u, titleAnchor(axis), adjustment, titleTransform, parent_.titlePointSize(), false);
+		titlePrimitives_[axis].add(title_[axis], u, titleAnchor(axis), adjustment, titleTransform, parent_.titlePointSize(), parent_.flatLabels());
 	}
 
 	// GridLines

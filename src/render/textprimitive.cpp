@@ -89,7 +89,7 @@ void TextPrimitive::set(QString text, Vec3<double> anchorPoint, TextPrimitive::T
 }
 
 // Return transformation matrix to use when rendering the text
-Matrix TextPrimitive::transformationMatrix(double baseFontSize, TextFragment* fragment)
+Matrix TextPrimitive::transformationMatrix(const Matrix& viewMatrixInverse, double baseFontSize, TextFragment* fragment)
 {
 	Matrix textMatrix, A;
 	Vec3<double> lowerLeft, upperRight, anchorPos, anchorPosRotated, textCentre;
@@ -140,8 +140,9 @@ Matrix TextPrimitive::transformationMatrix(double baseFontSize, TextFragment* fr
 	// -- Translate to centre of text bounding box (not rotated) accounting for fragment translation if one was specified
 	if (fragment) textCentre -= fragment->translation();
 	textMatrix.createTranslation(-textCentre);
-	// -- Apply scaled local rotation matrix
-	A = localRotation_;
+	// -- Apply scaled local rotation matrix (if not flat)
+	if (flat_) A = viewMatrixInverse;
+	else A = localRotation_;
 	A.applyScaling(scale, scale, scale);
 	textMatrix *= A;
 	// -- Apply translation to text anchor point
@@ -202,7 +203,7 @@ void TextPrimitive::render(const Matrix& viewMatrix, const Matrix& viewMatrixInv
 	// Loop over fragments
 	for (TextFragment* fragment = fragments_.first(); fragment != NULL; fragment = fragment->next)
 	{
-		textMatrix = transformationMatrix(baseFontSize, fragment) * viewMatrix;
+		textMatrix = transformationMatrix(viewMatrixInverse, baseFontSize, fragment) * viewMatrix;
 		glLoadMatrixd(textMatrix.matrix());
 
 		// Draw bounding boxes around each fragment
