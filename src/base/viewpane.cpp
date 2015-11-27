@@ -53,6 +53,8 @@ ViewPane::ViewPane(ViewLayout& parent) : ListItem<ViewPane>(), ObjectStore<ViewP
 	viewTranslation_.set(0.0, 0.0, zOffset_);
 	viewViewportUsedAt_ = -1;
 	viewAxesUsedAt_ = -1;
+	viewRotationPoint_ = 0;
+	viewRotationInversePoint_ = -1;
 
 	// Role
 	role_ = ViewPane::StandardRole;
@@ -101,6 +103,9 @@ void ViewPane::operator=(const ViewPane& source)
 	viewportMatrix_[3] = source.viewportMatrix_[3];
 	viewportVersion_ = 0;
 	viewRotation_ = source.viewRotation_;
+	viewRotationPoint_ = source.viewRotationPoint_;
+	viewRotationInverse_ = source.viewRotationInverse_;
+	viewRotationInversePoint_ = source.viewRotationInversePoint_;
 	viewTranslation_ = source.viewTranslation_;
 	viewViewportUsedAt_ = -1;
 	viewAxesUsedAt_ = -1;
@@ -542,6 +547,8 @@ void ViewPane::setViewRotation(Matrix& mat)
 	if ((viewType_ != ViewPane::NormalView) && (viewType_ != ViewPane::AutoStretchedView)) return;
 
 	viewRotation_ = mat;
+
+	++viewRotationPoint_;
 }
 
 // Update single column of view matrix
@@ -551,6 +558,8 @@ void ViewPane::setViewRotationColumn(int column, double x, double y, double z)
 	if ((viewType_ != ViewPane::NormalView) && (viewType_ != ViewPane::AutoStretchedView)) return;
 	
 	viewRotation_.setColumn(column, x, y, z, 0.0);
+
+	++viewRotationPoint_;
 }
 
 // Rotate view matrix about x and y by amounts specified
@@ -562,12 +571,28 @@ void ViewPane::rotateView(double dx, double dy)
 	Matrix A;
 	A.createRotationXY(dx, dy);
 	viewRotation_ *= A;
+
+	++viewRotationPoint_;
 }
 
 // Return view rotation
 Matrix ViewPane::viewRotation() const
 {
 	return viewRotation_;
+}
+
+// Return view rotation inverse
+Matrix ViewPane::viewRotationInverse()
+{
+	if (viewRotationPoint_ != viewRotationInversePoint_)
+	{
+		viewRotationInverse_ = viewRotation_;
+		viewRotationInverse_.invert();
+		
+		viewRotationInversePoint_ = viewRotationPoint_;
+	}
+
+	return viewRotationInverse_;
 }
 
 // Set view translation
@@ -740,7 +765,7 @@ Vec3<double> ViewPane::screenToModel(int x, int y, double z)
 	int newx, newy;
 	double dx, dy;
 
-	// Grab transformation matrix, apply translation correction, and invert
+	// Grab full transformation matrix (not just rotation matrix) and invert
 	Matrix itransform = viewMatrix();
 	itransform.invert();
 
@@ -836,7 +861,7 @@ void ViewPane::recalculateView(bool force)
 	}
 	
 	const double margin = 10.0;
-	Matrix viewMat, B;
+	Matrix viewMat, B, viewMatrixInverse;
 	double tempMin, tempMax;
 	Vec3<double> coordMin[3], coordMax[3], labelMin, labelMax, a, b, globalMin, globalMax;
 
@@ -848,6 +873,11 @@ void ViewPane::recalculateView(bool force)
 		viewMat.createTranslation(-axes().coordCentre());
 		if (viewType_ == ViewPane::FlatXZView) viewMat.applyRotationX(90.0);
 		else if (viewType_ == ViewPane::FlatZYView) viewMat.applyRotationY(-90.0);
+
+		// Calculate view rotation matrix inverse
+		viewMatrixInverse = viewMat;
+		viewMatrixInverse.removeTranslationAndScaling();
+		viewMatrixInverse.invert();
 
 		// Calculate coordinates and global extremes over axes and labels
 		globalMin.set(1e9,1e9,1e9);
@@ -874,8 +904,8 @@ void ViewPane::recalculateView(bool force)
 
 			// Get bounding cuboid for axis text
 			Cuboid cuboid;
-			cuboid = axes_.labelPrimitive(axis).boundingCuboid(*this, false, textZScale_);
-			cuboid = axes_.titlePrimitive(axis).boundingCuboid(*this, false, textZScale_, cuboid);
+			cuboid = axes_.labelPrimitive(axis).boundingCuboid(viewMatrixInverse, textZScale_);
+			cuboid = axes_.titlePrimitive(axis).boundingCuboid(viewMatrixInverse, textZScale_, cuboid);
 
 			// Project cuboid extremes and store projected coordinates
 			a = modelToScreen(cuboid.minima(), tempProjection, viewMat);
@@ -1277,6 +1307,8 @@ double ViewPane::textZScale()
 void ViewPane::setFlatLabels(bool flat)
 {
 	flatLabels_ = flat;
+
+	axes_.setPrimitivesInvalid();
 }
 
 // Whether axis text labels are drawn flat in 3D views
@@ -1292,7 +1324,10 @@ bool ViewPane::flatLabels()
 // Return axis title at specified coordinates (if any)
 int ViewPane::axisTitleAt(int screenX, int screenY)
 {
-	printf("Coords=%i %i\n", screenX, screenY);
+// 	printf("Coords=%i %i\n", screenX, screenY);
+	// Get view matrix inverse
+	Matrix viewRotInverse = viewRotationInverse();
+
 	Vec3<double> labelMin, labelMax;
 	for (int axis=0; axis<3; ++axis)
 	{
@@ -1301,7 +1336,7 @@ int ViewPane::axisTitleAt(int screenX, int screenY)
 		labelMax = -labelMin;
 
 		// Calculate orthogonal bounding cuboid for this axis title (local coordinates)
-		Cuboid cuboid = axes_.titlePrimitive(axis).boundingCuboid(*this, false, textZScale_);
+		Cuboid cuboid = axes_.titlePrimitive(axis).boundingCuboid(viewRotInverse, textZScale_);
 
 		// Determine whether the screen point specified is within the projected cuboid
 		if (cuboid.isPointWithinProjection(screenX, screenY, viewMatrix(), projectionMatrix_, viewportMatrix_)) return axis;

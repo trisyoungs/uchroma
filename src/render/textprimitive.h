@@ -69,6 +69,8 @@ class TextPrimitive : public ListItem<TextPrimitive>
 	Vec3<double> adjustmentVector_;
 	// Local transform matrix for the text
 	Matrix localRotation_;
+	// Whether text should be rendered flat (w.r.t viewer's screen plane)
+	bool flat_;
 	// Text size
 	double textSize_;
 	// Text fragments to render
@@ -78,13 +80,13 @@ class TextPrimitive : public ListItem<TextPrimitive>
 	// Set text scaling factor
 	static void setTextSizeScale(double textSizeScale);
 	// Set data
-	void set(QString text, Vec3<double> anchorPoint, TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize);
+	void set(QString text, Vec3<double> anchorPoint, TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& localRotation, double textSize, bool flat);
 	// Return transformation matrix to use when rendering (including fragment scale/translation if one is specified)
-	Matrix transformationMatrix(double baseFontSize, TextFragment* fragment = NULL);
+	Matrix transformationMatrix(const Matrix& viewMatrixInverse, double baseFontSize, TextFragment* fragment = NULL);
 	// Calculate bounding box of primitive
 	void boundingBox(Vec3<double>& lowerLeft, Vec3<double>& upperRight);
 	// Render primitive
-	void render(Matrix viewMatrix, bool correctOrientation, double baseFontSize);
+	void render(const Matrix& viewMatrix, const Matrix& viewMatrixInverse, double baseFontSize);
 
 
 	/*

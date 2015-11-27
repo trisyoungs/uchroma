@@ -34,14 +34,14 @@ void TextPrimitiveList::clear()
 }
 
 // Set data from literal coordinates and text
-void TextPrimitiveList::add(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& rotation, double textSize)
+void TextPrimitiveList::add(QString text, Vec3<double> anchorPoint, TextPrimitive::TextAnchor anchorPosition, Vec3<double> adjustmentVector, Matrix& localRotation, double textSize, bool flat)
 {
 	TextPrimitive* primitive = textPrimitives_.add();
-	primitive->set(text, anchorPoint, anchorPosition, adjustmentVector, rotation, textSize);
+	primitive->set(text, anchorPoint, anchorPosition, adjustmentVector, localRotation, textSize, flat);
 }
 
 // Update global bounding cuboid for all text primitives in the list
-Cuboid TextPrimitiveList::boundingCuboid(ViewPane& pane, bool flatLabels, double baseFontSize, Cuboid startingCuboid)
+Cuboid TextPrimitiveList::boundingCuboid(const Matrix& viewMatrixInverse, double baseFontSize, Cuboid startingCuboid)
 {
 	Cuboid result = startingCuboid;
 	Matrix textMatrix;
@@ -49,7 +49,7 @@ Cuboid TextPrimitiveList::boundingCuboid(ViewPane& pane, bool flatLabels, double
 	for (TextPrimitive* primitive = textPrimitives_.first(); primitive != NULL; primitive = primitive->next)
 	{
 		// Get transformation matrix and bounding box for text
-		textMatrix = primitive->transformationMatrix(baseFontSize);
+		textMatrix = primitive->transformationMatrix(viewMatrixInverse, baseFontSize);
 		primitive->boundingBox(corners[0], corners[1]);
 		corners[2].set(corners[0].x, corners[1].y, 0.0);
 		corners[3].set(corners[1].x, corners[0].y, 0.0);
@@ -67,8 +67,8 @@ Cuboid TextPrimitiveList::boundingCuboid(ViewPane& pane, bool flatLabels, double
 }
 
 // Render all primitives in list
-void TextPrimitiveList::renderAll(Matrix viewMatrix, bool flatLabels, double baseFontSize)
+void TextPrimitiveList::renderAll(const Matrix& viewMatrix, const Matrix& viewMatrixInverse, double baseFontSize)
 {
-	for (TextPrimitive* primitive = textPrimitives_.first(); primitive != NULL; primitive = primitive->next) primitive->render(viewMatrix, flatLabels, baseFontSize);
+	for (TextPrimitive* primitive = textPrimitives_.first(); primitive != NULL; primitive = primitive->next) primitive->render(viewMatrix, viewMatrixInverse, baseFontSize);
 }
 

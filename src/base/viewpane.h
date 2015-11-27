@@ -184,8 +184,14 @@ class ViewPane : public ListItem<ViewPane>, public ObjectStore<ViewPane>
 	bool hasPerspective_;
 	// Field of view angle used in projectionMatrix_ when using perspective
 	double perspectiveFieldOfView_;
-	// View matrix for GL
+	// View rotation matrix for GL
 	Matrix viewRotation_;
+	// Logpoint for view rotation matrix
+	int viewRotationPoint_;
+	// View rotation matrix inverse
+	Matrix viewRotationInverse_;
+	// Logpoint for view rotation inverse matrix calculation
+	int viewRotationInversePoint_;
 	// Current translation of view
 	Vec3<double> viewTranslation_;
 	// Standard zOffset for translation matrix
@@ -222,6 +228,8 @@ class ViewPane : public ListItem<ViewPane>, public ObjectStore<ViewPane>
 	void rotateView(double dx, double dy);
 	// Return view rotation
 	Matrix viewRotation() const;
+	// Return view rotation inverse
+	Matrix viewRotationInverse();
 	// Set view translation
 	void setViewTranslation(double x, double y, double z);
 	// Translate view matrix by amounts specified
