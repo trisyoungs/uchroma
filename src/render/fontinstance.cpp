@@ -109,7 +109,7 @@ FTBBox FontInstance::boundingBox(QString text)
 	if (!font_) return FTBBox();
 
 	// Need to be a little careful here - we will put a '.' either side of the text so we get the full width of strings with trailing spaces..
-	FTBBox box = font_->BBox(qPrintable("." + text + "."));
+	FTBBox box = font_->BBox(qPrintable("." + text.toUtf8() + "."));
 // 	double newWidth = box.Upper().X() - dotWidth_;
 // 	box.Upper().X(newWidth);
 	return FTBBox(box.Lower(), FTPoint(box.Upper().X()-dotWidth_, box.Upper().Y()));
