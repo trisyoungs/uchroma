@@ -32,7 +32,7 @@ Packager: Tristan Youngs
 AutoReq: yes
 
 # Build dependencies
-BuildRequires: gcc-c++ bison Mesa-devel libqt4 libqt4-devel libhdf5-devel
+BuildRequires: gcc-c++ bison Mesa-devel hdf5-devel ftgl-devel libQt5Core-devel libQt5Core5 libQt5OpenGL-devel libQt5OpenGL5 libQt5Widgets5 libQt5Widgets-devel libQt5Svg5
 
 # In-depth description.
 %description
