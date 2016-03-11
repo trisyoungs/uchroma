@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 9), ftgl-dev, bison, libtool, chrpath, qt54base
 
 Package: uchroma
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, qt4base, qt4svg, libftgl2
+Depends: ${shlibs:Depends}, ${misc:Depends}, qt54base, qt54svg, libftgl2, libreadline6
 Description: 2D / 3D data visualisation
  uChroma allows scientific XY data to be visualised as multiplot line graphs,
  3D surfaces, grids, etc.
