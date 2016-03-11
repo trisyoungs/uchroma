@@ -16,7 +16,7 @@ CFLAGS += -O2
 endif
 
 # Set some variables
-QTBASE=/opt/qt4
+QTBASE=/opt/qt54
 QTPC=$(QTBASE)/lib/pkgconfig
 QTBIN=$(QTBASE)/bin
 LDPATH=$(QTBASE)/lib/x86_64-linux-gnu:$(QTBASE)/lib:$(QTBASE)/lib/i386-linux-gnu
@@ -33,6 +33,9 @@ build-stamp:
 	
 	# Make the binary
 	$(MAKE)
+
+	# Remove rpath to /opt/qt54
+	chrpath -d src/aten
 
 	# --- end custom part for compiling
 
