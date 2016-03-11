@@ -13,3 +13,6 @@ uchroma_DATA = extra/uchroma.png resources/wright.ttf
 desktopdir = @BUILDDIR@/usr/share/applications
 desktop_DATA = extra/uChroma.desktop
 
+icondir = @BUILDDIR@/usr/share/pixmaps
+icon_DATA = extra/uchroma.png
+

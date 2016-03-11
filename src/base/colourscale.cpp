@@ -398,7 +398,7 @@ void ColourScale::colour(double value, Vec4<GLfloat>& target) const
 	}
 
 	// If we get to here then the supplied value is outside the range of all values, so take colour from the endpoint
-	printf("OUTSIDE RANGE\n");
+	//printf("OUTSIDE RANGE\n");
 	points_.last()->colour(target);
 }
 
