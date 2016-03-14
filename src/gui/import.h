@@ -73,6 +73,10 @@ class ImportDialog : public QDialog
 	bool import();
 	// Return first imported slice
 	DataSet* importedSlices();
+	// Return selected filename
+	QString filename();
+	// Return whether a new collection should be created for the imported data
+	bool createNewCollection();
 
 
 	/*
@@ -81,10 +85,9 @@ class ImportDialog : public QDialog
 	private slots:
 	// -- Global Widgets
 	void on_DataFileSelectButton_clicked(bool checked);
+	void on_DataFileEdit_textChanged(QString text);
 	void on_ImportButton_clicked(bool checked);
 	void on_CancelButton_clicked(bool checked);
-	// -- Sequential XY Data
-	
 };
 
 #endif

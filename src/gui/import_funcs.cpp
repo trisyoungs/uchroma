@@ -56,6 +56,7 @@ void ImportDialog::closeEvent(QCloseEvent *event)
 bool ImportDialog::import()
 {
 	importedDataSets_.clear();
+
 	int result = exec();
 	return result;
 }
@@ -65,6 +66,18 @@ bool ImportDialog::import()
 DataSet* ImportDialog::importedSlices()
 {
 	return importedDataSets_.first();
+}
+
+// Return selected filename
+QString ImportDialog::filename()
+{
+	return ui.DataFileEdit->text();
+}
+
+// Return whether a new collection should be created for the imported data
+bool ImportDialog::createNewCollection()
+{
+	return ui.ImportIntoNewCollectionRadio->isChecked();
 }
 
 /*
@@ -79,6 +92,13 @@ void ImportDialog::on_DataFileSelectButton_clicked(bool checked)
 		ui.DataFileEdit->setText(newFile);
 		currentDirectory_ = newFile;
 	}
+}
+
+void ImportDialog::on_DataFileEdit_textChanged(QString text)
+{
+	// Make a quick check on the specified file to see if it exists and is readable, and disable/enable the Import button accordingly
+	QFileInfo fileInfo(text);
+	ui.ImportButton->setEnabled(fileInfo.exists() && fileInfo.isReadable() && (! fileInfo.isDir()));
 }
 
 void ImportDialog::on_ImportButton_clicked(bool checked)

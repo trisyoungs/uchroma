@@ -96,6 +96,7 @@ UChromaWindow::UChromaWindow(QMainWindow *parent) : QMainWindow(parent),
 
 	// Add QLabel as a normal widget to the status bar
 	statusBarInfoLabel_ = new QLabel(this);
+	statusBarInfoLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 	ui.StatusBar->addWidget(statusBarInfoLabel_);
 	statusBarRenderingTimeLabel_ = new QLabel(this);
 	ui.StatusBar->addPermanentWidget(statusBarRenderingTimeLabel_);	

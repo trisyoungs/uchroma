@@ -475,22 +475,36 @@ void UChromaWindow::on_actionDataLoadXY_triggered(bool checked)
 
 void UChromaWindow::on_actionDataImport_triggered(bool checked)
 {
-	// Check current Collection
-	Collection* currentCollection = UChromaSession::currentCollection();
-	if (!Collection::objectValid(currentCollection, "collection in UChromaWindow::on_actionDataImport_triggered()")) return;
-
 	// Raise the Data Import dialog
 	bool result = importDialog_.import();
 	if (!result) return;
 
+	// Create new Collection if requested
+	Collection* currentCollection = NULL;
+	if (importDialog_.createNewCollection())
+	{
+		// Start edit state group
+		UChromaSession::beginEditStateGroup("import data into new collection");
+
+		currentCollection = UChromaSession::addCollection();
+
+		// No need to capture additional undo information
+		UChromaSession::endEditStateGroup();
+
+		// Set name of collection
+		currentCollection->setName(importDialog_.filename());
+	}
+	else currentCollection = UChromaSession::currentCollection();
+
+	// Check current Collection
+	
+	if (!Collection::objectValid(currentCollection, "collection in UChromaWindow::on_actionDataImport_triggered()")) return;
+
 	// Loop over list of imported slices and copy them to our local list
 	for (DataSet* dataSet = importDialog_.importedSlices(); dataSet != NULL; dataSet = dataSet->next) currentCollection->addDataSet(dataSet);
 
-	// Update subwindows
-	updateSubWindows();
-	
-	// Need to update display
-	updateDisplay();
+	// Update everything
+	updateGUI();
 }
 
 void UChromaWindow::on_actionDataReload_triggered(bool checked)
