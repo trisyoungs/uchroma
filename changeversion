@@ -65,25 +65,27 @@ then
 fi
 grep 'm4_define(\[UCHROMA_VERSION\]' ./configure.ac | sed -e 's/m4_define(\[UCHROMA_VERSION\],\[\([0-9a-z\.]\+\)\])/\1/g'
 
-
 # Change specfile name and contents
 if [ "$TEST" = "false" ]
 then
-  echo "Writing new specfile..."
-  sed -i -e "s/Version: [0-9a-z\.]\+/Version: $MAJOR.$MINOR.$PATCH/g" uchroma.spec
-  grep "Version:" uchroma.spec
-else
-  echo -n "                          Specfile : "
-  grep "Version:" uchroma.spec | sed -e 's/Version: \([0-9a-z\.]\+\)/\1/g'
+  sed -i -e "s/Version: [0-9a-z\.]\+/Version: $MAJOR.$MINOR.$PATCH/g" extra/*/uchroma.spec
 fi
+for a in extra/*/uchroma.spec
+do
+  ver=`grep "Version:" $a | sed -e 's/Version: \([0-9a-z\.]\+\)/\1/g'`
+  printf  '%34s : %s\n' $a $ver
+done
 
 # Debian build files
-echo -n "       *.control (Program Version) : "
 if [ "$TEST" = "false" ]
 then
-  sed -i -e "s/Version: \([0-9a-z\.]\+\)/Version: $MAJOR.$MINOR.$PATCH/g" -e "s/^ \([a-z0-9]*\) \([0-9]*\) .*/ \1 \2 uchroma-$MAJOR.$MINOR.$PATCH.tar.gz/g" ./extra/*/control
+  sed -i -e "s/uchroma (\([0-9\.]\+\))/uchroma ($MAJOR.$MINOR.$PATCH)/g" -e "s/^  v \([0-9\.]*\)-1/  * \1-1/g" extra/*/changelog
 fi
-grep 'Version:' ./extra/*/control | sed -e 's/Version: \([0-9a-z\.]\+\)/\1/g'
+for a in extra/*/changelog
+do
+  ver=`grep 'uchroma (' $a | sed -e 's/uchroma (\([0-9\.]\+\).*/\1/g'`
+  printf  '%34s : %s\n' $a $ver
+done
 
 # OSX build files
 echo -n "    uchroma.dmginfo (Program Version) : "

@@ -35,7 +35,7 @@ build-stamp:
 	$(MAKE)
 
 	# Remove rpath to /opt/qt54
-	chrpath -d src/aten
+	chrpath -d src/uchroma
 
 	# --- end custom part for compiling
 
