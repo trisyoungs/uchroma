@@ -716,8 +716,7 @@ void Axes::setTickDirection(int axis, int dir, double value)
 // Return axis tick direction
 Vec3<double> Axes::tickDirection(int axis) const
 {
-	if ((!useBestFlatView_) || (parent_.viewType() <= ViewPane::AutoStretchedView)) return tickDirection_[axis];
-	else switch (parent_.viewType())
+	if (useBestFlatView_ && parent_.isFlatView()) switch (parent_.viewType())
 	{
 		case (ViewPane::FlatXYView):
 			return (axis == 0 ? Vec3<double>(0.0, inverted_.y ? 1.0 : -1.0, 0.0) : Vec3<double>(inverted_.x ? 1.0 : -1.0, 0.0, 0.0));
@@ -849,8 +848,7 @@ void Axes::setLabelOrientation(int axis, int component, double value)
 // Return orientation of labels for specified axis
 Vec3<double> Axes::labelOrientation(int axis) const
 {
-	if ((!useBestFlatView_) || (parent_.viewType() <= ViewPane::AutoStretchedView)) return labelOrientation_[axis];
-	else switch (parent_.viewType())
+	if (useBestFlatView_ && parent_.isFlatView()) switch (parent_.viewType())
 	{
 		case (ViewPane::FlatXYView):
 			return (axis == 0 ? Vec3<double>(0.0, 0.0, 0.2) : Vec3<double>(0.0, 0.0, 0.2));
@@ -881,8 +879,7 @@ void Axes::setLabelAnchor(int axis, TextPrimitive::TextAnchor anchor)
 // Return axis label text anchor position for specified axis
 TextPrimitive::TextAnchor Axes::labelAnchor(int axis) const
 {
-	if ((!useBestFlatView_) || (parent_.viewType() <= ViewPane::AutoStretchedView)) return labelAnchor_[axis];
-	else switch (parent_.viewType())
+	if (useBestFlatView_ && parent_.isFlatView()) switch (parent_.viewType())
 	{
 		case (ViewPane::FlatXYView):
 			return (axis == 0 ? (inverted_.y ? TextPrimitive::BottomMiddleAnchor : TextPrimitive::TopMiddleAnchor) : (inverted_.x ? TextPrimitive::MiddleLeftAnchor : TextPrimitive::MiddleRightAnchor));
@@ -931,8 +928,7 @@ void Axes::setTitleOrientation(int axis, int component, double value)
 // Return orientation of titles for specified axis
 Vec4<double> Axes::titleOrientation(int axis) const
 {
-	if ((!useBestFlatView_) || (parent_.viewType() <= ViewPane::AutoStretchedView)) return titleOrientation_[axis];
-	else switch (parent_.viewType())
+	if (useBestFlatView_ && parent_.isFlatView()) switch (parent_.viewType())
 	{
 		case (ViewPane::FlatXYView):
 			return (axis == 0 ? Vec4<double>(0.0, 0.0, 0.2, 0.5) : Vec4<double>(0.0, 270.0, 0.2, 0.5));
@@ -963,8 +959,7 @@ void Axes::setTitleAnchor(int axis, TextPrimitive::TextAnchor anchor)
 // Return axis title text anchor position for specified axis
 TextPrimitive::TextAnchor Axes::titleAnchor(int axis) const
 {
-	if ((!useBestFlatView_) || (parent_.viewType() <= ViewPane::AutoStretchedView)) return titleAnchor_[axis];
-	else switch (parent_.viewType())
+	if (useBestFlatView_ && parent_.isFlatView()) switch (parent_.viewType())
 	{
 		case (ViewPane::FlatXYView):
 			return (axis == 0 ? (inverted_.y ? TextPrimitive::BottomMiddleAnchor : TextPrimitive::TopMiddleAnchor) : (inverted_.x ? TextPrimitive::TopMiddleAnchor : TextPrimitive::BottomMiddleAnchor));
@@ -1281,7 +1276,7 @@ void Axes::updateAxisPrimitives()
 			u.set(axis, (inverted_[axis] ? (max_[axis] - value) + min_[axis]: value) * stretch_[axis]);
 		}
 		// -- Next step depends on whether we are automatically adjusting label positions
-		if (useBestFlatView_ || autoPositionTitles_)
+		if ((useBestFlatView_ && parent_.isFlatView()) || autoPositionTitles_)
 		{
 			Cuboid cuboid = labelPrimitives_[axis].boundingCuboid(viewRotationInverse, parent_.textZScale());
 			// Project tick direction onto cuboid width/height

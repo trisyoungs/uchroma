@@ -4,7 +4,7 @@
 # Name, brief description, and version 
 Summary: uChroma - 2D/3D visualisation of scientific data
 Name: %{shortname}
-Version: 0.2.1
+Version: 0.2.2
 Release: 1
 License: GPL
 %define fullname %{name}-%{version}

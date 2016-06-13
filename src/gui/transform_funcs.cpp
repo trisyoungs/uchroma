@@ -84,10 +84,15 @@ bool TransformWindow::transformEquationChanged(int axis, QString equation)
 	if (!Collection::objectValid(currentCollection, "collection in TransformWindow::transformEquationChanged()")) return false;
 
 	currentCollection->setTransformEquation(axis, equation);
+	QPalette redText = ui.TransformXCheck->palette();
+	redText.setColor(QPalette::Text, Qt::red);
+	ui.TransformXEquationEdit->setPalette(currentCollection->transformEquationValid(0) ? ui.TransformXCheck->palette() : redText);
+	ui.TransformYEquationEdit->setPalette(currentCollection->transformEquationValid(1) ? ui.TransformXCheck->palette() : redText);
+	ui.TransformZEquationEdit->setPalette(currentCollection->transformEquationValid(2) ? ui.TransformXCheck->palette() : redText);
 
-	// Update GUI
+	// Update main display only
 	UChromaSession::setAsModified();
-	uChroma_.updateGUI();
+	uChroma_.updateDisplay();
 
 	return true;
 }

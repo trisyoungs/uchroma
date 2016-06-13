@@ -22,7 +22,7 @@
 #ifndef UCHROMA_VERSION_H
 #define UCHROMA_VERSION_H
 
-#define UCHROMAVERSION "0.2.1"
+#define UCHROMAVERSION "0.2.2"
 #define UCHROMAURL "http://www.projectaten.net/uchroma"
 
 #endif
