@@ -24,18 +24,6 @@ include(FindBISON)
 include(FindFTGL)
 include(FindGLEXT)
 
-# Find required packages for this project
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Gui REQUIRED)
-find_package(BISON REQUIRED)
-find_package(OpenGL REQUIRED)
-find_package(FTGL REQUIRED)
-find_package(Freetype REQUIRED)
-find_package(GLEXT REQUIRED)
-find_package(HDF5 REQUIRED)
-find_package(ZLIB REQUIRED)
-
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -49,6 +37,9 @@ CMAKE_POLICY(SET CMP0020 NEW)
 # -- Windows
 if(WIN32)
   set (target_name uChroma)
+ 
+  # Request C++11 Standard Support (Required for Qt 5.7)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
   # Adjust external include directories
   include_directories(
@@ -57,9 +48,11 @@ if(WIN32)
     ${GLEXT_INCLUDE_DIRS}
   )
 
-   # Setup HDF5
-  SET(HDF5_LIBS "-LC:/src/hdf5-1.8.10-patch1/bin -lhdf5 -L${SZIP_DIR}/bin -lszip" CACHE STRING "Link-time commands to use HDF5 (Windows only)")
-
+  # HDF5
+  set(HDF5_DIR "C:/Users/axr61803/src/hdf5_build")
+  set(HDF5_INCLUDE_DIRS "C:/Users/axr61803/src/hdf5-1.8.14/src")
+  set(HDF5_LIBS "-LC:/Users/axr61803/src/hdf5_build/bin -lhdf5 -L${SZIP_DIR}/bin -lszip" CACHE STRING "Link-time commands to use HDF5 (Windows only)")
+	
   # Add global NOMINMAX define for Windows systems, and inhibit console creation
   ADD_DEFINITIONS("-DNOMINMAX")
   SET(GUI_TYPE WIN32)
@@ -81,6 +74,18 @@ if(APPLE)
   # Find OpenGL and GLUT
   find_package(GLUT REQUIRED)
 endif(APPLE)
+
+# Find required packages for this project
+find_package(Qt5Widgets REQUIRED)
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Gui REQUIRED)
+find_package(BISON REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(FTGL REQUIRED)
+find_package(Freetype REQUIRED)
+find_package(GLEXT REQUIRED)
+find_package(HDF5 REQUIRED)
+find_package(ZLIB REQUIRED)
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
