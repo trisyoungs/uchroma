@@ -69,9 +69,14 @@ endif(UNIX)
 # -- OSX
 if(APPLE)
   set (target_name uchroma)
+
   set(CMAKE_OSX_ARCHITECTURES "x86_64")
   ADD_DEFINITIONS(-D_MAC)
-  # Find OpenGL and GLUT
+
+  # Set some specific C++11 related options here (set_property below does not seem to persist)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++11 ")
+
+  # Find GLUT
   find_package(GLUT REQUIRED)
 endif(APPLE)
 
@@ -105,10 +110,14 @@ endif(APPLE)
 # Process CMakeLists in subdirs
 add_subdirectory(${SRCS})
 
+# Tag executable target
 add_executable(${target_name}
   MACOSX_BUNDLE
   ${SRCS}/main.cpp 
 )
+
+# Request C++11 Standard Support (Required for Qt 5.7)
+set_property(TARGET ${target_name} PROPERTY CXX_STANDARD 11)
 
 # Set project-local include directories for target
 target_include_directories(${target_name} PRIVATE
