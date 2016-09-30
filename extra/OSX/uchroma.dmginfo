@@ -31,10 +31,6 @@ APP_DSSTORE="NONE"
 
 # -- USE_QT : Set to TRUE if this is a Qt app, and macdeployqt should be used
 USE_QT="TRUE"
-#QT_DIR=/Developer/Applications/Qt
-#QT_FRAMEWORKS_DIR=/Library/Frameworks
-QT_DIR=/usr/local/qt-4.8.4
-QT_FRAMEWORKS_DIR=/usr/local/qt-4.8.4/lib
 QT_NO_DYLIBS="TRUE"
 QT_EXTRA_FRAMEWORKS="QtSvg QtXml"
 QT_EXTRA_IMAGEFORMATS="libqsvg.dylib"
