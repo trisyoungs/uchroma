@@ -62,5 +62,5 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/uchroma/
 
 %changelog
-* Sun Aug 23 2015 Tristan Youngs <tris@projectaten.net> 
+* Sun Aug 23 2015 Tristan Youngs <tristan.youngs@stfc.ac.uk> 
 - initial version.
