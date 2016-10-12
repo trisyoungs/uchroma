@@ -23,7 +23,7 @@ build-stamp:
 	./autogen.sh
 
 	# Configure the build
-	./configure --with-qtmoc="moc" --with-qtuic="uic" --with-qtrcc="rcc"
+	export CXXFLAGS="-I/usr/include/hdf5/serial"; ./configure --with-qtmoc="moc" --with-qtuic="uic" --with-qtrcc="rcc" --with-hdf-lib=hdf5_serial
 	
 	# Make the binary
 	$(MAKE)
