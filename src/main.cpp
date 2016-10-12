@@ -119,12 +119,12 @@ int main(int argc, char *argv[])
 	/* Update main window */
 	mainWindow.updateGUI();
 
-	// Load font 
-	if (!FontInstance::setup(UChromaSession::viewerFontFileName())) QMessageBox::warning(0, "Font Error", "Failed to setup font '" + UChromaSession::viewerFontFileName() + "'.");
-
 	/* Show the main window */
 	mainWindow.show();
 
+	/* Load font - must do this after the main window is shown on some systems (e.g. OSX) */
+	if (!FontInstance::setup(UChromaSession::viewerFontFileName())) QMessageBox::warning(0, "Font Error", "Failed to setup font '" + UChromaSession::viewerFontFileName() + "'.");
+	
 	/* Enter Qt's main events loop */
 	return app.exec();
 }
