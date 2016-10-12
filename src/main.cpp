@@ -21,6 +21,8 @@
 
 #include "version.h"
 #include "gui/uchroma.h"
+#include "render/fontinstance.h"
+#include <QMessageBox>
 
 int main(int argc, char *argv[])
 {	
@@ -116,6 +118,9 @@ int main(int argc, char *argv[])
 
 	/* Update main window */
 	mainWindow.updateGUI();
+
+	// Load font 
+	if (!FontInstance::setup(UChromaSession::viewerFontFileName())) QMessageBox::warning(0, "Font Error", "Failed to setup font '" + UChromaSession::viewerFontFileName() + "'.");
 
 	/* Show the main window */
 	mainWindow.show();
